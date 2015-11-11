@@ -1,0 +1,15 @@
+- name: Install packages
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+
+      # Python Dev
+      - python-dev
+      - python-setuptools
+      - python-virtualenv
+
+- name: Setup Virtualenv
+  pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}/requirements/common.txt
+
+- name: Django migrate
+  django_manage: command=migrate app_path={{ application_path }}/app virtualenv={{ virtualenv_path }}

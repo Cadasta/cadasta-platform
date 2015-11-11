@@ -1,0 +1,3 @@
+postgresql_version: "9.4"
+postgis_version: "2.1"
+postgis_package_version: "2.1.*.pgdg14.04+1"
