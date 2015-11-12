@@ -4,7 +4,8 @@
   with_items:
 
       # Python Dev
-      - python-dev
+      - python3
+      - python3-dev
       - python-setuptools
       - python-virtualenv
       - nginx
@@ -19,7 +20,10 @@
   notify:
     - restart nginx
 
-- name: Setup Virtualenv
+- name: Manually create the initial virtualenv
+  command: virtualenv {{ virtualenv_path }} -p python3 creates="{{ virtualenv_path }}"
+
+- name: Install requirements
   pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}/requirements/common.txt
 
 - name: Django migrate
