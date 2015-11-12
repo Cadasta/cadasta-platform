@@ -4,3 +4,5 @@ db_password: sdjgh34iutwefhfgbqkj3
 
 application_path: /vagrant
 virtualenv_path: /vagrant/env
+
+server_name: precise64

@@ -7,6 +7,17 @@
       - python-dev
       - python-setuptools
       - python-virtualenv
+      - nginx
+
+- name: write precise64 to sites-available
+  action: template src=precise64.j2 dest=/etc/nginx/sites-available/{{ server_name }}
+  sudo: True
+
+- name: enable site precise64
+  action: file src=/etc/nginx/sites-available/{{ server_name }} dest=/etc/nginx/sites-enabled/{{ server_name }} state=link
+  sudo: True
+  notify:
+    - restart nginx
 
 - name: Setup Virtualenv
   pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}/requirements/common.txt
