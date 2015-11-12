@@ -8,7 +8,7 @@ Install:
 - [Vagrant](https://www.vagrantup.com/)
 - [Ansible](http://www.ansible.com/)
 
-Clone the [repository](#).
+Clone the [repository](https://github.com/cadasta/cadasta-platform).
 
 Provision the VM:
 
