@@ -1,0 +1,2 @@
+- name: Install requirements
+  pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}/requirements/dev.txt

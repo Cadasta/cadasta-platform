@@ -9,3 +9,5 @@ include/
 lib/
 local/
 *.pyc
+.cache
+__pycache__/

@@ -1,5 +1,13 @@
 - hosts: all
+  vars:
+    db_name: django_app
+    db_user: django
+    db_password: sdjgh34iutwefhfgbqkj3
+    application_path: /vagrant
+    virtualenv_path: /vagrant/env
+    server_name: precise64
   roles:
-      - dev_local
       - db
       - webserver
+      - cadasta_dev
+      - cadasta_app

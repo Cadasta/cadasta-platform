@@ -2,8 +2,6 @@
   sudo: yes
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
-
-      # Python Dev
       - python3
       - python3-dev
       - python-setuptools
@@ -22,9 +20,3 @@
 
 - name: Manually create the initial virtualenv
   command: virtualenv {{ virtualenv_path }} -p python3 creates="{{ virtualenv_path }}"
-
-- name: Install requirements
-  pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}/requirements/common.txt
-
-- name: Django migrate
-  django_manage: command=migrate app_path={{ application_path }}/app virtualenv={{ virtualenv_path }}
