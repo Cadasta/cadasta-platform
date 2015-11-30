@@ -13,3 +13,5 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
+
+ALLOWED_HOSTS = [*]
