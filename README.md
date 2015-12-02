@@ -1,5 +1,7 @@
 # cadasta-platform
 
+[![Build Status](https://travis-ci.com/Cadasta/cadasta-platform.svg?token=3Gq6szrnpvs9ousfkQxj&](https://travis-ci.com/Cadasta/cadasta-platform)
+
 ## Install for development
 
 Install:

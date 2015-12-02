@@ -1,0 +1,12 @@
+---
+sudo: required
+language: python
+python:
+  - "2.7"
+before_install:
+  - sudo pip install ansible==1.9.4
+before_script:
+  - ansible-playbook -vvv -i 'localhost ansible_connection=local,' provision/travis.yml --sudo
+  - source env/bin/activate
+script:
+  - py.test cadasta

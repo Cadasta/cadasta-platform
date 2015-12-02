@@ -3,11 +3,12 @@
     db_name: django_app
     db_user: django
     db_password: sdjgh34iutwefhfgbqkj3
-    application_path: /vagrant
-    virtualenv_path: /vagrant/env
+    application_path: /vagrant/
+    virtualenv_path: /vagrant/env/
     server_name: precise64
   roles:
+      - common
       - db
       - webserver
-      - cadasta_dev
       - cadasta_app
+      - cadasta_dev

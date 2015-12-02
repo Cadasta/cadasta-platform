@@ -16,11 +16,6 @@
       - libpq-dev # Required for Ansible to interact with postgres
       - python-psycopg2 # Required for Ansible to interact with postgres
 
-      # Python Dev
-      - python-dev
-      - python-setuptools
-      - python-virtualenv
-
 - name: Allow password authentication for local socket users
   sudo: yes
   copy: src=pg_hba.conf dest=/etc/postgresql/9.4/main/pg_hba.conf force=yes
