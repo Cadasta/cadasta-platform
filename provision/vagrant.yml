@@ -7,7 +7,6 @@
     virtualenv_path: /vagrant/env/
     server_name: precise64
   roles:
-      - common
       - db
       - webserver
       - cadasta_app
