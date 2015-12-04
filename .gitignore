@@ -11,3 +11,7 @@ local/
 *.pyc
 .cache
 __pycache__/
+
+# Coverage
+.coverage
+htmlcov

@@ -28,3 +28,19 @@ python app/manage.py runserver
 ```
 
 Open `http://localhost:5000/` in your browser, you should see a default Django page.
+
+## Run tests
+
+From the repository's root run:
+
+```
+py.test cadasta
+```
+
+To get coverage reports run:
+
+```
+py.test cadasta --cov=cadasta  --cov-report=html
+```
+
+This creates a HTML report under `htmlcov`. See [pytest-cov docs](http://pytest-cov.readthedocs.org/en/latest/readme.html#reporting) for other report formats.
