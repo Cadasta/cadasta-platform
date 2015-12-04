@@ -13,6 +13,6 @@ before_script:
   - psql template1 postgres -c 'create extension hstore;'
   - psql -c 'create database cadasta;' -U postgres
   - psql -U postgres -d cadasta -c "create extension postgis;"
-  - python cadasta/manage.py migrate
+  - python cadasta/manage.py migrate --settings=config.settings.travis
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
