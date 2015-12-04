@@ -1,12 +1,18 @@
 ---
-sudo: required
 language: python
 python:
-  - "2.7"
-before_install:
-  - sudo pip install ansible==1.9.4
+  - "3.4"
+services:
+  - postgresql
+addons:
+  postgresql: "9.4"
+install:
+  - pip install -r requirements/common.txt
+  - pip install -r requirements/dev.txt
 before_script:
-  - ansible-playbook -vvv -i 'localhost ansible_connection=local,' provision/travis.yml --sudo
-  - source env/bin/activate
+  - psql template1 postgres -c 'create extension hstore;'
+  - psql -c 'create database cadasta;' -U postgres
+  - psql -U postgres -d cadasta -c "create extension postgis;"
+  - python cadasta/manage.py migrate
 script:
-  - py.test cadasta
+  - py.test cadasta --cov=cadasta --ds=config.settings.travis
