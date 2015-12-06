@@ -1,2 +1,2 @@
-git+git://github.com/dcramer/django-devserver.git#egg=django-devserver
 pytest-django
+pytest-cov

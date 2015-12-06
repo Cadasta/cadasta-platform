@@ -1,5 +1,15 @@
+- name: Install packages
+  sudo: yes
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+      - python3-dev
+      - python-virtualenv
+
+- name: Manually create the initial virtualenv
+  command: virtualenv {{ virtualenv_path }} --python=python3 creates="{{ virtualenv_path }}"
+
 - name: Install requirements
-  pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}/requirements/common.txt
+  pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}requirements/common.txt
 
 - name: Django migrate
-  django_manage: command=migrate app_path={{ application_path }}/cadasta virtualenv={{ virtualenv_path }}
+  django_manage: command=migrate app_path={{ application_path }}cadasta virtualenv={{ virtualenv_path }}

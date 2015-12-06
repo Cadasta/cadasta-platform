@@ -1,0 +1,5 @@
+[run]
+omit =
+    cadasta/*/tests/*
+    cadasta/config/*
+    cadasta/manage.py
