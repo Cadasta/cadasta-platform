@@ -1,0 +1,2 @@
+class EmailNotVerifiedError(BaseException):
+    pass

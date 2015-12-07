@@ -24,6 +24,7 @@ SECRET_KEY = '@=fy$)xx+6yjo*us@&+m6$14@l-s6#atg(msm=9%)9@%b7l%h('
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'accounts.User'
 
 # Application definition
 
@@ -33,6 +34,12 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
+
+    'accounts',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -45,6 +52,22 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+}
+
+DJOSER = {
+    'DOMAIN': 'cadasta.org',
+    'SITE_NAME': 'Cadasta',
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+}
 
 ROOT_URLCONF = 'config.urls'
 
