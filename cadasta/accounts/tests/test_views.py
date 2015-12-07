@@ -4,11 +4,59 @@ from django.test import TestCase
 from django.core import mail
 from django.contrib.auth.tokens import default_token_generator
 
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 from djoser.utils import encode_uid
 
 from ..models import User
-from ..views import AccountRegister, AccountLogin, AccountVerify
+from ..views import AccountUser, AccountRegister, AccountLogin, AccountVerify
+
+
+class AccountUserTest(TestCase):
+    def test_update_email_address(self):
+        """Service should send a verification email when the user updates their
+           email."""
+        user = User.objects.create(**{
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'first_name': 'John',
+            'last_name': 'Lennon',
+        })
+
+        data = {
+            'email': 'boss@beatles.uk',
+            'username': 'imagine71',
+            'first_name': 'John',
+            'last_name': 'Lennon',
+        }
+
+        request = APIRequestFactory().put('/account/', data)
+        force_authenticate(request, user=user)
+        response = AccountUser.as_view()(request).render()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_keep_email_address(self):
+        """Service should not send a verification email when the user does not
+           their email."""
+        user = User.objects.create(**{
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'first_name': 'John',
+            'last_name': 'Lennon',
+        })
+
+        data = {
+            'email': 'john@beatles.uk',
+            'username': 'imagine71',
+            'first_name': 'John',
+            'last_name': 'Lennon',
+        }
+
+        request = APIRequestFactory().put('/account/', data)
+        force_authenticate(request, user=user)
+        response = AccountUser.as_view()(request).render()
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(mail.outbox), 0)
 
 
 class AccountSignupTest(TestCase):

@@ -16,6 +16,26 @@ from .serializers import RegistrationSerializer, AccountLoginSerializer
 from .exceptions import EmailNotVerifiedError
 
 
+class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
+    token_generator = default_token_generator
+    subject_template_name = 'activation_email_subject.txt'
+    plain_body_template_name = 'activation_email_body.txt'
+
+    def get_email_context(self, user):
+        context = super(AccountUser, self).get_email_context(user)
+        context['url'] = settings.get('ACTIVATION_URL').format(**context)
+        return context
+
+    def perform_update(self, serializer):
+        old_obj = self.get_object()
+        new_data_dict = serializer.validated_data
+
+        if old_obj.email != new_data_dict['email']:
+            self.send_email(**self.get_send_email_kwargs(self.request.user))
+
+        serializer.save()
+
+
 class AccountRegister(djoser_views.RegistrationView):
     serializer_class = RegistrationSerializer
 

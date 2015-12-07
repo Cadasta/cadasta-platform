@@ -4,6 +4,12 @@ from .. import views
 
 
 class UserUrlsTest(TestCase):
+    def test_account_user(self):
+        self.assertEqual(reverse('accounts:user'), '/account/')
+
+        resolved = resolve('/account/')
+        self.assertEqual(resolved.func.__name__, views.AccountUser.__name__)
+
     def test_account_register(self):
         self.assertEqual(reverse('accounts:register'), '/account/register/')
 
