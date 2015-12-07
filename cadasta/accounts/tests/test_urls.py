@@ -15,3 +15,9 @@ class UserUrlsTest(TestCase):
 
         resolved = resolve('/account/login/')
         self.assertEqual(resolved.func.__name__, views.AccountLogin.__name__)
+
+    def test_account_activate(self):
+        self.assertEqual(reverse('accounts:verify'), '/account/verify/')
+
+        resolved = resolve('/account/verify/')
+        self.assertEqual(resolved.func.__name__, views.AccountVerify.__name__)

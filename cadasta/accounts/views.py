@@ -3,10 +3,13 @@ from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from djoser import views as djoser_views
 from djoser import utils as djoser_utils
+from djoser import serializers as djoser_serializers
 from djoser import settings
 
 from .serializers import RegistrationSerializer, AccountLoginSerializer
@@ -44,3 +47,15 @@ class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
                 data={'detail': _("The email has not been verified.")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class AccountVerify(djoser_utils.ActionViewMixin, GenericAPIView):
+    serializer_class = djoser_serializers.UidAndTokenSerializer
+    permission_classes = (AllowAny, )
+    token_generator = default_token_generator
+
+    def action(self, serializer):
+        serializer.user.email_verified = True
+        serializer.user.is_active = True
+        serializer.user.save()
+        return Response(status=status.HTTP_200_OK)

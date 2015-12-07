@@ -2,11 +2,13 @@ from datetime import datetime
 
 from django.test import TestCase
 from django.core import mail
+from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework.test import APIRequestFactory
+from djoser.utils import encode_uid
 
 from ..models import User
-from ..views import AccountRegister, AccountLogin
+from ..views import AccountRegister, AccountLogin, AccountVerify
 
 
 class AccountSignupTest(TestCase):
@@ -85,3 +87,25 @@ class AccountLoginTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertNotIn('auth_token', response.content.decode("utf-8"))
         self.assertEqual(len(mail.outbox), 1)
+
+
+class AccountVerifyTest(TestCase):
+    def test_activate_account(self):
+        user = User(**{
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'first_name': 'John',
+            'last_name': 'Lennon',
+        })
+        user.set_password('iloveyoko79')
+        user.save()
+
+        request = APIRequestFactory().post('/account/activate/', {
+            'uid': encode_uid(user.pk),
+            'token': default_token_generator.make_token(user)
+        })
+        response = AccountVerify.as_view()(request).render()
+        self.assertEqual(response.status_code, 200)
+
+        user.refresh_from_db()
+        self.assertTrue(user.email_verified)
