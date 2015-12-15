@@ -15,3 +15,7 @@ __pycache__/
 # Coverage
 .coverage
 htmlcov
+
+# JS
+dist/
+node_modules/
