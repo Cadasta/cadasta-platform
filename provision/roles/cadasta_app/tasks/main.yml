@@ -13,3 +13,7 @@
 
 - name: Django migrate
   django_manage: command=migrate app_path={{ application_path }}cadasta virtualenv={{ virtualenv_path }}
+
+- name: write settings.js
+  action: template src=settings.j2 dest={{ application_path }}/app/src/settings.js
+  sudo: True

@@ -9,7 +9,7 @@ import * as accountActions from '../../actions/account';
 export class Home extends React.Component {
   render() {
     if (this.props.user.get('auth_token')) {
-      return <Dashboard /> 
+      return <Dashboard accountLogout={this.props.accountLogout} /> 
     } else {
       return <SplashPage accountLogin={this.props.accountLogin} />
     }
