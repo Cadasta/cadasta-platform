@@ -4,7 +4,10 @@ import { applyMiddleware } from 'redux'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
+import Storage from '../utils/Storage';
+
 import SETTINGS from '../../src/settings';
+import history from '../../src/history';
 import * as accountActions from '../../src/actions/account';
 
 
@@ -79,6 +82,9 @@ describe('Actions: account', () => {
   });
 
   it ('creates POST_LOGOUT_DONE when logout was succesful', (done) => {
+    window.localStorage = new Storage();
+    window.localStorage.setItem('auth_token', '8937hds8yh8hsd')
+
     const response = { };
 
     nock(SETTINGS.API_BASE)
@@ -92,5 +98,55 @@ describe('Actions: account', () => {
 
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountLogout({}))
+  });
+
+  it ('creates POST_REGISTER_START', () => {
+    const action = accountActions.postRegisterStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_REGISTER_START
+    })
+  });
+
+  it ('creates POST_REGISTER_DONE', () => {
+    const response = {}
+    const action = accountActions.postRegisterDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_REGISTER_DONE,
+      response
+    })
+  });
+
+  it ('creates POST_REGISTER_DONE when registration was succesful', (done) => {
+    const userCredentials = {
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon',
+      password: '123456',
+      password_repeat: '123456',
+    }
+    
+    const response = { 
+        username: 'John',
+        email: 'john@beatles.uk',
+        first_name: 'John',
+        last_name: 'Lennon',
+      };
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/register/', userCredentials)
+      .reply(201, response)
+
+    const expectedActions = [
+      { type: accountActions.POST_REGISTER_START },
+      { type: accountActions.POST_REGISTER_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountRegister(userCredentials))
+
+    done();
   });
 });

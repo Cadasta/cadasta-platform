@@ -25,6 +25,12 @@ export default function rootReducer(state = INITIAL_STATE, action) {
       var user = state.get('user').delete('auth_token');
       return state.merge({ user });
 
+    case 'POST_REGISTER_DONE':
+      var user = state.get('user').merge(Map(action.response));
+
+      return state.merge({ user });
+
+
     case 'MESSAGE_DISMISS':
       let messages = state.get('messages').filter(obj => obj.get('id') !== action.messageId);
 

@@ -2,15 +2,17 @@ import React from 'react/addons';
 import TestUtils from 'react-addons-test-utils';
 import { expect } from 'chai';
 
-import SplashPage from '../../../src/components/home/SplashPage';
+import { Login } from '../../../src/components/Account/Login';
 
 
-describe('SplashPage', () => {
+describe('Login', () => {
   it('invokes callback when the login form is submitted', () => {
     let user;
-    const accountLogin = (credentials) => user = credentials;
+    const accountLogin = (credentials) => {
+      user = credentials
+    };
 
-    const component = TestUtils.renderIntoDocument(<SplashPage accountLogin={accountLogin} />);
+    const component = TestUtils.renderIntoDocument(<Login accountLogin={accountLogin} />);
 
     var username = component.refs.username;
     username.value = "John";
@@ -20,8 +22,8 @@ describe('SplashPage', () => {
     password.value = "123456";
     TestUtils.Simulate.change(password);
 
-    const buttons = TestUtils.scryRenderedDOMComponentsWithTag(component, 'button');
-    TestUtils.Simulate.click(buttons[0]);
+    const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
+    TestUtils.Simulate.submit(forms[0]);
 
     expect(user).to.deep.equal({
       "username": "John",

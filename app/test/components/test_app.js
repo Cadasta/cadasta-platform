@@ -21,7 +21,11 @@ describe("App", () => {
       }
     ]);
 
-    const wrapper = shallow(<App messages={messages} />);
+    const user = fromJS({
+      auth_token: '89usadih8sdhf'
+    })
+
+    const wrapper = shallow(<App user={user} messages={messages} />);
     expect(wrapper.find(Message)).to.have.length(2);
   });
 });

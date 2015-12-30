@@ -51,4 +51,30 @@ describe('reducer', () => {
 
     expect(window.localStorage.getItem('auth_token')).to.be.null;
   });
+
+  it('handles POST_REGISTER_DONE', () => {
+    const state = fromJS({ user: { } });
+
+    const action = {
+      type: 'POST_REGISTER_DONE',
+      response: {
+        email: "john@beatles.uk",
+        email_verified: false,
+        first_name: "John",
+        last_name: "Lennon",
+        username: "john"
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: {
+        email: "john@beatles.uk",
+        email_verified: false,
+        first_name: "John",
+        last_name: "Lennon",
+        username: "john"
+      }
+    }));
+  });
 });

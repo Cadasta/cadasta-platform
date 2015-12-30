@@ -1,31 +1,53 @@
-import { Map } from 'immutable';
-
+import TestUtils from 'react-addons-test-utils';
 import React from 'react/addons';
 import { expect } from 'chai';
-import { shallow } from 'enzyme';
 
 import { Home } from '../../../src/components/home';
-import SplashPage from '../../../src/components/home/SplashPage';
-import Dashboard from '../../../src/components/home/Dashboard';
 
 
 describe('Home', () => {
-  it('renders the login form when no user object is provided', () => {
-    const userObj = Map({ });
-    const wrapper = shallow(<Home user={userObj} />);
-    expect(wrapper.find(SplashPage)).to.have.length(1);
-  });
+  it('invokes callback when the register form is submitted', () => {
+    let user;
+    const accountRegister = (credentials) => {
+      user = credentials
+    };
 
-  it('renders the Dashboard when a user object is provided', () => {
-    const userObj = Map({
-      username: "john",
-      email: "john@beatles.uk",
-      first_name: "John",
-      last_name: "Lennon",
-      auth_token: "idsf89dsf8"
+    const component = TestUtils.renderIntoDocument(<Home accountRegister={accountRegister} />);
+
+    var username = component.refs.username;
+    username.value = "John";
+    TestUtils.Simulate.change(username);
+
+    var email = component.refs.email;
+    email.value = "john@beatles.uk";
+    TestUtils.Simulate.change(email);
+
+    var password = component.refs.password;
+    password.value = "123456";
+    TestUtils.Simulate.change(password);
+
+    var password_repeat = component.refs.password_repeat;
+    password_repeat.value = "123456";
+    TestUtils.Simulate.change(password_repeat);
+
+    var first_name = component.refs.first_name;
+    first_name.value = "John";
+    TestUtils.Simulate.change(first_name);
+
+    var last_name = component.refs.last_name;
+    last_name.value = "Lennon";
+    TestUtils.Simulate.change(last_name);
+
+    const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
+    TestUtils.Simulate.submit(forms[0]);
+
+    expect(user).to.deep.equal({
+      "username": "John",
+      "password": "123456",
+      "password_repeat": "123456",
+      "email": "john@beatles.uk",
+      "first_name": "John",
+      "last_name": "Lennon"
     });
-
-    const wrapper = shallow(<Home user={userObj} />);
-    expect(wrapper.find(Dashboard)).to.have.length(1);
   });
 });
