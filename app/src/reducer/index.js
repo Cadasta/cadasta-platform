@@ -26,6 +26,8 @@ export default function rootReducer(state = INITIAL_STATE, action) {
       return state.merge({ user });
 
     case 'POST_REGISTER_DONE':
+    case 'POST_UPDATEPROFILE_DONE':
+    case 'GET_USERINFO_DONE':
       var user = state.get('user').merge(Map(action.response));
 
       return state.merge({ user });

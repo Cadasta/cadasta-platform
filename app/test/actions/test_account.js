@@ -15,6 +15,11 @@ const middlewares = [ thunk ]
 const mockStore = configureMockStore(middlewares)
 
 describe('Actions: account', () => {
+  beforeEach(() => {
+    window.localStorage = new Storage();
+    window.localStorage.setItem('auth_token', 's8yc8shch98s');
+  });
+
   it ('creates POST_LOGIN_START', () => {
     const action = accountActions.postLoginStart();
 
@@ -54,9 +59,15 @@ describe('Actions: account', () => {
       .post('/account/login/', userCredentials)
       .reply(200, response)
 
+    nock(SETTINGS.API_BASE)
+      .get('/account/me/')
+      .reply(200, response)
+
     const expectedActions = [
       { type: accountActions.POST_LOGIN_START },
-      { type: accountActions.POST_LOGIN_DONE, response }
+      { type: accountActions.POST_LOGIN_DONE, response },
+      { type: accountActions.GET_USERINFO_START },
+      { type: accountActions.GET_USERINFO_DONE, response }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -132,7 +143,7 @@ describe('Actions: account', () => {
         username: 'John',
         email: 'john@beatles.uk',
         first_name: 'John',
-        last_name: 'Lennon',
+        last_name: 'Lennon'
       };
 
     nock(SETTINGS.API_BASE)
@@ -148,5 +159,100 @@ describe('Actions: account', () => {
     store.dispatch(accountActions.accountRegister(userCredentials))
 
     done();
+  });
+
+  it ('creates GET_USERINFO_START', () => {
+    const action = accountActions.getUserInfoStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.GET_USERINFO_START
+    })
+  });
+
+  it ('creates GET_USERINFO_DONE', () => {
+    const response = {
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon'
+    }
+    const action = accountActions.getUserInfoDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.GET_USERINFO_DONE,
+      response
+    })
+  });
+
+  it ('creates GET_USERINFO_DONE when profile update was succesful', (done) => {
+    const response = {
+        username: 'John',
+        email: 'john@beatles.uk',
+        first_name: 'John',
+        last_name: 'Lennon'
+      };
+
+    nock(SETTINGS.API_BASE)
+      .get('/account/me/')
+      .reply(200, response)
+
+    const expectedActions = [
+      { type: accountActions.GET_USERINFO_START },
+      { type: accountActions.GET_USERINFO_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountGetUserInfo());
+  });
+
+  it ('creates POST_UPDATEPROFILE_START', () => {
+    const action = accountActions.postUpdateProfileStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_UPDATEPROFILE_START
+    })
+  });
+
+  it ('creates POST_UPDATEPROFILE_DONE', () => {
+    const response = {
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon'
+    }
+    const action = accountActions.postUpdateProfileDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_UPDATEPROFILE_DONE,
+      response
+    })
+  });
+
+  it ('creates POST_UPDATEPROFILE_DONE when profile update was succesful', (done) => {
+    const userCredentials = {
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon',
+    }
+    
+    const response = {
+        username: 'John',
+        email: 'john@beatles.uk',
+        first_name: 'John',
+        last_name: 'Lennon'
+      };
+
+    nock(SETTINGS.API_BASE)
+      .put('/account/me/', userCredentials)
+      .reply(200, response)
+
+    const expectedActions = [
+      { type: accountActions.POST_UPDATEPROFILE_START },
+      { type: accountActions.POST_UPDATEPROFILE_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountUpdateProfile(userCredentials));
   });
 });

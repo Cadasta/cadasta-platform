@@ -77,4 +77,57 @@ describe('reducer', () => {
       }
     }));
   });
+
+  it('handles POST_UPDATEPROFILE_DONE', () => {
+    const state = fromJS({ user: {
+      email: "john@beatles.uk",
+        first_name: "John",
+        last_name: "Lennon",
+        username: "john"
+      }});
+
+    const action = {
+      type: 'POST_UPDATEPROFILE_DONE',
+      response: {
+        email: "paul@beatles.uk",
+        first_name: "paul",
+        last_name: "McCartney",
+        username: "Paul"
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: {
+        email: "paul@beatles.uk",
+        first_name: "paul",
+        last_name: "McCartney",
+        username: "Paul"
+      }
+    }));
+  });
+
+  it('handles GET_USERINFO_DONE', () => {
+    const state = fromJS({ user: {} });
+
+    const action = {
+      type: 'GET_USERINFO_DONE',
+      response: {
+        email: "paul@beatles.uk",
+        first_name: "paul",
+        last_name: "McCartney",
+        username: "Paul"
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: {
+        email: "paul@beatles.uk",
+        first_name: "paul",
+        last_name: "McCartney",
+        username: "Paul"
+      }
+    }));
+  });
 });

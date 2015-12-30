@@ -12,6 +12,12 @@ export const POST_LOGOUT_DONE  = 'POST_LOGOUT_DONE';
 export const POST_REGISTER_START = 'POST_REGISTER_START';
 export const POST_REGISTER_DONE  = 'POST_REGISTER_DONE';
 
+export const POST_UPDATEPROFILE_START = 'POST_UPDATEPROFILE_START';
+export const POST_UPDATEPROFILE_DONE  = 'POST_UPDATEPROFILE_DONE';
+
+export const GET_USERINFO_START = 'GET_USERINFO_START';
+export const GET_USERINFO_DONE  = 'GET_USERINFO_DONE';
+
 
 export function postLoginStart() {
   return {
@@ -39,7 +45,10 @@ export function accountLogin(userCredentials) {
       body: JSON.stringify(userCredentials)
     })
       .then(response => response.json())
-      .then(json => dispatch(postLoginDone(json)));
+      .then(json => {
+        dispatch(postLoginDone(json));
+        dispatch(accountGetUserInfo());
+      });
   }
 }
 
@@ -111,5 +120,68 @@ export function accountRegister(userCredentials) {
       .then(json => {
         dispatch(postRegisterDone(json));
       });
+  }
+}
+
+export function getUserInfoStart() {
+  return {
+    type: GET_USERINFO_START
+  }
+}
+
+export function getUserInfoDone(response) {
+  return {
+    type: GET_USERINFO_DONE,
+    response
+  }
+}
+
+export function accountGetUserInfo() {
+  return dispatch => {
+    dispatch(getUserInfoStart());
+
+
+    console.log(window.localStorage.getItem('auth_token'))
+    return fetch(SETTINGS.API_BASE + '/account/me/', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
+      }
+    })
+      .then(response => response.json())
+      .then(json => dispatch(getUserInfoDone(json)));
+  }
+}
+
+export function postUpdateProfileStart() {
+  return {
+    type: POST_UPDATEPROFILE_START
+  }
+}
+
+export function postUpdateProfileDone(response) {
+  return {
+    type: POST_UPDATEPROFILE_DONE,
+    response
+  }
+}
+
+export function accountUpdateProfile(userCredentials) {
+  return dispatch => {
+    dispatch(postUpdateProfileStart());
+
+    return fetch(SETTINGS.API_BASE + '/account/me/', {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
+      },
+      body: JSON.stringify(userCredentials)
+    })
+      .then(response => response.json())
+      .then(json => dispatch(postUpdateProfileDone(json)));
   }
 }

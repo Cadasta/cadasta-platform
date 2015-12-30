@@ -7,7 +7,7 @@ const Header = React.createClass({
     if (this.props.user.get('auth_token')) {
       return (
         <ul>
-          <li><a href="/account/profile/">Profile</a></li>
+          <li><Link to="/account/profile/">Profile</Link></li>
           <li><Link to={ "/account/logout/" }>Logout</Link></li>
         </ul>
       )
