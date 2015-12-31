@@ -5,14 +5,21 @@ import * as accountActions from '../../actions/account';
 
 
 export const Profile = React.createClass({
-  getInitialState: function() {
-    const user = this.props.user;
+  getStateFromProps: function(props) {
     return {
-      username: user.get('username'),
-      email: user.get('email'),
-      first_name: user.get('first_name'),
-      last_name: user.get('last_name')
+      username: props.user.get('username'),
+      email: props.user.get('email'),
+      first_name: props.user.get('first_name'),
+      last_name: props.user.get('last_name')
     };
+  },
+
+  getInitialState: function() {
+    return this.getStateFromProps(this.props);
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    this.setState(this.getStateFromProps(nextProps));
   },
 
   handleValueChange(e) {

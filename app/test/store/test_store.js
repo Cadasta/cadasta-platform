@@ -1,13 +1,12 @@
 import {Map, fromJS} from 'immutable';
 import {expect} from 'chai';
 
-import makeStore from '../../src/store';
+import store from '../../src/store';
 import { INITIAL_STATE } from '../../src/reducer'
 
 describe('store', () => {
 
   it('is a Redux store configured with the correct reducer', () => {
-    const store = makeStore();
     expect(store.getState()).to.equal(INITIAL_STATE);
 
     store.dispatch({

@@ -12,6 +12,7 @@ export default function rootReducer(state = INITIAL_STATE, action) {
 
     case 'POST_LOGIN_DONE':
       var user = state.get('user');
+
       if (action.response.auth_token) {
         user = user.merge( Map({ auth_token: action.response.auth_token }) );
         window.localStorage.setItem('auth_token', action.response.auth_token);
@@ -29,8 +30,9 @@ export default function rootReducer(state = INITIAL_STATE, action) {
     case 'POST_UPDATEPROFILE_DONE':
     case 'GET_USERINFO_DONE':
       var user = state.get('user').merge(Map(action.response));
+      var newState = state.merge({ user });
 
-      return state.merge({ user });
+      return newState;
 
 
     case 'MESSAGE_DISMISS':

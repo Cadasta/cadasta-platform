@@ -7,10 +7,19 @@ import * as accountActions from '../../actions/account';
 export const Login = React.createClass({
   handleFormSubmit: function(e) {
     e.preventDefault();
-    this.props.accountLogin({
+
+    let userCredentials = {
       username: this.refs.username.value,
-      password: this.refs.password.value
-    });
+      password: this.refs.password.value,
+    }
+
+    if (this.props.location && 
+        this.props.location.state && 
+        this.props.location.state.nextPathname) {
+      userCredentials.redirectTo = this.props.location.state.nextPathname;
+    }
+
+    this.props.accountLogin(userCredentials);
   },
 
   render: function() {

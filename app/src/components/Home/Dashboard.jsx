@@ -1,8 +1,8 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-import SplashPage from './SplashPage'
 
-export default const Dashboard = React.createClassextends({
+export const Dashboard = React.createClass({
   render: function() {
     return (
       <div>
@@ -10,4 +10,12 @@ export default const Dashboard = React.createClassextends({
       </div>
     )
   }
-})
+});
+
+function mapStateToProps(state) {
+  return {};
+}
+
+export const DashboardContainer = connect(
+  mapStateToProps
+)(Dashboard);

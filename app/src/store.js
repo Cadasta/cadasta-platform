@@ -3,8 +3,11 @@ import thunk from 'redux-thunk';
 import rootReducer from './reducer';
 
 
-export default function makeStore() {
-  let createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+let store;
 
-  return createStoreWithMiddleware(rootReducer);
+if (!store) {
+  let createStoreWithMiddleware = applyMiddleware(thunk)(createStore);
+  store = createStoreWithMiddleware(rootReducer);
 }
+
+export default store;

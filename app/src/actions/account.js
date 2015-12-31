@@ -48,6 +48,12 @@ export function accountLogin(userCredentials) {
       .then(json => {
         dispatch(postLoginDone(json));
         dispatch(accountGetUserInfo());
+
+        if (userCredentials.redirectTo) {
+          history.replaceState(null, userCredentials.redirectTo);
+        } else {
+          history.replaceState(null, '/dashboard/');  
+        }
       });
   }
 }
@@ -140,8 +146,6 @@ export function accountGetUserInfo() {
   return dispatch => {
     dispatch(getUserInfoStart());
 
-
-    console.log(window.localStorage.getItem('auth_token'))
     return fetch(SETTINGS.API_BASE + '/account/me/', {
       method: 'GET',
       headers: {
