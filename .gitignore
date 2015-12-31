@@ -17,5 +17,5 @@ __pycache__/
 htmlcov
 
 # JS
-dist/
+*/dist/bundle.js
 node_modules/
