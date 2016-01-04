@@ -20,6 +20,12 @@ describe('Actions: account', () => {
     window.localStorage.setItem('auth_token', 's8yc8shch98s');
   });
 
+  /* ********************************************************
+   *
+   * Login
+   *
+   * ********************************************************/
+
   it ('creates POST_LOGIN_START', () => {
     const action = accountActions.postLoginStart();
 
@@ -74,6 +80,13 @@ describe('Actions: account', () => {
     store.dispatch(accountActions.accountLogin(userCredentials))
   });
 
+
+  /* ********************************************************
+   *
+   * Logout
+   *
+   * ********************************************************/
+
   it ('creates POST_LOGOUT_START', () => {
     const action = accountActions.postLogoutStart();
 
@@ -119,6 +132,13 @@ describe('Actions: account', () => {
     })
   });
 
+
+  /* ********************************************************
+   *
+   * Register
+   *
+   * ********************************************************/
+
   it ('creates POST_REGISTER_DONE', () => {
     const response = {}
     const action = accountActions.postRegisterDone(response);
@@ -160,6 +180,13 @@ describe('Actions: account', () => {
 
     done();
   });
+
+
+  /* ********************************************************
+   *
+   * Get user info
+   *
+   * ********************************************************/
 
   it ('creates GET_USERINFO_START', () => {
     const action = accountActions.getUserInfoStart();
@@ -204,6 +231,13 @@ describe('Actions: account', () => {
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountGetUserInfo());
   });
+
+
+  /* ********************************************************
+   *
+   * Update profile
+   *
+   * ********************************************************/
 
   it ('creates POST_UPDATEPROFILE_START', () => {
     const action = accountActions.postUpdateProfileStart();
@@ -254,5 +288,53 @@ describe('Actions: account', () => {
 
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountUpdateProfile(userCredentials));
+  });
+
+
+  /* ********************************************************
+   *
+   * Change password
+   *
+   * ********************************************************/
+
+  it ('creates POST_CHANGEPASSWORD_START', () => {
+    const action = accountActions.postChangePasswordStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_CHANGEPASSWORD_START
+    })
+  });
+
+  it ('creates POST_CHANGEPASSWORD_DONE', () => {
+    const response = {}
+
+    const action = accountActions.postChangePasswordDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_CHANGEPASSWORD_DONE,
+      response
+    })
+  });
+
+  it ('creates POST_CHANGEPASSWORD_DONE when profile update was succesful', (done) => {
+    const passwords = {
+      new_password: "123456",
+      re_new_password: "123456",
+      current_password: "78910"
+    }
+    
+    const response = {};
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/password/', passwords)
+      .reply(200, response)
+
+    const expectedActions = [
+      { type: accountActions.POST_CHANGEPASSWORD_START },
+      { type: accountActions.POST_CHANGEPASSWORD_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountChangePassword(passwords));
   });
 });

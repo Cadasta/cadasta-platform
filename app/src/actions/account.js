@@ -18,6 +18,16 @@ export const POST_UPDATEPROFILE_DONE  = 'POST_UPDATEPROFILE_DONE';
 export const GET_USERINFO_START = 'GET_USERINFO_START';
 export const GET_USERINFO_DONE  = 'GET_USERINFO_DONE';
 
+export const POST_CHANGEPASSWORD_START = 'GET_CHANGEPASSWORD_START';
+export const POST_CHANGEPASSWORD_DONE  = 'GET_CHANGEPASSWORD_DONE';
+
+
+/* ********************************************************
+ *
+ * Login
+ *
+ * ********************************************************/
+
 
 export function postLoginStart() {
   return {
@@ -58,6 +68,12 @@ export function accountLogin(userCredentials) {
   }
 }
 
+/* ********************************************************
+ *
+ * Logout
+ *
+ * ********************************************************/
+
 export function postLogoutStart() {
   return {
     type: POST_LOGOUT_START
@@ -90,6 +106,12 @@ export function accountLogout() {
       .then(json => dispatch(postLogoutDone(json)));
   } 
 }
+
+/* ********************************************************
+ *
+ * Register user
+ *
+ * ********************************************************/
 
 export function postRegisterStart() {
   return {
@@ -129,6 +151,12 @@ export function accountRegister(userCredentials) {
   }
 }
 
+/* ********************************************************
+ *
+ * Get user information
+ *
+ * ********************************************************/
+
 export function getUserInfoStart() {
   return {
     type: GET_USERINFO_START
@@ -159,6 +187,12 @@ export function accountGetUserInfo() {
   }
 }
 
+/* ********************************************************
+ *
+ * Update profile
+ *
+ * ********************************************************/
+
 export function postUpdateProfileStart() {
   return {
     type: POST_UPDATEPROFILE_START
@@ -187,5 +221,45 @@ export function accountUpdateProfile(userCredentials) {
     })
       .then(response => response.json())
       .then(json => dispatch(postUpdateProfileDone(json)));
+  }
+}
+
+
+/* ********************************************************
+ *
+ * Change password
+ *
+ * ********************************************************/
+
+export function postChangePasswordStart() {
+  return {
+    type: POST_CHANGEPASSWORD_START
+  }
+}
+
+export function postChangePasswordDone(response) {
+  return {
+    type: POST_CHANGEPASSWORD_DONE,
+    response
+  }
+}
+
+export function accountChangePassword(passwords) {
+  return dispatch => {
+    dispatch(postChangePasswordStart());
+
+    return fetch(SETTINGS.API_BASE + '/account/password/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
+      },
+      body: JSON.stringify(passwords)
+    })
+      .then(response => {
+        if (response.status === 200) return {};
+      })
+      .then(json => dispatch(postChangePasswordDone(json)));
   }
 }

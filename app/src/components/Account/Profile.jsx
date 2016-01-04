@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
 import * as accountActions from '../../actions/account';
 
@@ -38,21 +39,28 @@ export const Profile = React.createClass({
 
   render: function() {
     return (
-      <form className="profile-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">Username</label>
-        <input name="username" ref="username" value={this.state.username} onChange={this.handleValueChange} />
+      <div>
+        <form className="profile-form" onSubmit={this.handleFormSubmit}>
+          <label htmlFor="username">Username</label>
+          <input name="username" ref="username" value={this.state.username} onChange={this.handleValueChange} />
 
-        <label htmlFor="email">Email</label>
-        <input name="email" ref="email" type="email" value={this.state.email} onChange={this.handleValueChange} />
+          <label htmlFor="email">Email</label>
+          <input name="email" ref="email" type="email" value={this.state.email} onChange={this.handleValueChange} />
 
-        <label htmlFor="first_name">First name</label>
-        <input name="first_name" ref="first_name" value={this.state.first_name} onChange={this.handleValueChange} />
+          <label htmlFor="first_name">First name</label>
+          <input name="first_name" ref="first_name" value={this.state.first_name} onChange={this.handleValueChange} />
 
-        <label htmlFor="last_name">Last name</label>
-        <input name="last_name" ref="last_name"  value={this.state.last_name} onChange={this.handleValueChange} />
+          <label htmlFor="last_name">Last name</label>
+          <input name="last_name" ref="last_name"  value={this.state.last_name} onChange={this.handleValueChange} />
 
-        <button type="submit">Update profile</button>
-      </form>
+          <button type="submit">Update profile</button>
+        </form>
+
+        <div>
+          <Link to="/account/password/">Change password</Link>
+        </div>
+      </div>
+      
     )
   }
 });
