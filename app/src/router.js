@@ -12,6 +12,7 @@ import { ProfileContainer } from './components/Account/Profile';
 import { PasswordContainer } from './components/Account/Password';
 import { PasswordResetContainer } from './components/Account/PasswordReset';
 import { PasswordResetConfirmContainer } from './components/Account/PasswordResetConfirm';
+import { ActivateContainer } from './components/Account/Activate';
 import { DashboardContainer } from './components/Home/Dashboard';
 
 
@@ -55,10 +56,11 @@ const router = <Router history={ history }>
     <IndexRoute component={ HomeContainer } onEnter={ checkAuth } />
     <Route path="/account/login/" component={ LoginContainer } />
     <Route path="/account/logout/" component={ LogoutContainer } />
-    <Route path="/account/profile/" component={ ProfileContainer }  onEnter={ requireAuth } />
-    <Route path="/account/password/" component={ PasswordContainer }  onEnter={ requireAuth } />
-    <Route path="/account/password/reset/" component={ PasswordResetConfirmContainer }  onEnter={ requireAuth } />
-    <Route path="/account/password/reset/confirm/:uid/:token/" component={ PasswordResetConfirmContainer }  onEnter={ requireAuth } />
+    <Route path="/account/profile/" component={ ProfileContainer } onEnter={ requireAuth } />
+    <Route path="/account/password/" component={ PasswordContainer } onEnter={ requireAuth } />
+    <Route path="/account/password/reset/" component={ PasswordResetConfirmContainer } onEnter={ requireAuth } />
+    <Route path="/account/password/reset/confirm/:uid/:token/" component={ PasswordResetConfirmContainer } onEnter={ requireAuth } />
+    <Route path="/account/activate/:uid/:token/" component={ ActivateContainer } />
     <Route path="/dashboard/" component={ DashboardContainer } onEnter={ requireAuth } />
   </Route>
 </Router>;

@@ -27,6 +27,9 @@ export const POST_RESETPASSWORD_DONE  = 'GET_RESETPASSWORD_DONE';
 export const POST_RESETCONFIRMPASSWORD_START = 'GET_RESETCONFIRMPASSWORD_START';
 export const POST_RESETCONFIRMPASSWORD_DONE  = 'GET_RESETCONFIRMPASSWORD_DONE';
 
+export const POST_ACTIVATE_START = 'GET_ACTIVATE_START';
+export const POST_ACTIVATE_DONE  = 'GET_ACTIVATE_DONE';
+
 
 /* ********************************************************
  *
@@ -347,3 +350,45 @@ export function accountResetConfirmPassword(password) {
       .then(json => dispatch(postResetConfirmPasswordDone(json)));
   }
 }
+
+/* ********************************************************
+ *
+ * Activate account
+ *
+ * ********************************************************/
+
+ export function postActivateStart() {
+  return {
+    type: POST_ACTIVATE_START
+  }
+}
+
+export function postActivateDone(response) {
+  return {
+    type: POST_ACTIVATE_DONE,
+    response
+  }
+}
+
+export function accountActivate(data) {
+  return dispatch => {
+    dispatch(postActivateStart());
+
+    return fetch(SETTINGS.API_BASE + '/account/activate/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    })
+      .then(response => {
+        if (response.status === 200) {
+          history.replaceState(null, '/account/login/');
+          return {};
+        };
+      })
+      .then(json => dispatch(postActivateDone(json)));
+  }
+}
+

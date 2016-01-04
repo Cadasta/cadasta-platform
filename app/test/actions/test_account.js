@@ -389,7 +389,7 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-   it ('creates POST_RESETCONFIRMPASSWORD_START', () => {
+  it ('creates POST_RESETCONFIRMPASSWORD_START', () => {
     const action = accountActions.postResetConfirmPasswordStart();
 
     expect(action).to.deep.equal({
@@ -429,5 +429,52 @@ describe('Actions: account', () => {
 
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountResetConfirmPassword(user));
+  });
+
+  /* ********************************************************
+   *
+   * Activate account
+   *
+   * ********************************************************/
+
+  it ('creates POST_ACTIVATE_START', () => {
+    const action = accountActions.postActivateStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_ACTIVATE_START
+    })
+  });
+
+  it ('creates POST_ACTIVATE_DONE', () => {
+    const response = {}
+
+    const action = accountActions.postActivateDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_ACTIVATE_DONE,
+      response
+    })
+  });
+
+  it ('creates POST_ACTIVATE_DONE when password reset was succesful', (done) => {
+    const data = {
+      uid: 'MQ',
+      token: '489-963055ee7742ad6c4440',
+    }
+    
+    const response = {};
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/activate/', data)
+      .reply(200, response)
+
+    const expectedActions = [
+      { type: accountActions.POST_ACTIVATE_START },
+      { type: accountActions.POST_ACTIVATE_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountActivate(data));
+    done();
   });
 });
