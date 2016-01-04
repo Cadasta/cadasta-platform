@@ -1,6 +1,4 @@
-import fetch from 'isomorphic-fetch';
-
-import SETTINGS from '../settings';
+import Request from '../request';
 import history from '../history';
 
 export const POST_LOGIN_START = 'POST_LOGIN_START';
@@ -55,16 +53,10 @@ export function accountLogin(userCredentials) {
   return dispatch => {
     dispatch(postLoginStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/login/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(userCredentials)
-    })
-      .then(response => response.json())
-      .then(json => {
+    return Request.post(
+      '/account/login/',
+      (json => {
+        console.log(json)
         dispatch(postLoginDone(json));
         dispatch(accountGetUserInfo());
 
@@ -73,7 +65,10 @@ export function accountLogin(userCredentials) {
         } else {
           history.replaceState(null, '/dashboard/');  
         }
-      });
+      }),
+      userCredentials,
+      false
+    )
   }
 }
 
@@ -100,19 +95,10 @@ export function accountLogout() {
   return dispatch => {
     dispatch(postLogoutStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/logout/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + window.localStorage.auth_token
-      },
-      body: JSON.stringify({})
-    })
-      .then(response => {
-        if (response.status === 200) return {};
-      })
-      .then(json => dispatch(postLogoutDone(json)));
+    return Request.post(
+      '/account/logout/',
+      (json => dispatch(postLogoutDone(json)))
+    )
   } 
 }
 
@@ -139,24 +125,15 @@ export function accountRegister(userCredentials) {
   return dispatch => {
     dispatch(postRegisterStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/register/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(userCredentials)
-    })
-      .then(response => {
-        if (response.status === 201) {
-          history.replaceState(null, '/account/login/');
-        }
-
-        return response.json();
-      })
-      .then(json => {
+    return Request.post(
+      '/account/register/',
+      (json => {
+        history.replaceState(null, '/account/login/');
         dispatch(postRegisterDone(json));
-      });
+      }),
+      userCredentials,
+      false
+    )
   }
 }
 
@@ -183,16 +160,10 @@ export function accountGetUserInfo() {
   return dispatch => {
     dispatch(getUserInfoStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/me/', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
-      }
-    })
-      .then(response => response.json())
-      .then(json => dispatch(getUserInfoDone(json)));
+    return Request.get(
+      '/account/me/',
+      (json => dispatch(getUserInfoDone(json)))
+    )
   }
 }
 
@@ -219,17 +190,11 @@ export function accountUpdateProfile(userCredentials) {
   return dispatch => {
     dispatch(postUpdateProfileStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/me/', {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
-      },
-      body: JSON.stringify(userCredentials)
-    })
-      .then(response => response.json())
-      .then(json => dispatch(postUpdateProfileDone(json)));
+    return Request.put(
+      '/account/me/',
+      (json => dispatch(postUpdateProfileDone(json))),
+      userCredentials
+    )
   }
 }
 
@@ -257,19 +222,11 @@ export function accountChangePassword(passwords) {
   return dispatch => {
     dispatch(postChangePasswordStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/password/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
-      },
-      body: JSON.stringify(passwords)
-    })
-      .then(response => {
-        if (response.status === 200) return {};
-      })
-      .then(json => dispatch(postChangePasswordDone(json)));
+    return Request.post(
+      '/account/password/',
+      (json => dispatch(postChangePasswordDone(json))),
+      passwords
+    )
   }
 }
 
@@ -292,23 +249,15 @@ export function postResetPasswordDone(response) {
   }
 }
 
-export function accountResetPassword(user) {
+export function accountResetPassword(tokens) {
   return dispatch => {
     dispatch(postResetPasswordStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/password/reset/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
-      },
-      body: JSON.stringify(user)
-    })
-      .then(response => {
-        if (response.status === 200) return {};
-      })
-      .then(json => dispatch(postResetPasswordDone(json)));
+    return Request.post(
+      '/account/password/reset/',
+      (json => dispatch(postResetPasswordDone(json))),
+      tokens
+    )
   }
 }
 
@@ -335,19 +284,11 @@ export function accountResetConfirmPassword(password) {
   return dispatch => {
     dispatch(postResetConfirmPasswordStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/password/reset/confirm/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
-      },
-      body: JSON.stringify(password)
-    })
-      .then(response => {
-        if (response.status === 200) return {};
-      })
-      .then(json => dispatch(postResetConfirmPasswordDone(json)));
+    return Request.post(
+      '/account/password/reset/confirm/',
+      (json => dispatch(postResetConfirmPasswordDone(json))),
+      password
+    )
   }
 }
 
@@ -374,21 +315,13 @@ export function accountActivate(data) {
   return dispatch => {
     dispatch(postActivateStart());
 
-    return fetch(SETTINGS.API_BASE + '/account/activate/', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    })
-      .then(response => {
-        if (response.status === 200) {
-          history.replaceState(null, '/account/login/');
-          return {};
-        };
-      })
-      .then(json => dispatch(postActivateDone(json)));
+    return Request.post(
+      '/account/activate/',
+      (json => {
+        history.replaceState(null, '/account/login/');
+        dispatch(postActivateDone(json));
+      }),
+      data
+    )
   }
 }
-

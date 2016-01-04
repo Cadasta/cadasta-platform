@@ -456,7 +456,7 @@ describe('Actions: account', () => {
     })
   });
 
-  it ('creates POST_ACTIVATE_DONE when password reset was succesful', (done) => {
+  it ('creates POST_ACTIVATE_DONE when account activation was succesful', (done) => {
     const data = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
