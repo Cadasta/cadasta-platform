@@ -20,6 +20,10 @@ INSTALLED_APPS = (
     # 'devserver',
 ) + INSTALLED_APPS
 
+DJOSER.update({
+    'DOMAIN': 'localhost:8080',
+})
+
 # devserver settings
 DEVSERVER_AUTO_PROFILE = False  # use decorated functions
 DEVSERVER_TRUNCATE_SQL = True  # squash verbose output, show from/where

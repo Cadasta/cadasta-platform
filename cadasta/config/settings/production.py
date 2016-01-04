@@ -13,3 +13,7 @@ DATABASES = {
         'HOST': 'localhost',
     }
 }
+
+DJOSER.update({
+    'DOMAIN': 'cadasta.org',
+})

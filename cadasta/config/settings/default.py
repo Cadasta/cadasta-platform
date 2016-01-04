@@ -61,16 +61,6 @@ REST_FRAMEWORK = {
     ),
 }
 
-DJOSER = {
-    'DOMAIN': 'cadasta.org',
-    'SITE_NAME': 'Cadasta',
-    'SET_PASSWORD_RETYPE': True,
-    'PASSWORD_RESET_CONFIRM_RETYPE': True,
-    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
-    'ACTIVATION_URL': '#/activate/{uid}/{token}',
-    'SEND_ACTIVATION_EMAIL': True,
-}
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -88,6 +78,15 @@ TEMPLATES = [
         },
     },
 ]
+
+DJOSER = {
+    'SITE_NAME': 'Cadasta',
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'account/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+}
 
 CORS_ORIGIN_ALLOW_ALL = False
 
