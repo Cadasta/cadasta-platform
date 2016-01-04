@@ -10,6 +10,8 @@ import { LoginContainer } from './components/Account/Login';
 import { LogoutContainer } from './components/Account/Logout';
 import { ProfileContainer } from './components/Account/Profile';
 import { PasswordContainer } from './components/Account/Password';
+import { PasswordResetContainer } from './components/Account/PasswordReset';
+import { PasswordResetConfirmContainer } from './components/Account/PasswordResetConfirm';
 import { DashboardContainer } from './components/Home/Dashboard';
 
 
@@ -55,6 +57,8 @@ const router = <Router history={ history }>
     <Route path="/account/logout/" component={ LogoutContainer } />
     <Route path="/account/profile/" component={ ProfileContainer }  onEnter={ requireAuth } />
     <Route path="/account/password/" component={ PasswordContainer }  onEnter={ requireAuth } />
+    <Route path="/account/password/reset/" component={ PasswordResetConfirmContainer }  onEnter={ requireAuth } />
+    <Route path="/account/password/reset/confirm/:uid/:token/" component={ PasswordResetConfirmContainer }  onEnter={ requireAuth } />
     <Route path="/dashboard/" component={ DashboardContainer } onEnter={ requireAuth } />
   </Route>
 </Router>;

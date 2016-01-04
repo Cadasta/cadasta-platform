@@ -337,4 +337,97 @@ describe('Actions: account', () => {
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountChangePassword(passwords));
   });
+
+  /* ********************************************************
+   *
+   * Reset password
+   *
+   * ********************************************************/
+
+  it ('creates POST_RESETPASSWORD_START', () => {
+    const action = accountActions.postResetPasswordStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_RESETPASSWORD_START
+    })
+  });
+
+  it ('creates POST_RESETPASSWORD_DONE', () => {
+    const response = {}
+
+    const action = accountActions.postResetPasswordDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_RESETPASSWORD_DONE,
+      response
+    })
+  });
+
+  it ('creates POST_RESETPASSWORD_DONE when password change was succesful', (done) => {
+    const user = {
+      email: 'john@beatles.uk'
+    }
+    
+    const response = {};
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/password/reset/', user)
+      .reply(200, response)
+
+    const expectedActions = [
+      { type: accountActions.POST_RESETPASSWORD_START },
+      { type: accountActions.POST_RESETPASSWORD_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountResetPassword(user));
+  });
+
+  /* ********************************************************
+   *
+   * Confirm reset password
+   *
+   * ********************************************************/
+
+   it ('creates POST_RESETCONFIRMPASSWORD_START', () => {
+    const action = accountActions.postResetConfirmPasswordStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_RESETCONFIRMPASSWORD_START
+    })
+  });
+
+  it ('creates POST_RESETCONFIRMPASSWORD_DONE', () => {
+    const response = {}
+
+    const action = accountActions.postResetConfirmPasswordDone(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_RESETCONFIRMPASSWORD_DONE,
+      response
+    })
+  });
+
+  it ('creates POST_RESETCONFIRMPASSWORD_DONE when password reset was succesful', (done) => {
+    const user = {
+      uid: 'MQ',
+      token: '489-963055ee7742ad6c4440',
+      new_password: '123456',
+      re_new_password: '123456'
+    }
+    
+    const response = {};
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/password/reset/confirm/', user)
+      .reply(200, response)
+
+    const expectedActions = [
+      { type: accountActions.POST_RESETCONFIRMPASSWORD_START },
+      { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountResetConfirmPassword(user));
+  });
 });

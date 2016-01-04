@@ -21,6 +21,12 @@ export const GET_USERINFO_DONE  = 'GET_USERINFO_DONE';
 export const POST_CHANGEPASSWORD_START = 'GET_CHANGEPASSWORD_START';
 export const POST_CHANGEPASSWORD_DONE  = 'GET_CHANGEPASSWORD_DONE';
 
+export const POST_RESETPASSWORD_START = 'GET_RESETPASSWORD_START';
+export const POST_RESETPASSWORD_DONE  = 'GET_RESETPASSWORD_DONE';
+
+export const POST_RESETCONFIRMPASSWORD_START = 'GET_RESETCONFIRMPASSWORD_START';
+export const POST_RESETCONFIRMPASSWORD_DONE  = 'GET_RESETCONFIRMPASSWORD_DONE';
+
 
 /* ********************************************************
  *
@@ -261,5 +267,83 @@ export function accountChangePassword(passwords) {
         if (response.status === 200) return {};
       })
       .then(json => dispatch(postChangePasswordDone(json)));
+  }
+}
+
+/* ********************************************************
+ *
+ * Reset password
+ *
+ * ********************************************************/
+
+export function postResetPasswordStart() {
+  return {
+    type: POST_RESETPASSWORD_START
+  }
+}
+
+export function postResetPasswordDone(response) {
+  return {
+    type: POST_RESETPASSWORD_DONE,
+    response
+  }
+}
+
+export function accountResetPassword(user) {
+  return dispatch => {
+    dispatch(postResetPasswordStart());
+
+    return fetch(SETTINGS.API_BASE + '/account/password/reset/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
+      },
+      body: JSON.stringify(user)
+    })
+      .then(response => {
+        if (response.status === 200) return {};
+      })
+      .then(json => dispatch(postResetPasswordDone(json)));
+  }
+}
+
+/* ********************************************************
+ *
+ * Confirm reset password
+ *
+ * ********************************************************/
+
+export function postResetConfirmPasswordStart() {
+  return {
+    type: POST_RESETCONFIRMPASSWORD_START
+  }
+}
+
+export function postResetConfirmPasswordDone(response) {
+  return {
+    type: POST_RESETCONFIRMPASSWORD_DONE,
+    response
+  }
+}
+
+export function accountResetConfirmPassword(password) {
+  return dispatch => {
+    dispatch(postResetConfirmPasswordStart());
+
+    return fetch(SETTINGS.API_BASE + '/account/password/reset/confirm/', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + window.localStorage.getItem('auth_token')
+      },
+      body: JSON.stringify(password)
+    })
+      .then(response => {
+        if (response.status === 200) return {};
+      })
+      .then(json => dispatch(postResetConfirmPasswordDone(json)));
   }
 }

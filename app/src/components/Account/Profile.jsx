@@ -58,6 +58,7 @@ export const Profile = React.createClass({
 
         <div>
           <Link to="/account/password/">Change password</Link>
+          <Link to="/account/password/reset/">Reset password</Link>
         </div>
       </div>
       
