@@ -20,7 +20,10 @@ describe('store', () => {
       user: {
         auth_token: "mskdj8sdh8shadhs"
       },
-      messages: [],
+      messages: {
+        requestsPending: 0,
+        userFeedback: []
+      },
       data: {}
     }));
   });

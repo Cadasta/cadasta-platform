@@ -9,6 +9,7 @@ import Storage from '../utils/Storage';
 import SETTINGS from '../../src/settings';
 import history from '../../src/history';
 import * as accountActions from '../../src/actions/account';
+import * as messageActions from '../../src/actions/messages';
 
 
 const middlewares = [ thunk ]
@@ -70,10 +71,14 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_LOGIN_START },
       { type: accountActions.POST_LOGIN_DONE, response },
+      { type: messageActions.REQUEST_DONE },
+      { type: messageActions.REQUEST_START },
       { type: accountActions.GET_USERINFO_START },
-      { type: accountActions.GET_USERINFO_DONE, response }
+      { type: accountActions.GET_USERINFO_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -116,20 +121,14 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_LOGOUT_START },
-      { type: accountActions.POST_LOGOUT_DONE, response }
+      { type: accountActions.POST_LOGOUT_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountLogout({}))
-  });
-
-  it ('creates POST_REGISTER_START', () => {
-    const action = accountActions.postRegisterStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_REGISTER_START
-    })
   });
 
 
@@ -138,6 +137,14 @@ describe('Actions: account', () => {
    * Register
    *
    * ********************************************************/
+
+  it ('creates POST_REGISTER_START', () => {
+    const action = accountActions.postRegisterStart();
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_REGISTER_START
+    })
+  });
 
   it ('creates POST_REGISTER_DONE', () => {
     const response = {}
@@ -171,8 +178,10 @@ describe('Actions: account', () => {
       .reply(201, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_REGISTER_START },
-      { type: accountActions.POST_REGISTER_DONE, response }
+      { type: accountActions.POST_REGISTER_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -224,8 +233,10 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.GET_USERINFO_START },
-      { type: accountActions.GET_USERINFO_DONE, response }
+      { type: accountActions.GET_USERINFO_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -282,8 +293,10 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_UPDATEPROFILE_START },
-      { type: accountActions.POST_UPDATEPROFILE_DONE, response }
+      { type: accountActions.POST_UPDATEPROFILE_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -330,8 +343,10 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_CHANGEPASSWORD_START },
-      { type: accountActions.POST_CHANGEPASSWORD_DONE, response }
+      { type: accountActions.POST_CHANGEPASSWORD_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -375,8 +390,10 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_RESETPASSWORD_START },
-      { type: accountActions.POST_RESETPASSWORD_DONE, response }
+      { type: accountActions.POST_RESETPASSWORD_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -423,8 +440,10 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_RESETCONFIRMPASSWORD_START },
-      { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response }
+      { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -469,8 +488,10 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
+      { type: messageActions.REQUEST_START },
       { type: accountActions.POST_ACTIVATE_START },
-      { type: accountActions.POST_ACTIVATE_DONE, response }
+      { type: accountActions.POST_ACTIVATE_DONE, response },
+      { type: messageActions.REQUEST_DONE }
     ]
 
     const store = mockStore({}, expectedActions, done);

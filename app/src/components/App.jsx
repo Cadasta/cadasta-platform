@@ -8,12 +8,23 @@ import Header from './Header';
 
 
 export const App = React.createClass({
+  loadingState: function () {
+    if (this.props.messages.get('requestsPending')) {
+      return (<div id="loading">Loading ...</div>);
+    }
+  },
+
   render: function() {
     return (
       <div>
         <Header user={this.props.user} />
+
+        { this.loadingState() }
+
         <div id="messages">
-          {this.props.messages.map(msg => <Message key={msg.get('id')} message={msg} />)}        
+          {this.props.messages.get('userFeedback').map(
+            msg => <Message key={msg.get('id')} message={msg} />
+          )}        
         </div>
         { this.props.children || <HomeContainer /> }
       </div>

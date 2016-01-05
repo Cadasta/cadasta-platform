@@ -1,6 +1,8 @@
 import Request from '../request';
 import history from '../history';
 
+import { requestStart, requestDone } from './messages';
+
 export const POST_LOGIN_START = 'POST_LOGIN_START';
 export const POST_LOGIN_DONE  = 'POST_LOGIN_DONE';
 
@@ -51,13 +53,14 @@ export function postLoginDone(response) {
 
 export function accountLogin(userCredentials) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postLoginStart());
 
     return Request.post(
       '/account/login/',
       (json => {
-        console.log(json)
         dispatch(postLoginDone(json));
+        dispatch(requestDone());
         dispatch(accountGetUserInfo());
 
         if (userCredentials.redirectTo) {
@@ -93,11 +96,15 @@ export function postLogoutDone(response) {
 
 export function accountLogout() {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postLogoutStart());
 
     return Request.post(
       '/account/logout/',
-      (json => dispatch(postLogoutDone(json)))
+      (json => {
+        dispatch(postLogoutDone(json));
+        dispatch(requestDone());
+      })
     )
   } 
 }
@@ -123,6 +130,7 @@ export function postRegisterDone(response) {
 
 export function accountRegister(userCredentials) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postRegisterStart());
 
     return Request.post(
@@ -130,6 +138,7 @@ export function accountRegister(userCredentials) {
       (json => {
         history.replaceState(null, '/account/login/');
         dispatch(postRegisterDone(json));
+        dispatch(requestDone());
       }),
       userCredentials,
       false
@@ -158,11 +167,15 @@ export function getUserInfoDone(response) {
 
 export function accountGetUserInfo() {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(getUserInfoStart());
 
     return Request.get(
       '/account/me/',
-      (json => dispatch(getUserInfoDone(json)))
+      (json => {
+        dispatch(getUserInfoDone(json));
+        dispatch(requestDone());
+      })
     )
   }
 }
@@ -188,11 +201,15 @@ export function postUpdateProfileDone(response) {
 
 export function accountUpdateProfile(userCredentials) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postUpdateProfileStart());
 
     return Request.put(
       '/account/me/',
-      (json => dispatch(postUpdateProfileDone(json))),
+      (json => {
+        dispatch(postUpdateProfileDone(json));
+        dispatch(requestDone());
+      }),
       userCredentials
     )
   }
@@ -220,11 +237,15 @@ export function postChangePasswordDone(response) {
 
 export function accountChangePassword(passwords) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postChangePasswordStart());
 
     return Request.post(
       '/account/password/',
-      (json => dispatch(postChangePasswordDone(json))),
+      (json => {
+        dispatch(postChangePasswordDone(json));
+        dispatch(requestDone());
+      }),
       passwords
     )
   }
@@ -251,11 +272,15 @@ export function postResetPasswordDone(response) {
 
 export function accountResetPassword(tokens) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postResetPasswordStart());
 
     return Request.post(
       '/account/password/reset/',
-      (json => dispatch(postResetPasswordDone(json))),
+      (json => {
+        dispatch(postResetPasswordDone(json));
+        dispatch(requestDone());
+      }),
       tokens
     )
   }
@@ -282,11 +307,15 @@ export function postResetConfirmPasswordDone(response) {
 
 export function accountResetConfirmPassword(password) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postResetConfirmPasswordStart());
 
     return Request.post(
       '/account/password/reset/confirm/',
-      (json => dispatch(postResetConfirmPasswordDone(json))),
+      (json => {
+        dispatch(postResetConfirmPasswordDone(json));
+        dispatch(requestDone());
+      }),
       password
     )
   }
@@ -313,6 +342,7 @@ export function postActivateDone(response) {
 
 export function accountActivate(data) {
   return dispatch => {
+    dispatch(requestStart());
     dispatch(postActivateStart());
 
     return Request.post(
@@ -320,6 +350,7 @@ export function accountActivate(data) {
       (json => {
         history.replaceState(null, '/account/login/');
         dispatch(postActivateDone(json));
+        dispatch(requestDone());
       }),
       data
     )

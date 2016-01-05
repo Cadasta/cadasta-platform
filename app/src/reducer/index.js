@@ -1,9 +1,12 @@
-import { Map, List } from 'immutable';
+import { fromJS, Map, List } from 'immutable';
 
-export const INITIAL_STATE = Map({
-  user: Map(),
-  messages: List([]),
-  data: Map()
+export const INITIAL_STATE = fromJS({
+  user: {},
+  messages: {
+    requestsPending: 0,
+    userFeedback: []
+  },
+  data: {}
 });
 
 
@@ -34,13 +37,15 @@ export default function rootReducer(state = INITIAL_STATE, action) {
 
       return newState;
 
+    case 'REQUEST_START':
+      var requestsPending = state.get('messages').get('requestsPending');
+      var messages = state.get('messages').set('requestsPending', requestsPending + 1);
+      return state.merge({messages});
 
-    case 'MESSAGE_DISMISS':
-      let messages = state.get('messages').filter(obj => obj.get('id') !== action.messageId);
-
-      return state.merge({
-        messages
-      });
+    case 'REQUEST_DONE':
+      var requestsPending = state.get('messages').get('requestsPending');
+      var messages = state.get('messages').set('requestsPending', requestsPending - 1);
+      return state.merge({messages});
   }
 
   return state;
