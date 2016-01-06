@@ -18,7 +18,10 @@ describe('reducer', () => {
     const action = {
       type: 'POST_LOGIN_DONE',
       response: {
-        auth_token: "mskdj8sdh8shadhs"
+        success: true,
+        content: {
+          auth_token: "mskdj8sdh8shadhs"  
+        }
       }
     };
     const nextState = rootReducer(state, action);
@@ -41,7 +44,10 @@ describe('reducer', () => {
 
     const action = {
       type: 'POST_LOGOUT_DONE',
-      response: { }
+      response: {
+        success: true,
+        content: { }
+      }
     };
     const nextState = rootReducer(state, action);
 
@@ -58,11 +64,14 @@ describe('reducer', () => {
     const action = {
       type: 'POST_REGISTER_DONE',
       response: {
-        email: "john@beatles.uk",
-        email_verified: false,
-        first_name: "John",
-        last_name: "Lennon",
-        username: "john"
+        success: true,
+        content: {
+          email: "john@beatles.uk",
+          email_verified: false,
+          first_name: "John",
+          last_name: "Lennon",
+          username: "john"
+        }
       }
     };
     const nextState = rootReducer(state, action);
@@ -89,10 +98,13 @@ describe('reducer', () => {
     const action = {
       type: 'POST_UPDATEPROFILE_DONE',
       response: {
-        email: "paul@beatles.uk",
-        first_name: "paul",
-        last_name: "McCartney",
-        username: "Paul"
+        success: true,
+        content: {
+          email: "paul@beatles.uk",
+          first_name: "paul",
+          last_name: "McCartney",
+          username: "Paul"
+        }
       }
     };
     const nextState = rootReducer(state, action);
@@ -113,10 +125,13 @@ describe('reducer', () => {
     const action = {
       type: 'GET_USERINFO_DONE',
       response: {
-        email: "paul@beatles.uk",
-        first_name: "paul",
-        last_name: "McCartney",
-        username: "Paul"
+        success: true,
+        content: {
+          email: "paul@beatles.uk",
+          first_name: "paul",
+          last_name: "McCartney",
+          username: "Paul"
+        }
       }
     };
     const nextState = rootReducer(state, action);

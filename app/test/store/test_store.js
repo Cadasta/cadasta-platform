@@ -10,18 +10,13 @@ describe('store', () => {
     expect(store.getState()).to.equal(INITIAL_STATE);
 
     store.dispatch({
-      type: 'POST_LOGIN_DONE',
-      response: {
-        auth_token: "mskdj8sdh8shadhs"
-      }
+      type: 'REQUEST_START'
     });
 
     expect(store.getState()).to.equal(fromJS({
-      user: {
-        auth_token: "mskdj8sdh8shadhs"
-      },
+      user: {},
       messages: {
-        requestsPending: 0,
+        requestsPending: 1,
         userFeedback: []
       },
       data: {}
