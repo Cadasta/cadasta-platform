@@ -27,14 +27,6 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_LOGIN_START', () => {
-    const action = accountActions.postLoginStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_LOGIN_START
-    })
-  });
-
   it ('creates POST_LOGIN_DONE', () => {
     const response = {
       username: 'John',
@@ -77,11 +69,9 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_LOGIN_START },
       { type: accountActions.POST_LOGIN_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE },
       { type: messageActions.REQUEST_START },
-      { type: accountActions.GET_USERINFO_START },
       { type: accountActions.GET_USERINFO_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -96,14 +86,6 @@ describe('Actions: account', () => {
    * Logout
    *
    * ********************************************************/
-
-  it ('creates POST_LOGOUT_START', () => {
-    const action = accountActions.postLogoutStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_LOGOUT_START
-    })
-  });
 
   it ('creates POST_LOGOUT_DONE', () => {
     const response = {}
@@ -130,7 +112,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_LOGOUT_START },
       { type: accountActions.POST_LOGOUT_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -145,14 +126,6 @@ describe('Actions: account', () => {
    * Register
    *
    * ********************************************************/
-
-  it ('creates POST_REGISTER_START', () => {
-    const action = accountActions.postRegisterStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_REGISTER_START
-    })
-  });
 
   it ('creates POST_REGISTER_DONE', () => {
     const response = {}
@@ -192,7 +165,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_REGISTER_START },
       { type: accountActions.POST_REGISTER_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -209,14 +181,6 @@ describe('Actions: account', () => {
    * Get user info
    *
    * ********************************************************/
-
-  it ('creates GET_USERINFO_START', () => {
-    const action = accountActions.getUserInfoStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.GET_USERINFO_START
-    })
-  });
 
   it ('creates GET_USERINFO_DONE', () => {
     const response = {
@@ -252,7 +216,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.GET_USERINFO_START },
       { type: accountActions.GET_USERINFO_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -267,14 +230,6 @@ describe('Actions: account', () => {
    * Update profile
    *
    * ********************************************************/
-
-  it ('creates POST_UPDATEPROFILE_START', () => {
-    const action = accountActions.postUpdateProfileStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_UPDATEPROFILE_START
-    })
-  });
 
   it ('creates POST_UPDATEPROFILE_DONE', () => {
     const response = {
@@ -318,7 +273,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_UPDATEPROFILE_START },
       { type: accountActions.POST_UPDATEPROFILE_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -333,14 +287,6 @@ describe('Actions: account', () => {
    * Change password
    *
    * ********************************************************/
-
-  it ('creates POST_CHANGEPASSWORD_START', () => {
-    const action = accountActions.postChangePasswordStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_CHANGEPASSWORD_START
-    })
-  });
 
   it ('creates POST_CHANGEPASSWORD_DONE', () => {
     const response = {}
@@ -374,7 +320,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_CHANGEPASSWORD_START },
       { type: accountActions.POST_CHANGEPASSWORD_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -388,14 +333,6 @@ describe('Actions: account', () => {
    * Reset password
    *
    * ********************************************************/
-
-  it ('creates POST_RESETPASSWORD_START', () => {
-    const action = accountActions.postResetPasswordStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_RESETPASSWORD_START
-    })
-  });
 
   it ('creates POST_RESETPASSWORD_DONE', () => {
     const response = {}
@@ -427,7 +364,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_RESETPASSWORD_START },
       { type: accountActions.POST_RESETPASSWORD_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -441,14 +377,6 @@ describe('Actions: account', () => {
    * Confirm reset password
    *
    * ********************************************************/
-
-  it ('creates POST_RESETCONFIRMPASSWORD_START', () => {
-    const action = accountActions.postResetConfirmPasswordStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_RESETCONFIRMPASSWORD_START
-    })
-  });
 
   it ('creates POST_RESETCONFIRMPASSWORD_DONE', () => {
     const response = {}
@@ -483,7 +411,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_RESETCONFIRMPASSWORD_START },
       { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
@@ -497,14 +424,6 @@ describe('Actions: account', () => {
    * Activate account
    *
    * ********************************************************/
-
-  it ('creates POST_ACTIVATE_START', () => {
-    const action = accountActions.postActivateStart();
-
-    expect(action).to.deep.equal({
-      type: accountActions.POST_ACTIVATE_START
-    })
-  });
 
   it ('creates POST_ACTIVATE_DONE', () => {
     const response = {}
@@ -536,7 +455,6 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_ACTIVATE_START },
       { type: accountActions.POST_ACTIVATE_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]

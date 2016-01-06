@@ -3,31 +3,15 @@ import history from '../history';
 
 import { requestStart, requestDone } from './messages';
 
-export const POST_LOGIN_START = 'POST_LOGIN_START';
+
 export const POST_LOGIN_DONE  = 'POST_LOGIN_DONE';
-
-export const POST_LOGOUT_START = 'POST_LOGOUT_START';
 export const POST_LOGOUT_DONE  = 'POST_LOGOUT_DONE';
-
-export const POST_REGISTER_START = 'POST_REGISTER_START';
 export const POST_REGISTER_DONE  = 'POST_REGISTER_DONE';
-
-export const POST_UPDATEPROFILE_START = 'POST_UPDATEPROFILE_START';
 export const POST_UPDATEPROFILE_DONE  = 'POST_UPDATEPROFILE_DONE';
-
-export const GET_USERINFO_START = 'GET_USERINFO_START';
 export const GET_USERINFO_DONE  = 'GET_USERINFO_DONE';
-
-export const POST_CHANGEPASSWORD_START = 'GET_CHANGEPASSWORD_START';
 export const POST_CHANGEPASSWORD_DONE  = 'GET_CHANGEPASSWORD_DONE';
-
-export const POST_RESETPASSWORD_START = 'GET_RESETPASSWORD_START';
 export const POST_RESETPASSWORD_DONE  = 'GET_RESETPASSWORD_DONE';
-
-export const POST_RESETCONFIRMPASSWORD_START = 'GET_RESETCONFIRMPASSWORD_START';
 export const POST_RESETCONFIRMPASSWORD_DONE  = 'GET_RESETCONFIRMPASSWORD_DONE';
-
-export const POST_ACTIVATE_START = 'GET_ACTIVATE_START';
 export const POST_ACTIVATE_DONE  = 'GET_ACTIVATE_DONE';
 
 
@@ -36,13 +20,6 @@ export const POST_ACTIVATE_DONE  = 'GET_ACTIVATE_DONE';
  * Login
  *
  * ********************************************************/
-
-
-export function postLoginStart() {
-  return {
-    type: POST_LOGIN_START
-  }
-}
 
 export function postLoginDone(response) {
   return {
@@ -54,7 +31,6 @@ export function postLoginDone(response) {
 export function accountLogin(userCredentials) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postLoginStart());
 
     return Request.post(
       '/account/login/',
@@ -81,12 +57,6 @@ export function accountLogin(userCredentials) {
  *
  * ********************************************************/
 
-export function postLogoutStart() {
-  return {
-    type: POST_LOGOUT_START
-  }
-}
-
 export function postLogoutDone(response) {
   return {
     type: POST_LOGOUT_DONE,
@@ -97,7 +67,6 @@ export function postLogoutDone(response) {
 export function accountLogout() {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postLogoutStart());
 
     return Request.post(
       '/account/logout/',
@@ -115,12 +84,6 @@ export function accountLogout() {
  *
  * ********************************************************/
 
-export function postRegisterStart() {
-  return {
-    type: POST_REGISTER_START
-  }
-}
-
 export function postRegisterDone(response) {
   return {
     type: POST_REGISTER_DONE,
@@ -131,7 +94,6 @@ export function postRegisterDone(response) {
 export function accountRegister(userCredentials) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postRegisterStart());
 
     return Request.post(
       '/account/register/',
@@ -152,12 +114,6 @@ export function accountRegister(userCredentials) {
  *
  * ********************************************************/
 
-export function getUserInfoStart() {
-  return {
-    type: GET_USERINFO_START
-  }
-}
-
 export function getUserInfoDone(response) {
   return {
     type: GET_USERINFO_DONE,
@@ -168,7 +124,6 @@ export function getUserInfoDone(response) {
 export function accountGetUserInfo() {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(getUserInfoStart());
 
     return Request.get(
       '/account/me/',
@@ -186,12 +141,6 @@ export function accountGetUserInfo() {
  *
  * ********************************************************/
 
-export function postUpdateProfileStart() {
-  return {
-    type: POST_UPDATEPROFILE_START
-  }
-}
-
 export function postUpdateProfileDone(response) {
   return {
     type: POST_UPDATEPROFILE_DONE,
@@ -202,7 +151,6 @@ export function postUpdateProfileDone(response) {
 export function accountUpdateProfile(userCredentials) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postUpdateProfileStart());
 
     return Request.put(
       '/account/me/',
@@ -222,12 +170,6 @@ export function accountUpdateProfile(userCredentials) {
  *
  * ********************************************************/
 
-export function postChangePasswordStart() {
-  return {
-    type: POST_CHANGEPASSWORD_START
-  }
-}
-
 export function postChangePasswordDone(response) {
   return {
     type: POST_CHANGEPASSWORD_DONE,
@@ -238,7 +180,6 @@ export function postChangePasswordDone(response) {
 export function accountChangePassword(passwords) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postChangePasswordStart());
 
     return Request.post(
       '/account/password/',
@@ -257,12 +198,6 @@ export function accountChangePassword(passwords) {
  *
  * ********************************************************/
 
-export function postResetPasswordStart() {
-  return {
-    type: POST_RESETPASSWORD_START
-  }
-}
-
 export function postResetPasswordDone(response) {
   return {
     type: POST_RESETPASSWORD_DONE,
@@ -273,7 +208,6 @@ export function postResetPasswordDone(response) {
 export function accountResetPassword(tokens) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postResetPasswordStart());
 
     return Request.post(
       '/account/password/reset/',
@@ -292,12 +226,6 @@ export function accountResetPassword(tokens) {
  *
  * ********************************************************/
 
-export function postResetConfirmPasswordStart() {
-  return {
-    type: POST_RESETCONFIRMPASSWORD_START
-  }
-}
-
 export function postResetConfirmPasswordDone(response) {
   return {
     type: POST_RESETCONFIRMPASSWORD_DONE,
@@ -308,7 +236,6 @@ export function postResetConfirmPasswordDone(response) {
 export function accountResetConfirmPassword(password) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postResetConfirmPasswordStart());
 
     return Request.post(
       '/account/password/reset/confirm/',
@@ -327,12 +254,6 @@ export function accountResetConfirmPassword(password) {
  *
  * ********************************************************/
 
- export function postActivateStart() {
-  return {
-    type: POST_ACTIVATE_START
-  }
-}
-
 export function postActivateDone(response) {
   return {
     type: POST_ACTIVATE_DONE,
@@ -343,7 +264,6 @@ export function postActivateDone(response) {
 export function accountActivate(data) {
   return dispatch => {
     dispatch(requestStart());
-    dispatch(postActivateStart());
 
     return Request.post(
       '/account/activate/',
