@@ -62,6 +62,11 @@ describe('Actions: account', () => {
         token: '8qwihd8zds87hds78'
       };
 
+    const processedResponse = {
+      success: true,
+      content: response
+    }
+
     nock(SETTINGS.API_BASE)
       .post('/account/login/', userCredentials)
       .reply(200, response)
@@ -73,11 +78,11 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_LOGIN_START },
-      { type: accountActions.POST_LOGIN_DONE, response },
+      { type: accountActions.POST_LOGIN_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE },
       { type: messageActions.REQUEST_START },
       { type: accountActions.GET_USERINFO_START },
-      { type: accountActions.GET_USERINFO_DONE, response },
+      { type: accountActions.GET_USERINFO_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -114,16 +119,19 @@ describe('Actions: account', () => {
     window.localStorage = new Storage();
     window.localStorage.setItem('auth_token', '8937hds8yh8hsd')
 
-    const response = { };
+    const processedResponse = {
+      success: true,
+      content: {}
+    }
 
     nock(SETTINGS.API_BASE)
       .post('/account/logout/', {})
-      .reply(200, response)
+      .reply(200)
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_LOGOUT_START },
-      { type: accountActions.POST_LOGOUT_DONE, response },
+      { type: accountActions.POST_LOGOUT_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -167,11 +175,16 @@ describe('Actions: account', () => {
     }
     
     const response = { 
-        username: 'John',
-        email: 'john@beatles.uk',
-        first_name: 'John',
-        last_name: 'Lennon'
-      };
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon'
+    };
+
+    const processedResponse = {
+      success: true,
+      content: response
+    }
 
     nock(SETTINGS.API_BASE)
       .post('/account/register/', userCredentials)
@@ -180,7 +193,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_REGISTER_START },
-      { type: accountActions.POST_REGISTER_DONE, response },
+      { type: accountActions.POST_REGISTER_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -222,11 +235,16 @@ describe('Actions: account', () => {
 
   it ('creates GET_USERINFO_DONE when profile update was succesful', (done) => {
     const response = {
-        username: 'John',
-        email: 'john@beatles.uk',
-        first_name: 'John',
-        last_name: 'Lennon'
-      };
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon'
+    };
+
+    const processedResponse = {
+      success: true,
+      content: response
+    }
 
     nock(SETTINGS.API_BASE)
       .get('/account/me/')
@@ -235,7 +253,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.GET_USERINFO_START },
-      { type: accountActions.GET_USERINFO_DONE, response },
+      { type: accountActions.GET_USERINFO_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -282,11 +300,17 @@ describe('Actions: account', () => {
     }
     
     const response = {
-        username: 'John',
-        email: 'john@beatles.uk',
-        first_name: 'John',
-        last_name: 'Lennon'
-      };
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon'
+    };
+
+    const processedResponse = {
+      success: true,
+      content: response
+    }
+
 
     nock(SETTINGS.API_BASE)
       .put('/account/me/', userCredentials)
@@ -295,7 +319,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_UPDATEPROFILE_START },
-      { type: accountActions.POST_UPDATEPROFILE_DONE, response },
+      { type: accountActions.POST_UPDATEPROFILE_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -338,6 +362,12 @@ describe('Actions: account', () => {
     
     const response = {};
 
+    const processedResponse = {
+      success: true,
+      content: response
+    }
+
+
     nock(SETTINGS.API_BASE)
       .post('/account/password/', passwords)
       .reply(200, response)
@@ -345,7 +375,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_CHANGEPASSWORD_START },
-      { type: accountActions.POST_CHANGEPASSWORD_DONE, response },
+      { type: accountActions.POST_CHANGEPASSWORD_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -385,6 +415,12 @@ describe('Actions: account', () => {
     
     const response = {};
 
+    const processedResponse = {
+      success: true,
+      content: response
+    }
+
+
     nock(SETTINGS.API_BASE)
       .post('/account/password/reset/', user)
       .reply(200, response)
@@ -392,7 +428,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_RESETPASSWORD_START },
-      { type: accountActions.POST_RESETPASSWORD_DONE, response },
+      { type: accountActions.POST_RESETPASSWORD_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -435,6 +471,12 @@ describe('Actions: account', () => {
     
     const response = {};
 
+    const processedResponse = {
+      success: true,
+      content: response
+    }
+
+
     nock(SETTINGS.API_BASE)
       .post('/account/password/reset/confirm/', user)
       .reply(200, response)
@@ -442,7 +484,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_RESETCONFIRMPASSWORD_START },
-      { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response },
+      { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -483,6 +525,11 @@ describe('Actions: account', () => {
     
     const response = {};
 
+    const processedResponse = {
+      success: true,
+      content: response
+    }
+
     nock(SETTINGS.API_BASE)
       .post('/account/activate/', data)
       .reply(200, response)
@@ -490,7 +537,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_ACTIVATE_START },
-      { type: accountActions.POST_ACTIVATE_DONE, response },
+      { type: accountActions.POST_ACTIVATE_DONE, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 

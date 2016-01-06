@@ -6,17 +6,34 @@ import Request from '../src/request';
 
 describe('request', () => {
   it("sends a GET request", () => {
+    const response = { some: "Response" }
     const expectedResponse = {
-      success: true
+      success: true,
+      content: response
     }
 
     nock(SETTINGS.API_BASE)
       .get('/')
-      .reply(200, expectedResponse)
+      .reply(200, response)
 
-    let result;
+    return Request.get(
+      '/',
+      (json => expect(json).to.deep.equal(expectedResponse))
+    );
+  });
 
-    Request.get('/',
+  it("handles HTTP errors", () => {
+    const response = { some: "Error" }
+    const expectedResponse = {
+      success: false,
+      content: response
+    }
+
+    nock(SETTINGS.API_BASE)
+      .get('/')
+      .reply(400, response)
+
+    return Request.get('/',
       (json => {
         expect(json).to.deep.equal(expectedResponse)
       })
@@ -24,15 +41,16 @@ describe('request', () => {
   });
 
   it("processes an empty response", () => {
-    const expectedResponse = {}
+    const expectedResponse = {
+      success: true,
+      content: {}
+    }
 
     nock(SETTINGS.API_BASE)
       .get('/')
       .reply(200, null)
 
-    let result;
-
-    Request.get('/',
+    return Request.get('/',
       (json => {
         expect(json).to.deep.equal(expectedResponse)
       })
@@ -40,17 +58,17 @@ describe('request', () => {
   });
 
   it("sends a POST request", () => {
+    const response = { some: "Response" }
     const expectedResponse = {
-      success: true
+      success: true,
+      content: response
     }
 
     nock(SETTINGS.API_BASE)
       .post('/', {})
-      .reply(200, expectedResponse)
+      .reply(200, response)
 
-    let result;
-
-    Request.post('/',
+    return Request.post('/',
       (json => {
         expect(json).to.deep.equal(expectedResponse)
       }),
@@ -59,17 +77,17 @@ describe('request', () => {
   });
 
   it("sends a PUT request", () => {
+    const response = { some: "Response" }
     const expectedResponse = {
-      success: true
+      success: true,
+      content: response
     }
 
     nock(SETTINGS.API_BASE)
       .put('/', {})
-      .reply(200, expectedResponse)
+      .reply(200, response)
 
-    let result;
-
-    Request.put('/',
+    return Request.put('/',
       (json => {
         expect(json).to.deep.equal(expectedResponse)
       }),
@@ -78,17 +96,17 @@ describe('request', () => {
   });
 
   it("sends a PATCH request", () => {
+    const response = { some: "Response" }
     const expectedResponse = {
-      success: true
+      success: true,
+      content: response
     }
 
     nock(SETTINGS.API_BASE)
       .patch('/', {})
-      .reply(200, expectedResponse)
+      .reply(200, response)
 
-    let result;
-
-    Request.patch('/',
+    return Request.patch('/',
       (json => {
         expect(json).to.deep.equal(expectedResponse)
       }),
@@ -97,16 +115,19 @@ describe('request', () => {
   });
 
   it("sends a DELETE request", () => {
+    const expectedResponse = {
+      success: true,
+      content: {}
+    }
+
     nock(SETTINGS.API_BASE)
       .delete('/')
       .reply(204)
 
-    let result;
-
-    Request.delete('/',
+    return Request.delete('/',
       (json => {
-        expect(json).to.deep.equal({})
+        expect(json).to.deep.equal(expectedResponse)
       })
     );
   });
-})
+});
