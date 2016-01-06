@@ -10,7 +10,7 @@ describe('reducer', () => {
     window.localStorage = new Storage();
   });
 
-  it('handles POST_LOGIN_DONE', () => {
+  it('handles POST_LOGIN_DONE with successful login', () => {
     const state = Map({
       user: Map()
     });
@@ -33,6 +33,36 @@ describe('reducer', () => {
     }));
 
     expect(window.localStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
+  });
+
+  it('handles POST_LOGIN_DONE with unsuccessful login', () => {
+    const state = Map({
+      user: Map(),
+      messages: Map({
+        userFeedback: List([])
+      })
+    });
+
+    const action = {
+      type: 'POST_LOGIN_DONE',
+      response: {
+        success: false,
+        content: {
+          "non_field_errors": ["Unable to login with provided credentials."]
+        }
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: { },
+      messages: {
+        userFeedback: [{
+          type: 'error',
+          msg: "Unable to login with provided credentials."
+        }]
+      }
+    }));
   });
 
   it('handles POST_LOGOUT_DONE', () => {

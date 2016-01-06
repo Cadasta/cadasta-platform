@@ -26,7 +26,7 @@ function request(url, method, callback, body={}, authenticate=true) {
         response.json().then(error => {
           callback({
             success: false,
-            content: response
+            content: error
           })
         })
       } else {

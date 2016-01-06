@@ -1,4 +1,5 @@
 import React from 'react';
+import classNames from 'classnames';
 
 const Message = React.createClass({
   dismiss: function() {
@@ -13,9 +14,10 @@ const Message = React.createClass({
 
   render: function() {
     const message = this.props.message;
+    const messageClass = classNames('message', message.get('type'));
 
     return (
-      <div className="message { message.get('type') }">
+      <div className={ messageClass }>
         <p>{ message.get('msg') }</p>
         { this.renderDismiss() }
       </div>

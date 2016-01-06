@@ -44,6 +44,7 @@
     ]
   },
   "dependencies": {
+    "classnames": "^2.2.3",
     "es6-promise": "^3.0.2",
     "history": "@1.13.1",
     "immutable": "^3.7.5",
