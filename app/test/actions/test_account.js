@@ -27,20 +27,20 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_LOGIN_DONE', () => {
+  it ('creates POST_LOGIN_SUCCESS', () => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk'
     }
-    const action = accountActions.postLoginDone(response);
+    const action = accountActions.postLoginSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_LOGIN_DONE,
+      type: accountActions.POST_LOGIN_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_LOGIN_DONE when login was succesful', (done) => {
+  it ('creates POST_LOGIN_SUCCESS when login was succesful', (done) => {
     const userCredentials = {
       username: 'John',
       password: '123455'
@@ -69,10 +69,10 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_LOGIN_DONE, response: processedResponse },
+      { type: accountActions.POST_LOGIN_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE },
       { type: messageActions.REQUEST_START },
-      { type: accountActions.GET_USERINFO_DONE, response: processedResponse },
+      { type: accountActions.GET_USERINFO_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -87,17 +87,17 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_LOGOUT_DONE', () => {
+  it ('creates POST_LOGOUT_SUCCESS', () => {
     const response = {}
-    const action = accountActions.postLogoutDone(response);
+    const action = accountActions.postLogoutSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_LOGOUT_DONE,
+      type: accountActions.POST_LOGOUT_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_LOGOUT_DONE when logout was succesful', (done) => {
+  it ('creates POST_LOGOUT_SUCCESS when logout was succesful', (done) => {
     window.localStorage = new Storage();
     window.localStorage.setItem('auth_token', '8937hds8yh8hsd')
 
@@ -112,7 +112,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_LOGOUT_DONE, response: processedResponse },
+      { type: accountActions.POST_LOGOUT_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -127,17 +127,17 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_REGISTER_DONE', () => {
+  it ('creates POST_REGISTER_SUCCESS', () => {
     const response = {}
-    const action = accountActions.postRegisterDone(response);
+    const action = accountActions.postRegisterSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_REGISTER_DONE,
+      type: accountActions.POST_REGISTER_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_REGISTER_DONE when registration was succesful', (done) => {
+  it ('creates POST_REGISTER_SUCCESS when registration was succesful', (done) => {
     const userCredentials = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -165,7 +165,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_REGISTER_DONE, response: processedResponse },
+      { type: accountActions.POST_REGISTER_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -182,22 +182,22 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates GET_USERINFO_DONE', () => {
+  it ('creates GET_USERINFO_SUCCESS', () => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk',
       first_name: 'John',
       last_name: 'Lennon'
     }
-    const action = accountActions.getUserInfoDone(response);
+    const action = accountActions.getUserInfoSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.GET_USERINFO_DONE,
+      type: accountActions.GET_USERINFO_SUCCESS,
       response
     })
   });
 
-  it ('creates GET_USERINFO_DONE when profile update was succesful', (done) => {
+  it ('creates GET_USERINFO_SUCCESS when profile update was succesful', (done) => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -216,7 +216,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.GET_USERINFO_DONE, response: processedResponse },
+      { type: accountActions.GET_USERINFO_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -231,22 +231,22 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_UPDATEPROFILE_DONE', () => {
+  it ('creates POST_UPDATEPROFILE_SUCCESS', () => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk',
       first_name: 'John',
       last_name: 'Lennon'
     }
-    const action = accountActions.postUpdateProfileDone(response);
+    const action = accountActions.postUpdateProfileSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_UPDATEPROFILE_DONE,
+      type: accountActions.POST_UPDATEPROFILE_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_UPDATEPROFILE_DONE when profile update was succesful', (done) => {
+  it ('creates POST_UPDATEPROFILE_SUCCESS when profile update was succesful', (done) => {
     const userCredentials = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -273,7 +273,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_UPDATEPROFILE_DONE, response: processedResponse },
+      { type: accountActions.POST_UPDATEPROFILE_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -288,18 +288,18 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_CHANGEPASSWORD_DONE', () => {
+  it ('creates POST_CHANGEPASSWORD_SUCCESS', () => {
     const response = {}
 
-    const action = accountActions.postChangePasswordDone(response);
+    const action = accountActions.postChangePasswordSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_CHANGEPASSWORD_DONE,
+      type: accountActions.POST_CHANGEPASSWORD_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_CHANGEPASSWORD_DONE when profile update was succesful', (done) => {
+  it ('creates POST_CHANGEPASSWORD_SUCCESS when profile update was succesful', (done) => {
     const passwords = {
       new_password: "123456",
       re_new_password: "123456",
@@ -320,7 +320,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_CHANGEPASSWORD_DONE, response: processedResponse },
+      { type: accountActions.POST_CHANGEPASSWORD_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -334,18 +334,18 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_RESETPASSWORD_DONE', () => {
+  it ('creates POST_RESETPASSWORD_SUCCESS', () => {
     const response = {}
 
-    const action = accountActions.postResetPasswordDone(response);
+    const action = accountActions.postResetPasswordSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_RESETPASSWORD_DONE,
+      type: accountActions.POST_RESETPASSWORD_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_RESETPASSWORD_DONE when password change was succesful', (done) => {
+  it ('creates POST_RESETPASSWORD_SUCCESS when password change was succesful', (done) => {
     const user = {
       email: 'john@beatles.uk'
     }
@@ -364,7 +364,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_RESETPASSWORD_DONE, response: processedResponse },
+      { type: accountActions.POST_RESETPASSWORD_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -378,18 +378,18 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_RESETCONFIRMPASSWORD_DONE', () => {
+  it ('creates POST_RESETCONFIRMPASSWORD_SUCCESS', () => {
     const response = {}
 
-    const action = accountActions.postResetConfirmPasswordDone(response);
+    const action = accountActions.postResetConfirmPasswordSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_RESETCONFIRMPASSWORD_DONE,
+      type: accountActions.POST_RESETCONFIRMPASSWORD_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_RESETCONFIRMPASSWORD_DONE when password reset was succesful', (done) => {
+  it ('creates POST_RESETCONFIRMPASSWORD_SUCCESS when password reset was succesful', (done) => {
     const user = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
@@ -411,7 +411,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_RESETCONFIRMPASSWORD_DONE, response: processedResponse },
+      { type: accountActions.POST_RESETCONFIRMPASSWORD_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -425,18 +425,18 @@ describe('Actions: account', () => {
    *
    * ********************************************************/
 
-  it ('creates POST_ACTIVATE_DONE', () => {
+  it ('creates POST_ACTIVATE_SUCCESS', () => {
     const response = {}
 
-    const action = accountActions.postActivateDone(response);
+    const action = accountActions.postActivateSuccess(response);
 
     expect(action).to.deep.equal({
-      type: accountActions.POST_ACTIVATE_DONE,
+      type: accountActions.POST_ACTIVATE_SUCCESS,
       response
     })
   });
 
-  it ('creates POST_ACTIVATE_DONE when account activation was succesful', (done) => {
+  it ('creates POST_ACTIVATE_SUCCESS when account activation was succesful', (done) => {
     const data = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
@@ -455,7 +455,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.POST_ACTIVATE_DONE, response: processedResponse },
+      { type: accountActions.POST_ACTIVATE_SUCCESS, response: processedResponse },
       { type: messageActions.REQUEST_DONE }
     ]
 

@@ -13,7 +13,7 @@ export const INITIAL_STATE = fromJS({
 export default function rootReducer(state = INITIAL_STATE, action) {
   switch (action.type) {
 
-    case 'POST_LOGIN_DONE':
+    case 'POST_LOGIN_SUCCESS':
       var user = state.get('user');
 
       if (action.response.success) {
@@ -38,7 +38,7 @@ export default function rootReducer(state = INITIAL_STATE, action) {
 
       break;
 
-    case 'POST_LOGOUT_DONE':
+    case 'POST_LOGOUT_SUCCESS':
       if (action.response.success) {
         window.localStorage.removeItem('auth_token');
 
@@ -47,9 +47,9 @@ export default function rootReducer(state = INITIAL_STATE, action) {
       }
       break;
 
-    case 'POST_REGISTER_DONE':
-    case 'POST_UPDATEPROFILE_DONE':
-    case 'GET_USERINFO_DONE':
+    case 'POST_REGISTER_SUCCESS':
+    case 'POST_UPDATEPROFILE_SUCCESS':
+    case 'GET_USERINFO_SUCCESS':
       if (action.response.success) {
         var user = state.get('user').merge(Map(action.response.content));
         var newState = state.merge({ user });

@@ -4,15 +4,15 @@ import history from '../history';
 import { requestStart, requestDone } from './messages';
 
 
-export const POST_LOGIN_DONE  = 'POST_LOGIN_DONE';
-export const POST_LOGOUT_DONE  = 'POST_LOGOUT_DONE';
-export const POST_REGISTER_DONE  = 'POST_REGISTER_DONE';
-export const POST_UPDATEPROFILE_DONE  = 'POST_UPDATEPROFILE_DONE';
-export const GET_USERINFO_DONE  = 'GET_USERINFO_DONE';
-export const POST_CHANGEPASSWORD_DONE  = 'GET_CHANGEPASSWORD_DONE';
-export const POST_RESETPASSWORD_DONE  = 'GET_RESETPASSWORD_DONE';
-export const POST_RESETCONFIRMPASSWORD_DONE  = 'GET_RESETCONFIRMPASSWORD_DONE';
-export const POST_ACTIVATE_DONE  = 'GET_ACTIVATE_DONE';
+export const POST_LOGIN_SUCCESS  = 'POST_LOGIN_SUCCESS';
+export const POST_LOGOUT_SUCCESS  = 'POST_LOGOUT_SUCCESS';
+export const POST_REGISTER_SUCCESS  = 'POST_REGISTER_SUCCESS';
+export const POST_UPDATEPROFILE_SUCCESS  = 'POST_UPDATEPROFILE_SUCCESS';
+export const GET_USERINFO_SUCCESS  = 'GET_USERINFO_SUCCESS';
+export const POST_CHANGEPASSWORD_SUCCESS  = 'GET_CHANGEPASSWORD_SUCCESS';
+export const POST_RESETPASSWORD_SUCCESS  = 'GET_RESETPASSWORD_SUCCESS';
+export const POST_RESETCONFIRMPASSWORD_SUCCESS  = 'GET_RESETCONFIRMPASSWORD_SUCCESS';
+export const POST_ACTIVATE_SUCCESS  = 'GET_ACTIVATE_SUCCESS';
 
 
 /* ********************************************************
@@ -21,9 +21,9 @@ export const POST_ACTIVATE_DONE  = 'GET_ACTIVATE_DONE';
  *
  * ********************************************************/
 
-export function postLoginDone(response) {
+export function postLoginSuccess(response) {
   return {
-    type: POST_LOGIN_DONE,
+    type: POST_LOGIN_SUCCESS,
     response
   }
 }
@@ -35,7 +35,7 @@ export function accountLogin(userCredentials) {
     return Request.post(
       '/account/login/',
       (json => {
-        dispatch(postLoginDone(json));
+        dispatch(postLoginSuccess(json));
         dispatch(requestDone());
         dispatch(accountGetUserInfo());
 
@@ -57,9 +57,9 @@ export function accountLogin(userCredentials) {
  *
  * ********************************************************/
 
-export function postLogoutDone(response) {
+export function postLogoutSuccess(response) {
   return {
-    type: POST_LOGOUT_DONE,
+    type: POST_LOGOUT_SUCCESS,
     response
   }
 }
@@ -71,7 +71,7 @@ export function accountLogout() {
     return Request.post(
       '/account/logout/',
       (json => {
-        dispatch(postLogoutDone(json));
+        dispatch(postLogoutSuccess(json));
         dispatch(requestDone());
       })
     )
@@ -84,9 +84,9 @@ export function accountLogout() {
  *
  * ********************************************************/
 
-export function postRegisterDone(response) {
+export function postRegisterSuccess(response) {
   return {
-    type: POST_REGISTER_DONE,
+    type: POST_REGISTER_SUCCESS,
     response
   }
 }
@@ -99,7 +99,7 @@ export function accountRegister(userCredentials) {
       '/account/register/',
       (json => {
         history.replaceState(null, '/account/login/');
-        dispatch(postRegisterDone(json));
+        dispatch(postRegisterSuccess(json));
         dispatch(requestDone());
       }),
       userCredentials,
@@ -114,9 +114,9 @@ export function accountRegister(userCredentials) {
  *
  * ********************************************************/
 
-export function getUserInfoDone(response) {
+export function getUserInfoSuccess(response) {
   return {
-    type: GET_USERINFO_DONE,
+    type: GET_USERINFO_SUCCESS,
     response
   }
 }
@@ -128,7 +128,7 @@ export function accountGetUserInfo() {
     return Request.get(
       '/account/me/',
       (json => {
-        dispatch(getUserInfoDone(json));
+        dispatch(getUserInfoSuccess(json));
         dispatch(requestDone());
       })
     )
@@ -141,9 +141,9 @@ export function accountGetUserInfo() {
  *
  * ********************************************************/
 
-export function postUpdateProfileDone(response) {
+export function postUpdateProfileSuccess(response) {
   return {
-    type: POST_UPDATEPROFILE_DONE,
+    type: POST_UPDATEPROFILE_SUCCESS,
     response
   }
 }
@@ -155,7 +155,7 @@ export function accountUpdateProfile(userCredentials) {
     return Request.put(
       '/account/me/',
       (json => {
-        dispatch(postUpdateProfileDone(json));
+        dispatch(postUpdateProfileSuccess(json));
         dispatch(requestDone());
       }),
       userCredentials
@@ -170,9 +170,9 @@ export function accountUpdateProfile(userCredentials) {
  *
  * ********************************************************/
 
-export function postChangePasswordDone(response) {
+export function postChangePasswordSuccess(response) {
   return {
-    type: POST_CHANGEPASSWORD_DONE,
+    type: POST_CHANGEPASSWORD_SUCCESS,
     response
   }
 }
@@ -184,7 +184,7 @@ export function accountChangePassword(passwords) {
     return Request.post(
       '/account/password/',
       (json => {
-        dispatch(postChangePasswordDone(json));
+        dispatch(postChangePasswordSuccess(json));
         dispatch(requestDone());
       }),
       passwords
@@ -198,9 +198,9 @@ export function accountChangePassword(passwords) {
  *
  * ********************************************************/
 
-export function postResetPasswordDone(response) {
+export function postResetPasswordSuccess(response) {
   return {
-    type: POST_RESETPASSWORD_DONE,
+    type: POST_RESETPASSWORD_SUCCESS,
     response
   }
 }
@@ -212,7 +212,7 @@ export function accountResetPassword(tokens) {
     return Request.post(
       '/account/password/reset/',
       (json => {
-        dispatch(postResetPasswordDone(json));
+        dispatch(postResetPasswordSuccess(json));
         dispatch(requestDone());
       }),
       tokens
@@ -226,9 +226,9 @@ export function accountResetPassword(tokens) {
  *
  * ********************************************************/
 
-export function postResetConfirmPasswordDone(response) {
+export function postResetConfirmPasswordSuccess(response) {
   return {
-    type: POST_RESETCONFIRMPASSWORD_DONE,
+    type: POST_RESETCONFIRMPASSWORD_SUCCESS,
     response
   }
 }
@@ -240,7 +240,7 @@ export function accountResetConfirmPassword(password) {
     return Request.post(
       '/account/password/reset/confirm/',
       (json => {
-        dispatch(postResetConfirmPasswordDone(json));
+        dispatch(postResetConfirmPasswordSuccess(json));
         dispatch(requestDone());
       }),
       password
@@ -254,9 +254,9 @@ export function accountResetConfirmPassword(password) {
  *
  * ********************************************************/
 
-export function postActivateDone(response) {
+export function postActivateSuccess(response) {
   return {
-    type: POST_ACTIVATE_DONE,
+    type: POST_ACTIVATE_SUCCESS,
     response
   }
 }
@@ -269,7 +269,7 @@ export function accountActivate(data) {
       '/account/activate/',
       (json => {
         history.replaceState(null, '/account/login/');
-        dispatch(postActivateDone(json));
+        dispatch(postActivateSuccess(json));
         dispatch(requestDone());
       }),
       data

@@ -10,13 +10,13 @@ describe('reducer', () => {
     window.localStorage = new Storage();
   });
 
-  it('handles POST_LOGIN_DONE with successful login', () => {
+  it('handles POST_LOGIN_SUCCESS with successful login', () => {
     const state = Map({
       user: Map()
     });
 
     const action = {
-      type: 'POST_LOGIN_DONE',
+      type: 'POST_LOGIN_SUCCESS',
       response: {
         success: true,
         content: {
@@ -35,7 +35,7 @@ describe('reducer', () => {
     expect(window.localStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
   });
 
-  it('handles POST_LOGIN_DONE with unsuccessful login', () => {
+  it('handles POST_LOGIN_SUCCESS with unsuccessful login', () => {
     const state = Map({
       user: Map(),
       messages: Map({
@@ -44,7 +44,7 @@ describe('reducer', () => {
     });
 
     const action = {
-      type: 'POST_LOGIN_DONE',
+      type: 'POST_LOGIN_SUCCESS',
       response: {
         success: false,
         content: {
@@ -65,7 +65,7 @@ describe('reducer', () => {
     }));
   });
 
-  it('handles POST_LOGOUT_DONE', () => {
+  it('handles POST_LOGOUT_SUCCESS', () => {
     const state = fromJS({
       user: {
         auth_token: "mskdj8sdh8shadhs"
@@ -73,7 +73,7 @@ describe('reducer', () => {
     });
 
     const action = {
-      type: 'POST_LOGOUT_DONE',
+      type: 'POST_LOGOUT_SUCCESS',
       response: {
         success: true,
         content: { }
@@ -88,11 +88,11 @@ describe('reducer', () => {
     expect(window.localStorage.getItem('auth_token')).to.be.null;
   });
 
-  it('handles POST_REGISTER_DONE', () => {
+  it('handles POST_REGISTER_SUCCESS', () => {
     const state = fromJS({ user: { } });
 
     const action = {
-      type: 'POST_REGISTER_DONE',
+      type: 'POST_REGISTER_SUCCESS',
       response: {
         success: true,
         content: {
@@ -117,7 +117,7 @@ describe('reducer', () => {
     }));
   });
 
-  it('handles POST_UPDATEPROFILE_DONE', () => {
+  it('handles POST_UPDATEPROFILE_SUCCESS', () => {
     const state = fromJS({ user: {
       email: "john@beatles.uk",
         first_name: "John",
@@ -126,7 +126,7 @@ describe('reducer', () => {
       }});
 
     const action = {
-      type: 'POST_UPDATEPROFILE_DONE',
+      type: 'POST_UPDATEPROFILE_SUCCESS',
       response: {
         success: true,
         content: {
@@ -149,11 +149,11 @@ describe('reducer', () => {
     }));
   });
 
-  it('handles GET_USERINFO_DONE', () => {
+  it('handles GET_USERINFO_SUCCESS', () => {
     const state = fromJS({ user: {} });
 
     const action = {
-      type: 'GET_USERINFO_DONE',
+      type: 'GET_USERINFO_SUCCESS',
       response: {
         success: true,
         content: {
