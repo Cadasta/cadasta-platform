@@ -15,7 +15,7 @@ Clone the [repository](https://github.com/cadasta/cadasta-platform).
 Provision the VM:
 
 ```
-run vagrant up --provision
+vagrant up --provision
 ```
 
 SSH into to the VM, activate the virtualenv and run the server:
