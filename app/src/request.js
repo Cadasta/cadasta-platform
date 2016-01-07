@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-fetch';
 import { Promise } from 'es6-promise';
 
 import SETTINGS from './settings';
