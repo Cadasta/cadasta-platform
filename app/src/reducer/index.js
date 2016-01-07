@@ -16,61 +16,44 @@ export default function rootReducer(state = INITIAL_STATE, action) {
     case 'POST_LOGIN_SUCCESS':
       var user = state.get('user');
 
-      if (action.response.success) {
+      user = user.merge( Map({ auth_token: action.response.auth_token }) );
+      window.localStorage.setItem('auth_token', action.response.auth_token);
 
-        user = user.merge( Map({ auth_token: action.response.content.auth_token }) );
-        window.localStorage.setItem('auth_token', action.response.content.auth_token);
+      return state.merge({ user });
 
-        return state.merge({ user });
+    case 'POST_LOGIN_ERROR':
+      var messages = state.get('messages');
+      var userFeedback = messages.get('userFeedback').push(Map({
+        type: 'error',
+        msg: action.response.non_field_errors[0]
+      }));
+      messages = messages.set('userFeedback', userFeedback);
 
-      } else {
-
-        var messages = state.get('messages');
-        var userFeedback = messages.get('userFeedback').push(Map({
-          type: 'error',
-          msg: action.response.content.non_field_errors[0]
-        }));
-        messages = messages.set('userFeedback', userFeedback);
-
-        return state.merge({ messages })
-
-      }
-
-      break;
+      return state.merge({ messages })
 
     case 'POST_LOGOUT_SUCCESS':
-      if (action.response.success) {
-        window.localStorage.removeItem('auth_token');
+      window.localStorage.removeItem('auth_token');
 
-        var user = state.get('user').delete('auth_token');
-        return state.merge({ user });
-      }
-      break;
+      var user = state.get('user').delete('auth_token');
+      return state.merge({ user });
 
     case 'POST_REGISTER_SUCCESS':
     case 'POST_UPDATEPROFILE_SUCCESS':
     case 'GET_USERINFO_SUCCESS':
-      if (action.response.success) {
-        var user = state.get('user').merge(Map(action.response.content));
-        var newState = state.merge({ user });
+      var user = state.get('user').merge(Map(action.response));
+      var newState = state.merge({ user });
 
-        return newState;  
-      }
-      break;
+      return newState;  
 
     case 'REQUEST_START':
       var requestsPending = state.get('messages').get('requestsPending');
       var messages = state.get('messages').set('requestsPending', requestsPending + 1);
       return state.merge({messages});
 
-      break;
-
     case 'REQUEST_DONE':
       var requestsPending = state.get('messages').get('requestsPending');
       var messages = state.get('messages').set('requestsPending', requestsPending - 1);
       return state.merge({messages});
-
-      break;
   }
 
   return state;

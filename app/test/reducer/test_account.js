@@ -18,10 +18,7 @@ describe('reducer', () => {
     const action = {
       type: 'POST_LOGIN_SUCCESS',
       response: {
-        success: true,
-        content: {
-          auth_token: "mskdj8sdh8shadhs"  
-        }
+        auth_token: "mskdj8sdh8shadhs"  
       }
     };
     const nextState = rootReducer(state, action);
@@ -35,7 +32,7 @@ describe('reducer', () => {
     expect(window.localStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
   });
 
-  it('handles POST_LOGIN_SUCCESS with unsuccessful login', () => {
+  it('handles POST_LOGIN_ERROR', () => {
     const state = Map({
       user: Map(),
       messages: Map({
@@ -44,12 +41,9 @@ describe('reducer', () => {
     });
 
     const action = {
-      type: 'POST_LOGIN_SUCCESS',
+      type: 'POST_LOGIN_ERROR',
       response: {
-        success: false,
-        content: {
-          "non_field_errors": ["Unable to login with provided credentials."]
-        }
+        "non_field_errors": ["Unable to login with provided credentials."]
       }
     };
     const nextState = rootReducer(state, action);
@@ -73,11 +67,7 @@ describe('reducer', () => {
     });
 
     const action = {
-      type: 'POST_LOGOUT_SUCCESS',
-      response: {
-        success: true,
-        content: { }
-      }
+      type: 'POST_LOGOUT_SUCCESS'
     };
     const nextState = rootReducer(state, action);
 
@@ -94,14 +84,11 @@ describe('reducer', () => {
     const action = {
       type: 'POST_REGISTER_SUCCESS',
       response: {
-        success: true,
-        content: {
-          email: "john@beatles.uk",
-          email_verified: false,
-          first_name: "John",
-          last_name: "Lennon",
-          username: "john"
-        }
+        email: "john@beatles.uk",
+        email_verified: false,
+        first_name: "John",
+        last_name: "Lennon",
+        username: "john"
       }
     };
     const nextState = rootReducer(state, action);
@@ -128,13 +115,10 @@ describe('reducer', () => {
     const action = {
       type: 'POST_UPDATEPROFILE_SUCCESS',
       response: {
-        success: true,
-        content: {
-          email: "paul@beatles.uk",
-          first_name: "paul",
-          last_name: "McCartney",
-          username: "Paul"
-        }
+        email: "paul@beatles.uk",
+        first_name: "paul",
+        last_name: "McCartney",
+        username: "Paul"
       }
     };
     const nextState = rootReducer(state, action);
@@ -155,13 +139,10 @@ describe('reducer', () => {
     const action = {
       type: 'GET_USERINFO_SUCCESS',
       response: {
-        success: true,
-        content: {
-          email: "paul@beatles.uk",
-          first_name: "paul",
-          last_name: "McCartney",
-          username: "Paul"
-        }
+        email: "paul@beatles.uk",
+        first_name: "paul",
+        last_name: "McCartney",
+        username: "Paul"
       }
     };
     const nextState = rootReducer(state, action);
