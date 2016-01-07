@@ -24,7 +24,7 @@ SSH into to the VM, activate the virtualenv and run the server:
 vagrant ssh
 cd /vagrant/
 source env/bin/activate
-python app/manage.py runserver
+python cadasta/manage.py runserver
 ```
 
 Open `http://localhost:5000/` in your browser, you should see a default Django page.
