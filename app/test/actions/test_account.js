@@ -1,19 +1,17 @@
 import {expect} from 'chai';
 import nock from 'nock';
-import { applyMiddleware } from 'redux'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
 import Storage from '../utils/Storage';
 
 import SETTINGS from '../../src/settings';
-import history from '../../src/history';
 import * as accountActions from '../../src/actions/account';
 import * as messageActions from '../../src/actions/messages';
+import * as routerActions from '../../src/actions/router';
 
-
-const middlewares = [ thunk ]
-const mockStore = configureMockStore(middlewares)
+var middlewares = [ thunk ];
+var mockStore = configureMockStore(middlewares);
 
 describe('Actions: account', () => {
   beforeEach(() => {
@@ -66,6 +64,7 @@ describe('Actions: account', () => {
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_LOGIN_SUCCESS, response: response },
       { type: messageActions.REQUEST_DONE },
+      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/dashboard/' },
       { type: messageActions.REQUEST_START },
       { type: accountActions.GET_USERINFO_SUCCESS, response: response },
       { type: messageActions.REQUEST_DONE }
@@ -185,13 +184,53 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_REGISTER_SUCCESS, response: response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE },
+      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/login/' }
     ]
 
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountRegister(userCredentials))
+  });
 
-    done();
+  it ('creates POST_REGISTER_ERROR', () => {
+    const response = {
+      "email": ["Another user is already registered with this email address"]
+    }
+    const action = accountActions.postRegisterError(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_REGISTER_ERROR,
+      response
+    })
+  });
+
+  it ('creates POST_REGISTER_ERROR when registration was not succesful', (done) => {
+    const userCredentials = {
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon',
+      password: '123456',
+      password_repeat: '123456',
+    }
+    
+    const response = {
+      "email": ["Another user is already registered with this email address"]
+    }
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/register/', userCredentials)
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_REGISTER_ERROR, response: response },
+      { type: messageActions.REQUEST_DONE },
+      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/register/' }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountRegister(userCredentials))
   });
 
 
@@ -421,11 +460,11 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_ACTIVATE_SUCCESS },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE },
+      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/login/' }
     ]
 
     const store = mockStore({}, expectedActions, done);
     store.dispatch(accountActions.accountActivate(data));
-    done();
   });
 });

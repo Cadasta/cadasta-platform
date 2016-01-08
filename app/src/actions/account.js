@@ -1,20 +1,20 @@
 import Request from '../request';
-import history from '../history';
 
 import { requestStart, requestDone } from './messages';
+import { redirect } from './router';
 
 
 export const POST_LOGIN_SUCCESS  = 'POST_LOGIN_SUCCESS';
 export const POST_LOGIN_ERROR  = 'POST_LOGIN_ERROR';
 export const POST_LOGOUT_SUCCESS  = 'POST_LOGOUT_SUCCESS';
 export const POST_REGISTER_SUCCESS  = 'POST_REGISTER_SUCCESS';
+export const POST_REGISTER_ERROR  = 'POST_REGISTER_SUCCESS';
 export const POST_UPDATEPROFILE_SUCCESS  = 'POST_UPDATEPROFILE_SUCCESS';
 export const GET_USERINFO_SUCCESS  = 'GET_USERINFO_SUCCESS';
 export const POST_CHANGEPASSWORD_SUCCESS  = 'GET_CHANGEPASSWORD_SUCCESS';
 export const POST_RESETPASSWORD_SUCCESS  = 'GET_RESETPASSWORD_SUCCESS';
 export const POST_RESETCONFIRMPASSWORD_SUCCESS  = 'GET_RESETCONFIRMPASSWORD_SUCCESS';
 export const POST_ACTIVATE_SUCCESS  = 'GET_ACTIVATE_SUCCESS';
-
 
 /* ********************************************************
  *
@@ -43,15 +43,11 @@ export function accountLogin(userCredentials) {
     return Request.post('/account/login/', userCredentials, false)
       .then(
         (success => {
-          dispatch(postLoginSuccess(success));
+          var redirectTo = (userCredentials.redirectTo ? userCredentials.redirectTo : '/dashboard/');
+          dispatch(postLoginSuccess(success, redirectTo));
           dispatch(requestDone());
+          dispatch(redirect(redirectTo));
           dispatch(accountGetUserInfo());
-
-          if (userCredentials.redirectTo) {
-            history.replaceState(null, userCredentials.redirectTo);
-          } else {
-            history.replaceState(null, '/dashboard/');  
-          }
         }),
         (error => {
           dispatch(postLoginError(error));
@@ -100,16 +96,28 @@ export function postRegisterSuccess(response) {
   }
 }
 
+export function postRegisterError(response) {
+  return {
+    type: POST_REGISTER_ERROR,
+    response
+  }
+}
+
 export function accountRegister(userCredentials) {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.post('/account/register/', userCredentials, false)
       .then(
-        (json => {
-          history.replaceState(null, '/account/login/');
-          dispatch(postRegisterSuccess(json));
+        (success => {
+          dispatch(postRegisterSuccess(success));
           dispatch(requestDone());
+          dispatch(redirect('/account/login/'));
+        }),
+        (error => {
+          dispatch(postRegisterError(error));
+          dispatch(requestDone());
+          dispatch(redirect('/account/register/'));
         })
       )
   }
@@ -267,9 +275,9 @@ export function accountActivate(data) {
     return Request.post('/account/activate/', data)
       .then(
         (json => {
-          history.replaceState(null, '/account/login/');
-          dispatch(postActivateSuccess(json));
+          dispatch(postActivateSuccess());
           dispatch(requestDone());
+          dispatch(redirect('/account/login/'));
         })
       )
   }
