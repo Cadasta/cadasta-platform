@@ -51,7 +51,6 @@ function requireAuth(nextState, replaceState) {
   }
 }
 
-
 const router = <Router history={ history }>
   <Route path="/" component={ AppContainer } >
     <IndexRoute component={ HomeContainer } onEnter={ checkAuth } />

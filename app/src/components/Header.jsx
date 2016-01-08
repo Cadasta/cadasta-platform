@@ -15,7 +15,7 @@ const Header = React.createClass({
       return (
         <ul>
           <li><Link to={ "/account/login/" }>Login</Link></li>
-          <li><a href="/account/register/">Register</a></li>
+          <li><Link to={ "/account/register/" }>Register</Link></li>
         </ul>
       )
     }

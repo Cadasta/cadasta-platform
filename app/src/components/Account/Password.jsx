@@ -1,9 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import DismissMessageMixin from '../mixins/DismissMessageMixin';
 import * as accountActions from '../../actions/account';
 
 export const Password = React.createClass({
+  mixins: [ DismissMessageMixin ],
+
   handleFormSubmit: function(e) {
     e.preventDefault();
     this.props.accountChangePassword({

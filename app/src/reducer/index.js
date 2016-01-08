@@ -67,6 +67,12 @@ export default function rootReducer(state = INITIAL_STATE, action) {
       var requestsPending = state.get('messages').get('requestsPending');
       var messages = state.get('messages').set('requestsPending', requestsPending - 1);
       return state.merge({messages});
+
+    case 'DISMISS_MESSAGES':
+      var messages = state.get('messages')
+      var userFeedback = messages.get('userFeedback').clear();
+      messages = messages.set('userFeedback', userFeedback);
+      return state.merge({ messages });
   }
 
   return state;

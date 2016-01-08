@@ -37,4 +37,24 @@ describe('reducer', () => {
 
     expect(requestsPending).to.equal(0);
   });
+
+  it('handles DISMISS_MESSAGES', () => {
+    const state = fromJS({
+      messages: {
+        requestsPending: 0,
+        userFeedback: [
+          "Test Message"
+        ]
+      }
+    });
+
+    const action = {
+      type: 'DISMISS_MESSAGES'
+    };
+
+    const nextState = rootReducer(state, action);
+    const requestsPending = nextState.get('messages').get('userFeedback').count();
+
+    expect(requestsPending).to.equal(0);
+  });
 });

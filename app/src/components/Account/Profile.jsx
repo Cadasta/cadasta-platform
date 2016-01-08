@@ -2,10 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
+import DismissMessageMixin from '../mixins/DismissMessageMixin';
 import * as accountActions from '../../actions/account';
 
 
 export const Profile = React.createClass({
+  mixins: [ DismissMessageMixin ],
+
   getStateFromProps: function(props) {
     return {
       username: props.user.get('username'),

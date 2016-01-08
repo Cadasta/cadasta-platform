@@ -5,10 +5,20 @@ import rootReducer from './reducer';
 import history from './history';
 
 import { ROUTER_REDIRECT } from './actions/router';
+import { dismissMessages } from './actions/messages';
+
+
+const messages = store => next => action => {
+  if (action.type && (action.type.endsWith('_SUCCESS') || action.type.endsWith('_ERROR'))) {
+    store.dispatch(dismissMessages());
+  }
+
+  return next(action);
+}
 
 
 const redirect = store => next => action => {
-  if (action.type === 'ROUTER_REDIRECT') {
+  if (action.type === ROUTER_REDIRECT) {
     history.replaceState(null, action.redirectTo);  
   }
 
@@ -19,7 +29,7 @@ const redirect = store => next => action => {
 let store;
 
 if (!store) {
-  let createStoreWithMiddleware = applyMiddleware(redirect, thunk)(createStore);
+  let createStoreWithMiddleware = applyMiddleware(messages, redirect, thunk)(createStore);
   store = createStoreWithMiddleware(rootReducer);
 }
 
