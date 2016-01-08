@@ -1,7 +1,7 @@
 import { Map, List, fromJS } from 'immutable';
 import {expect} from 'chai';
 
-import Storage from '../utils/Storage';
+import Storage from '../test-helper/Storage';
 
 import rootReducer from '../../src/reducer'
 
@@ -100,6 +100,38 @@ describe('reducer', () => {
         first_name: "John",
         last_name: "Lennon",
         username: "john"
+      }
+    }));
+  });
+
+  it("handles POST_REGISTER_ERROR", () => {
+    const state = Map({
+      user: Map(),
+      messages: Map({
+        userFeedback: List([])
+      })
+    });
+
+    const action = {
+      type: 'POST_REGISTER_ERROR',
+      response: {
+        "email": ["Another user is already registered with this email address"],
+        "username": ["A user with that username already exists."]
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: { },
+      messages: {
+        userFeedback: [{
+          type: 'error',
+          msg: "Unable to register with provided credentials.",
+          details: [
+            "Another user is already registered with this email address",
+            "A user with that username already exists."
+          ]
+        }]
       }
     }));
   });

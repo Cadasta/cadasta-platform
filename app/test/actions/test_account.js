@@ -3,7 +3,7 @@ import nock from 'nock';
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
-import Storage from '../utils/Storage';
+import Storage from '../test-helper/Storage';
 
 import SETTINGS from '../../src/settings';
 import * as accountActions from '../../src/actions/account';

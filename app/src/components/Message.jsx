@@ -12,6 +12,13 @@ const Message = React.createClass({
     }
   },
 
+  renderErrorDetail: function () {
+    const details = this.props.message.get('details');
+    if (details && details.count()) {
+      return <ul>{details.map(detail => <li>{ detail }</li>)}</ul>
+    }
+  },
+
   render: function() {
     const message = this.props.message;
     const messageClass = classNames('message', message.get('type'));
@@ -19,6 +26,7 @@ const Message = React.createClass({
     return (
       <div className={ messageClass }>
         <p>{ message.get('msg') }</p>
+        { this.renderErrorDetail() }
         { this.renderDismiss() }
       </div>
     )

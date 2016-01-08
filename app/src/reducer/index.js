@@ -1,4 +1,5 @@
 import { fromJS, Map, List } from 'immutable';
+import { parseError } from '../utils/messages';
 
 export const INITIAL_STATE = fromJS({
   user: {},
@@ -29,7 +30,7 @@ export default function rootReducer(state = INITIAL_STATE, action) {
       }));
       messages = messages.set('userFeedback', userFeedback);
 
-      return state.merge({ messages })
+      return state.merge({ messages });
 
     case 'POST_LOGOUT_SUCCESS':
       window.localStorage.removeItem('auth_token');
@@ -43,7 +44,19 @@ export default function rootReducer(state = INITIAL_STATE, action) {
       var user = state.get('user').merge(Map(action.response));
       var newState = state.merge({ user });
 
-      return newState;  
+      return newState;
+
+    case 'POST_REGISTER_ERROR':
+      const message = Map({
+        type: 'error',
+        msg: "Unable to register with provided credentials.",
+        details: fromJS(parseError(action.response))
+      });
+
+      var messages = state.get('messages')
+      var userFeedback = messages.get('userFeedback').push(message);
+      messages = messages.set('userFeedback', userFeedback);
+      return state.merge({ messages });
 
     case 'REQUEST_START':
       var requestsPending = state.get('messages').get('requestsPending');

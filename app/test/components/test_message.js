@@ -1,5 +1,5 @@
 import React from 'react/addons';
-import { Map } from 'immutable';
+import { Map, fromJS } from 'immutable';
 
 import { expect } from 'chai';
 import { shallow } from 'enzyme';
@@ -23,6 +23,30 @@ describe("Message", () => {
     expect(wrapper.find('p')).to.have.length(1);
     expect(wrapper.find('p').text()).to.equal("Test message");
     expect(wrapper.find('button')).to.have.length(1);
+  });
+
+  it("renders error details when provided", () => {
+    const errorDetails = [
+      "Email required",
+      "Username already exists"
+    ];
+
+    const message = fromJS({
+      type: 'error',
+      msg: "Test message",
+      id: 1,
+      details: errorDetails
+    });
+
+    const wrapper = shallow(<Message message={message} />);
+
+    const detailElements = wrapper.find('li');
+    expect(detailElements).to.have.length(2);
+
+    detailElements.map(detail => {
+      expect(errorDetails).to.include(detail.text());
+    });
+
   });
 
   it("does not render the dismiss button when message is not dismissable", () => {
