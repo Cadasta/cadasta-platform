@@ -46,10 +46,34 @@ export default function rootReducer(state = INITIAL_STATE, action) {
 
       return newState;
 
+    case 'POST_CHANGEPASSWORD_ERROR':
+      var message = Map({
+        type: 'error',
+        msg: "Unable to change password",
+        details: fromJS(parseError(action.response))
+      });
+
+      var messages = state.get('messages')
+      var userFeedback = messages.get('userFeedback').push(message);
+      messages = messages.set('userFeedback', userFeedback);
+      return state.merge({ messages });
+
     case 'POST_REGISTER_ERROR':
-      const message = Map({
+      var message = Map({
         type: 'error',
         msg: "Unable to register with provided credentials.",
+        details: fromJS(parseError(action.response))
+      });
+
+      var messages = state.get('messages')
+      var userFeedback = messages.get('userFeedback').push(message);
+      messages = messages.set('userFeedback', userFeedback);
+      return state.merge({ messages });
+
+    case 'POST_UPDATEPROFILE_ERROR':
+      var message = Map({
+        type: 'error',
+        msg: "Unable to update profile",
         details: fromJS(parseError(action.response))
       });
 

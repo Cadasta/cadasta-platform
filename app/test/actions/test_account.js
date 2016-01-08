@@ -328,6 +328,44 @@ describe('Actions: account', () => {
     store.dispatch(accountActions.accountUpdateProfile(userCredentials));
   });
 
+  it ('creates POST_UPDATEPROFILE_ERROR', () => {
+    const response = {
+      "email": ["Another user is already registered with this email address"]
+    }
+    const action = accountActions.postUpdateProfileError(response);
+
+    expect(action).to.deep.equal({
+      type: 'POST_UPDATEPROFILE_ERROR',
+      response
+    })
+  });
+
+  it ('creates POST_UPDATEPROFILE_SUCCESS when profile update was succesful', (done) => {
+    const userCredentials = {
+      username: 'John',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon',
+    }
+    
+    const response = {
+      "email": ["Another user is already registered with this email address"]
+    }
+
+    nock(SETTINGS.API_BASE)
+      .put('/account/me/', userCredentials)
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_UPDATEPROFILE_ERROR, response: response },
+      { type: messageActions.REQUEST_DONE }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountUpdateProfile(userCredentials));
+  });
+
 
   /* ********************************************************
    *
@@ -357,6 +395,38 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_CHANGEPASSWORD_SUCCESS },
+      { type: messageActions.REQUEST_DONE }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountChangePassword(passwords));
+  });
+
+  it ('creates POST_CHANGEPASSWORD_ERROR', () => {
+    const response = {"current_password":["Invalid password."]};
+    const action = accountActions.postChangePasswordError(response);
+
+    expect(action).to.deep.equal({
+      type: 'POST_CHANGEPASSWORD_ERROR',
+      response
+    })
+  });
+
+  it ('creates POST_CHANGEPASSWORD_ERROR when profile update was not succesful', (done) => {
+    const response = {"current_password":["Invalid password."]};
+    const passwords = {
+      new_password: "123456",
+      re_new_password: "123456",
+      current_password: "78910"
+    }
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/password/', passwords)
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_CHANGEPASSWORD_ERROR, response },
       { type: messageActions.REQUEST_DONE }
     ]
 

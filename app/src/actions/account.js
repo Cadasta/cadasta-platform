@@ -10,8 +10,10 @@ export const POST_LOGOUT_SUCCESS  = 'POST_LOGOUT_SUCCESS';
 export const POST_REGISTER_SUCCESS  = 'POST_REGISTER_SUCCESS';
 export const POST_REGISTER_ERROR  = 'POST_REGISTER_ERROR';
 export const POST_UPDATEPROFILE_SUCCESS  = 'POST_UPDATEPROFILE_SUCCESS';
+export const POST_UPDATEPROFILE_ERROR  = 'POST_UPDATEPROFILE_ERROR';
 export const GET_USERINFO_SUCCESS  = 'GET_USERINFO_SUCCESS';
 export const POST_CHANGEPASSWORD_SUCCESS  = 'GET_CHANGEPASSWORD_SUCCESS';
+export const POST_CHANGEPASSWORD_ERROR = 'POST_CHANGEPASSWORD_ERROR';
 export const POST_RESETPASSWORD_SUCCESS  = 'GET_RESETPASSWORD_SUCCESS';
 export const POST_RESETCONFIRMPASSWORD_SUCCESS  = 'GET_RESETCONFIRMPASSWORD_SUCCESS';
 export const POST_ACTIVATE_SUCCESS  = 'GET_ACTIVATE_SUCCESS';
@@ -163,14 +165,25 @@ export function postUpdateProfileSuccess(response) {
   }
 }
 
+export function postUpdateProfileError(response) {
+  return {
+    type: POST_UPDATEPROFILE_ERROR,
+    response
+  }
+}
+
 export function accountUpdateProfile(userCredentials) {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.put('/account/me/', userCredentials)
       .then(
-        (json => {
-          dispatch(postUpdateProfileSuccess(json));
+        (success => {
+          dispatch(postUpdateProfileSuccess(success));
+          dispatch(requestDone());
+        }),
+        (error => {
+          dispatch(postUpdateProfileError(error));
           dispatch(requestDone());
         })
       )
@@ -190,14 +203,25 @@ export function postChangePasswordSuccess() {
   }
 }
 
+export function postChangePasswordError(response) {
+  return {
+    type: POST_CHANGEPASSWORD_ERROR,
+    response
+  }
+}
+
 export function accountChangePassword(passwords) {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.post('/account/password/', passwords)
       .then(
-        (json => {
-          dispatch(postChangePasswordSuccess(json));
+        (success => {
+          dispatch(postChangePasswordSuccess());
+          dispatch(requestDone());
+        }),
+        (error => {
+          dispatch(postChangePasswordError(error));
           dispatch(requestDone());
         })
       )

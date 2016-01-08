@@ -136,6 +136,36 @@ describe('reducer', () => {
     }));
   });
 
+  it("handles POST_CHANGEPASSWORD_ERROR", () => {
+    const state = Map({
+      user: Map(),
+      messages: Map({
+        userFeedback: List([])
+      })
+    });
+
+    const action = {
+      type: 'POST_CHANGEPASSWORD_ERROR',
+      response: {
+        "current_password": ["Invalid password."]
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: { },
+      messages: {
+        userFeedback: [{
+          type: 'error',
+          msg: "Unable to change password",
+          details: [
+            "Invalid password."
+          ]
+        }]
+      }
+    }));
+  });
+
   it('handles POST_UPDATEPROFILE_SUCCESS', () => {
     const state = fromJS({ user: {
       email: "john@beatles.uk",
@@ -165,6 +195,46 @@ describe('reducer', () => {
     }));
   });
 
+  it('handles POST_UPDATEPROFILE_ERROR', () => {
+    const state = fromJS({ 
+      user: {
+        email: "john@beatles.uk",
+        first_name: "John",
+        last_name: "Lennon",
+        username: "john"
+      },
+      messages: {
+        userFeedback: []  
+      }
+    });
+
+    const action = {
+      type: 'POST_UPDATEPROFILE_ERROR',
+      response: {
+        "email": ["Another user is already registered with this email address"]
+      }
+    };
+    const nextState = rootReducer(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      user: {
+        email: "john@beatles.uk",
+        first_name: "John",
+        last_name: "Lennon",
+        username: "john"
+      },
+      messages: {
+        userFeedback: [{
+          type: 'error',
+          msg: "Unable to update profile",
+          details: [
+            "Another user is already registered with this email address"
+          ]
+        }]
+      }
+    }));
+  });
+
   it('handles GET_USERINFO_SUCCESS', () => {
     const state = fromJS({ user: {} });
 
@@ -175,6 +245,9 @@ describe('reducer', () => {
         first_name: "paul",
         last_name: "McCartney",
         username: "Paul"
+      },
+      messages: {
+        userFeedback: []
       }
     };
     const nextState = rootReducer(state, action);
