@@ -6,7 +6,8 @@
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --require ./test/test-helper 'test/**/*.@(js|jsx)'",
     "test:watch": "npm run test -- --watch",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "start": "./node_modules/.bin/webpack-dev-server"
   },
   "keywords": [],
   "author": "",
