@@ -173,7 +173,7 @@ export function accountGetUserInfo() {
   return dispatch => {
     dispatch(requestStart());
 
-    return Request.get('/account/me/')
+    return Request.get('/account/')
       .then(
         (success => {
           dispatch(getUserInfoSuccess(success));
@@ -211,7 +211,7 @@ export function accountUpdateProfile(userCredentials) {
   return dispatch => {
     dispatch(requestStart());
 
-    return Request.put('/account/me/', userCredentials)
+    return Request.put('/account/', userCredentials)
       .then(
         (success => {
           dispatch(postUpdateProfileSuccess(success));

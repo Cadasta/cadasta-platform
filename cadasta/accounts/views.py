@@ -12,7 +12,7 @@ from djoser import utils as djoser_utils
 from djoser import serializers as djoser_serializers
 from djoser import settings
 
-from .serializers import RegistrationSerializer, AccountLoginSerializer
+from . import serializers
 from .exceptions import EmailNotVerifiedError
 
 
@@ -20,6 +20,8 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
     token_generator = default_token_generator
     subject_template_name = 'activation_email_subject.txt'
     plain_body_template_name = 'activation_email_body.txt'
+    serializer_class = serializers.UserSerializer
+
 
     def get_email_context(self, user):
         context = super(AccountUser, self).get_email_context(user)
@@ -27,21 +29,21 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
         return context
 
     def perform_update(self, serializer):
-        old_obj = self.get_object()
-        new_data_dict = serializer.validated_data
+        old_email = self.get_object().email
+        new_email = serializer.validated_data['email']
 
-        if old_obj.email != new_data_dict['email']:
-            self.send_email(**self.get_send_email_kwargs(self.request.user))
+        user = serializer.save()
 
-        serializer.save()
+        if old_email != new_email:
+            self.send_email(**self.get_send_email_kwargs(user))
 
 
 class AccountRegister(djoser_views.RegistrationView):
-    serializer_class = RegistrationSerializer
+    serializer_class = serializers.RegistrationSerializer
 
 
 class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
-    serializer_class = AccountLoginSerializer
+    serializer_class = serializers.AccountLoginSerializer
     token_generator = default_token_generator
     subject_template_name = 'activation_email_subject.txt'
     plain_body_template_name = 'activation_email_body.txt'

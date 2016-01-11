@@ -58,6 +58,74 @@ class AccountUserTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(mail.outbox), 0)
 
+    def test_update_with_existing_email(self):
+        User.objects.create(**{
+            'username': 'paul',
+            'email': 'boss@beatles.uk',
+        })
+
+        user = User.objects.create(**{
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+        })
+
+        data = {
+            'email': 'boss@beatles.uk',
+            'username': 'imagine71'
+        }
+
+        request = APIRequestFactory().put('/account/', data)
+        force_authenticate(request, user=user)
+        response = AccountUser.as_view()(request).render()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(mail.outbox), 0)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, 'john@beatles.uk')
+
+    def test_update_username(self):
+        user = User.objects.create(**{
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+        })
+
+        data = {
+            'email': 'john@beatles.uk',
+            'username': 'john'
+        }
+
+        request = APIRequestFactory().put('/account/', data)
+        force_authenticate(request, user=user)
+        response = AccountUser.as_view()(request).render()
+        self.assertEqual(response.status_code, 200)
+
+        user.refresh_from_db()
+        self.assertEqual(user.username, 'john')
+
+    def test_update_with_existing_username(self):
+        User.objects.create(**{
+            'username': 'boss',
+            'email': 'paul@beatles.uk',
+        })
+
+        user = User.objects.create(**{
+            'username': 'john',
+            'email': 'john@beatles.uk',
+        })
+
+        data = {
+            'email': 'john@beatles.uk',
+            'username': 'boss'
+        }
+
+        request = APIRequestFactory().put('/account/', data)
+        force_authenticate(request, user=user)
+        response = AccountUser.as_view()(request).render()
+        self.assertEqual(response.status_code, 400)
+
+        user.refresh_from_db()
+        self.assertEqual(user.username, 'john')
+
 
 class AccountSignupTest(TestCase):
     def test_user_signs_up(self):
