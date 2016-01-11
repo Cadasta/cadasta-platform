@@ -15,6 +15,7 @@ export const Login = React.createClass({
     let userCredentials = {
       username: this.refs.username.value,
       password: this.refs.password.value,
+      rememberMe: this.refs.rememberMe.checked
     }
 
     if (this.props.location && 
@@ -34,6 +35,9 @@ export const Login = React.createClass({
         
         <label htmlFor="password">Password</label>
         <input name="password" ref="password" type="password" />
+
+        <input name="rememberMe" ref="rememberMe" type="checkbox" />
+        <label htmlFor="rememberMe">Remember Me</label>
 
         <button type="submit">Login</button>
       </form>

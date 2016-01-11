@@ -6,12 +6,17 @@ export default function user(state = defaultState, action) {
   switch (action.type) {
 
   	case 'LOGIN_SUCCESS':
-      window.localStorage.setItem('auth_token', action.response.auth_token);
+      window.sessionStorage.setItem('auth_token', action.response.auth_token);
+
+      if (action.rememberMe) {
+        window.localStorage.setItem('auth_token', action.response.auth_token);  
+      }
 
       return state.merge({ auth_token: action.response.auth_token });
 
     case 'LOGOUT_SUCCESS':
       window.localStorage.removeItem('auth_token');
+      window.sessionStorage.removeItem('auth_token');
       return Map({});
 
     case 'REGISTER_SUCCESS':

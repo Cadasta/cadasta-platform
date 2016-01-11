@@ -37,10 +37,11 @@ export const ACTIVATE_ERROR  = 'ACTIVATE_ERROR';
  *
  * ********************************************************/
 
-export function postLoginSuccess(response) {
+export function postLoginSuccess(response, rememberMe) {
   return {
     type: LOGIN_SUCCESS,
-    response
+    response,
+    rememberMe
   }
 }
 
@@ -59,7 +60,7 @@ export function accountLogin(userCredentials) {
       .then(
         (success => {
           var redirectTo = (userCredentials.redirectTo ? userCredentials.redirectTo : '/dashboard/');
-          dispatch(postLoginSuccess(success, redirectTo));
+          dispatch(postLoginSuccess(success, userCredentials.rememberMe));
           dispatch(requestDone());
           dispatch(redirect(redirectTo));
           dispatch(accountGetUserInfo());

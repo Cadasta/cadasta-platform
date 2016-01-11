@@ -15,8 +15,8 @@ var mockStore = configureMockStore(middlewares);
 
 describe('Actions: account', () => {
   beforeEach(() => {
-    window.localStorage = new Storage();
-    window.localStorage.setItem('auth_token', 's8yc8shch98s');
+    window.sessionStorage = new Storage();
+    window.sessionStorage.setItem('auth_token', 's8yc8shch98s');
   });
 
   /* ********************************************************
@@ -28,20 +28,22 @@ describe('Actions: account', () => {
   it ('creates LOGIN_SUCCESS', () => {
     const response = {
       username: 'John',
-      email: 'john@beatles.uk'
+      email: 'john@beatles.uk',
     }
-    const action = accountActions.postLoginSuccess(response);
+    const action = accountActions.postLoginSuccess(response, true);
 
     expect(action).to.deep.equal({
       type: accountActions.LOGIN_SUCCESS,
-      response
+      response,
+      rememberMe: true
     })
   });
 
   it ('creates LOGIN_SUCCESS when login was succesful', (done) => {
     const userCredentials = {
       username: 'John',
-      password: '123455'
+      password: '123455',
+      rememberMe: true
     }
     
     const response = { 
@@ -62,7 +64,7 @@ describe('Actions: account', () => {
 
     const expectedActions = [
       { type: messageActions.REQUEST_START },
-      { type: accountActions.LOGIN_SUCCESS, response: response },
+      { type: accountActions.LOGIN_SUCCESS, response, rememberMe: true },
       { type: messageActions.REQUEST_DONE },
       { type: routerActions.ROUTER_REDIRECT, redirectTo: '/dashboard/' },
       { type: messageActions.REQUEST_START },

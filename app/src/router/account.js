@@ -17,9 +17,7 @@ function recoverAuthToken() {
   let auth_token = store.getState().user.get('auth_token');
 
   if (!auth_token) {
-    if (window.localStorage.getItem('auth_token')) {
-      auth_token = window.localStorage.getItem('auth_token');
-    }
+    auth_token = window.sessionStorage.getItem('auth_token') || window.localStorage.getItem('auth_token')
 
     if (auth_token) {
       store.dispatch({

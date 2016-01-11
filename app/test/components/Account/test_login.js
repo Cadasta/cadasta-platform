@@ -27,7 +27,8 @@ describe('Login', () => {
 
     expect(user).to.deep.equal({
       "username": "John",
-      "password": "123456"
+      "password": "123456",
+      "rememberMe": false
     });
   });
 });

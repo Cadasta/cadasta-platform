@@ -7,16 +7,38 @@ import Storage from '../test-helper/Storage';
 describe('user reducer', () => {
   beforeEach(() => {
     window.localStorage = new Storage();
+    window.sessionStorage = new Storage();
   });
 
-  it('handles LOGIN_SUCCESS with successful login', () => {
+  it('handles LOGIN_SUCCESS', () => {
     const state = fromJS({ });
 
     const action = {
       type: 'LOGIN_SUCCESS',
       response: {
         auth_token: "mskdj8sdh8shadhs"  
-      }
+      },
+      rememberMe: false
+    };
+    const nextState = user(state, action);
+
+    expect(nextState).to.equal(fromJS({
+      auth_token: "mskdj8sdh8shadhs"
+    }));
+
+    expect(window.localStorage.getItem('auth_token')).to.be.null;
+    expect(window.sessionStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
+  });
+
+  it('handles LOGIN_SUCCESS with remember me', () => {
+    const state = fromJS({ });
+
+    const action = {
+      type: 'LOGIN_SUCCESS',
+      response: {
+        auth_token: "mskdj8sdh8shadhs"  
+      },
+      rememberMe: true
     };
     const nextState = user(state, action);
 
@@ -25,9 +47,13 @@ describe('user reducer', () => {
     }));
 
     expect(window.localStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
+    expect(window.sessionStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
   });
 
   it('handles LOGOUT_SUCCESS', () => {
+    window.sessionStorage.setItem('auth_token', 'mskdj8sdh8shadhs');
+    window.localStorage.setItem('auth_token', 'mskdj8sdh8shadhs');
+
     const state = fromJS({ auth_token: "mskdj8sdh8shadhs" });
     const action = { type: 'LOGOUT_SUCCESS' };
     const nextState = user(state, action);
@@ -35,6 +61,20 @@ describe('user reducer', () => {
     expect(nextState).to.equal(fromJS({ }));
 
     expect(window.localStorage.getItem('auth_token')).to.be.null;
+    expect(window.sessionStorage.getItem('auth_token')).to.be.null;
+  });
+
+  it('handles LOGOUT_SUCCESS', () => {
+    window.sessionStorage.setItem('auth_token', 'mskdj8sdh8shadhs');
+
+    const state = fromJS({ auth_token: "mskdj8sdh8shadhs" });
+    const action = { type: 'LOGOUT_SUCCESS' };
+    const nextState = user(state, action);
+
+    expect(nextState).to.equal(fromJS({ }));
+
+    expect(window.localStorage.getItem('auth_token')).to.be.null;
+    expect(window.sessionStorage.getItem('auth_token')).to.be.null;
   });
 
   it('handles REGISTER_SUCCESS', () => {

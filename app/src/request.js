@@ -12,7 +12,7 @@ function request(url, method, body={}, authenticate=true) {
     client.setRequestHeader('Content-Type', 'application/json');
 
     if (authenticate) {
-      client.setRequestHeader('Authorization', 'Token ' + window.localStorage.auth_token);
+      client.setRequestHeader('Authorization', 'Token ' + window.sessionStorage.auth_token);
     }
 
     client.send(JSON.stringify(body));
