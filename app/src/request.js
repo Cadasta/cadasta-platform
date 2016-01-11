@@ -6,7 +6,7 @@ function request(url, method, body={}, authenticate=true) {
   const promise = new Promise(function(resolve, reject) {
     const client = new XMLHttpRequest();
 
-    client.open(method, SETTINGS.API_BASE + url);
+    client.open(method, SETTINGS.API_BASE + url, true);
 
     client.setRequestHeader('Accept', 'application/json');
     client.setRequestHeader('Content-Type', 'application/json');
