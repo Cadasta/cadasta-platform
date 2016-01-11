@@ -1,21 +1,17 @@
 import React from 'react';
-import Router, { Route, IndexRoute } from 'react-router';
+import { Route } from 'react-router';
 
-import history from './history';
-import store from './store';
-import { accountGetUserInfo } from './actions/account';
-import { AppContainer } from './components/App';
-import { HomeContainer } from './components/Home';
-import { LoginContainer } from './components/Account/Login';
-import { LogoutContainer } from './components/Account/Logout';
-import { ProfileContainer } from './components/Account/Profile';
-import { RegisterContainer } from './components/Account/Register';
-import { PasswordContainer } from './components/Account/Password';
-import { PasswordResetContainer } from './components/Account/PasswordReset';
-import { PasswordResetConfirmContainer } from './components/Account/PasswordResetConfirm';
-import { ActivateContainer } from './components/Account/Activate';
-import { DashboardContainer } from './components/Home/Dashboard';
+import store from '../store';
 
+import { accountGetUserInfo } from '../actions/account';
+import { LoginContainer } from '../components/Account/Login';
+import { LogoutContainer } from '../components/Account/Logout';
+import { ProfileContainer } from '../components/Account/Profile';
+import { RegisterContainer } from '../components/Account/Register';
+import { PasswordContainer } from '../components/Account/Password';
+import { PasswordResetContainer } from '../components/Account/PasswordReset';
+import { PasswordResetConfirmContainer } from '../components/Account/PasswordResetConfirm';
+import { ActivateContainer } from '../components/Account/Activate';
 
 function recoverAuthToken() {
   let auth_token = store.getState().user.get('auth_token');
@@ -38,22 +34,21 @@ function recoverAuthToken() {
 }
 
 
-function checkAuth(nextState, replaceState) {
+export function checkAuth(nextState, replaceState) {
   if (recoverAuthToken()) {
     replaceState(null, '/dashboard/');
   }
 }
 
 
-function requireAuth(nextState, replaceState) {
+export function requireAuth(nextState, replaceState) {
   if (!recoverAuthToken()) {
     replaceState({nextPathname: nextState.location.pathname}, '/account/login/');
   }
 }
 
-const router = <Router history={ history }>
-  <Route path="/" component={ AppContainer } >
-    <IndexRoute component={ HomeContainer } onEnter={ checkAuth } />
+export default (
+  <div>
     <Route path="/account/login/" component={ LoginContainer } />
     <Route path="/account/logout/" component={ LogoutContainer } />
     <Route path="/account/register/" component={ RegisterContainer } />
@@ -62,8 +57,5 @@ const router = <Router history={ history }>
     <Route path="/account/password/reset/" component={ PasswordResetConfirmContainer } onEnter={ requireAuth } />
     <Route path="/account/password/reset/confirm/:uid/:token/" component={ PasswordResetConfirmContainer } onEnter={ requireAuth } />
     <Route path="/account/activate/:uid/:token/" component={ ActivateContainer } />
-    <Route path="/dashboard/" component={ DashboardContainer } onEnter={ requireAuth } />
-  </Route>
-</Router>;
-
-export default router;
+  </div>
+)
