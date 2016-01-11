@@ -6,17 +6,30 @@ import { redirect } from './router';
 
 export const POST_LOGIN_SUCCESS  = 'POST_LOGIN_SUCCESS';
 export const POST_LOGIN_ERROR  = 'POST_LOGIN_ERROR';
+
 export const POST_LOGOUT_SUCCESS  = 'POST_LOGOUT_SUCCESS';
+export const POST_LOGOUT_ERROR  = 'POST_LOGOUT_ERROR';
+
 export const POST_REGISTER_SUCCESS  = 'POST_REGISTER_SUCCESS';
 export const POST_REGISTER_ERROR  = 'POST_REGISTER_ERROR';
+
 export const POST_UPDATEPROFILE_SUCCESS  = 'POST_UPDATEPROFILE_SUCCESS';
 export const POST_UPDATEPROFILE_ERROR  = 'POST_UPDATEPROFILE_ERROR';
+
 export const GET_USERINFO_SUCCESS  = 'GET_USERINFO_SUCCESS';
+export const GET_USERINFO_ERROR  = 'GET_USERINFO_ERROR';
+
 export const POST_CHANGEPASSWORD_SUCCESS  = 'GET_CHANGEPASSWORD_SUCCESS';
 export const POST_CHANGEPASSWORD_ERROR = 'POST_CHANGEPASSWORD_ERROR';
-export const POST_RESETPASSWORD_SUCCESS  = 'GET_RESETPASSWORD_SUCCESS';
+
+export const POST_RESETPASSWORD_SUCCESS  = 'POST_RESETPASSWORD_SUCCESS';
+export const POST_RESETPASSWORD_ERROR  = 'POST_RESETPASSWORD_ERROR';
+
 export const POST_RESETCONFIRMPASSWORD_SUCCESS  = 'GET_RESETCONFIRMPASSWORD_SUCCESS';
+export const POST_RESETCONFIRMPASSWORD_ERROR  = 'GET_RESETCONFIRMPASSWORD_ERROR';
+
 export const POST_ACTIVATE_SUCCESS  = 'GET_ACTIVATE_SUCCESS';
+export const POST_ACTIVATE_ERROR  = 'GET_ACTIVATE_ERROR';
 
 /* ********************************************************
  *
@@ -71,6 +84,13 @@ export function postLogoutSuccess() {
   }
 }
 
+export function postLogoutError(response) {
+  return {
+    type: POST_LOGOUT_ERROR,
+    response
+  }
+}
+
 export function accountLogout() {
   return dispatch => {
     dispatch(requestStart());
@@ -79,6 +99,10 @@ export function accountLogout() {
       .then(
         (success => {
           dispatch(postLogoutSuccess(success));
+          dispatch(requestDone());
+        }),
+        (error => {
+          dispatch(postLogoutError(error));
           dispatch(requestDone());
         })
       )
@@ -138,14 +162,25 @@ export function getUserInfoSuccess(response) {
   }
 }
 
+export function getUserInfoError(response) {
+  return {
+    type: GET_USERINFO_ERROR,
+    response
+  }
+}
+
 export function accountGetUserInfo() {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.get('/account/me/')
       .then(
-        (json => {
-          dispatch(getUserInfoSuccess(json));
+        (success => {
+          dispatch(getUserInfoSuccess(success));
+          dispatch(requestDone());
+        }),
+        (error => {
+          dispatch(getUserInfoError(error));
           dispatch(requestDone());
         })
       )
@@ -240,14 +275,25 @@ export function postResetPasswordSuccess() {
   }
 }
 
+export function postResetPasswordError(response) {
+  return {
+    type: POST_RESETPASSWORD_ERROR,
+    response
+  }
+}
+
 export function accountResetPassword(tokens) {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.post('/account/password/reset/', tokens)
       .then(
-        (json => {
-          dispatch(postResetPasswordSuccess(json));
+        (success => {
+          dispatch(postResetPasswordSuccess(success));
+          dispatch(requestDone());
+        }),
+        (error => {
+          dispatch(postResetPasswordError(error));
           dispatch(requestDone());
         })
       )
@@ -266,16 +312,27 @@ export function postResetConfirmPasswordSuccess() {
   }
 }
 
+export function postResetConfirmPasswordError(response) {
+  return {
+    type: POST_RESETCONFIRMPASSWORD_ERROR,
+    response
+  }
+}
+
 export function accountResetConfirmPassword(password) {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.post('/account/password/reset/confirm/', password)
       .then(
-        (json => {
-          dispatch(postResetConfirmPasswordSuccess(json));
+        (success => {
+          dispatch(postResetConfirmPasswordSuccess(success));
           dispatch(requestDone());
-        })  
+        }),
+        (error => {
+          dispatch(postResetConfirmPasswordError(error));
+          dispatch(requestDone());
+        })
       )
   }
 }
@@ -292,16 +349,27 @@ export function postActivateSuccess() {
   }
 }
 
+export function postActivateError(response) {
+  return {
+    type: POST_ACTIVATE_ERROR,
+    response
+  }
+}
+
 export function accountActivate(data) {
   return dispatch => {
     dispatch(requestStart());
 
     return Request.post('/account/activate/', data)
       .then(
-        (json => {
+        (success => {
           dispatch(postActivateSuccess());
           dispatch(requestDone());
           dispatch(redirect('/account/login/'));
+        }),
+        (error => {
+          dispatch(postActivateError(error));
+          dispatch(requestDone());
         })
       )
   }

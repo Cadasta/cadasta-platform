@@ -36,6 +36,16 @@ describe('request', () => {
       )
   });
 
+  it("throws an error when the network fails", () => {
+    const response = { network_error: "Unable to connect to the server." }
+
+    return Request.get('/')
+      .then(
+        (success => assert(false, "Success called with: " + JSON.stringify(error))),
+        (error => expect(error).to.deep.equal(response))
+      )
+  });
+
   it("sends a POST request", () => {
     const response = { some: "Response" }
 

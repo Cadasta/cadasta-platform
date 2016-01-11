@@ -143,6 +143,33 @@ describe('Actions: account', () => {
     store.dispatch(accountActions.accountLogout({}))
   });
 
+  it ('creates POST_LOGOUT_ERROR', () => {
+    const response = { some: "error" }
+    const action = accountActions.postLogoutError(response);
+
+    expect(action).to.deep.equal({
+      type: 'POST_LOGOUT_ERROR',
+      response
+    })
+  });
+
+  it ('creates POST_LOGOUT_ERROR when logout was not succesful', (done) => {
+    const response = { some: "error" }
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/logout/', {})
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_LOGOUT_ERROR, response },
+      { type: messageActions.REQUEST_DONE }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountLogout())
+  });
+
 
   /* ********************************************************
    *
@@ -270,6 +297,33 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.GET_USERINFO_SUCCESS, response: response },
+      { type: messageActions.REQUEST_DONE }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountGetUserInfo());
+  });
+
+  it ('creates GET_USERINFO_SUCCESS', () => {
+    const response = { some: "error" };
+    const action = accountActions.getUserInfoError(response);
+
+    expect(action).to.deep.equal({
+      type: 'GET_USERINFO_ERROR',
+      response
+    })
+  });
+
+  it ('creates GET_USERINFO_ERROR when profile update was not succesful', (done) => {
+    const response = { some: "error" };
+
+    nock(SETTINGS.API_BASE)
+      .get('/account/me/')
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.GET_USERINFO_ERROR, response: response },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -448,7 +502,7 @@ describe('Actions: account', () => {
     })
   });
 
-  it ('creates POST_RESETPASSWORD_SUCCESS when password change was succesful', (done) => {
+  it ('creates POST_RESETPASSWORD_SUCCESS when password reset was succesful', (done) => {
     const user = {
       email: 'john@beatles.uk'
     }
@@ -460,6 +514,35 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START },
       { type: accountActions.POST_RESETPASSWORD_SUCCESS },
+      { type: messageActions.REQUEST_DONE }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountResetPassword(user));
+  });
+
+  it ('creates POST_RESETPASSWORD_ERROR', () => {
+    const user = { email: 'john@beatles.uk' }
+    const response = { some: "Error"}
+    const action = accountActions.postResetPasswordError(response);
+
+    expect(action).to.deep.equal({
+      type: 'POST_RESETPASSWORD_ERROR',
+      response
+    })
+  });
+
+  it ('creates POST_RESETPASSWORD_ERROR when password reset was not succesful', (done) => {
+    const user = { email: 'john@beatles.uk' }
+    const response = { some: "Error" }
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/password/reset/', user)
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_RESETPASSWORD_ERROR, response },
       { type: messageActions.REQUEST_DONE }
     ]
 
@@ -503,6 +586,39 @@ describe('Actions: account', () => {
     store.dispatch(accountActions.accountResetConfirmPassword(user));
   });
 
+  it ('creates POST_RESETCONFIRMPASSWORD_ERROR', () => {
+    const response = { some: "Error" };
+    const action = accountActions.postResetConfirmPasswordError(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_RESETCONFIRMPASSWORD_ERROR,
+      response
+    });
+  });
+
+  it ('creates POST_RESETCONFIRMPASSWORD_ERROR when password reset was not succesful', (done) => {
+    const user = {
+      uid: 'MQ',
+      token: '489-963055ee7742ad6c4440',
+      new_password: '123456',
+      re_new_password: '123456'
+    }
+    const response = { some: "Error" };
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/password/reset/confirm/', user)
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_RESETCONFIRMPASSWORD_ERROR, response },
+      { type: messageActions.REQUEST_DONE }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountResetConfirmPassword(user));
+  });
+
   /* ********************************************************
    *
    * Activate account
@@ -532,6 +648,37 @@ describe('Actions: account', () => {
       { type: accountActions.POST_ACTIVATE_SUCCESS },
       { type: messageActions.REQUEST_DONE },
       { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/login/' }
+    ]
+
+    const store = mockStore({}, expectedActions, done);
+    store.dispatch(accountActions.accountActivate(data));
+  });
+
+  it ('creates POST_ACTIVATE_ERROR', () => {
+    const response = { some: "Error" };
+    const action = accountActions.postActivateError(response);
+
+    expect(action).to.deep.equal({
+      type: accountActions.POST_ACTIVATE_ERROR,
+      response
+    })
+  });
+
+  it ('creates POST_ACTIVATE_ERROR when account activation was not succesful', (done) => {
+    const data = {
+      uid: 'MQ',
+      token: '489-963055ee7742ad6c4440',
+    };
+    const response = { some: "Error" };
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/activate/', data)
+      .reply(400, response)
+
+    const expectedActions = [
+      { type: messageActions.REQUEST_START },
+      { type: accountActions.POST_ACTIVATE_ERROR, response },
+      { type: messageActions.REQUEST_DONE },
     ]
 
     const store = mockStore({}, expectedActions, done);

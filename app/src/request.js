@@ -30,8 +30,8 @@ function request(url, method, body={}, authenticate=true) {
       }
     };
 
-    client.onerror = function () {
-      reject(this.statusText);
+    client.onerror = function (e) {
+      reject({network_error: "Unable to connect to the server."});
     };
   });
   return promise;
