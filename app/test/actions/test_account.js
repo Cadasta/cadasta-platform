@@ -57,7 +57,7 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     nock(SETTINGS.API_BASE)
-      .get('/account/me/')
+      .get('/account/')
       .reply(200, response)
 
     const expectedActions = [
@@ -291,7 +291,7 @@ describe('Actions: account', () => {
     };
 
     nock(SETTINGS.API_BASE)
-      .get('/account/me/')
+      .get('/account/')
       .reply(200, response)
 
     const expectedActions = [
@@ -318,7 +318,7 @@ describe('Actions: account', () => {
     const response = { some: "error" };
 
     nock(SETTINGS.API_BASE)
-      .get('/account/me/')
+      .get('/account/')
       .reply(400, response)
 
     const expectedActions = [
@@ -369,7 +369,7 @@ describe('Actions: account', () => {
     };
 
     nock(SETTINGS.API_BASE)
-      .put('/account/me/', userCredentials)
+      .put('/account/', userCredentials)
       .reply(200, response)
 
     const expectedActions = [
@@ -407,7 +407,7 @@ describe('Actions: account', () => {
     }
 
     nock(SETTINGS.API_BASE)
-      .put('/account/me/', userCredentials)
+      .put('/account/', userCredentials)
       .reply(400, response)
 
     const expectedActions = [
