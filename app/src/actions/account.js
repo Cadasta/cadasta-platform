@@ -4,32 +4,32 @@ import { requestStart, requestDone } from './messages';
 import { redirect } from './router';
 
 
-export const POST_LOGIN_SUCCESS  = 'POST_LOGIN_SUCCESS';
-export const POST_LOGIN_ERROR  = 'POST_LOGIN_ERROR';
+export const LOGIN_SUCCESS  = 'LOGIN_SUCCESS';
+export const LOGIN_ERROR  = 'LOGIN_ERROR';
 
-export const POST_LOGOUT_SUCCESS  = 'POST_LOGOUT_SUCCESS';
-export const POST_LOGOUT_ERROR  = 'POST_LOGOUT_ERROR';
+export const LOGOUT_SUCCESS  = 'LOGOUT_SUCCESS';
+export const LOGOUT_ERROR  = 'LOGOUT_ERROR';
 
-export const POST_REGISTER_SUCCESS  = 'POST_REGISTER_SUCCESS';
-export const POST_REGISTER_ERROR  = 'POST_REGISTER_ERROR';
+export const REGISTER_SUCCESS  = 'REGISTER_SUCCESS';
+export const REGISTER_ERROR  = 'REGISTER_ERROR';
 
-export const POST_UPDATEPROFILE_SUCCESS  = 'POST_UPDATEPROFILE_SUCCESS';
-export const POST_UPDATEPROFILE_ERROR  = 'POST_UPDATEPROFILE_ERROR';
+export const UPDATEPROFILE_SUCCESS  = 'UPDATEPROFILE_SUCCESS';
+export const UPDATEPROFILE_ERROR  = 'UPDATEPROFILE_ERROR';
 
-export const GET_USERINFO_SUCCESS  = 'GET_USERINFO_SUCCESS';
-export const GET_USERINFO_ERROR  = 'GET_USERINFO_ERROR';
+export const USERINFO_SUCCESS  = 'USERINFO_SUCCESS';
+export const USERINFO_ERROR  = 'USERINFO_ERROR';
 
-export const POST_CHANGEPASSWORD_SUCCESS  = 'GET_CHANGEPASSWORD_SUCCESS';
-export const POST_CHANGEPASSWORD_ERROR = 'POST_CHANGEPASSWORD_ERROR';
+export const CHANGEPASSWORD_SUCCESS  = 'CHANGEPASSWORD_SUCCESS';
+export const CHANGEPASSWORD_ERROR = 'CHANGEPASSWORD_ERROR';
 
-export const POST_RESETPASSWORD_SUCCESS  = 'POST_RESETPASSWORD_SUCCESS';
-export const POST_RESETPASSWORD_ERROR  = 'POST_RESETPASSWORD_ERROR';
+export const RESETPASSWORD_SUCCESS  = 'RESETPASSWORD_SUCCESS';
+export const RESETPASSWORD_ERROR  = 'RESETPASSWORD_ERROR';
 
-export const POST_RESETCONFIRMPASSWORD_SUCCESS  = 'POST_RESETCONFIRMPASSWORD_SUCCESS';
-export const POST_RESETCONFIRMPASSWORD_ERROR  = 'POST_RESETCONFIRMPASSWORD_ERROR';
+export const RESETCONFIRMPASSWORD_SUCCESS  = 'RESETCONFIRMPASSWORD_SUCCESS';
+export const RESETCONFIRMPASSWORD_ERROR  = 'RESETCONFIRMPASSWORD_ERROR';
 
-export const POST_ACTIVATE_SUCCESS  = 'GET_ACTIVATE_SUCCESS';
-export const POST_ACTIVATE_ERROR  = 'GET_ACTIVATE_ERROR';
+export const ACTIVATE_SUCCESS  = 'ACTIVATE_SUCCESS';
+export const ACTIVATE_ERROR  = 'ACTIVATE_ERROR';
 
 /* ********************************************************
  *
@@ -39,14 +39,14 @@ export const POST_ACTIVATE_ERROR  = 'GET_ACTIVATE_ERROR';
 
 export function postLoginSuccess(response) {
   return {
-    type: POST_LOGIN_SUCCESS,
+    type: LOGIN_SUCCESS,
     response
   }
 }
 
 export function postLoginError(response) {
   return {
-    type: POST_LOGIN_ERROR,
+    type: LOGIN_ERROR,
     response
   }
 }
@@ -80,13 +80,13 @@ export function accountLogin(userCredentials) {
 
 export function postLogoutSuccess() {
   return {
-    type: POST_LOGOUT_SUCCESS
+    type: LOGOUT_SUCCESS
   }
 }
 
 export function postLogoutError(response) {
   return {
-    type: POST_LOGOUT_ERROR,
+    type: LOGOUT_ERROR,
     response
   }
 }
@@ -117,14 +117,14 @@ export function accountLogout() {
 
 export function postRegisterSuccess(response) {
   return {
-    type: POST_REGISTER_SUCCESS,
+    type: REGISTER_SUCCESS,
     response
   }
 }
 
 export function postRegisterError(response) {
   return {
-    type: POST_REGISTER_ERROR,
+    type: REGISTER_ERROR,
     response
   }
 }
@@ -157,14 +157,14 @@ export function accountRegister(userCredentials) {
 
 export function getUserInfoSuccess(response) {
   return {
-    type: GET_USERINFO_SUCCESS,
+    type: USERINFO_SUCCESS,
     response
   }
 }
 
 export function getUserInfoError(response) {
   return {
-    type: GET_USERINFO_ERROR,
+    type: USERINFO_ERROR,
     response
   }
 }
@@ -195,14 +195,14 @@ export function accountGetUserInfo() {
 
 export function postUpdateProfileSuccess(response) {
   return {
-    type: POST_UPDATEPROFILE_SUCCESS,
+    type: UPDATEPROFILE_SUCCESS,
     response
   }
 }
 
 export function postUpdateProfileError(response) {
   return {
-    type: POST_UPDATEPROFILE_ERROR,
+    type: UPDATEPROFILE_ERROR,
     response
   }
 }
@@ -234,13 +234,13 @@ export function accountUpdateProfile(userCredentials) {
 
 export function postChangePasswordSuccess() {
   return {
-    type: POST_CHANGEPASSWORD_SUCCESS
+    type: CHANGEPASSWORD_SUCCESS
   }
 }
 
 export function postChangePasswordError(response) {
   return {
-    type: POST_CHANGEPASSWORD_ERROR,
+    type: CHANGEPASSWORD_ERROR,
     response
   }
 }
@@ -271,13 +271,13 @@ export function accountChangePassword(passwords) {
 
 export function postResetPasswordSuccess() {
   return {
-    type: POST_RESETPASSWORD_SUCCESS
+    type: RESETPASSWORD_SUCCESS
   }
 }
 
 export function postResetPasswordError(response) {
   return {
-    type: POST_RESETPASSWORD_ERROR,
+    type: RESETPASSWORD_ERROR,
     response
   }
 }
@@ -308,13 +308,13 @@ export function accountResetPassword(tokens) {
 
 export function postResetConfirmPasswordSuccess() {
   return {
-    type: POST_RESETCONFIRMPASSWORD_SUCCESS
+    type: RESETCONFIRMPASSWORD_SUCCESS
   }
 }
 
 export function postResetConfirmPasswordError(response) {
   return {
-    type: POST_RESETCONFIRMPASSWORD_ERROR,
+    type: RESETCONFIRMPASSWORD_ERROR,
     response
   }
 }
@@ -345,13 +345,13 @@ export function accountResetConfirmPassword(password) {
 
 export function postActivateSuccess() {
   return {
-    type: POST_ACTIVATE_SUCCESS
+    type: ACTIVATE_SUCCESS
   }
 }
 
 export function postActivateError(response) {
   return {
-    type: POST_ACTIVATE_ERROR,
+    type: ACTIVATE_ERROR,
     response
   }
 }

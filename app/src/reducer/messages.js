@@ -7,26 +7,26 @@ const DEFAULT_STATE = Map({
 });
 
 const ERROR_MESSAGES = {
-  POST_LOGIN_ERROR: "Unable to login.",
-  POST_LOGOUT_ERROR: "Unable to logout.",
-  POST_CHANGEPASSWORD_ERROR: "Unable to change password.",
-  POST_REGISTER_ERROR: "Unable to register with provided credentials.",
-  POST_UPDATEPROFILE_ERROR: "Unable to update profile.",
-  GET_USERINFO_ERROR: "Unable to get user profile information from server.",
-  POST_RESETPASSWORD_ERROR: "Unable to reset password.",
-  POST_RESETCONFIRMPASSWORD_ERROR: "Unable to reset password.",
-  GET_ACTIVATE_ERROR: "Unable to activate account."
+  LOGIN_ERROR: "Unable to login.",
+  LOGOUT_ERROR: "Unable to logout.",
+  CHANGEPASSWORD_ERROR: "Unable to change password.",
+  REGISTER_ERROR: "Unable to register with provided credentials.",
+  UPDATEPROFILE_ERROR: "Unable to update profile.",
+  USERINFO_ERROR: "Unable to get user profile information from server.",
+  RESETPASSWORD_ERROR: "Unable to reset password.",
+  RESETCONFIRMPASSWORD_ERROR: "Unable to reset password.",
+  ACTIVATE_ERROR: "Unable to activate account."
 }
 
 const SUCCESS_MESSAGES = {
-  POST_LOGIN_SUCCESS: "Successfully logged in.",
-  POST_LOGOUT_SUCCESS: "Successfully logged out.",
-  POST_CHANGEPASSWORD_SUCCESS: "Successfully changed password.",
-  POST_REGISTER_SUCCESS: "Successfully registered. You can now log in.",
-  POST_UPDATEPROFILE_SUCCESS: "Successfully updated profile information.",
-  POST_RESETPASSWORD_SUCCESS: "Password successfully reset. You have recieved an email to confirm the reset.",
-  POST_RESETCONFIRMPASSWORD_SUCCESS: "Password successfully reset.",
-  GET_ACTIVATE_SUCCESS: "Account successfully activated."
+  LOGIN_SUCCESS: "Successfully logged in.",
+  LOGOUT_SUCCESS: "Successfully logged out.",
+  CHANGEPASSWORD_SUCCESS: "Successfully changed password.",
+  REGISTER_SUCCESS: "Successfully registered. You can now log in.",
+  UPDATEPROFILE_SUCCESS: "Successfully updated profile information.",
+  RESETPASSWORD_SUCCESS: "Password successfully reset. You have recieved an email to confirm the reset.",
+  RESETCONFIRMPASSWORD_SUCCESS: "Password successfully reset.",
+  ACTIVATE_SUCCESS: "Account successfully activated."
 }
 
 export default function messages(state = DEFAULT_STATE, action) {

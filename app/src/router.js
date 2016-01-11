@@ -27,7 +27,7 @@ function recoverAuthToken() {
 
     if (auth_token) {
       store.dispatch({
-        type: 'POST_LOGIN_SUCCESS',
+        type: 'LOGIN_SUCCESS',
         response: {auth_token}
       });
       store.dispatch(accountGetUserInfo());

@@ -9,11 +9,11 @@ describe('user reducer', () => {
     window.localStorage = new Storage();
   });
 
-  it('handles POST_LOGIN_SUCCESS with successful login', () => {
+  it('handles LOGIN_SUCCESS with successful login', () => {
     const state = fromJS({ });
 
     const action = {
-      type: 'POST_LOGIN_SUCCESS',
+      type: 'LOGIN_SUCCESS',
       response: {
         auth_token: "mskdj8sdh8shadhs"  
       }
@@ -27,9 +27,9 @@ describe('user reducer', () => {
     expect(window.localStorage.getItem('auth_token')).to.equal("mskdj8sdh8shadhs");
   });
 
-  it('handles POST_LOGOUT_SUCCESS', () => {
+  it('handles LOGOUT_SUCCESS', () => {
     const state = fromJS({ auth_token: "mskdj8sdh8shadhs" });
-    const action = { type: 'POST_LOGOUT_SUCCESS' };
+    const action = { type: 'LOGOUT_SUCCESS' };
     const nextState = user(state, action);
 
     expect(nextState).to.equal(fromJS({ }));
@@ -37,11 +37,11 @@ describe('user reducer', () => {
     expect(window.localStorage.getItem('auth_token')).to.be.null;
   });
 
-  it('handles POST_REGISTER_SUCCESS', () => {
+  it('handles REGISTER_SUCCESS', () => {
     const state = fromJS({ });
 
     const action = {
-      type: 'POST_REGISTER_SUCCESS',
+      type: 'REGISTER_SUCCESS',
       response: {
         email: "john@beatles.uk",
         email_verified: false,
@@ -61,7 +61,7 @@ describe('user reducer', () => {
     }));
   });
 
-  it('handles POST_UPDATEPROFILE_SUCCESS', () => {
+  it('handles UPDATEPROFILE_SUCCESS', () => {
     const state = fromJS({ 
       email: "john@beatles.uk",
       first_name: "John",
@@ -70,7 +70,7 @@ describe('user reducer', () => {
     });
 
     const action = {
-      type: 'POST_UPDATEPROFILE_SUCCESS',
+      type: 'UPDATEPROFILE_SUCCESS',
       response: {
         email: "paul@beatles.uk",
         first_name: "paul",
@@ -88,11 +88,11 @@ describe('user reducer', () => {
     }));
   });
 
-  it('handles GET_USERINFO_SUCCESS', () => {
+  it('handles USERINFO_SUCCESS', () => {
     const state = fromJS({ });
 
     const action = {
-      type: 'GET_USERINFO_SUCCESS',
+      type: 'USERINFO_SUCCESS',
       response: {
         email: "paul@beatles.uk",
         first_name: "paul",

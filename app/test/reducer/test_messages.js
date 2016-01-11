@@ -40,10 +40,10 @@ describe('messages reducer', () => {
     expect(requestsPending).to.equal(0);
   });
 
-  it('handles POST_LOGIN_SUCCESS', () => {
+  it('handles LOGIN_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_LOGIN_SUCCESS' };
+    const action = { type: 'LOGIN_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -54,11 +54,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_LOGIN_ERROR', () => {
+  it('handles LOGIN_ERROR', () => {
     const state = Map({ userFeedback: List([]) });
 
     const action = {
-      type: 'POST_LOGIN_ERROR',
+      type: 'LOGIN_ERROR',
       response: {
         "non_field_errors": ["Unable to login with provided credentials."]
       }
@@ -76,10 +76,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_LOGOUT_SUCCESS', () => {
+  it('handles LOGOUT_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_LOGOUT_SUCCESS' };
+    const action = { type: 'LOGOUT_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -90,11 +90,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_LOGOUT_ERROR', () => {
+  it('handles LOGOUT_ERROR', () => {
     const state = Map({ userFeedback: List([]) });
 
     const action = {
-      type: 'POST_LOGOUT_ERROR',
+      type: 'LOGOUT_ERROR',
       response: {
         "non_field_errors": ["Unable to logout with provided credentials."]
       }
@@ -112,10 +112,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_REGISTER_SUCCESS', () => {
+  it('handles REGISTER_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_REGISTER_SUCCESS' };
+    const action = { type: 'REGISTER_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -126,11 +126,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it("handles POST_REGISTER_ERROR", () => {
+  it("handles REGISTER_ERROR", () => {
     const state = Map({ userFeedback: List([]) });
 
     const action = {
-      type: 'POST_REGISTER_ERROR',
+      type: 'REGISTER_ERROR',
       response: {
         "email": ["Another user is already registered with this email address"],
         "username": ["A user with that username already exists."]
@@ -150,10 +150,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_CHANGEPASSWORD_SUCCESS', () => {
+  it('handles CHANGEPASSWORD_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_CHANGEPASSWORD_SUCCESS' };
+    const action = { type: 'CHANGEPASSWORD_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -164,11 +164,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it("handles POST_CHANGEPASSWORD_ERROR", () => {
+  it("handles CHANGEPASSWORD_ERROR", () => {
     const state = Map({ userFeedback: List([]) });
 
     const action = {
-      type: 'POST_CHANGEPASSWORD_ERROR',
+      type: 'CHANGEPASSWORD_ERROR',
       response: {
         "current_password": ["Invalid password."]
       }
@@ -186,10 +186,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_UPDATEPROFILE_SUCCESS', () => {
+  it('handles UPDATEPROFILE_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_UPDATEPROFILE_SUCCESS' };
+    const action = { type: 'UPDATEPROFILE_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -200,11 +200,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_UPDATEPROFILE_ERROR', () => {
+  it('handles UPDATEPROFILE_ERROR', () => {
     const state = fromJS({ userFeedback: [] });
 
     const action = {
-      type: 'POST_UPDATEPROFILE_ERROR',
+      type: 'UPDATEPROFILE_ERROR',
       response: {
         "email": ["Another user is already registered with this email address"]
       }
@@ -222,11 +222,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles GET_USERINFO_ERROR', () => {
+  it('handles USERINFO_ERROR', () => {
     const state = fromJS({ userFeedback: [] });
 
     const action = {
-      type: 'GET_USERINFO_ERROR',
+      type: 'USERINFO_ERROR',
       response: {
         "email": ["User not found"]
       }
@@ -244,10 +244,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_RESETPASSWORD_SUCCESS', () => {
+  it('handles RESETPASSWORD_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_RESETPASSWORD_SUCCESS' };
+    const action = { type: 'RESETPASSWORD_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -258,11 +258,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_RESETPASSWORD_ERROR', () => {
+  it('handles RESETPASSWORD_ERROR', () => {
     const state = fromJS({ userFeedback: [] });
 
     const action = {
-      type: 'POST_RESETPASSWORD_ERROR',
+      type: 'RESETPASSWORD_ERROR',
       response: {
         "email": ["User not found"]
       }
@@ -280,10 +280,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_RESETCONFIRMPASSWORD_SUCCESS', () => {
+  it('handles RESETCONFIRMPASSWORD_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'POST_RESETCONFIRMPASSWORD_SUCCESS' };
+    const action = { type: 'RESETCONFIRMPASSWORD_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -294,11 +294,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles POST_RESETCONFIRMPASSWORD_ERROR', () => {
+  it('handles RESETCONFIRMPASSWORD_ERROR', () => {
     const state = fromJS({ userFeedback: [] });
 
     const action = {
-      type: 'POST_RESETCONFIRMPASSWORD_ERROR',
+      type: 'RESETCONFIRMPASSWORD_ERROR',
       response: {
         "email": ["User not found"]
       }
@@ -316,10 +316,10 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles GET_ACTIVATE_SUCCESS', () => {
+  it('handles ACTIVATE_SUCCESS', () => {
     const state = Map({ userFeedback: List([]) });
 
-    const action = { type: 'GET_ACTIVATE_SUCCESS' };
+    const action = { type: 'ACTIVATE_SUCCESS' };
     const nextState = messages(state, action);
 
     expect(nextState).to.equal(fromJS({
@@ -330,11 +330,11 @@ describe('messages reducer', () => {
     }));
   });
 
-  it('handles GET_ACTIVATE_ERROR', () => {
+  it('handles ACTIVATE_ERROR', () => {
     const state = fromJS({ userFeedback: [] });
 
     const action = {
-      type: 'GET_ACTIVATE_ERROR',
+      type: 'ACTIVATE_ERROR',
       response: {
         "email": ["User not found"]
       }
