@@ -71,7 +71,7 @@ export const Profile = React.createClass({
 
 function mapStateToProps(state) {
   return {
-    user: state.get('user')
+    user: state.user
   };
 }
 

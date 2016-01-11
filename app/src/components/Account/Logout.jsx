@@ -19,7 +19,7 @@ export const Logout =  React.createClass({
 
 function mapStateToProps(state) {
   return {
-    user: state.get('user')
+    user: state.user
   };
 }
 

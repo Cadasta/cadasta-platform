@@ -35,8 +35,8 @@ export const App = React.createClass({
 
 function mapStateToProps(state) {
   return {
-    messages: state.get('messages'),
-    user: state.get('user')
+    messages: state.messages,
+    user: state.user
   };
 }
 

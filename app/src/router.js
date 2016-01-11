@@ -18,7 +18,7 @@ import { DashboardContainer } from './components/Home/Dashboard';
 
 
 function recoverAuthToken() {
-  let auth_token = store.getState().get('user').get('auth_token');
+  let auth_token = store.getState().user.get('auth_token');
 
   if (!auth_token) {
     if (window.localStorage.getItem('auth_token')) {

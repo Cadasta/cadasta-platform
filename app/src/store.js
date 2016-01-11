@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
-import rootReducer from './reducer';
+import reducer from './reducer';
 
 import history from './history';
 
@@ -30,7 +30,7 @@ let store;
 
 if (!store) {
   let createStoreWithMiddleware = applyMiddleware(messages, redirect, thunk)(createStore);
-  store = createStoreWithMiddleware(rootReducer);
+  store = createStoreWithMiddleware(reducer);
 }
 
 export default store;
