@@ -6,16 +6,12 @@ from ..serializers import RegistrationSerializer, AccountLoginSerializer
 from ..models import User
 from ..exceptions import EmailNotVerifiedError
 
+from .factories import UserFactory
+
 
 class RegistrationSerializerTest(TestCase):
     def test_field_serialization(self):
-        user = User(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'password': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
-        })
+        user = UserFactory.build()
         serializer = RegistrationSerializer(user)
         self.assertIn('email_verified', serializer.data)
         self.assertNotIn('password', serializer.data)
@@ -43,8 +39,6 @@ class RegistrationSerializerTest(TestCase):
     def test_create_without_email(self):
         """Serialiser should be invalid when no email address is provided."""
 
-        User.objects.create()
-
         data = {
             'username': 'imagine71',
             'password': 'iloveyoko79',
@@ -60,12 +54,8 @@ class RegistrationSerializerTest(TestCase):
         """Serialiser should be invalid when another user with the same email
            address is already registered."""
 
-        User.objects.create(**{
-            'username': 'sgt_pepper',
+        UserFactory.create(**{
             'email': 'john@beatles.uk',
-            'password': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
         })
 
         data = {
@@ -90,16 +80,11 @@ class AccountLoginSerializerTest(TestCase):
         """Serializer should raise EmailNotVerifiedError exeception when the
            user has not verified their email address within 48 hours"""
 
-        user = User(**{
+        user = UserFactory.create(**{
           'username': 'sgt_pepper',
-          'email': 'john@beatles.uk',
           'password': 'iloveyoko79',
-          'first_name': 'John',
-          'last_name': 'Lennon',
           'verify_email_by': datetime.now()
         })
-        user.set_password('iloveyoko79')
-        user.save()
 
         with pytest.raises(EmailNotVerifiedError):
             AccountLoginSerializer().validate(attrs={

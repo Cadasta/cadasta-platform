@@ -10,23 +10,21 @@ from djoser.utils import encode_uid
 from ..models import User
 from ..views import AccountUser, AccountRegister, AccountLogin, AccountVerify
 
+from .factories import UserFactory
+
 
 class AccountUserTest(TestCase):
     def test_update_email_address(self):
         """Service should send a verification email when the user updates their
            email."""
-        user = User.objects.create(**{
+        user = UserFactory.create(**{
             'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'email': 'john@beatles.uk'
         })
 
         data = {
             'email': 'boss@beatles.uk',
-            'username': 'imagine71',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'username': 'imagine71'
         }
 
         request = APIRequestFactory().put('/account/', data)
@@ -38,18 +36,14 @@ class AccountUserTest(TestCase):
     def test_keep_email_address(self):
         """Service should not send a verification email when the user does not
            their email."""
-        user = User.objects.create(**{
+        user = UserFactory.create(**{
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'first_name': 'John',
-            'last_name': 'Lennon',
         })
 
         data = {
             'email': 'john@beatles.uk',
-            'username': 'imagine71',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'username': 'imagine71'
         }
 
         request = APIRequestFactory().put('/account/', data)
@@ -59,19 +53,17 @@ class AccountUserTest(TestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_update_with_existing_email(self):
-        User.objects.create(**{
-            'username': 'paul',
-            'email': 'boss@beatles.uk',
+        UserFactory.create(**{
+            'email': 'boss@beatles.uk'
         })
 
-        user = User.objects.create(**{
-            'username': 'imagine71',
+        user = UserFactory.create(**{
             'email': 'john@beatles.uk',
         })
 
         data = {
             'email': 'boss@beatles.uk',
-            'username': 'imagine71'
+            'username': user.username
         }
 
         request = APIRequestFactory().put('/account/', data)
@@ -84,13 +76,12 @@ class AccountUserTest(TestCase):
         self.assertEqual(user.email, 'john@beatles.uk')
 
     def test_update_username(self):
-        user = User.objects.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
+        user = UserFactory.create(**{
+            'username': 'imagine71'
         })
 
         data = {
-            'email': 'john@beatles.uk',
+            'email': user.email,
             'username': 'john'
         }
 
@@ -103,18 +94,16 @@ class AccountUserTest(TestCase):
         self.assertEqual(user.username, 'john')
 
     def test_update_with_existing_username(self):
-        User.objects.create(**{
-            'username': 'boss',
-            'email': 'paul@beatles.uk',
+        UserFactory.create(**{
+            'username': 'boss'
         })
 
-        user = User.objects.create(**{
-            'username': 'john',
-            'email': 'john@beatles.uk',
+        user = UserFactory.create(**{
+            'username': 'john'
         })
 
         data = {
-            'email': 'john@beatles.uk',
+            'email': user.email,
             'username': 'boss'
         }
 
@@ -160,14 +149,11 @@ class AccountSignupTest(TestCase):
 
 class AccountLoginTest(TestCase):
     def setUp(self):
-        self.user = User(**{
+        self.user = UserFactory.create(**{
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'password': 'iloveyoko79'
         })
-        self.user.set_password('iloveyoko79')
-        self.user.save()
 
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""
@@ -207,14 +193,7 @@ class AccountLoginTest(TestCase):
 
 class AccountVerifyTest(TestCase):
     def test_activate_account(self):
-        user = User(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'first_name': 'John',
-            'last_name': 'Lennon',
-        })
-        user.set_password('iloveyoko79')
-        user.save()
+        user = UserFactory.create()
 
         request = APIRequestFactory().post('/account/activate/', {
             'uid': encode_uid(user.pk),

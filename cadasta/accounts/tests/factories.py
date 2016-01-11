@@ -1,0 +1,21 @@
+import factory
+
+from ..models import User
+
+class UserFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = User
+
+    username = factory.Sequence(lambda n: "user #%s" % n)
+    email = factory.Sequence(lambda n: "email_%s@example.com" % n)
+    password = ''
+
+    @classmethod
+    def _prepare(cls, create, **kwargs):
+        password = kwargs.pop('password', None)
+        user = super(UserFactory, cls)._prepare(create, **kwargs)
+        if password:
+            user.set_password(password)
+            if create:
+                user.save()
+        return user
