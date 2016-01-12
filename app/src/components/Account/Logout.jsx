@@ -12,7 +12,7 @@ export const Logout =  React.createClass({
     if (this.props.user.get('auth_token')) {
       return ( <div>Logging out</div> );
     } else {
-      return (<div>Successfully logged out</div>);
+      return (<div />);
     }
   }
 });
