@@ -7,7 +7,7 @@ const DEFAULT_STATE = Map({
 });
 
 const ERROR_MESSAGES = {
-  LOGIN_ERROR: "Unable to login.",
+  LOGIN_ERROR: "Unable to login with provided credentials.",
   LOGOUT_ERROR: "Unable to logout.",
   CHANGEPASSWORD_ERROR: "Unable to change password.",
   REGISTER_ERROR: "Unable to register with provided credentials.",
@@ -24,7 +24,7 @@ const SUCCESS_MESSAGES = {
   CHANGEPASSWORD_SUCCESS: "Successfully changed password.",
   REGISTER_SUCCESS: "Successfully registered. You can now log in.",
   UPDATEPROFILE_SUCCESS: "Successfully updated profile information.",
-  RESETPASSWORD_SUCCESS: "Password successfully reset. You have recieved an email to confirm the reset.",
+  RESETPASSWORD_SUCCESS: "Password successfully reset. You have received an email to confirm the reset.",
   RESETCONFIRMPASSWORD_SUCCESS: "Password successfully reset.",
   ACTIVATE_SUCCESS: "Account successfully activated."
 }
