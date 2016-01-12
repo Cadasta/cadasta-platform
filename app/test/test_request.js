@@ -1,11 +1,8 @@
 import chai, {expect, assert} from 'chai';
-import chaiAsPromised from 'chai-as-promised';
 import nock from 'nock';
 
 import SETTINGS from '../src/settings';
 import Request from '../src/request';
-
-chai.use(chaiAsPromised);
 
 describe('request', () => {
   it("sends a GET request", () => {
