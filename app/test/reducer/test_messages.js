@@ -68,7 +68,7 @@ describe('messages reducer', () => {
     expect(nextState).to.equal(fromJS({
       userFeedback: [{
         type: 'error',
-        msg: "Unable to login.",
+        msg: "Unable to login with provided credentials.",
         details: [
           "Unable to login with provided credentials."
         ]
@@ -253,7 +253,7 @@ describe('messages reducer', () => {
     expect(nextState).to.equal(fromJS({
       userFeedback: [{
         type: 'success',
-        msg: "Password successfully reset. You have recieved an email to confirm the reset."
+        msg: "Password successfully reset. You have received an email to confirm the reset."
       }]
     }));
   });

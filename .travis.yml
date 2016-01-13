@@ -9,6 +9,11 @@ addons:
 install:
   - pip install -r requirements/common.txt
   - pip install -r requirements/dev.txt
+  - nvm install 4.0.0
+  - nvm alias default 4.0.0
+  - cd app
+  - npm install
+  - cd ..
 before_script:
   - psql template1 postgres -c 'create extension hstore;'
   - psql -c 'create database cadasta;' -U postgres
@@ -16,3 +21,6 @@ before_script:
   - python cadasta/manage.py migrate --settings=config.settings.travis
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
+  - cd app
+  - npm test
+  - cd ..
