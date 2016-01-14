@@ -2,13 +2,10 @@ import React from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
-import DismissMessageMixin from '../mixins/DismissMessageMixin';
 import * as accountActions from '../../actions/account';
 
 
 export const Login = React.createClass({
-  mixins: [ DismissMessageMixin ],
-
   handleFormSubmit: function(e) {
     e.preventDefault();
 

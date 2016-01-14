@@ -159,14 +159,16 @@ export function accountRegister(userCredentials) {
 export function getUserInfoSuccess(response) {
   return {
     type: USERINFO_SUCCESS,
-    response
+    response,
+    keepMessages: true
   }
 }
 
 export function getUserInfoError(response) {
   return {
     type: USERINFO_ERROR,
-    response
+    response,
+    keepMessages: true
   }
 }
 

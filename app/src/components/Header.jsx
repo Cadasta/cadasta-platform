@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router'
+import Link from './Router/Link';
 
 
 const Header = React.createClass({
@@ -7,7 +7,7 @@ const Header = React.createClass({
     if (this.props.user.get('auth_token')) {
       return (
         <ul>
-          <li><Link to="/account/profile/">Profile</Link></li>
+          <li><Link to={ "/account/profile/" }>Profile</Link></li>
           <li><Link to={ "/account/logout/" }>Logout</Link></li>
         </ul>
       )

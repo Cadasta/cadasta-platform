@@ -63,13 +63,13 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.LOGIN_SUCCESS, response, rememberMe: true },
-      { type: messageActions.REQUEST_DONE },
-      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/dashboard/' },
-      { type: messageActions.REQUEST_START },
-      { type: accountActions.USERINFO_SUCCESS, response: response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
+      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/dashboard/' },
+      { type: messageActions.REQUEST_START, keepMessages: true },
+      { type: accountActions.USERINFO_SUCCESS, response: response, keepMessages: true },
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -103,9 +103,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.LOGIN_ERROR, response: response },
-      { type: messageActions.REQUEST_DONE },
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -136,9 +136,9 @@ describe('Actions: account', () => {
       .reply(200)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.LOGOUT_SUCCESS },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -163,9 +163,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.LOGOUT_ERROR, response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -211,10 +211,10 @@ describe('Actions: account', () => {
       .reply(201, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.REGISTER_SUCCESS, response: response },
-      { type: messageActions.REQUEST_DONE },
-      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/login/' }
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
+      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/account/login/' }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -252,10 +252,10 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.REGISTER_ERROR, response: response },
-      { type: messageActions.REQUEST_DONE },
-      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/register/' }
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
+      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/account/register/' }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -280,7 +280,8 @@ describe('Actions: account', () => {
 
     expect(action).to.deep.equal({
       type: accountActions.USERINFO_SUCCESS,
-      response
+      response,
+      keepMessages: true
     })
   });
 
@@ -297,9 +298,9 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
-      { type: accountActions.USERINFO_SUCCESS, response: response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_START, keepMessages: true },
+      { type: accountActions.USERINFO_SUCCESS, response: response, keepMessages: true },
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -312,7 +313,8 @@ describe('Actions: account', () => {
 
     expect(action).to.deep.equal({
       type: 'USERINFO_ERROR',
-      response
+      response,
+      keepMessages: true
     })
   });
 
@@ -324,9 +326,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
-      { type: accountActions.USERINFO_ERROR, response: response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_START, keepMessages: true },
+      { type: accountActions.USERINFO_ERROR, response: response, keepMessages: true },
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -375,9 +377,9 @@ describe('Actions: account', () => {
       .reply(200, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.UPDATEPROFILE_SUCCESS, response: response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -413,9 +415,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.UPDATEPROFILE_ERROR, response: response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -449,9 +451,9 @@ describe('Actions: account', () => {
       .reply(200)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.CHANGEPASSWORD_SUCCESS },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -481,9 +483,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.CHANGEPASSWORD_ERROR, response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -514,9 +516,9 @@ describe('Actions: account', () => {
       .reply(200)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.RESETPASSWORD_SUCCESS },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -543,9 +545,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.RESETPASSWORD_ERROR, response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -579,9 +581,9 @@ describe('Actions: account', () => {
       .reply(200)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.RESETCONFIRMPASSWORD_SUCCESS },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -612,9 +614,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.RESETCONFIRMPASSWORD_ERROR, response },
-      { type: messageActions.REQUEST_DONE }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -646,10 +648,10 @@ describe('Actions: account', () => {
       .reply(200)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.ACTIVATE_SUCCESS },
-      { type: messageActions.REQUEST_DONE },
-      { type: routerActions.ROUTER_REDIRECT, redirectTo: '/account/login/' }
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
+      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/account/login/' }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -678,9 +680,9 @@ describe('Actions: account', () => {
       .reply(400, response)
 
     const expectedActions = [
-      { type: messageActions.REQUEST_START },
+      { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.ACTIVATE_ERROR, response },
-      { type: messageActions.REQUEST_DONE },
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
     ]
 
     const store = mockStore({}, expectedActions, done);

@@ -9,7 +9,7 @@ import { dismissMessages } from './actions/messages';
 
 
 const messages = store => next => action => {
-  if (action.type && (action.type.endsWith('_SUCCESS') || action.type.endsWith('_ERROR'))) {
+  if (action.type && !action.keepMessages) {
     store.dispatch(dismissMessages());
   }
 

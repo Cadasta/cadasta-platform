@@ -7,7 +7,8 @@ describe('Actions: Router', () => {
 
     expect(action).to.deep.equal({
       type: actions.ROUTER_REDIRECT,
-      redirectTo: '/dashboard/'
+      redirectTo: '/dashboard/',
+      keepMessages: true
     })
   });
 });

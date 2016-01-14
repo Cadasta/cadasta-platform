@@ -1,13 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router';
+import Link from '../Router/Link';
 
-import DismissMessageMixin from '../mixins/DismissMessageMixin';
 import * as accountActions from '../../actions/account';
 
 
 export const Profile = React.createClass({
-  mixins: [ DismissMessageMixin ],
 
   getStateFromProps: function(props) {
     return {
@@ -60,8 +58,8 @@ export const Profile = React.createClass({
         </form>
 
         <div>
-          <Link to="/account/password/">Change password</Link>
-          <Link to="/account/password/reset/">Reset password</Link>
+          <Link to={ "/account/password/" }>Change password</Link>
+          <Link to={ "/account/password/reset/" }>Reset password</Link>
         </div>
       </div>
       

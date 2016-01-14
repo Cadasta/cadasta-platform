@@ -6,7 +6,8 @@ describe('Actions: Messages', () => {
     const action = messageActions.requestStart();
 
     expect(action).to.deep.equal({
-      type: 'REQUEST_START'
+      type: 'REQUEST_START',
+      keepMessages: true
     })
   });
 
@@ -14,7 +15,8 @@ describe('Actions: Messages', () => {
     const action = messageActions.requestDone();
 
     expect(action).to.deep.equal({
-      type: 'REQUEST_DONE'
+      type: 'REQUEST_DONE',
+      keepMessages: true
     })
   });
 
@@ -22,7 +24,8 @@ describe('Actions: Messages', () => {
     const action = messageActions.dismissMessages();
 
     expect(action).to.deep.equal({
-      type: 'DISMISS_MESSAGES'
+      type: 'DISMISS_MESSAGES',
+      keepMessages: true
     })
   });
 });
