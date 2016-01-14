@@ -1,0 +1,12 @@
+{% load i18n %}{% autoescape off %}
+
+{% blocktrans %}You have recently changed your email address at {{ site_name }}. {% endblocktrans %}
+
+{% trans "Please go to the following page to confirm your new email address. " %}
+{% block reset_link %}
+{{ protocol }}://{{ domain }}/{{ url }}
+{% endblock %}
+
+{% blocktrans %}The {{ site_name }} Team. {% endblocktrans %}
+
+{% endautoescape %}

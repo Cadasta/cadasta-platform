@@ -18,8 +18,8 @@ from .exceptions import EmailNotVerifiedError
 
 class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
     token_generator = default_token_generator
-    subject_template_name = 'activation_email_subject.txt'
-    plain_body_template_name = 'activation_email_body.txt'
+    subject_template_name = 'change_email_email_subject.txt'
+    plain_body_template_name = 'change_email_email_body.txt'
     serializer_class = serializers.UserSerializer
 
 

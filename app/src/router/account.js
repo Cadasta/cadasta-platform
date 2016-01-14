@@ -48,7 +48,7 @@ export function requireAuth(nextState, replaceState) {
 export default (
   <div>
     <Route path="/account/login/" component={ LoginContainer } />
-    <Route path="/account/logout/" component={ LogoutContainer } />
+    <Route path="/account/logout/" component={ LogoutContainer } onEnter={ requireAuth } />
     <Route path="/account/register/" component={ RegisterContainer } />
     <Route path="/account/profile/" component={ ProfileContainer } onEnter={ requireAuth } />
     <Route path="/account/password/" component={ PasswordContainer } onEnter={ requireAuth } />
