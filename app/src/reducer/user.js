@@ -14,6 +14,7 @@ export default function user(state = defaultState, action) {
   switch (action.type) {
 
   	case 'LOGIN_SUCCESS':
+    case 'SET_TOKEN':
       setToken(action.response.auth_token, action.rememberMe);
 
       return state.merge({ auth_token: action.response.auth_token });

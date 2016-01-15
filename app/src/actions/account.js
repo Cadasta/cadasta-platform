@@ -368,7 +368,6 @@ export function accountActivate(data) {
         (success => {
           dispatch(postActivateSuccess());
           dispatch(requestDone());
-          dispatch(redirect('/dashboard/'));
         }),
         (error => {
           dispatch(postActivateError(error));

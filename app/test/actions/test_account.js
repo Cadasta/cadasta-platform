@@ -672,8 +672,7 @@ describe('Actions: account', () => {
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.ACTIVATE_SUCCESS },
-      { type: messageActions.REQUEST_DONE, keepMessages: true },
-      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/dashboard/' }
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
