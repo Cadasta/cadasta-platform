@@ -23,7 +23,13 @@ class UserUrlsTest(TestCase):
         self.assertEqual(resolved.func.__name__, views.AccountLogin.__name__)
 
     def test_account_activate(self):
-        self.assertEqual(reverse('accounts:verify'), '/account/verify/')
+        self.assertEqual(reverse('accounts:activate'), '/account/activate/')
 
-        resolved = resolve('/account/verify/')
+        resolved = resolve('/account/activate/')
         self.assertEqual(resolved.func.__name__, views.AccountVerify.__name__)
+
+    def test_password_reset(self):
+        self.assertEqual(reverse('accounts:password_reset'), '/account/password/reset/')
+
+        resolved = resolve('/account/password/reset/')
+        self.assertEqual(resolved.func.__name__, views.PasswordReset.__name__)

@@ -3,7 +3,7 @@
 
 {% trans "Please go to the following page to activate account:" %}
 {% block reset_link %}
-{{ protocol }}://{{ domain }}/{{ url }}
+{{ protocol }}://{{ domain }}/{{ url }}/
 {% endblock %}
 
 {% trans "Thanks for using our site!" %}
