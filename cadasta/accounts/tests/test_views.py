@@ -2,13 +2,13 @@ from datetime import datetime
 
 from django.test import TestCase
 from django.core import mail
-from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework.test import APIRequestFactory, force_authenticate
 from djoser.utils import encode_uid
 
 from ..models import User
 from ..views import AccountUser, AccountRegister, AccountLogin, AccountVerify
+from ..token import cadastaTokenGenerator
 
 from .factories import UserFactory
 
@@ -129,7 +129,11 @@ class AccountSignupTest(TestCase):
         request = APIRequestFactory().post('/account/register/', data)
         response = AccountRegister.as_view()(request).render()
         self.assertEqual(response.status_code, 201)
+        # self.assertIn('auth_token', response.content.decode("utf-8"))
+        
         self.assertEqual(User.objects.count(), 1)
+        # user = User.objects.first()
+        # self.assertTrue(user.is_authenticated())
 
     def test_user_signs_up_with_invalid(self):
         """The server should respond with an 404 error code when a user tries
@@ -195,9 +199,14 @@ class AccountVerifyTest(TestCase):
     def test_activate_account(self):
         user = UserFactory.create()
 
+        token = cadastaTokenGenerator.make_token(user)
+
+        user.last_login = datetime.now()
+        user.save()
+
         request = APIRequestFactory().post('/account/activate/', {
             'uid': encode_uid(user.pk),
-            'token': default_token_generator.make_token(user)
+            'token': token
         })
         response = AccountVerify.as_view()(request).render()
         self.assertEqual(response.status_code, 200)

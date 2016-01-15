@@ -1,11 +1,12 @@
+from django.contrib.auth import user_logged_in
 from django.utils.translation import ugettext as _
-from django.contrib.auth.tokens import default_token_generator
 
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 
 from djoser import views as djoser_views
 from djoser import utils as djoser_utils
@@ -14,12 +15,13 @@ from djoser import settings
 
 from . import serializers
 from .exceptions import EmailNotVerifiedError
+from .token import cadastaTokenGenerator
 
 
 class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
-    token_generator = default_token_generator
-    subject_template_name = 'change_email_email_subject.txt'
-    plain_body_template_name = 'change_email_email_body.txt'
+    token_generator = cadastaTokenGenerator
+    subject_template_name = 'change_email_subject.txt'
+    plain_body_template_name = 'change_email.txt'
     serializer_class = serializers.UserSerializer
 
 
@@ -39,14 +41,16 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
 
 
 class AccountRegister(djoser_views.RegistrationView):
+    token_generator = cadastaTokenGenerator
     serializer_class = serializers.RegistrationSerializer
+    plain_body_template_name = 'activate_email.txt'
 
 
 class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
     serializer_class = serializers.AccountLoginSerializer
-    token_generator = default_token_generator
+    token_generator = cadastaTokenGenerator
     subject_template_name = 'activation_email_subject.txt'
-    plain_body_template_name = 'activation_email_body.txt'
+    plain_body_template_name = 'activate_email.txt'
 
     def get_email_context(self, user):
         context = super(AccountLogin, self).get_email_context(user)
@@ -71,10 +75,14 @@ class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
             )
 
 
+class PasswordReset(djoser_views.PasswordResetView):
+    plain_body_template_name = 'password_reset.txt'
+
+
 class AccountVerify(djoser_utils.ActionViewMixin, GenericAPIView):
     serializer_class = djoser_serializers.UidAndTokenSerializer
     permission_classes = (AllowAny, )
-    token_generator = default_token_generator
+    token_generator = cadastaTokenGenerator
 
     def action(self, serializer):
         serializer.user.email_verified = True
