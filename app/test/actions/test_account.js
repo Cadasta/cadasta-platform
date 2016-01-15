@@ -206,15 +206,37 @@ describe('Actions: account', () => {
       last_name: 'Lennon'
     };
 
+    const loginResponse = { 
+        username: 'John',
+        email: 'john@beatles.uk',
+        first_name: 'John',
+        last_name: 'Lennon',
+        token: '8qwihd8zds87hds78'
+      };
+
     nock(SETTINGS.API_BASE)
       .post('/account/register/', userCredentials)
       .reply(201, response)
+
+    nock(SETTINGS.API_BASE)
+      .post('/account/login/', userCredentials)
+      .reply(200, loginResponse)
+
+    nock(SETTINGS.API_BASE)
+      .get('/account/')
+      .reply(200, response)
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.REGISTER_SUCCESS, response: response },
       { type: messageActions.REQUEST_DONE, keepMessages: true },
-      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/account/login/' }
+      { type: messageActions.REQUEST_START, keepMessages: true },
+      { type: accountActions.LOGIN_SUCCESS, response: loginResponse, rememberMe: undefined },
+      { type: messageActions.REQUEST_DONE, keepMessages: true },
+      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/dashboard/' },
+      { type: messageActions.REQUEST_START, keepMessages: true },
+      { type: accountActions.USERINFO_SUCCESS, response: response, keepMessages: true },
+      { type: messageActions.REQUEST_DONE, keepMessages: true }
     ]
 
     const store = mockStore({}, expectedActions, done);
@@ -651,7 +673,7 @@ describe('Actions: account', () => {
       { type: messageActions.REQUEST_START, keepMessages: true },
       { type: accountActions.ACTIVATE_SUCCESS },
       { type: messageActions.REQUEST_DONE, keepMessages: true },
-      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/account/login/' }
+      { type: routerActions.ROUTER_REDIRECT, keepMessages: true, redirectTo: '/dashboard/' }
     ]
 
     const store = mockStore({}, expectedActions, done);

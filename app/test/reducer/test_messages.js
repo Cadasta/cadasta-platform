@@ -121,7 +121,7 @@ describe('messages reducer', () => {
     expect(nextState).to.equal(fromJS({
       userFeedback: [{
         type: 'success',
-        msg: "Successfully registered. You can now log in."
+        msg: "Successfully registered."
       }]
     }));
   });

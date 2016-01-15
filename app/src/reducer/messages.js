@@ -22,7 +22,7 @@ const SUCCESS_MESSAGES = {
   LOGIN_SUCCESS: "Successfully logged in.",
   LOGOUT_SUCCESS: "Successfully logged out.",
   CHANGEPASSWORD_SUCCESS: "Successfully changed password.",
-  REGISTER_SUCCESS: "Successfully registered. You can now log in.",
+  REGISTER_SUCCESS: "Successfully registered.",
   UPDATEPROFILE_SUCCESS: "Successfully updated profile information.",
   RESETPASSWORD_SUCCESS: "Password successfully reset. Check your inbox for a link to confirm the reset.",
   RESETCONFIRMPASSWORD_SUCCESS: "Password successfully reset.",

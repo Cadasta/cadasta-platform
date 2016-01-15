@@ -139,7 +139,7 @@ export function accountRegister(userCredentials) {
         (success => {
           dispatch(postRegisterSuccess(success));
           dispatch(requestDone());
-          dispatch(redirect('/account/login/'));
+          dispatch(accountLogin(userCredentials))
         }),
         (error => {
           dispatch(postRegisterError(error));
@@ -363,12 +363,12 @@ export function accountActivate(data) {
   return dispatch => {
     dispatch(requestStart());
 
-    return Request.post('/account/activate/', data)
+    return Request.post('/account/activate/', data, false)
       .then(
         (success => {
           dispatch(postActivateSuccess());
           dispatch(requestDone());
-          dispatch(redirect('/account/login/'));
+          dispatch(redirect('/dashboard/'));
         }),
         (error => {
           dispatch(postActivateError(error));
