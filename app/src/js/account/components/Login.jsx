@@ -12,6 +12,9 @@ const propTypes = {
   }),
 };
 
+const contextTypes = {
+  intl: React.PropTypes.object,
+};
 
 export class Login extends React.Component {
   constructor(props) {
@@ -39,24 +42,27 @@ export class Login extends React.Component {
   }
 
   render() {
+    const labels = this.context.intl.getMessage('labels');
+
     return (
       <form className="login-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="username">{ labels.username }</label>
         <input name="username" ref="username" />
 
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">{ labels.password }</label>
         <input name="password" ref="password" type="password" />
 
         <input name="rememberMe" ref="rememberMe" type="checkbox" />
-        <label htmlFor="rememberMe">Remember Me</label>
+        <label htmlFor="rememberMe">{ labels.rememberMe }</label>
 
-        <button type="submit">Login</button>
+        <button type="submit">{ labels.login }</button>
       </form>
     );
   }
 }
 
 Login.propTypes = propTypes;
+Login.contextTypes = contextTypes;
 
 function mapStateToProps() {
   return {};

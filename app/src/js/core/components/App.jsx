@@ -1,6 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { Intl } from 'react-intl-es6';
+import intlData from '../intlData';
+
 import Message from '../../messages/components/Message';
 import { HomeContainer } from './Home';
 import Header from './Header';
@@ -11,7 +14,11 @@ const propTypes = {
   children: React.PropTypes.object,
 };
 
-export class App extends React.Component {
+export class App extends Intl {
+  constructor() {
+    super(intlData.locales, intlData.messages);
+  }
+
   loadingState() {
     if (this.props.messages.get('requestsPending')) {
       return (<div id="loading">Loading ...</div>);
