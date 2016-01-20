@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha --compilers js:babel-core/register --require ./test/test-helper 'test/**/*.@(js|jsx)'",
     "test:watch": "npm run test -- --watch",
-    "lint": "eslint src",
+    "lint": "./node_modules/.bin/eslint --ext .js,.jsx 'src/js/**/*.@(js|jsx)'; exit 0",
     "start": "./node_modules/.bin/webpack-dev-server"
   },
   "keywords": [],
@@ -24,6 +24,8 @@
     "css-loader": "^0.23.1",
     "enzyme": "^1.2.0",
     "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^3.1.0",
+    "eslint-plugin-react": "^3.15.0",
     "jsdom": "^7.2.1",
     "less": "^2.5.3",
     "less-loader": "^2.2.2",
