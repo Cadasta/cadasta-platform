@@ -1,4 +1,3 @@
-
 import { Map, List, fromJS } from 'immutable';
 
 const DEFAULT_STATE = new Map({

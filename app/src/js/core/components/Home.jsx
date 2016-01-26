@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import connect from 'react-redux/lib/components/connect';
 
 import RegistrationForm from '../../account/components/RegistrationForm';
 import * as accountActions from '../../account/actions';

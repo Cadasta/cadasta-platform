@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import connect from 'react-redux/lib/components/connect';
 
 import Message from '../../messages/components/Message';
 import { HomeContainer } from './Home';

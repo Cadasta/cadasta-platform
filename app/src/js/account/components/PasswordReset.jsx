@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import connect from 'react-redux/lib/components/connect';
 
 import * as accountActions from '../actions';
 
