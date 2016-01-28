@@ -1,0 +1,21 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#: src/js/account/components/Login.jsx:48
+msgid "Username"
+msgstr "Benutzername"
+
+#: src/js/account/components/Login.jsx:51
+msgid "Password"
+msgstr "Passwort"
+
+#: src/js/account/components/Login.jsx:55
+msgid "Remember me"
+msgstr "Angemeldet bleiben"
+
+#: src/js/account/components/Login.jsx:57
+msgid "Login"
+msgstr "Anmelden"

@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import * as accountActions from '../actions';
+import { t } from '../../i18n';
 
 const propTypes = {
   accountLogin: React.PropTypes.func.isRequired,
@@ -42,20 +43,18 @@ export class Login extends React.Component {
   }
 
   render() {
-    const labels = this.context.intl.getMessage('labels');
-
     return (
       <form className="login-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">{ labels.username }</label>
+        <label htmlFor="username">{ t('Username') }</label>
         <input name="username" ref="username" />
 
-        <label htmlFor="password">{ labels.password }</label>
+        <label htmlFor="password">{ t('Password') }</label>
         <input name="password" ref="password" type="password" />
 
         <input name="rememberMe" ref="rememberMe" type="checkbox" />
-        <label htmlFor="rememberMe">{ labels.rememberMe }</label>
+        <label htmlFor="rememberMe">{ t('Remember me') }</label>
 
-        <button type="submit">{ labels.login }</button>
+        <button type="submit">{ t('Login') }</button>
       </form>
     );
   }
