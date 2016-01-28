@@ -1,2 +1,4 @@
 Django==1.8.6
 psycopg2==2.6.1
+djoser==0.4.0
+django-cors-headers==1.1.0

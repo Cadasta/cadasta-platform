@@ -14,4 +14,6 @@ DATABASES = {
     }
 }
 
-ALLOWED_HOSTS = [*]
+DJOSER.update({
+    'DOMAIN': 'cadasta.org',
+})

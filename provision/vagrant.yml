@@ -6,6 +6,7 @@
     application_path: /vagrant/
     virtualenv_path: /vagrant/env/
     server_name: precise64
+    api_url: http://localhost:5000
   roles:
       - db
       - webserver

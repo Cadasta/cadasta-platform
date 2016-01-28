@@ -20,6 +20,10 @@ INSTALLED_APPS = (
     # 'devserver',
 ) + INSTALLED_APPS
 
+DJOSER.update({
+    'DOMAIN': 'localhost:8080',
+})
+
 # devserver settings
 DEVSERVER_AUTO_PROFILE = False  # use decorated functions
 DEVSERVER_TRUNCATE_SQL = True  # squash verbose output, show from/where
@@ -40,3 +44,11 @@ DEVSERVER_MODULES = (
     # show django session information
     # 'devserver.modules.request.SessionInfoModule',
 )
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+EMAIL_USE_TLS = False
+DEFAULT_FROM_EMAIL = 'testing@example.com'

@@ -1,5 +1,7 @@
 [run]
 omit =
     cadasta/*/tests/*
+    cadasta/*/migrations/*
+    cadasta/*/__init__.py
     cadasta/config/*
     cadasta/manage.py
