@@ -1,0 +1,122 @@
+#!/usr/bin/env python3
+
+import os.path, sys, re, textwrap
+import random, string, uuid
+import boto3
+
+import config
+
+
+#----------------------------------------------------------------------
+#
+#  CONFIGURATION OPTIONS
+#
+
+RDS_INSTANCES = [ 'db.m3.medium', 'db.m3.large', 'db.m3.xlarge',
+                  'db.m3.2xlarge',
+                  'db.r3.large', 'db.r3.xlarge', 'db.r3.2xlarge',
+                  'db.r3.4xlarge', 'db.r3.8xlarge',
+                  'db.t2.micro', 'db.t2.small', 'db.t2.medium', 'db.t2.large' ]
+
+EC2_INSTANCES = [ 't2.micro', 't2.small', 't2.medium', 't2.large',
+                  'm4.large', 'm4.xlarge', 'm4.2xlarge',
+                  'm4.4xlarge', 'm4.10xlarge',
+                  'm3.medium', 'm3.large', 'm3.xlarge', 'm3.2xlarge',
+                  'c4.large', 'c4.xlarge', 'c4.2xlarge',
+                  'c4.4xlarge', 'c4.8xlarge',
+                  'c3.large', 'c3.xlarge', 'c3.2xlarge',
+                  'c3.4xlarge', 'c3.8xlarge',
+                  'r3.large', 'r3.xlarge', 'r3.2xlarge',
+                  'r3.4xlarge', 'r3.8xlarge',
+                  'g2.2xlarge', 'g2.8xlarge',
+                  'i2.xlarge', 'i2.2xlarge', 'i2.4xlarge', 'i2.8xlarge',
+                  'd2.xlarge', 'd2.2xlarge', 'd2.4xlarge', 'd2.8xlarge' ]
+
+
+if len(sys.argv) != 2:
+    print('Usage: create-deployment aws-profile')
+    sys.exit(1)
+
+
+# AWS profile to use.
+
+aws_profile = sys.argv[1]
+
+
+# Make sure profile works and hook up the configuration manager.
+
+try:
+    aws = boto3.session.Session(profile_name=aws_profile)
+    config.set_session(aws)
+except:
+    print('FAILED TO CREATE AWS SESSION USING PROFILE "' + aws_profile + '"')
+    sys.exit(1)
+
+
+print("""
+
+This script will ask for the information required to set up a Cadasta
+Django deployment.
+
+This script does not perform any actions apart from collecting
+configuration information.  Once you've provided the required
+information, you can run the deploy script to create the required AWS
+resources and deploy the platform to those resources.
+
+To get help for any of the configuration options, just answer "?" at
+the prompt.
+""")
+
+def name_check(p):
+    if re.match('^[A-Za-z][A-Za-z0-9]*$' , p) is None:
+        print('Name must be alphanumeric, e.g. "CadastaTest3"')
+        return False
+    else:
+        return True
+
+config.get('deployment_name', 'Deployment name',
+"""This name is used to tag all the AWS entities used and to refer to
+the deployment more generally.  Must be alphanumeric.""",
+          check=name_check)
+config.set()
+if config.exists():
+    print('Deployment "{}" already exists!'.format(config.vals['deployment_name']))
+    sys.exit(1)
+
+
+def camel_to_snake(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s1).lower()
+
+prefix = config.vals['deployment_name']
+snprefix = camel_to_snake(prefix)
+
+config.get('main_url', 'Main endpoint URL',
+"""This is the host part of the URL used to access the Cadasta "front
+page".""",
+          default=snprefix+'.cadasta.org')
+
+config.get('api_url', 'API endpoint URL',
+"""This is the host part of the URL used to access the Cadasta "front
+page".""",
+          default=snprefix+'-api.cadasta.org')
+
+
+def instance_help(type, name, instances):
+    help = (type + ' instance type for the ' + name +
+            '.  Must be one of the following:')
+    help = textwrap.fill(help) + '\n\n'
+    help += '\n'.join(map(lambda s: '  ' + s,
+                          textwrap.wrap(', '.join(instances), 75)))
+    return help
+
+config.get('ec2_instance_type', 'EC2 instance type for platform processes',
+          instance_help('EC2', 'platform processes', EC2_INSTANCES),
+          values=EC2_INSTANCES)
+
+config.get('rds_instance_type', 'RDS instance type for Postgres database',
+          instance_help('RDS', 'Postgres database', RDS_INSTANCES),
+          values=RDS_INSTANCES)
+
+
+config.write()

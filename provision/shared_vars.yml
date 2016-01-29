@@ -1,0 +1,4 @@
+postgresql_version: "9.4"
+aws_postgresql_version: "9.4.5"
+postgis_version: "2.1"
+postgis_package_version: "2.1.*.pgdg14.04+1"

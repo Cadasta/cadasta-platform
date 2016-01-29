@@ -1,0 +1,64 @@
+- name: Install packages
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+    - git
+
+- name: Create base directory for installation
+  become: yes
+  become_user: root
+  file: path="{{ base_path }}" state=directory
+        owner="{{ app_user }}" mode=0755
+
+- name: Clone cadasta-platform repository
+  become: yes
+  become_user: "{{ app_user }}"
+  git: repo=https://github.com/Cadasta/cadasta-platform
+       dest="{{ application_path }}"
+       force=yes
+       version="{{ deploy_version }}"
+
+- name: Set up environment variables
+  become: yes
+  become_user: root
+  register: env_vars
+  blockinfile:
+    dest: /etc/environment
+    state: present
+    insertafter: EOF
+    marker: "ANSIBLE_{mark}=dummy"
+    block: |
+      DB_HOST="{{ db_host }}"
+      API_HOST="{{ api_url }}"
+      SECRET_KEY="{{ secret_key }}"
+      EMAIL_HOST_USER="{{ email_host_user }}"
+      EMAIL_HOST_PASSWORD="{{ email_host_password }}"
+      DJANGO_SETTINGS_MODULE={{ django_settings }}
+
+- name: Enable environment variables for SSH
+  become: yes
+  become_user: root
+  register: ssh_env
+  blockinfile:
+    dest: /etc/sudoers
+    state: present
+    insertafter: 'Defaults\s+secure_path'
+    block: |
+      Defaults	env_keep += DB_HOST
+      Defaults	env_keep += API_HOST
+      Defaults	env_keep += SECRET_KEY
+      Defaults	env_keep += EMAIL_HOST_USER
+      Defaults	env_keep += EMAIL_HOST_PASSWORD
+      Defaults	env_keep += DJANGO_SETTINGS_MODULE
+
+# This is VERY ugly.  The problem is that Ansible keeps SSH
+# connections open across tasks, so the environment variable changes
+# and sudo secure environment changes above don't get picked up unless
+# you blow away the SSH connection.  The only way to do that though is
+# to kill *all* SSH connections on the remote machine.
+
+- name: Kill SSH connections
+  shell: "sudo ps -ef | grep sshd | grep `whoami` | awk '{print \"sudo kill -9\", $2}' | sh"
+  failed_when: false
+  when: env_vars|changed or ssh_env|changed

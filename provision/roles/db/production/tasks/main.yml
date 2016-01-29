@@ -1,0 +1,42 @@
+- name: Install packages
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+      - postgresql-client-{{ postgresql_version }}
+      - libpq-dev # Required for Ansible to interact with postgres
+      - python-psycopg2 # Required for Ansible to interact with postgres
+
+- name: Create database
+  postgresql_db: login_host="{{ db_host }}"
+                 login_user="postgres" login_password="postgres"
+                 name="cadasta"
+
+# This test is needed because of a bad interaction between the way
+# that the Ansible postgresql_user modules works and the way that
+# Amazon RDS PostgreSQL instances have their admin roles set up.
+
+- name: Check for existence of database user
+  become: yes
+  become_user: cadasta
+  shell: psql -h '{{ db_host }}' -U postgres
+         -c "select rolname from pg_roles where rolname='cadasta'"
+  register: user_test
+  ignore_errors: true
+
+- name: Create database user
+  postgresql_user: login_host="{{ db_host }}"
+                   login_user="postgres" login_password="postgres"
+                   name="cadasta" password="cadasta"
+                   state=present role_attr_flags=NOSUPERUSER,CREATEDB
+  when: user_test.stdout.find('0') != -1
+
+- name: Provide user with DB permissions
+  postgresql_user: login_host="{{ db_host }}"
+                   login_user="postgres" login_password="postgres"
+                   user="cadasta" db="cadasta" priv=ALL
+
+- name: Install PostGIS on DB
+  postgresql_ext: login_host="{{ db_host }}"
+                  login_user="postgres" login_password="postgres"
+                  name=postgis db="cadasta"

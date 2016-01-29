@@ -1,0 +1,9 @@
+- name: Configure the PostgreSQL APT key
+  become: yes
+  become_user: root
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+
+- name: Configure the PostgreSQL APT repositories
+  become: yes
+  become_user: root
+  apt_repository: repo="deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release}}-pgdg main" state=present

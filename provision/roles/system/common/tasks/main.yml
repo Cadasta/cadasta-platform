@@ -1,0 +1,5 @@
+- name: Create Postgres password file for Cadasta user
+  become: yes
+  become_user: root
+  copy: src=pgpass dest="/home/{{ app_user }}/.pgpass"
+        owner="{{ app_user }}" mode=0600

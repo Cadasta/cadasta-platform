@@ -1,14 +1,19 @@
 - hosts: all
   vars:
-    db_name: django_app
-    db_user: django
-    db_password: sdjgh34iutwefhfgbqkj3
     application_path: /vagrant/
     virtualenv_path: /vagrant/env/
-    server_name: precise64
+    django_settings: config.settings.dev
     api_url: http://localhost:5000
+    app_user: vagrant
+    uwsgi_socket: /tmp/uwsgi.sock
+  vars_files:
+    - shared_vars.yml
   roles:
-      - db
-      - webserver
-      - cadasta_app
-      - cadasta_dev
+    - system/common
+    - db/common
+    - db/development
+    - node
+    - cadasta/application
+    - cadasta/development
+    - webserver/common
+    - webserver/development

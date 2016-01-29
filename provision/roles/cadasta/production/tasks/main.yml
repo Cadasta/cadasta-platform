@@ -1,0 +1,17 @@
+- name: Install NodeJS dependencies
+  become: yes
+  become_user: "{{ app_user }}"
+  ignore_errors: yes
+  command: npm install
+           chdir="{{ application_path }}app"
+
+- name: Install npm-run
+  become: yes
+  become_user: root
+  command: npm install -g npm-run
+
+- name: Build Webpack bundle
+  become: yes
+  become_user: "{{ app_user }}"
+  command: npm-run webpack -p
+           chdir="{{ application_path }}app"

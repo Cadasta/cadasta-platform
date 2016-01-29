@@ -1,0 +1,129 @@
+#!/usr/bin/env python3
+
+import boto3
+import os
+import sys
+import subprocess
+import json
+import time
+import tempfile
+from os.path import normpath, join, dirname, abspath
+
+from ami import get_ami
+import config
+import secrets
+
+
+if len(sys.argv) != 5:
+    print('Usage: provision aws-profile private-key-file ' +
+          'deployment-name deployment-version')
+    sys.exit(1)
+
+
+# AWS profile and private key file to use, plus deployment name.
+
+aws_profile = sys.argv[1]
+private_key_file = sys.argv[2]
+deployment_name = sys.argv[3]
+deploy_version = sys.argv[4]
+
+
+# Make sure profile works and look up region from profile.
+
+try:
+    aws = boto3.session.Session(profile_name=aws_profile)
+except:
+    print('FAILED TO CREATE AWS SESSION USING PROFILE "' + aws_profile + '"')
+    sys.exit(1)
+aws_region = aws._session.get_config_variable('region')
+
+
+# Open and read deployment configuration file.
+
+config.set_session(aws)
+config.set(deployment_name)
+if not config.exists():
+    print('Deployment "{}" does not exist!'.format(deployment_name))
+    sys.exit(1)
+config.read()
+config.vals['aws_region'] = aws_region
+config.vals['deploy_version'] = deploy_version
+
+
+# Get AWS user ID.
+
+try:
+    iam = aws.client('iam')
+    aws_uid = iam.get_user()['User']['Arn'].split(':')[4]
+except Exception as e:
+    print('\nFAILED TO GET CURRENT AMAZON USER ID!\n')
+    print(e)
+    print()
+    sys.exit(1)
+
+
+# Check that CloudFormation stack already exists.
+
+cfn = aws.client('cloudformation')
+try:
+    stacks = cfn.list_stacks()['StackSummaries']
+    stack_names = [s['StackName'] for s in stacks
+                   if s['StackStatus'] != 'DELETE_COMPLETE']
+except:
+    print('Failed to list CloudFormation stacks!')
+    sys.exit(1)
+stack_name = deployment_name + '-stack'
+if stack_name not in stack_names:
+    print('CloudFormation stack for deployment "{}" does not exist!'.
+          format(deployment_name))
+    sys.exit(1)
+
+
+# Get platform email credentials.
+
+secrets.set_session(aws)
+platform_email = secrets.read('platform-email')
+
+
+# Set up Ansible provisioning command parameters.
+
+config.write()
+work_dir = normpath(join(dirname(abspath(__file__)), '../../provision'))
+extra_vars = [('main_url',           config.vals['main_url']),
+              ('api_url',            config.vals['api_url']),
+              ('aws_region',         config.vals['aws_region']),
+              ('db_host',            config.vals['db_host']),
+              ('secret_key',         config.vals['secret_key']),
+              ('deployment_name',    config.vals['deployment_name']),
+              ('s3_bucket',          config.vals['s3_bucket']),
+              ('deploy_version',     config.vals['deploy_version']),
+              ('email_host_user',     platform_email['email_host_user']),
+              ('email_host_password', platform_email['email_host_password'])]
+extra_vars = ' '.join(map(lambda p: p[0] + '=' + p[1], extra_vars))
+
+
+# Set up temporary hosts file for Ansible.
+
+tmp_hosts = tempfile.mkstemp()[1]
+with open(tmp_hosts, 'w') as tmp_fp:
+    print(config.vals['public_ip'], file=tmp_fp)
+
+
+# Run provisioning playbook.
+
+os.chdir(work_dir)
+os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'false'
+cmd = ['ansible-playbook',
+       '--private-key=' + private_key_file,
+       '--inventory-file=' + tmp_hosts,
+       '--extra-vars', extra_vars,
+#       '-vvv',
+#       '--tags=test',
+       'aws-deploy.yml']
+if subprocess.call(cmd) != 0:
+    print('\n\nansible-playbook TERMINATED INCORRECTLY!\n\n')
+else:
+    print('\n\nPROVISIONING COMPLETED!\n\n')
+    print('See s3://cadasta-secrets/deployments/{}.json for details\n'.
+          format(config.vals['deployment_name']))
+os.remove(tmp_hosts)
