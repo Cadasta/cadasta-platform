@@ -8,7 +8,7 @@ Install:
 
 - [VirtualBox](https://www.virtualbox.org/)
 - [Vagrant](https://www.vagrantup.com/)
-- [Ansible](http://www.ansible.com/)
+- [Ansible](http://www.ansible.com/) (version 2: install with PIP for a recent version)
 
 Clone the [repository](https://github.com/cadasta/cadasta-platform).
 
