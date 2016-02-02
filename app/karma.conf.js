@@ -2,10 +2,10 @@ module.exports = function karmaConf(config) {
   config.set({
     frameworks: ['mocha', 'chai', 'sinon'],
     files: [
-      'test/test_index.js',
+      'test/index.js',
     ],
     preprocessors: {
-      'test/test_index.js': ['webpack', 'sourcemap'],
+      'test/index.js': ['webpack', 'sourcemap'],
     },
     webpack: {
       resolve: {
@@ -47,6 +47,7 @@ module.exports = function karmaConf(config) {
         'jsdom': 'window',
         'cheerio': 'window',
         'react/lib/ExecutionEnvironment': true,
+        'react/lib/ReactContext': true
       },
     },
     browsers: ['jsdom'],

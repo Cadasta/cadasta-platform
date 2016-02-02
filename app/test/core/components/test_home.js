@@ -7,7 +7,8 @@ import RegistrationForm from '../../../src/js/account/components/RegistrationFor
 
 describe('Home', () => {
   it('renders registration form', () => {
-    const wrapper = shallow(<Home />);
+    const accountRegister = () => {};
+    const wrapper = shallow(<Home accountRegister={accountRegister} />);
     expect(wrapper.find(RegistrationForm)).to.have.length(1);
   });
 });
