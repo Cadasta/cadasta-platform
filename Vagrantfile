@@ -72,6 +72,7 @@ Vagrant.configure(2) do |config|
   # Enable provisioning using Ansible
   config.vm.provision "ansible" do |ansible|
     ansible.verbose = "vvv"
+    ansible.limit = "all"
     ansible.playbook = "provision/vagrant.yml"
   end
 end

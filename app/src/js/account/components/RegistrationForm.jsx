@@ -26,25 +26,37 @@ class RegistrationForm extends React.Component {
   render() {
     return (
       <form className="account-register" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">Username</label>
-        <input name="username" ref="username" />
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input name="username" ref="username" type="text" className="form-control" />
+        </div>
 
-        <label htmlFor="email">Email</label>
-        <input name="email" ref="email" type="email" />
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input name="email" ref="email" type="email" className="form-control" />
+        </div>
 
-        <label htmlFor="password">Password</label>
-        <input name="password" ref="password" type="password" />
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input name="password" ref="password" type="password" className="form-control" />
+        </div>
 
-        <label htmlFor="password_repeat">Password</label>
-        <input name="password_repeat" ref="password_repeat" type="password" />
+        <div className="form-group">
+          <label htmlFor="password_repeat">Password</label>
+          <input name="password_repeat" ref="password_repeat" type="password" className="form-control" />
+        </div>
 
-        <label htmlFor="first_name">First name</label>
-        <input name="first_name" ref="first_name" />
+        <div className="form-group">
+          <label htmlFor="first_name">First name</label>
+          <input name="first_name" ref="first_name" type="text" className="form-control" />
+        </div>
 
-        <label htmlFor="last_name">Last name</label>
-        <input name="last_name" ref="last_name" />
+        <div className="form-group">
+          <label htmlFor="last_name">Last name</label>
+          <input name="last_name" ref="last_name" type="text" className="form-control" />
+        </div>
 
-        <button type="submit">Register</button>
+        <button type="submit" className="btn btn-default">Register</button>
       </form>
     );
   }
