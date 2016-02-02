@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
   entry: [
@@ -25,6 +26,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['', '.js', '.jsx'],
+    root: [
+      path.resolve('./src'),
+    ],
   },
   output: {
     path: __dirname + '/dist',

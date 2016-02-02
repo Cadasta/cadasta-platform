@@ -1,8 +1,6 @@
-import { describe, it } from 'mocha';
 import React from 'react/addons';
 import { fromJS } from 'immutable';
 
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 import Message from '../../../src/js/messages/components/Message';

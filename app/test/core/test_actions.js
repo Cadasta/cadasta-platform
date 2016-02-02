@@ -1,5 +1,3 @@
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
 import * as actions from '../../src/js/core/actions';
 
 describe('Core: Actions', () => {

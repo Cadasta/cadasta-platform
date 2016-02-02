@@ -1,6 +1,4 @@
-import { describe, it } from 'mocha';
 import React from 'react/addons';
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 import { Home } from '../../../src/js/core/components/Home';

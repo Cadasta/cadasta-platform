@@ -4,6 +4,7 @@ import { sprintf } from 'sprintf-js';
 import catalogs from '../../locale/catalogs';
 
 let jed;
+const LOCALE_DEBUG = true;
 const browserLocale = window.navigator.language || 'en';
 
 const translations = (function translations() {
@@ -12,7 +13,6 @@ const translations = (function translations() {
   catalogs.supported_locales.forEach(function (lang) {
     languages[lang] = require('../../locale/' + lang + '/LC_MESSAGES/messages.po');
   });
-
   return languages;
 }());
 
@@ -31,6 +31,31 @@ export function setLocale(locale) {
 
 setLocale(browserLocale);
 
+function mark(str) {
+  if (!LOCALE_DEBUG) {
+    return str;
+  }
+
+  const proxy = {
+    $$typeof: Symbol.for('react.element'),
+    type: 'span',
+    key: null,
+    ref: null,
+    props: {
+      className: 'translation-wrapper',
+      children: typeof str === 'array' ? str : [str],
+    },
+    _owner: null,
+    _store: {},
+  };
+
+  proxy.toString = function () {
+    return '-@-' + str + '-@-';
+  };
+
+  return str;
+}
+
 export function t(str, ...args) {
   let translated = jed.gettext(str);
 
@@ -38,7 +63,7 @@ export function t(str, ...args) {
     translated = sprintf(translated, ...args);
   }
 
-  return translated;
+  return mark(translated);
 }
 
 export function tn(singular, plural, ...args) {

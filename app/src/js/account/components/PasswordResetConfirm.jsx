@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { t } from '../../i18n';
 import * as accountActions from '../actions';
 
 const propTypes = {
@@ -31,13 +32,13 @@ export class PasswordResetConfirm extends React.Component {
   render() {
     return (
       <form onSubmit={this.handleFormSubmit}>
-        <label htmlFor="new_password">Enter new password</label>
+        <label htmlFor="new_password">{ t('Enter new password') }</label>
         <input type="password" name="new_password" ref="new_password" />
 
-        <label htmlFor="re_new_password">Retype newpassword</label>
+        <label htmlFor="re_new_password">{ t('Retype new password') }</label>
         <input type="password" name="re_new_password" ref="re_new_password" />
 
-        <button type="submit">Reset password</button>
+        <button type="submit">{ t('Reset password') }</button>
       </form>
     );
   }

@@ -1,6 +1,3 @@
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
-import nock from 'nock';
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
 
@@ -15,9 +12,18 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 describe('Account: actions', () => {
+  let server;
+
   beforeEach(() => {
     window.sessionStorage = new Storage();
     window.sessionStorage.setItem('auth_token', 's8yc8shch98s');
+
+    server = sinon.fakeServer.create();
+    server.autoRespond = true;
+  });
+
+  afterEach(() => {
+    server.restore();
   });
 
   /* ********************************************************
@@ -55,13 +61,8 @@ describe('Account: actions', () => {
       token: '8qwihd8zds87hds78',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/login/', userCredentials)
-      .reply(200, response);
-
-    nock(SETTINGS.API_BASE)
-      .get('/account/')
-      .reply(200, response);
+    server.respondWith('POST', SETTINGS.API_BASE + '/account/login/', JSON.stringify(response));
+    server.respondWith('GET', SETTINGS.API_BASE + '/account/', JSON.stringify(response));
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -89,19 +90,21 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates LOGIN_ERROR when login was unsuccesful', (done) => {
+  it('creates LOGIN_ERROR when login was unsuccesful', (done) => {
     const userCredentials = {
       username: 'John',
       password: '123455',
     };
 
     const response = {
-      non_field_errors: ['Unable to login with provided credentials.']
+      non_field_errors: ['Unable to login with provided credentials.'],
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/login/', userCredentials)
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/login/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -120,7 +123,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates LOGOUT_SUCCESS', () => {
+  it('creates LOGOUT_SUCCESS', () => {
     const action = accountActions.postLogoutSuccess();
 
     expect(action).to.deep.equal({
@@ -128,13 +131,11 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates LOGOUT_SUCCESS when logout was succesful', (done) => {
+  it('creates LOGOUT_SUCCESS when logout was succesful', (done) => {
     window.localStorage = new Storage();
     window.localStorage.setItem('auth_token', '8937hds8yh8hsd');
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/logout/', {})
-      .reply(200);
+    server.respondWith('POST', SETTINGS.API_BASE + '/account/logout/', '');
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -143,10 +144,10 @@ describe('Account: actions', () => {
     ];
 
     const store = mockStore({}, expectedActions, done);
-    store.dispatch(accountActions.accountLogout({}))
+    store.dispatch(accountActions.accountLogout({}));
   });
 
-  it ('creates LOGOUT_ERROR', () => {
+  it('creates LOGOUT_ERROR', () => {
     const response = { some: 'error' };
     const action = accountActions.postLogoutError(response);
 
@@ -156,12 +157,14 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates LOGOUT_ERROR when logout was not succesful', (done) => {
+  it('creates LOGOUT_ERROR when logout was not succesful', (done) => {
     const response = { some: 'error' };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/logout/', {})
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/logout/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -170,7 +173,7 @@ describe('Account: actions', () => {
     ];
 
     const store = mockStore({}, expectedActions, done);
-    store.dispatch(accountActions.accountLogout())
+    store.dispatch(accountActions.accountLogout());
   });
 
 
@@ -180,7 +183,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates REGISTER_SUCCESS', () => {
+  it('creates REGISTER_SUCCESS', () => {
     const response = {};
     const action = accountActions.postRegisterSuccess(response);
 
@@ -215,17 +218,21 @@ describe('Account: actions', () => {
       token: '8qwihd8zds87hds78',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/register/', userCredentials)
-      .reply(201, response);
-
-    nock(SETTINGS.API_BASE)
-      .post('/account/login/', userCredentials)
-      .reply(200, loginResponse);
-
-    nock(SETTINGS.API_BASE)
-      .get('/account/')
-      .reply(200, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/register/',
+      [201, {}, JSON.stringify(response)]
+    );
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/login/',
+      JSON.stringify(loginResponse)
+    );
+    server.respondWith(
+      'GET',
+      SETTINGS.API_BASE + '/account/',
+      JSON.stringify(response)
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -244,7 +251,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountRegister(userCredentials));
   });
 
-  it ('creates REGISTER_ERROR', () => {
+  it('creates REGISTER_ERROR', () => {
     const response = {
       email: ['Another user is already registered with this email address'],
     };
@@ -256,7 +263,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates REGISTER_ERROR when registration was not succesful', (done) => {
+  it('creates REGISTER_ERROR when registration was not succesful', (done) => {
     const userCredentials = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -270,9 +277,11 @@ describe('Account: actions', () => {
       email: ['Another user is already registered with this email address'],
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/register/', userCredentials)
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/register/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -292,7 +301,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates USERINFO_SUCCESS', () => {
+  it('creates USERINFO_SUCCESS', () => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -308,7 +317,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates USERINFO_SUCCESS when profile update was succesful', (done) => {
+  it('creates USERINFO_SUCCESS when profile update was succesful', (done) => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -316,9 +325,11 @@ describe('Account: actions', () => {
       last_name: 'Lennon',
     };
 
-    nock(SETTINGS.API_BASE)
-      .get('/account/')
-      .reply(200, response);
+    server.respondWith(
+      'GET',
+      SETTINGS.API_BASE + '/account/',
+      [200, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -330,7 +341,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountGetUserInfo());
   });
 
-  it ('creates USERINFO_SUCCESS', () => {
+  it('creates USERINFO_SUCCESS', () => {
     const response = { some: 'error' };
     const action = accountActions.getUserInfoError(response);
 
@@ -341,12 +352,14 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates USERINFO_ERROR when profile update was not succesful', (done) => {
+  it('creates USERINFO_ERROR when profile update was not succesful', (done) => {
     const response = { some: 'error' };
 
-    nock(SETTINGS.API_BASE)
-      .get('/account/')
-      .reply(400, response);
+    server.respondWith(
+      'GET',
+      SETTINGS.API_BASE + '/account/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -365,7 +378,7 @@ describe('Account: actions', () => {
    *
    * *******************************************************/
 
-  it ('creates UPDATEPROFILE_SUCCESS', () => {
+  it('creates UPDATEPROFILE_SUCCESS', () => {
     const response = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -380,7 +393,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates UPDATEPROFILE_SUCCESS when profile update was succesful', (done) => {
+  it('creates UPDATEPROFILE_SUCCESS when profile update was succesful', (done) => {
     const userCredentials = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -395,9 +408,11 @@ describe('Account: actions', () => {
       last_name: 'Lennon',
     };
 
-    nock(SETTINGS.API_BASE)
-      .put('/account/', userCredentials)
-      .reply(200, response);
+    server.respondWith(
+      'PUT',
+      SETTINGS.API_BASE + '/account/',
+      [200, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -409,7 +424,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountUpdateProfile(userCredentials));
   });
 
-  it ('creates UPDATEPROFILE_ERROR', () => {
+  it('creates UPDATEPROFILE_ERROR', () => {
     const response = {
       email: ['Another user is already registered with this email address'],
     };
@@ -421,7 +436,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates UPDATEPROFILE_SUCCESS when profile update was succesful', (done) => {
+  it('creates UPDATEPROFILE_SUCCESS when profile update was succesful', (done) => {
     const userCredentials = {
       username: 'John',
       email: 'john@beatles.uk',
@@ -433,9 +448,11 @@ describe('Account: actions', () => {
       email: ['Another user is already registered with this email address'],
     };
 
-    nock(SETTINGS.API_BASE)
-      .put('/account/', userCredentials)
-      .reply(400, response);
+    server.respondWith(
+      'PUT',
+      SETTINGS.API_BASE + '/account/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -454,7 +471,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates CHANGEPASSWORD_SUCCESS', () => {
+  it('creates CHANGEPASSWORD_SUCCESS', () => {
     const action = accountActions.postChangePasswordSuccess();
 
     expect(action).to.deep.equal({
@@ -462,16 +479,18 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates CHANGEPASSWORD_SUCCESS when profile update was succesful', (done) => {
+  it('creates CHANGEPASSWORD_SUCCESS when profile update was succesful', (done) => {
     const passwords = {
       new_password: '123456',
       re_new_password: '123456',
       current_password: '78910',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/password/', passwords)
-      .reply(200);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/password/',
+      [200, {}, '']
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -483,7 +502,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountChangePassword(passwords));
   });
 
-  it ('creates CHANGEPASSWORD_ERROR', () => {
+  it('creates CHANGEPASSWORD_ERROR', () => {
     const response = { current_password: ['Invalid password.'] };
     const action = accountActions.postChangePasswordError(response);
 
@@ -493,7 +512,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates CHANGEPASSWORD_ERROR when profile update was not succesful', (done) => {
+  it('creates CHANGEPASSWORD_ERROR when profile update was not succesful', (done) => {
     const response = { current_password: ['Invalid password.'] };
     const passwords = {
       new_password: '123456',
@@ -501,9 +520,11 @@ describe('Account: actions', () => {
       current_password: '78910',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/password/', passwords)
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/password/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -521,7 +542,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates RESETPASSWORD_SUCCESS', () => {
+  it('creates RESETPASSWORD_SUCCESS', () => {
     const action = accountActions.postResetPasswordSuccess();
 
     expect(action).to.deep.equal({
@@ -529,14 +550,16 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates RESETPASSWORD_SUCCESS when password reset was succesful', (done) => {
+  it('creates RESETPASSWORD_SUCCESS when password reset was succesful', (done) => {
     const user = {
       email: 'john@beatles.uk',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/password/reset/', user)
-      .reply(200);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/password/reset/',
+      [200, {}, '']
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -548,7 +571,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountResetPassword(user));
   });
 
-  it ('creates RESETPASSWORD_ERROR', () => {
+  it('creates RESETPASSWORD_ERROR', () => {
     const response = { some: 'Error' };
     const action = accountActions.postResetPasswordError(response);
 
@@ -558,13 +581,15 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates RESETPASSWORD_ERROR when password reset was not succesful', (done) => {
+  it('creates RESETPASSWORD_ERROR when password reset was not succesful', (done) => {
     const user = { email: 'john@beatles.uk' };
     const response = { some: 'Error' };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/password/reset/', user)
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/password/reset/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -582,7 +607,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates RESETCONFIRMPASSWORD_SUCCESS', () => {
+  it('creates RESETCONFIRMPASSWORD_SUCCESS', () => {
     const action = accountActions.postResetConfirmPasswordSuccess();
 
     expect(action).to.deep.equal({
@@ -590,7 +615,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates RESETCONFIRMPASSWORD_SUCCESS when password reset was succesful', (done) => {
+  it('creates RESETCONFIRMPASSWORD_SUCCESS when password reset was succesful', (done) => {
     const user = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
@@ -598,9 +623,11 @@ describe('Account: actions', () => {
       re_new_password: '123456',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/password/reset/confirm/', user)
-      .reply(200);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/password/reset/confirm/',
+      [200, {}, '']
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -612,7 +639,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountResetConfirmPassword(user));
   });
 
-  it ('creates RESETCONFIRMPASSWORD_ERROR', () => {
+  it('creates RESETCONFIRMPASSWORD_ERROR', () => {
     const response = { some: 'Error' };
     const action = accountActions.postResetConfirmPasswordError(response);
 
@@ -622,7 +649,7 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates RESETCONFIRMPASSWORD_ERROR when password reset was not succesful', (done) => {
+  it('creates RESETCONFIRMPASSWORD_ERROR when password reset was not succesful', (done) => {
     const user = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
@@ -631,9 +658,11 @@ describe('Account: actions', () => {
     };
     const response = { some: 'Error' };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/password/reset/confirm/', user)
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/password/reset/confirm/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -651,7 +680,7 @@ describe('Account: actions', () => {
    *
    * ********************************************************/
 
-  it ('creates ACTIVATE_SUCCESS', () => {
+  it('creates ACTIVATE_SUCCESS', () => {
     const action = accountActions.postActivateSuccess();
 
     expect(action).to.deep.equal({
@@ -659,15 +688,17 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates ACTIVATE_SUCCESS when account activation was succesful', (done) => {
+  it('creates ACTIVATE_SUCCESS when account activation was succesful', (done) => {
     const data = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
     };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/activate/', data)
-      .reply(200);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/activate/',
+      [200, {}, '']
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
@@ -679,7 +710,7 @@ describe('Account: actions', () => {
     store.dispatch(accountActions.accountActivate(data));
   });
 
-  it ('creates ACTIVATE_ERROR', () => {
+  it('creates ACTIVATE_ERROR', () => {
     const response = { some: 'Error' };
     const action = accountActions.postActivateError(response);
 
@@ -689,16 +720,18 @@ describe('Account: actions', () => {
     });
   });
 
-  it ('creates ACTIVATE_ERROR when account activation was not succesful', (done) => {
+  it('creates ACTIVATE_ERROR when account activation was not succesful', (done) => {
     const data = {
       uid: 'MQ',
       token: '489-963055ee7742ad6c4440',
     };
     const response = { some: 'Error' };
 
-    nock(SETTINGS.API_BASE)
-      .post('/account/activate/', data)
-      .reply(400, response);
+    server.respondWith(
+      'POST',
+      SETTINGS.API_BASE + '/account/activate/',
+      [400, {}, JSON.stringify(response)]
+    );
 
     const expectedActions = [
       { type: messageActions.REQUEST_START, keepMessages: true },
