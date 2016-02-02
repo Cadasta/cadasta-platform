@@ -1,5 +1,7 @@
 import React from 'react';
-import Router, { Route, IndexRoute } from 'react-router';
+import Router from 'react-router/lib/Router';
+import Route from 'react-router/lib/Route';
+import IndexRoute from 'react-router/lib/IndexRoute';
 
 import history from './history';
 

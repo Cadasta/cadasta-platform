@@ -22,6 +22,9 @@ module.exports = {
       test: /\.json?$/,
       exclude: /node_modules/,
       loader: 'react-hot!json',
+    }, {
+      test: /\.scss$/,
+      loaders: ['style', 'css', 'sass'],
     }],
   },
   resolve: {

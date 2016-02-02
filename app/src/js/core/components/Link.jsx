@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router';
+import RouterLink from 'react-router/lib/Link';
 import { dismissMessages } from '../../messages/actions';
 
 const propTypes = {
