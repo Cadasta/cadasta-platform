@@ -22,5 +22,5 @@ before_script:
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
   - cd app
-  - npm test
+  - npm travis-test
   - cd ..

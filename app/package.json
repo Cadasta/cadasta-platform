@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --compilers js:babel-core/register --require ./test/test-helper 'test/**/*.@(js|jsx)'",
+    "test": "./node_modules/.bin/karma start",
+    "travis-test": "./node_modules/.bin/karma start --single-run",
     "lint": "./node_modules/.bin/eslint --ext .js,.jsx 'src/js/**/*.@(js|jsx)'; exit 0",
     "start": "./node_modules/.bin/webpack-dev-server"
   },
