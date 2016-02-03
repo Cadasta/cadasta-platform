@@ -52,7 +52,7 @@ describe('messages reducer', () => {
       }],
     });
 
-    expect(is(nextState, expected)).to.be.true
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles LOGIN_ERROR', () => {

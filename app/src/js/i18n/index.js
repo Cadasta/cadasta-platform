@@ -3,8 +3,9 @@ import { sprintf } from 'sprintf-js';
 
 import catalogs from '../../locale/catalogs';
 
+const LOCALE_DEBUG = __I18N_DEBUG__ || false;
+
 let jed;
-const LOCALE_DEBUG = true;
 const browserLocale = window.navigator.language || 'en';
 
 const translations = (function translations() {
@@ -53,7 +54,7 @@ function mark(str) {
     return '-@-' + str + '-@-';
   };
 
-  return str;
+  return proxy;
 }
 
 export function t(str, ...args) {
@@ -67,5 +68,5 @@ export function t(str, ...args) {
 }
 
 export function tn(singular, plural, ...args) {
-  return sprintf(jed.ngettext(singular, plural, args[0] || 0), args);
+  return mark(sprintf(jed.ngettext(singular, plural, args[0] || 0), args));
 }

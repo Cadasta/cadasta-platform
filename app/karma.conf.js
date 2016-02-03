@@ -1,3 +1,6 @@
+const webpack = require('webpack');
+const BUILD_OPTIONS = require('./webpack.options').BUILD_OPTIONS;
+
 module.exports = function karmaConf(config) {
   config.set({
     frameworks: ['mocha', 'chai', 'sinon'],
@@ -43,11 +46,14 @@ module.exports = function karmaConf(config) {
           },
         ],
       },
+      plugins: [
+        new webpack.DefinePlugin(BUILD_OPTIONS),
+      ],
       externals: {
         'jsdom': 'window',
         'cheerio': 'window',
         'react/lib/ExecutionEnvironment': true,
-        'react/lib/ReactContext': true
+        'react/lib/ReactContext': true,
       },
     },
     browsers: ['jsdom'],

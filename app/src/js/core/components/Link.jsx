@@ -3,7 +3,10 @@ import RouterLink from 'react-router/lib/Link';
 import { dismissMessages } from '../../messages/actions';
 
 const propTypes = {
-  children: React.PropTypes.string.isRequired,
+  children: React.PropTypes.oneOfType([
+    React.PropTypes.object.isRequired,
+    React.PropTypes.string.isRequired,
+  ]),
 };
 
 const contextTypes = {
