@@ -1,0 +1,9 @@
+{
+  "clause": [
+    {
+      "effect": "allow",
+      "object": ["organization/*"],
+      "action": ["org.*"]
+    }
+  ]
+}

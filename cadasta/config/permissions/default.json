@@ -1,0 +1,13 @@
+{
+  "clause": [
+    {
+      "effect": "allow",
+      "object": ["*"],
+      "action": ["org.list"]
+    }, {
+      "effect": "allow",
+      "object": ["organization/*"],
+      "action": ["org.view"]
+    }
+  ]   
+}

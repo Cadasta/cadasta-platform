@@ -15,7 +15,13 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 
-urlpatterns = [
+urls = [
     url(r'^account/', include('accounts.urls', namespace='accounts')),
     url(r'^account/', include('djoser.urls.authtoken')),
+
+    url(r'^organizations/', include('organization.urls', namespace='organization')),
+]
+
+urlpatterns = [
+    url(r'^v1/', include(urls, namespace='v1'))
 ]
