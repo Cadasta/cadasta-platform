@@ -4,9 +4,31 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 
+#### Use for tests only
+
+#: src/js/account/components/Login.jsx:48
+msgid "Hello %(name)s"
+msgstr "Hallo %(name)s"
+
+#: src/js/account/components/Login.jsx:48
+msgid "%d unread message"
+msgid_plural "%d unread messages"
+msgstr[0] "%d ungelesene Nachricht"
+msgstr[1] "%d ungelesene Nachrichten"
+
+#: src/js/account/components/Login.jsx:48
+msgid "Need more information? [link:Click here]."
+msgstr "Für weitere Informationen [link:Hier klicken]."
+
+#### End test
+
+#: src/js/account/components/Login.jsx:48
+msgid "%d unread messages"
+msgstr "%d ungelesene Nachrichten"
+
 #: src/js/account/components/Login.jsx:48
 msgid "Username"
-msgstr "Benutzername"
+msgstr "Nutzername"
 
 #: src/js/account/components/Login.jsx:51
 msgid "Password"
