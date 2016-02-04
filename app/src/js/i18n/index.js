@@ -12,7 +12,7 @@ const browserLocale = window.navigator.language || 'en';
 const translations = (function translations() {
   const languages = {};
 
-  catalogs.supported_locales.forEach(function (lang) {
+  catalogs.supported_locales.forEach(function readLang(lang) {
     languages[lang] = require('../../locale/' + lang + '/LC_MESSAGES/messages.po');
   });
   return languages;
@@ -135,7 +135,7 @@ function mark(str) {
     _store: {},
   };
 
-  proxy.toString = function () {
+  proxy.toString = function toString() {
     return '-@-' + str + '-@-';
   };
 
