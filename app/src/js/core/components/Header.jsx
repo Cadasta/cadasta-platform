@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from './Link';
+import { t } from '../../i18n';
 
 const propTypes = {
   user: React.PropTypes.object.isRequired,
@@ -18,15 +19,15 @@ class Header extends React.Component {
     if (this.props.user.get('auth_token')) {
       userLinks = (
         <ul>
-          <li><Link to={ "/account/profile/" }>Profile</Link></li>
-          <li><Link to={ "/account/logout/" }>Logout</Link></li>
+          <li><Link to={ "/account/profile/" }>{ t('Profile') }</Link></li>
+          <li><Link to={ "/account/logout/" }>{ t('Logout') }</Link></li>
         </ul>
       );
     } else {
       userLinks = (
         <ul>
-          <li><Link to={ "/account/login/" }>Login</Link></li>
-          <li><Link to={ "/account/register/" }>Register</Link></li>
+          <li><Link to={ "/account/login/" }>{ t('Login') }</Link></li>
+          <li><Link to={ "/account/register/" }>{ t('Register') }</Link></li>
         </ul>
       );
     }

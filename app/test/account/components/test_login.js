@@ -1,7 +1,5 @@
-import { describe, it } from 'mocha';
 import React from 'react/addons';
 import TestUtils from 'react-addons-test-utils';
-import { expect } from 'chai';
 
 import { Login } from '../../../src/js/account/components/Login';
 

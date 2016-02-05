@@ -1,4 +1,5 @@
 import { Map, List, fromJS } from 'immutable';
+import { t } from '../i18n';
 
 const DEFAULT_STATE = new Map({
   requestsPending: 0,
@@ -6,27 +7,26 @@ const DEFAULT_STATE = new Map({
 });
 
 const ERROR_MESSAGES = {
-  LOGIN_ERROR: 'Unable to login with provided username and password.',
-  LOGOUT_ERROR: 'Unable to logout.',
-  CHANGEPASSWORD_ERROR: 'Unable to change password.',
-  REGISTER_ERROR: 'Unable to register with provided credentials.',
-  UPDATEPROFILE_ERROR: 'Unable to update profile.',
-  USERINFO_ERROR: 'Unable to get user profile information from server.',
-  RESETPASSWORD_ERROR: 'Unable to reset password.',
-  RESETCONFIRMPASSWORD_ERROR: 'Unable to reset password.',
-  ACTIVATE_ERROR: 'Unable to activate account.',
+  LOGIN_ERROR: t('Unable to login with provided username and password.'),
+  LOGOUT_ERROR: t('Unable to logout.'),
+  CHANGEPASSWORD_ERROR: t('Unable to change password.'),
+  REGISTER_ERROR: t('Unable to register with provided credentials.'),
+  UPDATEPROFILE_ERROR: t('Unable to update profile.'),
+  USERINFO_ERROR: t('Unable to get user profile information from server.'),
+  RESETPASSWORD_ERROR: t('Unable to reset password.'),
+  RESETCONFIRMPASSWORD_ERROR: t('Unable to reset password.'),
+  ACTIVATE_ERROR: t('Unable to activate account.'),
 };
 
 const SUCCESS_MESSAGES = {
-  LOGIN_SUCCESS: 'Successfully logged in.',
-  LOGOUT_SUCCESS: 'Successfully logged out.',
-  CHANGEPASSWORD_SUCCESS: 'Successfully changed password.',
-  REGISTER_SUCCESS: 'Successfully registered.',
-  UPDATEPROFILE_SUCCESS: 'Successfully updated profile information.',
-  RESETPASSWORD_SUCCESS: ('Password successfully reset. Check your inbox for ' +
-                          'a link to confirm the reset.'),
-  RESETCONFIRMPASSWORD_SUCCESS: 'Password successfully reset.',
-  ACTIVATE_SUCCESS: 'Account successfully activated.',
+  LOGIN_SUCCESS: t('Successfully logged in.'),
+  LOGOUT_SUCCESS: t('Successfully logged out.'),
+  CHANGEPASSWORD_SUCCESS: t('Successfully changed password.'),
+  REGISTER_SUCCESS: t('Successfully registered.'),
+  UPDATEPROFILE_SUCCESS: t('Successfully updated profile information.'),
+  RESETPASSWORD_SUCCESS: t('Password successfully reset. Check your inbox for a link to confirm the reset.'),
+  RESETCONFIRMPASSWORD_SUCCESS: t('Password successfully reset.'),
+  ACTIVATE_SUCCESS: t('Account successfully activated.'),
 };
 
 function parseError(response) {

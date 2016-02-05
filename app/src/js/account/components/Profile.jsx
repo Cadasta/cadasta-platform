@@ -2,6 +2,7 @@ import React from 'react';
 import connect from 'react-redux/lib/components/connect';
 import Link from '../../core/components/Link';
 
+import { t } from '../../i18n';
 import * as accountActions from '../actions';
 
 
@@ -53,7 +54,7 @@ export class Profile extends React.Component {
     return (
       <div>
         <form className="profile-form" onSubmit={this.handleFormSubmit}>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{ t('Username') }</label>
           <input
             name="username"
             ref="username"
@@ -61,7 +62,7 @@ export class Profile extends React.Component {
             onChange={this.handleValueChange}
           />
 
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email">{ t('Email') }</label>
           <input
             name="email"
             ref="email"
@@ -70,7 +71,7 @@ export class Profile extends React.Component {
             onChange={this.handleValueChange}
           />
 
-          <label htmlFor="first_name">First name</label>
+          <label htmlFor="first_name">{ t('First name') }</label>
           <input
             name="first_name"
             ref="first_name"
@@ -78,7 +79,7 @@ export class Profile extends React.Component {
             onChange={this.handleValueChange}
           />
 
-          <label htmlFor="last_name">Last name</label>
+          <label htmlFor="last_name">{ t('Last name') }</label>
           <input
             name="last_name"
             ref="last_name"
@@ -86,12 +87,12 @@ export class Profile extends React.Component {
             onChange={this.handleValueChange}
           />
 
-          <button type="submit">Update profile</button>
+          <button type="submit">{ t('Update profile') }</button>
         </form>
 
         <div>
-          <Link to={ "/account/password/" }>Change password</Link>
-          <Link to={ "/account/password/reset/" }>Reset password</Link>
+          <Link to={ "/account/password/" }>{ t('Change password') }</Link>
+          <Link to={ "/account/password/reset/" }>{ t('Reset password') }</Link>
         </div>
       </div>
     );

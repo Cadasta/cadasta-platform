@@ -1,8 +1,6 @@
-import { describe, it } from 'mocha';
 import React from 'react/addons';
 import { fromJS } from 'immutable';
 
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 
 import Message from '../../../src/js/messages/components/Message';
@@ -14,8 +12,9 @@ describe('App', () => {
       requestsPending: 0,
       userFeedback: [],
     });
+    const user = fromJS({});
 
-    const wrapper = shallow(<App messages={messages} />);
+    const wrapper = shallow(<App user={user} messages={messages} />);
     expect(wrapper.find('#loading')).to.have.length(0);
   });
 
@@ -24,8 +23,9 @@ describe('App', () => {
       requestsPending: 2,
       userFeedback: [],
     });
+    const user = fromJS({});
 
-    const wrapper = shallow(<App messages={messages} />);
+    const wrapper = shallow(<App user={user} messages={messages} />);
     expect(wrapper.find('#loading')).to.have.length(1);
   });
 

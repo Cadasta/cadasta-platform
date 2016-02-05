@@ -1,5 +1,5 @@
 export default class Storage {
-  constructor(height, width) {
+  constructor() {
     this.storage = {};
   }
 

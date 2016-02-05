@@ -1,6 +1,4 @@
-import { describe, it } from 'mocha';
-import { Map, List, fromJS } from 'immutable';
-import { expect } from 'chai';
+import { Map, List, fromJS, is } from 'immutable';
 
 import messages from '../../src/js/messages/reducer';
 
@@ -12,7 +10,7 @@ describe('messages reducer', () => {
     const nextState = messages(state, action);
     const requestsPending = nextState.get('requestsPending');
 
-    expect(requestsPending).to.equal(1);
+    expect(requestsPending).to.deep.equal(1);
   });
 
   it('handles REQUEST_DONE', () => {
@@ -38,7 +36,7 @@ describe('messages reducer', () => {
     const nextState = messages(state, action);
     const requestsPending = nextState.get('userFeedback').count();
 
-    expect(requestsPending).to.equal(0);
+    expect(requestsPending).to.deep.equal(0);
   });
 
   it('handles LOGIN_SUCCESS', () => {
@@ -47,12 +45,14 @@ describe('messages reducer', () => {
     const action = { type: 'LOGIN_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Successfully logged in.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles LOGIN_ERROR', () => {
@@ -66,7 +66,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to login with provided username and password.',
@@ -74,7 +74,9 @@ describe('messages reducer', () => {
           'Unable to login with provided credentials.',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles LOGOUT_SUCCESS', () => {
@@ -83,12 +85,14 @@ describe('messages reducer', () => {
     const action = { type: 'LOGOUT_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Successfully logged out.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles LOGOUT_ERROR', () => {
@@ -102,7 +106,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to logout.',
@@ -110,7 +114,9 @@ describe('messages reducer', () => {
           'Unable to logout with provided credentials.',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles REGISTER_SUCCESS', () => {
@@ -119,12 +125,14 @@ describe('messages reducer', () => {
     const action = { type: 'REGISTER_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Successfully registered.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles REGISTER_ERROR', () => {
@@ -139,7 +147,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to register with provided credentials.',
@@ -148,7 +156,9 @@ describe('messages reducer', () => {
           'A user with that username already exists.',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles CHANGEPASSWORD_SUCCESS', () => {
@@ -157,12 +167,14 @@ describe('messages reducer', () => {
     const action = { type: 'CHANGEPASSWORD_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Successfully changed password.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles CHANGEPASSWORD_ERROR', () => {
@@ -176,7 +188,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to change password.',
@@ -184,7 +196,9 @@ describe('messages reducer', () => {
           'Invalid password.',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles UPDATEPROFILE_SUCCESS', () => {
@@ -193,12 +207,14 @@ describe('messages reducer', () => {
     const action = { type: 'UPDATEPROFILE_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Successfully updated profile information.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles UPDATEPROFILE_ERROR', () => {
@@ -212,7 +228,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to update profile.',
@@ -220,7 +236,9 @@ describe('messages reducer', () => {
           'Another user is already registered with this email address',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles USERINFO_ERROR', () => {
@@ -234,13 +252,15 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to get user profile information from server.',
         details: ['User not found'],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles RESETPASSWORD_SUCCESS', () => {
@@ -249,12 +269,14 @@ describe('messages reducer', () => {
     const action = { type: 'RESETPASSWORD_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Password successfully reset. Check your inbox for a link to confirm the reset.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles RESETPASSWORD_ERROR', () => {
@@ -268,7 +290,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to reset password.',
@@ -276,7 +298,9 @@ describe('messages reducer', () => {
           'User not found',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles RESETCONFIRMPASSWORD_SUCCESS', () => {
@@ -285,12 +309,14 @@ describe('messages reducer', () => {
     const action = { type: 'RESETCONFIRMPASSWORD_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Password successfully reset.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles RESETCONFIRMPASSWORD_ERROR', () => {
@@ -304,7 +330,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to reset password.',
@@ -312,7 +338,9 @@ describe('messages reducer', () => {
           'User not found',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles ACTIVATE_SUCCESS', () => {
@@ -321,12 +349,14 @@ describe('messages reducer', () => {
     const action = { type: 'ACTIVATE_SUCCESS' };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'success',
         msg: 'Account successfully activated.',
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 
   it('handles ACTIVATE_ERROR', () => {
@@ -340,7 +370,7 @@ describe('messages reducer', () => {
     };
     const nextState = messages(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    const expected = fromJS({
       userFeedback: [{
         type: 'error',
         msg: 'Unable to activate account.',
@@ -348,6 +378,8 @@ describe('messages reducer', () => {
           'User not found',
         ],
       }],
-    }));
+    });
+
+    expect(is(nextState, expected)).to.be.true;
   });
 });

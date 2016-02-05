@@ -1,5 +1,3 @@
-import { describe, it, beforeEach } from 'mocha';
-import { expect } from 'chai';
 import { fromJS } from 'immutable';
 
 import user from '../../src/js/account/reducer';
@@ -23,7 +21,7 @@ describe('user reducer', () => {
     };
     const nextState = user(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    expect(nextState).to.deep.equal(fromJS({
       auth_token: 'mskdj8sdh8shadhs',
     }));
 
@@ -43,7 +41,7 @@ describe('user reducer', () => {
     };
     const nextState = user(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    expect(nextState).to.deep.equal(fromJS({
       auth_token: 'mskdj8sdh8shadhs',
     }));
 
@@ -93,7 +91,7 @@ describe('user reducer', () => {
     };
     const nextState = user(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    expect(nextState).to.deep.equal(fromJS({
       email: 'john@beatles.uk',
       email_verified: false,
       first_name: 'John',
@@ -121,7 +119,7 @@ describe('user reducer', () => {
     };
     const nextState = user(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    expect(nextState).to.deep.equal(fromJS({
       email: 'paul@beatles.uk',
       first_name: 'paul',
       last_name: 'McCartney',
@@ -143,7 +141,7 @@ describe('user reducer', () => {
     };
     const nextState = user(state, action);
 
-    expect(nextState).to.equal(fromJS({
+    expect(nextState).to.deep.equal(fromJS({
       email: 'paul@beatles.uk',
       first_name: 'paul',
       last_name: 'McCartney',

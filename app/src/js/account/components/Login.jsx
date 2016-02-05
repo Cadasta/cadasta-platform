@@ -2,6 +2,7 @@ import React from 'react';
 import connect from 'react-redux/lib/components/connect';
 
 import * as accountActions from '../actions';
+import { t } from '../../i18n';
 
 const propTypes = {
   accountLogin: React.PropTypes.func.isRequired,
@@ -12,6 +13,9 @@ const propTypes = {
   }),
 };
 
+const contextTypes = {
+  intl: React.PropTypes.object,
+};
 
 export class Login extends React.Component {
   constructor(props) {
@@ -41,22 +45,23 @@ export class Login extends React.Component {
   render() {
     return (
       <form className="login-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">Username</label>
+        <label htmlFor="username">{ t('Username') }</label>
         <input name="username" ref="username" />
 
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">{ t('Password') }</label>
         <input name="password" ref="password" type="password" />
 
         <input name="rememberMe" ref="rememberMe" type="checkbox" />
-        <label htmlFor="rememberMe">Remember Me</label>
+        <label htmlFor="rememberMe">{ t('Remember me') }</label>
 
-        <button type="submit">Login</button>
+        <button type="submit">{ t('Login') }</button>
       </form>
     );
   }
 }
 
 Login.propTypes = propTypes;
+Login.contextTypes = contextTypes;
 
 function mapStateToProps() {
   return {};

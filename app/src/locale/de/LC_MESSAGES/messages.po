@@ -1,0 +1,175 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+#### Use for tests only
+
+#: src/js/account/components/Login.jsx:48
+msgid "Hello %(name)s"
+msgstr "Hallo %(name)s"
+
+#: src/js/account/components/Login.jsx:48
+msgid "%d unread message"
+msgid_plural "%d unread messages"
+msgstr[0] "%d ungelesene Nachricht"
+msgstr[1] "%d ungelesene Nachrichten"
+
+#: src/js/account/components/Login.jsx:48
+msgid "Need more information? [link:Click here]."
+msgstr "Für weitere Informationen [link:Hier klicken]."
+
+#### End test
+
+#: src/js/account/components/Login.jsx:48
+msgid "%d unread messages"
+msgstr "%d ungelesene Nachrichten"
+
+#: src/js/account/components/Login.jsx:48
+msgid "Username"
+msgstr "Nutzername"
+
+#: src/js/account/components/Login.jsx:51
+msgid "Password"
+msgstr "Passwort"
+
+#: src/js/account/components/Login.jsx:55
+msgid "Remember me"
+msgstr "Angemeldet bleiben"
+
+#: src/js/account/components/Login.jsx:57
+msgid "Login"
+msgstr "Anmelden"
+
+#: src/js/account/components/Password.jsx:30
+msgid "New password"
+msgstr "Neues Passwort"
+
+#: src/js/account/components/Password.jsx:33
+msgid "Repeat new password"
+msgstr "Neues Passwort bestätigen"
+
+#: src/js/account/components/Password.jsx:36
+msgid "Current password"
+msgstr "Aktuelles Passwort"
+
+#: src/js/account/components/Password.jsx:39
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: src/js/account/components/PasswordReset.jsx:28
+msgid "Enter email"
+msgstr "E-Mail-Adresse eingeben"
+
+#: src/js/account/components/PasswordReset.jsx:31
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
+#: src/js/account/components/PasswordResetConfirm.jsx:35
+msgid "Enter new password"
+msgstr "Neues Passwort"
+
+#: src/js/account/components/PasswordResetConfirm.jsx:35
+msgid "Retype new password"
+msgstr "Neues Passwort bestätigen"
+
+#: src/js/account/components/PasswordResetConfirm.jsx:35
+msgid "Email"
+msgstr "E-Mail"
+
+#: src/js/account/components/Profile.jsx:57
+msgid "First name"
+msgstr "Vorname"
+
+#: src/js/account/components/Profile.jsx:65
+msgid "Last name"
+msgstr "Nachname"
+
+#: src/js/account/components/Profile.jsx:74
+msgid "Update profile"
+msgstr "Profile aktualisieren"
+
+#: src/js/account/components/Profile.jsx:82
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: src/js/core/components/Header.jsx:22
+msgid "Profile"
+msgstr "Profil"
+
+#: src/js/core/components/Header.jsx:23
+msgid "Logout"
+msgstr "Abmelden"
+
+#: src/js/core/components/Header.jsx:30
+msgid "Register"
+msgstr "Registrieren"
+
+#: src/js/core/components/Home.jsx:16
+msgid "Welcome"
+msgstr "Willkommen"
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to login with provided username and password."
+msgstr "Anmeldung mit angegebenem Nutznamen und Passwort nicht möglich."
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to logout."
+msgstr "Ameldung fehlgeschlagen."
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to change password."
+msgstr "Änderung des Passwortes fehlgeschlagen."
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to register with provided credentials."
+msgstr "Registrierung mit den angegebenen Details nicht möglich. "
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to update profile."
+msgstr "Aktualisierung des Nutzerprofils fehlgeschlagen."
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to get user profile information from server."
+msgstr "Nutzerunformationen konnten nicht geladen werden. "
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to reset password."
+msgstr "Zurücksetzen des Passwortes fehlgeschlagen."
+
+#: src/js/messages/actions.jsx:1
+msgid "Unable to activate account."
+msgstr "Aktivierung des Nutzerkontos fehlgeschlagen."
+
+#: src/js/messages/actions.jsx:1
+msgid "Successfully logged in."
+msgstr "Anmeldung erfolgreich."
+
+#: src/js/messages/actions.jsx:1
+msgid "Successfully logged out."
+msgstr "Abmeldung erfolgreich."
+
+#: src/js/messages/actions.jsx:1
+msgid "Successfully changed password."
+msgstr "Passwort erfolgreich geändert.."
+
+#: src/js/messages/actions.jsx:1
+msgid "Successfully registered."
+msgstr "Registrieung erfolgreich. "
+
+#: src/js/messages/actions.jsx:1
+msgid "Successfully updated profile information."
+msgstr "Nutzerprofil erfolgreich geladen. ."
+
+#: src/js/messages/actions.jsx:1
+msgid "Password successfully reset. Check your inbox for a link to confirm the reset."
+msgstr "Passwort erfolgreich zurück gesetzt. Wir haben ihnen einen Link zum setzen eines neuen Passworts geschickt. Bitte prüfen sie ihren Posteingang."
+
+#: src/js/messages/actions.jsx:1
+msgid "Password successfully reset."
+msgstr "Passwort zurückgesetzt."
+
+#: src/js/messages/actions.jsx:1
+msgid "Account successfully activated."
+msgstr "Benutzerkonto aktiviert."
