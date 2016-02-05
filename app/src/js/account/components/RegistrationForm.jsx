@@ -25,9 +25,13 @@ class RegistrationForm extends React.Component {
 
   render() {
     return (
-      <form className="account-register" onSubmit={this.handleFormSubmit}>
+      <form className="account-register form-narrow" onSubmit={this.handleFormSubmit}>
+
+        <h1>Register for an account</h1>
+        <p>By creating an account ...</p>
+
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">Choose username</label>
           <input name="username" ref="username" type="text" className="form-control" />
         </div>
 
@@ -42,7 +46,7 @@ class RegistrationForm extends React.Component {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password_repeat">Password</label>
+          <label htmlFor="password_repeat">Confirm password</label>
           <input name="password_repeat" ref="password_repeat" type="password" className="form-control" />
         </div>
 
@@ -56,7 +60,10 @@ class RegistrationForm extends React.Component {
           <input name="last_name" ref="last_name" type="text" className="form-control" />
         </div>
 
-        <button type="submit" className="btn btn-default">Register</button>
+        <div className="text-center">
+          <button type="submit" className="btn btn-primary btn-lg">Register</button>
+        </div>
+
       </form>
     );
   }

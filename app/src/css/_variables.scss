@@ -1,1 +1,21 @@
+// Override Bootstrap variables:
+
+//== Colors
+
+$gray-dark:              #595a5c;  // Cadasta gray
+$brand-primary:          #00b288;  // Cadasta green
+
+//== Scaffolding
+
+ $body-bg:               #eee;
+
+//== Typography
+
+$font-family-sans-serif:  "Roboto", Helvetica, Arial, sans-serif;
+$font-size-base:          16px;
+
+
+// End Override
+
+
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables";

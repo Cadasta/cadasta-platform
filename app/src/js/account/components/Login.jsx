@@ -40,17 +40,28 @@ export class Login extends React.Component {
 
   render() {
     return (
-      <form className="login-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">Username</label>
-        <input name="username" ref="username" />
+      <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
+ 
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input name="username" ref="username" className="form-control" />
+        </div>
 
-        <label htmlFor="password">Password</label>
-        <input name="password" ref="password" type="password" />
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input name="password" ref="password" type="password" className="form-control" />
+        </div>
 
-        <input name="rememberMe" ref="rememberMe" type="checkbox" />
-        <label htmlFor="rememberMe">Remember Me</label>
+        <div className="checkbox">
+          <label htmlFor="rememberMe">
+          <input name="rememberMe" ref="rememberMe" type="checkbox" />
+          Remember Me</label>
+        </div>
 
-        <button type="submit">Login</button>
+        <div className="text-center">
+          <button type="submit" className="btn btn-primary btn-lg">Login</button>
+        </div>
+
       </form>
     );
   }

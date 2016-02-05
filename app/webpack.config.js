@@ -14,6 +14,12 @@ module.exports = {
     }, {
       test: /\.scss$/,
       loaders: ['style', 'css', 'sass'],
+    }, {
+      test:  /\.(jpe?g|png|gif|svg)$/i,
+      loaders: ['url?limit=8192', 'img']
+    }, {
+      test: /\.(woff|woff2|eot|ttf|svg)$/,
+      loader: 'url?limit=100000'
     }],
   },
   resolve: {
