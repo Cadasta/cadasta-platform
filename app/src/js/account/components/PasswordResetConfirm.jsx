@@ -31,32 +31,22 @@ export class PasswordResetConfirm extends React.Component {
 
   render() {
     return (
-<<<<<<< HEAD
       <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <h1>Confirm your new password</h1>
+        <h1>{ t('Confirm your new password') }</h1>
 
         <div className="form-group">
-          <label htmlFor="new_password">Enter new password</label>
+          <label htmlFor="new_password">{ t('Enter new password') }</label>
           <input type="password" name="new_password" ref="new_password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="re_new_password">Retype newpassword</label>
+          <label htmlFor="re_new_password">{ t('Retype new password') }</label>
           <input type="password" name="re_new_password" ref="re_new_password" className="form-control input-lg" />
         </div>
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Reset password</button>
-=======
-      <form onSubmit={this.handleFormSubmit}>
-        <label htmlFor="new_password">{ t('Enter new password') }</label>
-        <input type="password" name="new_password" ref="new_password" />
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Reset password') }</button>
 
-        <label htmlFor="re_new_password">{ t('Retype new password') }</label>
-        <input type="password" name="re_new_password" ref="re_new_password" />
-
-        <button type="submit">{ t('Reset password') }</button>
->>>>>>> master
       </form>
     );
   }

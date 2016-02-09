@@ -26,40 +26,27 @@ export class Password extends React.Component {
 
   render() {
     return (
-<<<<<<< HEAD
       <form onSubmit={this.handleFormSubmit} className="form-narrow">
 
-        <h1>Change your password</h1>
+        <h1>{ t('Change your password') }</h1>
 
         <div className="form-group">
-          <label htmlFor="current_password">Current password</label>
+          <label htmlFor="current_password">{ t('Current password') }</label>
           <input type="password" name="current_password" ref="current_password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="new_password">New password</label>
+          <label htmlFor="new_password">{ t('New password') }</label>
           <input type="password" name="new_password" ref="new_password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="new_password">Repeat new password</label>
+          <label htmlFor="new_password">{ t('Repeat new password') }</label>
           <input type="password" name="re_new_password" ref="re_new_password" className="form-control input-lg" />
         </div>
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Change password</button>
-=======
-      <form onSubmit={this.handleFormSubmit}>
-        <label htmlFor="new_password">{ t('New password') }</label>
-        <input type="password" name="new_password" ref="new_password" />
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Change password') }</button>
 
-        <label htmlFor="new_password">{ t('Repeat new password') }</label>
-        <input type="password" name="re_new_password" ref="re_new_password" />
-
-        <label htmlFor="current_password">{ t('Current password') }</label>
-        <input type="password" name="current_password" ref="current_password" />
-
-        <button type="submit">{ t('Change password') }</button>
->>>>>>> master
       </form>
     );
   }

@@ -18,11 +18,10 @@ class Header extends React.Component {
 
     if (this.props.user.get('auth_token')) {
       userLinks = (
-<<<<<<< HEAD
         <div className="user-links pull-right">
           <ul className="list-inline">
-            <li><Link to={ "/account/profile/" }>My Profile</Link></li>
-            <li><Link to={ "/account/logout/" }>Log Out</Link></li>
+            <li><Link to={ "/account/profile/" }>{ t('Profile') }</Link></li>
+            <li><Link to={ "/account/logout/" }>{ t('Logout') }</Link></li>
           </ul>
         </div>
       );
@@ -30,23 +29,10 @@ class Header extends React.Component {
       userLinks = (
         <div className="reg-links pull-right">
           <ul className="list-inline">
-            <li><Link to={ "/account/login/" }>Sign In</Link></li>
-            <li><Link to={ "/account/register/" }>Register</Link></li>
+            <li><Link to={ "/account/login/" }>{ t('Login') }</Link></li>
+            <li><Link to={ "/account/register/" }>{ t('Register') }</Link></li>
           </ul>
         </div>
-=======
-        <ul>
-          <li><Link to={ "/account/profile/" }>{ t('Profile') }</Link></li>
-          <li><Link to={ "/account/logout/" }>{ t('Logout') }</Link></li>
-        </ul>
-      );
-    } else {
-      userLinks = (
-        <ul>
-          <li><Link to={ "/account/login/" }>{ t('Login') }</Link></li>
-          <li><Link to={ "/account/register/" }>{ t('Register') }</Link></li>
-        </ul>
->>>>>>> master
       );
     }
 

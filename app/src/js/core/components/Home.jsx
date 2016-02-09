@@ -13,10 +13,6 @@ export class Home extends React.Component {
   render() {
     return (
       <div>
-<<<<<<< HEAD
-=======
-        <h2>{ t('Welcome') }</h2>
->>>>>>> master
         <RegistrationForm accountRegister={this.props.accountRegister} />
       </div>
     );

@@ -1,9 +1,6 @@
 import React from 'react';
-<<<<<<< HEAD
 import Link from '../../core/components/Link';
-=======
 import { t } from '../../i18n';
->>>>>>> master
 
 const propTypes = {
   accountRegister: React.PropTypes.func.isRequired,
@@ -30,69 +27,46 @@ class RegistrationForm extends React.Component {
 
   render() {
     return (
-<<<<<<< HEAD
       <form className="account-register form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <h1>Sign up for a free account</h1>
+        <h1>{ t('Sign up for a free account') }</h1>
 
         <div className="form-group">
-          <label htmlFor="username">Choose username</label>
+          <label htmlFor="username">{ t('Choose username') }</label>
           <input name="username" ref="username" type="text" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="email">{ t('Email address') }</label>
           <input name="email" ref="email" type="email" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{ t('Password') }</label>
           <input name="password" ref="password" type="password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password_repeat">Confirm password</label>
+          <label htmlFor="password_repeat">{ t('Confirm Password') }</label>
           <input name="password_repeat" ref="password_repeat" type="password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="first_name">First name</label>
+          <label htmlFor="first_name">{ t('First name') }</label>
           <input name="first_name" ref="first_name" type="text" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="last_name">Last name</label>
+          <label htmlFor="last_name">{ t('Last name') }</label>
           <input name="last_name" ref="last_name" type="text" className="form-control input-lg" />
         </div>
 
         <div className="text-center">
-          <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Register</button>
+          <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Register') }</button>
         </div>
 
         <p className="text-center">Already have an account? <Link to={ "/account/login/" }>Sign in</Link></p>
 
-=======
-      <form className="account-register" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">{ t('Username') }</label>
-        <input name="username" ref="username" />
-
-        <label htmlFor="email">{ t('Email') }</label>
-        <input name="email" ref="email" type="email" />
-
-        <label htmlFor="password">{ t('Password') }</label>
-        <input name="password" ref="password" type="password" />
-
-        <label htmlFor="password_repeat">{ t('Password') }</label>
-        <input name="password_repeat" ref="password_repeat" type="password" />
-
-        <label htmlFor="first_name">{ t('First name') }</label>
-        <input name="first_name" ref="first_name" />
-
-        <label htmlFor="last_name">{ t('Last name') }</label>
-        <input name="last_name" ref="last_name" />
-
-        <button type="submit">{ t('Register') }</button>
->>>>>>> master
       </form>
     );
   }

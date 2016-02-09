@@ -45,44 +45,30 @@ export class Login extends React.Component {
 
   render() {
     return (
-<<<<<<< HEAD
       <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <h1>Sign in to your account</h1>
+        <h1>{ t('Sign in to your account') }</h1>
 
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{ t('Username') }</label>
           <input name="username" ref="username" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Password</label>
-
+          <label htmlFor="password">{ t('Password') }</label>
           <input name="password" ref="password" type="password" className="form-control input-lg" />
         </div>
 
         <div className="checkbox">
           <label htmlFor="rememberMe">
           <input name="rememberMe" ref="rememberMe" type="checkbox" />
-          Remember Me</label>
+          { t('Remember me') }</label>
         </div>
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Sign In</button>
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Sign In') }</button>
 
         <p className="text-center">Don't have an account? <Link to={ "/account/register/" }>Register here</Link></p>
-=======
-      <form className="login-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">{ t('Username') }</label>
-        <input name="username" ref="username" />
 
-        <label htmlFor="password">{ t('Password') }</label>
-        <input name="password" ref="password" type="password" />
-
-        <input name="rememberMe" ref="rememberMe" type="checkbox" />
-        <label htmlFor="rememberMe">{ t('Remember me') }</label>
-
-        <button type="submit">{ t('Login') }</button>
->>>>>>> master
       </form>
     );
   }

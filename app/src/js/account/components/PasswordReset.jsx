@@ -24,24 +24,16 @@ export class PasswordReset extends React.Component {
 
   render() {
     return (
-<<<<<<< HEAD
       <form className="form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <h1>Reset your password</h1>
+        <h1>{ t('Reset your password') }</h1>
 
         <div className="form-group">
-          <label htmlFor="email">Enter email</label>
+          <label htmlFor="email">{ t('Enter email') }</label>
           <input type="email" name="email" ref="email" className="form-control input-lg" />
         </div>
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Reset password</button>
-=======
-      <form onSubmit={this.handleFormSubmit}>
-        <label htmlFor="email">{ t('Enter email') }</label>
-        <input type="email" name="email" ref="email" />
-
-        <button type="submit">{ t('Reset password') }</button>
->>>>>>> master
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Reset password') }</button>
       </form>
     );
   }
