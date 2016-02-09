@@ -3,6 +3,7 @@ import connect from 'react-redux/lib/components/connect';
 import Link from '../../core/components/Link';
 
 import * as accountActions from '../actions';
+import { t } from '../../i18n';
 
 const propTypes = {
   accountLogin: React.PropTypes.func.isRequired,
@@ -13,6 +14,9 @@ const propTypes = {
   }),
 };
 
+const contextTypes = {
+  intl: React.PropTypes.object,
+};
 
 export class Login extends React.Component {
   constructor(props) {
@@ -41,6 +45,7 @@ export class Login extends React.Component {
 
   render() {
     return (
+<<<<<<< HEAD
       <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
 
         <h1>Sign in to your account</h1>
@@ -65,12 +70,26 @@ export class Login extends React.Component {
         <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Sign In</button>
 
         <p className="text-center">Don't have an account? <Link to={ "/account/register/" }>Register here</Link></p>
+=======
+      <form className="login-form" onSubmit={this.handleFormSubmit}>
+        <label htmlFor="username">{ t('Username') }</label>
+        <input name="username" ref="username" />
+
+        <label htmlFor="password">{ t('Password') }</label>
+        <input name="password" ref="password" type="password" />
+
+        <input name="rememberMe" ref="rememberMe" type="checkbox" />
+        <label htmlFor="rememberMe">{ t('Remember me') }</label>
+
+        <button type="submit">{ t('Login') }</button>
+>>>>>>> master
       </form>
     );
   }
 }
 
 Login.propTypes = propTypes;
+Login.contextTypes = contextTypes;
 
 function mapStateToProps() {
   return {};

@@ -1,6 +1,7 @@
 import React from 'react';
 import connect from 'react-redux/lib/components/connect';
 
+import { t } from '../../i18n';
 import * as accountActions from '../actions';
 
 const propTypes = {
@@ -25,6 +26,7 @@ export class Password extends React.Component {
 
   render() {
     return (
+<<<<<<< HEAD
       <form onSubmit={this.handleFormSubmit} className="form-narrow">
 
         <h1>Change your password</h1>
@@ -45,6 +47,19 @@ export class Password extends React.Component {
         </div>
 
         <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Change password</button>
+=======
+      <form onSubmit={this.handleFormSubmit}>
+        <label htmlFor="new_password">{ t('New password') }</label>
+        <input type="password" name="new_password" ref="new_password" />
+
+        <label htmlFor="new_password">{ t('Repeat new password') }</label>
+        <input type="password" name="re_new_password" ref="re_new_password" />
+
+        <label htmlFor="current_password">{ t('Current password') }</label>
+        <input type="password" name="current_password" ref="current_password" />
+
+        <button type="submit">{ t('Change password') }</button>
+>>>>>>> master
       </form>
     );
   }

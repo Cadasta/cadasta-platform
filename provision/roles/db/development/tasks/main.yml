@@ -1,0 +1,59 @@
+- name: Install packages
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+      # Database
+      - postgresql-{{ postgresql_version }}
+      - postgresql-{{ postgresql_version }}-postgis-{{ postgis_version }}
+      - libpq-dev # Required for Ansible to interact with postgres
+      - python-psycopg2 # Required for Ansible to interact with postgres
+
+- name: Allow password authentication for local socket users
+  become: yes
+  become_user: root
+  register: pg_hba
+  copy: src=pg_hba.conf dest=/etc/postgresql/9.4/main/pg_hba.conf force=yes
+
+- name: Restart Postgres
+  become: yes
+  become_user: root
+  when: pg_hba|changed
+  service: name=postgresql state=restarted
+
+- name: Create database
+  become: yes
+  become_user: postgres
+  postgresql_db: login_user="postgres" name="cadasta"
+
+# This test is needed because of a bad interaction between the way
+# that the Ansible postgresql_user modules works and the way that
+# Amazon RDS PostgreSQL instances have their admin roles set up.
+
+- name: Check for existence of database user
+  become: yes
+  become_user: postgres
+  shell: psql -U postgres
+         -c "select rolname from pg_roles where rolname='cadasta'"
+  register: user_test
+  ignore_errors: true
+
+- name: Create database user
+  become: yes
+  become_user: postgres
+  postgresql_user: login_user="postgres"
+                   name="cadasta" password="cadasta"
+                   state=present role_attr_flags=NOSUPERUSER,CREATEDB
+  when: user_test.stdout.find('0') != -1
+
+- name: Provide user with DB permissions
+  become: yes
+  become_user: postgres
+  postgresql_user: login_user="postgres"
+                   user="cadasta" db="cadasta" priv=ALL
+
+- name: Install PostGIS on DB
+  become: yes
+  become_user: postgres
+  postgresql_ext: login_user="postgres"
+                  name=postgis db="cadasta"

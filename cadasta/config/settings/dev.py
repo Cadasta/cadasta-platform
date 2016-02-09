@@ -8,9 +8,9 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'django_app',
-        'USER': 'django',
-        'PASSWORD': 'sdjgh34iutwefhfgbqkj3',
+        'NAME': 'cadasta',
+        'USER': 'cadasta',
+        'PASSWORD': 'cadasta',
         'HOST': 'localhost',
     }
 }

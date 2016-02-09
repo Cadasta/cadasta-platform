@@ -2,6 +2,7 @@ import React from 'react';
 import connect from 'react-redux/lib/components/connect';
 import Link from '../../core/components/Link';
 
+import { t } from '../../i18n';
 import * as accountActions from '../actions';
 
 
@@ -52,6 +53,7 @@ export class Profile extends React.Component {
   render() {
     return (
       <div>
+<<<<<<< HEAD
         <form className="profile-form form-narrow" onSubmit={this.handleFormSubmit}>
 
         <h1>Update your profile</h1>
@@ -86,6 +88,48 @@ export class Profile extends React.Component {
 
         <div>
 
+=======
+        <form className="profile-form" onSubmit={this.handleFormSubmit}>
+          <label htmlFor="username">{ t('Username') }</label>
+          <input
+            name="username"
+            ref="username"
+            value={this.state.username}
+            onChange={this.handleValueChange}
+          />
+
+          <label htmlFor="email">{ t('Email') }</label>
+          <input
+            name="email"
+            ref="email"
+            type="email"
+            value={this.state.email}
+            onChange={this.handleValueChange}
+          />
+
+          <label htmlFor="first_name">{ t('First name') }</label>
+          <input
+            name="first_name"
+            ref="first_name"
+            value={this.state.first_name}
+            onChange={this.handleValueChange}
+          />
+
+          <label htmlFor="last_name">{ t('Last name') }</label>
+          <input
+            name="last_name"
+            ref="last_name"
+            value={this.state.last_name}
+            onChange={this.handleValueChange}
+          />
+
+          <button type="submit">{ t('Update profile') }</button>
+        </form>
+
+        <div>
+          <Link to={ "/account/password/" }>{ t('Change password') }</Link>
+          <Link to={ "/account/password/reset/" }>{ t('Reset password') }</Link>
+>>>>>>> master
         </div>
       </div>
     );

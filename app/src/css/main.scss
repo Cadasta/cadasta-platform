@@ -5,6 +5,7 @@
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/scaffolding";
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/type";
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/grid";
+<<<<<<< HEAD
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/alerts";
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/buttons";
 @import "../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/forms";
@@ -174,3 +175,9 @@ header nav a:hover {
 .alert {
   text-align: center;
 }
+=======
+
+.translation-wrapper {
+    background-color: fuchsia;
+}
+>>>>>>> master

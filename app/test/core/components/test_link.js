@@ -1,6 +1,4 @@
-import { describe, it } from 'mocha';
 import React from 'react/addons';
-import { expect } from 'chai';
 import { mount } from 'enzyme';
 
 import Link from '../../../src/js/core/components/Link';

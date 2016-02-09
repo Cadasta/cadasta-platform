@@ -1,8 +1,6 @@
-import { describe, it } from 'mocha';
 import React from 'react/addons';
 import { Map, fromJS } from 'immutable';
 
-import { expect } from 'chai';
 import { shallow } from 'enzyme';
 import sinon from 'sinon';
 

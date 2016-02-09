@@ -1,17 +1,22 @@
-import { describe, it } from 'mocha';
-import { expect, assert } from 'chai';
-import nock from 'nock';
-
 import SETTINGS from '../src/js/settings';
 import Request from '../src/js/request';
 
 describe('request', () => {
+  let server;
+
+  beforeEach(() => {
+    server = sinon.fakeServer.create();
+    server.autoRespond = true;
+  });
+
+  afterEach(() => {
+    server.restore();
+  });
+
   it('sends a GET request', () => {
     const response = { some: 'Response' };
 
-    nock(SETTINGS.API_BASE)
-      .get('/')
-      .reply(200, response);
+    server.respondWith('GET', SETTINGS.API_BASE + '/', JSON.stringify(response));
 
     return Request.get('/')
       .then(
@@ -23,9 +28,7 @@ describe('request', () => {
   it('handles HTTP errors', () => {
     const response = { some: 'Error' };
 
-    nock(SETTINGS.API_BASE)
-      .get('/')
-      .reply(400, response);
+    server.respondWith('GET', SETTINGS.API_BASE + '/', [400, {}, JSON.stringify(response)]);
 
     return Request.get('/')
       .then(
@@ -36,6 +39,7 @@ describe('request', () => {
 
   it('throws an error when the network fails', () => {
     const response = { network_error: 'Unable to connect to the server.' };
+    server.restore();
 
     return Request.get('/')
       .then(
@@ -47,9 +51,7 @@ describe('request', () => {
   it('sends a POST request', () => {
     const response = { some: 'Response' };
 
-    nock(SETTINGS.API_BASE)
-      .post('/', {})
-      .reply(200, response);
+    server.respondWith('POST', SETTINGS.API_BASE + '/', JSON.stringify(response));
 
     return Request.post('/', {})
       .then(
@@ -61,9 +63,7 @@ describe('request', () => {
   it('sends a PUT request', () => {
     const response = { some: 'Response' };
 
-    nock(SETTINGS.API_BASE)
-      .put('/', {})
-      .reply(200, response);
+    server.respondWith('PUT', SETTINGS.API_BASE + '/', JSON.stringify(response));
 
     return Request.put('/', {})
       .then(
@@ -75,9 +75,7 @@ describe('request', () => {
   it('sends a PATCH request', () => {
     const response = { some: 'Response' };
 
-    nock(SETTINGS.API_BASE)
-      .patch('/', {})
-      .reply(200, response);
+    server.respondWith('PATCH', SETTINGS.API_BASE + '/', JSON.stringify(response));
 
     return Request.patch('/', {})
       .then(
@@ -87,9 +85,7 @@ describe('request', () => {
   });
 
   it('sends a DELETE request', () => {
-    nock(SETTINGS.API_BASE)
-      .delete('/')
-      .reply(204);
+    server.respondWith('DELETE', SETTINGS.API_BASE + '/', [204, {}, '']);
 
     return Request.delete('/')
       .then(

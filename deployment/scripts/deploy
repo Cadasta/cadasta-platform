@@ -1,0 +1,262 @@
+#!/usr/bin/env python3
+
+import boto3
+import os
+import sys
+import subprocess
+import json
+import time
+import tempfile
+import random
+import string
+from os.path import normpath, join, dirname, abspath
+
+from ami import get_ami
+import config
+import secrets
+
+
+if len(sys.argv) != 5:
+    print('Usage: deploy aws-profile private-key-file ' +
+          'deployment-name deployment-version')
+    sys.exit(1)
+
+
+# AWS profile and private key file to use, plus deployment name.
+
+aws_profile = sys.argv[1]
+private_key_file = sys.argv[2]
+deployment_name = sys.argv[3]
+deploy_version = sys.argv[4]
+
+
+# Make sure profile works and look up region from profile.
+
+try:
+    aws = boto3.session.Session(profile_name=aws_profile)
+except:
+    print('FAILED TO CREATE AWS SESSION USING PROFILE "' + aws_profile + '"')
+    sys.exit(1)
+aws_region = aws._session.get_config_variable('region')
+
+
+# Read deployment configuration information.
+
+config.set_session(aws)
+config.set(deployment_name)
+if not config.exists():
+    print('Deployment "{}" does not exist!'.format(deployment_name))
+    sys.exit(1)
+config.read()
+
+
+# Get AWS user ID.
+
+try:
+    iam = aws.client('iam')
+    aws_uid = iam.get_user()['User']['Arn'].split(':')[4]
+except Exception as e:
+    print('\nFAILED TO GET CURRENT AMAZON USER ID!\n')
+    print(e)
+    print()
+    sys.exit(1)
+
+
+# Check that CloudFormation stack doesn't already exist.
+
+cfn = aws.client('cloudformation')
+try:
+    stacks = cfn.list_stacks()['StackSummaries']
+    stack_names = [s['StackName'] for s in stacks
+                   if s['StackStatus'] != 'DELETE_COMPLETE']
+except:
+    print('Failed to list CloudFormation stacks!')
+    sys.exit(1)
+stack_name = deployment_name + '-stack'
+if stack_name in stack_names:
+    print('CloudFormation stack for deployment "{}" already exists!'.
+          format(deployment_name))
+    sys.exit(1)
+
+
+config.vals['aws_region'] = aws_region
+config.vals['deploy_version'] = deploy_version
+config.vals['secret_key'] = ''.join(
+    [random.choice(string.ascii_letters + string.digits) for n in range(64)]
+)
+
+
+# Look up deployment AMI for region.
+
+deploy_ami = get_ami('ubuntu', aws_region)
+
+
+# Set up unique S3 bucket name.
+
+s3 = aws.client('s3')
+
+def bucket_exists(b):
+    try:
+        res = s3.head_bucket(Bucket=b)
+        return True
+    except:
+        return False
+
+def bucket_candidate(i):
+    b = '-'.join(['cadasta', config.vals['deployment_name'], 'bucket'])
+    if i > 0: b += '-' + str(i)
+    return b
+
+i = 0
+config.vals['s3_bucket'] = bucket_candidate(i)
+while bucket_exists(config.vals['s3_bucket']):
+    i = i + 1
+    config.vals['s3_bucket'] = bucket_candidate(i)
+
+config.write()
+
+
+# Create CloudFormation stack.
+
+print('\nCreating deployment CloudFormation stack...')
+template_file = normpath(join(dirname(abspath(__file__)),
+                             '../files/cloudformation-template.json'))
+template_body = open(template_file, 'r').read()
+template_parameters = [('Region',          aws_region),
+                       ('Deployment',      deployment_name),
+                       ('AZ1',             aws_region + 'a'),
+                       ('AZ2',             aws_region + 'b'),
+                       ('UID',             aws_uid),
+                       ('DeployAMI',       deploy_ami),
+                       ('EC2InstanceType', config.vals['ec2_instance_type']),
+                       ('RDSInstanceType', config.vals['rds_instance_type']),
+                       ('RDSStorage',      str(config.vals['rds_storage'])),
+                       ('DNSMain',         config.vals['main_url'] + '.'),
+                       ('DNSAPI',          config.vals['api_url'] + '.'),
+                       ('S3Bucket',        config.vals['s3_bucket'])]
+template_parameters_dict = [dict([('ParameterKey', k), ('ParameterValue', v)])
+                            for k, v in template_parameters]
+response = cfn.create_stack(StackName=stack_name,
+                            TemplateBody=template_body,
+                            Parameters=template_parameters_dict,
+                            Capabilities=['CAPABILITY_IAM'])
+
+
+# Wait for CloudFormation stack to come alive.
+
+print("""
+
+             WAITING FOR CLOUDFORMATION STACK TO BECOME ACTIVE....
+
+The stack may take quite a long time to become active (often around
+12-13 minutes).  AWS needs to create an RDS database instance and all
+the associated networking infrastructure (and it creates an initial
+database backup as it does that) as well as the EC2 instance used to
+host the platform.
+
+If you want to watch what's happening, you can log in to the AWS
+Console in your browser and look on the CloudFormation page -- you'll
+see various events occurring as AWS sets up the resources to run the
+platform..
+
+Please be patient and do NOT interrupt this process while we're waiting!
+""")
+
+start = time.time()
+cloudformation = boto3.resource('cloudformation')
+stack = cloudformation.Stack(stack_name)
+while True:
+    time.sleep(5)
+    stack.reload()
+    w = int(time.time() - start)
+    print('WAITING: ', w // 60, 'm ', w % 60, 's   ',
+          sep='', end='\r', flush=True)
+    if stack.stack_status == 'CREATE_COMPLETE': break
+    if (stack.stack_status == 'ROLLBACK_COMPLETE' or
+        stack.stack_status == 'CREATE_ROLLBACK_COMPLETE' or
+        stack.stack_status == 'CREATE_FAILED'):
+        print('CloudFormation stack creation failed!')
+        sys.exit(1)
+print('\n')
+print('Stack {} successfully created.  Provisioning...'.format(stack_name))
+
+
+# Find EC2 instance IP address and RDS host name to use for
+# provisioning.
+
+ec2_name = deployment_name + '-ec2'
+ec2 = aws.client('ec2')
+ec2s = ec2.describe_instances(Filters=[{'Name': 'tag:Name', 'Values': [ec2_name]}])
+ec2s = [ec2['Instances'][0] for ec2 in ec2s['Reservations']
+        if ec2['Instances'][0]['State']['Name'] == 'running']
+if len(ec2s) != 1:
+    print("Oops.  Can't find EC2 instance!")
+    sys.exit(1)
+public_ip = ec2s[0]['NetworkInterfaces'][0]['Association']['PublicIp']
+config.vals['public_ip'] = public_ip
+config.write()
+
+rds = aws.client('rds')
+dbs = rds.describe_db_instances()['DBInstances']
+db_host = None
+arn_base = 'arn:aws:rds:' + aws_region + ':' + aws_uid + ':db:'
+for db in dbs:
+    arn = arn_base + db['DBInstanceIdentifier']
+    tags = rds.list_tags_for_resource(ResourceName=arn)['TagList']
+    s = [v['Value'] for v in tags
+         if v['Key'] == 'aws:cloudformation:stack-name'][0]
+    if s == stack_name:
+        db_host = db['Endpoint']['Address']
+        break
+if not db_host:
+    print("Couldn't identify database hostname!")
+    sys.exit(1)
+config.vals['db_host'] = db_host
+config.write()
+
+
+# Get platform email credentials.
+
+secrets.set_session(aws)
+platform_email = secrets.read('platform-email')
+
+
+# Set up Ansible provisioning command parameters.
+
+work_dir = normpath(join(dirname(abspath(__file__)), '../../provision'))
+extra_vars = [('main_url',            config.vals['main_url']),
+              ('api_url',             config.vals['api_url']),
+              ('aws_region',          config.vals['aws_region']),
+              ('db_host',             config.vals['db_host']),
+              ('secret_key',          config.vals['secret_key']),
+              ('deployment_name',     config.vals['deployment_name']),
+              ('s3_bucket',           config.vals['s3_bucket']),
+              ('deploy_version',      config.vals['deploy_version']),
+              ('email_host_user',     platform_email['email_host_user']),
+              ('email_host_password', platform_email['email_host_password'])]
+extra_vars = ' '.join(map(lambda p: p[0] + '=' + p[1], extra_vars))
+
+
+# Set up temporary hosts file for Ansible.
+
+tmp_hosts = tempfile.mkstemp()[1]
+with open(tmp_hosts, 'w') as tmp_fp:
+    print(public_ip, file=tmp_fp)
+
+
+# Run provisioning playbook.
+
+os.chdir(work_dir)
+os.environ['ANSIBLE_HOST_KEY_CHECKING'] = 'false'
+cmd = ['ansible-playbook',
+       '--private-key=' + private_key_file,
+       '--inventory-file=' + tmp_hosts,
+       '--extra-vars', extra_vars,
+       'aws-deploy.yml']
+if subprocess.call(cmd) != 0:
+    print('\n\nansible-playbook TERMINATED INCORRECTLY!\n\n')
+else:
+    print('\n\nPROVISIONING COMPLETED!\n\n')
+    print('See s3://cadasta-secrets/deployments/{}.json for details\n'.
+          format(config.vals['deployment_name']))
+os.remove(tmp_hosts)
