@@ -31,6 +31,20 @@ class Message extends React.Component {
     }
   }
 
+  getClassNames(msgType) {
+    let classes = ['alert', 'text-center'];
+    switch(msgType):
+      case 'success':
+        classes.push('alert-success');
+        break;
+      case 'error':
+        classes.push('alert-danger');
+        break;
+
+    return classNames('message', ...classes);
+
+  }
+
   render() {
     const message = this.props.message;
     const messageClass = classNames('message', message.get('type'));
