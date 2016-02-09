@@ -27,6 +27,7 @@
     "eslint": "^1.10.3",
     "eslint-config-airbnb": "^3.1.0",
     "eslint-plugin-react": "^3.15.0",
+    "file-loader": "^0.8.5",
     "jsdom": "^7.2.1",
     "less": "^2.5.3",
     "less-loader": "^2.2.2",

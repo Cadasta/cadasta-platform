@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from '../../core/components/Link';
 
 const propTypes = {
   accountRegister: React.PropTypes.func.isRequired,
@@ -27,42 +28,43 @@ class RegistrationForm extends React.Component {
     return (
       <form className="account-register form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <h1>Register for an account</h1>
-        <p>By creating an account ...</p>
+        <h1>Sign up for a free account</h1>
 
         <div className="form-group">
           <label htmlFor="username">Choose username</label>
-          <input name="username" ref="username" type="text" className="form-control" />
+          <input name="username" ref="username" type="text" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input name="email" ref="email" type="email" className="form-control" />
+          <label htmlFor="email">Email address</label>
+          <input name="email" ref="email" type="email" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input name="password" ref="password" type="password" className="form-control" />
+          <input name="password" ref="password" type="password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
           <label htmlFor="password_repeat">Confirm password</label>
-          <input name="password_repeat" ref="password_repeat" type="password" className="form-control" />
+          <input name="password_repeat" ref="password_repeat" type="password" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
           <label htmlFor="first_name">First name</label>
-          <input name="first_name" ref="first_name" type="text" className="form-control" />
+          <input name="first_name" ref="first_name" type="text" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
           <label htmlFor="last_name">Last name</label>
-          <input name="last_name" ref="last_name" type="text" className="form-control" />
+          <input name="last_name" ref="last_name" type="text" className="form-control input-lg" />
         </div>
 
         <div className="text-center">
-          <button type="submit" className="btn btn-primary btn-lg">Register</button>
+          <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Register</button>
         </div>
+
+        <p className="text-center">Already have an account? <Link to={ "/account/login/" }>Sign in</Link></p>
 
       </form>
     );

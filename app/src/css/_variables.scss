@@ -3,7 +3,7 @@
 //== Colors
 
 $gray-dark:              #595a5c;  // Cadasta gray
-$brand-primary:          #00b288;  // Cadasta green
+$brand-primary:          #2069b3;  // Cadasta blue
 
 //== Scaffolding
 
@@ -11,8 +11,13 @@ $brand-primary:          #00b288;  // Cadasta green
 
 //== Typography
 
-$font-family-sans-serif:  "Roboto", Helvetica, Arial, sans-serif;
-$font-size-base:          16px;
+$font-family-sans-serif:  'roboto', Helvetica, Arial, sans-serif;
+
+//== Buttons
+
+$btn-default-color:              #fff;
+$btn-default-bg:                 #00b288;  // Cadasta green
+$btn-default-border:             #009975;
 
 
 // End Override

@@ -15,11 +15,11 @@ module.exports = {
       test: /\.scss$/,
       loaders: ['style', 'css', 'sass'],
     }, {
-      test:  /\.(jpe?g|png|gif|svg)$/i,
-      loaders: ['url?limit=8192', 'img']
+      test: /\.(jpe?g|png|gif|svg)$/i,
+      loader: 'file-loader?name=img/[name].[ext]',
     }, {
       test: /\.(woff|woff2|eot|ttf|svg)$/,
-      loader: 'url?limit=100000'
+      loader: 'file-loader?name=fonts/[name].[ext]',
     }],
   },
   resolve: {

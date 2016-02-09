@@ -1,5 +1,6 @@
 import React from 'react';
 import connect from 'react-redux/lib/components/connect';
+import Link from '../../core/components/Link';
 
 import * as accountActions from '../actions';
 
@@ -41,15 +42,18 @@ export class Login extends React.Component {
   render() {
     return (
       <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
- 
+
+        <h1>Sign in to your account</h1>
+
         <div className="form-group">
           <label htmlFor="username">Username</label>
-          <input name="username" ref="username" className="form-control" />
+          <input name="username" ref="username" className="form-control input-lg" />
         </div>
 
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input name="password" ref="password" type="password" className="form-control" />
+
+          <input name="password" ref="password" type="password" className="form-control input-lg" />
         </div>
 
         <div className="checkbox">
@@ -58,10 +62,9 @@ export class Login extends React.Component {
           Remember Me</label>
         </div>
 
-        <div className="text-center">
-          <button type="submit" className="btn btn-primary btn-lg">Login</button>
-        </div>
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Sign In</button>
 
+        <p className="text-center">Don't have an account? <Link to={ "/account/register/" }>Register here</Link></p>
       </form>
     );
   }

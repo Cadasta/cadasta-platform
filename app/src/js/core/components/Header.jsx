@@ -17,14 +17,16 @@ class Header extends React.Component {
 
     if (this.props.user.get('auth_token')) {
       userLinks = (
-        <ul>
-          <li><Link to={ "/account/profile/" }>Profile</Link></li>
-          <li><Link to={ "/account/logout/" }>Logout</Link></li>
-        </ul>
+        <div className="user-links pull-right">
+          <ul className="list-inline">
+            <li><Link to={ "/account/profile/" }>My Profile</Link></li>
+            <li><Link to={ "/account/logout/" }>Log Out</Link></li>
+          </ul>
+        </div>
       );
     } else {
       userLinks = (
-        <div className="user-links pull-right">
+        <div className="reg-links pull-right">
           <ul className="list-inline">
             <li><Link to={ "/account/login/" }>Sign In</Link></li>
             <li><Link to={ "/account/register/" }>Register</Link></li>
@@ -40,7 +42,7 @@ class Header extends React.Component {
     return (
       <header>
         <div className="container">
-          <h1 id="logo" className="pull-left"><Link to="/"><img src="/img/logo-white-l.png" alt="Cadasta" /></Link></h1>
+          <h1 id="logo" className="pull-left"><Link to="/"><img src={require('../../../img/logo-white.png')} /></Link></h1>
           { this.getUserLinks() }
         </div>
       </header>

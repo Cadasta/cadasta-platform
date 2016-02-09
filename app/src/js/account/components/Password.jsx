@@ -25,17 +25,26 @@ export class Password extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleFormSubmit}>
-        <label htmlFor="new_password">New password</label>
-        <input type="password" name="new_password" ref="new_password" />
+      <form onSubmit={this.handleFormSubmit} className="form-narrow">
 
-        <label htmlFor="new_password">Repeat new password</label>
-        <input type="password" name="re_new_password" ref="re_new_password" />
+        <h1>Change your password</h1>
 
-        <label htmlFor="current_password">Current password</label>
-        <input type="password" name="current_password" ref="current_password" />
+        <div className="form-group">
+          <label htmlFor="current_password">Current password</label>
+          <input type="password" name="current_password" ref="current_password" className="form-control input-lg" />
+        </div>
 
-        <button type="submit">Change password</button>
+        <div className="form-group">
+          <label htmlFor="new_password">New password</label>
+          <input type="password" name="new_password" ref="new_password" className="form-control input-lg" />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="new_password">Repeat new password</label>
+          <input type="password" name="re_new_password" ref="re_new_password" className="form-control input-lg" />
+        </div>
+
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Change password</button>
       </form>
     );
   }

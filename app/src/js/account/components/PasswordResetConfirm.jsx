@@ -30,14 +30,21 @@ export class PasswordResetConfirm extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleFormSubmit}>
-        <label htmlFor="new_password">Enter new password</label>
-        <input type="password" name="new_password" ref="new_password" />
+      <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <label htmlFor="re_new_password">Retype newpassword</label>
-        <input type="password" name="re_new_password" ref="re_new_password" />
+        <h1>Confirm your new password</h1>
 
-        <button type="submit">Reset password</button>
+        <div className="form-group">
+          <label htmlFor="new_password">Enter new password</label>
+          <input type="password" name="new_password" ref="new_password" className="form-control input-lg" />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="re_new_password">Retype newpassword</label>
+          <input type="password" name="re_new_password" ref="re_new_password" className="form-control input-lg" />
+        </div>
+
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Reset password</button>
       </form>
     );
   }

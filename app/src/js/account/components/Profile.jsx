@@ -52,46 +52,40 @@ export class Profile extends React.Component {
   render() {
     return (
       <div>
-        <form className="profile-form" onSubmit={this.handleFormSubmit}>
-          <label htmlFor="username">Username</label>
-          <input
-            name="username"
-            ref="username"
-            value={this.state.username}
-            onChange={this.handleValueChange}
-          />
+        <form className="profile-form form-narrow" onSubmit={this.handleFormSubmit}>
 
-          <label htmlFor="email">Email</label>
-          <input
-            name="email"
-            ref="email"
-            type="email"
-            value={this.state.email}
-            onChange={this.handleValueChange}
-          />
+        <h1>Update your profile</h1>
 
-          <label htmlFor="first_name">First name</label>
-          <input
-            name="first_name"
-            ref="first_name"
-            value={this.state.first_name}
-            onChange={this.handleValueChange}
-          />
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input name="username" ref="username" value={this.state.username} onChange={this.handleValueChange} className="form-control input-lg" />
+          </div>
 
-          <label htmlFor="last_name">Last name</label>
-          <input
-            name="last_name"
-            ref="last_name"
-            value={this.state.last_name}
-            onChange={this.handleValueChange}
-          />
+          <div className="form-group">
+            <label htmlFor="email">Email Address</label>
+            <input name="email" ref="email" type="email" value={this.state.email} onChange={this.handleValueChange} className="form-control input-lg" />
+          </div>
 
-          <button type="submit">Update profile</button>
+          <div className="form-group">
+            <label htmlFor="first_name">First name</label>
+            <input name="first_name" ref="first_name" value={this.state.first_name} onChange={this.handleValueChange} className="form-control input-lg" />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="last_name">Last name</label>
+            <input name="last_name" ref="last_name" value={this.state.last_name} onChange={this.handleValueChange} className="form-control input-lg" />
+          </div>
+
+          <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">Update Profile</button>
+          <h5>Password options</h5>
+          <ul>
+            <li><Link to={ "/account/password/" } >Change password</Link></li>
+            <li><Link to={ "/account/password/reset/" }>Reset password</Link></li>
+          </ul>
         </form>
 
         <div>
-          <Link to={ "/account/password/" }>Change password</Link>
-          <Link to={ "/account/password/reset/" }>Reset password</Link>
+
         </div>
       </div>
     );

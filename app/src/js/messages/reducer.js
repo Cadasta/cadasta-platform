@@ -62,12 +62,12 @@ export default function messages(state = DEFAULT_STATE, action) {
 
   if (action.type in SUCCESS_MESSAGES) {
     userFeedback = userFeedback.push(
-      createMessage('success', SUCCESS_MESSAGES[action.type])
+      createMessage('success alert alert-success text-center', SUCCESS_MESSAGES[action.type])
     );
     newState = state.set('userFeedback', userFeedback);
   } else if (action.type in ERROR_MESSAGES) {
     userFeedback = userFeedback.push(
-      createMessage('error', ERROR_MESSAGES[action.type], action.response)
+      createMessage('error alert alert-danger', ERROR_MESSAGES[action.type], action.response)
     );
     newState = state.set('userFeedback', userFeedback);
   } else {
