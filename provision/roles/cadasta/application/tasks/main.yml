@@ -1,0 +1,38 @@
+- name: Install packages
+  become: yes
+  become_user: root
+  apt: pkg={{ item }} state=installed update_cache=yes
+  with_items:
+      - python3-dev
+      - python-virtualenv
+
+- name: Manually create the initial virtualenv
+  become: yes
+  become_user: "{{ app_user }}"
+  command: virtualenv {{ virtualenv_path }} --python=python3
+           creates="{{ virtualenv_path }}"
+
+- name: Install requirements
+  become: yes
+  become_user: "{{ app_user }}"
+  pip: virtualenv="{{ virtualenv_path }}"
+       requirements="{{ application_path }}requirements/common.txt"
+
+- name: Set up logging directory
+  become: yes
+  become_user: root
+  file: path=/var/log/django state=directory owner="{{ app_user }}"
+
+- name: Django migrate
+  become: yes
+  become_user: "{{ app_user }}"
+  django_manage: command=migrate
+                 app_path="{{ application_path }}cadasta"
+                 virtualenv="{{ virtualenv_path }}"
+                 settings="{{ django_settings }}"
+
+- name: write settings.js
+  become: yes
+  become_user: "{{ app_user }}"
+  template: src=settings.j2
+            dest="{{ application_path }}/app/src/js/settings.js"

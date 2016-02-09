@@ -1,0 +1,9 @@
+- name: Add nginx/stable repository
+  become: yes
+  become_user: root
+  apt_repository: repo='ppa:nginx/stable'
+
+- name: Install packages
+  become: yes
+  become_user: root
+  apt: pkg=nginx state=installed update_cache=yes

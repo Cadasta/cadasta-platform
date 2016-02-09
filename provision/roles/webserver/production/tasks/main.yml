@@ -1,0 +1,79 @@
+- name: Install packages
+  become: yes
+  become_user: root
+  apt: pkg=python3-setuptools state=installed update_cache=yes
+
+- name: Install global Python3 PIP
+  become: yes
+  become_user: root
+  shell: easy_install3 pip
+
+- name: Install global uWSGI
+  become: yes
+  become_user: root
+  pip: name=uwsgi state=present executable=pip3
+
+- name: Make sure uWSGI log directory exists
+  become: yes
+  become_user: root
+  file: path=/var/log/uwsgi state=directory mode=755
+
+- name: Make sure uWSGI vassals directory exists
+  become: yes
+  become_user: root
+  file: path=/etc/uwsgi state=directory mode=755
+
+- name: Set up uWSGI Upstart service definition
+  become: yes
+  become_user: root
+  copy: src=uwsgi.conf dest=/etc/init/uwsgi.conf owner=root mode=644
+
+- name: Start uWSGI emperor process
+  become: yes
+  become_user: root
+  service: name=uwsgi state=restarted enabled=yes
+
+- name: Write Cadasta site configuration to sites-available
+  become: yes
+  become_user: root
+  template: src=nginx-production
+            dest="/etc/nginx/sites-available/cadasta"
+  notify:
+    - Restart nginx
+
+- name: Enable Cadasta site
+  become: yes
+  become_user: root
+  file: src="/etc/nginx/sites-available/cadasta"
+        dest="/etc/nginx/sites-enabled/cadasta"
+        state=link
+  notify:
+    - Restart nginx
+
+- name: Link static content
+  become: yes
+  become_user: "{{ app_user }}"
+  file: path="{{ application_path }}static"
+        src="{{ application_path }}app/dist"
+        state=link
+
+- name: Copy uwsgi_params to base directory
+  become: yes
+  become_user: "{{ app_user }}"
+  copy: src=uwsgi_params
+        dest="{{ application_path }}uwsgi_params"
+        owner="{{ app_user }}" mode=644
+
+- name: Set up uwsgi.ini file
+  become: yes
+  become_user: "{{ app_user }}"
+  template: src=uwsgi.ini
+            dest="{{ application_path }}uwsgi.ini"
+            owner="{{ app_user }}" mode=644
+
+- name: Make uWSGI vassal link
+  become: yes
+  become_user: root
+  file: path=/etc/uwsgi/cadasta.ini
+        src="{{ application_path }}uwsgi.ini"
+        state=link

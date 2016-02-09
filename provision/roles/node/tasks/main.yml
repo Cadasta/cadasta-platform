@@ -1,0 +1,39 @@
+- name: Check for existing Node installation
+  stat: path=/usr/local/bin/node
+  register: node_check
+
+- name: Create temporary directory
+  file: path=/tmp/nodejs state=directory
+  when: node_check.stat.exists == False
+
+- name: Download Node 5.5.0 binary distribution
+  unarchive: src=https://nodejs.org/dist/v5.5.0/node-v5.5.0-linux-x64.tar.gz
+             dest=/tmp/nodejs copy=no
+  when: node_check.stat.exists == False
+
+- name: Copy Node files
+  become: yes
+  become_user: root
+  shell: rsync -rl /tmp/nodejs/node-v5.5.0-linux-x64/{{ item }} /usr/local
+  with_items:
+    - bin
+    - include
+    - lib
+    - share
+  when: node_check.stat.exists == False
+
+- name: Clean up Node binary distribution
+  file: path=/tmp/nodejs state=absent
+  when: node_check.stat.exists == False
+
+- name: Make /usr/bin/node link
+  become: yes
+  become_user: root
+  file: path=/usr/bin/node src=/usr/local/bin/node state=link
+  when: node_check.stat.exists == False
+
+- name: Install NPM 2
+  become: yes
+  become_user: root
+  shell: npm install -g npm@2
+  when: node_check.stat.exists == False
