@@ -31,6 +31,7 @@
     block: |
       DB_HOST="{{ db_host }}"
       API_HOST="{{ api_url }}"
+      DOMAIN="{{ main_url }}"
       SECRET_KEY="{{ secret_key }}"
       EMAIL_HOST_USER="{{ email_host_user }}"
       EMAIL_HOST_PASSWORD="{{ email_host_password }}"
@@ -47,6 +48,7 @@
     block: |
       Defaults	env_keep += DB_HOST
       Defaults	env_keep += API_HOST
+      Defaults	env_keep += DOMAIN
       Defaults	env_keep += SECRET_KEY
       Defaults	env_keep += EMAIL_HOST_USER
       Defaults	env_keep += EMAIL_HOST_PASSWORD
