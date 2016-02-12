@@ -20,17 +20,18 @@ export class App extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="wrapper">
         <Header user={this.props.user} />
 
         { this.loadingState() }
-
-        <div id="messages">
-          {this.props.messages.get('userFeedback').map(
-            msg => <Message key={msg.get('id')} message={msg} />
-          )}
-        </div>
+        <div className="container">
+          <div id="messages">
+            {this.props.messages.get('userFeedback').map(
+              msg => <Message key={msg.get('id')} message={msg} />
+            )}
+          </div>
         { this.props.children || <HomeContainer /> }
+        </div>
       </div>
     );
   }

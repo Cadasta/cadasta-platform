@@ -1,5 +1,6 @@
 import React from 'react';
 import connect from 'react-redux/lib/components/connect';
+import Link from '../../core/components/Link';
 
 import * as accountActions from '../actions';
 import { t } from '../../i18n';
@@ -44,17 +45,32 @@ export class Login extends React.Component {
 
   render() {
     return (
-      <form className="login-form" onSubmit={this.handleFormSubmit}>
-        <label htmlFor="username">{ t('Username') }</label>
-        <input name="username" ref="username" />
+      <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <label htmlFor="password">{ t('Password') }</label>
-        <input name="password" ref="password" type="password" />
+        <h1>{ t('Sign in to your account') }</h1>
 
-        <input name="rememberMe" ref="rememberMe" type="checkbox" />
-        <label htmlFor="rememberMe">{ t('Remember me') }</label>
+        <div className="form-group">
+          <label htmlFor="username">{ t('Username') }</label>
+          <input name="username" ref="username" className="form-control input-lg" />
+        </div>
 
-        <button type="submit">{ t('Login') }</button>
+        <div className="form-group">
+          <label htmlFor="password">{ t('Password') }</label>
+          <input name="password" ref="password" type="password" className="form-control input-lg" />
+        </div>
+
+        <div className="checkbox pull-left">
+          <label htmlFor="rememberMe">
+          <input name="rememberMe" ref="rememberMe" type="checkbox" />
+          { t('Remember me') }</label>
+        </div>
+
+        <p className="small pull-right"><Link to={ "/account/password/reset/" }>{ t('Forgotten password?') }</Link></p>
+
+        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Sign In') }</button>
+
+        <p className="text-center">Don't have an account? <Link to={ "/account/register/" }>Register here</Link></p>
+
       </form>
     );
   }
