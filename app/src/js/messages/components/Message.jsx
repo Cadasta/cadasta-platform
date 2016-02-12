@@ -30,10 +30,21 @@ class Message extends React.Component {
       return <ul>{details.map(detail => <li>{ detail }</li>)}</ul>;
     }
   }
+  
+  getClassNames(msgType) {
+    let classes = ['text-center alert '];
+    switch(msgType) {
+      case 'success': classes.push('alert-success');
+        break;
+      case 'error': classes.push('alert-danger');
+        break;
+    }
+    return classNames('message', classes);
+  }
 
   render() {
     const message = this.props.message;
-    const messageClass = classNames('message', message.get('type'));
+    const messageClass = this.getClassNames(message.get('type'));
 
     return (
       <div className={ messageClass }>

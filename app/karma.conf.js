@@ -44,6 +44,14 @@ module.exports = function karmaConf(config) {
             test: /\.json$/,
             loader: 'json-loader',
           },
+          {
+            test: /\.(png|jpg|gif|svg)$/,
+            loader: 'file-loader?name=img/[name].[ext]',
+          },
+          {
+            test: /\.(woff|woff2|eot|ttf|svg)$/,
+            loader: 'file-loader?name=fonts/[name].[ext]',
+          },
         ],
       },
       plugins: [

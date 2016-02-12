@@ -18,17 +18,21 @@ class Header extends React.Component {
 
     if (this.props.user.get('auth_token')) {
       userLinks = (
-        <ul>
-          <li><Link to={ "/account/profile/" }>{ t('Profile') }</Link></li>
-          <li><Link to={ "/account/logout/" }>{ t('Logout') }</Link></li>
-        </ul>
+        <div className="user-links pull-right">
+          <ul className="list-inline">
+            <li><Link to={ "/account/profile/" }>{ t('Profile') }</Link></li>
+            <li><Link to={ "/account/logout/" }>{ t('Logout') }</Link></li>
+          </ul>
+        </div>
       );
     } else {
       userLinks = (
-        <ul>
-          <li><Link to={ "/account/login/" }>{ t('Login') }</Link></li>
-          <li><Link to={ "/account/register/" }>{ t('Register') }</Link></li>
-        </ul>
+        <div className="reg-links pull-right">
+          <ul className="list-inline">
+            <li><Link to={ "/account/login/" }>{ t('Login') }</Link></li>
+            <li><Link to={ "/account/register/" }>{ t('Register') }</Link></li>
+          </ul>
+        </div>
       );
     }
 
@@ -37,10 +41,12 @@ class Header extends React.Component {
 
   render() {
     return (
-      <div id="header">
-        <h1><Link to="/">Cadasta</Link></h1>
-        { this.getUserLinks() }
-      </div>
+      <header>
+        <div className="container">
+          <h1 id="logo" className="pull-left"><Link to="/"><img src={require('../../../img/logo-white.png')} /></Link></h1>
+          { this.getUserLinks() }
+        </div>
+      </header>
     );
   }
 }
