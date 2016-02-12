@@ -33,7 +33,7 @@ export class PasswordResetConfirm extends React.Component {
     return (
       <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
 
-        <h1>{ t('Confirm your new password') }</h1>
+        <h1>{ t('Create a new password') }</h1>
 
         <div className="form-group">
           <label htmlFor="new_password">{ t('Enter new password') }</label>

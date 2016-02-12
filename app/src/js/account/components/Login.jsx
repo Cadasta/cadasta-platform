@@ -59,11 +59,13 @@ export class Login extends React.Component {
           <input name="password" ref="password" type="password" className="form-control input-lg" />
         </div>
 
-        <div className="checkbox">
+        <div className="checkbox pull-left">
           <label htmlFor="rememberMe">
           <input name="rememberMe" ref="rememberMe" type="checkbox" />
           { t('Remember me') }</label>
         </div>
+
+        <p className="small pull-right"><Link to={ "/account/password/reset/" }>{ t('Forgotten password?') }</Link></p>
 
         <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Sign In') }</button>
 
