@@ -1,0 +1,150 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"Plural-Forms: nplurals = 2; plural = (n !== 1);\n"
+
+#: src/js/core/components/Home.jsx:16
+msgid "Welcome"
+msgstr ""
+
+#: src/js/messages/reducer.js:10
+msgid "Unable to login with provided username and password."
+msgstr ""
+
+#: src/js/messages/reducer.js:11
+msgid "Unable to logout."
+msgstr ""
+
+#: src/js/messages/reducer.js:12
+msgid "Unable to change password."
+msgstr ""
+
+#: src/js/messages/reducer.js:13
+msgid "Unable to register with provided credentials."
+msgstr ""
+
+#: src/js/messages/reducer.js:14
+msgid "Unable to update profile."
+msgstr ""
+
+#: src/js/messages/reducer.js:15
+msgid "Unable to get user profile information from server."
+msgstr ""
+
+#: src/js/messages/reducer.js:17
+msgid "Unable to reset password."
+msgstr ""
+
+#: src/js/messages/reducer.js:18
+msgid "Unable to activate account."
+msgstr ""
+
+#: src/js/messages/reducer.js:22
+msgid "Successfully logged in."
+msgstr ""
+
+#: src/js/messages/reducer.js:23
+msgid "Successfully logged out."
+msgstr ""
+
+#: src/js/messages/reducer.js:24
+msgid "Successfully changed password."
+msgstr ""
+
+#: src/js/messages/reducer.js:25
+msgid "Successfully registered."
+msgstr ""
+
+#: src/js/messages/reducer.js:26
+msgid "Successfully updated profile information."
+msgstr ""
+
+#: src/js/messages/reducer.js:27
+msgid ""
+"Password successfully reset. Check your inbox for a link to confirm the "
+"reset."
+msgstr ""
+
+#: src/js/messages/reducer.js:28
+msgid "Password successfully reset."
+msgstr ""
+
+#: src/js/messages/reducer.js:29
+msgid "Account successfully activated."
+msgstr ""
+
+#: src/js/core/components/Header.jsx:22
+msgid "Profile"
+msgstr ""
+
+#: src/js/core/components/Header.jsx:23
+msgid "Logout"
+msgstr ""
+
+#: src/js/account/components/Login.jsx:57
+msgid "Login"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:48
+msgid "Register"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:57
+msgid "Username"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:65
+msgid "Email"
+msgstr ""
+
+#: src/js/account/components/Login.jsx:51
+msgid "Password"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:74
+msgid "First name"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:82
+msgid "Last name"
+msgstr ""
+
+#: src/js/account/components/Login.jsx:55
+msgid "Remember me"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:90
+msgid "Update profile"
+msgstr ""
+
+#: src/js/account/components/Password.jsx:39
+msgid "Change password"
+msgstr ""
+
+#: src/js/account/components/PasswordResetConfirm.jsx:41
+msgid "Reset password"
+msgstr ""
+
+#: src/js/account/components/Password.jsx:30
+msgid "New password"
+msgstr ""
+
+#: src/js/account/components/Password.jsx:33
+msgid "Repeat new password"
+msgstr ""
+
+#: src/js/account/components/Password.jsx:36
+msgid "Current password"
+msgstr ""
+
+#: src/js/account/components/PasswordReset.jsx:28
+msgid "Enter email"
+msgstr ""
+
+#: src/js/account/components/PasswordResetConfirm.jsx:35
+msgid "Enter new password"
+msgstr ""
+
+#: src/js/account/components/PasswordResetConfirm.jsx:38
+msgid "Retype new password"
+msgstr ""

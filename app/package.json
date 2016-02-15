@@ -7,15 +7,17 @@
     "test": "./node_modules/.bin/karma start",
     "travis-test": "./node_modules/.bin/karma start --single-run",
     "lint": "./node_modules/.bin/eslint --ext .js,.jsx 'src/js/**/*.@(js|jsx)'; exit 0",
-    "start": "./node_modules/.bin/webpack-dev-server"
+    "start": "./node_modules/.bin/webpack-dev-server --inline --hot"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "autoprefixer-loader": "^3.1.0",
+    "babel-cli": "^6.5.1",
     "babel-core": "^6.3.17",
     "babel-eslint": "^4.1.6",
+    "babel-gettext-extractor": "git://github.com/Cadasta/babel-gettext-extractor.git",
     "babel-loader": "^6.2.0",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
@@ -53,6 +55,19 @@
     "presets": [
       "es2015",
       "react"
+    ],
+    "plugins": [
+      [
+        "babel-gettext-extractor", {
+          "functionNames": {
+            "t": ["msgid"],
+            "tn": ["msgid", "msgid_plural", "count"],
+            "tct": ["msgid"]
+          },
+          "baseDirectory": ".",
+          "fileName": "./src/locale/gettext.po"
+        }
+      ]
     ]
   },
   "dependencies": {

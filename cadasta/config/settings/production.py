@@ -17,7 +17,7 @@ DATABASES = {
 }
 
 DJOSER.update({
-    'DOMAIN': 'cadasta.org',
+    'DOMAIN': os.environ['DOMAIN'],
 })
 
 # Adding localhost here for uWSGI debugging!
@@ -25,9 +25,12 @@ ALLOWED_HOSTS = [os.environ['API_HOST'], 'localhost']
 
 ADMINS = [('Cadasta platform admins', 'platform-admin@cadasta.org')]
 EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 SERVER_EMAIL = 'platform-errors@cadasta.org'
+DEFAULT_FROM_EMAIL = 'platform@cadasta.org'
 
 # Debug logging...
 LOGGING = {
