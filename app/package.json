@@ -64,7 +64,8 @@
             "tn": ["msgid", "msgid_plural", "count"],
             "tct": ["msgid"]
           },
-          "baseDirectory": "."
+          "baseDirectory": ".",
+          "fileName": "./src/locale/gettext.po"
         }
       ]
     ]
