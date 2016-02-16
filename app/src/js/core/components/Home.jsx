@@ -13,7 +13,6 @@ export class Home extends React.Component {
   render() {
     return (
       <div>
-        <h2>{ t('Welcome') }</h2>
         <RegistrationForm accountRegister={this.props.accountRegister} />
       </div>
     );

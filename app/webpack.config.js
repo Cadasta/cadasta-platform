@@ -35,6 +35,12 @@ module.exports = {
     }, {
       test: /\.scss$/,
       loaders: ['style', 'css', 'sass'],
+    }, {
+      test: /\.(jpe?g|png|gif|svg)$/i,
+      loader: 'file-loader?name=img/[name].[ext]',
+    }, {
+      test: /\.(woff|woff2|eot|ttf|svg)$/,
+      loader: 'file-loader?name=fonts/[name].[ext]',
     }],
   },
   resolve: {

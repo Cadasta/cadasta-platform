@@ -30,6 +30,7 @@
     "eslint-config-airbnb": "^3.1.0",
     "eslint-plugin-react": "^3.15.0",
     "fetch-mock": "^4.1.0",
+    "file-loader": "^0.8.5",
     "jsdom": "^7.2.1",
     "karma-chai": "^0.1.0",
     "karma-jsdom-launcher": "^3.0.0",
