@@ -53,11 +53,7 @@ export default (
     <Route path="/account/register/" component={ RegisterContainer } />
     <Route path="/account/profile/" component={ ProfileContainer } onEnter={ requireAuth } />
     <Route path="/account/password/" component={ PasswordContainer } onEnter={ requireAuth } />
-    <Route
-      path="/account/password/reset/"
-      component={ PasswordResetContainer }
-      onEnter={ requireAuth }
-    />
+    <Route path="/account/password/reset/" component={ PasswordResetContainer } />
     <Route
       path="/account/password/reset/confirm/:uid/:token/"
       component={ PasswordResetConfirmContainer }
