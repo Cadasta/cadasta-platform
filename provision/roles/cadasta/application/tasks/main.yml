@@ -5,6 +5,7 @@
   with_items:
       - python3-dev
       - python-virtualenv
+      - git
 
 - name: Manually create the initial virtualenv
   become: yes
