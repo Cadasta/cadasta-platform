@@ -1,5 +1,6 @@
 const webpack = require('webpack');
-const BUILD_OPTIONS = require('./webpack.options').BUILD_OPTIONS;
+const BUILD_OPTIONS = require('./config/webpack.options').BUILD_OPTIONS;
+const LOADERS = require('./config/webpack.loaders');
 
 module.exports = function karmaConf(config) {
   config.set({
@@ -27,32 +28,7 @@ module.exports = function karmaConf(config) {
         noParse: [
           /node_modules\/sinon\//,
         ],
-        loaders: [
-          {
-            exclude: /(vendor|node_modules)/,
-            test: /\.jsx?$/,
-            loader: 'babel-loader',
-          },
-          {
-            test: /\.po$/,
-            loader: 'po-catalog-loader',
-            query: {
-              referenceExtensions: ['.js', '.jsx'],
-            },
-          },
-          {
-            test: /\.json$/,
-            loader: 'json-loader',
-          },
-          {
-            test: /\.(png|jpg|gif|svg)$/,
-            loader: 'file-loader?name=img/[name].[ext]',
-          },
-          {
-            test: /\.(woff|woff2|eot|ttf|svg)$/,
-            loader: 'file-loader?name=fonts/[name].[ext]',
-          },
-        ],
+        loaders: LOADERS,
       },
       plugins: [
         new webpack.DefinePlugin(BUILD_OPTIONS),
