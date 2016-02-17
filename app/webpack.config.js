@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
-const BUILD_OPTIONS = require('./webpack.options').BUILD_OPTIONS;
+const BUILD_OPTIONS = require('./config/webpack.options').BUILD_OPTIONS;
+const LOADERS = require('./config/webpack.loaders');
 
 process.argv.forEach(function processCliArgs(arg) {
   if (arg.startsWith('--build')) {
@@ -18,30 +19,7 @@ module.exports = {
     './src/index.jsx',
   ],
   module: {
-    loaders: [{
-      test: /\.jsx?$/,
-      exclude: /node_modules/,
-      loader: 'react-hot!babel',
-    }, {
-      test: /\.po$/,
-      loader: 'po-catalog-loader',
-      query: {
-        referenceExtensions: ['.js', '.jsx'],
-      },
-    }, {
-      test: /\.json?$/,
-      exclude: /node_modules/,
-      loader: 'react-hot!json',
-    }, {
-      test: /\.scss$/,
-      loaders: ['style', 'css', 'sass'],
-    }, {
-      test: /\.(jpe?g|png|gif|svg)$/i,
-      loader: 'file-loader?name=img/[name].[ext]',
-    }, {
-      test: /\.(woff|woff2|eot|ttf|svg)$/,
-      loader: 'file-loader?name=fonts/[name].[ext]',
-    }],
+    loaders: LOADERS,
   },
   resolve: {
     extensions: ['', '.js', '.jsx'],
