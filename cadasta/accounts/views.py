@@ -1,4 +1,3 @@
-from django.contrib.auth import user_logged_in
 from django.utils.translation import ugettext as _
 
 from rest_framework.serializers import ValidationError
@@ -6,7 +5,6 @@ from rest_framework.response import Response
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 
 from djoser import views as djoser_views
 from djoser import utils as djoser_utils
@@ -23,7 +21,6 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
     subject_template_name = 'change_email_subject.txt'
     plain_body_template_name = 'change_email.txt'
     serializer_class = serializers.UserSerializer
-
 
     def get_email_context(self, user):
         context = super(AccountUser, self).get_email_context(user)

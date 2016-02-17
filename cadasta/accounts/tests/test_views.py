@@ -46,7 +46,7 @@ class AccountUserTest(TestCase):
             'username': 'imagine71'
         }
 
-        request = APIRequestFactory().put('/account/', data)
+        request = APIRequestFactory().put('/v1/account/', data)
         force_authenticate(request, user=user)
         response = AccountUser.as_view()(request).render()
         self.assertEqual(response.status_code, 200)
@@ -66,7 +66,7 @@ class AccountUserTest(TestCase):
             'username': user.username
         }
 
-        request = APIRequestFactory().put('/account/', data)
+        request = APIRequestFactory().put('/v1/account/', data)
         force_authenticate(request, user=user)
         response = AccountUser.as_view()(request).render()
         self.assertEqual(response.status_code, 400)
@@ -85,7 +85,7 @@ class AccountUserTest(TestCase):
             'username': 'john'
         }
 
-        request = APIRequestFactory().put('/account/', data)
+        request = APIRequestFactory().put('/v1/account/', data)
         force_authenticate(request, user=user)
         response = AccountUser.as_view()(request).render()
         self.assertEqual(response.status_code, 200)
@@ -107,7 +107,7 @@ class AccountUserTest(TestCase):
             'username': 'boss'
         }
 
-        request = APIRequestFactory().put('/account/', data)
+        request = APIRequestFactory().put('/v1/account/', data)
         force_authenticate(request, user=user)
         response = AccountUser.as_view()(request).render()
         self.assertEqual(response.status_code, 400)
@@ -126,14 +126,10 @@ class AccountSignupTest(TestCase):
             'last_name': 'Lennon',
         }
 
-        request = APIRequestFactory().post('/account/register/', data)
+        request = APIRequestFactory().post('/v1/account/register/', data)
         response = AccountRegister.as_view()(request).render()
         self.assertEqual(response.status_code, 201)
-        # self.assertIn('auth_token', response.content.decode("utf-8"))
-        
         self.assertEqual(User.objects.count(), 1)
-        # user = User.objects.first()
-        # self.assertTrue(user.is_authenticated())
 
     def test_user_signs_up_with_invalid(self):
         """The server should respond with an 404 error code when a user tries
@@ -145,7 +141,7 @@ class AccountSignupTest(TestCase):
             'last_name': 'Lennon',
         }
 
-        request = APIRequestFactory().post('/account/register/', data)
+        request = APIRequestFactory().post('/v1/account/register/', data)
         response = AccountRegister.as_view()(request).render()
         self.assertEqual(response.status_code, 400)
         self.assertEqual(User.objects.count(), 0)
@@ -161,7 +157,7 @@ class AccountLoginTest(TestCase):
 
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""
-        request = APIRequestFactory().post('/account/login/', {
+        request = APIRequestFactory().post('/v1/account/login/', {
             'username': 'imagine71',
             'password': 'iloveyoko79'
         })
@@ -171,7 +167,7 @@ class AccountLoginTest(TestCase):
 
     def test_unsuccessful_login(self):
         """The view should return a token to authenticate API calls"""
-        request = APIRequestFactory().post('/account/login/', {
+        request = APIRequestFactory().post('/v1/account/login/', {
             'username': 'imagine71',
             'password': 'iloveyoko78'
         })
@@ -185,7 +181,7 @@ class AccountLoginTest(TestCase):
         self.user.verify_email_by = datetime.now()
         self.user.save()
 
-        request = APIRequestFactory().post('/account/login/', {
+        request = APIRequestFactory().post('/v1/account/login/', {
             'username': 'imagine71',
             'password': 'iloveyoko79'
         })
@@ -204,7 +200,7 @@ class AccountVerifyTest(TestCase):
         user.last_login = datetime.now()
         user.save()
 
-        request = APIRequestFactory().post('/account/activate/', {
+        request = APIRequestFactory().post('/v1/account/activate/', {
             'uid': encode_uid(user.pk),
             'token': token
         })

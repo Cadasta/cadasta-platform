@@ -36,11 +36,15 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'corsheaders',
 
+    'crispy_forms',
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'tutelary',
 
+    'core',
     'accounts',
+    'organization'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,12 +57,16 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'audit_log.middleware.UserLoggingMiddleware',
 )
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'EXCEPTION_HANDLER': 'core.views.exception_handler'
 }
 
 ROOT_URLCONF = 'config.urls'
@@ -78,6 +86,8 @@ TEMPLATES = [
         },
     },
 ]
+
+AUTHENTICATION_BACKENDS = ['core.backends.Auth']
 
 DJOSER = {
     'SITE_NAME': 'Cadasta',
