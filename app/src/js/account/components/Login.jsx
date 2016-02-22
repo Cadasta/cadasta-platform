@@ -5,6 +5,12 @@ import Link from '../../core/components/Link';
 import * as accountActions from '../actions';
 import { t } from '../../i18n';
 
+import Formsy from 'formsy-react';
+import FRC from 'formsy-react-components';
+const { Form } = Formsy;
+const { Input, Checkbox } = FRC;
+
+
 const propTypes = {
   accountLogin: React.PropTypes.func.isRequired,
   location: React.PropTypes.shape({
@@ -25,15 +31,8 @@ export class Login extends React.Component {
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
   }
 
-  handleFormSubmit(e) {
-    e.preventDefault();
-
-    const userCredentials = {
-      username: this.refs.username.value,
-      password: this.refs.password.value,
-      rememberMe: this.refs.rememberMe.checked,
-    };
-
+  handleFormSubmit(data) {
+    const userCredentials = data;
     if (this.props.location &&
         this.props.location.state &&
         this.props.location.state.nextPathname) {
@@ -45,33 +44,58 @@ export class Login extends React.Component {
 
   render() {
     return (
-      <form className="login-form form-narrow" onSubmit={this.handleFormSubmit}>
-
+      <Form className="login-form form-narrow" onValidSubmit={this.handleFormSubmit}>
         <h1>{ t('Sign in to your account') }</h1>
 
-        <div className="form-group">
-          <label htmlFor="username">{ t('Username') }</label>
-          <input name="username" ref="username" className="form-control input-lg" />
-        </div>
+        <Input
+          name="username"
+          ref="username"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Username') }
+          type="text"
+          required
+          validationErrors={{
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+        />
 
-        <div className="form-group">
-          <label htmlFor="password">{ t('Password') }</label>
-          <input name="password" ref="password" type="password" className="form-control input-lg" />
-        </div>
+        <Input
+          name="password"
+          ref="password"
+          layout="vertical"
+          label={ t('Password') }
+          className="form-control input-lg"
+          type="password"
+          required
+          validationErrors={{
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+        />
 
-        <div className="checkbox pull-left">
-          <label htmlFor="rememberMe">
-          <input name="rememberMe" ref="rememberMe" type="checkbox" />
-          { t('Remember me') }</label>
-        </div>
+        <p className="small pull-right">
+          <Link to={ "/account/password/reset/" }>{ t('Forgotten password?') }</Link>
+        </p>
 
-        <p className="small pull-right"><Link to={ "/account/password/reset/" }>{ t('Forgotten password?') }</Link></p>
+        <Checkbox
+          name="rememberMe"
+          ref="rememberMe"
+          layout="elementOnly"
+          label={t('Remember me')}
+        />
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Sign in') }</button>
+        <button
+          type="submit"
+          formNoValidate
+          className="btn btn-default btn-lg btn-block text-uppercase"
+        >
+          { t('Sign in') }
+        </button>
 
-        <p className="text-center">Don't have an account? <Link to={ "/account/register/" }>Register here</Link></p>
-
-      </form>
+        <p className="text-center">
+          Don't have an account? <Link to={ "/account/register/" }>Register here</Link>
+        </p>
+      </Form>
     );
   }
 }

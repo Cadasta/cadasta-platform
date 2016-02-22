@@ -27,7 +27,7 @@ class Message extends React.Component {
   renderErrorDetail() {
     const details = this.props.message.get('details');
     if (details && details.count()) {
-      return <ul>{details.map(detail => <li>{ detail }</li>)}</ul>;
+      return <ul>{details.map((detail, key) => <li key={key}>{ detail }</li>)}</ul>;
     }
   }
   

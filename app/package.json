@@ -59,11 +59,20 @@
     ],
     "plugins": [
       [
-        "babel-gettext-extractor", {
+        "babel-gettext-extractor",
+        {
           "functionNames": {
-            "t": ["msgid"],
-            "tn": ["msgid", "msgid_plural", "count"],
-            "tct": ["msgid"]
+            "t": [
+              "msgid"
+            ],
+            "tn": [
+              "msgid",
+              "msgid_plural",
+              "count"
+            ],
+            "tct": [
+              "msgid"
+            ]
           },
           "baseDirectory": ".",
           "fileName": "./src/locale/gettext.po"
@@ -74,6 +83,8 @@
   "dependencies": {
     "classnames": "^2.2.3",
     "es6-promise": "^3.0.2",
+    "formsy-react": "^0.17.0",
+    "formsy-react-components": "^0.6.6",
     "history": "^1.13.1",
     "immutable": "^3.7.5",
     "jed": "^1.1.0",
