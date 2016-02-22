@@ -47,7 +47,7 @@ export class Profile extends React.Component {
   render() {
     return (
       <Form
-        className="form-narrow"
+        className="profile-form form-narrow"
         onValidSubmit={this.handleFormSubmit}
         ref="form"
       >
@@ -105,6 +105,7 @@ export class Profile extends React.Component {
 
         <button
           formNoValidate
+          name="update"
           type="submit"
           className="btn btn-default btn-lg btn-block text-uppercase"
         >

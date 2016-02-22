@@ -7,11 +7,17 @@
       - python-virtualenv
       - git
 
+- name: Create base directory for virtual environment
+  become: yes
+  become_user: root
+  file: path="{{ virtualenv_path | dirname }}" state=directory
+        owner="{{ app_user }}" mode=0755
+
 - name: Manually create the initial virtualenv
   become: yes
   become_user: "{{ app_user }}"
   command: virtualenv {{ virtualenv_path }} --python=python3
-           creates="{{ virtualenv_path }}"
+           creates="{{ virtualenv_path }}bin"
 
 - name: Install requirements
   become: yes
@@ -37,3 +43,16 @@
   become_user: "{{ app_user }}"
   template: src=settings.j2
             dest="{{ application_path }}/app/src/js/settings.js"
+
+- name: Install NodeJS dependencies
+  become: yes
+  become_user: "{{ app_user }}"
+  ignore_errors: yes
+  command: npm install
+           chdir="{{ application_path }}app"
+
+- name: Fix node-sass problem
+  become: yes
+  become_user: "{{ app_user }}"
+  command: npm rebuild node-sass
+           chdir="{{ application_path }}app"

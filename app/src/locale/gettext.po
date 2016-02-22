@@ -3,22 +3,68 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Plural-Forms: nplurals = 2; plural = (n !== 1);\n"
 
+#: src/js/account/components/Login.jsx:48
+msgid "Sign in to your account"
+msgstr ""
+
 #: src/js/account/components/Profile.jsx:60
 msgid "Username"
 msgstr ""
 
-#: test/locale/test_locale.js:16
-msgid "Hello %(name)s"
+#: src/js/account/components/RegistrationForm.jsx:88
+msgid "This field is required"
 msgstr ""
 
-#: test/locale/test_locale.js:33
-msgid "%d unread message"
-msgid_plural "%d unread messages"
-msgstr[0] ""
-msgstr[1] ""
+#: src/js/account/components/RegistrationForm.jsx:67
+msgid "Password"
+msgstr ""
 
-#: test/locale/test_locale.js:38
-msgid "Need more information? [link:Click here]."
+#: src/js/account/components/Login.jsx:77
+msgid "Forgotten password?"
+msgstr ""
+
+#: src/js/account/components/Login.jsx:84
+msgid "Remember me"
+msgstr ""
+
+#: src/js/account/components/Login.jsx:93
+msgid "Sign in"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:54
+msgid "Update your profile"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:53
+msgid "Email"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:57
+msgid "Please provide a valid email address"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:98
+msgid "First name"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:107
+msgid "Last name"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:112
+msgid "Update profile"
+msgstr ""
+
+#: src/js/account/components/Profile.jsx:115
+msgid "Password options"
+msgstr ""
+
+#: src/js/account/components/Password.jsx:84
+msgid "Change password"
+msgstr ""
+
+#: src/js/account/components/PasswordResetConfirm.jsx:81
+msgid "Reset password"
 msgstr ""
 
 #: src/js/account/components/Password.jsx:34
@@ -33,72 +79,16 @@ msgstr ""
 msgid "New password"
 msgstr ""
 
-#: src/js/account/components/RegistrationForm.jsx:67
+#: src/js/account/components/RegistrationForm.jsx:72
 msgid "Your password must be at least 6 characters long."
 msgstr ""
 
-#: src/js/account/components/PasswordResetConfirm.jsx:62
+#: src/js/account/components/PasswordResetConfirm.jsx:65
 msgid "Repeat new password"
 msgstr ""
 
-#: src/js/account/components/RegistrationForm.jsx:80
+#: src/js/account/components/RegistrationForm.jsx:87
 msgid "Passwords must match."
-msgstr ""
-
-#: src/js/account/components/Profile.jsx:112
-msgid "Change password"
-msgstr ""
-
-#: src/js/account/components/Login.jsx:48
-msgid "Sign in to your account"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:63
-msgid "Password"
-msgstr ""
-
-#: src/js/account/components/Login.jsx:71
-msgid "Forgotten password?"
-msgstr ""
-
-#: src/js/account/components/Login.jsx:78
-msgid "Remember me"
-msgstr ""
-
-#: src/js/account/components/Login.jsx:86
-msgid "Sign in"
-msgstr ""
-
-#: src/js/account/components/Profile.jsx:54
-msgid "Update your profile"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:50
-msgid "Email"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:54
-msgid "Please provide a valid email address"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:90
-msgid "First name"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:99
-msgid "Last name"
-msgstr ""
-
-#: src/js/account/components/Profile.jsx:107
-msgid "Update profile"
-msgstr ""
-
-#: src/js/account/components/Profile.jsx:110
-msgid "Password options"
-msgstr ""
-
-#: src/js/account/components/PasswordResetConfirm.jsx:77
-msgid "Reset password"
 msgstr ""
 
 #: src/js/account/components/PasswordReset.jsx:34
@@ -107,38 +97,6 @@ msgstr ""
 
 #: src/js/account/components/PasswordReset.jsx:41
 msgid "Enter email"
-msgstr ""
-
-#: src/js/account/components/PasswordResetConfirm.jsx:44
-msgid "Create a new password"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:33
-msgid "Sign up for a free account"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:40
-msgid "Choose username"
-msgstr ""
-
-#: src/js/account/components/RegistrationForm.jsx:75
-msgid "Confirm password"
-msgstr ""
-
-#: src/js/core/components/Header.jsx:33
-msgid "Register"
-msgstr ""
-
-#: src/js/core/components/Header.jsx:23
-msgid "Profile"
-msgstr ""
-
-#: src/js/core/components/Header.jsx:24
-msgid "Logout"
-msgstr ""
-
-#: src/js/core/components/Header.jsx:32
-msgid "Login"
 msgstr ""
 
 #: src/js/messages/reducer.js:10
@@ -205,4 +163,36 @@ msgstr ""
 
 #: src/js/messages/reducer.js:29
 msgid "Account successfully activated."
+msgstr ""
+
+#: src/js/account/components/PasswordResetConfirm.jsx:44
+msgid "Create a new password"
+msgstr ""
+
+#: src/js/core/components/Header.jsx:23
+msgid "Profile"
+msgstr ""
+
+#: src/js/core/components/Header.jsx:24
+msgid "Logout"
+msgstr ""
+
+#: src/js/core/components/Header.jsx:32
+msgid "Login"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:117
+msgid "Register"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:33
+msgid "Sign up for a free account"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:40
+msgid "Choose username"
+msgstr ""
+
+#: src/js/account/components/RegistrationForm.jsx:82
+msgid "Confirm password"
 msgstr ""

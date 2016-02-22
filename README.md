@@ -23,15 +23,17 @@ SSH into to the VM, activate the virtualenv and run the server:
 ```
 vagrant ssh
 cd /vagrant/
-source env/bin/activate
+source /opt/cadasta/env/bin/activate
 python cadasta/manage.py runserver
 ```
 
 Open `http://localhost:5000/` in your browser, you should see a default Django page.
 
+See the wiki ([here](https://github.com/Cadasta/cadasta-platform/wiki/Installation) and [here](https://github.com/Cadasta/cadasta-platform/wiki/Run-for-development)) for detailed instructions on installation and running the platform for development.
+
 ## Run tests
 
-From the repository's root run:
+Within the development VM, from the `/vagrant` directory run:
 
 ```
 py.test cadasta
