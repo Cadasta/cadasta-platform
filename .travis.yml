@@ -6,6 +6,13 @@ services:
   - postgresql
 addons:
   postgresql: "9.4"
+# env:
+#  - DJANGO_LIVE_TEST_SERVER_ADDRESS=127.0.0.1:5000
+# before_install:
+#  - travis_retry sudo apt-get update
+#  - travis_retry sudo apt-get install phantomjs
+#  - sudo mkdir /var/log/django
+#  - sudo chmod 777 /var/log/django
 install:
   - pip install -r requirements/common.txt
   - pip install -r requirements/dev.txt
@@ -23,4 +30,8 @@ script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
   - cd app
   - npm run travis-test
-  - cd ..
+#   - npm start | tee /tmp/npm-start.log &
+#   - while ! grep 'bundle is now VALID' /tmp/npm-start.log; do sleep 1; done
+#   - sleep 2
+#   - cd ../functional_tests
+#   - ./run.py --ds=config.settings.travis

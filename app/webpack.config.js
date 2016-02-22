@@ -34,11 +34,19 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist',
+    host: '0.0.0.0',
     hot: true,
     historyApiFallback: true,
+    watchOptions: {
+      aggregateTimeout: 300,
+      poll: 1000
+    }
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin(BUILD_OPTIONS),
   ],
+  watchOptions: {
+    poll: true
+  }
 };

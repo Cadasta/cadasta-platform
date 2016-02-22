@@ -1,5 +1,5 @@
 server {
-    listen      8080;
+    listen      5000;
     charset     utf-8;
 
     client_max_body_size 75M;
@@ -13,5 +13,13 @@ server {
         add_header 'Access-Control-Allow-Methods' 'GET, PUT, PATCH, POST, DELETE, OPTIONS';
         add_header 'Access-Control-Allow-Origin' '*' always;
         add_header 'Access-Control-Allow-Headers' 'Authorization,Access-Control-Allow-Origin,Content-Type';
+    }
+}
+
+server {
+    listen 3000;
+
+    location / {
+        root /vagrant/app/dist;
     }
 }

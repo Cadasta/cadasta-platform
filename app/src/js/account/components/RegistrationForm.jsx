@@ -109,6 +109,7 @@ class RegistrationForm extends React.Component {
         />
 
         <button
+          name="register"
           type="submit"
           formNoValidate
           className="btn btn-default btn-lg btn-block text-uppercase"
