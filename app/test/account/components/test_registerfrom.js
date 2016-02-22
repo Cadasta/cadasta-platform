@@ -16,35 +16,54 @@ describe('Account: Components: RegistrationForm', () => {
       });
     };
 
+    const callback = sinon.spy(accountRegister);
+
     const component = TestUtils.renderIntoDocument(
-      <RegistrationForm accountRegister={accountRegister} />
+      <RegistrationForm accountRegister={callback} />
     );
 
-    const username = component.refs.username;
+    const username = TestUtils.findRenderedDOMComponentWithTag(component.refs.username, 'INPUT');
     username.value = 'John';
     TestUtils.Simulate.change(username);
 
-    const email = component.refs.email;
+    const email = TestUtils.findRenderedDOMComponentWithTag(component.refs.email, 'INPUT');
     email.value = 'john@beatles.uk';
     TestUtils.Simulate.change(email);
 
-    const password = component.refs.password;
+    const password = TestUtils.findRenderedDOMComponentWithTag(component.refs.password, 'INPUT');
     password.value = '123456';
     TestUtils.Simulate.change(password);
 
-    const passwordRepeat = component.refs.password_repeat;
+    const passwordRepeat = TestUtils.findRenderedDOMComponentWithTag(
+      component.refs.password_repeat,
+      'INPUT'
+    );
     passwordRepeat.value = '123456';
     TestUtils.Simulate.change(passwordRepeat);
 
-    const firstName = component.refs.first_name;
+    const firstName = TestUtils.findRenderedDOMComponentWithTag(component.refs.first_name, 'INPUT');
     firstName.value = 'John';
     TestUtils.Simulate.change(firstName);
 
-    const lastName = component.refs.last_name;
+    const lastName = TestUtils.findRenderedDOMComponentWithTag(component.refs.last_name, 'INPUT');
     lastName.value = 'Lennon';
     TestUtils.Simulate.change(lastName);
 
     const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
     TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(true);
+  });
+
+  it('does not invoke the callback when the form is invalid', () => {
+    const callback = sinon.spy();
+
+    const component = TestUtils.renderIntoDocument(
+      <RegistrationForm accountRegister={callback} />
+    );
+    const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
+    TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(false);
   });
 });

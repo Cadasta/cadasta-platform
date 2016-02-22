@@ -16,6 +16,8 @@ describe('Account: Components: Profile', () => {
       });
     };
 
+    const callback = sinon.spy(accountUpdate);
+
     const userObj = new Map({
       username: 'John',
       email: 'john@beatles.uk',
@@ -24,26 +26,47 @@ describe('Account: Components: Profile', () => {
     });
 
     const component = TestUtils.renderIntoDocument(
-      <Profile user={userObj} accountUpdateProfile={accountUpdate} />
+      <Profile user={userObj} accountUpdateProfile={callback} />
     );
 
-    const username = component.refs.username;
+    const username = TestUtils.findRenderedDOMComponentWithTag(component.refs.username, 'INPUT');
     username.value = 'John2';
     TestUtils.Simulate.change(username);
 
-    const email = component.refs.email;
+    const email = TestUtils.findRenderedDOMComponentWithTag(component.refs.email, 'INPUT');
     email.value = 'john+yoko@beatles.uk';
     TestUtils.Simulate.change(email);
 
-    const firstName = component.refs.first_name;
+    const firstName = TestUtils.findRenderedDOMComponentWithTag(component.refs.first_name, 'INPUT');
     firstName.value = 'John + Yoko';
     TestUtils.Simulate.change(firstName);
 
-    const lastName = component.refs.last_name;
+    const lastName = TestUtils.findRenderedDOMComponentWithTag(component.refs.last_name, 'INPUT');
     lastName.value = 'Lennon + Ono';
     TestUtils.Simulate.change(lastName);
 
     const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
     TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(true);
+  });
+
+  it('does not invoke the callback when the form is invalid', () => {
+    const callback = sinon.spy();
+
+    const userObj = new Map({
+      username: '',
+      email: 'john@beatles.uk',
+      first_name: 'John',
+      last_name: 'Lennon',
+    });
+
+    const component = TestUtils.renderIntoDocument(
+      <Profile user={userObj} accountUpdateProfile={callback} />
+    );
+    const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
+    TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(false);
   });
 });

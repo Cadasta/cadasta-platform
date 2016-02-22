@@ -5,6 +5,11 @@ import Link from '../../core/components/Link';
 import { t } from '../../i18n';
 import * as accountActions from '../actions';
 
+import Formsy from 'formsy-react';
+import FRC from 'formsy-react-components';
+const { Form } = Formsy;
+const { Input } = FRC;
+
 
 const propTypes = {
   user: React.PropTypes.object.isRequired,
@@ -18,7 +23,6 @@ export class Profile extends React.Component {
     this.state = this.getStateFromProps(props);
 
     this.componentWillReceiveProps = this.componentWillReceiveProps.bind(this);
-    this.handleValueChange = this.handleValueChange.bind(this);
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
     this.getStateFromProps = this.getStateFromProps.bind(this);
   }
@@ -36,57 +40,83 @@ export class Profile extends React.Component {
     };
   }
 
-  handleValueChange(e) {
-    this.setState({ [e.target.name]: e.target.value });
-  }
-
-  handleFormSubmit(e) {
-    e.preventDefault();
-    this.props.accountUpdateProfile({
-      username: this.refs.username.value,
-      email: this.refs.email.value,
-      first_name: this.refs.first_name.value,
-      last_name: this.refs.last_name.value,
-    });
+  handleFormSubmit(data) {
+    this.props.accountUpdateProfile(data);
   }
 
   render() {
     return (
-      <div>
-        <form className="profile-form form-narrow" onSubmit={this.handleFormSubmit}>
+      <Form
+        className="form-narrow"
+        onValidSubmit={this.handleFormSubmit}
+        ref="form"
+      >
+        <h1>{ t('Update your profile') }</h1>
 
-          <h1>{ t('Update your profile') }</h1>
+        <Input
+          name="username"
+          ref="username"
+          layout="vertical"
+          label={ t('Username') }
+          className="form-control input-lg"
+          type="text"
+          required
+          value={this.state.username}
+          validationErrors={{
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+        />
 
-          <div className="form-group">
-            <label htmlFor="username">{ t('Username') }</label>
-            <input name="username" ref="username" value={this.state.username} onChange={this.handleValueChange} className="form-control input-lg" />
-          </div>
+        <Input
+          name="email"
+          ref="email"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Email') }
+          type="email"
+          validations="isEmail"
+          validationErrors={{
+            isDefaultRequiredValue: t('This field is required'),
+            isEmail: t('Please provide a valid email address'),
+          }}
+          required
+          value={this.state.email}
+        />
 
-          <div className="form-group">
-            <label htmlFor="email">{ t('Email address') }</label>
-            <input name="email" ref="email" type="email" value={this.state.email} onChange={this.handleValueChange} className="form-control input-lg" />
-          </div>
-          <div className="form-group">
-            <label htmlFor="first_name">{ t('First name') }</label>
-            <input name="first_name" ref="first_name" value={this.state.first_name} onChange={this.handleValueChange} className="form-control input-lg" />
-          </div>
+        <Input
+          name="first_name"
+          ref="first_name"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('First name') }
+          type="text"
+          value={this.state.first_name}
+        />
 
-          <div className="form-group">
-            <label htmlFor="last_name">{ t('Last name') }</label>
-            <input name="last_name" ref="last_name" value={this.state.last_name} onChange={this.handleValueChange} className="form-control input-lg" />
-          </div>
+        <Input
+          name="last_name"
+          ref="last_name"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Last name') }
+          type="text"
+          value={this.state.last_name}
+        />
 
-          <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Update profile') }</button>
+        <button
+          formNoValidate
+          type="submit"
+          className="btn btn-default btn-lg btn-block text-uppercase"
+        >
+          { t('Update profile') }
+        </button>
 
-          <h5>{ t('Password options') }</h5>
-          <ul>
-            <li><Link to={ "/account/password/" } >{ t('Change password') }</Link></li>
-            <li><Link to={ "/account/password/reset/" }>{ t('Reset password') }</Link></li>
-          </ul>
-          
-        </form>
-
-      </div>
+        <h5>{ t('Password options') }</h5>
+        <ul>
+          <li><Link to={ "/account/password/" } >{ t('Change password') }</Link></li>
+          <li><Link to={ "/account/password/reset/" }>{ t('Reset password') }</Link></li>
+        </ul>
+      </Form>
     );
   }
 }

@@ -1,6 +1,12 @@
 import React from 'react';
+
 import Link from '../../core/components/Link';
 import { t } from '../../i18n';
+
+import Formsy from 'formsy-react';
+import FRC from 'formsy-react-components';
+const { Form } = Formsy;
+const { Input } = FRC;
 
 const propTypes = {
   accountRegister: React.PropTypes.func.isRequired,
@@ -13,59 +19,107 @@ class RegistrationForm extends React.Component {
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
   }
 
-  handleFormSubmit(e) {
-    e.preventDefault();
-    this.props.accountRegister({
-      username: this.refs.username.value,
-      email: this.refs.email.value,
-      password: this.refs.password.value,
-      password_repeat: this.refs.password_repeat.value,
-      first_name: this.refs.first_name.value,
-      last_name: this.refs.last_name.value,
-    });
+  handleFormSubmit(data) {
+    this.props.accountRegister(data);
   }
 
   render() {
     return (
-      <form className="account-register form-narrow" onSubmit={this.handleFormSubmit}>
-
+      <Form
+        className="account-register form-narrow"
+        onValidSubmit={this.handleFormSubmit}
+        ref="form"
+      >
         <h1>{ t('Sign up for a free account') }</h1>
 
-        <div className="form-group">
-          <label htmlFor="username">{ t('Choose username') }</label>
-          <input name="username" ref="username" className="form-control input-lg" />
-        </div>
+        <Input
+          name="username"
+          ref="username"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Choose username') }
+          type="text"
+          required
+          validationErrors={{
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+        />
 
-        <div className="form-group">
-          <label htmlFor="email">{ t('Email') }</label>
-          <input name="email" ref="email" type="email" className="form-control input-lg" />
-        </div>
+        <Input
+          name="email"
+          ref="email"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Email') }
+          type="email"
+          validations="isEmail"
+          validationErrors={{
+            isEmail: t('Please provide a valid email address'),
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+          required
+        />
 
-        <div className="form-group">
-          <label htmlFor="password">{ t('Password') }</label>
-          <input name="password" ref="password" type="password" className="form-control input-lg" />
-        </div>
+        <Input
+          name="password"
+          ref="password"
+          layout="vertical"
+          label={ t('Password') }
+          className="form-control input-lg"
+          type="password"
+          validations="minLength:6"
+          validationErrors={{
+            minLength: t('Your password must be at least 6 characters long.'),
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+          required
+        />
 
-        <div className="form-group">
-          <label htmlFor="password_repeat">{ t('Confirm password') }</label>
-          <input name="password_repeat" ref="password_repeat" type="password" className="form-control input-lg" />
-        </div>
+        <Input
+          name="password_repeat"
+          ref="password_repeat"
+          layout="vertical"
+          label={ t('Confirm password') }
+          className="form-control input-lg"
+          type="password"
+          validations="equalsField:password"
+          validationErrors={{
+            equalsField: t('Passwords must match.'),
+            isDefaultRequiredValue: t('This field is required'),
+          }}
+          required
+        />
 
-        <div className="form-group">
-          <label htmlFor="first_name">{ t('First name') }</label>
-          <input name="first_name" ref="first_name" className="form-control input-lg" />
-        </div>
+        <Input
+          name="first_name"
+          ref="first_name"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('First name') }
+          type="text"
+        />
 
-        <div className="form-group">
-          <label htmlFor="last_name">{ t('Last name') }</label>
-          <input name="last_name" ref="last_name" className="form-control input-lg" />
-        </div>
+        <Input
+          name="last_name"
+          ref="last_name"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Last name') }
+          type="text"
+        />
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Register') }</button>
+        <button
+          type="submit"
+          formNoValidate
+          className="btn btn-default btn-lg btn-block text-uppercase"
+        >
+          { t('Register') }
+        </button>
 
-        <p className="text-center">Already have an account? <Link to={ "/account/login/" }>Sign in</Link></p>
-
-      </form>
+        <p className="text-center">
+          Already have an account? <Link to={ "/account/login/" }>Sign in</Link>
+        </p>
+      </Form>
     );
   }
 }

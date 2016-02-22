@@ -11,15 +11,30 @@ describe('Account: Components: PasswordReset', () => {
       });
     };
 
+    const callback = sinon.spy(accountResetPassword);
+
     const component = TestUtils.renderIntoDocument(
-      <PasswordReset accountResetPassword={accountResetPassword} />
+      <PasswordReset accountResetPassword={callback} />
     );
 
-    const email = component.refs.email;
+    const email = TestUtils.findRenderedDOMComponentWithTag(component.refs.email, 'INPUT');
     email.value = 'john@beatles.uk';
     TestUtils.Simulate.change(email);
 
     const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
     TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(true);
+  });
+
+  it('does not invoke the callback when the form is invalid', () => {
+    const callback = sinon.spy();
+    const component = TestUtils.renderIntoDocument(
+      <PasswordReset accountResetPassword={callback} />
+    );
+    const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
+    TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(false);
   });
 });
