@@ -4,6 +4,11 @@ import connect from 'react-redux/lib/components/connect';
 import { t } from '../../i18n';
 import * as accountActions from '../actions';
 
+import Formsy from 'formsy-react';
+import FRC from 'formsy-react-components';
+const { Form } = Formsy;
+const { Input } = FRC;
+
 const propTypes = {
   accountResetPassword: React.PropTypes.func.isRequired,
 };
@@ -15,26 +20,43 @@ export class PasswordReset extends React.Component {
     this.handleFormSubmit = this.handleFormSubmit.bind(this);
   }
 
-  handleFormSubmit(e) {
-    e.preventDefault();
-    this.props.accountResetPassword({
-      email: this.refs.email.value,
-    });
+  handleFormSubmit(data) {
+    this.props.accountResetPassword(data);
   }
 
   render() {
     return (
-      <form onSubmit={this.handleFormSubmit} className="form-narrow">
-
+      <Form
+        className="form-narrow"
+        onValidSubmit={this.handleFormSubmit}
+        ref="form"
+      >
         <h1>{ t('Reset your password') }</h1>
 
-        <div className="form-group">
-          <label htmlFor="email">{ t('Enter email') }</label>
-          <input type="email" name="email" ref="email" className="form-control input-lg" />
-        </div>
+        <Input
+          name="email"
+          ref="email"
+          layout="vertical"
+          className="form-control input-lg"
+          label={ t('Enter email') }
+          type="email"
+          validations="isEmail"
+          validationErrors={{
+            isDefaultRequiredValue: t('This field is required'),
+            isEmail: t('Please provide a valid email address'),
+          }}
+          required
+        />
 
-        <button type="submit" className="btn btn-default btn-lg btn-block text-uppercase">{ t('Reset password') }</button>
-      </form>
+        <button
+          type="submit"
+          formNoValidate
+          className="btn btn-default btn-lg btn-block text-uppercase"
+        >
+          { t('Reset password') }
+        </button>
+
+      </Form>
     );
   }
 }

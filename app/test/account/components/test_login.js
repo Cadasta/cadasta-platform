@@ -14,17 +14,30 @@ describe('Account: Components: Login', () => {
       });
     };
 
-    const component = TestUtils.renderIntoDocument(<Login accountLogin={accountLogin} />);
+    const callback = sinon.spy(accountLogin);
 
-    const username = component.refs.username;
+    const component = TestUtils.renderIntoDocument(<Login accountLogin={callback} />);
+
+    const username = TestUtils.findRenderedDOMComponentWithTag(component.refs.username, 'INPUT');
     username.value = 'John';
     TestUtils.Simulate.change(username);
 
-    const password = component.refs.password;
+    const password = TestUtils.findRenderedDOMComponentWithTag(component.refs.password, 'INPUT');
     password.value = '123456';
     TestUtils.Simulate.change(password);
 
     const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
     TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(true);
+  });
+
+  it('does not invoke the callback when the form is invalid', () => {
+    const callback = sinon.spy();
+    const component = TestUtils.renderIntoDocument(<Login accountLogin={callback} />);
+    const forms = TestUtils.scryRenderedDOMComponentsWithTag(component, 'form');
+    TestUtils.Simulate.submit(forms[0]);
+
+    expect(callback.called).to.equal(false);
   });
 });
