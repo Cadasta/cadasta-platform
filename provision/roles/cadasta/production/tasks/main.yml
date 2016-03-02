@@ -1,16 +1,3 @@
-- name: Install NodeJS dependencies
-  become: yes
-  become_user: "{{ app_user }}"
-  ignore_errors: yes
-  command: npm install
-           chdir="{{ application_path }}app"
-
-- name: Fix node-sass problem
-  become: yes
-  become_user: "{{ app_user }}"
-  command: npm rebuild node-sass
-           chdir="{{ application_path }}app"
-
 - name: Install npm-run
   become: yes
   become_user: root

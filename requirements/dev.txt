@@ -1,3 +1,4 @@
 pytest-django
 pytest-cov
 factory_boy
+selenium

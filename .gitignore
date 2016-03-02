@@ -19,3 +19,8 @@ htmlcov
 # JS
 */dist/bundle.js
 node_modules/
+/.envrc
+/.virtualenv/
+
+ghostdriver.log
+npm-debug.log

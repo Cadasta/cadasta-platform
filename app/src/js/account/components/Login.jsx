@@ -85,6 +85,7 @@ export class Login extends React.Component {
         />
 
         <button
+          name="sign-in"
           type="submit"
           formNoValidate
           className="btn btn-default btn-lg btn-block text-uppercase"
