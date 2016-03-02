@@ -1,15 +1,12 @@
 from base import FunctionalTest
 from pages.Profile import ProfilePage
 from pages.Login import LoginPage
-from accounts.models import User
+from accounts.tests.factories import UserFactory
 
 
 class ProfileTest(FunctionalTest):
     def setUp(self):
-        user1 = User(username='user1', email='user1@example.org',
-                     first_name='User', last_name='One')
-        user1.set_password('user1pwd')
-        user1.save()
+        UserFactory.create(username='user1', password='user1pwd')
 
     def test_profile_view_and_edit(self):
         """A registered user can view and edit their profile."""
