@@ -21,9 +21,9 @@ class Organization(RandomIDModel):
     class TutelaryMeta:
         perm_type = 'organization'
         path_fields = ('slug',)
-        actions = (('org.list', "List existing organisations"),
-                   ('org.view', "View existing organisations"),
-                   ('org.create', "Create organisations"),
+        actions = (('org.list', "List existing organizations"),
+                   ('org.view', "View existing organizations"),
+                   ('org.create', "Create organizations"),
                    ('org.update', "Update an existing organization"),
                    ('org.archive', "Archive an existing organization"),
                    ('org.unarchive', "Unarchive an existing organization"),
@@ -33,3 +33,57 @@ class Organization(RandomIDModel):
 
     def __str__(self):
         return "<Organization: {name}>".format(name=self.name)
+
+
+@permissioned_model
+class Project(RandomIDModel):
+    name = models.CharField(max_length=100)
+    organization = models.ForeignKey(Organization)
+    country = models.CharField(max_length=50, blank=True)
+    description = models.TextField(null=True, blank=True)
+    logo = models.ImageField(blank=True, upload_to='/image/logo')
+    urls = ArrayField(models.URLField(), default=[])
+    contacts = JSONField(validators=[validate_contact], default={})
+    users = models.ManyToManyField('accounts.User')
+
+    class Meta:
+        ordering = ('organization', 'name')
+
+    class TutelaryMeta:
+        perm_type = 'project'
+        path_fields = ('organization', 'name')
+        actions = [
+            ('project.list', {'description':'List organization existing '
+                , 'permissions_object': 'organization'}),
+            ('project.view', {'description': 'View organization project',
+                              'permissions_object': 'organization'}),
+            ('project.edit', {'description': 'Edit project details',
+                              'permissions_object':'organization'}),
+            ('project.archive', {'description': 'Archive an existing project',
+                                 'permissions_object': 'organization'}),
+            ('project.unarchive', {'description': 'Unarchive an existing '
+                                                  'project',
+                                   'permissions_object': 'organization'}),
+            ('project.user.list', {'description': 'List users within a '
+                                                  'project',
+                                   'permissions_object': 'organization'}),
+            ('project.user.add', {'description':'Add user to a project',
+                                  'permissions_object': 'organization'}),
+            ('project.user.remove', {'description': 'Remove user from a '
+                                                    'project',
+                                     'permissions_object': 'organization'}),
+            ('project.resource.add', {'description': 'Add project resource',
+                                      'permissions_object': 'organization'}),
+            ('project.resource.archive', {'description':'Archive a projects '
+                                                        'resource',
+                                          'permissions_object':
+                                              'organization'}),
+            ('project.resource.list', {'description': 'List project resource',
+                                       'permissions_object': 'organization'}),
+            ('project.resource.delete', {'description': 'Delete a project',
+                                         'permissions_object':
+                                             'organization'}),
+        ]
+
+    def __str__(self):
+        return "<Project: {name}>".format(name=self.name)

@@ -5,7 +5,9 @@ from rest_framework import filters, status
 from core.views import PermissionRequiredMixin
 from accounts.serializers import UserSerializer
 from accounts.models import User
-from .models import Organization
+from .models import (
+    Organization, Project
+)
 from .serializers import OrganizationSerializer
 from .mixins import OrganizationUsersQuerySet
 
@@ -88,3 +90,16 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
         self.org.users.remove(user)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProjectList(PermissionRequiredMixin, generics.ListCreateAPIView):
+    queryset = Organization.objects.all()
+    permission_required = {
+        'GET': 'project.list',
+        'POST': 'project.create'
+    }
+
+
+class ProjectDelete(PermissionRequiredMixin, generics.DestroyAPIView):
+    queryset = Organization.objects.all()
+    permission_required = 'project.resource.delete'
