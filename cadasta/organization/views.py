@@ -94,6 +94,9 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
 
 class ProjectList(PermissionRequiredMixin, generics.ListCreateAPIView):
     queryset = Organization.objects.all()
+    filter_fields = ('archived',)
+    search_fields = ('name', 'organization', 'country', 'description',)
+    ordering_fields = ('name', 'organization', 'country', 'description',)
     permission_required = {
         'GET': 'project.list',
         'POST': 'project.create'
