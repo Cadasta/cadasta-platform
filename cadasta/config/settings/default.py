@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     'djoser',
     'tutelary',
+    'django_countries',
 
     'core',
     'accounts',

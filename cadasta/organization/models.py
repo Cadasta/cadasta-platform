@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField, ArrayField
+from django_countries.fields import CountryField
 
 from tutelary.decorators import permissioned_model
 
@@ -39,9 +40,9 @@ class Organization(RandomIDModel):
 class Project(RandomIDModel):
     name = models.CharField(max_length=100)
     organization = models.ForeignKey(Organization)
-    country = models.CharField(max_length=50, blank=True)
+    country = CountryField()
     description = models.TextField(null=True, blank=True)
-    logo = models.ImageField(blank=True, upload_to='/image/logo')
+    # logo = models.ImageField(blank=True, upload_to='/image/logo')
     archived = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
     contacts = JSONField(validators=[validate_contact], default={})
@@ -54,36 +55,42 @@ class Project(RandomIDModel):
         perm_type = 'project'
         path_fields = ('organization', 'name')
         actions = [
-            ('project.list', {'description':'List organization existing '
-                , 'permissions_object': 'organization'}),
-            ('project.view', {'description': 'View organization project',
-                              'permissions_object': 'organization'}),
-            ('project.edit', {'description': 'Edit project details',
-                              'permissions_object':'organization'}),
-            ('project.archive', {'description': 'Archive an existing project',
-                                 'permissions_object': 'organization'}),
-            ('project.unarchive', {'description': 'Unarchive an existing '
-                                                  'project',
-                                   'permissions_object': 'organization'}),
-            ('project.user.list', {'description': 'List users within a '
-                                                  'project',
-                                   'permissions_object': 'organization'}),
-            ('project.user.add', {'description':'Add user to a project',
-                                  'permissions_object': 'organization'}),
-            ('project.user.remove', {'description': 'Remove user from a '
-                                                    'project',
-                                     'permissions_object': 'organization'}),
-            ('project.resource.add', {'description': 'Add project resource',
-                                      'permissions_object': 'organization'}),
-            ('project.resource.archive', {'description':'Archive a projects '
-                                                        'resource',
-                                          'permissions_object':
-                                              'organization'}),
-            ('project.resource.list', {'description': 'List project resource',
-                                       'permissions_object': 'organization'}),
-            ('project.resource.delete', {'description': 'Delete a project',
-                                         'permissions_object':
-                                             'organization'}),
+            ('project.list',
+             {'description': 'List organization existing',
+              'permissions_object': 'organization'}),
+            ('project.view',
+             {'description': 'View organization project',
+              'permissions_object': 'organization'}),
+            ('project.edit',
+             {'description': 'Edit project details',
+              'permissions_object': 'organization'}),
+            ('project.archive',
+             {'description': 'Archive an existing project',
+              'permissions_object': 'organization'}),
+            ('project.unarchive',
+             {'description': 'Unarchive an existing',
+              'permissions_object': 'organization'}),
+            ('project.user.list',
+             {'description': 'List users within a',
+              'permissions_object': 'organization'}),
+            ('project.user.add',
+             {'description': 'Add user to a project',
+              'permissions_object': 'organization'}),
+            ('project.user.remove',
+             {'description': 'Remove user from a project',
+              'permissions_object': 'organization'}),
+            ('project.resource.add',
+             {'description': 'Add project resource',
+              'permissions_object': 'organization'}),
+            ('project.resource.archive',
+             {'description': 'Archive a projects resource',
+              'permissions_object': 'organization'}),
+            ('project.resource.list',
+             {'description': 'List project resource',
+              'permissions_object': 'organization'}),
+            ('project.resource.delete',
+             {'description': 'Delete a project',
+              'permissions_object': 'organization'}),
         ]
 
     def __str__(self):
