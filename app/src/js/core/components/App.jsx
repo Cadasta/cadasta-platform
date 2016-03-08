@@ -4,6 +4,7 @@ import connect from 'react-redux/lib/components/connect';
 import Message from '../../messages/components/Message';
 import { HomeContainer } from './Home';
 import Header from './Header';
+import Footer from './Footer';
 
 const propTypes = {
   messages: React.PropTypes.object.isRequired,
@@ -32,6 +33,8 @@ export class App extends React.Component {
           </div>
         { this.props.children || <HomeContainer /> }
         </div>
+        
+        <Footer />
       </div>
     );
   }
