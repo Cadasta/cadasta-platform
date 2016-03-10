@@ -8,7 +8,7 @@ from accounts.models import User
 from .models import (
     Organization, Project
 )
-from .serializers import OrganizationSerializer
+from .serializers import OrganizationSerializer, ProjectSerializer
 from .mixins import OrganizationUsersQuerySet
 
 
@@ -92,7 +92,36 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectList(PermissionRequiredMixin, generics.ListCreateAPIView):
+class ProjectList(PermissionRequiredMixin, generics.ListAPIView):
+    serializer_class = ProjectSerializer
+    filter_fields = ('archived',)
+    search_fields = ('name', 'organization', 'country', 'description',)
+    ordering_fields = ('name', 'organization', 'country', 'description',)
+    permission_required = {
+        'GET': 'project.list',
+        'POST': 'project.create'
+    }
+
+    def get_organization(self):
+        if not self.organization_object:
+            org_slug = self.kwargs['slug']
+            self.organization_object = Organization.objects.get(slug=org_slug)
+
+        return self.organization_object
+
+    def get_serializer_context(self, *args, **kwargs):
+        org = self.get_organization()
+        context = super(ProjectList, self).get_serializer_context(*args, **kwargs)
+        context['organization'] = org
+
+        return context
+
+    def get_queryset(self):
+        org_slug = self.kwarg['slug']
+        return self.get_organization().projects.all()
+
+
+class ProjectDetails(PermissionRequiredMixin, generics.ListCreateAPIView):
     queryset = Organization.objects.all()
     filter_fields = ('archived',)
     search_fields = ('name', 'organization', 'country', 'description',)

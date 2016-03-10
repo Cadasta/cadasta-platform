@@ -1,7 +1,7 @@
 from django.utils.text import slugify
 from django.test import TestCase
 
-from ..serializers import OrganizationSerializer
+from ..serializers import OrganizationSerializer, ProjectSerializer
 
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory
@@ -44,3 +44,21 @@ class OrganizationSerializerTest(TestCase):
 
         serializer = OrganizationSerializer(org, detail=True)
         assert 'users' in serializer.data
+
+
+class ProjectSerializerTest(TestCase):
+    def test_organization_is_set(self):
+        organization = OrganizationFactory.create()
+        project_data = {
+            'name': 'Project',
+            'organization': organization
+        }
+        context = {
+            'organization': organization
+        }
+        serializer = ProjectSerializer(data=project_data, context=context)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        project_instance = serializer.instance
+        assert project_instance.organization == organization

@@ -63,3 +63,19 @@ class OrganizationUrlTest(TestCase):
             views.OrganizationUsersDetail.__name__)
         self.assertEqual(resolved.kwargs['slug'], 'org-slug')
         self.assertEqual(resolved.kwargs['username'], 'n_smith')
+
+
+class ProjectUrlTest(TestCase):
+    def test_project_list(self):
+        actual = reverse(
+            version_ns('organization:project_list'),
+            kwargs={'slug': 'habitat'}
+        )
+
+        expected = version_url('/organizations/habitat/projects/')
+
+        assert actual == expected
+
+        resolved = resolve(version_url('/organizations/habitat/projects/'))
+        assert resolved.func.__name__ == views.ProjectList.__name__
+        assert resolved.kwargs['slug'] == 'habitat'

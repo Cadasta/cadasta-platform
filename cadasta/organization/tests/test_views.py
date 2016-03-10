@@ -7,7 +7,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Policy, assign_user_policies
 
 from accounts.tests.factories import UserFactory
-from .factories import OrganizationFactory
+from .factories import OrganizationFactory, ProjectFactory
 from .. import views
 from ..models import Organization
 
@@ -704,3 +704,56 @@ class OrganizationUsersDetailTest(TestCase):
 
         assert response.status_code == 404
         assert content['detail'] == "Organization not found."
+
+
+class ProjectListAPITest(TestCase):
+    def setUp(self):
+        clause = {
+            'clause': [
+                {
+                  'effect': 'allow',
+                  'object': ['organization/*'],
+                  'action': ['project.list']
+                }
+            ]
+        }
+
+        policy = Policy.objects.create(
+            name='default',
+            body=json.dumps(clause))
+        self.user = UserFactory.create()
+        assign_user_policies(self.user, policy)
+
+    def test_full_list(self):
+        """
+        It should return all organizations.
+        """
+        organization = OrganizationFactory.create(**{'slug': 'habitat'})
+        ProjectFactory.create_batch(2, **{'organization': organization})
+        ProjectFactory.create_batch(2)
+        request = APIRequestFactory().get('/v1/organizations/habitat/projects/')
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request).render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert len(content) == 2
+
+        for project in content:
+            assert project.get('organization').get('id') == organization.id
+
+    def test_create_valid_project(self):
+        data = {
+            'name': 'Project Name',
+            'description': 'Project description'
+        }
+        organization = OrganizationFactory.create(**{'slug': 'habitat'})
+        request = APIRequestFactory().post('/v1/organizations/habitat/projects/', data)
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request).render()
+
+        assert response.status_code == 201
+        assert organization.projects.count() == 1
+        # assert Project.objects.count() == 1

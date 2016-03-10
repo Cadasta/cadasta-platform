@@ -39,7 +39,7 @@ class Organization(RandomIDModel):
 @permissioned_model
 class Project(RandomIDModel):
     name = models.CharField(max_length=100)
-    organization = models.ForeignKey(Organization)
+    organization = models.ForeignKey(Organization, related_name='projects')
     country = CountryField()
     description = models.TextField(null=True, blank=True)
     # logo = models.ImageField(blank=True, upload_to='/image/logo')
@@ -53,7 +53,7 @@ class Project(RandomIDModel):
 
     class TutelaryMeta:
         perm_type = 'project'
-        path_fields = ('organization', 'name')
+        path_fields = ('organization', 'id')
         actions = [
             ('project.list',
              {'description': 'List organization existing',

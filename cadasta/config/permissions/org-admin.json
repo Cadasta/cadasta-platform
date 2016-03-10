@@ -8,6 +8,10 @@
       "effect": "allow",
       "object": ["organization/*"],
       "action": ["org.*"]
+    }, {
+      "effect": "allow",
+      "object": ["/organization/*/project/*"],
+      "action": ["project.*"]
     }
-  ]   
+  ]
 }
