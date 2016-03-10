@@ -21,3 +21,8 @@ htmlcov
 node_modules/
 
 .idea
+/.envrc
+/.virtualenv/
+
+ghostdriver.log
+npm-debug.log

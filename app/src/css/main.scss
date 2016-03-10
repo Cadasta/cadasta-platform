@@ -35,8 +35,14 @@
 /* =Basics
 -------------------------------------------------------------- */
 
+html, body {
+  height: 100%;
+  overflow: auto;
+}
+
 #cadasta {
   padding-top: 120px;
+  margin-bottom: 30px;
 }
 
 .wrapper {
@@ -181,4 +187,24 @@ header nav a:hover {
 
 .translation-wrapper {
   background-color: fuchsia;
+}
+
+/* =Footer
+-------------------------------------------------------------- */
+
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+  background-color: #eee;
+  border-top: solid 1px #ddd;
+  font-size: 11px;
+  white-space: nowrap;
+  padding-top: 4px;
+}
+
+footer .list-inline > li {
+  padding-left: 24px;
+  text-align: right;
 }
