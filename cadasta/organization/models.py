@@ -21,9 +21,11 @@ class Organization(RandomIDModel):
     class TutelaryMeta:
         perm_type = 'organization'
         path_fields = ('slug',)
-        actions = (('org.list', "List existing organisations"),
+        actions = (('org.list', {'description': "List existing organisations",
+                                 'permissions_object': None}),
                    ('org.view', "View existing organisations"),
-                   ('org.create', "Create organisations"),
+                   ('org.create', {'description': "Create organisations",
+                                   'permissions_object': None}),
                    ('org.update', "Update an existing organization"),
                    ('org.archive', "Archive an existing organization"),
                    ('org.unarchive', "Unarchive an existing organization"),

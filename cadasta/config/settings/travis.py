@@ -14,3 +14,7 @@ DATABASES = {
         'HOST': '',
     }
 }
+
+DJOSER.update({
+    'SEND_ACTIVATION_EMAIL': False,
+})
