@@ -2,19 +2,21 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters, status
 
+from tutelary.mixins import PermissionRequiredMixin as TPermMixin
+
 from core.views import PermissionRequiredMixin
 from accounts.serializers import UserSerializer
 from accounts.models import User
 from .models import (
     Organization, Project
 )
-from .serializers import OrganizationSerializer, ProjectSerializer
-from .mixins import OrganizationUsersQuerySet
+from . import serializers
+from .mixins import OrganizationUsersQuerySet, ProjectUsersQuerySet
 
 
 class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
     queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+    serializer_class = serializers.OrganizationSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
@@ -30,7 +32,7 @@ class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
 class OrganizationDetail(PermissionRequiredMixin,
                          generics.RetrieveUpdateAPIView):
     queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+    serializer_class = serializers.OrganizationSerializer
     lookup_field = 'slug'
     permission_required = {
         'GET': 'org.view',
@@ -93,7 +95,7 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
 
 
 class ProjectList(PermissionRequiredMixin, generics.ListAPIView):
-    serializer_class = ProjectSerializer
+    serializer_class = serializers.ProjectSerializer
     filter_fields = ('archived',)
     search_fields = ('name', 'organization', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
@@ -135,3 +137,31 @@ class ProjectDetails(PermissionRequiredMixin, generics.ListCreateAPIView):
 class ProjectDelete(PermissionRequiredMixin, generics.DestroyAPIView):
     queryset = Organization.objects.all()
     permission_required = 'project.resource.delete'
+
+
+# class ProjectUsers(TPermMixin, ProjectUsersQuerySet, generics.ListAPIView):
+class ProjectUsers(ProjectUsersQuerySet, generics.ListCreateAPIView):
+    serializer_class = serializers.ProjectUserSerializer
+    permission_required = {
+        'GET': 'project.users.list',
+        'POST': 'project.users.add'
+    }
+
+    def get_serializer_context(self, *args, **kwargs):
+        prj = self.get_project()
+        context = super(ProjectUsers, self).get_serializer_context(
+            *args, **kwargs)
+        context['project'] = prj
+
+        return context
+
+
+class ProjectUsersDetail(ProjectUsersQuerySet,
+                         generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.ProjectUserSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        self.prj.users.remove(user)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

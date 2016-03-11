@@ -706,14 +706,70 @@ class OrganizationUsersDetailTest(TestCase):
         assert content['detail'] == "Organization not found."
 
 
-class ProjectListAPITest(TestCase):
+# class ProjectListAPITest(TestCase):
+#     def setUp(self):
+#         clause = {
+#             'clause': [
+#                 {
+#                   'effect': 'allow',
+#                   'object': ['organization/*'],
+#                   'action': ['project.list']
+#                 }
+#             ]
+#         }
+
+#         policy = Policy.objects.create(
+#             name='default',
+#             body=json.dumps(clause))
+#         self.user = UserFactory.create()
+#         assign_user_policies(self.user, policy)
+
+#     def test_full_list(self):
+#         """
+#         It should return all organizations.
+#         """
+#         organization = OrganizationFactory.create(**{'slug': 'habitat'})
+#         ProjectFactory.create_batch(2, **{'organization': organization})
+#         ProjectFactory.create_batch(2)
+#         request = APIRequestFactory().get('/v1/organizations/habitat/projects/')
+#         force_authenticate(request, user=self.user)
+
+#         response = views.ProjectList.as_view()(request).render()
+#         content = json.loads(response.content.decode('utf-8'))
+
+#         assert response.status_code == 200
+#         assert len(content) == 2
+
+#         for project in content:
+#             assert project.get('organization').get('id') == organization.id
+
+#     def test_create_valid_project(self):
+#         data = {
+#             'name': 'Project Name',
+#             'description': 'Project description'
+#         }
+#         organization = OrganizationFactory.create(**{'slug': 'habitat'})
+#         request = APIRequestFactory().post('/v1/organizations/habitat/projects/', data)
+#         force_authenticate(request, user=self.user)
+
+#         response = views.ProjectList.as_view()(request).render()
+
+#         assert response.status_code == 201
+#         assert organization.projects.count() == 1
+
+
+class ProjectUsersAPITest(TestCase):
     def setUp(self):
         clause = {
             'clause': [
                 {
                   'effect': 'allow',
                   'object': ['organization/*'],
-                  'action': ['project.list']
+                  'action': ['org.*']
+                }, {
+                  'effect': 'allow',
+                  'object': ['project/*/*'],
+                  'action': ['project.*.*']
                 }
             ]
         }
@@ -724,36 +780,228 @@ class ProjectListAPITest(TestCase):
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
 
+        self.view = views.ProjectUsers.as_view()
+
     def test_full_list(self):
         """
         It should return all organizations.
         """
-        organization = OrganizationFactory.create(**{'slug': 'habitat'})
-        ProjectFactory.create_batch(2, **{'organization': organization})
-        ProjectFactory.create_batch(2)
-        request = APIRequestFactory().get('/v1/organizations/habitat/projects/')
+        prj_users = UserFactory.create_batch(2)
+        other_user = UserFactory.create()
+
+        project = ProjectFactory.create(add_users=prj_users)
+        request = APIRequestFactory().get(
+            '/v1/organizations/{org}/projects/{prj}/users/'.format(
+                org=project.organization.slug,
+                prj=project.id
+            )
+        )
+        # request.user = self.user
+        # request.successful_authenticator = True
         force_authenticate(request, user=self.user)
 
-        response = views.ProjectList.as_view()(request).render()
+        response = self.view(
+            request,
+            slug=project.organization.slug,
+            project_id=project.id).render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
         assert len(content) == 2
+        assert other_user.username not in [u['username'] for u in content]
 
-        for project in content:
-            assert project.get('organization').get('id') == organization.id
+    def test_full_list_with_unauthorized_user(self):
+        pass
 
-    def test_create_valid_project(self):
-        data = {
-            'name': 'Project Name',
-            'description': 'Project description'
-        }
-        organization = OrganizationFactory.create(**{'slug': 'habitat'})
-        request = APIRequestFactory().post('/v1/organizations/habitat/projects/', data)
+    def test_get_full_list_organization_does_not_exist(self):
+        project = ProjectFactory.create()
+        request = APIRequestFactory().get(
+            '/v1/organizations/some-org/projects/{prj}/users/'.format(
+                prj=project.id
+            )
+        )
+        response = self.view(
+            request,
+            slug='some-org',
+            project_id=project.id).render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 404
+        assert content['detail'] == "Project not found."
+
+    def test_get_full_list_project_does_not_exist(self):
+        organization = OrganizationFactory.create()
+        request = APIRequestFactory().get(
+            '/v1/organizations/{slug}/projects/{prj}/users/'.format(
+                slug=organization.slug,
+                prj='123abd'
+            )
+        )
+        response = self.view(
+            request,
+            slug=organization.slug,
+            project_id='123abc').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 404
+        assert content['detail'] == "Project not found."
+
+    def test_add_user(self):
+        user_to_add = UserFactory.create()
+        project = ProjectFactory.create()
+        request = APIRequestFactory().post(
+            '/v1/organizations/{org}/projects/{prj}/users/'.format(
+                org=project.organization.slug,
+                prj=project.id
+            ),
+            {'username': user_to_add.username}
+        )
         force_authenticate(request, user=self.user)
 
-        response = views.ProjectList.as_view()(request).render()
+        response = self.view(
+            request,
+            slug=project.organization.slug,
+            project_id=project.id).render()
+        content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 201
-        assert organization.projects.count() == 1
-        # assert Project.objects.count() == 1
+        assert project.users.count() == 1
+
+    def test_add_user_with_invalid_data(self):
+        pass
+
+
+class ProjectUsersDetailTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory.create()
+        self.view = views.ProjectUsersDetail.as_view()
+
+    def _get(self, org, prj, user):
+        request = APIRequestFactory().get(
+            '/v1/organizations/{org}/projects/{prj}/users/{user}'.format(
+                org=org,
+                prj=prj,
+                user=user
+            )
+        )
+        force_authenticate(request, user=self.user)
+        return self.view(
+            request, slug=org, project_id=prj, username=user).render()
+
+    def _patch(self, org, prj, user, data):
+        request = APIRequestFactory().patch(
+            '/v1/organizations/{org}/projects/{prj}/users/{user}'.format(
+                org=org,
+                prj=prj,
+                user=user
+            ),
+            data,
+            format='json' 
+        )
+        force_authenticate(request, user=self.user)
+        return self.view(
+            request, slug=org, project_id=prj, username=user).render()
+
+    def _delete(self, org, prj, user):
+        request = APIRequestFactory().delete(
+            '/v1/organizations/{org}/projects/{prj}/users/{user}'.format(
+                org=org,
+                prj=prj,
+                user=user
+            )
+        )
+        force_authenticate(request, user=self.user)
+        return self.view(
+            request, slug=org, project_id=prj, username=user).render()
+
+    def test_get_user(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        response = self._get(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username)
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert content['username'] == user.username
+
+    def test_get_user_with_unauthorized_user(self):
+        pass
+
+    def test_get_user_that_does_not_exist(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+
+        response = self._get(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username)
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 404
+        assert content['detail'] == "User not found."
+
+    def test_get_user_from_org_that_does_not_exist(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+
+        response = self._get(
+            org='some-org',
+            prj=project.id,
+            user=user.username)
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 404
+        assert content['detail'] == "Project not found."
+
+    def test_get_user_from_project_that_does_not_exist(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+
+        response = self._get(
+            org=project.organization.slug,
+            prj='abc123',
+            user=user.username)
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 404
+        assert content['detail'] == "Project not found."
+
+    def test_update_user(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        data = {
+            'roles': {
+                'manager': True
+            }
+        }
+
+        response = self._patch(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username,
+            data=data)
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+
+    def test_update_user_with_unauthorized_user(self):
+        pass
+
+    def test_delete_user(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        response = self._delete(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username)
+
+        assert response.status_code == 204
+        assert project.users.count() == 0
+
+    def test_delete_user_with_unauthorized_user(self):
+        pass

@@ -1,12 +1,13 @@
 from django.utils.text import slugify
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 
 from core.serializers import DetailSerializer
+from accounts.models import User
 from accounts.serializers import UserSerializer
 from .models import Organization, Project
 
 
-class OrganizationSerializer(DetailSerializer, ModelSerializer):
+class OrganizationSerializer(DetailSerializer, serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
 
     class Meta:
@@ -23,7 +24,7 @@ class OrganizationSerializer(DetailSerializer, ModelSerializer):
         return super(OrganizationSerializer, self).to_internal_value(data)
 
 
-class ProjectSerializer(DetailSerializer, ModelSerializer):
+class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
     organization = OrganizationSerializer(read_only=True)
 
@@ -41,3 +42,71 @@ class ProjectSerializer(DetailSerializer, ModelSerializer):
             **validated_data
         )
 
+
+class ProjectUserSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    roles = serializers.JSONField()
+
+    def set_roles(self, user, roles):
+        pass
+
+    def to_internal_value(self, data):
+        if data and data.get('roles'):
+            default_roles = {
+                'manager': False,
+                'collector': False
+            }
+
+            if self.instance:
+                pass
+                # TODO: Find the roles for the user
+                # 1. Read the current roles for the user and save as default
+                # 2. Read the new roles from data and update default_roles
+                #    accordingly
+
+                default_roles = {
+                    'manager': True,
+                    'collector': True
+                }
+
+            new_roles = {
+                'manager': data['roles'].get(
+                    'manager', default_roles['manager']),
+                'collector': data['roles'].get(
+                    'collector', default_roles['collector'])
+            }
+
+            data['roles'] = new_roles
+            self.roles_json = new_roles
+
+        return data
+
+    def to_representation(self, instance):
+        rep = UserSerializer(instance).data
+
+        if not hasattr(self, 'roles_json'):
+            self.roles_json = {
+                'manager': False,
+                'collector': False
+            }
+            # TODO: Find roles for the user
+        rep['roles'] = self.roles_json
+
+        return rep
+
+    def create(self, validated_data):
+        user = User.objects.get(username=validated_data['username'])
+        project = self.context['project']
+        project.users.add(user)
+
+        # TODO: Find the relevant policy according to roles and assign it
+        # to the user
+        self.set_roles(user, validated_data.get('roles'))
+
+        return user
+
+    def update(self, instance, validated_data):
+        # TODO: Update the policy according to roles
+        self.set_roles(instance, validated_data.get('roles'))
+
+        return instance

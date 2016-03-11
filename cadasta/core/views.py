@@ -50,9 +50,9 @@ def exception_handler(exception, context):
     exception = set_exception(exception)
 
     response = drf_exception_handler(exception, context)
-    response.data = eval_json(response.data)
-
-    return response
+    if response:
+        response.data = eval_json(response.data)
+        return response
 
 
 class PermissionRequiredMixin:

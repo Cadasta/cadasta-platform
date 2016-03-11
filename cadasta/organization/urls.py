@@ -23,4 +23,12 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/projects/$',
         views.ProjectList.as_view(),
         name='project_list'),
+    url(
+        r'^(?P<slug>[-\w]+)/projects/(?P<project_id>[-\w]+)/users/$',
+        views.ProjectUsers.as_view(),
+        name='project_users'),
+    url(
+        r'^(?P<slug>[-\w]+)/projects/(?P<project_id>[-\w]+)/users/(?P<username>[-\w]+)/$',
+        views.ProjectUsersDetail.as_view(),
+        name='project_users_detail'),
 ]
