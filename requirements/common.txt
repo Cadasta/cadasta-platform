@@ -1,11 +1,11 @@
 Django==1.9.2
 psycopg2==2.6.1
-djoser==0.4.0
+djoser==0.4.3
 django-cors-headers==1.1.0
 django-filter==0.12.0
 django-crispy-forms==1.6.0
 jsonschema==2.5.1
 rfc3987==1.3.5
--e git+https://github.com/Cadasta/django-tutelary.git#egg=tutelary
+django-tutelary==0.1.3
 django-audit-log==0.7.0
 simplejson==3.8.1
