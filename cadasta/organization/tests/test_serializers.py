@@ -1,11 +1,10 @@
-import json
-
+import pytest
 from django.utils.text import slugify
 from django.test import TestCase
-
-from tutelary.models import Role, Policy
+from rest_framework.serializers import ValidationError
 
 from .. import serializers
+from ..models import OrganizationRole, ProjectRole
 
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, ProjectFactory
@@ -70,39 +69,117 @@ class ProjectSerializerTest(TestCase):
         project_instance = serializer.instance
         assert project_instance.organization == organization
 
+# class EntityUserSerializerTest(TestCase):
+#     def setUp(self):
+#         class SerializerInstance(serializers.EntityUserSerializer):
+#             def get_roles_json(self):
+#                 return {'admin': True}
 
-class ProjectUserSerializerTest(TestCase):
-    def test_to_internal_value_with_instance(self):
+#             def set_roles(self, user, roles):
+#                 pass
+
+#             def get_permissions_object(self):
+#                 return self.context['project']
+
+#         self.serializer_class = SerializerInstance
+
+#     def test_to_representation(self):
+#         user = UserFactory.create()
+#         serializer = self.serializer_class(user)
+
+#         data = serializer.to_representation(user)
+#         assert data['username'] == user.username
+#         assert data['email'] == user.email
+#         assert data['roles']
+#         assert data['roles']['admin']
+
+#     def test_create(self):
+#         user = UserFactory.create()
+#         project = ProjectFactory.create()
+#         data = {
+#             'username': user.username
+#         }
+#         serializer = self.serializer_class(
+#             data=data,
+#             context={'project': project}
+#         )
+
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         assert project.users.count() == 1
+
+
+class OrganizationUserSerializerTest(TestCase):
+    def test_to_represenation(self):
         user = UserFactory.create()
-        serializer = serializers.ProjectUserSerializer(user)
-        internal = serializer.to_internal_value(None)
-        assert not internal
+        org = OrganizationFactory.create(add_users=[user])
 
-    def test_to_internal_value_no_roles_set(self):
-        data = {}
-        serializer = serializers.ProjectUserSerializer()
-        internal = serializer.to_internal_value(data)
-        assert not internal.get('roles')
-
-    def test_to_internal_value(self):
-        data = {
-            'roles': {
-                'manager': False,
-                'collector': True,
+        serializer = serializers.OrganizationUserSerializer(
+            user,
+            context={
+                'organization': org
             }
-        }
-        serializer = serializers.ProjectUserSerializer()
-        internal = serializer.to_internal_value(data)
-        assert not internal['roles']['manager']
-        assert internal['roles']['collector']
+        )
+        assert serializer.data['username'] == user.username
+        assert serializer.data['email'] == user.email
+        assert serializer.data['roles']['admin'] is False
 
-    def test_to_representation(self):
+    def test_list_to_representation(self):
+        users = UserFactory.create_batch(2)
+        org_admin = UserFactory.create()
+        org = OrganizationFactory.create(add_users=users)
+        OrganizationRole.objects.create(
+            user=org_admin,
+            organization=org,
+            admin=True
+        )
+
+        serializer = serializers.OrganizationUserSerializer(
+            org.users.all(),
+            many=True,
+            context={
+                'organization': org
+            }
+        )
+
+        assert len(serializer.data) == 3
+
+        for u in serializer.data:
+            if u['username'] is org_admin.username:
+                assert u['roles']['admin'] is True
+            else:
+                assert u['roles']['admin'] is False
+
+    def test_set_roles_for_existing_user(self):
         user = UserFactory.create()
-        project = ProjectFactory.create()
+        org = OrganizationFactory.create()
+
         data = {
             'username': user.username,
             'roles': {
-                'manager': True,
+                'admin': True,
+            }
+        }
+
+        serializer = serializers.OrganizationUserSerializer(
+            data=data,
+            context={
+                'organization': org
+            }
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        role = OrganizationRole.objects.get(user=user, organization=org)
+        assert role.admin == data['roles']['admin']
+
+    def test_set_roles_for_user_that_does_not_exist(self):
+        org = OrganizationFactory.create()
+
+        data = {
+            'username': 'some-user',
+            'roles': {
+                'manager': False,
                 'collector': True,
             }
         }
@@ -110,38 +187,86 @@ class ProjectUserSerializerTest(TestCase):
         serializer = serializers.ProjectUserSerializer(
             data=data,
             context={
-                'project': project
+                'organization': org
+            }
+        )
+
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert 'User some-user does not exist' in serializer.errors['username']
+
+    def test_update_roles_for_user(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+
+        data = {
+            'roles': {
+                'admin': True,
+            }
+        }
+
+        serializer = serializers.OrganizationUserSerializer(
+            user,
+            data=data,
+            partial=True,
+            context={
+                'organization': org
             }
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
+        role = OrganizationRole.objects.get(user=user, organization=org)
+        assert role.admin == data['roles']['admin']
+
+
+class ProjectUserSerializerTest(TestCase):
+    def test_to_represenation(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        serializer = serializers.ProjectUserSerializer(
+            user,
+            context={
+                'project': project
+            }
+        )
+
         assert serializer.data['username'] == user.username
         assert serializer.data['email'] == user.email
-        assert serializer.data['roles']
-        assert serializer.data['roles']['manager']
-        assert serializer.data['roles']['collector']
+        assert serializer.data['roles']['manager'] is False
+        assert serializer.data['roles']['collector'] is False
+
+    def test_list_to_representation(self):
+        users = UserFactory.create_batch(2)
+        prj_admin = UserFactory.create()
+        project = ProjectFactory.create(add_users=users)
+        ProjectRole.objects.create(
+            user=prj_admin,
+            project=project,
+            manager=True
+        )
+
+        serializer = serializers.ProjectUserSerializer(
+            project.users.all(),
+            many=True,
+            context={
+                'project': project
+            }
+        )
+
+        assert len(serializer.data) == 3
+
+        for u in serializer.data:
+            if u['username'] is prj_admin.username:
+                assert u['roles']['manager'] is True
+            else:
+                assert u['roles']['manager'] is False
 
     def test_set_roles_for_existing_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create()
 
-        collector_pol = Policy.objects.create(
-            name='default',
-            body=json.dumps({
-                "effect": "allow",
-                "action": ["project.collect_data"],
-                "object": ["project/*/*"]
-            })
-        )
-        project_role = Role.objects.create(
-            name='Data Collector',
-            policies=[collector_pol],
-            variables={
-                'organization': project.organization.slug,
-                'project': project.id}
-        )
-
         data = {
             'username': user.username,
             'roles': {
@@ -158,31 +283,40 @@ class ProjectUserSerializerTest(TestCase):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        # assert False, 'Fix this test when permissions work properly'
-        # user.has_perm()
 
-    def test_update_roles_for_user(self):
-        user = UserFactory.create()
+        role = ProjectRole.objects.get(user=user, project=project)
+        assert role.manager == data['roles']['manager']
+        assert role.collector == data['roles']['collector']
+
+    def test_set_roles_for_user_that_does_not_exist(self):
         project = ProjectFactory.create()
 
-        manager_pol = Policy.objects.create(
-            name='default',
-            body=json.dumps({
-                "effect": "allow",
-                "action": ["project.*"],
-                "object": ["project/*/*"]
-            })
-        )
-        user.assign_policies(
-            (manager_pol,
-             {'organization': project.organization.slug,
-              'project': project.id})
-        )
-
         data = {
+            'username': 'some-user',
             'roles': {
                 'manager': False,
                 'collector': True,
+            }
+        }
+
+        serializer = serializers.ProjectUserSerializer(
+            data=data,
+            context={
+                'project': project
+            }
+        )
+
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert 'User some-user does not exist' in serializer.errors['username']
+
+    def test_update_roles_for_user(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        data = {
+            'roles': {
+                'manager': True,
             }
         }
         serializer = serializers.ProjectUserSerializer(
@@ -195,4 +329,7 @@ class ProjectUserSerializerTest(TestCase):
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        # assert False, 'Fix this test when permissions work properly'
+
+        role = ProjectRole.objects.get(user=user, project=project)
+        assert role.manager == data['roles']['manager']
+        assert role.collector is False

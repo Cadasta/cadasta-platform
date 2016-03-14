@@ -5,10 +5,9 @@ from rest_framework import filters, status
 from tutelary.mixins import PermissionRequiredMixin as TPermMixin
 
 from core.views import PermissionRequiredMixin
-from accounts.serializers import UserSerializer
 from accounts.models import User
 from .models import (
-    Organization, Project
+    Organization, Project, OrganizationRole
 )
 from . import serializers
 from .mixins import OrganizationUsersQuerySet, ProjectUsersQuerySet
@@ -58,28 +57,18 @@ class OrganizationDetail(PermissionRequiredMixin,
 class OrganizationUsers(PermissionRequiredMixin,
                         OrganizationUsersQuerySet,
                         generics.ListCreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.OrganizationUserSerializer
     permission_required = {
         'GET': 'org.users.list',
         'POST': 'org.users.add',
     }
 
-    def create(self, request, *args, **kwargs):
-        try:
-            new_user = User.objects.get(username=request.POST['username'])
+    def get_serializer_context(self, *args, **kwargs):
+        context = super(OrganizationUsers, self).get_serializer_context(
+            *args, **kwargs)
+        context['organization'] = self.get_organization()
 
-            org = self.get_organization(self.kwargs['slug'])
-            org.users.add(new_user)
-
-            return Response(
-                self.serializer_class(new_user).data,
-                status=status.HTTP_201_CREATED
-            )
-        except User.DoesNotExist:
-            return Response(
-                {'detail': "User with given username does not exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        return context
 
 
 class OrganizationUsersDetail(PermissionRequiredMixin,
@@ -89,7 +78,8 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
-        self.org.users.remove(user)
+        role = self.org.users.get(id=user.id)
+        role.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -119,7 +109,6 @@ class ProjectList(PermissionRequiredMixin, generics.ListAPIView):
         return context
 
     def get_queryset(self):
-        org_slug = self.kwarg['slug']
         return self.get_organization().projects.all()
 
 
@@ -160,8 +149,16 @@ class ProjectUsersDetail(ProjectUsersQuerySet,
                          generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProjectUserSerializer
 
+    def get_serializer_context(self, *args, **kwargs):
+        context = super(ProjectUsersDetail, self).get_serializer_context(
+            *args, **kwargs)
+        context['project'] = self.get_project()
+
+        return context
+
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
-        self.prj.users.remove(user)
+        role = self.prj.users.get(id=user.id)
+        role.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -4,15 +4,15 @@ from .models import Organization, Project
 
 
 class OrganizationMixin:
-    def get_organization(self, slug):
-        return get_object_or_404(Organization, slug=slug)
+    def get_organization(self):
+        return get_object_or_404(Organization, slug=self.kwargs['slug'])
 
 
 class OrganizationUsersQuerySet(OrganizationMixin):
     lookup_field = 'username'
 
     def get_queryset(self):
-        self.org = self.get_organization(self.kwargs['slug'])
+        self.org = self.get_organization()
         return self.org.users.all()
 
 

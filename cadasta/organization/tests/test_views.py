@@ -584,7 +584,7 @@ class OrganizationUsersTest(TestCase):
 
         assert response.status_code == 400
         assert org.users.count() == 2
-        assert content['detail'] == 'User with given username does not exist.'
+        assert 'User some_username does not exist' in content['username']
 
     def test_add_user_to_organization_that_does_not_exist(self):
         new_user = UserFactory.create()

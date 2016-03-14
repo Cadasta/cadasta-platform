@@ -4,7 +4,7 @@ from rest_framework import serializers
 from core.serializers import DetailSerializer
 from accounts.models import User
 from accounts.serializers import UserSerializer
-from .models import Organization, Project
+from .models import Organization, Project, OrganizationRole, ProjectRole
 
 
 class OrganizationSerializer(DetailSerializer, serializers.ModelSerializer):
@@ -43,70 +43,122 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
         )
 
 
-class ProjectUserSerializer(serializers.Serializer):
+class EntityUserSerializer(serializers.Serializer):
     username = serializers.CharField()
     roles = serializers.JSONField()
 
-    def set_roles(self, user, roles):
-        pass
+    def to_representation(self, instance):
+        if isinstance(instance, User):
+            rep = UserSerializer(instance).data
+            rep['roles'] = self.get_roles_json(instance)
+            return rep
+        else:
+            return super(EntityUserSerializer, self).to_representation(
+                instance)
 
     def to_internal_value(self, data):
-        if data and data.get('roles'):
-            default_roles = {
-                'manager': False,
-                'collector': False
-            }
+        data['roles'] = self.set_roles(data.get('roles', None))
+        return super(EntityUserSerializer, self).to_internal_value(data)
 
-            if self.instance:
-                pass
-                # TODO: Find the roles for the user
-                # 1. Read the current roles for the user and save as default
-                # 2. Read the new roles from data and update default_roles
-                #    accordingly
-
-                default_roles = {
-                    'manager': True,
-                    'collector': True
-                }
-
-            new_roles = {
-                'manager': data['roles'].get(
-                    'manager', default_roles['manager']),
-                'collector': data['roles'].get(
-                    'collector', default_roles['collector'])
-            }
-
-            data['roles'] = new_roles
-            self.roles_json = new_roles
-
-        return data
-
-    def to_representation(self, instance):
-        rep = UserSerializer(instance).data
-
-        if not hasattr(self, 'roles_json'):
-            self.roles_json = {
-                'manager': False,
-                'collector': False
-            }
-            # TODO: Find roles for the user
-        rep['roles'] = self.roles_json
-
-        return rep
+    def validate_username(self, value):
+        if not self.instance:
+            try:
+                self.user = User.objects.get(username=value)
+            except User.DoesNotExist:
+                raise serializers.ValidationError(
+                    'User {} does not exist'.format(value))
 
     def create(self, validated_data):
-        user = User.objects.get(username=validated_data['username'])
-        project = self.context['project']
-        project.users.add(user)
+        obj = self.context[self.Meta.context_key]
 
-        # TODO: Find the relevant policy according to roles and assign it
-        # to the user
-        self.set_roles(user, validated_data.get('roles'))
+        create_kwargs = validated_data['roles']
+        create_kwargs['user'] = self.user
+        create_kwargs[self.Meta.context_key] = obj
 
-        return user
+        self.role = self.Meta.role_model.objects.create(**create_kwargs)
+
+        return self.user
 
     def update(self, instance, validated_data):
-        # TODO: Update the policy according to roles
-        self.set_roles(instance, validated_data.get('roles'))
+        role = self.get_roles_object(instance)
+
+        for key in validated_data['roles'].keys():
+            setattr(role, key, validated_data['roles'][key])
+
+        role.save()
 
         return instance
+
+
+class OrganizationUserSerializer(EntityUserSerializer):
+    class Meta:
+        role_model = OrganizationRole
+        context_key = 'organization'
+
+    def get_roles_object(self, instance):
+        if not hasattr(self, 'role'):
+            self.role = OrganizationRole.objects.get(
+                user=instance,
+                organization=self.context['organization'])
+
+        return self.role
+
+    def get_roles_json(self, instance):
+        role = self.get_roles_object(instance)
+
+        return {
+            'admin': role.admin
+        }
+
+    def set_roles(self, data):
+        roles = {
+            'admin': False
+        }
+
+        if self.instance:
+            role = self.get_roles_object(self.instance)
+            roles['admin'] = role.admin
+
+        if data:
+            roles['admin'] = data.get('admin', roles['admin'])
+
+        return roles
+
+
+class ProjectUserSerializer(EntityUserSerializer):
+    class Meta:
+        role_model = ProjectRole
+        context_key = 'project'
+
+    def get_roles_object(self, instance):
+        if not hasattr(self, 'role'):
+            self.role = ProjectRole.objects.get(
+                user=instance,
+                project=self.context['project'])
+
+        return self.role
+
+    def get_roles_json(self, instance):
+        role = self.get_roles_object(instance)
+
+        return {
+            'manager': role.manager,
+            'collector': role.collector
+        }
+
+    def set_roles(self, data):
+        roles = {
+            'manager': False,
+            'collector': False
+        }
+
+        if self.instance:
+            role = self.get_roles_object(self.instance)
+            roles['manager'] = role.manager
+            roles['collector'] = role.collector
+
+        if data:
+            roles['manager'] = data.get('manager', roles['manager'])
+            roles['collector'] = data.get('collector', roles['collector'])
+
+        return roles

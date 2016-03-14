@@ -16,7 +16,7 @@ class Organization(RandomIDModel):
     archived = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
     contacts = JSONField(validators=[validate_contact], default={})
-    users = models.ManyToManyField('accounts.User')
+    users = models.ManyToManyField('accounts.User', through='OrganizationRole')
     # logo = TemporalForeignKey('Resource')
 
     class TutelaryMeta:
@@ -36,6 +36,12 @@ class Organization(RandomIDModel):
         return "<Organization: {name}>".format(name=self.name)
 
 
+class OrganizationRole(RandomIDModel):
+    organization = models.ForeignKey(Organization)
+    user = models.ForeignKey('accounts.User')
+    admin = models.BooleanField(default=False)
+
+
 @permissioned_model
 class Project(RandomIDModel):
     name = models.CharField(max_length=100)
@@ -46,7 +52,7 @@ class Project(RandomIDModel):
     archived = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
     contacts = JSONField(validators=[validate_contact], default={})
-    users = models.ManyToManyField('accounts.User')
+    users = models.ManyToManyField('accounts.User', through='ProjectRole')
 
     class Meta:
         ordering = ('organization', 'name')
@@ -90,3 +96,13 @@ class Project(RandomIDModel):
 
     def __str__(self):
         return "<Project: {name}>".format(name=self.name)
+
+
+class ProjectRole(RandomIDModel):
+    project = models.ForeignKey(Project)
+    user = models.ForeignKey('accounts.User')
+    manager = models.BooleanField(default=False)
+    collector = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('project', 'user')
