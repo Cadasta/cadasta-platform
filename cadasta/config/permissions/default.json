@@ -2,12 +2,23 @@
   "clause": [
     {
       "effect": "allow",
-      "object": ["*"],
-      "action": ["org.list"]
-    }, {
+      "action": ["org.list", "org.create"]
+    },
+    {
       "effect": "allow",
-      "object": ["organization/*"],
       "action": ["org.view"]
+      "object": ["organization/*"],
+    },
+
+    {
+      "effect": "allow",
+      "action": ["project.list"],
+      "object": ["organization/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["project.view"],
+      "object": ["project/*/*"]
     }
-  ]   
+  ]
 }

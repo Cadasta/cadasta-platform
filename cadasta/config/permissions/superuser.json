@@ -2,8 +2,33 @@
   "clause": [
     {
       "effect": "allow",
-      "object": ["organization/*"],
       "action": ["org.*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["org.*", "org.*.*"]
+      "object": ["organization/*"],
+    },
+
+    {
+      "effect": "allow",
+      "action": ["project.*", "project.*.*"]
+      "object": ["organization/*"],
+    },
+    {
+      "effect": "allow",
+      "action": ["project.*", "project.*.*"]
+      "object": ["project/*/*"],
+    },
+
+    {
+      "effect": "allow",
+      "action": ["user.*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["user.*"]
+      "object": ["user/*"],
     }
   ]
 }
