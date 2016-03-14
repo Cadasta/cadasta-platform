@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters, status
 
-from core.views import PermissionRequiredMixin
+from tutelary.mixins import PermissionRequiredMixin
 from accounts.serializers import UserSerializer
 from accounts.models import User
 from .models import Organization
@@ -27,28 +27,23 @@ class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
 
 class OrganizationDetail(PermissionRequiredMixin,
                          generics.RetrieveUpdateAPIView):
+    def patch_actions(self, request):
+        if hasattr(request, 'data'):
+            is_archived = self.get_object().archived
+            new_archived = request.data.get('archived', is_archived)
+            if not is_archived and (is_archived != new_archived):
+                return ('org.update', 'org.archive')
+            elif is_archived and (is_archived != new_archived):
+                return ('org.update', 'org.unarchive')
+        return 'org.update'
+
     queryset = Organization.objects.all()
     serializer_class = OrganizationSerializer
     lookup_field = 'slug'
     permission_required = {
         'GET': 'org.view',
-        'PATCH': 'org.update',
+        'PATCH': patch_actions,
     }
-
-    def initial(self, request, *args, **kwargs):
-        if hasattr(request, 'data'):
-            is_archived = self.get_object().archived
-            new_archived = request.data.get('archived', is_archived)
-
-            if not is_archived and (is_archived != new_archived):
-                # Add required permission when archiving
-                self.add_permission_required = ('org.archive', )
-            elif is_archived and (is_archived != new_archived):
-                # Add required permission when unarchiving
-                self.add_permission_required = ('org.unarchive', )
-
-        return super(OrganizationDetail, self).initial(
-            request, *args, **kwargs)
 
 
 class OrganizationUsers(PermissionRequiredMixin,
@@ -59,6 +54,9 @@ class OrganizationUsers(PermissionRequiredMixin,
         'GET': 'org.users.list',
         'POST': 'org.users.add',
     }
+
+    def get_perms_objects(self):
+        return [self.get_organization(self.kwargs['slug'])]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -82,6 +80,9 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
                               OrganizationUsersQuerySet,
                               generics.DestroyAPIView):
     permission_required = 'org.users.remove'
+
+    def get_perms_objects(self):
+        return [self.get_organization(self.kwargs['slug'])]
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()

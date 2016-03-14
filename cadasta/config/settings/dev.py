@@ -22,6 +22,7 @@ INSTALLED_APPS = (
 
 DJOSER.update({
     'DOMAIN': 'localhost:8080',
+    'SEND_ACTIVATION_EMAIL': False,
 })
 
 # devserver settings
