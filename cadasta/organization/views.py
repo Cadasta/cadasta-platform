@@ -6,7 +6,7 @@ from tutelary.mixins import PermissionRequiredMixin
 from accounts.serializers import UserSerializer
 from accounts.models import User
 from .models import Organization
-from .serializers import OrganizationSerializer
+from .serializers import OrganizationSerializer, UserAdminSerializer
 from .mixins import OrganizationUsersQuerySet
 
 
@@ -23,6 +23,7 @@ class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
         'GET': 'org.list',
         'POST': 'org.create',
     }
+    permission_filter_queryset = ('org.view',)
 
 
 class OrganizationDetail(PermissionRequiredMixin,
@@ -89,3 +90,25 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
         self.org.users.remove(user)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserAdminList(PermissionRequiredMixin, generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserAdminSerializer
+    filter_backends = (filters.DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,)
+    filter_fields = ('is_active',)
+    search_fields = ('username', 'first_name', 'last_name', 'email')
+    ordering_fields = ('username', 'first_name', 'last_name')
+    permission_required = 'user.view'
+
+
+class UserAdminDetail(PermissionRequiredMixin, generics.RetrieveUpdateAPIView):
+    serializer_class = UserAdminSerializer
+    queryset = User.objects.all()
+    lookup_field = 'username'
+    permission_required = {
+        'GET': 'user.view',
+        'PATCH': 'user.update'
+    }
