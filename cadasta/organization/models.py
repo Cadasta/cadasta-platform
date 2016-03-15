@@ -74,8 +74,6 @@ class Project(RandomIDModel):
              {'description': 'Archive an existing project'}),
             ('project.unarchive',
              {'description': 'Unarchive an existing'}),
-            ('project.collect_data',
-             {'description': 'Collect data for the project'}),
             ('project.users.list',
              {'description': 'List users within a'}),
             ('project.users.add',

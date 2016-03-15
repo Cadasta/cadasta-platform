@@ -810,13 +810,17 @@ class ProjectUsersAPITest(TestCase):
         clause = {
             'clause': [
                 {
-                  'effect': 'allow',
-                  'object': ['organization/*'],
-                  'action': ['org.*']
+                    "effect": "allow",
+                    "object": ["*"],
+                    "action": ["org.*"]
                 }, {
-                  'effect': 'allow',
-                  'object': ['project/*/*'],
-                  'action': ['project.*.*']
+                    'effect': 'allow',
+                    'object': ['organization/*'],
+                    'action': ['org.*', "org.*.*"]
+                }, {
+                    'effect': 'allow',
+                    'object': ['project/*/*'],
+                    'action': ['project.*', 'project.*.*']
                 }
             ]
         }
@@ -825,9 +829,32 @@ class ProjectUsersAPITest(TestCase):
             name='default',
             body=json.dumps(clause))
         self.user = UserFactory.create()
-        assign_user_policies(self.user, policy)
+        self.user.assign_policies(policy)
 
         self.view = views.ProjectUsers.as_view()
+
+    def _get(self, org, prj, user=AnonymousUser()):
+        request = APIRequestFactory().get(
+            '/v1/organizations/{org}/projects/{prj}/users/'.format(
+                org=org,
+                prj=prj
+            )
+        )
+        force_authenticate(request, user=user)
+        return self.view(request, slug=org, project_id=prj).render()
+
+    def _post(self, org, prj, data={}, user=AnonymousUser()):
+        request = APIRequestFactory().post(
+            '/v1/organizations/{org}/projects/{prj}/users/'.format(
+                org=org,
+                prj=prj
+            ),
+            data,
+            format='json'
+        )
+        force_authenticate(request, user=user)
+
+        return self.view(request, slug=org, project_id=prj).render()
 
     def test_full_list(self):
         """
@@ -837,20 +864,11 @@ class ProjectUsersAPITest(TestCase):
         other_user = UserFactory.create()
 
         project = ProjectFactory.create(add_users=prj_users)
-        request = APIRequestFactory().get(
-            '/v1/organizations/{org}/projects/{prj}/users/'.format(
-                org=project.organization.slug,
-                prj=project.id
-            )
+        response = self._get(
+            org=project.organization.slug,
+            prj=project.id,
+            user=self.user
         )
-        # request.user = self.user
-        # request.successful_authenticator = True
-        force_authenticate(request, user=self.user)
-
-        response = self.view(
-            request,
-            slug=project.organization.slug,
-            project_id=project.id).render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
@@ -858,19 +876,21 @@ class ProjectUsersAPITest(TestCase):
         assert other_user.username not in [u['username'] for u in content]
 
     def test_full_list_with_unauthorized_user(self):
-        pass
+        project = ProjectFactory.create()
+        response = self._get(
+            org=project.organization.slug,
+            prj=project.id
+        )
+
+        assert response.status_code == 403
 
     def test_get_full_list_organization_does_not_exist(self):
         project = ProjectFactory.create()
-        request = APIRequestFactory().get(
-            '/v1/organizations/some-org/projects/{prj}/users/'.format(
-                prj=project.id
-            )
+        response = self._get(
+            org='some-org',
+            prj=project.id,
+            user=self.user
         )
-        response = self.view(
-            request,
-            slug='some-org',
-            project_id=project.id).render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
@@ -878,16 +898,11 @@ class ProjectUsersAPITest(TestCase):
 
     def test_get_full_list_project_does_not_exist(self):
         organization = OrganizationFactory.create()
-        request = APIRequestFactory().get(
-            '/v1/organizations/{slug}/projects/{prj}/users/'.format(
-                slug=organization.slug,
-                prj='123abd'
-            )
+        response = self._get(
+            org=organization.slug,
+            prj='123abd',
+            user=self.user
         )
-        response = self.view(
-            request,
-            slug=organization.slug,
-            project_id='123abc').render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
@@ -896,38 +911,36 @@ class ProjectUsersAPITest(TestCase):
     def test_add_user(self):
         user_to_add = UserFactory.create()
         project = ProjectFactory.create()
-        request = APIRequestFactory().post(
-            '/v1/organizations/{org}/projects/{prj}/users/'.format(
-                org=project.organization.slug,
-                prj=project.id
-            ),
-            {'username': user_to_add.username}
+        response = self._post(
+            org=project.organization.slug,
+            prj=project.id,
+            user=self.user,
+            data={'username': user_to_add.username}
         )
-        force_authenticate(request, user=self.user)
-
-        response = self.view(
-            request,
-            slug=project.organization.slug,
-            project_id=project.id).render()
 
         assert response.status_code == 201
         assert project.users.count() == 1
 
+    def test_add_user_with_unauthorized_user(self):
+        user_to_add = UserFactory.create()
+        project = ProjectFactory.create()
+        response = self._post(
+            org=project.organization.slug,
+            prj=project.id,
+            data={'username': user_to_add.username}
+        )
+
+        assert response.status_code == 403
+        assert project.users.count() == 0
+
     def test_add_user_with_invalid_data(self):
         project = ProjectFactory.create()
-        request = APIRequestFactory().post(
-            '/v1/organizations/{org}/projects/{prj}/users/'.format(
-                org=project.organization.slug,
-                prj=project.id
-            ),
-            {'username': 'some-user'}
+        response = self._post(
+            org=project.organization.slug,
+            prj=project.id,
+            user=self.user,
+            data={'username': 'some-user'}
         )
-        force_authenticate(request, user=self.user)
-
-        response = self.view(
-            request,
-            slug=project.organization.slug,
-            project_id=project.id).render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 400
@@ -937,10 +950,33 @@ class ProjectUsersAPITest(TestCase):
 
 class ProjectUsersDetailTest(TestCase):
     def setUp(self):
+        clause = {
+            'clause': [
+                {
+                    "effect": "allow",
+                    "object": ["*"],
+                    "action": ["org.*"]
+                }, {
+                    'effect': 'allow',
+                    'object': ['organization/*'],
+                    'action': ['org.*', "org.*.*"]
+                }, {
+                    'effect': 'allow',
+                    'object': ['project/*/*'],
+                    'action': ['project.*', 'project.*.*']
+                }
+            ]
+        }
+
+        policy = Policy.objects.create(
+            name='default',
+            body=json.dumps(clause))
         self.user = UserFactory.create()
+        self.user.assign_policies(policy)
+
         self.view = views.ProjectUsersDetail.as_view()
 
-    def _get(self, org, prj, user):
+    def _get(self, org, prj, user, auth=AnonymousUser()):
         request = APIRequestFactory().get(
             '/v1/organizations/{org}/projects/{prj}/users/{user}'.format(
                 org=org,
@@ -948,11 +984,11 @@ class ProjectUsersDetailTest(TestCase):
                 user=user
             )
         )
-        force_authenticate(request, user=self.user)
+        force_authenticate(request, user=auth)
         return self.view(
             request, slug=org, project_id=prj, username=user).render()
 
-    def _patch(self, org, prj, user, data):
+    def _patch(self, org, prj, user, data, auth=AnonymousUser()):
         request = APIRequestFactory().patch(
             '/v1/organizations/{org}/projects/{prj}/users/{user}'.format(
                 org=org,
@@ -962,11 +998,11 @@ class ProjectUsersDetailTest(TestCase):
             data,
             format='json'
         )
-        force_authenticate(request, user=self.user)
+        force_authenticate(request, user=auth)
         return self.view(
             request, slug=org, project_id=prj, username=user).render()
 
-    def _delete(self, org, prj, user):
+    def _delete(self, org, prj, user, auth=AnonymousUser()):
         request = APIRequestFactory().delete(
             '/v1/organizations/{org}/projects/{prj}/users/{user}'.format(
                 org=org,
@@ -974,7 +1010,7 @@ class ProjectUsersDetailTest(TestCase):
                 user=user
             )
         )
-        force_authenticate(request, user=self.user)
+        force_authenticate(request, user=auth)
         return self.view(
             request, slug=org, project_id=prj, username=user).render()
 
@@ -985,14 +1021,23 @@ class ProjectUsersDetailTest(TestCase):
         response = self._get(
             org=project.organization.slug,
             prj=project.id,
-            user=user.username)
+            user=user.username,
+            auth=self.user)
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
         assert content['username'] == user.username
 
     def test_get_user_with_unauthorized_user(self):
-        pass
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        response = self._get(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username)
+
+        assert response.status_code == 403
 
     def test_get_user_that_does_not_exist(self):
         user = UserFactory.create()
@@ -1001,7 +1046,8 @@ class ProjectUsersDetailTest(TestCase):
         response = self._get(
             org=project.organization.slug,
             prj=project.id,
-            user=user.username)
+            user=user.username,
+            auth=self.user)
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
@@ -1014,7 +1060,8 @@ class ProjectUsersDetailTest(TestCase):
         response = self._get(
             org='some-org',
             prj=project.id,
-            user=user.username)
+            user=user.username,
+            auth=self.user)
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
@@ -1027,7 +1074,8 @@ class ProjectUsersDetailTest(TestCase):
         response = self._get(
             org=project.organization.slug,
             prj='abc123',
-            user=user.username)
+            user=user.username,
+            auth=self.user)
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
@@ -1047,14 +1095,32 @@ class ProjectUsersDetailTest(TestCase):
             org=project.organization.slug,
             prj=project.id,
             user=user.username,
-            data=data)
+            data=data,
+            auth=self.user)
 
         assert response.status_code == 200
         role = ProjectRole.objects.get(project=project, user=user)
         assert role.manager is True
 
     def test_update_user_with_unauthorized_user(self):
-        pass
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        data = {
+            'roles': {
+                'manager': True
+            }
+        }
+
+        response = self._patch(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username,
+            data=data)
+
+        assert response.status_code == 403
+        role = ProjectRole.objects.get(project=project, user=user)
+        assert role.manager is False
 
     def test_delete_user(self):
         user = UserFactory.create()
@@ -1063,10 +1129,20 @@ class ProjectUsersDetailTest(TestCase):
         response = self._delete(
             org=project.organization.slug,
             prj=project.id,
-            user=user.username)
+            user=user.username,
+            auth=self.user)
 
         assert response.status_code == 204
         assert project.users.count() == 0
 
     def test_delete_user_with_unauthorized_user(self):
-        pass
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user])
+
+        response = self._delete(
+            org=project.organization.slug,
+            prj=project.id,
+            user=user.username)
+
+        assert response.status_code == 403
+        assert project.users.count() == 1

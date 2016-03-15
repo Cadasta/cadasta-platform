@@ -37,6 +37,9 @@ class ProjectMixin:
 class ProjectRoles(ProjectMixin):
     lookup_field = 'username'
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
     def get_queryset(self):
         self.prj = self.get_project()
         return self.prj.users.all()

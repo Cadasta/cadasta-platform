@@ -112,8 +112,9 @@ class ProjectDelete(PermissionRequiredMixin, generics.DestroyAPIView):
     permission_required = 'project.resource.delete'
 
 
-# class ProjectUsers(TPermMixin, ProjectRoles, generics.ListAPIView):
-class ProjectUsers(ProjectRoles, generics.ListCreateAPIView):
+class ProjectUsers(PermissionRequiredMixin,
+                   ProjectRoles,
+                   generics.ListCreateAPIView):
     serializer_class = serializers.ProjectUserSerializer
     permission_required = {
         'GET': 'project.users.list',
@@ -121,9 +122,16 @@ class ProjectUsers(ProjectRoles, generics.ListCreateAPIView):
     }
 
 
-class ProjectUsersDetail(ProjectRoles,
+class ProjectUsersDetail(PermissionRequiredMixin,
+                         ProjectRoles,
                          generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProjectUserSerializer
+
+    permission_required = {
+        'GET': 'project.users.list',
+        'PATCH': 'project.users.add',
+        'DELETE': 'project.users.delete'
+    }
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
