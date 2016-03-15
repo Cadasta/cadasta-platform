@@ -6,18 +6,18 @@
     },
     {
       "effect": "allow",
-      "action": ["org.*", "org.*.*"]
+      "action": ["org.*", "org.*.*"],
       "object": ["organization/*"],
     },
 
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*"]
+      "action": ["project.*", "project.*.*"],
       "object": ["organization/*"],
     },
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*"]
+      "action": ["project.*", "project.*.*"],
       "object": ["project/*/*"],
     },
 
@@ -27,7 +27,7 @@
     },
     {
       "effect": "allow",
-      "action": ["user.*"]
+      "action": ["user.*"],
       "object": ["user/*"],
     }
   ]

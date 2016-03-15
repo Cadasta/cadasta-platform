@@ -2,7 +2,7 @@
   "clause": [
     {
       "effect": "allow",
-      "action": ["project.resources.*"]
+      "action": ["project.resources.*"],
       "object": ["project/$organization/$project"],
     }
   ]

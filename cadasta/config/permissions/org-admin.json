@@ -2,13 +2,13 @@
   "clause": [
     {
       "effect": "allow",
-      "action": ["org.*", "org.*.*", "project.*", "project.*.*"]
+      "action": ["org.*", "org.*.*", "project.*", "project.*.*"],
       "object": ["organization/$organization"],
     },
 
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*"]
+      "action": ["project.*", "project.*.*"],
       "object": ["project/$organization/*"],
     }
   ]
