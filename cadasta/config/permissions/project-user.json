@@ -1,13 +1,8 @@
 {
   "clause": [
-    {
-      "effect": "allow",
-      "action": ["org.list", "org.create"]
-    },
-    {
-      "effect": "allow",
-      "object": ["organization/*"],
-      "action": ["org.view"]
-    }
+    // Currently, "ordinary" users associated with a project have no
+    // additional permissions over those given to all users.  This may
+    // change in the future.  In particular, project users may be
+    // permitted access to projects that are normally private.
   ]
 }

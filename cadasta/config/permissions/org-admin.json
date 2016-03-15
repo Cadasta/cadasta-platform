@@ -1,15 +1,20 @@
 {
   "clause": [
+    // In addition to the permissions provided by the default
+    // policy, organization administrators are allowed to perform all
+    // organization management actions for a specified organization,
+    // and all project management actions for all projects within a
+    // specified organization.
     {
       "effect": "allow",
       "action": ["org.*", "org.*.*", "project.*", "project.*.*"],
-      "object": ["organization/$organization"],
+      "object": ["organization/$organization"]
     },
 
     {
       "effect": "allow",
       "action": ["project.*", "project.*.*"],
-      "object": ["project/$organization/*"],
+      "object": ["project/$organization/*"]
     }
   ]
 }
