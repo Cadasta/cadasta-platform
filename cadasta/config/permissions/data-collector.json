@@ -1,0 +1,12 @@
+{
+  "clause": [
+    // In addition to the permissions provided by the default
+    // policy, data collectors are allowed to manage resources for a
+    // specified project within a specified organization.
+    {
+      "effect": "allow",
+      "action": ["project.resources.*"],
+      "object": ["project/$organization/$project"]
+    }
+  ]
+}
