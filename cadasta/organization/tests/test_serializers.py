@@ -1,7 +1,8 @@
+from datetime import datetime
 from django.utils.text import slugify
 from django.test import TestCase
 
-from ..serializers import OrganizationSerializer
+from ..serializers import OrganizationSerializer, UserAdminSerializer
 
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory
@@ -44,3 +45,21 @@ class OrganizationSerializerTest(TestCase):
 
         serializer = OrganizationSerializer(org, detail=True)
         assert 'users' in serializer.data
+
+
+class UserAdminSerializerTest(TestCase):
+    def test_user_fields_are_set(self):
+        user = UserFactory.create(last_login=datetime.now())
+        serializer = UserAdminSerializer(user)
+
+        assert 'username' in serializer.data
+        assert 'last_login' in serializer.data
+        assert 'is_active' in serializer.data
+
+    def test_organizations_are_serialized(self):
+        user = UserFactory.create()
+        OrganizationFactory.create(add_users=[user])
+        OrganizationFactory.create(add_users=[user])
+
+        serializer = UserAdminSerializer(user)
+        assert 'organizations' in serializer.data
