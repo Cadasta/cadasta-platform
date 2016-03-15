@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.http import QueryDict
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
 from accounts.tests.factories import UserFactory
@@ -89,7 +90,7 @@ class OrganizationListAPITest(TestCase):
 
     def test_full_list_with_unautorized_user(self):
         """
-        It should 403 Permission denied.
+        It should 403 "You do not have permission to perform this action."
         """
         OrganizationFactory.create_batch(2)
         request = APIRequestFactory().get('/v1/organizations/')
@@ -99,7 +100,7 @@ class OrganizationListAPITest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 403
-        assert content['detail'] == "Permission denied."
+        assert content['detail'] == PermissionDenied.default_detail
 
     def test_filter_active(self):
         """
@@ -256,6 +257,7 @@ class OrganizationCreateAPITest(TestCase):
         assign_user_policies(unauthorized_user, policy)
 
         data = {
+            'name': 'new_org',
             'description': 'Org description'
         }
         request = APIRequestFactory().post('/v1/organizations/', data)
@@ -265,7 +267,7 @@ class OrganizationCreateAPITest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 403
-        assert content['detail'] == 'Permission denied.'
+        assert content['detail'] == PermissionDenied.default_detail
         assert Organization.objects.count() == 0
 
 
@@ -317,7 +319,7 @@ class OrganizationDetailTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 403
-        assert content['detail'] == "Permission denied."
+        assert content['detail'] == PermissionDenied.default_detail
 
     def test_get_organization_that_does_not_exist(self):
         request = APIRequestFactory().get('/v1/organizations/some-org/')
@@ -495,7 +497,7 @@ class OrganizationUsersTest(TestCase):
                 }, {
                       "effect": "allow",
                       "object": ["organization/*"],
-                      "action": ["org.*"]
+                      "action": ["org.*", "org.*.*"]
                 }
             ]
         }
@@ -533,7 +535,7 @@ class OrganizationUsersTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 403
-        assert content['detail'] == 'Permission denied.'
+        assert content['detail'] == PermissionDenied.default_detail
 
     def test_add_user(self):
         org_users = UserFactory.create_batch(2)
@@ -566,7 +568,7 @@ class OrganizationUsersTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 403
-        assert content['detail'] == 'Permission denied.'
+        assert content['detail'] == PermissionDenied.default_detail
         assert org.users.count() == 2
 
     def test_add_user_that_does_not_exist(self):
@@ -615,7 +617,7 @@ class OrganizationUsersDetailTest(TestCase):
                 }, {
                       "effect": "allow",
                       "object": ["organization/*"],
-                      "action": ["org.*"]
+                      "action": ["org.*", "org.*.*"]
                 }
             ]
         }
@@ -710,7 +712,7 @@ class OrganizationUsersDetailTest(TestCase):
 
         assert response.status_code == 403
         assert org.users.count() == 2
-        assert content['detail'] == 'Permission denied.'
+        assert content['detail'] == PermissionDenied.default_detail
 
     def test_remove_user_that_does_not_exist(self):
         user = UserFactory.create()

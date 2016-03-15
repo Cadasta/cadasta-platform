@@ -2,9 +2,8 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters, status
 
-from tutelary.mixins import PermissionRequiredMixin as TPermMixin
-
-from core.views import PermissionRequiredMixin
+from tutelary.mixins import PermissionRequiredMixin
+from accounts.serializers import UserSerializer
 from accounts.models import User
 from .models import (
     Organization, Project, OrganizationRole
@@ -30,28 +29,23 @@ class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
 
 class OrganizationDetail(PermissionRequiredMixin,
                          generics.RetrieveUpdateAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = serializers.OrganizationSerializer
-    lookup_field = 'slug'
-    permission_required = {
-        'GET': 'org.view',
-        'PATCH': 'org.update',
-    }
-
-    def initial(self, request, *args, **kwargs):
+    def patch_actions(self, request):
         if hasattr(request, 'data'):
             is_archived = self.get_object().archived
             new_archived = request.data.get('archived', is_archived)
-
             if not is_archived and (is_archived != new_archived):
-                # Add required permission when archiving
-                self.add_permission_required = ('org.archive', )
+                return ('org.update', 'org.archive')
             elif is_archived and (is_archived != new_archived):
-                # Add required permission when unarchiving
-                self.add_permission_required = ('org.unarchive', )
+                return ('org.update', 'org.unarchive')
+        return 'org.update'
 
-        return super(OrganizationDetail, self).initial(
-            request, *args, **kwargs)
+    queryset = Organization.objects.all()
+    serializer_class = OrganizationSerializer
+    lookup_field = 'slug'
+    permission_required = {
+        'GET': 'org.view',
+        'PATCH': patch_actions,
+    }
 
 
 class OrganizationUsers(PermissionRequiredMixin,
@@ -67,8 +61,10 @@ class OrganizationUsers(PermissionRequiredMixin,
         context = super(OrganizationUsers, self).get_serializer_context(
             *args, **kwargs)
         context['organization'] = self.get_organization()
-
         return context
+
+    def get_perms_objects(self):
+        return [self.get_organization(self.kwargs['slug'])]
 
 
 class OrganizationUsersDetail(PermissionRequiredMixin,
@@ -76,6 +72,9 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
                               generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = 'org.users.remove'
+
+    def get_perms_objects(self):
+        return [self.get_organization(self.kwargs['slug'])]
 
     def get_serializer_context(self, *args, **kwargs):
         context = super(OrganizationUsersDetail, self).get_serializer_context(
