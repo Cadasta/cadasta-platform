@@ -1,5 +1,7 @@
 {
   "clause": [
+    // A superuser is permitted to perform all actions on all entities
+    // within the platform.
     {
       "effect": "allow",
       "action": ["org.*"]
@@ -7,18 +9,18 @@
     {
       "effect": "allow",
       "action": ["org.*", "org.*.*"],
-      "object": ["organization/*"],
+      "object": ["organization/*"]
     },
 
     {
       "effect": "allow",
       "action": ["project.*", "project.*.*"],
-      "object": ["organization/*"],
+      "object": ["organization/*"]
     },
     {
       "effect": "allow",
       "action": ["project.*", "project.*.*"],
-      "object": ["project/*/*"],
+      "object": ["project/*/*"]
     },
 
     {
@@ -28,7 +30,7 @@
     {
       "effect": "allow",
       "action": ["user.*"],
-      "object": ["user/*"],
+      "object": ["user/*"]
     }
   ]
 }

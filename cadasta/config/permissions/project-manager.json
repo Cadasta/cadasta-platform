@@ -1,14 +1,19 @@
 {
   "clause": [
+    // In addition to the permissions provided by the default
+    // policy, project managers are allowed to perform all project
+    // management actions, except for project archiving and
+    // unarchiving, for a specified project within a specified
+    // organization.
     {
       "effect": "allow",
       "action": ["project.*", "project.*.*"],
-      "object": ["project/$organization/$project"],
+      "object": ["project/$organization/$project"]
     },
     {
       "effect": "deny",
       "action": ["project.archive", "project.unarchive"],
-      "object": ["project/$organization/$project"],
+      "object": ["project/$organization/$project"]
     }
   ]
 }
