@@ -9,7 +9,7 @@ from tutelary.models import Policy, assign_user_policies
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, ProjectFactory
 from .. import views
-from ..models import Organization
+from ..models import Organization, OrganizationRole, ProjectRole
 
 
 class OrganizationListAPITest(TestCase):
@@ -627,6 +627,51 @@ class OrganizationUsersDetailTest(TestCase):
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
 
+    def test_get_user(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/{org}/users/{username}'.format(
+                org=org.slug,
+                username=user.username)
+        )
+        force_authenticate(request, user=self.user)
+        response = self.view(
+            request,
+            slug=org.slug,
+            username=user.username).render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert content['username'] == user.username
+
+    def test_update_user(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+
+        request = APIRequestFactory().patch(
+            '/v1/organizations/{org}/users/{username}'.format(
+                org=org.slug,
+                username=user.username),
+            data={
+                'roles': {
+                    'admin': True
+                }
+            },
+            format='json'
+        )
+        force_authenticate(request, user=self.user)
+        response = self.view(
+            request,
+            slug=org.slug,
+            username=user.username).render()
+        assert response.status_code == 200
+        assert org.users.count() == 1
+
+        role = OrganizationRole.objects.get(organization=org, user=user)
+        assert role.admin is True
+
     def test_remove_user(self):
         user = UserFactory.create()
         user_to_remove = UserFactory.create()
@@ -862,13 +907,30 @@ class ProjectUsersAPITest(TestCase):
             request,
             slug=project.organization.slug,
             project_id=project.id).render()
-        content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 201
         assert project.users.count() == 1
 
     def test_add_user_with_invalid_data(self):
-        pass
+        project = ProjectFactory.create()
+        request = APIRequestFactory().post(
+            '/v1/organizations/{org}/projects/{prj}/users/'.format(
+                org=project.organization.slug,
+                prj=project.id
+            ),
+            {'username': 'some-user'}
+        )
+        force_authenticate(request, user=self.user)
+
+        response = self.view(
+            request,
+            slug=project.organization.slug,
+            project_id=project.id).render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 400
+        assert project.users.count() == 0
+        assert 'User some-user does not exist' in content['username']
 
 
 class ProjectUsersDetailTest(TestCase):
@@ -896,7 +958,7 @@ class ProjectUsersDetailTest(TestCase):
                 user=user
             ),
             data,
-            format='json' 
+            format='json'
         )
         force_authenticate(request, user=self.user)
         return self.view(
@@ -984,9 +1046,10 @@ class ProjectUsersDetailTest(TestCase):
             prj=project.id,
             user=user.username,
             data=data)
-        content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
+        role = ProjectRole.objects.get(project=project, user=user)
+        assert role.manager is True
 
     def test_update_user_with_unauthorized_user(self):
         pass

@@ -73,8 +73,16 @@ class OrganizationUsers(PermissionRequiredMixin,
 
 class OrganizationUsersDetail(PermissionRequiredMixin,
                               OrganizationUsersQuerySet,
-                              generics.DestroyAPIView):
+                              generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.OrganizationUserSerializer
     permission_required = 'org.users.remove'
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super(OrganizationUsersDetail, self).get_serializer_context(
+            *args, **kwargs)
+        context['organization'] = self.get_organization()
+
+        return context
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
@@ -137,10 +145,9 @@ class ProjectUsers(ProjectUsersQuerySet, generics.ListCreateAPIView):
     }
 
     def get_serializer_context(self, *args, **kwargs):
-        prj = self.get_project()
         context = super(ProjectUsers, self).get_serializer_context(
             *args, **kwargs)
-        context['project'] = prj
+        context['project'] = self.get_project()
 
         return context
 

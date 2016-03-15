@@ -179,12 +179,11 @@ class OrganizationUserSerializerTest(TestCase):
         data = {
             'username': 'some-user',
             'roles': {
-                'manager': False,
-                'collector': True,
+                'admin': True
             }
         }
 
-        serializer = serializers.ProjectUserSerializer(
+        serializer = serializers.OrganizationUserSerializer(
             data=data,
             context={
                 'organization': org
