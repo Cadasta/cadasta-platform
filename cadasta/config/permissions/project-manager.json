@@ -2,12 +2,12 @@
   "clause": [
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*"]
+      "action": ["project.*", "project.*.*"],
       "object": ["project/$organization/$project"],
     },
     {
       "effect": "deny",
-      "action": ["project.archive", "project.unarchive"]
+      "action": ["project.archive", "project.unarchive"],
       "object": ["project/$organization/$project"],
     }
   ]

@@ -6,7 +6,7 @@
     },
     {
       "effect": "allow",
-      "action": ["org.view"]
+      "action": ["org.view"],
       "object": ["organization/*"],
     },
 
