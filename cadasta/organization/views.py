@@ -3,13 +3,9 @@ from rest_framework import generics
 from rest_framework import filters, status
 
 from tutelary.mixins import PermissionRequiredMixin
-from accounts.serializers import UserSerializer
-from accounts.models import User
-from .models import (
-    Organization, Project, OrganizationRole
-)
+from .models import Organization
 from . import serializers
-from .mixins import OrganizationUsersQuerySet, ProjectUsersQuerySet
+from .mixins import OrganizationRoles, ProjectRoles
 
 
 class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
@@ -40,7 +36,7 @@ class OrganizationDetail(PermissionRequiredMixin,
         return 'org.update'
 
     queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+    serializer_class = serializers.OrganizationSerializer
     lookup_field = 'slug'
     permission_required = {
         'GET': 'org.view',
@@ -49,7 +45,7 @@ class OrganizationDetail(PermissionRequiredMixin,
 
 
 class OrganizationUsers(PermissionRequiredMixin,
-                        OrganizationUsersQuerySet,
+                        OrganizationRoles,
                         generics.ListCreateAPIView):
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = {
@@ -57,31 +53,12 @@ class OrganizationUsers(PermissionRequiredMixin,
         'POST': 'org.users.add',
     }
 
-    def get_serializer_context(self, *args, **kwargs):
-        context = super(OrganizationUsers, self).get_serializer_context(
-            *args, **kwargs)
-        context['organization'] = self.get_organization()
-        return context
-
-    def get_perms_objects(self):
-        return [self.get_organization(self.kwargs['slug'])]
-
 
 class OrganizationUsersDetail(PermissionRequiredMixin,
-                              OrganizationUsersQuerySet,
+                              OrganizationRoles,
                               generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = 'org.users.remove'
-
-    def get_perms_objects(self):
-        return [self.get_organization(self.kwargs['slug'])]
-
-    def get_serializer_context(self, *args, **kwargs):
-        context = super(OrganizationUsersDetail, self).get_serializer_context(
-            *args, **kwargs)
-        context['organization'] = self.get_organization()
-
-        return context
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
@@ -135,32 +112,18 @@ class ProjectDelete(PermissionRequiredMixin, generics.DestroyAPIView):
     permission_required = 'project.resource.delete'
 
 
-# class ProjectUsers(TPermMixin, ProjectUsersQuerySet, generics.ListAPIView):
-class ProjectUsers(ProjectUsersQuerySet, generics.ListCreateAPIView):
+# class ProjectUsers(TPermMixin, ProjectRoles, generics.ListAPIView):
+class ProjectUsers(ProjectRoles, generics.ListCreateAPIView):
     serializer_class = serializers.ProjectUserSerializer
     permission_required = {
         'GET': 'project.users.list',
         'POST': 'project.users.add'
     }
 
-    def get_serializer_context(self, *args, **kwargs):
-        context = super(ProjectUsers, self).get_serializer_context(
-            *args, **kwargs)
-        context['project'] = self.get_project()
 
-        return context
-
-
-class ProjectUsersDetail(ProjectUsersQuerySet,
+class ProjectUsersDetail(ProjectRoles,
                          generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProjectUserSerializer
-
-    def get_serializer_context(self, *args, **kwargs):
-        context = super(ProjectUsersDetail, self).get_serializer_context(
-            *args, **kwargs)
-        context['project'] = self.get_project()
-
-        return context
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()

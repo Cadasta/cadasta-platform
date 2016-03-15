@@ -49,3 +49,5 @@ def exception_handler(exception, context):
     response = drf_exception_handler(exception, context)
     if response:
         response.data = eval_json(response.data)
+
+        return response

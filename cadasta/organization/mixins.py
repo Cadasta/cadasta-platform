@@ -8,12 +8,21 @@ class OrganizationMixin:
         return get_object_or_404(Organization, slug=self.kwargs['slug'])
 
 
-class OrganizationUsersQuerySet(OrganizationMixin):
+class OrganizationRoles(OrganizationMixin):
     lookup_field = 'username'
 
     def get_queryset(self):
         self.org = self.get_organization()
         return self.org.users.all()
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super(OrganizationRoles, self).get_serializer_context(
+            *args, **kwargs)
+        context['organization'] = self.get_organization()
+        return context
+
+    def get_perms_objects(self):
+        return [self.get_organization()]
 
 
 class ProjectMixin:
@@ -25,9 +34,16 @@ class ProjectMixin:
         )
 
 
-class ProjectUsersQuerySet(ProjectMixin):
+class ProjectRoles(ProjectMixin):
     lookup_field = 'username'
 
     def get_queryset(self):
         self.prj = self.get_project()
         return self.prj.users.all()
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super(ProjectRoles, self).get_serializer_context(
+            *args, **kwargs)
+        context['project'] = self.get_project()
+
+        return context
