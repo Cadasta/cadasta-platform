@@ -129,7 +129,7 @@ class ProjectUsersDetail(PermissionRequiredMixin,
 
     permission_required = {
         'GET': 'project.users.list',
-        'PATCH': 'project.users.add',
+        'PATCH': 'project.users.edit',
         'DELETE': 'project.users.delete'
     }
 

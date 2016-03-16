@@ -3,6 +3,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django_countries.fields import CountryField
 from django.dispatch import receiver
+from django.utils.translation import ugettext as _
 
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
@@ -38,17 +39,27 @@ class Organization(RandomIDModel):
     class TutelaryMeta:
         perm_type = 'organization'
         path_fields = ('slug',)
-        actions = (('org.list', {'description': "List existing organisations",
-                                 'permissions_object': None}),
-                   ('org.view', "View existing organisations"),
-                   ('org.create', {'description': "Create organisations",
-                                   'permissions_object': None}),
-                   ('org.update', "Update an existing organization"),
-                   ('org.archive', "Archive an existing organization"),
-                   ('org.unarchive', "Unarchive an existing organization"),
-                   ('org.users.list', "List members of an organization"),
-                   ('org.users.add', "Add a member to an organization"),
-                   ('org.users.remove', "Remove a member from an organization"))
+        actions = (('org.list',
+                    {'description': _("List existing organisations"),
+                     'permissions_object': None}),
+                   ('org.view',
+                    {'description': _("View existing organisations")}),
+                   ('org.create',
+                    {'description': "Create organisations",
+                     'permissions_object': None}),
+                   ('org.update',
+                    {'description': _("Update an existing organization")}),
+                   ('org.archive',
+                    {'description': _("Archive an existing organization")}),
+                   ('org.unarchive',
+                    {'description': _("Unarchive an existing organization")}),
+                   ('org.users.list',
+                    {'description': _("List members of an organization")}),
+                   ('org.users.add',
+                    {'description': _("Add a member to an organization")}),
+                   ('org.users.remove',
+                    {'description': _("Remove a member from an organization")})
+                   )
 
     def __str__(self):
         return "<Organization: {name}>".format(name=self.name)
@@ -95,34 +106,24 @@ class Project(RandomIDModel):
         path_fields = ('organization', 'id')
         actions = [
             ('project.list',
-             {'description': 'List organization existing',
+             {'description': _("List existing projects"),
               'permissions_object': 'organization'}),
             ('project.view',
-             {'description': 'View organization project'}),
+             {'description': _("View existing project")}),
             ('project.edit',
-             {'description': 'Edit project details'}),
+             {'description': _("Edit project details")}),
             ('project.archive',
-             {'description': 'Archive an existing project'}),
+             {'description': _("Archive an existing project")}),
             ('project.unarchive',
-             {'description': 'Unarchive an existing'}),
+             {'description': _("Unarchive an existing")}),
             ('project.users.list',
-             {'description': 'List users within a'}),
+             {'description': _("List users within a")}),
             ('project.users.add',
-             {'description': 'Add user to a project'}),
+             {'description': _("Add user to a project")}),
+            ('project.users.edit',
+             {'description': _("Edit roles of user in a project")}),
             ('project.users.remove',
-             {'description': 'Remove user from a project'}),
-            # ('project.resource.add',
-            #  {'description': 'Add project resource',
-            #   'permissions_object': 'organization'}),
-            # ('project.resource.archive',
-            #  {'description': 'Archive a projects resource',
-            #   'permissions_object': 'organization'}),
-            # ('project.resource.list',
-            #  {'description': 'List project resource',
-            #   'permissions_object': 'organization'}),
-            # ('project.resource.delete',
-            #  {'description': 'Delete a project',
-            #   'permissions_object': 'organization'}),
+             {'description': _("Remove user from a project")}),
         ]
 
     def __str__(self):
