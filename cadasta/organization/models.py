@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django_countries.fields import CountryField
+from django.dispatch import receiver
 
 from tutelary.decorators import permissioned_model
+from tutelary.models import Role, Policy
 
 from core.models import RandomIDModel
 from .validators import validate_contact
@@ -42,6 +44,22 @@ class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)
     user = models.ForeignKey('accounts.User')
     admin = models.BooleanField(default=False)
+
+
+@receiver(models.signals.post_save, sender=OrganizationRole)
+def assign_org_permissions(sender, instance, created, **kwargs):
+    if created:
+        # role = Role.objects.get(
+        #     name='org-admin',
+        #     variables={'organization': instance.organization.slug}
+        # )
+        policy = Policy.objects.get(name='org-admin')
+        instance.user.assign_policies(
+            (policy, {'organization': instance.organization.slug})
+        )
+    else:
+        pass
+        # check if the user has exactly the policies they need
 
 
 @permissioned_model

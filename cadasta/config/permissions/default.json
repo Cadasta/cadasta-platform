@@ -1,13 +1,31 @@
 {
   "clause": [
     {
+      // Any user is allowed to list organizations and create new
+      // ones.
       "effect": "allow",
-      "object": ["*"],
-      "action": ["org.list"]
-    }, {
+      "action": ["org.list", "org.create"]
+    },
+    {
+      // Any user is allowed to view the details of an organization.
       "effect": "allow",
-      "object": ["organization/*"],
-      "action": ["org.view"]
+      "action": ["org.view"],
+      "object": ["organization/*"]
+    },
+
+    {
+      // Any user is allowed to list the public projects in an
+      // organization.
+      "effect": "allow",
+      "action": ["project.list"],
+      "object": ["organization/*"]
+    },
+    {
+      // Any user is allowed to view the details of public projects in
+      // an organization.
+      "effect": "allow",
+      "action": ["project.view"],
+      "object": ["project/*/*"]
     }
-  ]   
+  ]
 }
