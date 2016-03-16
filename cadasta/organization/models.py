@@ -1,13 +1,27 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django_countries.fields import CountryField
 from django.dispatch import receiver
 
 from tutelary.decorators import permissioned_model
-from tutelary.models import Role, Policy
+from tutelary.models import Policy
 
 from core.models import RandomIDModel
 from .validators import validate_contact
+
+PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
+
+
+def get_policy_instance(policy_name, variables):
+    try:
+        policy = Policy.objects.get(name=policy_name)
+    except Policy.DoesNotExist:
+        policy = Policy.objects.create(
+            name=policy_name,
+            body=open(PERMISSIONS_DIR + policy_name + '.json').read()
+        )
+    return (policy, variables)
 
 
 @permissioned_model
@@ -47,19 +61,18 @@ class OrganizationRole(RandomIDModel):
 
 
 @receiver(models.signals.post_save, sender=OrganizationRole)
-def assign_org_permissions(sender, instance, created, **kwargs):
-    if created:
-        # role = Role.objects.get(
-        #     name='org-admin',
-        #     variables={'organization': instance.organization.slug}
-        # )
-        policy = Policy.objects.get(name='org-admin')
-        instance.user.assign_policies(
-            (policy, {'organization': instance.organization.slug})
-        )
-    else:
-        pass
-        # check if the user has exactly the policies they need
+def assign_org_permissions(sender, instance, **kwargs):
+    policy_instance = get_policy_instance('org-admin', {
+        'organization': instance.organization.slug})
+    assigned_policies = instance.user.assigned_policies()
+    has_policy = policy_instance in assigned_policies
+
+    if not has_policy and instance.admin:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.admin:
+        assigned_policies.remove(policy_instance)
+
+    instance.user.assign_policies(*assigned_policies)
 
 
 @permissioned_model
@@ -124,3 +137,32 @@ class ProjectRole(RandomIDModel):
 
     class Meta:
         unique_together = ('project', 'user')
+
+
+@receiver(models.signals.post_save, sender=ProjectRole)
+def assign_project_permissions(sender, instance, **kwargs):
+    assigned_policies = instance.user.assigned_policies()
+
+    policy_instance = get_policy_instance('project-manager', {
+        'organization': instance.project.organization.slug,
+        'project': instance.project.id
+    })
+    has_policy = policy_instance in assigned_policies
+
+    if not has_policy and instance.manager:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.manager:
+        assigned_policies.remove(policy_instance)
+
+    policy_instance = get_policy_instance('data-collector', {
+        'organization': instance.project.organization.slug,
+        'project': instance.project.id
+    })
+    has_policy = policy_instance in assigned_policies
+
+    if not has_policy and instance.collector:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.collector:
+        assigned_policies.remove(policy_instance)
+
+    instance.user.assign_policies(*assigned_policies)
