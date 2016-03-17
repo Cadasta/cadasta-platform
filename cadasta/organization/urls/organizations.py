@@ -19,4 +19,12 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/users/(?P<username>[-\w]+)/$',
         views.OrganizationUsersDetail.as_view(),
         name='users_detail'),
+    url(
+        r'^(?P<slug>[-\w]+)/projects/$',
+        views.ProjectList.as_view(),
+        name='project_list'),
+    url(
+        r'^(?P<slug>[-\w]+)/projects/(?P<project_slug>[-\w]+)/$',
+        views.ProjectDetail.as_view(),
+        name='project_detail'),
 ]
