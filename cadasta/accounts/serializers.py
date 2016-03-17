@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from django.utils.translation import ugettext as _
 
-from rest_framework.serializers import EmailField
+from rest_framework.serializers import EmailField, ValidationError
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 
@@ -58,6 +58,23 @@ class UserSerializer(djoser_serializers.UserSerializer):
             'email': {'required': True, 'unique': True},
             'email_verified': {'read_only': True}
         }
+
+    def validate_username(self, username):
+        instance = self.instance
+        if instance is not None:
+            if (username is not None and
+               username != instance.username and
+               self.context['request'].user != instance):
+                raise ValidationError('Cannot update username')
+        return username
+
+    def validate_last_login(self, last_login):
+        instance = self.instance
+        if instance is not None:
+            if (last_login is not None and
+               last_login != instance.last_login):
+                raise ValidationError('Cannot update last_login')
+        return last_login
 
 
 class AccountLoginSerializer(djoser_serializers.LoginSerializer):
