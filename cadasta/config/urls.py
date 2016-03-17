@@ -19,7 +19,10 @@ urls = [
     url(r'^account/', include('accounts.urls', namespace='accounts')),
     url(r'^account/', include('djoser.urls.authtoken')),
 
-    url(r'^organizations/', include('organization.urls', namespace='organization')),
+    url(r'^organizations/',
+        include('organization.urls.organizations', namespace='organization')),
+    url(r'^users/',
+        include('organization.urls.users', namespace='user')),
 ]
 
 urlpatterns = [
