@@ -1,13 +1,14 @@
 from django.utils.text import slugify
 from rest_framework.serializers import ModelSerializer
 
-from core.serializers import DetailSerializer
+from core.serializers import DetailSerializer, FieldSelectorSerializer
 from accounts.serializers import UserSerializer
 from accounts.models import User
 from .models import Organization
 
 
-class OrganizationSerializer(DetailSerializer, ModelSerializer):
+class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
+                             ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
 
     class Meta:
@@ -24,15 +25,9 @@ class OrganizationSerializer(DetailSerializer, ModelSerializer):
         return super(OrganizationSerializer, self).to_internal_value(data)
 
 
-class UserOrganizationSerializer(ModelSerializer):
-    class Meta:
-        model = Organization
-        fields = ('id', 'name')
-        read_only_fields = ('id', 'name')
-
-
 class UserAdminSerializer(UserSerializer):
-    organizations = UserOrganizationSerializer(many=True, read_only=True)
+    organizations = OrganizationSerializer(
+        many=True, read_only=True, fields=('id', 'name'))
 
     class Meta:
         model = User
