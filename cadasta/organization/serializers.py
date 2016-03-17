@@ -52,9 +52,6 @@ class EntityUserSerializer(serializers.Serializer):
             rep = UserSerializer(instance).data
             rep['roles'] = self.get_roles_json(instance)
             return rep
-        else:
-            return super(EntityUserSerializer, self).to_representation(
-                instance)
 
     def to_internal_value(self, data):
         data['roles'] = self.set_roles(data.get('roles', None))

@@ -69,45 +69,6 @@ class ProjectSerializerTest(TestCase):
         project_instance = serializer.instance
         assert project_instance.organization == organization
 
-# class EntityUserSerializerTest(TestCase):
-#     def setUp(self):
-#         class SerializerInstance(serializers.EntityUserSerializer):
-#             def get_roles_json(self):
-#                 return {'admin': True}
-
-#             def set_roles(self, user, roles):
-#                 pass
-
-#             def get_permissions_object(self):
-#                 return self.context['project']
-
-#         self.serializer_class = SerializerInstance
-
-#     def test_to_representation(self):
-#         user = UserFactory.create()
-#         serializer = self.serializer_class(user)
-
-#         data = serializer.to_representation(user)
-#         assert data['username'] == user.username
-#         assert data['email'] == user.email
-#         assert data['roles']
-#         assert data['roles']['admin']
-
-#     def test_create(self):
-#         user = UserFactory.create()
-#         project = ProjectFactory.create()
-#         data = {
-#             'username': user.username
-#         }
-#         serializer = self.serializer_class(
-#             data=data,
-#             context={'project': project}
-#         )
-
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         assert project.users.count() == 1
-
 
 class OrganizationUserSerializerTest(TestCase):
     def test_to_represenation(self):
