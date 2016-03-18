@@ -2,12 +2,12 @@ import pytest
 from datetime import datetime
 from django.utils.text import slugify
 from django.test import TestCase
+from django.core import mail
 from rest_framework.serializers import ValidationError
 
 from accounts.tests.factories import UserFactory
 from .. import serializers
 from ..models import OrganizationRole, ProjectRole
-from ..serializers import OrganizationSerializer, UserAdminSerializer
 from .factories import OrganizationFactory, ProjectFactory
 
 
@@ -112,7 +112,7 @@ class OrganizationUserSerializerTest(TestCase):
             else:
                 assert u['roles']['admin'] is False
 
-    def test_set_roles_for_existing_user(self):
+    def test_set_roles_with_username(self):
         user = UserFactory.create()
         org = OrganizationFactory.create()
 
@@ -126,7 +126,9 @@ class OrganizationUserSerializerTest(TestCase):
         serializer = serializers.OrganizationUserSerializer(
             data=data,
             context={
-                'organization': org
+                'organization': org,
+                'domain': 'https://example.com',
+                'sitename': 'Cadasta'
             }
         )
         serializer.is_valid(raise_exception=True)
@@ -134,6 +136,33 @@ class OrganizationUserSerializerTest(TestCase):
 
         role = OrganizationRole.objects.get(user=user, organization=org)
         assert role.admin == data['roles']['admin']
+        assert len(mail.outbox) == 1
+
+    def test_set_roles_with_email(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create()
+
+        data = {
+            'username': user.email,
+            'roles': {
+                'admin': True,
+            }
+        }
+
+        serializer = serializers.OrganizationUserSerializer(
+            data=data,
+            context={
+                'organization': org,
+                'domain': 'https://example.com',
+                'sitename': 'Cadasta'
+            }
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        role = OrganizationRole.objects.get(user=user, organization=org)
+        assert role.admin == data['roles']['admin']
+        assert len(mail.outbox) == 1
 
     def test_set_roles_for_user_that_does_not_exist(self):
         org = OrganizationFactory.create()
@@ -154,7 +183,8 @@ class OrganizationUserSerializerTest(TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert 'User some-user does not exist' in serializer.errors['username']
+        assert ('User with username or email some-user does not exist'
+                in serializer.errors['username'])
 
     def test_update_roles_for_user(self):
         user = UserFactory.create()
@@ -226,6 +256,30 @@ class ProjectUserSerializerTest(TestCase):
 
     def test_set_roles_for_existing_user(self):
         user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        project = ProjectFactory.create(**{'organization': org})
+
+        data = {
+            'username': user.username,
+            'roles': {
+                'manager': False,
+                'collector': True,
+            }
+        }
+
+        serializer = serializers.ProjectUserSerializer(
+            data=data,
+            context={'project': project}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        role = ProjectRole.objects.get(user=user, project=project)
+        assert role.manager == data['roles']['manager']
+        assert role.collector == data['roles']['collector']
+
+    def test_set_roles_for_user_who_is_not_an_org_member(self):
+        user = UserFactory.create()
         project = ProjectFactory.create()
 
         data = {
@@ -242,12 +296,11 @@ class ProjectUserSerializerTest(TestCase):
                 'project': project
             }
         )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
 
-        role = ProjectRole.objects.get(user=user, project=project)
-        assert role.manager == data['roles']['manager']
-        assert role.collector == data['roles']['collector']
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert ('User some-user is not member of the project\'s organization'
+                in serializer.errors['username'])
 
     def test_set_roles_for_user_that_does_not_exist(self):
         project = ProjectFactory.create()
@@ -269,7 +322,8 @@ class ProjectUserSerializerTest(TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert 'User some-user does not exist' in serializer.errors['username']
+        assert ('User with username or email some-user does not exist'
+                in serializer.errors['username'])
 
     def test_update_roles_for_user(self):
         user = UserFactory.create()
@@ -299,7 +353,7 @@ class ProjectUserSerializerTest(TestCase):
 class UserAdminSerializerTest(TestCase):
     def test_user_fields_are_set(self):
         user = UserFactory.create(last_login=datetime.now())
-        serializer = UserAdminSerializer(user)
+        serializer = serializers.UserAdminSerializer(user)
 
         assert 'username' in serializer.data
         assert 'last_login' in serializer.data
@@ -310,5 +364,5 @@ class UserAdminSerializerTest(TestCase):
         OrganizationFactory.create(add_users=[user])
         OrganizationFactory.create(add_users=[user])
 
-        serializer = UserAdminSerializer(user)
+        serializer = serializers.UserAdminSerializer(user)
         assert 'organizations' in serializer.data

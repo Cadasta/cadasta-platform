@@ -1,4 +1,10 @@
+from django.conf import settings
 from django.utils.text import slugify
+from django.db.models import Q
+from django.core.mail import send_mail
+from django.utils.translation import ugettext as _
+from django.template.loader import get_template
+from django.template import Context
 from rest_framework import serializers
 
 from core.serializers import DetailSerializer, FieldSelectorSerializer
@@ -59,12 +65,20 @@ class EntityUserSerializer(serializers.Serializer):
         return super(EntityUserSerializer, self).to_internal_value(data)
 
     def validate_username(self, value):
+        error = ""
         if not self.instance:
-            try:
-                self.user = User.objects.get(username=value)
-            except User.DoesNotExist:
-                raise serializers.ValidationError(
-                    'User {} does not exist'.format(value))
+            users = User.objects.filter(Q(username=value) | Q(email=value))
+            users_count = len(users)
+
+            if users_count == 0:
+                error = "User with username or email {} does not exist"
+            elif users_count > 1:
+                error = "More than one user found for username or email {}"
+            else:
+                self.user = users[0]
+
+            if error:
+                raise serializers.ValidationError(error.format(value))
 
     def create(self, validated_data):
         obj = self.context[self.Meta.context_key]
@@ -74,6 +88,9 @@ class EntityUserSerializer(serializers.Serializer):
         create_kwargs[self.Meta.context_key] = obj
 
         self.role = self.Meta.role_model.objects.create(**create_kwargs)
+
+        if hasattr(self, 'send_invitaion_email'):
+            self.send_invitaion_email()
 
         return self.user
 
@@ -122,11 +139,37 @@ class OrganizationUserSerializer(EntityUserSerializer):
 
         return roles
 
+    def send_invitaion_email(self):
+        template = get_template('org_invite.txt')
+        organization = self.context['organization']
+        context = Context({
+            'site_name': self.context['sitename'],
+            'organization': organization.name,
+            'domain': self.context['domain'],
+            'url': 'organizations/{}/leave'.format(organization.slug),
+        })
+        message = template.render(context)
+        print(message)
+
+        subject = _("You have been added to organization {organization}").format(
+            organization=self.context['organization'].name)
+        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None),
+        send_mail(subject, message, from_email, [self.user.email])
+
 
 class ProjectUserSerializer(EntityUserSerializer):
     class Meta:
         role_model = ProjectRole
         context_key = 'project'
+
+    def validate_username(self, value):
+        super(ProjectUserSerializer, self).validate_username(value)
+        project = self.context[self.Meta.context_key]
+
+        if self.user not in project.organization.users.all():
+            raise serializers.ValidationError(
+                "User some-user is not member of the project\'s "
+                "organization".format(value))
 
     def get_roles_object(self, instance):
         if not hasattr(self, 'role'):

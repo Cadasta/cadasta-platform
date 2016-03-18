@@ -71,6 +71,7 @@ REST_FRAMEWORK = {
 }
 
 ROOT_URLCONF = 'config.urls'
+SITE_NAME = 'Cadasta'
 
 TEMPLATES = [
     {
@@ -91,7 +92,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = ['core.backends.Auth']
 
 DJOSER = {
-    'SITE_NAME': 'Cadasta',
+    'SITE_NAME': SITE_NAME,
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_URL': 'account/password/reset/confirm/{uid}/{token}',

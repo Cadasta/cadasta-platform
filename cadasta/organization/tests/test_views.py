@@ -530,7 +530,8 @@ class OrganizationUsersTest(TestCase):
 
         assert response.status_code == 400
         assert org.users.count() == 2
-        assert 'User some_username does not exist' in content['username']
+        assert ('User with username or email some_username does not exist'
+                in content['username'])
 
     def test_add_user_to_organization_that_does_not_exist(self):
         new_user = UserFactory.create()
@@ -847,7 +848,8 @@ class ProjectUsersAPITest(TestCase):
 
     def test_add_user(self):
         user_to_add = UserFactory.create()
-        project = ProjectFactory.create()
+        org = OrganizationFactory.create(add_users=[user_to_add])
+        project = ProjectFactory.create(**{'organization': org})
         response = self._post(
             org=project.organization.slug,
             prj=project.id,
@@ -882,7 +884,8 @@ class ProjectUsersAPITest(TestCase):
 
         assert response.status_code == 400
         assert project.users.count() == 0
-        assert 'User some-user does not exist' in content['username']
+        assert ('User with username or email some-user does not exist'
+                in content['username'])
 
 
 class ProjectUsersDetailTest(TestCase):

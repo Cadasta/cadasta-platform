@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 
 from .models import Organization, Project
@@ -19,6 +21,8 @@ class OrganizationRoles(OrganizationMixin):
         context = super(OrganizationRoles, self).get_serializer_context(
             *args, **kwargs)
         context['organization'] = self.get_organization()
+        context['domain'] = get_current_site(self.request).domain
+        context['sitename'] = settings.SITE_NAME
         return context
 
     def get_perms_objects(self):
