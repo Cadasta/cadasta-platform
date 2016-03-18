@@ -1,12 +1,13 @@
 import pytest
+from datetime import datetime
 from django.utils.text import slugify
 from django.test import TestCase
 from rest_framework.serializers import ValidationError
 
+from accounts.tests.factories import UserFactory
 from .. import serializers
 from ..models import OrganizationRole, ProjectRole
-
-from accounts.tests.factories import UserFactory
+from ..serializers import OrganizationSerializer, UserAdminSerializer
 from .factories import OrganizationFactory, ProjectFactory
 
 
@@ -293,3 +294,21 @@ class ProjectUserSerializerTest(TestCase):
         role = ProjectRole.objects.get(user=user, project=project)
         assert role.manager == data['roles']['manager']
         assert role.collector is False
+
+
+class UserAdminSerializerTest(TestCase):
+    def test_user_fields_are_set(self):
+        user = UserFactory.create(last_login=datetime.now())
+        serializer = UserAdminSerializer(user)
+
+        assert 'username' in serializer.data
+        assert 'last_login' in serializer.data
+        assert 'is_active' in serializer.data
+
+    def test_organizations_are_serialized(self):
+        user = UserFactory.create()
+        OrganizationFactory.create(add_users=[user])
+        OrganizationFactory.create(add_users=[user])
+
+        serializer = UserAdminSerializer(user)
+        assert 'organizations' in serializer.data

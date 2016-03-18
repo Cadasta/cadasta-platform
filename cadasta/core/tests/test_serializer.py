@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.db import models
 from rest_framework.serializers import ModelSerializer
 
-from ..serializers import DetailSerializer
+from ..serializers import DetailSerializer, FieldSelectorSerializer
 
 
 class SerializerModel(models.Model):
@@ -13,11 +13,17 @@ class SerializerModel(models.Model):
         app_label = 'core'
 
 
-class MyTestSerializer(DetailSerializer, ModelSerializer):
+class MyDetailSerializer(DetailSerializer, ModelSerializer):
     class Meta:
         model = SerializerModel
         fields = ('name', 'description',)
         detail_only_fields = ('description',)
+
+
+class MyFieldSerializer(FieldSelectorSerializer, ModelSerializer):
+    class Meta:
+        model = SerializerModel
+        fields = ('name', 'description',)
 
 
 class DetailSerializerTest(TestCase):
@@ -26,7 +32,7 @@ class DetailSerializerTest(TestCase):
             name='Blah',
             description='Blah'
         )
-        serializer = MyTestSerializer(model)
+        serializer = MyDetailSerializer(model)
         assert 'description' in serializer.data
 
     def test_detail_fields_are_not_included_when_instance_list(self):
@@ -34,7 +40,7 @@ class DetailSerializerTest(TestCase):
             name='Blah',
             description='Blah'
         )
-        serializer = MyTestSerializer([model], many=True)
+        serializer = MyDetailSerializer([model], many=True)
         assert 'description' not in serializer.data[0]
 
     def test_detail_fields_are_included_when_instance_list_detail_true(self):
@@ -42,7 +48,7 @@ class DetailSerializerTest(TestCase):
             name='Blah',
             description='Blah'
         )
-        serializer = MyTestSerializer([model], detail=True, many=True)
+        serializer = MyDetailSerializer([model], detail=True, many=True)
         assert 'description' in serializer.data[0]
 
     def test_detail_fields_are_included_instance_is_created(self):
@@ -50,7 +56,27 @@ class DetailSerializerTest(TestCase):
             'name': 'Blah',
             'description': 'Blah'
         }
-        serializer = MyTestSerializer(data=data)
+        serializer = MyDetailSerializer(data=data)
         assert serializer.is_valid()
         serializer.save()
         assert 'description' in serializer.data
+
+
+class FieldSelectorSerializerTest(TestCase):
+    def test_all_fields_are_included(self):
+        model = SerializerModel(
+            name='Blah',
+            description='Blah'
+        )
+        serializer = MyFieldSerializer(model)
+        assert 'name' in serializer.data
+        assert 'description' in serializer.data
+
+    def test_only_defined_fields_are_included(self):
+        model = SerializerModel(
+            name='Blah',
+            description='Blah'
+        )
+        serializer = MyFieldSerializer(model, fields=('name',))
+        assert 'name' in serializer.data
+        assert 'description' not in serializer.data

@@ -1,7 +1,6 @@
 import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
 from tutelary.decorators import permissioned_model
 
 
@@ -19,6 +18,5 @@ class User(AbstractUser):
     class TutelaryMeta:
         perm_type = 'user'
         path_fields = ('username',)
-        actions = (
-            ('user.create', "Create a new user")
-        )
+        actions = [('user.view', {'permissions_object': None}),
+                   'user.update']

@@ -1,13 +1,14 @@
 from django.utils.text import slugify
 from rest_framework import serializers
 
-from core.serializers import DetailSerializer
+from core.serializers import DetailSerializer, FieldSelectorSerializer
 from accounts.models import User
 from accounts.serializers import UserSerializer
 from .models import Organization, Project, OrganizationRole, ProjectRole
 
 
-class OrganizationSerializer(DetailSerializer, serializers.ModelSerializer):
+class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
+                             serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
 
     class Meta:
@@ -159,3 +160,13 @@ class ProjectUserSerializer(EntityUserSerializer):
             roles['collector'] = data.get('collector', roles['collector'])
 
         return roles
+
+
+class UserAdminSerializer(UserSerializer):
+    organizations = OrganizationSerializer(
+        many=True, read_only=True, fields=('id', 'name'))
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email',
+                  'organizations', 'last_login', 'is_active')

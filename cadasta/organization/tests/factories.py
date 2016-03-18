@@ -43,3 +43,10 @@ class ProjectFactory(factory.django.DjangoModelFactory):
         if users:
             for u in users:
                 ProjectRole.objects.create(project=self, user=u)
+
+
+def clause(effect, action, object=None):
+    if object is None:
+        return {'effect': effect, 'action': action}
+    else:
+        return {'effect': effect, 'action': action, 'object': object}

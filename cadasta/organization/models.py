@@ -33,7 +33,9 @@ class Organization(RandomIDModel):
     archived = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
     contacts = JSONField(validators=[validate_contact], default={})
-    users = models.ManyToManyField('accounts.User', through='OrganizationRole')
+    users = models.ManyToManyField('accounts.User',
+                                   through='OrganizationRole',
+                                   related_name='organizations')
     # logo = TemporalForeignKey('Resource')
 
     class TutelaryMeta:
