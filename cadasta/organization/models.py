@@ -88,6 +88,12 @@ def assign_org_permissions(sender, instance, **kwargs):
     instance.user.assign_policies(*assigned_policies)
 
 
+@receiver(models.signals.pre_delete, sender=OrganizationRole)
+def remove_project_membership(sender, instance, **kwargs):
+    prjs = instance.organization.projects.values_list('id', flat=True)
+    ProjectRole.objects.filter(user=instance.user, project_id__in=prjs).delete()
+
+
 @permissioned_model
 class Project(RandomIDModel):
     name = models.CharField(max_length=100)

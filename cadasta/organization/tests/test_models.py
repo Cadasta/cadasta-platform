@@ -95,6 +95,20 @@ class OrganizationRoleTest(TestCase):
         role.save()
         assert user.has_perm('org.update', org) is False
 
+    def test_delete_project_roles(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        ProjectFactory.create_batch(2, add_users=[user],
+                                    **{'organization': org})
+        ProjectFactory.create_batch(2, add_users=[user])
+
+        assert ProjectRole.objects.filter(user=user).count() == 4
+
+        role = OrganizationRole.objects.get(organization=org, user=user)
+        role.delete()
+
+        assert ProjectRole.objects.filter(user=user).count() == 2
+
 
 class ProjectTest(TestCase):
     def test_str(self):
