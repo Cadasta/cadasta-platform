@@ -40,7 +40,14 @@ module.exports = function karmaConf(config) {
         'react/lib/ReactContext': true,
       },
     },
+    webpackMiddleware: {
+      quiet: true,
+      watchOptions: {
+        poll: true
+      }
+    },
     browsers: ['jsdom'],
+    hostname: '0.0.0.0',
     reporters: ['dots'],
     colors: true,
     plugins: [

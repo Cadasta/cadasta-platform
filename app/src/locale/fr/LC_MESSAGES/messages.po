@@ -1,34 +1,33 @@
 # 
 # Translators:
-# Ian Ross <iross@cadasta.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: Cadasta platform\n"
-"PO-Revision-Date: 2016-03-16 16:18+0000\n"
+"PO-Revision-Date: 2016-03-16 13:57+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
-"Language-Team: German (http://www.transifex.com/cadasta/cadasta-platform/language/de/)\n"
+"Language-Team: French (http://www.transifex.com/cadasta/cadasta-platform/language/fr/)\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src/js/account/components/Profile.jsx:60
 msgid "Username"
-msgstr "Nutzername"
+msgstr ""
 
 #: test/locale/test_locale.js:16
 msgid "Hello %(name)s"
-msgstr "Hallo %(name)s"
+msgstr ""
 
 #: test/locale/test_locale.js:33
 msgid "%d unread message"
 msgid_plural "%d unread messages"
-msgstr[0] "%d ungelesene Nachricht"
-msgstr[1] "%d ungelesene Nachrichten"
+msgstr[0] ""
+msgstr[1] ""
 
 #: test/locale/test_locale.js:38
 msgid "Need more information? [link:Click here]."
-msgstr "Für weitere Informationen [link:Hier klicken]."
+msgstr ""
 
 #: src/js/account/components/Password.jsx:34
 msgid "Change your password"
@@ -36,7 +35,7 @@ msgstr ""
 
 #: src/js/account/components/Password.jsx:40
 msgid "Current password"
-msgstr "Aktuelles Passwort"
+msgstr ""
 
 #: src/js/account/components/Profile.jsx:79
 msgid "This field is required"
@@ -44,7 +43,7 @@ msgstr ""
 
 #: src/js/account/components/PasswordResetConfirm.jsx:50
 msgid "New password"
-msgstr "Neues Passwort"
+msgstr ""
 
 #: src/js/account/components/PasswordResetConfirm.jsx:55
 msgid "Your password must be at least 6 characters long."
@@ -52,7 +51,7 @@ msgstr ""
 
 #: src/js/account/components/PasswordResetConfirm.jsx:65
 msgid "Repeat new password"
-msgstr "Neues Passwort bestätigen"
+msgstr ""
 
 #: src/js/account/components/PasswordResetConfirm.jsx:70
 msgid "Passwords must match."
@@ -60,7 +59,7 @@ msgstr ""
 
 #: src/js/account/components/Profile.jsx:117
 msgid "Change password"
-msgstr "Passwort ändern"
+msgstr ""
 
 #: src/js/account/components/PasswordReset.jsx:34
 msgid "Reset your password"
@@ -68,7 +67,7 @@ msgstr ""
 
 #: src/js/account/components/PasswordReset.jsx:41
 msgid "Enter email"
-msgstr "E-Mail-Adresse eingeben"
+msgstr ""
 
 #: src/js/account/components/Profile.jsx:80
 msgid "Please provide a valid email address"
@@ -76,7 +75,7 @@ msgstr ""
 
 #: src/js/account/components/Profile.jsx:118
 msgid "Reset password"
-msgstr "Passwort zurücksetzen"
+msgstr ""
 
 #: src/js/account/components/Login.jsx:48
 msgid "Sign in to your account"
@@ -84,7 +83,7 @@ msgstr ""
 
 #: src/js/account/components/RegistrationForm.jsx:67
 msgid "Password"
-msgstr "Passwort"
+msgstr ""
 
 #: src/js/account/components/Login.jsx:77
 msgid "Forgotten password?"
@@ -92,7 +91,7 @@ msgstr ""
 
 #: src/js/account/components/Login.jsx:84
 msgid "Remember me"
-msgstr "Angemeldet bleiben"
+msgstr ""
 
 #: src/js/account/components/Login.jsx:93
 msgid "Sign in"
@@ -108,7 +107,7 @@ msgstr ""
 
 #: src/js/account/components/Profile.jsx:75
 msgid "Email"
-msgstr "E-Mail"
+msgstr ""
 
 #: src/js/account/components/RegistrationForm.jsx:82
 msgid "Confirm password"
@@ -116,15 +115,15 @@ msgstr ""
 
 #: src/js/account/components/Profile.jsx:91
 msgid "First name"
-msgstr "Vorname"
+msgstr ""
 
 #: src/js/account/components/Profile.jsx:101
 msgid "Last name"
-msgstr "Nachname"
+msgstr ""
 
 #: src/js/core/components/Header.jsx:33
 msgid "Register"
-msgstr "Registrieren"
+msgstr ""
 
 #: src/js/account/components/PasswordResetConfirm.jsx:44
 msgid "Create a new password"
@@ -136,7 +135,7 @@ msgstr ""
 
 #: src/js/account/components/Profile.jsx:112
 msgid "Update profile"
-msgstr "Profile aktualisieren"
+msgstr ""
 
 #: src/js/account/components/Profile.jsx:115
 msgid "Password options"
@@ -144,81 +143,81 @@ msgstr ""
 
 #: src/js/core/components/Header.jsx:23
 msgid "Profile"
-msgstr "Profil"
+msgstr ""
 
 #: src/js/core/components/Header.jsx:24
 msgid "Logout"
-msgstr "Abmelden"
+msgstr ""
 
 #: src/js/core/components/Header.jsx:32
 msgid "Login"
-msgstr "Anmelden"
+msgstr ""
 
 #: src/js/messages/reducer.js:10
 msgid "Unable to login with provided username and password."
-msgstr "Anmeldung mit angegebenem Nutznamen und Passwort nicht möglich."
+msgstr ""
 
 #: src/js/messages/reducer.js:11
 msgid "Unable to logout."
-msgstr "Ameldung fehlgeschlagen."
+msgstr ""
 
 #: src/js/messages/reducer.js:12
 msgid "Unable to change password."
-msgstr "Änderung des Passwortes fehlgeschlagen."
+msgstr ""
 
 #: src/js/messages/reducer.js:13
 msgid "Unable to register with provided credentials."
-msgstr "Registrierung mit den angegebenen Details nicht möglich. "
+msgstr ""
 
 #: src/js/messages/reducer.js:14
 msgid "Unable to update profile."
-msgstr "Aktualisierung des Nutzerprofils fehlgeschlagen."
+msgstr ""
 
 #: src/js/messages/reducer.js:15
 msgid "Unable to get user profile information from server."
-msgstr "Nutzerunformationen konnten nicht geladen werden. "
+msgstr ""
 
 #: src/js/messages/reducer.js:17
 msgid "Unable to reset password."
-msgstr "Zurücksetzen des Passwortes fehlgeschlagen."
+msgstr ""
 
 #: src/js/messages/reducer.js:18
 msgid "Unable to activate account."
-msgstr "Aktivierung des Nutzerkontos fehlgeschlagen."
+msgstr ""
 
 #: src/js/messages/reducer.js:22
 msgid "Successfully logged in."
-msgstr "Anmeldung erfolgreich."
+msgstr ""
 
 #: src/js/messages/reducer.js:23
 msgid "Successfully logged out."
-msgstr "Abmeldung erfolgreich."
+msgstr ""
 
 #: src/js/messages/reducer.js:24
 msgid "Successfully changed password."
-msgstr "Passwort erfolgreich geändert.."
+msgstr ""
 
 #: src/js/messages/reducer.js:25
 msgid "Successfully registered."
-msgstr "Registrieung erfolgreich. "
+msgstr ""
 
 #: src/js/messages/reducer.js:26
 msgid "Successfully updated profile information."
-msgstr "Nutzerprofil erfolgreich geladen. ."
+msgstr ""
 
 #: src/js/messages/reducer.js:27
 msgid ""
 "Password successfully reset. Check your inbox for a link to confirm the "
 "reset."
-msgstr "Passwort erfolgreich zurück gesetzt. Wir haben ihnen einen Link zum setzen eines neuen Passworts geschickt. Bitte prüfen sie ihren Posteingang."
+msgstr ""
 
 #: src/js/messages/reducer.js:28
 msgid "Password successfully reset."
-msgstr "Passwort zurückgesetzt."
+msgstr ""
 
 #: src/js/messages/reducer.js:29
 msgid "Account successfully activated."
-msgstr "Benutzerkonto aktiviert."
+msgstr ""
 
 #: src/js/core/components/Footer.jsx:12
 msgid "About Us"

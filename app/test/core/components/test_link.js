@@ -1,5 +1,6 @@
 import React from 'react/addons';
 import { mount } from 'enzyme';
+import { expect } from 'chai';
 
 import Link from '../../../src/js/core/components/Link';
 import { Link as RLink } from 'react-router';

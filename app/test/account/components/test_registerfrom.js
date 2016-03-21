@@ -1,5 +1,7 @@
 import TestUtils from 'react-addons-test-utils';
 import React from 'react/addons';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
 import RegistrationForm from '../../../src/js/account/components/RegistrationForm';
 

@@ -29,7 +29,7 @@ before_script:
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
   - cd app
-  - npm run travis-test
+  - npm run test
 #   - npm start | tee /tmp/npm-start.log &
 #   - while ! grep 'bundle is now VALID' /tmp/npm-start.log; do sleep 1; done
 #   - sleep 2

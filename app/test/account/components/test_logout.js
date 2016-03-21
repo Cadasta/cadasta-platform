@@ -1,6 +1,8 @@
 import React from 'react/addons';
 import { Map } from 'immutable';
 import TestUtils from 'react-addons-test-utils';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
 import { Logout } from '../../../src/js/account/components/Logout';
 

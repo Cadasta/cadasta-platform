@@ -1,5 +1,6 @@
 import React from 'react/addons';
 import { shallow } from 'enzyme';
+import { expect } from 'chai';
 
 import { Register } from '../../../src/js/account/components/Register';
 import RegistrationForm from '../../../src/js/account/components/RegistrationForm';
