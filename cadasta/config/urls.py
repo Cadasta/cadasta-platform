@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 
-urls = [
+indv_urls = [
     url(r'^account/', include('accounts.urls', namespace='accounts')),
     url(r'^account/', include('djoser.urls.authtoken')),
 
@@ -23,8 +23,9 @@ urls = [
         include('organization.urls.organizations', namespace='organization')),
     url(r'^users/',
         include('organization.urls.users', namespace='user')),
+    url(r'^docs/', include('rest_framework_docs.urls'))
 ]
 
 urlpatterns = [
-    url(r'^v1/', include(urls, namespace='v1'))
+    url(r'^v1/', include(indv_urls, namespace='v1'))
 ]

@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'rest_framework',
     'rest_framework.authtoken',
+    'rest_framework_docs',
     'djoser',
     'tutelary',
     'django_countries',
