@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.db import models
-from django.contrib.postgres.fields import JSONField, ArrayField
 from django_countries.fields import CountryField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+import django.contrib.gis.db.models as gismodels
 
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
@@ -36,32 +37,39 @@ class Organization(RandomIDModel):
     users = models.ManyToManyField('accounts.User',
                                    through='OrganizationRole',
                                    related_name='organizations')
+    # TEMPORARY:
+    logo = models.URLField(null=True)
     # logo = TemporalForeignKey('Resource')
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('name',)
 
     class TutelaryMeta:
         perm_type = 'organization'
         path_fields = ('slug',)
-        actions = (('org.list',
-                    {'description': _("List existing organisations"),
-                     'permissions_object': None}),
-                   ('org.view',
-                    {'description': _("View existing organisations")}),
-                   ('org.create',
-                    {'description': "Create organisations",
-                     'permissions_object': None}),
-                   ('org.update',
-                    {'description': _("Update an existing organization")}),
-                   ('org.archive',
-                    {'description': _("Archive an existing organization")}),
-                   ('org.unarchive',
-                    {'description': _("Unarchive an existing organization")}),
-                   ('org.users.list',
-                    {'description': _("List members of an organization")}),
-                   ('org.users.add',
-                    {'description': _("Add a member to an organization")}),
-                   ('org.users.remove',
-                    {'description': _("Remove a member from an organization")})
-                   )
+        actions = (
+            ('org.list',
+             {'description': _("List existing organisations"),
+              'permissions_object': None}),
+            ('org.view',
+             {'description': _("View existing organisations")}),
+            ('org.create',
+             {'description': "Create organisations",
+              'permissions_object': None}),
+            ('org.update',
+             {'description': _("Update an existing organization")}),
+            ('org.archive',
+             {'description': _("Archive an existing organization")}),
+            ('org.unarchive',
+             {'description': _("Unarchive an existing organization")}),
+            ('org.users.list',
+             {'description': _("List members of an organization")}),
+            ('org.users.add',
+             {'description': _("Add a member to an organization")}),
+            ('org.users.remove',
+             {'description': _("Remove a member from an organization")})
+        )
 
     def __str__(self):
         return "<Organization: {name}>".format(name=self.name)
@@ -107,14 +115,16 @@ class Project(RandomIDModel):
     urls = ArrayField(models.URLField(), default=[])
     contacts = JSONField(validators=[validate_contact], default={})
     users = models.ManyToManyField('accounts.User', through='ProjectRole')
+    last_updated = models.DateTimeField(auto_now=True)
+    extent = gismodels.PolygonField(null=True)
 
     class Meta:
         ordering = ('organization', 'name')
 
     class TutelaryMeta:
         perm_type = 'project'
-        path_fields = ('organization', 'id')
-        actions = [
+        path_fields = ('organization', 'project_slug')
+        actions = (
             ('project.list',
              {'description': 'List organization existing',
               'permissions_object': 'organization'}),
@@ -137,7 +147,7 @@ class Project(RandomIDModel):
              {'description': _("Edit roles of user in a project")}),
             ('project.users.remove',
              {'description': _("Remove user from a project")}),
-        ]
+        )
 
     def __str__(self):
         return "<Project: {name}>".format(name=self.name)
@@ -159,7 +169,7 @@ def assign_project_permissions(sender, instance, **kwargs):
 
     policy_instance = get_policy_instance('project-manager', {
         'organization': instance.project.organization.slug,
-        'project': instance.project.id
+        'project': instance.project.project_slug
     })
     has_policy = policy_instance in assigned_policies
 
@@ -170,7 +180,7 @@ def assign_project_permissions(sender, instance, **kwargs):
 
     policy_instance = get_policy_instance('data-collector', {
         'organization': instance.project.organization.slug,
-        'project': instance.project.id
+        'project': instance.project.project_slug
     })
     has_policy = policy_instance in assigned_policies
 

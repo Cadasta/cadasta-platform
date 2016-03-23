@@ -43,7 +43,7 @@
   become_user: postgres
   postgresql_user: login_user="postgres"
                    name="cadasta" password="cadasta"
-                   state=present role_attr_flags=NOSUPERUSER,CREATEDB
+                   state=present role_attr_flags=SUPERUSER,CREATEDB
   when: user_test.stdout.find('0') != -1
 
 - name: Provide user with DB permissions

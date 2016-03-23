@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+
+{% load wizard_state %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-5">
+    <h1>PROJECTS: Add new</h1>
+  </div>
+  <div class="col-md-7">
+    <div class="wizard">
+      <ul class="steps">
+        <li class="{% wizard_step_classes wizard.steps.index 0 %}">
+          1. Create Project Geometry
+          <span class="chevron"></span>
+        </li>
+        <li class="{% wizard_step_classes wizard.steps.index 1 %}">
+          2. Add Details
+          <span class="chevron"></span>
+        </li>
+        <li class="{% wizard_step_classes wizard.steps.index 2 %}">
+          3. Assign Permissions
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<hr/>
+
+
+<form action="" method="post">{% csrf_token %}
+  <div class="row">
+    <h2>{% block step_title %}{% endblock %}</h2>
+
+    <p>{% block step_description %}{% endblock %}</p>
+
+    {% block step_content %}{% endblock %}
+  </div>
+
+  <br>
+  <div class="row">
+    <input class="btn btn-default btn-lg" type="submit" value="Continue"/>
+    <a href="{% url 'project:list' %}">Cancel</a>
+  </div>
+</form>
+
+{% endblock %}

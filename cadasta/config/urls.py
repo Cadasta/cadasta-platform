@@ -15,17 +15,35 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 
-indv_urls = [
-    url(r'^account/', include('accounts.urls', namespace='accounts')),
+api_v1 = [
+    url(r'^account/', include('accounts.urls.api', namespace='accounts')),
     url(r'^account/', include('djoser.urls.authtoken')),
 
     url(r'^organizations/',
-        include('organization.urls.organizations', namespace='organization')),
+        include('organization.urls.api.organizations',
+                namespace='organization')),
     url(r'^users/',
-        include('organization.urls.users', namespace='user')),
-    url(r'^docs/', include('rest_framework_docs.urls'))
+        include('organization.urls.api.users', namespace='user')),
+]
+
+api = [
+    url(r'^v1/', include(api_v1, namespace='v1'))
 ]
 
 urlpatterns = [
-    url(r'^v1/', include(indv_urls, namespace='v1'))
+    url(r'^', include('core.urls', namespace='core')),
+    url(r'^account/', include('accounts.urls.default', namespace='account')),
+    url(r'^account/', include('allauth.urls')),
+    url('^', include('django.contrib.auth.urls')),
+    url(r'^organizations/',
+        include('organization.urls.default.organizations',
+                namespace='organization')),
+    url(r'^projects/',
+        include('organization.urls.default.projects',
+                namespace='project')),
+    url(r'^users/',
+        include('organization.urls.default.users',
+                namespace='user')),
+
+    url(r'^api/', include(api, namespace='api'))
 ]

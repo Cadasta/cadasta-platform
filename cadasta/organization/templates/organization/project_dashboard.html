@@ -1,0 +1,136 @@
+{% extends "core/base.html" %}
+
+{% load leaflet_tags %}
+
+{% block extra_head %}
+{% leaflet_css %}
+{% endblock %}
+
+{% block extra_script %}
+{% leaflet_js %}
+<script>
+ function project_map_init(map, options) {
+   {% if extent %}
+   var sw = L.latLng({{ slat }}, {{ wlon }});
+   var ne = L.latLng({{ nlat }}, {{ elon }});
+   var bounds = L.latLngBounds(sw, ne);
+   map.fitBounds(bounds);
+   var boundary = L.polygon({{ boundary }});
+   boundary.addTo(map);
+   {% endif %}
+ }
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row project-overview-header">
+  <a class="index-link" href="{% url 'project:list' %}">
+    <span class="glyphicon glyphicon-step-backward" aria-hidden=true></span>
+    Index
+  </a>
+  <img class="org-logo" style="width: 120px;" src="{{ object.organization.logo }}"/>
+  <div class="project-name">
+    {{ object.name }}
+  </div>
+  <span class="menus pull-right">
+    <span class="add-menu">
+      <a href="#" class="btn btn-default">
+        <span>
+          <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
+          Add
+          <span class="caret"></span>
+        </span>
+      </a>
+    </span>
+    <span class="ellipsis-menu">
+    </span>
+  </span>
+</div>
+
+<div class="row">
+  <div class="col-md-1 project-overview-button-bar">
+    <div class="project-overview-button active">
+      <span class="glyphicon glyphicon-dashboard" aria-hidden=true></span>
+      Overview
+    </div>
+
+    <div class="project-overview-button">
+      <span class="glyphicon glyphicon-map-marker" aria-hidden=true></span>
+      Parcels
+    </div>
+
+    <div class="project-overview-button">
+      <span class="glyphicon glyphicon-check" aria-hidden=true></span>
+      Questionnaires
+    </div>
+
+    <div class="project-overview-button">
+      <span class="glyphicon glyphicon-duplicate" aria-hidden=true></span>
+      Resources
+    </div>
+
+    <div class="project-overview-button">
+      <span class="glyphicon glyphicon-time" aria-hidden=true></span>
+      Activity
+    </div>
+
+    <div class="project-overview-button">
+      <span class="glyphicon glyphicon-book" aria-hidden=true></span>
+      Reports
+    </div>
+  </div>
+
+  <div class="col-md-11 project-overview-content">
+    <div class="row">
+      <div class="col-md-5 project-overview-details">
+        <div class="project-overview-text">
+          <h3>Project Overview</h3>
+
+          <p>
+            {{ object.description }}
+          </p>
+        </div>
+
+        {% if has_content %}
+        <div class="project-statistics">
+          Some statistics here...
+        </div>
+        {% else %}
+        <div class="project-getting-started">
+          <p class="larger">
+            You have successfully created your project.
+          </p>
+
+          <p class="larger">
+            What would you like to do next?
+          </p>
+
+          <div class="text-center">
+            <button class="btn btn-default btn-lg">
+              Add a parcel
+            </button>
+            <button class="btn btn-default btn-lg">
+              Upload data
+            </button>
+          </div>
+
+          <br/>
+          <p>Not sure what to do next?  View our Getting Started demo.</p>
+
+          <iframe width="420" height="315"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  frameborder="0" allowfullscreen>
+          </iframe>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="col-md-7 project-overview-map">
+        {% leaflet_map "project-overview-map" callback="project_map_init" %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

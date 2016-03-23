@@ -1,0 +1,108 @@
+{% extends "organization/project_add_wrapper.html" %}
+
+{% load widget_tweaks %}
+
+{% block step_title %}Add project details{% endblock %}
+
+{% block extra_script %}
+<script>
+ $(document).ready(function () {
+   var logos = {{ org_logos|safe }};
+   var select = $('#{{ wizard.form.organization.id_for_label }}');
+   var img = $('#org-logo');
+   select.change(function() {
+     if (logos[select[0].value]) {
+       img.removeClass('org-logo-hidden');
+       img.attr('src', logos[select[0].value]);
+     } else {
+       img.hadClass('org-logo-hidden');
+     }
+   });
+ });
+</script>
+{% endblock %}
+
+{% block step_content %}
+
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+{{ wizard.form.management_form }}
+{% for form in wizard.form.forms %}
+{{ form }}
+{% endfor %}
+{% else %}
+
+<div class="row">
+  <div class="col-md-9">
+    {{ wizard.form.non_field_errors }}
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <div class="form-group">
+      {{ wizard.form.organization.errors }}
+      <label for="{{ wizard.form.organization.id_for_label }}">
+        Select organization
+      </label>
+      {% render_field wizard.form.organization class+="form-control input-lg" %}
+    </div>
+  </div>
+  <div class="col-md-2">
+    <img class="org-logo {{ init_org_hidden }}" id="org-logo"
+         src="{{ init_org_logo }}" />
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-7">
+    <div class="form-group">
+      {{ wizard.form.name.errors }}
+      <label for="{{ wizard.form.name.id_for_label }}">
+        Project name
+      </label>
+      {% render_field wizard.form.name class+="form-control input-lg" %}
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="row">
+      <div class="col-md-1">
+        Private
+        <span class="glyphicon glyphicon-eye-close"></span>
+      </div>
+      <div class="col-md-3">
+        <div class="switch">
+          {% render_field wizard.form.public class+="toggle toggle-round" %}
+          <label for="{{ wizard.form.public.id_for_label }}"></label>
+        </div>
+      </div>
+      <div class="col-md-1">
+        Public
+        <span class="glyphicon glyphicon-eye-open"></span>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-9">
+    <div class="form-group">
+      {{ wizard.form.description.errors }}
+      <label for="{{ wizard.form.description.id_for_label }}">
+        Description
+      </label>
+      {% render_field wizard.form.description class+="form-control input-lg" %}
+    </div>
+
+    <div class="form-group">
+      {{ wizard.form.url.errors }}
+      <label for="{{ wizard.form.url.id_for_label }}">
+        Project URL
+      </label>
+      {% render_field wizard.form.url class+="form-control input-lg" %}
+    </div>
+  </div>
+</div>
+
+{% endif %}
+
+{% endblock %}

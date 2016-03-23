@@ -1,0 +1,38 @@
+// Override Bootstrap variables:
+
+//== Colors
+
+$gray-dark:              #595a5c;  // Cadasta gray
+$brand-primary:          #2e51a3;  // Cadasta blue
+
+//== Scaffolding
+
+ $body-bg:               #eee;
+
+//== Typography
+
+$font-family-sans-serif:  'roboto', Helvetica, Arial, sans-serif;
+
+//== Buttons
+
+$btn-default-color:              #fff;
+$btn-default-bg:                 #00b288;  // Cadasta green
+$btn-default-border:             #009975;
+
+//== Buttons
+
+$btn-default-color:              #fff;
+$btn-default-bg:                 #00b288;  // Cadasta green
+$btn-default-border:             #009975;
+
+//== Icons
+
+$icon-font-path: 'bootstrap-sass/assets/fonts/bootstrap/';
+
+//== Modals
+
+$modal-backdrop-bg:              rgba(0, 0, 0, 0.6);
+
+// End Override
+
+@import "bootstrap-sass/assets/stylesheets/bootstrap/variables";

@@ -1,0 +1,53 @@
+{% extends "account/base.html" %}
+
+{% load widget_tweaks %}
+{% load i18n %}
+{% load account socialaccount %}
+
+{% block title %} | {% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+
+<form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}">
+  <h1>{% trans "Sign in to your account" %}</h1>
+
+  {% csrf_token %}
+
+  <div class="form-group">
+    <label for="id_login" class="control-label">Username</label>
+    {% render_field form.login class+="form-control input-lg" placeholder="" %}
+  </div>
+
+  <div class="form-group">
+    <label for="id_password" class="control-label">Password</label>
+    {% render_field form.password class+="form-control input-lg" placeholder="" %}
+  </div>
+
+  <div class="small">
+    <a href="{% url 'account_reset_password' %}">
+      {% trans "Forgotten password?" %}
+    </a>
+  </div>
+
+  <div class="checkbox">
+    <label>
+      <input id="id_remember" label="Remember me"
+             name="remember" type="checkbox" />
+      Remember me
+    </label>
+  </div>
+
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <button class="btn btn-default btn-lg btn-block text-uppercase" type="submit">
+    {% trans "Sign In" %}
+  </button>
+
+  <p class="text-center">
+    Don't have an account?
+    <a href="{% url 'account_signup' %}">Register here</a>
+  </p>
+</form>
+
+{% endblock %}

@@ -1,11 +1,11 @@
-import datetime
+from datetime import datetime, timezone, timedelta
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from tutelary.decorators import permissioned_model
 
 
 def now_plus_48_hours():
-    return datetime.datetime.now() + datetime.timedelta(hours=48)
+    return datetime.now(tz=timezone.utc) + timedelta(hours=48)
 
 
 @permissioned_model
@@ -18,5 +18,10 @@ class User(AbstractUser):
     class TutelaryMeta:
         perm_type = 'user'
         path_fields = ('username',)
-        actions = [('user.view', {'permissions_object': None}),
-                   'user.update']
+        actions = [('user.list',
+                    {'permissions_object': None,
+                     'error_message':
+                     "You don't have permission to view user details"}),
+                   ('user.update',
+                    {'error_message':
+                     "You don't have permission to update user details"})]

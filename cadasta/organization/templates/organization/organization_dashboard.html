@@ -1,0 +1,59 @@
+{% extends "core/base.html" %}
+
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block title %} | Organizations | {{ object.name }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-8">
+        <h1>{{ object.name }}</h1>
+    </div>
+    <div class="col-sm-4">
+        <a href="{% url 'organization:edit' object.slug %}">Edit</a> | 
+        <a href="#archive_confirm" data-toggle="modal">Archive</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <h2>Dashboard</h2>
+        {% for prj in object.projects.all %}
+            <div>{{ prj.name }}</div>
+        {% empty %}
+            <h3>You're ready to go</h3>
+            <p>
+                <a href="{% url 'project:add' %}" class="btn btn-default">Add new project</a>
+                <a href="#" class="btn btn-default">Add members</a>
+            </p>
+            
+        {% endfor %}
+    </div>
+    <div class="col-sm-4">
+        {{ object.description }}
+    </div>
+</div>
+
+<div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Archive organization</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to archive this organization?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
+        <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary">Archive</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% block modals %} {% endblock %}
+
+{% endblock %}
