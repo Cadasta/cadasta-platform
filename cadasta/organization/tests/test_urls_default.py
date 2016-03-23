@@ -102,3 +102,48 @@ class ProjectUrlsTest(TestCase):
         assert resolved.func.__name__ == default.ProjectEdit.__name__
         assert resolved.kwargs['organization'] == 'org-slug'
         assert resolved.kwargs['project'] == 'proj-slug'
+
+
+class OrganizationMembersUrlsTest(TestCase):
+    def test_member_list(self):
+        url = reverse('organization:members', kwargs={'slug': 'org-slug'})
+        assert url == '/organizations/org-slug/members/'
+
+        resolved = resolve('/organizations/org-slug/members/')
+        assert resolved.func.__name__ == default.OrganizationMembers.__name__
+        assert resolved.kwargs['slug'] == 'org-slug'
+
+    def test_member_add(self):
+        url = reverse('organization:members_add', kwargs={'slug': 'org-slug'})
+        assert url == '/organizations/org-slug/members/add/'
+
+        resolved = resolve('/organizations/org-slug/members/add/')
+        assert (resolved.func.__name__ ==
+                default.OrganizationMembersAdd.__name__)
+        assert resolved.kwargs['slug'] == 'org-slug'
+
+    def test_member_edit(self):
+        url = reverse(
+            'organization:members_edit',
+            kwargs={'slug': 'org-slug', 'username': 'some-user'}
+        )
+        assert url == '/organizations/org-slug/members/some-user/'
+
+        resolved = resolve('/organizations/org-slug/members/some-user/')
+        assert (resolved.func.__name__ ==
+                default.OrganizationMembersEdit.__name__)
+        assert resolved.kwargs['slug'] == 'org-slug'
+        assert resolved.kwargs['username'] == 'some-user'
+
+    def test_member_remove(self):
+        url = reverse(
+            'organization:members_remove',
+            kwargs={'slug': 'org-slug', 'username': 'some-user'}
+        )
+        assert url == '/organizations/org-slug/members/some-user/remove/'
+
+        resolved = resolve('/organizations/org-slug/members/some-user/remove/')
+        assert (resolved.func.__name__ ==
+                default.OrganizationMembersRemove.__name__)
+        assert resolved.kwargs['slug'] == 'org-slug'
+        assert resolved.kwargs['username'] == 'some-user'

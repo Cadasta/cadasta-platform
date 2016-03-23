@@ -1,0 +1,86 @@
+{% extends "core/base.html" %}
+
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block title %}Members | {{ organization.name }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-8">
+        <h1>{{ organization.name }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <h2>Member: {{ object.username }}</h2>
+    </div>
+</div>
+
+<form method="POST" action="">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h4>{{ object.username }}</h4>
+                    {{ object.get_full_name }}<br>
+                    {{ object.email }}<br>
+                    Last login: {{ object.last_login }}<br>
+
+                    <div class="form-group">
+                        {{ form.org_role.errors }}
+                        <label for="{{ form.org_role.id_for_label }}">Role</label>
+                        {% render_field form.org_role class+="form-control" %}
+                    </div>
+
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#remove_confirm">Remove member</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Project</th>
+                        <th>Permissions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in form %}
+                    {% if field.name != 'org_role' %}
+                    <tr>
+                        <td><label for="{{ field.id_for_label }}">{{field.label}}</label></td>
+                        <td>{% render_field field class+="form-control" %}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-default">Save</button>
+        </div>
+    </div>
+</form>
+
+<div class="modal fade" id="remove_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Confirm Removal of Member</h4>
+      </div>
+      <div class="modal-body">
+        <p>Removing this member will remove the member's project permissions for this organization.</p>
+        <p>Are you sure you want to remove this member?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
+        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-default">Confirm removal</a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock %}

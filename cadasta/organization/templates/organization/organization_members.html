@@ -1,0 +1,47 @@
+{% extends "core/base.html" %}
+
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block title %}Members | {{ object.name }}{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-8">
+        <h1>{{ object.name }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-8">
+        <h2>Members</h2>
+    </div>
+    <div class="col-sm-4">
+        <a class="btn btn-default pull-right" href="{% url 'organization:members_add' object.slug %}">Add</a>  
+    </div>
+</div>
+
+<div class="row">
+  <table class="table table-hover datatable" data-paging-type="simple">
+    <thead>
+      <tr>
+        <th>Member</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Last login</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for user in object.users.all %}
+      <tr onclick="window.document.location='{% url 'organization:members_edit' slug=object.slug username=user.username %}';">
+        <td>{{ user.get_full_name }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.last_login }}</td>
+      </tr>
+    {% endfor %}      
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -18,13 +18,11 @@
 
  - Add translations to templates
 
+ - Functionality to add contacts to organizations/projects
+
+ - Catch not found exceptions and display error message
+
 # Clean up
-
- - URL config
-
- - Make naming of template files consistent
-
- - Make page titles consistent
 
  - Entry point for creating new projects, should it be the root level of an
    organization dashboard
@@ -32,3 +30,5 @@
 # Bugs
 
  - Adding project step 3 throws `Role matching query does not exist`
+
+ - Creating user not added to new organizations

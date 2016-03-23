@@ -126,7 +126,7 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         ProjectRole.objects.create(
-            project=project, user=user, manager=True)
+            project=project, user=user, role='PM')
         assert user.has_perm('project.edit', project) is True
 
     def test_add_manager_role(self):
@@ -135,7 +135,7 @@ class ProjectRoleTest(TestCase):
 
         assert user.has_perm('project.edit', project) is False
         ProjectRole.objects.create(
-            project=project, user=user, manager=True)
+            project=project, user=user, role='PM')
         assert user.has_perm('project.edit', project) is True
 
     def test_keep_manager_role(self):
@@ -143,7 +143,7 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         role = ProjectRole.objects.create(
-            project=project, user=user, manager=True)
+            project=project, user=user, role='PM')
 
         assert user.has_perm('project.edit', project) is True
         role.manager = True
@@ -155,7 +155,7 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         role = ProjectRole.objects.create(
-            project=project, user=user, manager=False)
+            project=project, user=user, role='PU')
 
         assert user.has_perm('project.edit', project) is False
         role.manager = False
@@ -167,10 +167,10 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         role = ProjectRole.objects.create(
-            project=project, user=user, manager=True)
+            project=project, user=user, role='PM')
 
         assert user.has_perm('project.edit', project) is True
-        role.manager = False
+        role.role = 'PU'
         role.save()
         assert user.has_perm('project.edit', project) is False
 
@@ -179,7 +179,7 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         ProjectRole.objects.create(
-            project=project, user=user, collector=True)
+            project=project, user=user, role='DC')
         assert user.has_perm('project.resources.add', project) is True
 
     def test_add_collector_role(self):
@@ -188,7 +188,7 @@ class ProjectRoleTest(TestCase):
 
         assert user.has_perm('project.resources.add', project) is False
         ProjectRole.objects.create(
-            project=project, user=user, collector=True)
+            project=project, user=user, role='DC')
         assert user.has_perm('project.resources.add', project) is True
 
     def test_keep_collector_role(self):
@@ -196,10 +196,10 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         role = ProjectRole.objects.create(
-            project=project, user=user, collector=True)
+            project=project, user=user, role='DC')
 
         assert user.has_perm('project.resources.add', project) is True
-        role.collector = True
+        role.role = 'DC'
         role.save()
         assert user.has_perm('project.resources.add', project) is True
 
@@ -208,10 +208,10 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         role = ProjectRole.objects.create(
-            project=project, user=user, collector=False)
+            project=project, user=user, role='PU')
 
         assert user.has_perm('project.resources.add', project) is False
-        role.collector = False
+        role.role = 'PU'
         role.save()
         assert user.has_perm('project.resources.add', project) is False
 
@@ -220,9 +220,9 @@ class ProjectRoleTest(TestCase):
         user = UserFactory.create()
 
         role = ProjectRole.objects.create(
-            project=project, user=user, collector=True)
+            project=project, user=user, role='DC')
 
         assert user.has_perm('project.resources.add', project) is True
-        role.collector = False
+        role.role = 'PU'
         role.save()
         assert user.has_perm('project.resources.add', project) is False

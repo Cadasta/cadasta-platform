@@ -23,6 +23,9 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/archive/$',
         default.OrganizationArchive.as_view(),
         name='archive'),
+    #
+    # PROJECTS
+    #
 
     url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/$',
@@ -31,5 +34,26 @@ urlpatterns = [
     url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/$',
         default.ProjectEdit.as_view(),
-        name='project-edit')
+        name='project-edit'),
+
+    #
+    # MEMBERS
+    #
+
+    url(
+        r'^(?P<slug>[-\w]+)/members/$',
+        default.OrganizationMembers.as_view(),
+        name='members'),
+    url(
+        r'^(?P<slug>[-\w]+)/members/add/$',
+        default.OrganizationMembersAdd.as_view(),
+        name='members_add'),
+    url(
+        r'^(?P<slug>[-\w]+)/members/(?P<username>[-\w]+)/$',
+        default.OrganizationMembersEdit.as_view(),
+        name='members_edit'),
+    url(
+        r'^(?P<slug>[-\w]+)/members/(?P<username>[-\w]+)/remove/$',
+        default.OrganizationMembersRemove.as_view(),
+        name='members_remove'),
 ]

@@ -31,10 +31,16 @@ api = [
 ]
 
 urlpatterns = [
-    url(r'^', include('core.urls', namespace='core')),
-    url(r'^account/', include('accounts.urls.default', namespace='account')),
-    url(r'^account/', include('allauth.urls')),
-    url('^', include('django.contrib.auth.urls')),
+    url(r'^',
+        include('core.urls',
+                namespace='core')),
+    url(r'^account/',
+        include('accounts.urls.default',
+                namespace='account')),
+    url(r'^account/',
+        include('allauth.urls')),
+    url('^',
+        include('django.contrib.auth.urls')),
     url(r'^organizations/',
         include('organization.urls.default.organizations',
                 namespace='organization')),
@@ -45,5 +51,7 @@ urlpatterns = [
         include('organization.urls.default.users',
                 namespace='user')),
 
-    url(r'^api/', include(api, namespace='api'))
+    url(r'^api/',
+        include(api,
+                namespace='api'))
 ]

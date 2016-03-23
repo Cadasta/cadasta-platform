@@ -76,7 +76,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_VERSION': 'v1',
-    'EXCEPTION_HANDLER': 'core.views.exception_handler'
+    'EXCEPTION_HANDLER': 'core.views.api.exception_handler'
 }
 
 ROOT_URLCONF = 'config.urls'
@@ -136,6 +136,12 @@ ACCOUNT_FORMS = {
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 
+LEAFLET_CONFIG = {
+    'TILES': [('OpenStreetMap',
+               'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+               {'attribution': 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'})],  # noqa
+    'RESET_VIEW': False
+}
 
 LEAFLET_CONFIG = {
     'TILES': [('OpenStreetMap',

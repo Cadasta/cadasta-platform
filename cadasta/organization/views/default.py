@@ -1,6 +1,6 @@
 from django.http import Http404
 import django.views.generic as generic
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
@@ -10,7 +10,8 @@ from tutelary.models import Role
 from core.mixins import PermissionRequiredMixin
 
 from accounts.models import User
-from ..models import Organization, Project
+
+from ..models import Organization, Project, OrganizationRole
 from .. import forms
 
 
@@ -36,8 +37,13 @@ class OrganizationAdd(generic.CreateView):
             kwargs={'slug': self.object.slug}
         )
 
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(OrganizationAdd, self).get_form_kwargs(*args, **kwargs)
+        kwargs['user'] = self.request.user
+        return kwargs
 
-class OrganizationDashboard(PermissionRequiredMixin, generic.DetailView):
+
+class OrganizationDashboard(generic.DetailView):
     model = Organization
     template_name = 'organization/organization_dashboard.html'
     permission_required = 'org.view'
@@ -72,6 +78,113 @@ class OrganizationArchive(generic.edit.FormMixin, generic.DetailView):
             'organization:dashboard',
             kwargs={'slug': self.object.slug}
         )
+
+
+class OrganizationMembers(generic.DetailView):
+    model = Organization
+    template_name = 'organization/organization_members.html'
+    permission_required = 'org.users.list'
+
+
+class OrganizationObjectMixin:
+    def get_organization(self):
+        if not hasattr(self, 'org'):
+            self.org = get_object_or_404(Organization,
+                                         slug=self.kwargs['slug'])
+        return self.org
+
+
+class OrganizationMembersAdd(OrganizationObjectMixin, generic.CreateView):
+    model = OrganizationRole
+    form_class = forms.AddOrganizationMemberForm
+    template_name = 'organization/organization_members_add.html'
+    permission_required = 'org.users.add'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(OrganizationMembersAdd, self).get_context_data(
+            *args, **kwargs)
+        context['object'] = self.get_organization()
+        return context
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+
+        if self.request.method == 'POST':
+            org = get_object_or_404(Organization, slug=self.kwargs['slug'])
+            kwargs['organization'] = org
+
+        return kwargs
+
+    def get_success_url(self):
+        return reverse(
+            'organization:members_edit',
+            kwargs={'slug': self.object.organization.slug,
+                    'username': self.object.user.username}
+        )
+
+
+class OrganizationMembersEdit(OrganizationObjectMixin,
+                              generic.edit.FormMixin,
+                              generic.DetailView):
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+    template_name = 'organization/organization_members_edit.html'
+    form_class = forms.EditOrganizationMemberForm
+
+    def get_success_url(self):
+        return reverse(
+            'organization:members',
+            kwargs={'slug': self.get_organization().slug}
+        )
+
+    def get_queryset(self):
+        return self.get_organization().users.all()
+
+    def get_form(self):
+        if self.request.method == 'POST':
+            return self.form_class(self.request.POST,
+                                   self.get_organization(),
+                                   self.get_object())
+        else:
+            return self.form_class(None,
+                                   self.get_organization(),
+                                   self.get_object())
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(OrganizationMembersEdit, self).get_context_data(
+            *args, **kwargs)
+        context['organization'] = self.get_organization()
+        context['form'] = self.get_form()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        form.save()
+        return super(OrganizationMembersEdit, self).form_valid(form)
+
+
+class OrganizationMembersRemove(OrganizationObjectMixin, generic.DeleteView):
+    def get_object(self):
+        return OrganizationRole.objects.get(
+            organization__slug=self.kwargs['slug'],
+            user__username=self.kwargs['username'],
+        )
+
+    def get_success_url(self):
+        return reverse(
+            'organization:members',
+            kwargs={'slug': self.get_organization().slug}
+        )
+
+    def get(self, *args, **kwargs):
+        return self.post(*args, **kwargs)
 
 
 class UserList(PermissionRequiredMixin, generic.ListView):
@@ -218,6 +331,7 @@ class ProjectAddWizard(wizard.SessionWizardView):
                     break
             if not is_admin:
                 usernames.append(user.username)
+        print(form_data)
         user_roles = [(k, form_data[2][k]) for k in usernames]
         print('name:', name)
         print('organization:', organization)
