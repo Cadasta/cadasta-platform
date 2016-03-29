@@ -63,3 +63,51 @@ class OrganizationUrlTest(TestCase):
             views.OrganizationUsersDetail.__name__)
         self.assertEqual(resolved.kwargs['slug'], 'org-slug')
         self.assertEqual(resolved.kwargs['username'], 'n_smith')
+
+
+class ProjectUrlTest(TestCase):
+    def test_project_list(self):
+        actual = reverse(
+            version_ns('organization:project_list'),
+            kwargs={'slug': 'habitat'}
+        )
+
+        expected = version_url('/organizations/habitat/projects/')
+
+        assert actual == expected
+
+        resolved = resolve(version_url('/organizations/habitat/projects/'))
+        assert resolved.func.__name__ == views.ProjectList.__name__
+        assert resolved.kwargs['slug'] == 'habitat'
+
+    def test_project_users(self):
+        actual = reverse(
+            version_ns('organization:project_users'),
+            kwargs={'slug': 'habitat', 'project_id': '123abc'}
+        )
+        expected = version_url('/organizations/habitat/projects/123abc/users/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/users/'))
+        assert resolved.func.__name__ == views.ProjectUsers.__name__
+        assert resolved.kwargs['slug'] == 'habitat'
+        assert resolved.kwargs['project_id'] == '123abc'
+
+    def test_project_users_detail(self):
+        actual = reverse(
+            version_ns('organization:project_users_detail'),
+            kwargs={'slug': 'habitat',
+                    'project_id': '123abc',
+                    'username': 'barbara'}
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/users/barbara/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/users/barbara/'))
+        assert resolved.func.__name__ == views.ProjectUsersDetail.__name__
+        assert resolved.kwargs['slug'] == 'habitat'
+        assert resolved.kwargs['project_id'] == '123abc'
+        assert resolved.kwargs['username'] == 'barbara'

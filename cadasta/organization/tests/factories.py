@@ -1,6 +1,6 @@
 import factory
 
-from ..models import Organization, Project
+from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
 class OrganizationFactory(factory.django.DjangoModelFactory):
@@ -21,7 +21,7 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
 
         if users:
             for u in users:
-                self.users.add(u)
+                OrganizationRole.objects.create(organization=self, user=u)
 
 
 class ProjectFactory(factory.django.DjangoModelFactory):
@@ -43,7 +43,8 @@ class ProjectFactory(factory.django.DjangoModelFactory):
 
         if users:
             for u in users:
-                self.users.add(u)
+                ProjectRole.objects.create(project=self, user=u)
+
 
 def clause(effect, action, object=None):
     if object is None:

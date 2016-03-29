@@ -3,17 +3,16 @@ from rest_framework import generics
 from rest_framework import filters, status
 
 from tutelary.mixins import PermissionRequiredMixin
-from accounts.serializers import UserSerializer
+
 from accounts.models import User
-from .models import Organization, Project
-from .serializers import OrganizationSerializer, ProjectSerializer, \
-    UserAdminSerializer
-from .mixins import OrganizationUsersQuerySet
+from .models import Organization
+from . import serializers
+from .mixins import OrganizationRoles, ProjectRoles
 
 
 class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
     queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+    serializer_class = serializers.OrganizationSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
@@ -40,7 +39,7 @@ class OrganizationDetail(PermissionRequiredMixin,
         return 'org.update'
 
     queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
+    serializer_class = serializers.OrganizationSerializer
     lookup_field = 'slug'
     permission_required = {
         'GET': 'org.view',
@@ -49,53 +48,32 @@ class OrganizationDetail(PermissionRequiredMixin,
 
 
 class OrganizationUsers(PermissionRequiredMixin,
-                        OrganizationUsersQuerySet,
+                        OrganizationRoles,
                         generics.ListCreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.OrganizationUserSerializer
     permission_required = {
         'GET': 'org.users.list',
         'POST': 'org.users.add',
     }
 
-    def get_perms_objects(self):
-        return [self.get_organization(self.kwargs['slug'])]
-
-    def create(self, request, *args, **kwargs):
-        try:
-            new_user = User.objects.get(username=request.POST['username'])
-
-            org = self.get_organization(self.kwargs['slug'])
-            org.users.add(new_user)
-
-            return Response(
-                self.serializer_class(new_user).data,
-                status=status.HTTP_201_CREATED
-            )
-        except User.DoesNotExist:
-            return Response(
-                {'detail': "User with given username does not exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
 
 class OrganizationUsersDetail(PermissionRequiredMixin,
-                              OrganizationUsersQuerySet,
-                              generics.DestroyAPIView):
+                              OrganizationRoles,
+                              generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.OrganizationUserSerializer
     permission_required = 'org.users.remove'
-
-    def get_perms_objects(self):
-        return [self.get_organization(self.kwargs['slug'])]
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
-        self.org.users.remove(user)
+        role = self.org.users.get(id=user.id)
+        role.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class UserAdminList(PermissionRequiredMixin, generics.ListAPIView):
     queryset = User.objects.all()
-    serializer_class = UserAdminSerializer
+    serializer_class = serializers.UserAdminSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
@@ -106,7 +84,7 @@ class UserAdminList(PermissionRequiredMixin, generics.ListAPIView):
 
 
 class UserAdminDetail(PermissionRequiredMixin, generics.RetrieveUpdateAPIView):
-    serializer_class = UserAdminSerializer
+    serializer_class = serializers.UserAdminSerializer
     queryset = User.objects.all()
     lookup_field = 'username'
     permission_required = {
@@ -116,7 +94,7 @@ class UserAdminDetail(PermissionRequiredMixin, generics.RetrieveUpdateAPIView):
 
 
 class ProjectList(PermissionRequiredMixin,  generics.ListCreateAPIView):
-    serializer_class = ProjectSerializer
+    serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
@@ -162,7 +140,7 @@ class ProjectDetail(PermissionRequiredMixin,
                 return ('project.update', 'project.unarchive')
         return 'project.update'
 
-    serializer_class = ProjectSerializer
+    serializer_class = serializers.ProjectSerializer
     filter_fields = ('archived',)
     # search_fields = ('name', 'organization', 'country', 'description',)
     # ordering_fields = ('name', 'organization', 'country', 'description',)
@@ -181,8 +159,8 @@ class ProjectDetail(PermissionRequiredMixin,
 
     def get_serializer_context(self, *args, **kwargs):
         org = self.get_organization()
-        context = super(ProjectDetail, self).get_serializer_context(*args,
-                                                                **kwargs)
+        context = super(ProjectDetail,
+                        self).get_serializer_context(*args, **kwargs)
         context['organization'] = org
 
         return context
@@ -191,32 +169,30 @@ class ProjectDetail(PermissionRequiredMixin,
         return self.get_organization().projects.all()
 
 
-class ProjectDelete(PermissionRequiredMixin, generics.DestroyAPIView):
-    queryset = Organization.objects.all()
-    permission_required = 'project.resource.delete'
-
-
 class ProjectUsers(PermissionRequiredMixin,
+                   ProjectRoles,
                    generics.ListCreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.ProjectUserSerializer
     permission_required = {
         'GET': 'project.users.list',
-        'POST': 'project.users.add',
+        'POST': 'project.users.add'
     }
 
-    def create(self, request, *args, **kwargs):
-        try:
-            new_user = User.objects.get(username=request.POST['username'])
 
-            org = self.get_organization(self.kwargs['slug'])
-            org.users.add(new_user)
+class ProjectUsersDetail(PermissionRequiredMixin,
+                         ProjectRoles,
+                         generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.ProjectUserSerializer
 
-            return Response(
-                self.serializer_class(new_user).data,
-                status=status.HTTP_201_CREATED
-            )
-        except User.DoesNotExist:
-            return Response(
-                {'detail': "User with given username does not exist."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    permission_required = {
+        'GET': 'project.users.list',
+        'PATCH': 'project.users.edit',
+        'DELETE': 'project.users.delete'
+    }
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        role = self.prj.users.get(id=user.id)
+        role.delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
