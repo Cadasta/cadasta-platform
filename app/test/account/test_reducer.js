@@ -1,4 +1,5 @@
 import { fromJS } from 'immutable';
+import { expect } from 'chai';
 
 import user from '../../src/js/account/reducer';
 import Storage from '../test-helper/Storage';

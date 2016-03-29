@@ -1,0 +1,8 @@
+[main]
+host = https://www.transifex.com
+
+[cadasta-platform.front-end]
+file_filter = app/src/locale/<lang>/LC_MESSAGES/messages.po
+source_file = app/src/locale/en/LC_MESSAGES/messages.po
+source_lang = en
+type = PO

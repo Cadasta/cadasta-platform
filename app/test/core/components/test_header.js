@@ -1,7 +1,12 @@
 import React from 'react/addons';
 import { fromJS } from 'immutable';
+import { expect } from 'chai';
+import mock from 'mock-require';
 
 import { shallow } from 'enzyme';
+
+// Mock up image require used in Header.jsx.
+mock('../../../src/img/logo-white.png', { image: "logo-white.png" });
 
 import Header from '../../../src/js/core/components/Header';
 

@@ -1,5 +1,7 @@
 import configureMockStore from 'redux-mock-store';
 import thunk from 'redux-thunk';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
 import Storage from '../test-helper/Storage';
 
@@ -202,7 +204,7 @@ describe('Account: actions', () => {
       password: '123456',
       password_repeat: '123456',
     };
-    
+
     const response = {
       username: 'John',
       email: 'john@beatles.uk',

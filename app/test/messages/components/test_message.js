@@ -2,6 +2,7 @@ import React from 'react/addons';
 import { Map, fromJS } from 'immutable';
 
 import { shallow } from 'enzyme';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 import Message from '../../../src/js/messages/components/Message';

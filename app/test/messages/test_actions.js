@@ -1,5 +1,5 @@
 import * as messageActions from '../../src/js/messages/actions';
-
+import { expect } from 'chai';
 
 describe('Messages: Actions', () => {
   it('creates REQUEST_START', () => {

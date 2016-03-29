@@ -1,4 +1,5 @@
 import { fromJS } from 'immutable';
+import { expect } from 'chai';
 
 import store from '../src/js/store';
 

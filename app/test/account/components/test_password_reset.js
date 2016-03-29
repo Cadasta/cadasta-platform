@@ -1,5 +1,7 @@
 import React from 'react/addons';
 import TestUtils from 'react-addons-test-utils';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
 import { PasswordReset } from '../../../src/js/account/components/PasswordReset';
 

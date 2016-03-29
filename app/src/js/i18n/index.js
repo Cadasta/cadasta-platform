@@ -7,27 +7,28 @@ import catalogs from '../../locale/catalogs';
 const LOCALE_DEBUG = __I18N_DEBUG__ || false;
 
 let jed;
+let currentLocale;
 const browserLocale = window.navigator.language || 'en';
 
 const translations = (function translations() {
   const languages = {};
 
   catalogs.supported_locales.forEach(function readLang(lang) {
-    languages[lang] = require('../../locale/' + lang + '/LC_MESSAGES/messages.po');
+    languages[lang] = require('../../locale/' + lang + '/LC_MESSAGES/messages.json');
   });
   return languages;
 }());
 
 export function setLocale(locale) {
   const localeCatalogue = translations[locale] || translations.en;
-
+  currentLocale = locale;
   jed = new Jed({
-    missing_key_callback: function missingKeyCallback(key) {
+    "missing_key_callback": function missingKeyCallback(key) {
       console.warn('Missing i18n key: ' + key);
     },
-    locale_data: {
-      messages: localeCatalogue,
-    },
+    "locale_data": {
+      "messages": localeCatalogue
+    }
   });
 }
 

@@ -1,5 +1,6 @@
 import React from 'react/addons';
 import { fromJS } from 'immutable';
+import { expect } from 'chai';
 
 import { shallow } from 'enzyme';
 

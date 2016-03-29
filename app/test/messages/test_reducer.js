@@ -1,4 +1,5 @@
 import { Map, List, fromJS, is } from 'immutable';
+import { expect } from 'chai';
 
 import messages from '../../src/js/messages/reducer';
 
