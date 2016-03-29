@@ -9,9 +9,10 @@ from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
 from accounts.tests.factories import UserFactory
-from .factories import OrganizationFactory, clause
+
+from .factories import OrganizationFactory, clause, ProjectFactory
 from .. import views
-from ..models import Organization
+from ..models import Organization, Project
 
 
 class OrganizationListAPITest(TestCase):
@@ -902,3 +903,344 @@ class UserDetailAPITest(TestCase):
         assert response.status_code == 400
         assert user.last_login == t1
         assert content['last_login'][0] == 'Cannot update last_login'
+
+
+class ProjectListAPITest(TestCase):
+    def setUp(self):
+        clause = {
+            'clause': [
+                {
+                  'effect': 'allow',
+                  'object': ['organization/*'],
+                  'action': ['project.list']
+                }
+            ]
+        }
+
+        policy = Policy.objects.create(
+            name='default',
+            body=json.dumps(clause))
+        self.user = UserFactory.create()
+        assign_user_policies(self.user, policy)
+
+    def test_full_list(self):
+        """
+        It should return all projects.
+        """
+        organization = OrganizationFactory.create(**{'slug': 'habitat'})
+        ProjectFactory.create_batch(2, **{'organization': organization})
+        ProjectFactory.create_batch(2)
+        request = APIRequestFactory().get(
+            '/v1/organizations/habitat/projects/')
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request, slug='habitat')\
+            .render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert len(content) == 2
+
+        for project in content:
+            assert project.get('organization').get('id') == organization.id
+
+    def test_full_list_with_unautorized_user(self):
+        """
+        It should 403 "You do not have permission to perform this action."
+        """
+        OrganizationFactory.create(**{'slug': 'habitat'})
+        request = APIRequestFactory().get(
+            '/v1/organizations/habitat/projects/')
+        force_authenticate(request, user=AnonymousUser())
+
+        response = views.ProjectList.as_view()(request,
+                                               slug='habitat').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 403
+        assert content['detail'] == PermissionDenied.default_detail
+
+    def test_filter_active(self):
+        """
+        It should return only one active project.
+        """
+        organization = OrganizationFactory.create(**{'slug': 'habitat'})
+        ProjectFactory.create(**{'organization': organization,
+                                          'archived': True})
+        ProjectFactory.create(**{'organization': organization,
+                                          'archived': False})
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/habitat/projects/?archived=True')
+        setattr(request, 'GET', QueryDict('archived=True'))
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request,
+                                               slug='habitat').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert len(content) == 1
+
+    def test_search_filter(self):
+        """
+        It should return only two matching projects.
+        """
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        ProjectFactory.create(**{'name': 'opdp', 'organization':
+                                organization})
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/?search=opdp')
+        setattr(request, 'GET', QueryDict('search=opdp'))
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request,
+                                               slug='namati').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        print(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert len(content) == 1
+
+        for project in content:
+            assert project['name'] == 'opdp'
+
+    def test_ordering(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        ProjectFactory.create(**{'name': 'A', 'organization': organization})
+        ProjectFactory.create(**{'name': 'B', 'organization': organization})
+        ProjectFactory.create(**{'name': 'C', 'organization': organization})
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/?ordering=name')
+        setattr(request, 'GET', QueryDict('ordering=name'))
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request,
+                                                    slug='namati').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        print(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert len(content) == 3
+
+        prev_name = ''
+        for org in content:
+            if prev_name:
+                assert org['name'] > prev_name
+
+            prev_name = org['name']
+
+    def test_reverse_ordering(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        ProjectFactory.create(**{'name': 'A', 'organization': organization})
+        ProjectFactory.create(**{'name': 'C', 'organization': organization})
+        ProjectFactory.create(**{'name': 'B', 'organization': organization})
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/?ordering=-name')
+        setattr(request, 'GET', QueryDict('ordering=-name'))
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request, slug='namati').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert len(content) == 3
+
+        prev_name = ''
+        for org in content:
+            if prev_name:
+                assert org['name'] < prev_name
+
+            prev_name = org['name']
+
+class ProjectCreateAPITest(TestCase):
+    def setUp(self):
+        clauses = {
+            'clause': [
+                clause('allow', ['org.*']),
+                clause('allow', ['org.*', 'org.*.*', 'project.*'],
+                       ['organization/*']),
+                clause('allow', ['project.*'], ['project/*/*'])
+            ]
+        }
+
+        policy = Policy.objects.create(
+            name='default',
+            body=json.dumps(clauses))
+
+        self.user = UserFactory.create()
+        assign_user_policies(self.user, policy)
+
+    def test_create_valid_project(self):
+        OrganizationFactory.create(**{'slug': 'habitat'})
+        data = {
+            'name': 'Project',
+            'description': 'Project description',
+        }
+        request = APIRequestFactory().post(
+            '/v1/organizations/habitat/projects/', data)
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request,
+                                               slug='habitat').render()
+        print(response.content.decode('utf-8'))
+        assert response.status_code == 201
+        assert Project.objects.count() == 1
+
+    def test_create_invalid_project(self):
+        OrganizationFactory.create(**{'slug': 'namati'})
+        data = {
+            'description': 'Project description'
+        }
+        request = APIRequestFactory().post(
+            '/v1/organizations/namati/projects/', data)
+        force_authenticate(request, user=self.user)
+
+        response = views.ProjectList.as_view()(request, slug='namati').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 400
+        assert content['name'][0] == 'This field is required.'
+        assert Project.objects.count() == 0
+
+
+class ProjectDetailTest(TestCase):
+    def setUp(self):
+        self.view = views.ProjectDetail.as_view()
+        clauses = {
+            'clause': [
+                clause('allow', ['org.*']),
+                clause('allow', ['org.*', 'org.*.*', 'project.*'],
+                       ['organization/*']),
+                clause('allow', ['project.*'], ['project/*/*'])
+            ]
+        }
+
+        policy = Policy.objects.create(
+            name='default',
+            body=json.dumps(clauses))
+
+        self.user = UserFactory.create()
+        assign_user_policies(self.user, policy)
+
+    def test_get_project(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        project = ProjectFactory.create(**{'project_slug': 'project',
+                                           'organization': organization})
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/{project_slug}'.format(
+                project_slug=project.project_slug))
+        force_authenticate(request, user=self.user)
+        response = self.view(request, slug=organization.slug,
+                             project_slug=project.project_slug).render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 200
+        assert content['id'] == project.id
+        assert 'users' in content
+
+    def test_get_project_with_unauthorized_user(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        project = ProjectFactory.create(**{'project_slug': 'project',
+                                           'organization': organization})
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/{project_slug}/'.format(
+                project_slug=project.project_slug))
+        force_authenticate(request, user=AnonymousUser())
+        response = self.view(request, slug=organization.slug,
+                             project_slug=project.project_slug).render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 403
+        assert content['detail'] == PermissionDenied.default_detail
+
+    def test_get_project_that_does_not_exist(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        ProjectFactory.create(**{'project_slug': 'namati-project',
+                                           'organization': organization})
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/some-project/')
+        force_authenticate(request, user=self.user)
+        response = self.view(request,
+                             slug='namati',
+                             project_slug='some-project').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        assert response.status_code == 404
+        assert content['detail'] == "Project not found."
+
+    def test_valid_update(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        project = ProjectFactory.create(**{'project_slug': 'namati-project',
+                                 'organization': organization})
+        data = {'name': 'OPDP'}
+        request = APIRequestFactory().patch(
+            '/v1/organizations/namati/projects/{project_slug}/'.format(
+                project_slug=project.project_slug), data)
+        force_authenticate(request, user=self.user)
+
+        response = self.view(request, slug=organization.slug,
+                             project_slug=project.project_slug).render()
+        project.refresh_from_db()
+
+        assert response.status_code == 200
+        assert project.name == data.get('name')
+
+    def test_update_with_unauthorized_user(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        project = ProjectFactory.create(**{'name': 'OPDP',
+                                           'project_slug': 'namati-project',
+                                           'organization': organization})
+        data = {'name': 'OPDP'}
+        request = APIRequestFactory().patch(
+            '/v1/organizations/namati/projects/{project_slug}/'.format(
+                project_slug=project.project_slug), data)
+        force_authenticate(request, user=AnonymousUser())
+
+        response = self.view(request, slug=organization.slug,
+                             project_slug=project.project_slug).render()
+        project.refresh_from_db()
+
+        assert response.status_code == 403
+        assert project.name == "OPDP"
+
+    def test_invalid_update(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        project = ProjectFactory.create(**{'name': 'OPDP',
+                                           'project_slug': 'namati-project',
+                                           'organization': organization})
+        data = {'name': ''}
+        request = APIRequestFactory().patch(
+            '/v1/organizations/namati/projects/{project_slug}/'.format(
+                project_slug=project.project_slug), data)
+        force_authenticate(request, user=self.user)
+
+        response = self.view(request, slug=organization.slug,
+                             project_slug=project.project_slug).render()
+        content = json.loads(response.content.decode('utf-8'))
+        project.refresh_from_db()
+
+        assert response.status_code == 400
+        assert project.name == 'OPDP'
+        assert content['name'][0] == 'This field may not be blank.'
+
+    def test_archive(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        project = ProjectFactory.create(**{'project_slug': 'namati-project',
+                                           'organization': organization})
+        data = {'archived': 'True'}
+        request = APIRequestFactory().patch(
+            '/v1/organizations/namati/projects/{project_slug}/'.format(
+                project_slug=project.project_slug), data)
+        force_authenticate(request, user=self.user)
+
+        response = self.view(request, slug=organization.slug,
+                             project_slug=project.project_slug).render()
+        project.refresh_from_db()
+
+        assert response.status_code == 200
+        assert project.archived
