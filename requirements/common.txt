@@ -10,3 +10,4 @@ django-tutelary==0.1.7
 django-audit-log==0.7.0
 simplejson==3.8.1
 django-countries==3.4.1
+drfdocs==0.0.9
