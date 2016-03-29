@@ -19,8 +19,11 @@ htmlcov
 # JS
 */dist/bundle.js
 node_modules/
+
+.idea
 /.envrc
 /.virtualenv/
 
 ghostdriver.log
 npm-debug.log
+vagrant.retry
