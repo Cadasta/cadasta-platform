@@ -15,7 +15,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -26,6 +25,8 @@ ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'accounts.User'
 
+SITE_ID = 1
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -34,19 +35,26 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'django.contrib.gis',
     'corsheaders',
 
+    'core',
+    'accounts',
+    'organization',
+
     'crispy_forms',
+    'widget_tweaks',
+    'django_countries',
+    'leaflet',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_docs',
     'djoser',
     'tutelary',
-    'django_countries',
-
-    'core',
-    'accounts',
-    'organization'
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -77,8 +85,8 @@ SITE_NAME = 'Cadasta'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [os.path.join(os.path.dirname(BASE_DIR),
+                              'templates', 'allauth')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -86,11 +94,21 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader'
+            ],
         },
     },
 ]
 
-AUTHENTICATION_BACKENDS = ['core.backends.Auth']
+AUTHENTICATION_BACKENDS = [
+    'core.backends.Auth',
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend'
+]
+
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 
 DJOSER = {
     'SITE_NAME': SITE_NAME,
@@ -103,8 +121,28 @@ DJOSER = {
 
 CORS_ORIGIN_ALLOW_ALL = False
 
-WSGI_APPLICATION = 'config.wsgi.application'
+LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_URL = '/account/login/'
+LOGOUT_URL = '/account/logout/'
 
+WSGI_APPLICATION = 'config.wsgi.application'
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = LOGIN_URL
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
+ACCOUNT_FORMS = {
+    'signup': 'accounts.forms.RegisterForm',
+    'profile': 'accounts.forms.ProfileForm',
+}
+ACCOUNT_LOGOUT_ON_GET = True
+ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
+
+
+LEAFLET_CONFIG = {
+    'TILES': [('OpenStreetMap',
+               'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+               {'attribution': 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'})],  # noqa
+    'RESET_VIEW': False
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/

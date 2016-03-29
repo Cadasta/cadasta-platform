@@ -8,7 +8,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'cadasta',
         'USER': 'cadasta',
         'PASSWORD': 'cadasta',

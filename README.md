@@ -18,16 +18,17 @@ Provision the VM:
 vagrant up --provision
 ```
 
-SSH into to the VM, activate the virtualenv and run the server:
+SSH into to the VM (this automatically activate the Python virtual
+environment) and run the server:
 
 ```
 vagrant ssh
-cd /vagrant/
-source /opt/cadasta/env/bin/activate
-python cadasta/manage.py runserver
+cd cadasta
+./runserver
 ```
 
-Open `http://localhost:5000/` in your browser, you should see a default Django page.
+Open `http://localhost:8000/` in your browser, you should see the
+front page of the platform site.
 
 See the wiki ([here](https://github.com/Cadasta/cadasta-platform/wiki/Installation) and [here](https://github.com/Cadasta/cadasta-platform/wiki/Run-for-development)) for detailed instructions on installation and running the platform for development.
 

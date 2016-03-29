@@ -1,0 +1,57 @@
+{% extends "account/base.html" %}
+
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block title %} | {% trans "Register" %}{% endblock %}
+
+{% block content %}
+<form class="login-form form-narrow" id="signup_form" method="POST"
+      action="{% url 'account_signup' %}">
+  <h1>{% trans "Sign up for a free account" %}</h1>
+
+  {% csrf_token %}
+
+  <div class="form-group">
+    <label for="id_username">Choose username</label>
+    {% render_field form.username class+="form-control input-lg" %}
+  </div>
+
+  <div class="form-group">
+    <label for="id_email">Email</label>
+    {% render_field form.email class+="form-control input-lg" %}
+  </div>
+
+  <div class="form-group">
+    <label for="id_password1">Password</label>
+    {% render_field form.password1 class+="form-control input-lg" %}
+  </div>
+
+  <div class="form-group">
+    <label for="id_password2">Confirm password</label>
+    {% render_field form.password2 class+="form-control input-lg" %}
+  </div>
+
+  <div class="form-group">
+    <label for="id_first_name">First name</label>
+    {% render_field form.first_name class+="form-control input-lg" %}
+  </div>
+
+  <div class="form-group">
+    <label for="id_last_name">Last name</label>
+    {% render_field form.last_name class+="form-control input-lg" %}
+  </div>
+
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <button class="btn btn-default btn-lg btn-block text-uppercase" type="submit">
+    {% trans "Register" %}
+  </button>
+
+  <p class="text-center">
+    {% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
+  </p>
+</form>
+
+{% endblock %}

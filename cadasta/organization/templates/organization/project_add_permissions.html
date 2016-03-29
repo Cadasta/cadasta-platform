@@ -1,0 +1,53 @@
+{% extends "organization/project_add_wrapper.html" %}
+
+{% block step_title %}Assign project permissions{% endblock %}
+
+{% block step_description %}
+Not able to find a member?  Organization administrators must first
+invite users to join your organization before permissions can be assigned.
+{% endblock %}
+
+{% block step_content %}
+
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+{{ wizard.form.management_form }}
+{% for form in wizard.form.forms %}
+{{ form }}
+{% endfor %}
+{% else %}
+
+<table class="table table-striped datatable" data-paging-type="simple">
+  <thead>
+    <tr>
+      <th class="col-md-2">Member</th>
+      <th class="col-md-3">Email address</th>
+      <th class="col-md-4">Permissions</th>
+    </tr>
+  </thead>
+  {% for user in members %}
+  <tr>
+    <td>
+      <p>{{ user.first_name }} {{ user.last_name }}</p>
+      <p>{{ user.username }}</p>
+    </td>
+    <td>{{ user.email }}</td>
+    <td>
+      {% if user.is_admin %}
+      Administrator
+      {% else %}
+      <select id="perms-{{ user.index }}" name="{{ user.username }}"
+              class="form-control">
+        <option value="PU">Project User</option>
+        <option value="DC">Data Collector</option>
+        <option value="PM">Project Manager</option>
+      </select>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endif %}
+
+{% endblock %}

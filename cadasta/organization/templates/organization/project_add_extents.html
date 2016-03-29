@@ -1,0 +1,35 @@
+{% extends "organization/project_add_wrapper.html" %}
+
+{% load leaflet_tags %}
+
+{% block extra_head %}
+{% leaflet_css plugins="draw,forms" %}
+{% endblock %}
+
+{% block extra_script %}
+{% leaflet_js plugins="draw,forms" %}
+{% endblock %}
+
+{% block step_title %}Create project geometry{% endblock %}
+
+{% block step_description %}
+Find your location and use the drawing tools to draw your project
+geometry.  Once complete, select the "Continue" button.  For
+guidance, view our step-by-step video.
+{% endblock %}
+
+{% block step_content %}
+
+<div class="col-md-12 project-extent-map">
+  {{ wizard.management_form }}
+  {% if wizard.form.forms %}
+  {{ wizard.form.management_form }}
+  {% for form in wizard.form.forms %}
+  {{ form }}
+  {% endfor %}
+  {% else %}
+  {{ wizard.form }}
+  {% endif %}
+</div>
+
+{% endblock %}

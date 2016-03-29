@@ -1,0 +1,35 @@
+organization{% extends "organization/organization_dashboard.html" %}
+
+{% load widget_tweaks %}
+
+{% block title %} | {{ form.instance.name }} | Edit{% endblock %}
+
+{% block modals %}
+
+<div class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="POST"
+              action="{% url 'organization:edit' form.instance.slug %}">
+          <div class="modal-header">
+            <a class="close" href="{% url 'organization:dashboard' form.instance.slug %}"><span aria-hidden="true">&times;</span></a>
+            <h3 class="modal-title">Edit organization</h3>
+          </div>
+
+          <div class="modal-body">
+            {% include "organization/organization_form.html" %}
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn btn-link" href="{% url 'organization:dashboard' form.instance.slug %}">Cancel</a>
+            <button type="submit" class="btn btn-default text-uppercase">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+

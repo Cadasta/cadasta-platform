@@ -18,9 +18,6 @@ install:
   - pip install -r requirements/dev.txt
   - nvm install 4.0.0
   - nvm alias default 4.0.0
-  - cd app
-  - npm install
-  - cd ..
 before_script:
   - psql template1 postgres -c 'create extension hstore;'
   - psql -c 'create database cadasta;' -U postgres
@@ -28,10 +25,5 @@ before_script:
   - python cadasta/manage.py migrate --settings=config.settings.travis
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
-  - cd app
-  - npm run test
-#   - npm start | tee /tmp/npm-start.log &
-#   - while ! grep 'bundle is now VALID' /tmp/npm-start.log; do sleep 1; done
-#   - sleep 2
-#   - cd ../functional_tests
+#   - cd functional_tests
 #   - ./run.py --ds=config.settings.travis

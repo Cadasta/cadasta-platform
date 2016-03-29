@@ -1,0 +1,84 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadasta{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css"/>
+    <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css">
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <div id="cadasta">
+      <div class="wrapper">
+        <header>
+          <div class="container">
+            <h1 id="logo" class="pull-left">
+              <a href="/">
+                <img src="{% static 'img/logo-white.png' %}" />
+              </a>
+            </h1>
+            <div class="reg-links pull-right">
+              <ul class="list-inline">
+                <li><a href="{% url 'organization:list' %}">Organizations</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'account:profile' %}">Profile</a></li>
+                <li><a href="{% url 'account_logout' %}">Logout</a></li>
+                {% else %}
+                <li><a href="{% url 'account_login' %}">Login</a></li>
+                <li><a href="{% url 'account_signup' %}">Register</a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </header>
+
+        <div class="container">
+          {% if messages %}
+          <div id="messages">
+            {% for message in messages %}
+            <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}"
+                 role="alert">
+              <button type="button" class="close" data-dismiss="alert"
+                      aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              {{message}}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% block content %}{% endblock %}
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p class="pull-left">Copyright 2016 Cadasta. All Rights Reserved.</p>
+            <ul class="list-inline pull-right">
+              <li><a href="http://cadasta.org/about-us">About Us</a></li>
+              <li><a href="#">Privacy</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="http://cadasta.org/code-of-conduct">Code of Conduct</a></li>
+              <li><a href="http://github.com/Cadasta">Visit us on Github</a></li>
+            </ul>
+          </div>
+        </footer>
+      </div>
+    </div>
+    {% block modals %} {% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+    {% block extra_script %}{% endblock %}
+    <script>
+     $(document).ready(function () {
+       $('.datatable').DataTable();
+     });
+    </script>
+  </body>
+</html>

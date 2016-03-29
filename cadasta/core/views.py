@@ -1,9 +1,11 @@
 import json
 import re
 from django.http import Http404
-
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+from django.shortcuts import redirect
+from django.views.generic import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from rest_framework.exceptions import NotFound
 from rest_framework.views import exception_handler as drf_exception_handler
@@ -52,3 +54,17 @@ def exception_handler(exception, context):
         response.data = eval_json(response.data)
 
         return response
+
+
+class IndexPage(TemplateView):
+    template_name = 'index.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_anonymous():
+            return redirect('core:dashboard')
+
+        return super(IndexPage, self).get(request, *args, **kwargs)
+
+
+class Dashboard(LoginRequiredMixin, TemplateView):
+    template_name = 'dashboard.html'

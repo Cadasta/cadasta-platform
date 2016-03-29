@@ -13,6 +13,11 @@
       - python-virtualenv
       - git
 
+- name: Install SASS
+  become: yes
+  become_user: root
+  command: gem install sass
+
 - name: Create base directory for virtual environment
   become: yes
   become_user: root
@@ -44,21 +49,14 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
-- name: write settings.js
+- name: Install Bootstrap for SASS processing
   become: yes
   become_user: "{{ app_user }}"
-  template: src=settings.j2
-            dest="{{ application_path }}/app/src/js/settings.js"
+  command: chdir="{{ application_path }}cadasta/core/sass"
+           npm install bootstrap-sass
 
-- name: Install NodeJS dependencies
+- name: Convert SASS to CSS
   become: yes
   become_user: "{{ app_user }}"
-  ignore_errors: yes
-  command: npm install
-           chdir="{{ application_path }}app"
-
-- name: Fix node-sass problem
-  become: yes
-  become_user: "{{ app_user }}"
-  command: npm rebuild node-sass
-           chdir="{{ application_path }}app"
+  command: chdir="{{ application_path }}cadasta/core/sass"
+           sass -I ./node_modules main.scss ../static/css/main.css

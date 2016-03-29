@@ -27,3 +27,5 @@ node_modules/
 ghostdriver.log
 npm-debug.log
 vagrant.retry
+
+.sass-cache/

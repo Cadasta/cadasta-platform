@@ -3,8 +3,6 @@
     application_path: /vagrant/
     virtualenv_path: /opt/cadasta/env/
     django_settings: config.settings.dev
-    api_url: 0.0.0.0:5000
-    api_version: v1
     app_user: vagrant
     uwsgi_socket: /tmp/uwsgi.sock
   vars_files:
@@ -16,6 +14,4 @@
     - node
     - cadasta/application
     - cadasta/development
-    - webserver/common
-    - webserver/development
     - testing

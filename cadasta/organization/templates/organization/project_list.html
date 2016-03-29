@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h1>Projects</h1>
+
+<div class="pull-right">
+  {% if add_allowed %}
+  <a href={% url 'project:add' %} class="btn btn-default">
+    <span>
+      <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
+      Add
+    </span>
+  </a>
+  {% endif %}
+</div>
+<div class="clearfix"></div>
+<br/>
+
+<table class="table table-hover datatable" data-paging-type="simple">
+  <thead>
+    <tr>
+      <th class="col-md-2">Organization</th>
+      <th class="col-md-6">Project</th>
+      <th class="col-md-2">Country</th>
+      <th class="col-md-2">Last updated</th>
+    </tr>
+  </thead>
+  {% for proj in object_list %}
+  <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.project_slug %}';">
+    <td><img src="{{ proj.organization.logo }}" style="width: 100%;" /></td>
+    <td>
+      <strong>{{ proj.name }}</strong>
+      <br/>
+      <p>{{ proj.description }}</p>
+    </td>
+    <td>{{ proj.country.name }}</td>
+    <td>{{ proj.last_updated|default_if_none:"&mdash;" }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
