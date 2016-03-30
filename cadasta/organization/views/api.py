@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import filters, status
 
-from tutelary.mixins import PermissionRequiredMixin
+from tutelary.mixins import APIPermissionRequiredMixin
 
 from accounts.models import User
 
@@ -11,7 +11,7 @@ from .. import serializers
 from ..mixins import OrganizationRoles, ProjectRoles
 
 
-class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
+class OrganizationList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
     queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -27,7 +27,7 @@ class OrganizationList(PermissionRequiredMixin, generics.ListCreateAPIView):
     permission_filter_queryset = ('org.view',)
 
 
-class OrganizationDetail(PermissionRequiredMixin,
+class OrganizationDetail(APIPermissionRequiredMixin,
                          generics.RetrieveUpdateAPIView):
     def patch_actions(self, request):
         if hasattr(request, 'data'):
@@ -48,7 +48,7 @@ class OrganizationDetail(PermissionRequiredMixin,
     }
 
 
-class OrganizationUsers(PermissionRequiredMixin,
+class OrganizationUsers(APIPermissionRequiredMixin,
                         OrganizationRoles,
                         generics.ListCreateAPIView):
     serializer_class = serializers.OrganizationUserSerializer
@@ -58,7 +58,7 @@ class OrganizationUsers(PermissionRequiredMixin,
     }
 
 
-class OrganizationUsersDetail(PermissionRequiredMixin,
+class OrganizationUsersDetail(APIPermissionRequiredMixin,
                               OrganizationRoles,
                               generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.OrganizationUserSerializer
@@ -72,7 +72,7 @@ class OrganizationUsersDetail(PermissionRequiredMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserAdminList(PermissionRequiredMixin, generics.ListAPIView):
+class UserAdminList(APIPermissionRequiredMixin, generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserAdminSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -84,7 +84,8 @@ class UserAdminList(PermissionRequiredMixin, generics.ListAPIView):
     permission_required = 'user.list'
 
 
-class UserAdminDetail(PermissionRequiredMixin, generics.RetrieveUpdateAPIView):
+class UserAdminDetail(APIPermissionRequiredMixin,
+                      generics.RetrieveUpdateAPIView):
     serializer_class = serializers.UserAdminSerializer
     queryset = User.objects.all()
     lookup_field = 'username'
@@ -94,7 +95,7 @@ class UserAdminDetail(PermissionRequiredMixin, generics.RetrieveUpdateAPIView):
     }
 
 
-class ProjectList(PermissionRequiredMixin,  generics.ListCreateAPIView):
+class ProjectList(APIPermissionRequiredMixin,  generics.ListCreateAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
@@ -129,7 +130,7 @@ class ProjectList(PermissionRequiredMixin,  generics.ListCreateAPIView):
         return self.get_organization().projects.all()
 
 
-class ProjectDetail(PermissionRequiredMixin,
+class ProjectDetail(APIPermissionRequiredMixin,
                     generics.RetrieveUpdateDestroyAPIView):
     def patch_actions(self, request):
         if hasattr(request, 'data'):
@@ -170,7 +171,7 @@ class ProjectDetail(PermissionRequiredMixin,
         return self.get_organization().projects.all()
 
 
-class ProjectUsers(PermissionRequiredMixin,
+class ProjectUsers(APIPermissionRequiredMixin,
                    ProjectRoles,
                    generics.ListCreateAPIView):
     serializer_class = serializers.ProjectUserSerializer
@@ -180,7 +181,7 @@ class ProjectUsers(PermissionRequiredMixin,
     }
 
 
-class ProjectUsersDetail(PermissionRequiredMixin,
+class ProjectUsersDetail(APIPermissionRequiredMixin,
                          ProjectRoles,
                          generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProjectUserSerializer
