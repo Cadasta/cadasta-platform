@@ -1,18 +1,19 @@
 ---
+sudo: required
+dist: trusty
 language: python
 python:
   - "3.5"
-services:
-  - postgresql
 addons:
   postgresql: "9.4"
-# env:
-#  - DJANGO_LIVE_TEST_SERVER_ADDRESS=127.0.0.1:5000
-# before_install:
-#  - travis_retry sudo apt-get update
-#  - travis_retry sudo apt-get install phantomjs
-#  - sudo mkdir /var/log/django
-#  - sudo chmod 777 /var/log/django
+  apt:
+    packages:
+      - postgresql-9.4-postgis-2.1 # Workaround https://github.com/travis-ci/travis-ci/issues/5178
+before_install:
+  - export DEBIAN_FRONTEND=noninteractive;
+    sudo -E apt-get -yq update &>> ~/apt-get-update.log;
+    sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
 install:
   - pip install -r requirements/common.txt
   - pip install -r requirements/dev.txt
@@ -25,5 +26,5 @@ before_script:
   - python cadasta/manage.py migrate --settings=config.settings.travis
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
-#   - cd functional_tests
-#   - ./run.py --ds=config.settings.travis
+  - cd functional_tests
+  - ./run.py --ds=config.settings.travis

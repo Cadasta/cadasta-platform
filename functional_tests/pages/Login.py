@@ -3,8 +3,8 @@ from .base import Page
 
 class LoginPage(Page):
     def __init__(self, test):
-        super(LoginPage, self).__init__(test)
-        self.url = self.test.ui_url + '/account/login/'
+        super().__init__(test)
+        self.url = self.base_url + '/account/login/'
 
     def go_to(self):
         self.browser.get(self.url)
@@ -18,7 +18,7 @@ class LoginPage(Page):
         return self.test.form_field('login-form', xpath)
 
     def get_username_input(self):
-        return self.get_form_field("input[@name='username']")
+        return self.get_form_field("input[@name='login']")
 
     def get_password_input(self):
         return self.get_form_field("input[@name='password']")

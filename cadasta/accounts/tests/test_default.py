@@ -3,6 +3,7 @@ from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 from accounts.tests.factories import UserFactory
 from ..views.default import AccountProfile
@@ -15,6 +16,11 @@ class ProfileTest(TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
         setattr(self.request, 'user', AnonymousUser())
+
+        # Mock up messages middleware.
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
 
     def test_get_profile(self):
         user = UserFactory.create()
@@ -44,6 +50,7 @@ class ProfileTest(TestCase):
         })
 
         response = self.view(self.request)
+        assert response.status_code == 302
 
         user.refresh_from_db()
         assert user.first_name == 'John'

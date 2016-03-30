@@ -1,53 +1,39 @@
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
-import sys
 import time
 import re
 import os
 import os.path
 import shutil
+import base64
 
 from selenium import webdriver
 from selenium.common.exceptions import (
-    NoSuchElementException, WebDriverException
+    NoSuchElementException, WebDriverException, TimeoutException
 )
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-class FunctionalTest(LiveServerTestCase):
-    DEFAULT_UI_ENDPOINT = 'localhost:8080'
+class FunctionalTest(StaticLiveServerTestCase):
     DEFAULT_WAIT = 5
 
     BY_ALERT = (By.CLASS_NAME, 'alert')
 
     @classmethod
     def setUpClass(cls):
+        super(FunctionalTest, cls).setUpClass()
+
         # IMPORTANT: Make sure the window size is big enough to see
         # everything (e.g. links in the nav bar).  Otherwise tests
         # will fail mysteriously because PhantomJS will clip the
         # viewport.
-        cls.browser = webdriver.PhantomJS()
+        cls.browser = webdriver.PhantomJS(
+            service_args=["--ssl-protocol=any"]
+        )
         cls.browser.set_window_size(1024, 768)
 
-        # Set up API and UI URLs.  This is intended for future testing
-        # against a staging server.  Don't know if it works properly
-        # yet (and there are other concerns to be dealt with for
-        # staging testing, like database fixtures).
-        cls.api_url = None
-        cls.ui_url = 'http://' + cls.DEFAULT_UI_ENDPOINT
-        for arg in sys.argv:
-            if 'ui' in arg:
-                cls.ui_url = 'http://' + arg.split('=')[1]
-            if 'api' in arg:
-                cls.api_url = 'http://' + arg.split('=')[1]
-        if cls.api_url is None:
-            super().setUpClass()
-            cls.api_url = cls.live_server_url
-
-        print('Live server URL:', cls.live_server_url)
-        print('        API URL:', cls.api_url)
         cls.screenshot_dir = os.path.join(
             os.path.dirname(os.path.realpath(__file__)),
             'screenshots'
@@ -87,9 +73,14 @@ class FunctionalTest(LiveServerTestCase):
         button.click()
         if screenshot is not None:
             self.screenshot(screenshot)
-        WebDriverWait(self.browser, 10).until(
-            EC.presence_of_element_located(wait)
-        )
+        try:
+            WebDriverWait(self.browser, 10).until(
+                EC.presence_of_element_located(wait)
+            )
+        except TimeoutException as exc:
+            with open('exception.png', 'wb') as f:
+                f.write(base64.b64decode(exc.screen))
+            raise
 
     def wait_for_no_alerts(self):
         """Wait for all alerts to be cleared by a page reload."""
@@ -105,7 +96,7 @@ class FunctionalTest(LiveServerTestCase):
         msgs = self.browser.find_element_by_xpath("//div[@id='messages']")
         try:
             msgs.find_element_by_xpath(
-                ("div[contains(@class,'{}')]//p[contains(.,'{}')]").
+                ("div[contains(@class,'{}') and contains(.,'{}')]").
                 format(msg_type, msg)
             )
         except NoSuchElementException as e:

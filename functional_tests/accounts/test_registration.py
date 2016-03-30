@@ -16,32 +16,38 @@ class RegistrationTest(FunctionalTest):
         fields = page.get_fields()
 
         # Try to submit an empty form and check for validation errors.
-        page.try_submit(err=['username', 'email',
-                             'password', 'password_repeat'])
+        page.try_submit(err=['username', 'email', 'password1', 'password2'])
 
         # Fill in required fields one by one, try to submit and check
         # for errors.
+        fields = page.get_fields()
         fields['username'].send_keys('user3')
-        page.try_submit(err=['email', 'password', 'password_repeat'],
+        page.try_submit(err=['email', 'password1', 'password2'],
                         ok=['username'])
+        fields = page.get_fields()
         fields['email'].send_keys('user3@example.net')
-        page.try_submit(err=['password', 'password_repeat'],
+        page.try_submit(err=['password1', 'password2'],
                         ok=['username', 'email'])
-        fields['password'].send_keys('very_secret')
-        page.try_submit(err=['password_repeat'],
-                        ok=['username', 'email', 'password'])
-        fields['password_repeat'].send_keys('not_very_secret')
-        page.try_submit(err=['password_repeat'],
-                        ok=['username', 'email', 'password'])
+        fields = page.get_fields()
+        fields['password1'].send_keys('very_secret')
+        page.try_submit(err=['password1', 'password2'],
+                        ok=['username', 'email'])
+        fields = page.get_fields()
+        fields['password2'].send_keys('not_very_secret')
+        page.try_submit(err=['password1'],
+                        ok=['username', 'email', 'password2'])
 
         # Fill in extra fields, fill in final required form and
         # submit.
+        fields = page.get_fields()
         fields['first_name'].send_keys('User')
         fields['last_name'].send_keys('Three')
-        fields['password_repeat'].clear()
-        fields['password_repeat'].send_keys('very_secret')
+        fields['password1'].clear()
+        fields['password1'].send_keys('very_secret')
+        fields['password2'].clear()
+        fields['password2'].send_keys('very_secret')
         self.click_through(fields['register'], self.BY_ALERT)
-        self.assert_has_message('alert', "logged in")
+        self.assert_has_message('alert', "signed in")
         self.browser.find_element_by_xpath("//h1[.='Dashboard']")
 
         # Log out.
@@ -49,7 +55,7 @@ class RegistrationTest(FunctionalTest):
             self.browser.find_element_by_xpath("//a[.='Logout']"),
             self.BY_ALERT
         )
-        self.assert_has_message('alert', "logged out")
+        self.assert_has_message('alert', "signed out")
 
         # Log in as new user.
         sign_in = LoginPage(self).setup('user3', 'very_secret')
@@ -63,13 +69,13 @@ class RegistrationTest(FunctionalTest):
 
         fields['username'].send_keys('user1')
         fields['email'].send_keys('b@lah.net')
-        fields['password'].send_keys('password123')
-        fields['password_repeat'].send_keys('password123')
+        fields['password1'].send_keys('password123')
+        fields['password2'].send_keys('password123')
         fields['first_name'].send_keys('Jane')
         fields['last_name'].send_keys('Doe')
-        self.click_through(fields['register'], self.BY_ALERT)
-        self.assert_has_message('alert',
-                                "Unable to register with provided credentials")
+        page.try_submit(err=['username'],
+                        ok=['email', 'password1', 'password2',
+                            'first_name', 'last_name'])
         self.browser.find_element_by_xpath(
             "//h1[.='Sign up for a free account']"
         )
