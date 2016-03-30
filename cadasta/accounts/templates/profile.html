@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<form class="login-form form-narrow" method="POST"
+<form class="profile-form form-narrow" method="POST"
       action="{% url 'account:profile' %}">
   <h1>Update your profile</h1>
 
@@ -37,7 +37,8 @@
     {% render_field form.last_name class+="form-control input-lg" %}
   </div>
 
-  <button type="submit"  class="btn btn-default btn-lg btn-block text-uppercase">
+  <button name="update" type="submit"
+          class="btn btn-default btn-lg btn-block text-uppercase">
     Update profile
   </button>
 

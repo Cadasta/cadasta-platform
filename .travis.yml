@@ -6,13 +6,9 @@ services:
   - postgresql
 addons:
   postgresql: "9.4"
-# env:
-#  - DJANGO_LIVE_TEST_SERVER_ADDRESS=127.0.0.1:5000
-# before_install:
-#  - travis_retry sudo apt-get update
-#  - travis_retry sudo apt-get install phantomjs
-#  - sudo mkdir /var/log/django
-#  - sudo chmod 777 /var/log/django
+before_install:
+  - travis_retry sudo apt-get update
+  - travis_retry sudo apt-get install phantomjs
 install:
   - pip install -r requirements/common.txt
   - pip install -r requirements/dev.txt
@@ -25,5 +21,5 @@ before_script:
   - python cadasta/manage.py migrate --settings=config.settings.travis
 script:
   - py.test cadasta --cov=cadasta --ds=config.settings.travis
-#   - cd functional_tests
-#   - ./run.py --ds=config.settings.travis
+  - cd functional_tests
+  - ./run.py --ds=config.settings.travis

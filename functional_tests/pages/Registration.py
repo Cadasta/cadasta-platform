@@ -3,8 +3,8 @@ from .base import Page
 
 class RegistrationPage(Page):
     def __init__(self, test):
-        super(RegistrationPage, self).__init__(test)
-        self.url = self.test.ui_url + '/account/register/'
+        super().__init__(test)
+        self.url = self.base_url + '/account/signup/'
 
     def go_to(self):
         self.browser.get(self.url)
@@ -24,10 +24,10 @@ class RegistrationPage(Page):
         return self.get_form_field("input[@name='email']")
 
     def get_password_input(self):
-        return self.get_form_field("input[@name='password']")
+        return self.get_form_field("input[@name='password1']")
 
     def get_password_repeat_input(self):
-        return self.get_form_field("input[@name='password_repeat']")
+        return self.get_form_field("input[@name='password2']")
 
     def get_first_name_input(self):
         return self.get_form_field("input[@name='first_name']")
@@ -40,13 +40,13 @@ class RegistrationPage(Page):
 
     def get_fields(self):
         return {
-            'username':        self.get_username_input(),
-            'email':           self.get_email_input(),
-            'password':        self.get_password_input(),
-            'password_repeat': self.get_password_repeat_input(),
-            'first_name':      self.get_first_name_input(),
-            'last_name':       self.get_last_name_input(),
-            'register':        self.get_register_button()
+            'username':   self.get_username_input(),
+            'email':      self.get_email_input(),
+            'password1':  self.get_password_input(),
+            'password2':  self.get_password_repeat_input(),
+            'first_name': self.get_first_name_input(),
+            'last_name':  self.get_last_name_input(),
+            'register':   self.get_register_button()
         }
 
     def setup(self, values):
@@ -64,6 +64,7 @@ class RegistrationPage(Page):
     def try_submit(self, err=None, ok=None):
         fields = self.get_fields()
         fields['register'].click()
+        fields = self.get_fields()
         if err is not None:
             for f in err:
                 try:
