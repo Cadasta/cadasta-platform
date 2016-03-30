@@ -28,7 +28,7 @@ class ProfileTest(FunctionalTest):
             self.browser.find_element_by_xpath("//a[.='Logout']"),
             self.BY_ALERT
         )
-        self.assert_has_message('alert', "logged out")
+        self.assert_has_message('alert', "signed out")
         LoginPage(self).login('user1', 'user1pwd')
 
         page = ProfilePage(self)

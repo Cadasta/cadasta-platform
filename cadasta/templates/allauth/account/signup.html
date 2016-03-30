@@ -6,46 +6,93 @@
 {% block title %} | {% trans "Register" %}{% endblock %}
 
 {% block content %}
-<form class="login-form form-narrow" id="signup_form" method="POST"
+
+{% if form.non_field_errors %}
+<div id="messages">
+  {% for message in form.non_field_errors %}
+  <div class="alert alert-dismissible alert-danger"
+       role="alert">
+    <button type="button" class="close" data-dismiss="alert"
+            aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message|escape }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<form class="account-register form-narrow" id="signup_form" method="POST"
       action="{% url 'account_signup' %}">
   <h1>{% trans "Sign up for a free account" %}</h1>
 
   {% csrf_token %}
 
-  <div class="form-group">
+  <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label for="id_username">Choose username</label>
+    <label class="pull-right control-label">
+      {% for error in form.username.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.username class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
+  <div class="form-group{% if form.email.errors %} has-error{% endif %}">
     <label for="id_email">Email</label>
+    <label class="pull-right control-label">
+      {% for error in form.email.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.email class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
+  <div class="form-group{% if form.password1.errors %} has-error{% endif %}">
     <label for="id_password1">Password</label>
+    <label class="pull-right control-label">
+      {% for error in form.password1.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.password1 class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
+  <div class="form-group{% if form.password2.errors %} has-error{% endif %}">
     <label for="id_password2">Confirm password</label>
+    <label class="pull-right control-label">
+      {% for error in form.password2.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.password2 class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
+  <div class="form-group{% if form.first_name.errors %} has-error{% endif %}">
     <label for="id_first_name">First name</label>
+    <label class="pull-right control-label">
+      {% for error in form.first_name.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.first_name class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
+  <div class="form-group{% if form.last_name.errors %} has-error{% endif %}">
     <label for="id_last_name">Last name</label>
+    <label class="pull-right control-label">
+      {% for error in form.last_name.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.last_name class+="form-control input-lg" %}
   </div>
 
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button class="btn btn-default btn-lg btn-block text-uppercase" type="submit">
+  <button type="submit" name="register"
+          class="btn btn-default btn-lg btn-block text-uppercase">
     {% trans "Register" %}
   </button>
 

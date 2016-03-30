@@ -8,18 +8,43 @@
 
 {% block content %}
 
+{% if form.non_field_errors %}
+<div id="messages">
+  {% for message in form.non_field_errors %}
+  <div class="alert alert-dismissible alert-danger"
+       role="alert">
+    <button type="button" class="close" data-dismiss="alert"
+            aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    {{ message|escape }}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
 <form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}">
   <h1>{% trans "Sign in to your account" %}</h1>
 
   {% csrf_token %}
 
-  <div class="form-group">
+  <div class="form-group{% if form.login.errors %} has-error{% endif %}">
     <label for="id_login" class="control-label">Username</label>
+    <label class="pull-right control-label">
+      {% for error in form.login.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.login class+="form-control input-lg" placeholder="" %}
   </div>
 
-  <div class="form-group">
+  <div class="form-group{% if form.password.errors %} has-error{% endif %}">
     <label for="id_password" class="control-label">Password</label>
+    <label class="pull-right control-label">
+      {% for error in form.password.errors %}
+      {{ error|escape }}
+      {% endfor %}
+    </label>
     {% render_field form.password class+="form-control input-lg" placeholder="" %}
   </div>
 
@@ -40,7 +65,8 @@
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
-  <button class="btn btn-default btn-lg btn-block text-uppercase" type="submit">
+  <button name="sign-in" type="submit"
+          class="btn btn-default btn-lg btn-block text-uppercase">
     {% trans "Sign In" %}
   </button>
 

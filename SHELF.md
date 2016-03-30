@@ -2,13 +2,9 @@
 
  - Assign permissions to owner when creating new organization
 
- - Get existing functional tests working with new setup
-
  - Functional tests for API?
 
  - SASS compilation (currently manual)
-
- - Message dismiss buttons in base template?
 
  - Need to work out which views require Login
 
