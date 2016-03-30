@@ -3,8 +3,8 @@ from .base import Page
 
 class ProfilePage(Page):
     def __init__(self, test):
-        super(ProfilePage, self).__init__(test)
-        self.url = self.test.ui_url + '/account/profile/'
+        super().__init__(test)
+        self.url = self.base_url + '/account/profile/'
 
     def go_to(self):
         self.browser.get(self.url)

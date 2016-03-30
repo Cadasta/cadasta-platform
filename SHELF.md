@@ -8,8 +8,6 @@
 
  - SASS compilation (currently manual)
 
- - Message dismiss buttons in base template?
-
  - Need to work out which views require Login
 
  - Permissions everywhere: user index and update, project index,
