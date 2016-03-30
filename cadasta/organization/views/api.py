@@ -6,7 +6,7 @@ from tutelary.mixins import APIPermissionRequiredMixin
 
 from accounts.models import User
 
-from ..models import Organization
+from ..models import Organization, Project
 from .. import serializers
 from ..mixins import OrganizationRoles, ProjectRoles
 
@@ -127,7 +127,7 @@ class ProjectList(APIPermissionRequiredMixin,  generics.ListCreateAPIView):
         return context
 
     def get_queryset(self):
-        return self.get_organization().projects.all()
+        return self.get_organization().projects.all().filter(access="public")
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
