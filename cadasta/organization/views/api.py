@@ -101,7 +101,7 @@ class ProjectList(APIPermissionRequiredMixin,  generics.ListCreateAPIView):
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
-    search_fields = ('name', 'organization__name', 'country', 'description',)
+    search_fields = ('name', 'country', 'description', 'access')
     ordering_fields = ('name', 'organization', 'country', 'description',)
     permission_required = {
         'GET': 'project.list',
@@ -168,7 +168,7 @@ class ProjectDetail(APIPermissionRequiredMixin,
         return context
 
     def get_queryset(self):
-        return self.get_organization().projects.all()
+        return self.get_organization().projects.all().filter(access="public")
 
 
 class ProjectUsers(APIPermissionRequiredMixin,

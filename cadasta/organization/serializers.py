@@ -50,7 +50,7 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'organization', 'country', 'name', 'description',
-                  'archived', 'urls', 'contacts', 'users')
+                  'archived', 'urls', 'contacts', 'users', 'access',)
         read_only_fields = ('id', 'country',)
         detail_only_fields = ('users',)
 

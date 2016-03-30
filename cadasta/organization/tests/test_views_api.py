@@ -1445,6 +1445,28 @@ class ProjectListAPITest(TestCase):
 
             prev_name = org['name']
 
+    def test_project_visibility(self):
+        organization = OrganizationFactory.create(**{'slug': 'namati'})
+        ProjectFactory.create(**{'name': 'opdp', 'access': "public",
+                                 'organization': organization})
+
+        request = APIRequestFactory().get(
+            '/v1/organizations/namati/projects/?access=public'
+        )
+        setattr(request, 'GET', QueryDict('access=public'))
+        force_authenticate(request, user=self.user)
+
+        response = api.ProjectList.as_view()(request,
+                                             slug='namati').render()
+        content = json.loads(response.content.decode('utf-8'))
+
+        print(response.content.decode('utf-8'))
+        assert response.status_code == 200
+        assert len(content) == 1
+
+        for project in content:
+            assert project['access'] == "public"
+
 
 class ProjectCreateAPITest(TestCase):
     def setUp(self):
