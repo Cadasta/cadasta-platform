@@ -1,26 +1,27 @@
 {% extends "core/base.html" %}
 
+{% load i18n %}
 {% load wizard_state %}
 
 {% block content %}
 
 <div class="row">
   <div class="col-md-5">
-    <h1>PROJECTS: Add new</h1>
+    <h1>{% trans "PROJECTS" %}: {% trans "Add new" %}</h1>
   </div>
   <div class="col-md-7">
     <div class="wizard">
       <ul class="steps">
         <li class="{% wizard_step_classes wizard.steps.index 0 %}">
-          1. Create Project Geometry
+          1. {% trans "Create Project Geometry" %}
           <span class="chevron"></span>
         </li>
         <li class="{% wizard_step_classes wizard.steps.index 1 %}">
-          2. Add Details
+          2. {% trans "Add Details" %}
           <span class="chevron"></span>
         </li>
         <li class="{% wizard_step_classes wizard.steps.index 2 %}">
-          3. Assign Permissions
+          3. {% trans "Assign Permissions" %}
         </li>
       </ul>
     </div>
@@ -41,8 +42,8 @@
 
   <br>
   <div class="row">
-    <input class="btn btn-default btn-lg" type="submit" value="Continue"/>
-    <a href="{% url 'project:list' %}">Cancel</a>
+    <input class="btn btn-default btn-lg" type="submit" value="{% trans 'Continue' %}"/>
+    <a href="{% url 'project:list' %}">{% trans "Cancel" %}</a>
   </div>
 </form>
 

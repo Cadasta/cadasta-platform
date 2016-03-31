@@ -1,6 +1,7 @@
 import pytest
 from datetime import datetime
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 from ..serializers import RegistrationSerializer, AccountLoginSerializer
 from ..models import User
@@ -70,7 +71,7 @@ class RegistrationSerializerTest(TestCase):
         serializer = RegistrationSerializer(data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn(
-            "Another user is already registered with this email address",
+            _("Another user is already registered with this email address"),
             serializer._errors['email'],
         )
 
@@ -80,7 +81,7 @@ class AccountLoginSerializerTest(TestCase):
         """Serializer should raise EmailNotVerifiedError exeception when the
            user has not verified their email address within 48 hours"""
 
-        user = UserFactory.create(**{
+        UserFactory.create(**{
           'username': 'sgt_pepper',
           'password': 'iloveyoko79',
           'verify_email_by': datetime.now()

@@ -1,10 +1,14 @@
 {% extends "organization/project_add_wrapper.html" %}
 
-{% block step_title %}Assign project permissions{% endblock %}
+{% load i18n %}
+
+{% block step_title %}{% trans "Assign project permissions" %}{% endblock %}
 
 {% block step_description %}
+{% blocktrans %}
 Not able to find a member?  Organization administrators must first
 invite users to join your organization before permissions can be assigned.
+{% endblocktrans %}
 {% endblock %}
 
 {% block step_content %}
@@ -20,9 +24,9 @@ invite users to join your organization before permissions can be assigned.
 <table class="table table-striped datatable" data-paging-type="simple">
   <thead>
     <tr>
-      <th class="col-md-2">Member</th>
-      <th class="col-md-3">Email address</th>
-      <th class="col-md-4">Permissions</th>
+      <th class="col-md-2">{% trans "Member" %}</th>
+      <th class="col-md-3">{% trans "Email address" %}</th>
+      <th class="col-md-4">{% trans "Permissions" %}</th>
     </tr>
   </thead>
   {% for user in members %}
@@ -34,13 +38,13 @@ invite users to join your organization before permissions can be assigned.
     <td>{{ user.email }}</td>
     <td>
       {% if user.is_admin %}
-      Administrator
+      {% trans "Administrator" %}
       {% else %}
       <select id="perms-{{ user.index }}" name="{{ user.username }}"
               class="form-control">
-        <option value="PU">Project User</option>
-        <option value="DC">Data Collector</option>
-        <option value="PM">Project Manager</option>
+        <option value="PU">{% trans "Project User" %}</option>
+        <option value="DC">{% trans "Data Collector" %}</option>
+        <option value="PM">{% trans "Project Manager" %}</option>
       </select>
       {% endif %}
     </td>

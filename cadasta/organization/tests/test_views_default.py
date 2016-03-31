@@ -123,6 +123,7 @@ class OrganizationAddTest(TestCase):
     #     assert expected == content
 
 
+
 class OrganizationDashboardTest(TestCase):
     def setUp(self):
         self.view = default.OrganizationDashboard.as_view()

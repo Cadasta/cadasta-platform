@@ -1,6 +1,6 @@
 import os.path
 import factory
-from faker import Faker, Factory
+from faker import Factory
 from datetime import datetime, timezone
 
 from accounts.models import User

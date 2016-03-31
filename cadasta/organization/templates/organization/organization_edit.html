@@ -1,8 +1,9 @@
 organization{% extends "organization/organization_dashboard.html" %}
 
+{% load i18n %}
 {% load widget_tweaks %}
 
-{% block title %}Edit {{ form.instance.name }}{% endblock %}
+{% block title %} | {% trans "Edit" %} {{ form.instance.name }}{% endblock %}
 
 {% block modals %}
 
@@ -13,8 +14,10 @@ organization{% extends "organization/organization_dashboard.html" %}
         <form method="POST"
               action="{% url 'organization:edit' form.instance.slug %}">
           <div class="modal-header">
-            <a class="close" href="{% url 'organization:dashboard' form.instance.slug %}"><span aria-hidden="true">&times;</span></a>
-            <h3 class="modal-title">Edit organization</h3>
+            <a class="close" href="{% url 'organization:dashboard' form.instance.slug %}">
+              <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title">{% trans "Edit organization" %}</h3>
           </div>
 
           <div class="modal-body">
@@ -22,8 +25,13 @@ organization{% extends "organization/organization_dashboard.html" %}
           </div>
 
           <div class="modal-footer">
-            <a class="btn btn-link" href="{% url 'organization:dashboard' form.instance.slug %}">Cancel</a>
-            <button type="submit" class="btn btn-default text-uppercase">Save</button>
+            <a class="btn btn-link"
+               href="{% url 'organization:dashboard' form.instance.slug %}">
+              {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-default text-uppercase">
+              {% trans "Save" %}
+            </button>
           </div>
         </form>
       </div>
@@ -32,4 +40,3 @@ organization{% extends "organization/organization_dashboard.html" %}
 </div>
 
 {% endblock %}
-

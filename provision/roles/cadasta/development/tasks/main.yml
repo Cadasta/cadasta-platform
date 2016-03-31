@@ -12,3 +12,8 @@
   become_user: "{{ app_user }}"
   lineinfile: dest=/home/vagrant/.bashrc
               line="cd /vagrant"
+
+- name: Install gettext translation utilities
+  become: yes
+  become: root
+  apt: pkg=gettext state=installed update_cache=yes

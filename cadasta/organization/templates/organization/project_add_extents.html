@@ -1,6 +1,7 @@
 {% extends "organization/project_add_wrapper.html" %}
 
 {% load leaflet_tags %}
+{% load i18n %}
 
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
@@ -10,12 +11,14 @@
 {% leaflet_js plugins="draw,forms" %}
 {% endblock %}
 
-{% block step_title %}Create project geometry{% endblock %}
+{% block step_title %}{% trans "Create project geometry" %}{% endblock %}
 
 {% block step_description %}
+{% blocktrans %}
 Find your location and use the drawing tools to draw your project
 geometry.  Once complete, select the "Continue" button.  For
 guidance, view our step-by-step video.
+{% endblocktrans %}
 {% endblock %}
 
 {% block step_content %}

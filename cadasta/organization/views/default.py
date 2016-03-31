@@ -4,6 +4,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
+from django.utils.translation import gettext as _
 import formtools.wizard.views as wizard
 from tutelary.models import Role
 
@@ -213,9 +214,10 @@ class UserActivation(generic.View):
             userobj.is_active = self.new_state
             userobj.save()
         else:
-            msg = "Wasn't able to modify user state for user '" + user + '"'
+            msg = _("Wasn't able to modify user state "
+                    "for user '{username}'").format(username=user)
             messages.add_message(request, messages.ERROR, msg)
-        return redirect('user:index')
+        return redirect('user:list')
 
 
 class ProjectList(PermissionRequiredMixin, generic.ListView):
@@ -261,7 +263,7 @@ class ProjectDashboard(generic.DetailView):
         try:
             obj = queryset.get()
         except queryset.model.DoesNotExist:
-            raise Http404("No projects found matching the query")
+            raise Http404(_("No projects found matching the query"))
         return obj
 
 

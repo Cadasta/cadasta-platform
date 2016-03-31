@@ -1,14 +1,17 @@
 {% extends "core/base.html" %}
 
+{% load i18n %}
 {% load widget_tweaks %}
 
-{% block title %}Organizations{% endblock %}
+{% block title %} | {% trans "Organizations" %}{% endblock %}
 
 {% block content %}
 
 <div class="row">
-  <h1 class="pull-left">Organizations</h1>
-  <a class="btn btn-default pull-right" href="{% url 'organization:add' %}">Add</a>  
+  <h1 class="pull-left">{% trans "Organizations" %}</h1>
+  <a class="btn btn-default pull-right" href="{% url 'organization:add' %}">
+    {% trans "Add" %}
+  </a>
 </div>
 
 <div class="row">
@@ -16,13 +19,16 @@
     <thead>
       <tr>
         <th class="col-md-2"></th>
-        <th class="col-md-8">Organization</th>
-        <th class="col-md-2">Projects</th>
+        <th class="col-md-8">{% trans "Organization" %}</th>
+        <th class="col-md-2">{% trans "Projects" %}</th>
       </tr>
     </thead>
     {% for org in object_list %}
     <tr onclick="window.document.location='{% url 'organization:dashboard' slug=org.slug %}';">
-      <td>{% if org.logo %}<img src="{{ org.logo }}" style="width: 100%; float: left;" />{% endif %}</td>
+      <td>{% if org.logo %}
+        <img src="{{ org.logo }}" style="width: 100%; float: left;" />
+        {% endif %}
+      </td>
       <td>
         <h4>{{ org.name }}</h4>
         {% if org.description %}<p>{{ org.description }}</p>{% endif %}
@@ -30,7 +36,7 @@
       <td>{{ org.projects.count }}</td>
     </tr>
     {% endfor %}
-  </table>  
+  </table>
 </div>
 
 {% endblock %}

@@ -1,5 +1,6 @@
 import pytest
 from django.test import TestCase
+from django.utils.translation import gettext as _
 from ..validators import validate_json, JsonValidationError
 
 
@@ -34,9 +35,9 @@ class ValidationTest(TestCase):
             assert validate_json({}, schema) is None
 
         assert exc.value.errors['name'] == (
-            "Please provide either name or description")
+            _("Please provide either name or description"))
         assert exc.value.errors['description'] == (
-            "Please provide either name or description")
+            _("Please provide either name or description"))
 
     def test_validate_invalid_required(self):
         schema = {
@@ -51,7 +52,7 @@ class ValidationTest(TestCase):
         with pytest.raises(JsonValidationError) as exc:
             validate_json({'some': 'val'}, schema)
 
-        assert exc.value.errors['name'] == "This field is required."
+        assert exc.value.errors['name'] == _("This field is required.")
 
     def test_validate_invalid_format(self):
         schema = {
@@ -65,4 +66,6 @@ class ValidationTest(TestCase):
         with pytest.raises(JsonValidationError) as exc:
             validate_json({'email': 'blah'}, schema)
 
-        assert exc.value.errors['email'] == "'blah' is not a 'email'"
+        assert (exc.value.errors['email'] ==
+                _("'{value}' is not a '{type}'").format(value='blah',
+                                                        type='email'))

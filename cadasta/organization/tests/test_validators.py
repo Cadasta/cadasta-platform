@@ -1,6 +1,7 @@
 import json
 import pytest
 from django.test import TestCase
+from django.utils.translation import gettext as _
 from django.core.exceptions import ValidationError
 
 from ..validators import validate_contact
@@ -25,7 +26,7 @@ class ValidateContactTest(TestCase):
 
         assert len(exc.value.error_list) == 1
         assert exc.value.error_list[0].messages[0] == (
-            '{"name": "This field is required."}')
+            '{"name": "' + _("This field is required.") + '"}')
 
     def test_validate_multiple_errors(self):
         value = {
@@ -39,8 +40,10 @@ class ValidateContactTest(TestCase):
 
         actual = json.loads(exc.value.error_list[0].messages[0])
         expected = json.loads(
-            '{"name": "This field is required.", '
-            '"email": "\'noemail\' is not a \'email\'"}'
+            '{"name": "' + _("This field is required.") + '", '
+            '"email": "' + _("\'{value}\' is not a \'{type}\'").format(
+                value='noemail', type='email'
+            ) + '"}'
         )
         assert actual == expected
 
@@ -57,6 +60,8 @@ class ValidateContactTest(TestCase):
 
         assert len(exc.value.error_list) == 2
         assert exc.value.error_list[0].messages[0] == (
-            '{"name": "This field is required."}')
+            '{"name": "' + _("This field is required.") + '"}')
         assert exc.value.error_list[1].messages[0] == (
-            '{"email": "\'noemail\' is not a \'email\'"}')
+            '{"email": "' + _("\'{value}\' is not a \'{type}\'").format(
+                value='noemail', type='email'
+            ) + '"}')

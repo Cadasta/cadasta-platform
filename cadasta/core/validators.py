@@ -16,7 +16,8 @@ def validate_json(value, schema):
             ]
 
             for f in fields:
-                message_dict[f] = _("Please provide either %s" % " or ".join(fields))
+                message_dict[f] = _("Please provide either {}").format(
+                    _(" or ").join(fields))
 
         elif e.validator == 'required':
             field = e.message.split(' ')[0].replace('\'', '')
