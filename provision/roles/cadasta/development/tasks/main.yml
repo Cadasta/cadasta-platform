@@ -15,5 +15,5 @@
 
 - name: Install gettext translation utilities
   become: yes
-  become: root
+  become_user: root
   apt: pkg=gettext state=installed update_cache=yes
