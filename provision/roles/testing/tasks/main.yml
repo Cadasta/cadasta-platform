@@ -1,9 +1,10 @@
-- name: Install PhantomJS
+- name: Install Firefox and Xvfb
   become: yes
   become_user: root
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
-      - phantomjs
+      - firefox
+      - xvfb
 
 - name: Install Python Selenium driver
   become: yes

@@ -29,9 +29,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         # everything (e.g. links in the nav bar).  Otherwise tests
         # will fail mysteriously because PhantomJS will clip the
         # viewport.
-        cls.browser = webdriver.PhantomJS(
-            service_args=["--ssl-protocol=any"]
-        )
+        cls.browser = webdriver.Firefox()
         cls.browser.set_window_size(1024, 768)
 
         cls.screenshot_dir = os.path.join(
