@@ -25,7 +25,7 @@ class ProfileTest(FunctionalTest):
                                 "Successfully updated profile information")
 
         self.click_through(
-            self.browser.find_element_by_xpath("//a[.='Logout']"),
+            self.browser.find_element_by_xpath(self.xpath('a', 'Logout')),
             self.BY_ALERT
         )
         self.assert_has_message('alert', "signed out")
