@@ -18,8 +18,8 @@ from ..token import cadastaTokenGenerator
 
 class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
     token_generator = cadastaTokenGenerator
-    subject_template_name = 'change_email_subject.txt'
-    plain_body_template_name = 'change_email.txt'
+    subject_template_name = 'accounts/email/change_email_subject.txt'
+    plain_body_template_name = 'accounts/email/change_email.txt'
     serializer_class = serializers.UserSerializer
 
     def get_email_context(self, user):
@@ -40,14 +40,14 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
 class AccountRegister(djoser_views.RegistrationView):
     token_generator = cadastaTokenGenerator
     serializer_class = serializers.RegistrationSerializer
-    plain_body_template_name = 'activate_email.txt'
+    plain_body_template_name = 'accounts/email/activate_email.txt'
 
 
 class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
     serializer_class = serializers.AccountLoginSerializer
     token_generator = cadastaTokenGenerator
-    subject_template_name = 'activation_email_subject.txt'
-    plain_body_template_name = 'activate_email.txt'
+    subject_template_name = 'accounts/email/activate_email_subject.txt'
+    plain_body_template_name = 'accounts/email/activate_email.txt'
 
     def get_email_context(self, user):
         context = super(AccountLogin, self).get_email_context(user)
@@ -73,7 +73,7 @@ class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
 
 
 class PasswordReset(djoser_views.PasswordResetView):
-    plain_body_template_name = 'password_reset.txt'
+    plain_body_template_name = 'accounts/email/password_reset.txt'
 
 
 class AccountVerify(djoser_utils.ActionViewMixin, GenericAPIView):
