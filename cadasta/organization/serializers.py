@@ -150,7 +150,7 @@ class OrganizationUserSerializer(EntityUserSerializer):
         return admin
 
     def send_invitaion_email(self):
-        template = get_template('org_invite.txt')
+        template = get_template('organization/email/org_invite.txt')
         organization = self.context['organization']
         context = Context({
             'site_name': self.context['sitename'],

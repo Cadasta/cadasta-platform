@@ -83,11 +83,13 @@ REST_FRAMEWORK = {
 ROOT_URLCONF = 'config.urls'
 SITE_NAME = 'Cadasta'
 
+BASE_TEMPLATE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'templates')
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(os.path.dirname(BASE_DIR),
-                              'templates', 'allauth')],
+        'DIRS': [BASE_TEMPLATE_DIR,
+                 os.path.join(BASE_TEMPLATE_DIR, 'allauth')],
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
