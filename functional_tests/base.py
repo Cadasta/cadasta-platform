@@ -129,6 +129,9 @@ class FunctionalTest(StaticLiveServerTestCase):
                                                    self.screenshot_index)
         self.browser.save_screenshot(f)
 
+    def xpath(self, tag, contents):
+        return "//{}[normalize-space(.)='{}']".format(tag, contents)
+
 
 def unique_file(dir, base, startidx):
     f = os.path.join(dir, base + '.png')

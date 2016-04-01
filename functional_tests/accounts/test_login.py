@@ -31,18 +31,20 @@ class LoginTest(FunctionalTest):
         """
         sign_in = LoginPage(self).setup('user1', 'user1pwd')
         self.click_through(sign_in, self.BY_ALERT)
-        self.browser.find_element_by_xpath("//h1[.='Dashboard']")
+        self.browser.find_element_by_xpath(self.xpath('h1', 'Dashboard'))
 
         self.browser.refresh()
         self.wait_for_no_alerts()
-        self.browser.find_element_by_xpath("//h1[.='Dashboard']")
+        self.browser.find_element_by_xpath(self.xpath('h1', 'Dashboard'))
 
         self.click_through(
-            self.browser.find_element_by_xpath("//a[.='Logout']"),
+            self.browser.find_element_by_xpath(self.xpath('a', 'Logout')),
             self.BY_ALERT
         )
         self.assert_has_message('alert', "signed out")
 
         self.browser.refresh()
         self.wait_for_no_alerts()
-        self.browser.find_element_by_xpath("//h1[.='Sign in to your account']")
+        self.browser.find_element_by_xpath(
+            self.xpath('h1', 'Sign in to your account')
+        )
