@@ -1,7 +1,6 @@
 {% extends "core/base.html" %}
 
 {% load i18n %}
-{% load wizard_state %}
 
 {% block content %}
 
@@ -12,15 +11,15 @@
   <div class="col-md-7">
     <div class="wizard">
       <ul class="steps">
-        <li class="{% wizard_step_classes wizard.steps.index 0 %}">
+        <li class="{{ wizard_step_classes.extent }}">
           1. {% trans "Create Project Geometry" %}
           <span class="chevron"></span>
         </li>
-        <li class="{% wizard_step_classes wizard.steps.index 1 %}">
+        <li class="{{ wizard_step_classes.details }}">
           2. {% trans "Add Details" %}
           <span class="chevron"></span>
         </li>
-        <li class="{% wizard_step_classes wizard.steps.index 2 %}">
+        <li class="{{ wizard_step_classes.permissions }}">
           3. {% trans "Assign Permissions" %}
         </li>
       </ul>

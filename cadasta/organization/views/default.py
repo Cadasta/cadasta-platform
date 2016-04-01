@@ -296,8 +296,26 @@ class ProjectAddWizard(wizard.SessionWizardView):
         logo = orgs.first().logo if orgs.first() is not None else ''
         context['init_org_logo'] = logo
         context['init_org_hidden'] = 'org-logo-hidden' if logo is None else ''
-        if isinstance(context['wizard']['form'], forms.ProjectAddPermissions):
+        form = context['wizard']['form']
+        if isinstance(form, forms.ProjectAddExtents):
+            context['wizard_step_classes'] = {
+                'extent': 'active enabled',
+                'details': '',
+                'permissions': ''
+            }
+        elif isinstance(form, forms.ProjectAddDetails):
+            context['wizard_step_classes'] = {
+                'extent': 'enabled complete',
+                'details': 'active enabled',
+                'permissions': ''
+            }
+        elif isinstance(form, forms.ProjectAddPermissions):
             context['members'] = context['wizard']['form'].members
+            context['wizard_step_classes'] = {
+                'extent': 'enabled complete',
+                'details': 'enabled complete',
+                'permissions': 'active enabled'
+            }
         return context
 
     def process_step(self, form):
