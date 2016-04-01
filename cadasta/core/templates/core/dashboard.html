@@ -1,0 +1,15 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h1>Dashboard</h1>
+
+<ul>
+  <li><a href="{% url 'organization:list' %}">Organization index</a></li>
+  <li><a href="{% url 'project:list' %}">Project index</a></li>
+  <li><a href="{% url 'user:list' %}">User index</a></li>
+</ul>
+
+{% endblock %}

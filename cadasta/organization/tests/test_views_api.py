@@ -973,11 +973,7 @@ class ProjectUsersDetailTest(TestCase):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
 
-        data = {
-            'roles': {
-                'manager': True
-            }
-        }
+        data = {'role': 'PM'}
 
         response = self._patch(
             org=project.organization.slug,
@@ -988,17 +984,13 @@ class ProjectUsersDetailTest(TestCase):
 
         assert response.status_code == 200
         role = ProjectRole.objects.get(project=project, user=user)
-        assert role.manager is True
+        assert role.role == 'PM'
 
     def test_update_user_with_unauthorized_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
 
-        data = {
-            'roles': {
-                'manager': True
-            }
-        }
+        data = {'role': 'PM'}
 
         response = self._patch(
             org=project.organization.slug,
@@ -1008,7 +1000,7 @@ class ProjectUsersDetailTest(TestCase):
 
         assert response.status_code == 403
         role = ProjectRole.objects.get(project=project, user=user)
-        assert role.manager is False
+        assert role.role == 'PU'
 
     def test_delete_user(self):
         user = UserFactory.create()

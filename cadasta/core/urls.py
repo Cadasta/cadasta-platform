@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from . import views
+from .views import default
 
 urlpatterns = [
-    url(r'^$', views.IndexPage.as_view(), name='index'),
-    url(r'^dashboard/$', views.Dashboard.as_view(), name='dashboard'),
+    url(r'^$', default.IndexPage.as_view(), name='index'),
+    url(r'^dashboard/$', default.Dashboard.as_view(), name='dashboard'),
 ]

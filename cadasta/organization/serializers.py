@@ -31,6 +31,16 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
 
         return super(OrganizationSerializer, self).to_internal_value(data)
 
+    def create(self, *args, **kwargs):
+        org = super(OrganizationSerializer, self).create(*args, **kwargs)
+
+        OrganizationRole.objects.create(
+            organization=org,
+            user=self.context['request'].user
+        )
+
+        return org
+
 
 class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
@@ -54,16 +64,16 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
 
 class EntityUserSerializer(serializers.Serializer):
     username = serializers.CharField()
-    roles = serializers.JSONField()
+    role = serializers.CharField()
 
     def to_representation(self, instance):
         if isinstance(instance, User):
             rep = UserSerializer(instance).data
-            rep['roles'] = self.get_roles_json(instance)
+            rep['role'] = self.get_role_json(instance)
             return rep
 
     def to_internal_value(self, data):
-        data['roles'] = self.set_roles(data.get('roles', None))
+        data['role'] = self.set_roles(data.get('role', None))
         return super(EntityUserSerializer, self).to_internal_value(data)
 
     def validate_username(self, value):
@@ -85,9 +95,11 @@ class EntityUserSerializer(serializers.Serializer):
     def create(self, validated_data):
         obj = self.context[self.Meta.context_key]
 
-        create_kwargs = validated_data['roles']
-        create_kwargs['user'] = self.user
-        create_kwargs[self.Meta.context_key] = obj
+        create_kwargs = {
+            self.Meta.role_key: validated_data['role'],
+            self.Meta.context_key: obj,
+            'user': self.user,
+        }
 
         self.role = self.Meta.role_model.objects.create(**create_kwargs)
 
@@ -99,8 +111,8 @@ class EntityUserSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         role = self.get_roles_object(instance)
 
-        for key in validated_data['roles'].keys():
-            setattr(role, key, validated_data['roles'][key])
+        if 'role' in validated_data:
+            setattr(role, self.Meta.role_key, validated_data['role'])
 
         role.save()
 
@@ -111,6 +123,7 @@ class OrganizationUserSerializer(EntityUserSerializer):
     class Meta:
         role_model = OrganizationRole
         context_key = 'organization'
+        role_key = 'admin'
 
     def get_roles_object(self, instance):
         if not hasattr(self, 'role'):
@@ -120,26 +133,21 @@ class OrganizationUserSerializer(EntityUserSerializer):
 
         return self.role
 
-    def get_roles_json(self, instance):
+    def get_role_json(self, instance):
         role = self.get_roles_object(instance)
-
-        return {
-            'admin': role.admin
-        }
+        return 'Admin' if role.admin else 'User'
 
     def set_roles(self, data):
-        roles = {
-            'admin': False
-        }
+        admin = False
 
         if self.instance:
             role = self.get_roles_object(self.instance)
-            roles['admin'] = role.admin
+            admin = role.admin
 
         if data:
-            roles['admin'] = data.get('admin', roles['admin'])
+            admin = data
 
-        return roles
+        return admin
 
     def send_invitaion_email(self):
         template = get_template('org_invite.txt')
@@ -163,6 +171,7 @@ class ProjectUserSerializer(EntityUserSerializer):
     class Meta:
         role_model = ProjectRole
         context_key = 'project'
+        role_key = 'role'
 
     def validate_username(self, value):
         super(ProjectUserSerializer, self).validate_username(value)
@@ -181,30 +190,21 @@ class ProjectUserSerializer(EntityUserSerializer):
 
         return self.role
 
-    def get_roles_json(self, instance):
+    def get_role_json(self, instance):
         role = self.get_roles_object(instance)
-
-        return {
-            'manager': role.manager,
-            'collector': role.collector
-        }
+        return role.role
 
     def set_roles(self, data):
-        roles = {
-            'manager': False,
-            'collector': False
-        }
+        user_role = 'PU'
 
         if self.instance:
             role = self.get_roles_object(self.instance)
-            roles['manager'] = role.manager
-            roles['collector'] = role.collector
+            user_role = role.role
 
         if data:
-            roles['manager'] = data.get('manager', roles['manager'])
-            roles['collector'] = data.get('collector', roles['collector'])
+            user_role = data
 
-        return roles
+        return user_role
 
 
 class UserAdminSerializer(UserSerializer):

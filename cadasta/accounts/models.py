@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from tutelary.decorators import permissioned_model
 
+from .manager import UserManager
+
 
 def now_plus_48_hours():
     return datetime.now(tz=timezone.utc) + timedelta(hours=48)
@@ -14,6 +16,8 @@ class User(AbstractUser):
     verify_email_by = models.DateTimeField(default=now_plus_48_hours)
 
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+
+    objects = UserManager()
 
     class TutelaryMeta:
         perm_type = 'user'

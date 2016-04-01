@@ -11,7 +11,7 @@ from ..forms import ProfileForm
 class AccountProfile(LoginRequiredMixin, UpdateView):
     model = User
     form_class = ProfileForm
-    template_name = 'profile.html'
+    template_name = 'accounts/profile.html'
     success_url = reverse_lazy('account:profile')
 
     def get_object(self, *args, **kwargs):
