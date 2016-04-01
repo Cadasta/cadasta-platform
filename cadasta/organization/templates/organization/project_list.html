@@ -1,17 +1,19 @@
 {% extends "core/base.html" %}
 
-{% block title %}Projects{% endblock %}
+{% load i18n %}
+
+{% block title %} | {% trans "Projects" %}{% endblock %}
 
 {% block content %}
 
-<h1>Projects</h1>
+<h1>{% trans "Projects" %}</h1>
 
 <div class="pull-right">
   {% if add_allowed %}
   <a href={% url 'project:add' %} class="btn btn-default">
     <span>
       <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
-      Add
+      {% trans "Add" %}
     </span>
   </a>
   {% endif %}
@@ -22,10 +24,10 @@
 <table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
-      <th class="col-md-2">Organization</th>
-      <th class="col-md-6">Project</th>
-      <th class="col-md-2">Country</th>
-      <th class="col-md-2">Last updated</th>
+      <th class="col-md-2">{% trans "Organization" %}</th>
+      <th class="col-md-6">{% trans "Project" %}</th>
+      <th class="col-md-2">{% trans "Country" %}</th>
+      <th class="col-md-2">{% trans "Last updated" %}</th>
     </tr>
   </thead>
   {% for proj in object_list %}

@@ -1,32 +1,44 @@
-<h1>Register</h1>
+{% load i18n %}
+
+<h1>{% trans "Register" %}</h1>
 
 <form method="POST" action="/site/account/register/">
     {% csrf_token %}
     {{ form.non_field_errors }}
     <div class="fieldWrapper">
-        {{ form.username.errors }}
-        <label for="{{ form.username.id_for_label }}">Username:</label>
-        {{ form.username }}
+      {{ form.username.errors }}
+      <label for="{{ form.username.id_for_label }}">
+        {% trans "Username" %}:
+      </label>
+      {{ form.username }}
     </div>
     <div class="fieldWrapper">
-        {{ form.email.errors }}
-        <label for="{{ form.email.id_for_label }}">Email:</label>
-        {{ form.email }}
+      {{ form.email.errors }}
+      <label for="{{ form.email.id_for_label }}">
+        {% trans "Email" %}:
+      </label>
+      {{ form.email }}
     </div>
     <div class="fieldWrapper">
-        {{ form.password.errors }}
-        <label for="{{ form.password.id_for_label }}">Password:</label>
-        {{ form.password }}
+      {{ form.password.errors }}
+      <label for="{{ form.password.id_for_label }}">
+        {% trans "Password" %}:
+      </label>
+      {{ form.password }}
     </div>
     <div class="fieldWrapper">
-        {{ form.first_name.errors }}
-        <label for="{{ form.first_name.id_for_label }}">First name:</label>
-        {{ form.first_name }}
+      {{ form.first_name.errors }}
+      <label for="{{ form.first_name.id_for_label }}">
+        {% trans "First name" %}:
+      </label>
+      {{ form.first_name }}
     </div>
     <div class="fieldWrapper">
-        {{ form.last_name.errors }}
-        <label for="{{ form.last_name.id_for_label }}">Last name</label>
-        {{ form.last_name }}
+      {{ form.last_name.errors }}
+      <label for="{{ form.last_name.id_for_label }}">
+        {% trans "Last name" %}:
+      </label>
+      {{ form.last_name }}
     </div>
-    <button type="submit">Submit</button>
+    <button type="submit">{% trans "Submit" %}</button>
 </form>

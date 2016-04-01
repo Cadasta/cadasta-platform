@@ -1,6 +1,9 @@
-ADMIN_CHOICES = (('A', 'Administrator'),
-                 ('M', 'Member'))
+from django.utils.translation import ugettext as _
 
-ROLE_CHOICES = (('PU', 'Project User'),
-                ('DC', 'Data Collector'),
-                ('PM', 'Project Manager'))
+
+ADMIN_CHOICES = (('A', _('Administrator')),
+                 ('M', _('Member')))
+
+ROLE_CHOICES = (('PU', _('Project User')),
+                ('DC', _('Data Collector')),
+                ('PM', _('Project Manager')))

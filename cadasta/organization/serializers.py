@@ -83,9 +83,9 @@ class EntityUserSerializer(serializers.Serializer):
             users_count = len(users)
 
             if users_count == 0:
-                error = "User with username or email {} does not exist"
+                error = _("User with username or email {} does not exist")
             elif users_count > 1:
-                error = "More than one user found for username or email {}"
+                error = _("More than one user found for username or email {}")
             else:
                 self.user = users[0]
 
@@ -161,8 +161,10 @@ class OrganizationUserSerializer(EntityUserSerializer):
         message = template.render(context)
         print(message)
 
-        subject = _("You have been added to organization {organization}").format(
-            organization=self.context['organization'].name)
+        subject = _("You have been added to organization "
+                    "{organization}").format(
+                        organization=self.context['organization'].name
+                    )
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None),
         send_mail(subject, message, from_email, [self.user.email])
 
@@ -179,8 +181,8 @@ class ProjectUserSerializer(EntityUserSerializer):
 
         if self.user not in project.organization.users.all():
             raise serializers.ValidationError(
-                "User some-user is not member of the project\'s "
-                "organization".format(value))
+                _("User {username} is not member of the project\'s "
+                  "organization").format(username=value))
 
     def get_roles_object(self, instance):
         if not hasattr(self, 'role'):

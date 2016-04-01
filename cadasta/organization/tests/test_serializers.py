@@ -2,6 +2,7 @@ import pytest
 from datetime import datetime
 from django.utils.text import slugify
 from django.test import TestCase
+from django.utils.translation import gettext as _
 from django.core import mail
 from rest_framework.serializers import ValidationError
 from rest_framework.test import APIRequestFactory
@@ -190,7 +191,8 @@ class OrganizationUserSerializerTest(TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert ('User with username or email some-user does not exist'
+        assert (_('User with username or email {username} '
+                  'does not exist').format(username='some-user')
                 in serializer.errors['username'])
 
     def test_update_roles_for_user(self):
@@ -296,7 +298,8 @@ class ProjectUserSerializerTest(TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert ('User some-user is not member of the project\'s organization'
+        assert (_('User {username} is not member of the '
+                  'project\'s organization').format(username=user.username)
                 in serializer.errors['username'])
 
     def test_set_roles_for_user_that_does_not_exist(self):
@@ -316,7 +319,8 @@ class ProjectUserSerializerTest(TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert ('User with username or email some-user does not exist'
+        assert (_('User with username or email {username} '
+                  'does not exist').format(username='some-user')
                 in serializer.errors['username'])
 
     def test_update_roles_for_user(self):

@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 from ..models import User
 from ..forms import RegisterForm, ProfileForm
@@ -37,7 +38,7 @@ class RegisterFormTest(TestCase):
         form = RegisterForm(data)
 
         assert form.is_valid() is False
-        assert "Passwords do not match" in form.errors.get('password1')
+        assert _("Passwords do not match") in form.errors.get('password1')
         assert User.objects.count() == 0
 
     def test_signup_with_existing_email(self):
@@ -53,7 +54,7 @@ class RegisterFormTest(TestCase):
         form = RegisterForm(data)
 
         assert form.is_valid() is False
-        assert ("Another user with this email already exists"
+        assert (_("Another user with this email already exists")
                 in form.errors.get('email'))
         assert User.objects.count() == 1
 

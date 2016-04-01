@@ -1,5 +1,6 @@
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import UpdateView
+from django.utils.translation import ugettext as _
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -19,10 +20,10 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         messages.add_message(self.request, messages.SUCCESS,
-                             "Successfully updated profile information")
+                             _("Successfully updated profile information"))
         return super().form_valid(form)
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.ERROR,
-                             "Failed to update profile information")
+                             _("Failed to update profile information"))
         return super().form_invalid(form)

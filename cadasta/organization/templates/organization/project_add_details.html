@@ -1,8 +1,9 @@
 {% extends "organization/project_add_wrapper.html" %}
 
 {% load widget_tweaks %}
+{% load i18n %}
 
-{% block step_title %}Add project details{% endblock %}
+{% block step_title %}{% trans "Add project details" %}{% endblock %}
 
 {% block extra_script %}
 <script>
@@ -43,7 +44,7 @@
     <div class="form-group">
       {{ wizard.form.organization.errors }}
       <label for="{{ wizard.form.organization.id_for_label }}">
-        Select organization
+        {% trans "Select organization" %}
       </label>
       {% render_field wizard.form.organization class+="form-control input-lg" %}
     </div>
@@ -59,7 +60,7 @@
     <div class="form-group">
       {{ wizard.form.name.errors }}
       <label for="{{ wizard.form.name.id_for_label }}">
-        Project name
+        {% trans "Project name" %}
       </label>
       {% render_field wizard.form.name class+="form-control input-lg" %}
     </div>
@@ -67,7 +68,7 @@
   <div class="col-md-4">
     <div class="row">
       <div class="col-md-1">
-        Private
+        {% trans "Private" %}
         <span class="glyphicon glyphicon-eye-close"></span>
       </div>
       <div class="col-md-3">
@@ -77,7 +78,7 @@
         </div>
       </div>
       <div class="col-md-1">
-        Public
+        {% trans "Public" %}
         <span class="glyphicon glyphicon-eye-open"></span>
       </div>
   </div>
@@ -88,7 +89,7 @@
     <div class="form-group">
       {{ wizard.form.description.errors }}
       <label for="{{ wizard.form.description.id_for_label }}">
-        Description
+        {% trans "Description" %}
       </label>
       {% render_field wizard.form.description class+="form-control input-lg" %}
     </div>
@@ -96,7 +97,7 @@
     <div class="form-group">
       {{ wizard.form.url.errors }}
       <label for="{{ wizard.form.url.id_for_label }}">
-        Project URL
+        {% trans "Project URL" %}
       </label>
       {% render_field wizard.form.url class+="form-control input-lg" %}
     </div>

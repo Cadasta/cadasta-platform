@@ -1,8 +1,9 @@
 {% extends "core/base.html" %}
 
-{% block title %}{{ project.name }}{% endblock %}
+{% block title %} | {{ project.name }}{% endblock %}
 
 {% load leaflet_tags %}
+{% load i18n %}
 
 {% block extra_head %}
 {% leaflet_css %}
@@ -29,7 +30,7 @@
 <div class="row project-overview-header">
   <a class="index-link" href="{% url 'project:list' %}">
     <span class="glyphicon glyphicon-step-backward" aria-hidden=true></span>
-    Index
+    {% trans "Index" %}
   </a>
   <img class="org-logo" style="width: 120px;" src="{{ object.organization.logo }}"/>
   <div class="project-name">
@@ -40,7 +41,7 @@
       <a href="#" class="btn btn-default">
         <span>
           <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
-          Add
+          {% trans "Add" %}
           <span class="caret"></span>
         </span>
       </a>
@@ -54,32 +55,32 @@
   <div class="col-md-1 project-overview-button-bar">
     <div class="project-overview-button active">
       <span class="glyphicon glyphicon-dashboard" aria-hidden=true></span>
-      Overview
+      {% trans "Overview" %}
     </div>
 
     <div class="project-overview-button">
       <span class="glyphicon glyphicon-map-marker" aria-hidden=true></span>
-      Parcels
+      {% trans "Parcels" %}
     </div>
 
     <div class="project-overview-button">
       <span class="glyphicon glyphicon-check" aria-hidden=true></span>
-      Questionnaires
+      {% trans "Questionnaires" %}
     </div>
 
     <div class="project-overview-button">
       <span class="glyphicon glyphicon-duplicate" aria-hidden=true></span>
-      Resources
+      {% trans "Resources" %}
     </div>
 
     <div class="project-overview-button">
       <span class="glyphicon glyphicon-time" aria-hidden=true></span>
-      Activity
+      {% trans "Activity" %}
     </div>
 
     <div class="project-overview-button">
       <span class="glyphicon glyphicon-book" aria-hidden=true></span>
-      Reports
+      {% trans "Reports" %}
     </div>
   </div>
 
@@ -96,29 +97,29 @@
 
         {% if has_content %}
         <div class="project-statistics">
-          Some statistics here...
+          {% trans "Some statistics here..." %}
         </div>
         {% else %}
         <div class="project-getting-started">
           <p class="larger">
-            You have successfully created your project.
+            {% trans "You have successfully created your project." %}
           </p>
 
           <p class="larger">
-            What would you like to do next?
+            {% trans "What would you like to do next?" %}
           </p>
 
           <div class="text-center">
             <button class="btn btn-default btn-lg">
-              Add a parcel
+              {% trans "Add a parcel" %}
             </button>
             <button class="btn btn-default btn-lg">
-              Upload data
+              {% trans "Upload data" %}
             </button>
           </div>
 
           <br/>
-          <p>Not sure what to do next?  View our Getting Started demo.</p>
+          <p>{% trans "Not sure what to do next?  View our Getting Started demo." %}</p>
 
           <iframe width="420" height="315"
                   src="https://www.youtube.com/embed/dQw4w9WgXcQ"

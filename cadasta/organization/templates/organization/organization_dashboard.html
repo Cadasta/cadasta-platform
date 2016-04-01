@@ -1,71 +1,86 @@
 {% extends "core/base.html" %}
 
+{% load i18n %}
 {% load widget_tweaks %}
 {% load staticfiles %}
 
-{% block title %}{{ object.name }}{% endblock %}
+{% block title %} | {{ object.name }}{% endblock %}
 
 {% block content %}
 
 <div class="row">
-    <div class="col-sm-8">
-        <h1>{{ object.name }}</h1>
-    </div>
+  <div class="col-sm-8">
+    <h1>{{ object.name }}</h1>
+  </div>
 </div>
 
 <div class="row">
-    <div class="col-sm-8">
-        <h2>Dashboard</h2>
-    </div>
-    <div class="col-sm-4">
-        <a href="{% url 'organization:edit' object.slug %}">Edit</a> | 
-        <a href="#archive_confirm" data-toggle="modal">Archive</a>
-    </div>
+  <div class="col-sm-8">
+    <h2>{% trans "Dashboard" %}</h2>
+  </div>
+  <div class="col-sm-4">
+    <a href="{% url 'organization:edit' object.slug %}">
+      {% trans "Edit" %}
+    </a> |
+    <a href="#archive_confirm" data-toggle="modal">
+      {% trans "Archive" %}
+    </a>
+  </div>
 </div>
 
 <div class="row">
-    <div class="col-sm-8">
-        {% if object.projects.all  %}
-        <table class="table table-hover datatable" data-paging-type="simple">
-          <thead>
-            <tr>
-              <th class="col-md-6">Project</th>
-              <th class="col-md-2">Country</th>
-              <th class="col-md-2">Last updated</th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for prj in object.projects.all %}
-            <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.project_slug %}';">
-              <td>{{ prj.name }}</td>
-              <td>{{ prj.country }}</td>
-              <td>{{ prj.last_updated }}</td>
-            </tr>
-              <div>{{ prj.name }}</div>
-          {% empty %}
-              
-          {% endfor %}  
-          </tbody>
-        </table>
-        {% else %}
-          <h4>You're ready to go</h4>
-          <p>You have successfully created your organization. What would you like to do next?</p>
-          <p>
-              <a href="{% url 'project:add' %}" class="btn btn-default">Add new project</a>
-              <a href="#" class="btn btn-default">Add members</a>
-          </p>
-        {% endif %}
-    </div>
-    <div class="col-sm-4">
-        {{ object.description }}
+  <div class="col-sm-8">
+    {% if object.projects.all  %}
+    <table class="table table-hover datatable" data-paging-type="simple">
+      <thead>
+        <tr>
+          <th class="col-md-6">{% trans "Project" %}</th>
+          <th class="col-md-2">{% trans "Country" %}</th>
+          <th class="col-md-2">{% trans "Last updated" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prj in object.projects.all %}
+        <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.project_slug %}';">
+          <td>{{ prj.name }}</td>
+          <td>{{ prj.country }}</td>
+          <td>{{ prj.last_updated }}</td>
+        </tr>
+        <div>{{ prj.name }}</div>
+        {% empty %}
 
-        <h4>Members</h4>
-        {% for user in object.users.all %}
-          <b>{{ user.get_full_name }}</b><br>
-          Username: {{ user.username }}
-          <hr>
         {% endfor %}
-        <a href="{% url 'organization:members' object.slug %}" class="btn btn-default">View all</a>
+      </tbody>
+    </table>
+    {% else %}
+    <h4>{% trans "You're ready to go" %}</h4>
+    <p>
+      {% trans "You have successfully created your organization." %}
+      {% trans "What would you like to do next?" %}
+    </p>
+    <p>
+      <a href="{% url 'project:add' %}" class="btn btn-default">
+        {% trans "Add new project" %}
+      </a>
+      <a href="#" class="btn btn-default">
+        {% trans "Add members" %}
+      </a>
+    </p>
+    {% endif %}
+  </div>
+  <div class="col-sm-4">
+    {{ object.description }}
+
+    <h4>{% trans "Members" %}</h4>
+    {% for user in object.users.all %}
+    <b>{{ user.get_full_name }}</b><br>
+    {% trans "Username" %}: {{ user.username }}
+    <hr>
+    {% endfor %}
+    <a href="{% url 'organization:members' object.slug %}"
+       class="btn btn-default">
+      {% trans "View all" %}
+    </a>
     </div>
 </div>
 
@@ -73,15 +88,24 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Archive organization</h4>
+        <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{% trans "Archive organization" %}</h4>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to archive this organization?</p>
+        <p>
+          {% trans "Are you sure you want to archive this organization?" %}
+        </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
-        <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary">Archive</a>
+        <button type="button" class="btn btn-link" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+        <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary">
+          {% trans "Archive" %}
+        </a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

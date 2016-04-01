@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta, timezone
 
 from django.test import TestCase
+from django.utils.translation import gettext as _
 from django.http import QueryDict
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -530,7 +531,7 @@ class OrganizationUsersTest(TestCase):
 
         assert response.status_code == 400
         assert org.users.count() == 2
-        assert ('User with username or email some_username does not exist'
+        assert (_('User with username or email some_username does not exist')
                 in content['username'])
 
     def test_add_user_to_organization_that_does_not_exist(self):
@@ -546,7 +547,7 @@ class OrganizationUsersTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
-        assert content['detail'] == "Organization not found."
+        assert content['detail'] == _("Organization not found.")
 
 
 class OrganizationUsersDetailTest(TestCase):
@@ -792,7 +793,7 @@ class ProjectUsersAPITest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == _("Project not found.")
 
     def test_add_user(self):
         user_to_add = UserFactory.create()
@@ -832,7 +833,7 @@ class ProjectUsersAPITest(TestCase):
 
         assert response.status_code == 400
         assert project.users.count() == 0
-        assert ('User with username or email some-user does not exist'
+        assert (_('User with username or email some-user does not exist')
                 in content['username'])
 
 
@@ -939,7 +940,7 @@ class ProjectUsersDetailTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
-        assert content['detail'] == "User not found."
+        assert content['detail'] == _("User not found.")
 
     def test_get_user_from_org_that_does_not_exist(self):
         user = UserFactory.create()
@@ -953,7 +954,7 @@ class ProjectUsersDetailTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == _("Project not found.")
 
     def test_get_user_from_project_that_does_not_exist(self):
         user = UserFactory.create()
@@ -967,7 +968,7 @@ class ProjectUsersDetailTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == _("Project not found.")
 
     def test_update_user(self):
         user = UserFactory.create()
@@ -1284,7 +1285,7 @@ class UserDetailAPITest(TestCase):
 
         assert response.status_code == 400
         assert user.last_login == t1
-        assert content['last_login'][0] == 'Cannot update last_login'
+        assert content['last_login'][0] == _('Cannot update last_login')
 
 
 class ProjectListAPITest(TestCase):
@@ -1492,7 +1493,7 @@ class ProjectCreateAPITest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 400
-        assert content['name'][0] == 'This field is required.'
+        assert content['name'][0] == _('This field is required.')
         assert Project.objects.count() == 0
 
 
@@ -1560,7 +1561,7 @@ class ProjectDetailTest(TestCase):
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 404
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == _("Project not found.")
 
     def test_valid_update(self):
         organization = OrganizationFactory.create(**{'slug': 'namati'})
@@ -1615,7 +1616,7 @@ class ProjectDetailTest(TestCase):
 
         assert response.status_code == 400
         assert project.name == 'OPDP'
-        assert content['name'][0] == 'This field may not be blank.'
+        assert content['name'][0] == _('This field may not be blank.')
 
     def test_archive(self):
         organization = OrganizationFactory.create(**{'slug': 'namati'})
