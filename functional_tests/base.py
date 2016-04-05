@@ -150,10 +150,16 @@ class FunctionalTest(StaticLiveServerTestCase):
                 f.write(base64.b64decode(exc.screen))
             raise
 
+    def wait_for_alert(self):
+        """Wait for an alert to display"""
+        WebDriverWait(self.browser, 10).until(
+            EC.presence_of_element_located(self.BY_ALERT)
+        )
+
     def wait_for_no_alerts(self):
         """Wait for all alerts to be cleared by a page reload."""
         WebDriverWait(self.browser, 10).until_not(
-            EC.presence_of_element_located((By.CLASS_NAME, 'alert'))
+            EC.presence_of_element_located(self.BY_ALERT)
         )
 
     # if all forms are going to have has-error, this won't be necessary.
@@ -194,6 +200,20 @@ class FunctionalTest(StaticLiveServerTestCase):
         """
         cls = field.find_element_by_xpath('..').get_attribute('class')
         assert not re.search(r'\bhas-error\b', cls)
+
+    def get_url_path(self):
+        """Return the path+query+fragment component of the current URL."""
+        return re.sub(
+            '^https?://[\w.]+(?::\d+)?', '',
+            self.browser.current_url
+        )
+
+    def logout(self):
+        """Click the logout link."""
+        self.click_through(
+            self.browser.find_element_by_xpath(self.xpath('a', 'Logout')),
+            self.BY_ALERT
+        )
 
     def screenshot(self, title=None):
         if title is not None:
