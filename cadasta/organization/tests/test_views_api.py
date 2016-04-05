@@ -1445,7 +1445,7 @@ class ProjectListAPITest(TestCase):
 
             prev_name = org['name']
 
-    def test_project_visibility(self):
+    def test_project_public_visibility(self):
         organization = OrganizationFactory.create(**{'slug': 'namati'})
         ProjectFactory.create(**{'name': 'opdp', 'access': "public",
                                  'organization': organization})
