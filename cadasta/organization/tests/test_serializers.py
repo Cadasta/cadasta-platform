@@ -65,7 +65,7 @@ class OrganizationSerializerTest(TestCase):
 
 
 class ProjectSerializerTest(TestCase):
-    def test_organization_is_set(self):
+    def test_project_is_set(self):
         organization = OrganizationFactory.create()
         project_data = {
             'name': 'Project',
@@ -82,7 +82,47 @@ class ProjectSerializerTest(TestCase):
         serializer.save()
 
         project_instance = serializer.instance
-        assert project_instance.organization == organization
+        assert project_instance.organization == organization\
+
+    def test_project_public_visibility(self):
+        organization = OrganizationFactory.create()
+        project_data = {
+            'name': 'Project',
+            'organization': organization,
+            'access': 'public'
+        }
+        context = {
+            'organization': organization
+        }
+        serializer = serializers.ProjectSerializer(
+            data=project_data,
+            context=context
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        project_instance = serializer.instance
+        assert project_instance.access == 'public'
+
+    def test_project_private_visibility(self):
+        organization = OrganizationFactory.create()
+        project_data = {
+            'name': 'Project',
+            'organization': organization,
+            'access': 'private'
+        }
+        context = {
+            'organization': organization
+        }
+        serializer = serializers.ProjectSerializer(
+            data=project_data,
+            context=context
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        project_instance = serializer.instance
+        assert project_instance.access == 'private'
 
 
 class OrganizationUserSerializerTest(TestCase):

@@ -127,7 +127,8 @@ class ProjectList(APIPermissionRequiredMixin,  generics.ListCreateAPIView):
         return context
 
     def get_queryset(self):
-        return self.get_organization().projects.all().filter(access="public")
+        return self.get_organization().projects.all()\
+            # .filter(access="public")
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
