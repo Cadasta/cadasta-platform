@@ -1,6 +1,7 @@
 import os.path
 import factory
 from faker import Factory
+from django.contrib.gis.geos import GEOSGeometry
 from datetime import datetime, timezone
 
 from accounts.models import User
@@ -142,7 +143,8 @@ class FixturesData():
             project.  This is a test project.  This is a test project.  This
             is a test project.  This is a test project.""",
             organization=orgs[0],
-            country='KE'
+            country='KE',
+            extent='SRID=4326;POLYGON ((-5.1031494140625000 8.1299292850467957, -5.0482177734375000 7.6837733211111425, -4.6746826171875000 7.8252894725496338, -4.8641967773437491 8.2278005261522775, -5.1031494140625000 8.1299292850467957))'
         ))
         projs.append(ProjectFactory.create(
             name='H4H Test Project',
@@ -152,7 +154,8 @@ class FixturesData():
             project.  This is a test project.  This is a test project.  This
             is a test project.  This is a test project.""",
             organization=orgs[0],
-            country='PH'
+            country='PH',
+            extent='SRID=4326;POLYGON ((-63.6328125000000000 44.7233201889582475, -63.3691406250000000 45.3830192789906519, -61.6992187500000000 45.6140374113509282, -61.1059570312500000 45.2439534226232425, -63.6328125000000000 44.7233201889582475))'
         ))
         projs.append(ProjectFactory.create(
             name='Cadasta Indonesia Test Project',
@@ -163,7 +166,8 @@ class FixturesData():
             This is another test project.  This is another test project.
             This is another test project.""",
             organization=orgs[1],
-            country='ID'
+            country='ID',
+            extent='SRID=4326;POLYGON ((-57.0520019531250000 -1.0793428942462329, -56.7553710937499929 -0.6646579437921112, -56.3790893554687500 -1.1562325507679554, -56.3186645507812429 -1.4774973547127075, -56.8405151367187500 -1.4500404973607948, -57.0520019531250000 -1.0793428942462329))'
         ))
         projs.append(ProjectFactory.create(
             name='Cadasta Myanmar Test Project',
@@ -175,6 +179,30 @@ class FixturesData():
             This is another test project.""",
             organization=orgs[1],
             country='MM'
+        ))
+        projs.append(ProjectFactory.create(
+            name='London 1',
+            project_slug='london-1',
+            description=""""This is another test project.  This is another test
+            project. This is another test project.  This is another test
+            project. This is another test project.  This is a test project.
+            This is another test project.  This is another test project.
+            This is another test project.""",
+            organization=orgs[1],
+            country='MM',
+            extent=GEOSGeometry('{"type": "Polygon","coordinates": [[[-0.17329216003417966,51.51194758264939],[-0.17303466796874997,51.511092905004745],[-0.1709747314453125,51.51023821132554],[-0.17037391662597656,51.507406923983446],[-0.1746654510498047,51.50211782162702],[-0.1533794403076172,51.503239803730864],[-0.15226364135742185,51.505964502406805],[-0.15913009643554688,51.51322956905176],[-0.17329216003417966,51.51194758264939]]]}')
+        ))
+        projs.append(ProjectFactory.create(
+            name='London 2',
+            project_slug='london-2',
+            description=""""This is another test project.  This is another test
+            project. This is another test project.  This is another test
+            project. This is another test project.  This is a test project.
+            This is another test project.  This is another test project.
+            This is another test project.""",
+            organization=orgs[1],
+            country='MM',
+            extent=GEOSGeometry('{"type": "Polygon","coordinates": [[[-0.1878833770751953,51.509864277798705],[-0.18393516540527344,51.50201096474784],[-0.17500877380371094,51.501690392607],[-0.17226219177246094,51.50671243040582],[-0.171661376953125,51.51152024583139],[-0.18642425537109375,51.509864277798705],[-0.1878833770751953,51.509864277798705]]]}')
         ))
 
     def delete_test_organizations(self):

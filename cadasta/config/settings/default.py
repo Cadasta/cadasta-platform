@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'django_countries',
     'leaflet',
     'rest_framework',
+    'rest_framework_gis',
     'rest_framework.authtoken',
     'rest_framework_docs',
     'djoser',
@@ -145,14 +146,10 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 LEAFLET_CONFIG = {
     'TILES': [('OpenStreetMap',
                'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-               {'attribution': 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'})],  # noqa
-    'RESET_VIEW': False
-}
-
-LEAFLET_CONFIG = {
-    'TILES': [('OpenStreetMap',
-               'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-               {'attribution': 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'})],  # noqa
+               {'attribution': 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}),
+              ('DigitalGlobe Satellite',
+               'https://{s}.tiles.mapbox.com/v4/digitalglobe.nal0g75k/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW11a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
+               {'attribution': 'DigitalGlobe'})],
     'RESET_VIEW': False
 }
 
