@@ -8,7 +8,7 @@ from accounts.models import User
 
 from ..models import Organization
 from .. import serializers
-from .mixins import OrganizationRoles, ProjectRoles
+from .mixins import OrganizationRoles, ProjectRoles, ProjectQuerySetMixin
 
 
 class OrganizationList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
@@ -95,7 +95,9 @@ class UserAdminDetail(APIPermissionRequiredMixin,
     }
 
 
-class ProjectList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
+class OrganizationProjectList(APIPermissionRequiredMixin,
+                              ProjectQuerySetMixin,
+                              generics.ListCreateAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
@@ -120,18 +122,38 @@ class ProjectList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
 
     def get_serializer_context(self, *args, **kwargs):
         org = self.get_organization()
-        context = super(ProjectList, self).get_serializer_context(*args,
-                                                                  **kwargs)
+        context = super(OrganizationProjectList,
+                        self).get_serializer_context(*args, **kwargs)
         context['organization'] = org
 
         return context
 
     def get_queryset(self):
-        return self.get_organization().projects.all()
+        return super().get_queryset().filter(
+            organization__slug=self.kwargs['slug']
+        )
+
+
+class ProjectList(APIPermissionRequiredMixin, ProjectQuerySetMixin,
+                  generics.ListAPIView):
+    serializer_class = serializers.ProjectSerializer
+    filter_backends = (filters.DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,)
+    filter_fields = ('archived',)
+    search_fields = ('name', 'organization__name', 'country', 'description',)
+    ordering_fields = ('name', 'organization', 'country', 'description',)
+    permission_required = {'project.list'}
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
                     generics.RetrieveUpdateDestroyAPIView):
+    def get_actions(self, request):
+        if self.get_object().public():
+            return 'project.view'
+        else:
+            return 'project.view_private'
+
     def patch_actions(self, request):
         if hasattr(request, 'data'):
             is_archived = self.get_object().archived
@@ -148,7 +170,7 @@ class ProjectDetail(APIPermissionRequiredMixin,
     # ordering_fields = ('name', 'organization', 'country', 'description',)
     lookup_field = 'project_slug'
     permission_required = {
-        'GET': 'project.list',
+        'GET': get_actions,
         'PATCH': patch_actions,
     }
 

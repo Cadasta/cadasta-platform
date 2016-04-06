@@ -107,6 +107,14 @@ class ProjectTest(TestCase):
         )
         assert project.country == ''
 
+    def test_defaults_to_public(self):
+        project = ProjectFactory.create()
+        assert project.public()
+
+    def test_can_create_private(self):
+        project = ProjectFactory.create(access='private')
+        assert not project.public()
+
 
 class ProjectRoleTest(TestCase):
     def setUp(self):

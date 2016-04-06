@@ -22,15 +22,10 @@ class ProjectListTest(TestCase):
         self.view = default.ProjectList.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
-        setattr(self.request, 'user', AnonymousUser())
 
-        self.ok_org1 = OrganizationFactory.create(
-            name='OK org 1', slug='org1'
-        )
-        self.ok_org2 = OrganizationFactory.create(
-            name='OK org 2', slug='org2'
-        )
-        self.unath_org = OrganizationFactory.create(
+        self.ok_org1 = OrganizationFactory.create(name='OK org 1', slug='org1')
+        self.ok_org2 = OrganizationFactory.create(name='OK org 2', slug='org2')
+        self.unauth_org = OrganizationFactory.create(
             name='Unauthorized org', slug='unauth-org'
         )
         self.projs = []
@@ -43,10 +38,22 @@ class ProjectListTest(TestCase):
         )
         ProjectFactory.create(
             name='Project in unauthorized org',
-            project_slug='proj-in-unath-org',
-            organization=self.unath_org
+            project_slug='proj-in-unauth-org',
+            organization=self.unauth_org
         )
+        self.priv_proj1 = ProjectFactory.create(
+            organization=self.ok_org1, access='private'
+        )
+        self.priv_proj2 = ProjectFactory.create(
+            organization=self.ok_org1, access='private'
+        )
+        self.priv_proj3 = ProjectFactory.create(
+            organization=self.ok_org2, access='private'
+        )
+        ProjectFactory.create(organization=self.unauth_org, access='private')
 
+        # Note: no project.view_private -- that's controlled by
+        # organization membership in the tests.
         clauses = {
             'clause': [
                 clause('allow', ['project.list'], ['organization/*']),
@@ -58,23 +65,58 @@ class ProjectListTest(TestCase):
         self.policy = Policy.objects.create(
             name='allow',
             body=json.dumps(clauses))
+        self.user = UserFactory.create()
+        self.user.assign_policies(self.policy)
 
-    def test_get_with_user(self):
-        user = UserFactory.create()
-        assign_user_policies(user, self.policy)
+    def _get(self, user=None, status=None, projs=None,
+             make_org_member=None):
+        if user is None:
+            user = self.user
+        if projs is None:
+            projs = self.projs
+        if make_org_member is not None:
+            for org in make_org_member:
+                OrganizationRole.objects.create(organization=org, user=user)
         setattr(self.request, 'user', user)
-        response = self.view(self.request).render()
-        content = response.content.decode('utf-8')
+        response = self.view(self.request)
+        if status is not None:
+            assert response.status_code == status
+        content = response.render().content.decode('utf-8')
 
         expected = render_to_string(
             'organization/project_list.html',
-            {'object_list': self.projs,
+            {'object_list':
+             sorted(projs,
+                    key=lambda p: p.organization.slug + ':' + p.project_slug),
              'add_allowed': True,
              'user': self.request.user},
             request=self.request)
 
-        assert response.status_code == 200
+        if expected != content:
+            with open('expected.txt', 'w') as fp:
+                print(expected, file=fp)
+            with open('content.txt', 'w') as fp:
+                print(content, file=fp)
         assert expected == content
+
+    def test_get_with_valid_user(self):
+        self._get(status=200, projs=self.projs)
+
+    def test_get_with_unauthenticated_user(self):
+        self._get(status=200, user=AnonymousUser(), projs=[])
+
+    def test_get_with_unauthorized_user(self):
+        self._get(status=200, user=UserFactory.create(), projs=[])
+
+    def test_get_with_org_membership(self):
+        self._get(status=200, make_org_member=[self.ok_org1],
+                  projs=self.projs + [self.priv_proj1, self.priv_proj2])
+
+    def test_get_with_org_memberships(self):
+        self._get(status=200, make_org_member=[self.ok_org1, self.ok_org2],
+                  projs=self.projs + [
+                      self.priv_proj1, self.priv_proj2, self.priv_proj3
+                  ])
 
 
 class ProjectDashboardTest(TestCase):
@@ -95,22 +137,44 @@ class ProjectDashboardTest(TestCase):
 
         clauses = {
             'clause': [
-                clause('allow', ['project.list']),
-                clause('allow', ['project.view'], ['project/*/*'])
+                clause('allow',
+                       ['project.list'],
+                       ['organization/*']),
+                clause('allow',
+                       ['project.view', 'project.view_private'],
+                       ['project/*/*'])
             ]
         }
         self.policy = Policy.objects.create(
             name='allow',
             body=json.dumps(clauses))
 
+        # Note, no project.view_private!
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['org.list']),
+                clause('allow', ['org.view'], ['organization/*']),
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+
+        self.user = UserFactory.create()
+        self.user.assign_policies(self.policy)
+        self.restricted_user = UserFactory.create()
+        self.restricted_user.assign_policies(restricted_policy)
+
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
         setattr(self.request, '_messages', self.messages)
 
-        self.user = UserFactory.create()
-        setattr(self.request, 'user', self.user)
-
-    def _get(self, project, status=None):
+    def _get(self, project, user=None, status=None):
+        if user is None:
+            user = self.user
+        setattr(self.request, 'user', user)
         response = self.view(self.request,
                              organization=project.organization.slug,
                              project=project.project_slug)
@@ -118,14 +182,34 @@ class ProjectDashboardTest(TestCase):
             assert response.status_code == status
         return response
 
-    def test_get_with_authorized_user(self):
-        assign_user_policies(self.user, self.policy)
-        response = self._get(self.project1, status=200).render()
-        content = response.content.decode('utf-8')
+    def _get_private(self, status=None, user=None, make_org_member=False,
+                     make_other_org_member=False, remove_org_member=False):
+        if user is None:
+            user = self.user
+        org = OrganizationFactory.create(slug='namati')
+        prj = ProjectFactory.create(
+            project_slug='project', organization=org,
+            name='Test Project', access='private'
+        )
+        if make_org_member:
+            OrganizationRole.objects.create(organization=org, user=user)
+        if remove_org_member:
+            OrganizationRole.objects.filter(
+                organization=org, user=user
+            ).delete()
+        if make_other_org_member:
+            other_org = OrganizationFactory.create()
+            OrganizationRole.objects.create(organization=other_org, user=user)
+        return self._get(prj, user=user, status=status), prj
+
+    def _check_render(self, response, project, assign_context=False):
+        content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
-        context['object'] = self.project1
-        context['project'] = self.project1
+        context['object'] = project
+        context['project'] = project
+        if assign_context:
+            default.assign_project_extent_context(context, project)
         expected = render_to_string(
             'organization/project_dashboard.html',
             context, request=self.request
@@ -133,32 +217,59 @@ class ProjectDashboardTest(TestCase):
 
         assert expected == content
 
-    def test_get_with_unauthorized_user(self):
-        self._get(self.project1, status=302)
+    def _check_fail(self):
         assert ("You don't have permission to access this project"
                 in [str(m) for m in get_messages(self.request)])
 
+    def test_get_with_authorized_user(self):
+        response = self._get(self.project1, status=200)
+        self._check_render(response, self.project1)
+
+    def test_get_with_unauthorized_user(self):
+        self._get(self.project1, user=UserFactory.create(), status=302)
+        self._check_fail()
+
     def test_get_non_existent_project(self):
-        assign_user_policies(self.user, self.policy)
+        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
             self.view(self.request,
                       organization='some-org', project='some-project')
 
     def test_get_with_project_extent(self):
-        assign_user_policies(self.user, self.policy)
-        response = self._get(self.project2, status=200).render()
-        content = response.content.decode('utf-8')
+        response = self._get(self.project2, status=200)
+        self._check_render(response, self.project2, assign_context=True)
 
-        context = RequestContext(self.request)
-        context['object'] = self.project2
-        context['project'] = self.project2
-        default.assign_project_extent_context(context, self.project2)
-        expected = render_to_string(
-            'organization/project_dashboard.html',
-            context, request=self.request
+    def test_get_private_project(self):
+        response, prj = self._get_private(status=200)
+        self._check_render(response, prj)
+
+    def test_get_private_project_with_unauthorized_user(self):
+        self._get_private(user=AnonymousUser(), status=302)
+        self._check_fail()
+
+    def test_get_private_project_without_permission(self):
+        self._get_private(user=self.restricted_user, status=302)
+        self._check_fail()
+
+    def test_get_private_project_based_on_org_membership(self):
+        response, prj = self._get_private(
+            user=UserFactory.create(), status=200, make_org_member=True
         )
+        self._check_render(response, prj)
 
-        assert expected == content
+    def test_get_private_project_with_other_org_membership(self):
+        self._get_private(
+            user=UserFactory.create(), status=302,
+            make_other_org_member=True
+        )
+        self._check_fail()
+
+    def test_get_private_project_on_org_membership_removal(self):
+        self._get_private(
+            user=UserFactory.create(), status=302,
+            make_org_member=True, remove_org_member=True
+        )
+        self._check_fail()
 
 
 class ProjectAddTest(TestCase):

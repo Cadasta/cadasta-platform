@@ -36,6 +36,7 @@ class ProjectFactory(ExtendedFactory):
         lambda n: "Project #%s description" % n)
     urls = ['http://example.com']
     contacts = []
+    access = "public"
 
     @factory.post_generation
     def add_users(self, create, users, **kwargs):

@@ -12,7 +12,7 @@ from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from accounts.models import User
 
 from ..models import Organization, Project, OrganizationRole, ProjectRole
-from .mixins import OrganizationMixin
+from .mixins import OrganizationMixin, ProjectQuerySetMixin
 from .. import forms
 from .. import messages as error_messages
 
@@ -247,7 +247,8 @@ class UserActivation(LoginPermissionRequiredMixin, generic.View):
         return redirect('user:list')
 
 
-class ProjectList(PermissionRequiredMixin, generic.ListView):
+class ProjectList(PermissionRequiredMixin, ProjectQuerySetMixin,
+                  generic.ListView):
     model = Project
     template_name = 'organization/project_list.html'
     permission_required = 'project.list'
@@ -271,9 +272,15 @@ def assign_project_extent_context(context, project):
 
 
 class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
+    def get_actions(view, request):
+        if view.get_object().public():
+            return 'project.view'
+        else:
+            return 'project.view_private'
+
     model = Project
     template_name = 'organization/project_dashboard.html'
-    permission_required = 'project.view'
+    permission_required = {'GET': get_actions}
     permission_denied_message = error_messages.PROJ_VIEW
 
     def get_context_data(self, **kwargs):

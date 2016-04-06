@@ -81,7 +81,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
+    'DEFAULT_VERSIONING_CLASS':
+    'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_VERSION': 'v1',
     'EXCEPTION_HANDLER': 'core.views.api.exception_handler'
 }
@@ -123,7 +124,8 @@ DJOSER = {
     'SITE_NAME': SITE_NAME,
     'SET_PASSWORD_RETYPE': True,
     'PASSWORD_RESET_CONFIRM_RETYPE': True,
-    'PASSWORD_RESET_CONFIRM_URL': 'account/password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL':
+    'account/password/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'account/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
 }
@@ -148,9 +150,16 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 LEAFLET_CONFIG = {
     'TILES': [('OpenStreetMap',
                'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-               {'attribution': 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'}),
+               {'attribution':
+                'Map data &copy; <a href="http://openstreetmap.org">'
+                'OpenStreetMap</a> contributors, '
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">'
+                'CC-BY-SA</a>'}),
               ('DigitalGlobe Satellite',
-               'https://{s}.tiles.mapbox.com/v4/digitalglobe.nal0g75k/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW11a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
+               'https://{s}.tiles.mapbox.com/v4/digitalglobe.nal0g75k'
+               '/{z}/{x}/{y}.png?access_token='
+               'pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW1'
+               '1a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
                {'attribution': 'DigitalGlobe'})],
     'RESET_VIEW': False
 }
