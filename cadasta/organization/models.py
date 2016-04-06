@@ -11,8 +11,6 @@ from tutelary.models import Policy
 
 from core.models import RandomIDModel
 from .validators import validate_contact
-from .choices import ROLE_CHOICES
-
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -52,12 +50,12 @@ class Organization(RandomIDModel):
         path_fields = ('slug',)
         actions = (
             ('org.list',
-             {'description': _("List existing organizations"),
+             {'description': _("List existing organisations"),
               'permissions_object': None}),
             ('org.view',
-             {'description': _("View existing organizations")}),
+             {'description': _("View existing organisations")}),
             ('org.create',
-             {'description': _("Create organizations"),
+             {'description': "Create organisations",
               'permissions_object': None}),
             ('org.update',
              {'description': _("Update an existing organization")}),
@@ -107,6 +105,10 @@ def remove_project_membership(sender, instance, **kwargs):
 
 @permissioned_model
 class Project(RandomIDModel):
+    ACCESS_CHOICES = [
+        ("public", _("Public")),
+        ("private", _("Private")),
+    ]
     name = models.CharField(max_length=100)
     project_slug = models.SlugField(max_length=50, unique=True, null=True)
     organization = models.ForeignKey(Organization, related_name='projects')
@@ -119,6 +121,8 @@ class Project(RandomIDModel):
     users = models.ManyToManyField('accounts.User', through='ProjectRole')
     last_updated = models.DateTimeField(auto_now=True)
     extent = gismodels.PolygonField(null=True)
+    access = models.CharField(default="public", choices=ACCESS_CHOICES,
+                              max_length=15, blank=True)
 
     class Meta:
         ordering = ('organization', 'name')
@@ -128,21 +132,24 @@ class Project(RandomIDModel):
         path_fields = ('organization', 'project_slug')
         actions = (
             ('project.list',
-             {'description': _("List existing projects in an organization"),
+             {'description': _("List organization existing"),
               'permissions_object': 'organization'}),
             ('project.create',
-             {'description': _("Create projects in an organization"),
+             {'description': _("Create an organization project"),
+              'permissions_object': 'organization'}),
+            ('project.view_private',
+             {'description': _("View a private project within a organization"),
               'permissions_object': 'organization'}),
             ('project.view',
-             {'description': _("View existing projects")}),
+             {'description': _("View organization project")}),
             ('project.update',
-             {'description': _("Update an existing project")}),
+             {'description': ("Update a project")}),
             ('project.archive',
              {'description': _("Archive an existing project")}),
             ('project.unarchive',
-             {'description': _("Unarchive an existing project")}),
+             {'description': _("Unarchive an existing")}),
             ('project.users.list',
-             {'description': _("List users within a project")}),
+             {'description': _("List users within a")}),
             ('project.users.add',
              {'description': _("Add user to a project")}),
             ('project.users.edit',
@@ -158,9 +165,8 @@ class Project(RandomIDModel):
 class ProjectRole(RandomIDModel):
     project = models.ForeignKey(Project)
     user = models.ForeignKey('accounts.User')
-    role = models.CharField(max_length=2,
-                            choices=ROLE_CHOICES,
-                            default='PU')
+    manager = models.BooleanField(default=False)
+    collector = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('project', 'user')
@@ -170,41 +176,26 @@ class ProjectRole(RandomIDModel):
 def assign_project_permissions(sender, instance, **kwargs):
     assigned_policies = instance.user.assigned_policies()
 
-    project_manager = get_policy_instance('project-manager', {
+    policy_instance = get_policy_instance('project-manager', {
         'organization': instance.project.organization.slug,
         'project': instance.project.project_slug
     })
-    is_manager = project_manager in assigned_policies
+    has_policy = policy_instance in assigned_policies
 
-    project_user = get_policy_instance('project-user', {
+    if not has_policy and instance.manager:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.manager:
+        assigned_policies.remove(policy_instance)
+
+    policy_instance = get_policy_instance('data-collector', {
         'organization': instance.project.organization.slug,
         'project': instance.project.project_slug
     })
-    is_user = project_user in assigned_policies
+    has_policy = policy_instance in assigned_policies
 
-    data_collector = get_policy_instance('data-collector', {
-        'organization': instance.project.organization.slug,
-        'project': instance.project.project_slug
-    })
-    is_collector = data_collector in assigned_policies
-
-    new_role = instance.role
-
-    if is_user and not new_role == 'PU':
-        assigned_policies.remove(project_user)
-    elif not is_user and new_role == 'PU':
-        assigned_policies.append(project_user)
-
-    if is_collector and not new_role == 'DC':
-        print('remove')
-        assigned_policies.remove(data_collector)
-    elif not is_collector and new_role == 'DC':
-        print('add')
-        assigned_policies.append(data_collector)
-
-    if is_manager and not new_role == 'PM':
-        assigned_policies.remove(project_manager)
-    elif not is_manager and new_role == 'PM':
-        assigned_policies.append(project_manager)
+    if not has_policy and instance.collector:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.collector:
+        assigned_policies.remove(policy_instance)
 
     instance.user.assign_policies(*assigned_policies)
