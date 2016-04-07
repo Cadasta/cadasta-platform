@@ -66,7 +66,19 @@ class OrganizationUrlTest(TestCase):
 
 
 class ProjectUrlTest(TestCase):
+
     def test_project_list(self):
+        self.assertEqual(
+            reverse(version_ns('project:list')),
+            version_url('/projects/')
+        )
+
+        resolved = resolve(version_url('/projects/'))
+        self.assertEqual(
+            resolved.func.__name__,
+            api.ProjectList.__name__)
+
+    def test_organization_project_list(self):
         actual = reverse(
             version_ns('organization:project_list'),
             kwargs={'slug': 'habitat'}

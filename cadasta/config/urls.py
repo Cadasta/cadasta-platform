@@ -22,6 +22,9 @@ api_v1 = [
     url(r'^organizations/',
         include('organization.urls.api.organizations',
                 namespace='organization')),
+    url(r'^projects/',
+        include('organization.urls.api.projects',
+                namespace='project')),
     url(r'^users/',
         include('organization.urls.api.users', namespace='user')),
 ]
