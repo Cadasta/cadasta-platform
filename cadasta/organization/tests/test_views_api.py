@@ -1318,8 +1318,8 @@ class ProjectListAPITest(TestCase):
         )
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='habitat').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='habitat').render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
@@ -1338,8 +1338,8 @@ class ProjectListAPITest(TestCase):
         )
         force_authenticate(request, user=AnonymousUser())
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='habitat').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='habitat').render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 403
@@ -1361,8 +1361,8 @@ class ProjectListAPITest(TestCase):
         setattr(request, 'GET', QueryDict('archived=True'))
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='habitat').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='habitat').render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
@@ -1382,8 +1382,8 @@ class ProjectListAPITest(TestCase):
         setattr(request, 'GET', QueryDict('search=opdp'))
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='namati').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='namati').render()
         content = json.loads(response.content.decode('utf-8'))
 
         print(response.content.decode('utf-8'))
@@ -1405,8 +1405,8 @@ class ProjectListAPITest(TestCase):
         setattr(request, 'GET', QueryDict('ordering=name'))
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='namati').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='namati').render()
         content = json.loads(response.content.decode('utf-8'))
 
         print(response.content.decode('utf-8'))
@@ -1432,7 +1432,7 @@ class ProjectListAPITest(TestCase):
         setattr(request, 'GET', QueryDict('ordering=-name'))
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request, slug='namati').render()
+        response = api.OrganizationProjectList.as_view()(request, slug='namati').render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 200
@@ -1456,8 +1456,8 @@ class ProjectListAPITest(TestCase):
         setattr(request, 'GET', QueryDict('access=public'))
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='namati').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='namati').render()
         content = json.loads(response.content.decode('utf-8'))
 
         print(response.content.decode('utf-8'))
@@ -1478,8 +1478,8 @@ class ProjectListAPITest(TestCase):
         setattr(request, 'GET', QueryDict('access=private'))
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='namati').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='namati').render()
         content = json.loads(response.content.decode('utf-8'))
 
         print(response.content.decode('utf-8'))
@@ -1518,8 +1518,8 @@ class ProjectCreateAPITest(TestCase):
             '/v1/organizations/habitat/projects/', data)
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request,
-                                             slug='habitat').render()
+        response = api.OrganizationProjectList.as_view()(request,
+                                                         slug='habitat').render()
         print(response.content.decode('utf-8'))
         assert response.status_code == 201
         assert Project.objects.count() == 1
@@ -1533,7 +1533,7 @@ class ProjectCreateAPITest(TestCase):
             '/v1/organizations/namati/projects/', data)
         force_authenticate(request, user=self.user)
 
-        response = api.ProjectList.as_view()(request, slug='namati').render()
+        response = api.OrganizationProjectList.as_view()(request, slug='namati').render()
         content = json.loads(response.content.decode('utf-8'))
 
         assert response.status_code == 400

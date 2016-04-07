@@ -11,6 +11,8 @@ from tutelary.models import Policy
 
 from core.models import RandomIDModel
 from .validators import validate_contact
+from .choices import ROLE_CHOICES
+
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -50,12 +52,12 @@ class Organization(RandomIDModel):
         path_fields = ('slug',)
         actions = (
             ('org.list',
-             {'description': _("List existing organisations"),
+             {'description': _("List existing organizations"),
               'permissions_object': None}),
             ('org.view',
-             {'description': _("View existing organisations")}),
+             {'description': _("View existing organizations")}),
             ('org.create',
-             {'description': "Create organisations",
+             {'description': _("Create organizations"),
               'permissions_object': None}),
             ('org.update',
              {'description': _("Update an existing organization")}),
@@ -132,24 +134,21 @@ class Project(RandomIDModel):
         path_fields = ('organization', 'project_slug')
         actions = (
             ('project.list',
-             {'description': _("List organization existing"),
+             {'description': _("List existing projects in an organization"),
               'permissions_object': 'organization'}),
             ('project.create',
-             {'description': _("Create an organization project"),
-              'permissions_object': 'organization'}),
-            ('project.view_private',
-             {'description': _("View a private project within a organization"),
+             {'description': _("Create projects in an organization"),
               'permissions_object': 'organization'}),
             ('project.view',
-             {'description': _("View organization project")}),
+             {'description': _("View existing projects")}),
             ('project.update',
-             {'description': ("Update a project")}),
+             {'description': _("Update an existing project")}),
             ('project.archive',
              {'description': _("Archive an existing project")}),
             ('project.unarchive',
-             {'description': _("Unarchive an existing")}),
+             {'description': _("Unarchive an existing project")}),
             ('project.users.list',
-             {'description': _("List users within a")}),
+             {'description': _("List users within a project")}),
             ('project.users.add',
              {'description': _("Add user to a project")}),
             ('project.users.edit',
@@ -165,8 +164,9 @@ class Project(RandomIDModel):
 class ProjectRole(RandomIDModel):
     project = models.ForeignKey(Project)
     user = models.ForeignKey('accounts.User')
-    manager = models.BooleanField(default=False)
-    collector = models.BooleanField(default=False)
+    role = models.CharField(max_length=2,
+                            choices=ROLE_CHOICES,
+                            default='PU')
 
     class Meta:
         unique_together = ('project', 'user')
@@ -176,26 +176,41 @@ class ProjectRole(RandomIDModel):
 def assign_project_permissions(sender, instance, **kwargs):
     assigned_policies = instance.user.assigned_policies()
 
-    policy_instance = get_policy_instance('project-manager', {
+    project_manager = get_policy_instance('project-manager', {
         'organization': instance.project.organization.slug,
         'project': instance.project.project_slug
     })
-    has_policy = policy_instance in assigned_policies
+    is_manager = project_manager in assigned_policies
 
-    if not has_policy and instance.manager:
-        assigned_policies.append(policy_instance)
-    elif has_policy and not instance.manager:
-        assigned_policies.remove(policy_instance)
-
-    policy_instance = get_policy_instance('data-collector', {
+    project_user = get_policy_instance('project-user', {
         'organization': instance.project.organization.slug,
         'project': instance.project.project_slug
     })
-    has_policy = policy_instance in assigned_policies
+    is_user = project_user in assigned_policies
 
-    if not has_policy and instance.collector:
-        assigned_policies.append(policy_instance)
-    elif has_policy and not instance.collector:
-        assigned_policies.remove(policy_instance)
+    data_collector = get_policy_instance('data-collector', {
+        'organization': instance.project.organization.slug,
+        'project': instance.project.project_slug
+    })
+    is_collector = data_collector in assigned_policies
+
+    new_role = instance.role
+
+    if is_user and not new_role == 'PU':
+        assigned_policies.remove(project_user)
+    elif not is_user and new_role == 'PU':
+        assigned_policies.append(project_user)
+
+    if is_collector and not new_role == 'DC':
+        print('remove')
+        assigned_policies.remove(data_collector)
+    elif not is_collector and new_role == 'DC':
+        print('add')
+        assigned_policies.append(data_collector)
+
+    if is_manager and not new_role == 'PM':
+        assigned_policies.remove(project_manager)
+    elif not is_manager and new_role == 'PM':
+        assigned_policies.append(project_manager)
 
     instance.user.assign_policies(*assigned_policies)

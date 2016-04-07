@@ -21,7 +21,7 @@ urlpatterns = [
         name='users_detail'),
     url(
         r'^(?P<slug>[-\w]+)/projects/$',
-        api.ProjectList.as_view(),
+        api.OrganizationProjectList.as_view(),
         name='project_list'),
     url(
         r'^(?P<slug>[-\w]+)/projects/(?P<project_slug>[-\w]+)/$',

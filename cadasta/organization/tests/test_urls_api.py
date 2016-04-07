@@ -77,7 +77,7 @@ class ProjectUrlTest(TestCase):
         assert actual == expected
 
         resolved = resolve(version_url('/organizations/habitat/projects/'))
-        assert resolved.func.__name__ == api.ProjectList.__name__
+        assert resolved.func.__name__ == api.OrganizationProjectList.__name__
         assert resolved.kwargs['slug'] == 'habitat'
 
     def test_project_users(self):
