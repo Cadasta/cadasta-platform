@@ -53,5 +53,8 @@ urlpatterns = [
 
     url(r'^api/',
         include(api,
-                namespace='api'))
+                namespace='api')),
+
+    url(r'^i18n/',
+        include('django.conf.urls.i18n')),
 ]
