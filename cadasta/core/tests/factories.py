@@ -5,7 +5,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from datetime import datetime, timezone
 
 from accounts.models import User
-from organization.models import Organization, Project
+from organization.models import Organization, Project, OrganizationRole
 from tutelary.models import Policy, Role, PolicyInstance, RolePolicyAssign
 
 from accounts.tests.factories import UserFactory
@@ -43,15 +43,13 @@ class FixturesData():
              'first_name': 'Oliver', 'last_name': 'Roick'}]
         # add user's with names in languages that need to be tested.
         languages = ['el_GR', 'ja_JP', 'hi_IN', 'hr_HR', 'lt_LT']
-        lang_users = [{
+        named_users.append({
             'first_name': 'עזרא',
             'last_name': 'ברש'
-        }]
+        })
         for lang in languages:
             fake = Factory.create(lang)
-            lang_users.append({
-                'username': 'testuser{}'.format(lang),
-                'email': '{}user@example.com'.format(lang),
+            named_users.append({
                 'first_name': fake.first_name(),
                 'last_name': fake.last_name()
             })
@@ -64,10 +62,9 @@ class FixturesData():
                     last_login=datetime.now(tz=timezone.utc),
                     is_active=True,
                 ))
-            elif n < len(named_users) + len(lang_users):
+            else:
                 users.append(UserFactory.create(
                     password='password',
-                    email_verified=True,
                     is_active=(n < 8),
                     first_name=factory.Faker('first_name'),
                     last_name=factory.Faker('last_name'),
@@ -77,6 +74,7 @@ class FixturesData():
 
     def add_test_users_and_roles(self):
         users = FixturesData.add_test_users(self)
+        orgs = Organization.objects.all()
 
         PolicyFactory.set_directory('config/permissions')
 
@@ -99,31 +97,46 @@ class FixturesData():
 
         users[0].assign_policies(roles['superuser'])
         users[1].assign_policies(roles['superuser'])
-        users[2].assign_policies(roles['cadasta-oa'])
-        users[3].assign_policies(roles['habitat-for-humanity-oa'])
-        users[4].assign_policies(roles['habitat-for-humanity-oa'],
-                                 roles['cadasta-oa'])
+
+        for i in [0, 1, 3, 4, 7, 10]:
+            admin = i == 3 or i == 4
+            OrganizationRole.objects.create(
+                organization=orgs[0], user=users[i], admin=admin
+            )
+
+        for i in [0, 1, 2, 4, 8, 10]:
+            admin = i == 2 or i == 4
+            OrganizationRole.objects.create(
+                organization=orgs[1], user=users[i], admin=admin
+            )
 
         self.stdout.write(self.style.SUCCESS(
-            "\n{} and {} have superuser policies."
+            "{} and {} have superuser policies."
             .format(users[0], users[1])))
-
-        self.stdout.write(self.style.SUCCESS(
-            "\n{} and {} have cadasta-oa policies."
-            .format(users[2], users[4])))
-
-        self.stdout.write(self.style.SUCCESS(
-            "\n{} and {} have habitat-for-humanity-oa policies."
-            .format(users[3], users[4])))
 
     def add_test_organizations(self):
         orgs = []
-        users = User.objects.filter(username__startswith='testuser')
-
-        for n in range(3):
-            orgs.append(OrganizationFactory.create(
-                add_users=users
-            ))
+        orgs.append(OrganizationFactory.create(
+            name='Habitat for Humanity (Test)', slug='habitat-for-humanity',
+            description="""Habitat for Humanity is a nonprofit, ecumenical Christian ministry
+        that builds with people in need regardless of race or religion. Since
+        1976, Habitat has helped 6.8 million people find strength, stability
+        and independence through safe, decent and affordable shelter.""",
+            urls=['http://www.habitat.org'],
+            logo='https://s3.amazonaws.com/cadasta-dev-tmp/logos/h4h.png',
+            contacts=[{'email': 'info@habitat.org'}]
+        ))
+        orgs.append(OrganizationFactory.create(
+            name='Cadasta (Test)', slug='cadasta',
+            description="""Cadasta Foundation is dedicated to the support, continued
+        development and growth of the Cadasta Platform – an innovative, open
+        source suite of tools for the collection and management of ownership,
+        occupancy, and spatial data that meets the unique challenges of this
+        process in much of the world.""",
+            urls=['http://www.cadasta.org'],
+            logo='https://s3.amazonaws.com/cadasta-dev-tmp/logos/cadasta.png',
+            contacts=[{'email': 'info@cadasta.org'}]
+        ))
 
         self.stdout.write(self.style.SUCCESS(
             '\nSuccessfully added organizations {}'
@@ -131,12 +144,10 @@ class FixturesData():
 
     def add_test_projects(self):
         projs = []
-        if Organization.objects.all().exists():
-            orgs = Organization.objects.all()
-        else:
-            orgs = OrganizationFactory.create_batch(2)
+        orgs = Organization.objects.filter(name__contains='Test')
+
         projs.append(ProjectFactory.create(
-            name='Kibera',
+            name='Kibera Test Project',
             project_slug='kibera',
             description="""This is a test project.  This is a test project.
             This is a test project.  This is a test project.  This is a test
@@ -204,20 +215,19 @@ class FixturesData():
             country='MM',
             extent=GEOSGeometry('{"type": "Polygon","coordinates": [[[-0.1878833770751953,51.509864277798705],[-0.18393516540527344,51.50201096474784],[-0.17500877380371094,51.501690392607],[-0.17226219177246094,51.50671243040582],[-0.171661376953125,51.51152024583139],[-0.18642425537109375,51.509864277798705],[-0.1878833770751953,51.509864277798705]]]}')
         ))
+        self.stdout.write(self.style.SUCCESS(
+            '\nSuccessfully added organizations {}'
+            .format(Project.objects.all())))
 
     def delete_test_organizations(self):
-        orgs = Organization.objects.filter(name__startswith='Organization #')
+        orgs = Organization.objects.filter(name__contains='Test')
         for org in orgs:
             org.delete()
 
         PolicyInstance.objects.all().delete()
         RolePolicyAssign.objects.all().delete()
         Policy.objects.all().delete()
-
-        self.stdout.write(self.style.SUCCESS(
-            """Successfully deleted all test organizations.
-            Remaining organizations: {}"""
-            .format(Organization.objects.all())))
+        Role.objects.all().delete()
 
     def delete_test_users(self):
         users = User.objects.filter(username__startswith='testuser')
@@ -229,14 +239,6 @@ class FixturesData():
             if User.objects.filter(username=user).exists():
                 User.objects.get(username=user).delete()
 
-        self.stdout.write(self.style.SUCCESS(
-            'Successfully deleted test users. Remaining users: {}'
-            .format(User.objects.all())))
-
     def delete_test_projects(self):
         projs = Project.objects.filter(name__contains='Test Project')
         projs.delete()
-
-        self.stdout.write(self.style.SUCCESS(
-            'Successfully deleted test projects. Remaining users: {}'
-            .format(User.objects.all())))
