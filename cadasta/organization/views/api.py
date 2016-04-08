@@ -95,10 +95,6 @@ class UserAdminDetail(APIPermissionRequiredMixin,
     }
 
 
-class ProjectList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
-    pass
-
-
 class OrganizationProjectList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -131,9 +127,19 @@ class OrganizationProjectList(APIPermissionRequiredMixin, generics.ListCreateAPI
         return context
 
     def get_queryset(self):
-        return self.get_organization().projects.all()\
-            # .filter(access="public")
+        return self.get_organization().projects.all()
 
+
+class ProjectList(APIPermissionRequiredMixin, generics.ListAPIView):
+    serializer_class = serializers.ProjectSerializer
+    queryset = Project.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,)
+    filter_fields = ('archived',)
+    search_fields = ('name', 'organization__name', 'country', 'description',)
+    ordering_fields = ('name', 'organization', 'country', 'description',)
+    permission_required = {'project.list'}
 
 
 class ProjectDetail(APIPermissionRequiredMixin,

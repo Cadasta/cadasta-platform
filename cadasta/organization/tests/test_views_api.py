@@ -1307,6 +1307,42 @@ class ProjectListAPITest(TestCase):
         assign_user_policies(self.user, policy)
 
     def test_full_list(self):
+        org1 = OrganizationFactory.create(**{'slug': 'habitat'})
+        org2 = OrganizationFactory.create(**{'slug': 'namati'})
+        ProjectFactory.create_batch(2, **{'organization': org1,
+                                          'access': 'public'})
+        ProjectFactory.create_batch(2, **{'organization': org2,
+                                          'access': 'private'})
+        request = APIRequestFactory().get(
+            '/v1/organizations/'
+        )
+        force_authenticate(request, user=self.user)
+        response = api.ProjectList.as_view()(request).render()
+        content = json.loads(response.content.decode('utf-8'))
+        print(content)
+        assert response.status_code == 200
+        assert len(content) == 4
+
+
+class OrganizationProjectListAPITest(TestCase):
+    def setUp(self):
+        clause = {
+            'clause': [
+                {
+                  'effect': 'allow',
+                  'object': ['organization/*'],
+                  'action': ['project.list']
+                }
+            ]
+        }
+
+        policy = Policy.objects.create(
+            name='default',
+            body=json.dumps(clause))
+        self.user = UserFactory.create()
+        assign_user_policies(self.user, policy)
+
+    def test_full_list(self):
         """
         It should return all projects.
         """

@@ -139,6 +139,9 @@ class Project(RandomIDModel):
             ('project.create',
              {'description': _("Create projects in an organization"),
               'permissions_object': 'organization'}),
+            ('project.view_private',
+             {'description': _("View private projects"),
+              'permissions_object': 'organization'}),
             ('project.view',
              {'description': _("View existing projects")}),
             ('project.update',
@@ -176,41 +179,26 @@ class ProjectRole(RandomIDModel):
 def assign_project_permissions(sender, instance, **kwargs):
     assigned_policies = instance.user.assigned_policies()
 
-    project_manager = get_policy_instance('project-manager', {
+    policy_instance = get_policy_instance('project-manager', {
         'organization': instance.project.organization.slug,
         'project': instance.project.project_slug
     })
-    is_manager = project_manager in assigned_policies
+    has_policy = policy_instance in assigned_policies
 
-    project_user = get_policy_instance('project-user', {
+    if not has_policy and instance.manager:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.manager:
+        assigned_policies.remove(policy_instance)
+
+    policy_instance = get_policy_instance('data-collector', {
         'organization': instance.project.organization.slug,
         'project': instance.project.project_slug
     })
-    is_user = project_user in assigned_policies
+    has_policy = policy_instance in assigned_policies
 
-    data_collector = get_policy_instance('data-collector', {
-        'organization': instance.project.organization.slug,
-        'project': instance.project.project_slug
-    })
-    is_collector = data_collector in assigned_policies
-
-    new_role = instance.role
-
-    if is_user and not new_role == 'PU':
-        assigned_policies.remove(project_user)
-    elif not is_user and new_role == 'PU':
-        assigned_policies.append(project_user)
-
-    if is_collector and not new_role == 'DC':
-        print('remove')
-        assigned_policies.remove(data_collector)
-    elif not is_collector and new_role == 'DC':
-        print('add')
-        assigned_policies.append(data_collector)
-
-    if is_manager and not new_role == 'PM':
-        assigned_policies.remove(project_manager)
-    elif not is_manager and new_role == 'PM':
-        assigned_policies.append(project_manager)
+    if not has_policy and instance.collector:
+        assigned_policies.append(policy_instance)
+    elif has_policy and not instance.collector:
+        assigned_policies.remove(policy_instance)
 
     instance.user.assign_policies(*assigned_policies)
