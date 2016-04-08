@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 
+from django.utils.translation import ugettext_lazy as _
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -162,6 +165,12 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
+LANGUAGES = [
+    ('en', _('English')),
+    ('fr', _('French')),
+    ('de', _('German')),
+    ('es', _('Spanish')),
+]
 
 USE_L10N = True
 

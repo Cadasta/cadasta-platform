@@ -3497,6 +3497,14 @@ footer {
   white-space: nowrap;
   padding-top: 4px; }
 
+footer .list-inline {
+  display: inline-block; }
+
+footer form {
+  display: inline-block;
+  padding-left: 24px;
+  color: #153367; }
+
 footer .list-inline > li {
   padding-left: 24px;
   text-align: right; }

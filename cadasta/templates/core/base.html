@@ -82,33 +82,52 @@
             <p class="pull-left">
               {% trans "Copyright 2016 Cadasta. All Rights Reserved." %}
             </p>
-            <ul class="list-inline pull-right">
-              <li>
-                <a href="http://cadasta.org/about-us">
-                  {% trans "About Us" %}
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  {% trans "Privacy" %}
-                </a>
-              </li>
-              <li>
-                <a href="#">
-                  {% trans "Terms of Service" %}
-                </a>
-              </li>
-              <li>
-                <a href="http://cadasta.org/code-of-conduct">
-                  {% trans "Code of Conduct" %}
-                </a>
-              </li>
-              <li>
-                <a href="http://github.com/Cadasta">
-                  {% trans "Visit us on Github" %}
-                </a>
-              </li>
-            </ul>
+            <div class="pull-right">
+              <ul class="list-inline">
+                <li>
+                  <a href="http://cadasta.org/about-us">
+                    {% trans "About Us" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    {% trans "Privacy" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="#">
+                    {% trans "Terms of Service" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="http://cadasta.org/code-of-conduct">
+                    {% trans "Code of Conduct" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="http://github.com/Cadasta">
+                    {% trans "Visit us on Github" %}
+                  </a>
+                </li>
+              </ul>
+
+              <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+                <select id="language" name="language">
+                  {% get_current_language as LANGUAGE_CODE %}
+                  {% get_available_languages as LANGUAGES %}
+                  {% get_language_info_list for LANGUAGES as languages %}
+                  {% for language in languages %}
+                  <option value="{{ language.code }}"
+                          {% if language.code == LANGUAGE_CODE %}
+                          selected="selected"
+                          {% endif %}>
+                    {{ language.name_local|capfirst }} ({{ language.code }})
+                  </option>
+                  {% endfor %}
+                </select>
+                <input hidden="true" type="submit" value="Go" />
+              </form>
+            </div>
           </div>
         </footer>
       </div>
@@ -124,6 +143,7 @@
     <script>
      $(document).ready(function () {
        $('.datatable').DataTable();
+       $('#language').change(function() { this.form.submit(); });
      });
     </script>
   </body>

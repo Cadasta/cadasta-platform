@@ -45,7 +45,8 @@ class OrganizationListTest(TestCase):
         expected = render_to_string(
             'organization/organization_list.html',
             {'object_list': self.orgs,
-             'user': self.request.user})
+             'user': self.request.user},
+            request=self.request)
 
         assert response.status_code == 200
         assert expected == content
@@ -512,7 +513,8 @@ class ProjectListTest(TestCase):
             'organization/project_list.html',
             {'object_list': self.projs,
              'add_allowed': True,
-             'user': self.request.user})
+             'user': self.request.user},
+            request=self.request)
 
         assert response.status_code == 200
         assert expected == content
