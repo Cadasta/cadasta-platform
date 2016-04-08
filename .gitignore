@@ -30,3 +30,5 @@ vagrant.retry
 
 .sass-cache/
 .transifexrc
+
+.DS_Store

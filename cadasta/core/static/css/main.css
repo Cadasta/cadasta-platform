@@ -3347,6 +3347,23 @@ input.toggle-round:checked + label:before {
 input.toggle-round:checked + label:after {
   margin-left: 30px; }
 
+.leaflet-control-geolocate {
+  width: 25px;
+  height: 25px;
+  background-color: #FFFFFF;
+  text-align: center; }
+
+.leaflet-control-geolocate:hover {
+  background-color: #f4f4f4; }
+
+.leaflet-control-geolocate span {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  vertical-align: middle;
+  cursor: pointer; }
+
 /* =Basics
 -------------------------------------------------------------- */
 html, body {
@@ -3432,7 +3449,7 @@ header nav a:hover {
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
-.reg-links li:first-child {
+.reg-links-divider {
   border-right: solid 1px #eee; }
 
 .reg-links .list-inline > li {
@@ -3577,5 +3594,12 @@ img.org-logo-hidden {
 
 img#org-logo {
   width: 120px; }
+
+div#dashboard-map {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100px;
+  bottom: 30px; }
 
 /*# sourceMappingURL=main.css.map */

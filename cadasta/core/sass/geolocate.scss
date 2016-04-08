@@ -1,0 +1,19 @@
+.leaflet-control-geolocate {
+    width: 25px;
+    height: 25px;
+    background-color: #FFFFFF;
+    text-align: center;
+}
+
+.leaflet-control-geolocate:hover {
+    background-color: #f4f4f4;
+}
+
+.leaflet-control-geolocate span {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    vertical-align: middle;
+    cursor: pointer;
+}

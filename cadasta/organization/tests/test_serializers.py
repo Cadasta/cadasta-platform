@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from django.test import TestCase
 from django.utils.translation import gettext as _
 from django.core import mail
+from django.core.urlresolvers import reverse
 from rest_framework.serializers import ValidationError
 from rest_framework.test import APIRequestFactory
 
@@ -83,6 +84,18 @@ class ProjectSerializerTest(TestCase):
 
         project_instance = serializer.instance
         assert project_instance.organization == organization
+
+
+class ProjectGeometrySerializerTest(TestCase):
+    def test_method_fields_work(self):
+        project = ProjectFactory.create()
+        test_data = serializers.ProjectGeometrySerializer(project).data
+
+        assert test_data['properties']['org'] == project.organization.name
+        assert test_data['properties']['url'] == reverse(
+            'organization:project-dashboard',
+            kwargs={ 'organization': project.organization.slug,
+                     'project': project.project_slug })
 
 
 class OrganizationUserSerializerTest(TestCase):

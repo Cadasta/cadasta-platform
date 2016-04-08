@@ -2,10 +2,12 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.db.models import Q
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.template.loader import get_template
 from django.template import Context
 from rest_framework import serializers
+from rest_framework_gis import serializers as geo_serializers
 from django_countries.serializer_fields import CountryField
 
 from core.serializers import DetailSerializer, FieldSelectorSerializer
@@ -60,6 +62,25 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
             organization_id=organization.id,
             **validated_data
         )
+
+
+class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
+    org = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Project
+        geo_field = 'extent'
+        fields = ('name', 'org', 'url')
+
+    def get_org(self, object):
+        return object.organization.name
+
+    def get_url(self, object):
+        return reverse(
+                  'organization:project-dashboard',
+                  kwargs={ 'organization': object.organization.slug,
+                           'project': object.project_slug })
 
 
 class EntityUserSerializer(serializers.Serializer):

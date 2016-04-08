@@ -30,6 +30,16 @@
                     {% trans "Organizations" %}
                   </a>
                 </li>
+                <li>
+                  <a href="{% url 'project:list' %}">
+                    {% trans "Projects" %}
+                  </a>
+                </li>
+                <li class="reg-links-divider">
+                  <a href="{% url 'user:list' %}">
+                    {% trans "Users" %}
+                  </a>
+                </li>
                 {% if user.is_authenticated %}
                 <li>
                   <a href="{% url 'account:profile' %}">

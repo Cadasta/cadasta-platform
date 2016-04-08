@@ -48,7 +48,7 @@ class RegistrationTest(FunctionalTest):
         fields['password2'].send_keys('very_secret')
         self.click_through(fields['register'], self.BY_ALERT)
         self.assert_has_message('alert', "signed in")
-        self.browser.find_element_by_xpath(self.xpath('h1', 'Dashboard'))
+        self.browser.find_element_by_id('dashboard-map')
 
         # Log out.
         self.click_through(
@@ -60,7 +60,7 @@ class RegistrationTest(FunctionalTest):
         # Log in as new user.
         sign_in = LoginPage(self).setup('user3', 'very_secret')
         self.click_through(sign_in, self.BY_ALERT)
-        self.browser.find_element_by_xpath(self.xpath('h1', 'Dashboard'))
+        self.browser.find_element_by_id('dashboard-map')
 
     def test_register_duplicate_user(self):
         page = RegistrationPage(self)

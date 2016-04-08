@@ -37,6 +37,7 @@
 
 @import "wizard";
 @import "toggle";
+@import "geolocate";
 
 /* =Basics
 -------------------------------------------------------------- */
@@ -133,9 +134,10 @@ header nav a:hover {
   -moz-border-radius: 2px;
   border-radius: 2px;
 }
-.reg-links li:first-child {
+.reg-links-divider {
    border-right: solid 1px #eee;
 }
+
 .reg-links .list-inline > li {
   padding: 0;
 }
@@ -316,4 +318,12 @@ img.org-logo-hidden {
 
 img#org-logo {
   width: 120px;
+}
+
+div#dashboard-map {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100px;
+  bottom: 30px;
 }
