@@ -4,6 +4,8 @@ from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
 from django.template import RequestContext
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.messages.api import get_messages
 
 from tutelary.models import Policy, assign_user_policies
 
@@ -106,23 +108,23 @@ class OrganizationAddTest(TestCase):
         assert response.status_code == 302
         assert '/organizations/{}/'.format(org.slug) in response['location']
 
-    # def test_get_with_unauthorized_user(self):
-    #     user = UserFactory.create()
-    #     setattr(self.request, 'user', user)
-    #     response = self.view(self.request).render()
-    #     content = response.content.decode('utf-8')
+    def test_get_with_unauthenticated_user(self):
+        response = self.view(self.request)
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
 
-    #     context = RequestContext(self.request)
-    #     context['form'] = forms.OrganizationForm()
+    def test_post_with_unauthenticated_user(self):
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {
+            'name': 'Org',
+            'description': 'Some description',
+            'url': 'http://example.com'
+        })
 
-    #     expected = render_to_string(
-    #         'organization/organization_add.html',
-    #         context
-    #     )
-
-    #     assert response.status_code == 200
-    #     assert expected == content
-
+        response = self.view(self.request)
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        assert Organization.objects.count() == 0
 
 
 class OrganizationDashboardTest(TestCase):
@@ -144,6 +146,10 @@ class OrganizationDashboardTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
@@ -161,8 +167,15 @@ class OrganizationDashboardTest(TestCase):
         assert response.status_code == 200
         assert expected == content
 
-    # def test_get_with_unauthorized_user(self):
-    #     assert False, 'Implement this'
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+        response = self.view(self.request, slug=self.org.slug)
+
+        assert response.status_code == 302
+        print(response['location'])
+        assert ("You don't have permission to access this organization"
+                in [str(m) for m in get_messages(self.request)])
 
 
 class OrganzationEditTest(TestCase):
@@ -183,6 +196,10 @@ class OrganzationEditTest(TestCase):
         self.policy = Policy.objects.create(
             name='allow',
             body=json.dumps(clauses))
+
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -227,6 +244,56 @@ class OrganzationEditTest(TestCase):
         assert self.org.name == 'Org'
         assert self.org.description == 'Some description'
 
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+        response = self.view(self.request, slug=self.org.slug)
+
+        assert response.status_code == 302
+        assert ("You don't have permission to update this organization"
+                in [str(m) for m in get_messages(self.request)])
+
+    def test_post_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {
+            'name': 'Org',
+            'description': 'Some description',
+            'urls': 'http://example.com'
+        })
+
+        response = self.view(self.request, slug=self.org.slug)
+        self.org.refresh_from_db()
+
+        assert response.status_code == 302
+        assert ("You don't have permission to update this organization"
+                in [str(m) for m in get_messages(self.request)])
+        assert self.org.name != 'Org'
+        assert self.org.description != 'Some description'
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.view(self.request)
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+
+    def test_post_with_unauthenticated_user(self):
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {
+            'name': 'Org',
+            'description': 'Some description',
+            'urls': 'http://example.com'
+        })
+
+        response = self.view(self.request, slug=self.org.slug)
+        self.org.refresh_from_db()
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        assert self.org.name != 'Org'
+        assert self.org.description != 'Some description'
+
 
 class OrganzationArchiveTest(TestCase):
     def setUp(self):
@@ -247,6 +314,10 @@ class OrganzationArchiveTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
     def test_archive_with_authorized_user(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
@@ -258,6 +329,81 @@ class OrganzationArchiveTest(TestCase):
         assert response.status_code == 302
         assert ('/organizations/{}/'.format(self.org.slug)
                 in response['location'])
+        assert self.org.archived is True
+
+    def test_archive_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+        response = self.view(self.request, slug=self.org.slug)
+
+        self.org.refresh_from_db()
+        assert response.status_code == 302
+        assert ("You don't have permission to archive this organization"
+                in [str(m) for m in get_messages(self.request)])
+        assert self.org.archived is False
+
+    def test_archive_with_unauthenticated_user(self):
+        response = self.view(self.request)
+        self.org.refresh_from_db()
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        assert self.org.archived is False
+
+
+class OrganzationUnarchiveTest(TestCase):
+    def setUp(self):
+        self.view = default.OrganizationUnarchive.as_view()
+        self.request = HttpRequest()
+        setattr(self.request, 'method', 'GET')
+        setattr(self.request, 'user', AnonymousUser())
+
+        self.org = OrganizationFactory.create(archived=True)
+
+        clauses = {
+            'clause': [
+                clause('allow', ['org.list']),
+                clause('allow', ['org.*'], ['organization/*'])
+            ]
+        }
+        self.policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
+    def test_unarchive_with_authorized_user(self):
+        user = UserFactory.create()
+        assign_user_policies(user, self.policy)
+        setattr(self.request, 'user', user)
+
+        response = self.view(self.request, slug=self.org.slug)
+        self.org.refresh_from_db()
+
+        assert response.status_code == 302
+        assert ('/organizations/{}/'.format(self.org.slug)
+                in response['location'])
+        assert self.org.archived is False
+
+    def test_unarchive_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+        response = self.view(self.request, slug=self.org.slug)
+
+        self.org.refresh_from_db()
+        assert response.status_code == 302
+        assert ("You don't have permission to unarchive this organization"
+                in [str(m) for m in get_messages(self.request)])
+        assert self.org.archived is True
+
+    def test_unarchive_with_unauthenticated_user(self):
+        response = self.view(self.request)
+        self.org.refresh_from_db()
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
         assert self.org.archived is True
 
 
@@ -281,6 +427,10 @@ class OrganizationMembersTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
@@ -299,6 +449,24 @@ class OrganizationMembersTest(TestCase):
 
         assert response.status_code == 200
         assert expected == content
+
+        response = self.view(self.request, slug=self.org.slug)
+
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+
+        response = self.view(self.request, slug=self.org.slug)
+        assert response.status_code == 302
+        assert ("You don't have permission to view members of this "
+                "organization"
+                in [str(m) for m in get_messages(self.request)])
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.view(self.request)
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
 
 
 class OrganizationMembersAddTest(TestCase):
@@ -320,6 +488,10 @@ class OrganizationMembersAddTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
@@ -340,6 +512,15 @@ class OrganizationMembersAddTest(TestCase):
         assert response.status_code == 200
         assert expected == content
 
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+
+        response = self.view(self.request, slug=self.org.slug)
+        assert response.status_code == 302
+        assert ("You don't have permission to add members to this organization"
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         user_to_add = UserFactory.create()
@@ -355,7 +536,39 @@ class OrganizationMembersAddTest(TestCase):
                     self.org.slug, user_to_add.username)
                 in response['location'])
         assert OrganizationRole.objects.filter(
-            organization=self.org, user=user_to_add).count() == 1
+            organization=self.org, user=user_to_add).exists() is True
+
+    def test_post_with_unauthorized_user(self):
+        user = UserFactory.create()
+        user_to_add = UserFactory.create()
+        setattr(self.request, 'user', user)
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {'identifier': user_to_add.username})
+
+        response = self.view(self.request, slug=self.org.slug)
+
+        assert response.status_code == 302
+        assert ("You don't have permission to add members to this organization"
+                in [str(m) for m in get_messages(self.request)])
+        assert OrganizationRole.objects.filter(
+            organization=self.org, user=user_to_add).exists() is False
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.view(self.request, slug=self.org.slug)
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+
+    def test_post_with_unauthenticated_user(self):
+        user_to_add = UserFactory.create()
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {'identifier': user_to_add.username})
+
+        response = self.view(self.request, slug=self.org.slug)
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        assert OrganizationRole.objects.filter(
+            organization=self.org, user=user_to_add).exists() is False
 
 
 class OrganizationMembersEditTest(TestCase):
@@ -378,6 +591,10 @@ class OrganizationMembersEditTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
@@ -392,7 +609,8 @@ class OrganizationMembersEditTest(TestCase):
         context = RequestContext(self.request)
         context['object'] = self.member
         context['organization'] = self.org
-        context['form'] = forms.EditOrganizationMemberForm(None, self.org, self.member)
+        context['form'] = forms.EditOrganizationMemberForm(
+            None, self.org, self.member)
 
         expected = render_to_string(
             'organization/organization_members_edit.html',
@@ -401,6 +619,24 @@ class OrganizationMembersEditTest(TestCase):
 
         assert response.status_code == 200
         assert expected == content
+
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+
+        response = self.view(
+            self.request,
+            slug=self.org.slug,
+            username=self.member.username)
+        assert response.status_code == 302
+        assert ("You don't have permission to edit roles of this organization"
+                in [str(m) for m in get_messages(self.request)])
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.view(self.request, slug=self.org.slug)
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
@@ -420,6 +656,39 @@ class OrganizationMembersEditTest(TestCase):
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.member)
         assert role.admin is True
+
+    def test_post_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {'org_role': 'A'})
+
+        response = self.view(
+            self.request,
+            slug=self.org.slug,
+            username=self.member.username)
+
+        assert response.status_code == 302
+        assert ("You don't have permission to edit roles of this organization"
+                in [str(m) for m in get_messages(self.request)])
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.member)
+        assert role.admin is False
+
+    def test_post_with_unauthenticated_user(self):
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', {'org_role': 'A'})
+
+        response = self.view(
+            self.request,
+            slug=self.org.slug,
+            username=self.member.username)
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.member)
+        assert role.admin is False
 
 
 class OrganizationMembersRemoveTest(TestCase):
@@ -442,6 +711,10 @@ class OrganizationMembersRemoveTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
@@ -451,13 +724,38 @@ class OrganizationMembersRemoveTest(TestCase):
             self.request,
             slug=self.org.slug,
             username=self.member.username)
+        role = OrganizationRole.objects.filter(organization=self.org,
+                                               user=self.member).exists()
 
         assert response.status_code == 302
         assert ('/organizations/{}/members/'.format(self.org.slug)
                 in response['location'])
-        assert (OrganizationRole.objects.filter(organization=self.org,
-                                                user=self.member).exists() is
-                False)
+        assert role is False
+
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        setattr(self.request, 'user', user)
+
+        response = self.view(
+            self.request,
+            slug=self.org.slug,
+            username=self.member.username)
+        role = OrganizationRole.objects.filter(organization=self.org,
+                                               user=self.member).exists()
+        assert response.status_code == 302
+        assert ("You don't have permission to remove members from this "
+                "organization"
+                in [str(m) for m in get_messages(self.request)])
+        assert role is True
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.view(self.request, slug=self.org.slug)
+        role = OrganizationRole.objects.filter(organization=self.org,
+                                               user=self.member).exists()
+
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        assert role is True
 
 
 class ProjectListTest(TestCase):

@@ -41,6 +41,14 @@ class OrganizationUrlsTest(TestCase):
         assert resolved.func.__name__ == default.OrganizationArchive.__name__
         assert resolved.kwargs['slug'] == 'org-slug'
 
+    def test_organization_unarchive(self):
+        url = reverse('organization:unarchive', kwargs={'slug': 'org-slug'})
+        assert (url == '/organizations/org-slug/unarchive/')
+
+        resolved = resolve('/organizations/org-slug/unarchive/')
+        assert resolved.func.__name__ == default.OrganizationUnarchive.__name__
+        assert resolved.kwargs['slug'] == 'org-slug'
+
 
 class UserUrlsTest(TestCase):
     def test_user_list(self):

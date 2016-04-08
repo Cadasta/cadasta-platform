@@ -1,6 +1,6 @@
 from django.http import Http404
 import django.views.generic as generic
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
@@ -8,12 +8,13 @@ from django.utils.translation import gettext as _
 import formtools.wizard.views as wizard
 from tutelary.models import Role
 
-from core.mixins import PermissionRequiredMixin
-
+from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from accounts.models import User
 
 from ..models import Organization, Project, OrganizationRole
+from .mixins import OrganizationMixin
 from .. import forms
+from .. import messages as error_messages
 
 
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
@@ -23,7 +24,7 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     permission_filter_queryset = ('org.view',)
 
 
-class OrganizationAdd(generic.CreateView):
+class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_add.html'
@@ -39,22 +40,24 @@ class OrganizationAdd(generic.CreateView):
         )
 
     def get_form_kwargs(self, *args, **kwargs):
-        kwargs = super(OrganizationAdd, self).get_form_kwargs(*args, **kwargs)
+        kwargs = super().get_form_kwargs(*args, **kwargs)
         kwargs['user'] = self.request.user
         return kwargs
 
 
-class OrganizationDashboard(generic.DetailView):
+class OrganizationDashboard(PermissionRequiredMixin, generic.DetailView):
     model = Organization
     template_name = 'organization/organization_dashboard.html'
     permission_required = 'org.view'
 
 
-class OrganizationEdit(generic.UpdateView):
+class OrganizationEdit(LoginPermissionRequiredMixin,
+                       generic.UpdateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_edit.html'
-    permission_required = 'org.edit'
+    permission_required = 'org.update'
+    permission_denied_message = error_messages.ORG_EDIT
 
     def get_success_url(self):
         return reverse(
@@ -63,9 +66,11 @@ class OrganizationEdit(generic.UpdateView):
         )
 
 
-class OrganizationArchive(generic.edit.FormMixin, generic.DetailView):
+class OrganizationArchive(LoginPermissionRequiredMixin,
+                          generic.DetailView):
     model = Organization
     permission_required = 'org.archive'
+    permission_denied_message = error_messages.ORG_ARCHIVE
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -81,29 +86,44 @@ class OrganizationArchive(generic.edit.FormMixin, generic.DetailView):
         )
 
 
-class OrganizationMembers(generic.DetailView):
+class OrganizationUnarchive(LoginPermissionRequiredMixin,
+                            generic.DetailView):
+    model = Organization
+    permission_required = 'org.unarchive'
+    permission_denied_message = error_messages.ORG_UNARCHIVE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.archived = False
+        self.object.save()
+
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse(
+            'organization:dashboard',
+            kwargs={'slug': self.object.slug}
+        )
+
+
+class OrganizationMembers(LoginPermissionRequiredMixin, generic.DetailView):
     model = Organization
     template_name = 'organization/organization_members.html'
     permission_required = 'org.users.list'
+    permission_denied_message = error_messages.ORG_USERS_LIST
 
 
-class OrganizationObjectMixin:
-    def get_organization(self):
-        if not hasattr(self, 'org'):
-            self.org = get_object_or_404(Organization,
-                                         slug=self.kwargs['slug'])
-        return self.org
-
-
-class OrganizationMembersAdd(OrganizationObjectMixin, generic.CreateView):
+class OrganizationMembersAdd(OrganizationMixin,
+                             LoginPermissionRequiredMixin,
+                             generic.CreateView):
     model = OrganizationRole
     form_class = forms.AddOrganizationMemberForm
     template_name = 'organization/organization_members_add.html'
     permission_required = 'org.users.add'
+    permission_denied_message = error_messages.ORG_USERS_ADD
 
     def get_context_data(self, *args, **kwargs):
-        context = super(OrganizationMembersAdd, self).get_context_data(
-            *args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['object'] = self.get_organization()
         return context
 
@@ -111,8 +131,7 @@ class OrganizationMembersAdd(OrganizationObjectMixin, generic.CreateView):
         kwargs = super().get_form_kwargs(*args, **kwargs)
 
         if self.request.method == 'POST':
-            org = get_object_or_404(Organization, slug=self.kwargs['slug'])
-            kwargs['organization'] = org
+            kwargs['organization'] = self.get_organization()
 
         return kwargs
 
@@ -124,13 +143,16 @@ class OrganizationMembersAdd(OrganizationObjectMixin, generic.CreateView):
         )
 
 
-class OrganizationMembersEdit(OrganizationObjectMixin,
+class OrganizationMembersEdit(OrganizationMixin,
+                              LoginPermissionRequiredMixin,
                               generic.edit.FormMixin,
                               generic.DetailView):
     slug_field = 'username'
     slug_url_kwarg = 'username'
     template_name = 'organization/organization_members_edit.html'
     form_class = forms.EditOrganizationMemberForm
+    permission_required = 'org.users.edit'
+    permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
         return reverse(
@@ -152,8 +174,7 @@ class OrganizationMembersEdit(OrganizationObjectMixin,
                                    self.get_object())
 
     def get_context_data(self, *args, **kwargs):
-        context = super(OrganizationMembersEdit, self).get_context_data(
-            *args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['organization'] = self.get_organization()
         context['form'] = self.get_form()
         return context
@@ -168,10 +189,15 @@ class OrganizationMembersEdit(OrganizationObjectMixin,
 
     def form_valid(self, form):
         form.save()
-        return super(OrganizationMembersEdit, self).form_valid(form)
+        return super().form_valid(form)
 
 
-class OrganizationMembersRemove(OrganizationObjectMixin, generic.DeleteView):
+class OrganizationMembersRemove(OrganizationMixin,
+                                LoginPermissionRequiredMixin,
+                                generic.DeleteView):
+    permission_required = 'org.users.remove'
+    permission_denied_message = error_messages.ORG_USERS_REMOVE
+
     def get_object(self):
         return OrganizationRole.objects.get(
             organization__slug=self.kwargs['slug'],
