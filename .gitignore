@@ -33,3 +33,6 @@ vagrant.retry
 .transifexrc
 
 .DS_Store
+/.tox/
+/cadasta_platform.egg-info/
+/pytest.txt

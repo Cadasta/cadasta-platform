@@ -95,7 +95,7 @@ class UserAdminDetail(APIPermissionRequiredMixin,
     }
 
 
-class ProjectList(APIPermissionRequiredMixin,  generics.ListCreateAPIView):
+class ProjectList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,

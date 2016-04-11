@@ -7,6 +7,12 @@
   lineinfile: dest=/home/vagrant/.bashrc
               line=". /opt/cadasta/env/bin/activate"
 
+- name: Set up development environment Django settings
+  become: yes
+  become_user: "{{ app_user }}"
+  lineinfile: dest=/home/vagrant/.bashrc
+              line="export DJANGO_SETTINGS_MODULE=config.settings.dev"
+
 - name: Go to cadasta-platform root on VM login
   become: yes
   become_user: "{{ app_user }}"

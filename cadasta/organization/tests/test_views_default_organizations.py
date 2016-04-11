@@ -527,8 +527,8 @@ class OrganizationMembersAddTest(TestCase):
 
         assert response.status_code == 302
         assert ('/organizations/{}/members/{}'.format(
-                    self.org.slug, user_to_add.username)
-                in response['location'])
+            self.org.slug, user_to_add.username) in response['location']
+        )
         assert OrganizationRole.objects.filter(
             organization=self.org, user=user_to_add).exists() is True
 

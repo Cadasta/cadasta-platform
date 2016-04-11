@@ -138,9 +138,9 @@ class AccountLoginSerializerTest(TestCase):
            user has not verified their email address within 48 hours"""
 
         UserFactory.create(**{
-          'username': 'sgt_pepper',
-          'password': 'iloveyoko79',
-          'verify_email_by': datetime.now()
+            'username': 'sgt_pepper',
+            'password': 'iloveyoko79',
+            'verify_email_by': datetime.now()
         })
 
         with pytest.raises(EmailNotVerifiedError):

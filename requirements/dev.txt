@@ -4,3 +4,5 @@ factory_boy
 selenium
 transifex-client
 django-compressor
+tox
+flake8

@@ -19,12 +19,12 @@
     </div>
 </div>
 
-<form method="POST" action="">
+<form method="POST" action="" class="org-member-edit">
     {% csrf_token %}
     <div class="row">
         <div class="col-sm-4">
             <div class="panel panel-default">
-                <div class="panel-body">
+                <div class="panel-body member-info">
                     <h4>{{ object.username }}</h4>
                     {{ object.get_full_name }}<br>
                     {{ object.email }}<br>
@@ -36,12 +36,12 @@
                         {% render_field form.org_role class+="form-control" %}
                     </div>
 
-                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#remove_confirm">Remove member</button>
+                    <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm">Remove member</button>
                 </div>
             </div>
         </div>
         <div class="col-sm-8">
-            <table class="table table-hover">
+            <table class="table table-hover" id="projects-permissions">
                 <thead>
                     <tr>
                         <th>Project</th>
@@ -59,7 +59,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <button type="submit" class="btn btn-default">Save</button>
+            <button type="submit" class="btn btn-default" name="submit">Save</button>
         </div>
     </div>
 </form>
@@ -68,7 +68,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" name="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Confirm Removal of Member</h4>
       </div>
       <div class="modal-body">
@@ -76,8 +76,8 @@
         <p>Are you sure you want to remove this member?</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-link" data-dismiss="modal">Cancel</button>
-        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-default">Confirm removal</a>
+        <button type="button" class="btn btn-link" name="cancel" data-dismiss="modal">Cancel</button>
+        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-default confirm">Confirm removal</a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

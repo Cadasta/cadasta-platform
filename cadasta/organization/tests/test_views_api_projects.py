@@ -264,9 +264,9 @@ class ProjectListAPITest(TestCase):
         clause = {
             'clause': [
                 {
-                  'effect': 'allow',
-                  'object': ['organization/*'],
-                  'action': ['project.list']
+                    'effect': 'allow',
+                    'object': ['organization/*'],
+                    'action': ['project.list']
                 }
             ]
         }

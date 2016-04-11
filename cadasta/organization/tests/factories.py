@@ -33,7 +33,7 @@ class ProjectFactory(ExtendedFactory):
     project_slug = factory.Sequence(lambda n: "project-%s" % n)
     organization = factory.SubFactory(OrganizationFactory)
     description = factory.Sequence(
-                  lambda n: "Project #%s description" % n)
+        lambda n: "Project #%s description" % n)
     urls = ['http://example.com']
     contacts = []
 

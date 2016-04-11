@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 import django.contrib.gis.db.models as gismodels
 
 from tutelary.decorators import permissioned_model
-from tutelary.models import Policy, Role
+from tutelary.models import Policy
 
 from core.models import RandomIDModel
 from .validators import validate_contact
@@ -59,28 +59,28 @@ class Organization(RandomIDModel):
              {'description': _("Create organizations"),
               'permissions_object': None}),
             ('org.view',
-             {'description':   _("View existing organizations"),
+             {'description': _("View existing organizations"),
               'error_message': messages.ORG_VIEW}),
             ('org.update',
-             {'description':   _("Update an existing organization"),
+             {'description': _("Update an existing organization"),
               'error_message': messages.ORG_EDIT}),
             ('org.archive',
-             {'description':   _("Archive an existing organization"),
+             {'description': _("Archive an existing organization"),
               'error_message': messages.ORG_ARCHIVE}),
             ('org.unarchive',
-             {'description':   _("Unarchive an existing organization"),
+             {'description': _("Unarchive an existing organization"),
               'error_message': messages.ORG_UNARCHIVE}),
             ('org.users.list',
-             {'description':   _("List members of an organization"),
+             {'description': _("List members of an organization"),
               'error_message': messages.ORG_USERS_LIST}),
             ('org.users.add',
-             {'description':   _("Add a member to an organization"),
+             {'description': _("Add a member to an organization"),
               'error_message': messages.ORG_USERS_ADD}),
             ('org.users.edit',
-             {'description':   _("Edit a member of an organization"),
+             {'description': _("Edit a member of an organization"),
               'error_message': messages.ORG_USERS_EDIT}),
             ('org.users.remove',
-             {'description':   _("Remove a member from an organization"),
+             {'description': _("Remove a member from an organization"),
               'error_message': messages.ORG_USERS_REMOVE})
         )
 

@@ -92,7 +92,7 @@ class ProjectUrlsTest(TestCase):
     def test_project_dashboard(self):
         url = reverse('organization:project-dashboard',
                       kwargs={'organization': 'org-slug',
-                              'project':      'proj-slug'})
+                              'project': 'proj-slug'})
         assert (url == '/organizations/org-slug/projects/proj-slug/')
 
         resolved = resolve('/organizations/org-slug/projects/proj-slug/')
@@ -103,7 +103,7 @@ class ProjectUrlsTest(TestCase):
     def test_project_edit(self):
         url = reverse('organization:project-edit',
                       kwargs={'organization': 'org-slug',
-                              'project':      'proj-slug'})
+                              'project': 'proj-slug'})
         assert (url == '/organizations/org-slug/projects/proj-slug/edit/')
 
         resolved = resolve('/organizations/org-slug/projects/proj-slug/edit/')
