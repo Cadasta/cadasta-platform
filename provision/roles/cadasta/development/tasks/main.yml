@@ -17,3 +17,7 @@
   become: yes
   become_user: root
   apt: pkg=gettext state=installed update_cache=yes
+
+- name: Make Transifex credentials file link
+  file: state=link force=yes
+        path=/home/vagrant/.transifexrc src=/vagrant/.transifexrc
