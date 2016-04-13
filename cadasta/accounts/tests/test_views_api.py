@@ -16,109 +16,69 @@ from .factories import UserFactory
 
 
 class AccountUserTest(TestCase):
+    def _put(self, user, data, versioned=True, status=None, mails=None):
+        if versioned:
+            url = '/v1/account/'
+        else:
+            url = '/account/'
+        request = APIRequestFactory().put(url, data)
+        force_authenticate(request, user=user)
+        response = AccountUser.as_view()(request).render()
+        if status is not None:
+            assert response.status_code == status
+        if mails is not None:
+            assert len(mail.outbox) == mails
+
     def test_update_email_address(self):
         """Service should send a verification email when the user updates their
            email."""
-        user = UserFactory.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk'
-        })
-
-        data = {
-            'email': 'boss@beatles.uk',
-            'username': 'imagine71'
-        }
-
-        request = APIRequestFactory().put('/account/', data)
-        force_authenticate(request, user=user)
-        response = AccountUser.as_view()(request).render()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(mail.outbox), 1)
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
+        data = {'email': 'boss@beatles.uk', 'username': 'imagine71'}
+        self._put(user, data, versioned=False, status=200, mails=1)
 
     def test_keep_email_address(self):
         """Service should not send a verification email when the user does not
            their email."""
-        user = UserFactory.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-        })
-
-        data = {
-            'email': 'john@beatles.uk',
-            'username': 'imagine71'
-        }
-
-        request = APIRequestFactory().put('/v1/account/', data)
-        force_authenticate(request, user=user)
-        response = AccountUser.as_view()(request).render()
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(mail.outbox), 0)
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
+        data = {'email': 'john@beatles.uk', 'username': 'imagine71'}
+        self._put(user, data, status=200, mails=0)
 
     def test_update_with_existing_email(self):
-        UserFactory.create(**{
-            'email': 'boss@beatles.uk'
-        })
-
-        user = UserFactory.create(**{
-            'email': 'john@beatles.uk',
-        })
-
-        data = {
-            'email': 'boss@beatles.uk',
-            'username': user.username
-        }
-
-        request = APIRequestFactory().put('/v1/account/', data)
-        force_authenticate(request, user=user)
-        response = AccountUser.as_view()(request).render()
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(len(mail.outbox), 0)
-
+        UserFactory.create(email='boss@beatles.uk')
+        user = UserFactory.create(email='john@beatles.uk')
+        data = {'email': 'boss@beatles.uk', 'username': user.username}
+        self._put(user, data, status=400, mails=0)
         user.refresh_from_db()
-        self.assertEqual(user.email, 'john@beatles.uk')
+        assert user.email == 'john@beatles.uk'
 
     def test_update_username(self):
-        user = UserFactory.create(**{
-            'username': 'imagine71'
-        })
-
-        data = {
-            'email': user.email,
-            'username': 'john'
-        }
-
-        request = APIRequestFactory().put('/v1/account/', data)
-        force_authenticate(request, user=user)
-        response = AccountUser.as_view()(request).render()
-        self.assertEqual(response.status_code, 200)
-
+        user = UserFactory.create(username='imagine71')
+        data = {'email': user.email, 'username': 'john'}
+        self._put(user, data, status=200)
         user.refresh_from_db()
-        self.assertEqual(user.username, 'john')
+        assert user.username == 'john'
 
     def test_update_with_existing_username(self):
-        UserFactory.create(**{
-            'username': 'boss'
-        })
-
-        user = UserFactory.create(**{
-            'username': 'john'
-        })
-
-        data = {
-            'email': user.email,
-            'username': 'boss'
-        }
-
-        request = APIRequestFactory().put('/v1/account/', data)
-        force_authenticate(request, user=user)
-        response = AccountUser.as_view()(request).render()
-        self.assertEqual(response.status_code, 400)
-
+        UserFactory.create(username='boss')
+        user = UserFactory.create(username='john')
+        data = {'email': user.email, 'username': 'boss'}
+        self._put(user, data, status=400)
         user.refresh_from_db()
-        self.assertEqual(user.username, 'john')
+        assert user.username == 'john'
 
 
 class AccountSignupTest(TestCase):
+    def _post(self, data, status=None, count=None):
+        url = '/v1/account/register/'
+        request = APIRequestFactory().post(url, data)
+        response = AccountRegister.as_view()(request).render()
+        if status is not None:
+            assert response.status_code == status
+        if count is not None:
+            assert User.objects.count() == count
+
     def test_user_signs_up(self):
         data = {
             'username': 'imagine71',
@@ -127,11 +87,7 @@ class AccountSignupTest(TestCase):
             'first_name': 'John',
             'last_name': 'Lennon',
         }
-
-        request = APIRequestFactory().post('/v1/account/register/', data)
-        response = AccountRegister.as_view()(request).render()
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(User.objects.count(), 1)
+        self._post(data, status=201, count=1)
 
     def test_user_signs_up_with_invalid(self):
         """The server should respond with an 404 error code when a user tries
@@ -142,11 +98,7 @@ class AccountSignupTest(TestCase):
             'first_name': 'John',
             'last_name': 'Lennon',
         }
-
-        request = APIRequestFactory().post('/v1/account/register/', data)
-        response = AccountRegister.as_view()(request).render()
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(User.objects.count(), 0)
+        self._post(data, status=400, count=0)
 
 
 class AccountLoginTest(TestCase):
@@ -157,24 +109,30 @@ class AccountLoginTest(TestCase):
             'password': 'iloveyoko79'
         })
 
+    def _post(self, data, status=None, token=None):
+        url = '/v1/account/login/'
+        request = APIRequestFactory().post(url, data)
+        response = AccountLogin.as_view()(request).render()
+        content = None
+        if len(response.content) > 0:
+            content = response.content.decode("utf-8")
+        if status is not None:
+            assert response.status_code == status
+        if token is not None:
+            if token:
+                assert 'auth_token' in content
+            else:
+                assert 'auth_token' not in content
+
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""
-        request = APIRequestFactory().post('/v1/account/login/', {
-            'username': 'imagine71',
-            'password': 'iloveyoko79'
-        })
-        response = AccountLogin.as_view()(request).render()
-        self.assertEqual(response.status_code, 200)
-        self.assertIn('auth_token', response.content.decode("utf-8"))
+        self._post({'username': 'imagine71', 'password': 'iloveyoko79'},
+                   status=200, token=True)
 
     def test_unsuccessful_login(self):
         """The view should return a token to authenticate API calls"""
-        request = APIRequestFactory().post('/v1/account/login/', {
-            'username': 'imagine71',
-            'password': 'iloveyoko78'
-        })
-        response = AccountLogin.as_view()(request).render()
-        self.assertEqual(response.status_code, 400)
+        self._post({'username': 'imagine71', 'password': 'iloveyoko78'},
+                   status=400)
 
     def test_login_with_unverified_email(self):
         """The view should return an error message if the User.verify_email_by
@@ -182,15 +140,9 @@ class AccountLoginTest(TestCase):
            sent to the user."""
         self.user.verify_email_by = datetime.now()
         self.user.save()
-
-        request = APIRequestFactory().post('/v1/account/login/', {
-            'username': 'imagine71',
-            'password': 'iloveyoko79'
-        })
-        response = AccountLogin.as_view()(request).render()
-        self.assertEqual(response.status_code, 400)
-        self.assertNotIn('auth_token', response.content.decode("utf-8"))
-        self.assertEqual(len(mail.outbox), 1)
+        self._post({'username': 'imagine71', 'password': 'iloveyoko79'},
+                   status=400, token=False)
+        assert len(mail.outbox) == 1
 
 
 class AccountVerifyTest(TestCase):
@@ -207,7 +159,7 @@ class AccountVerifyTest(TestCase):
             'token': token
         })
         response = AccountVerify.as_view()(request).render()
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
 
         user.refresh_from_db()
-        self.assertTrue(user.email_verified)
+        assert user.email_verified

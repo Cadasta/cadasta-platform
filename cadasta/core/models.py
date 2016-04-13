@@ -13,14 +13,13 @@ class RandomIDModel(models.Model):
         if not self.id:
             kwargs['force_insert'] = True
 
-            while True:
+            ok = False
+            while not ok:
                 self.id = random_id()
 
                 if not type(self).objects.filter(pk=self.id).exists():
+                    ok = True
                     super(RandomIDModel, self).save(*args, **kwargs)
-                    break
-                else:
-                    continue
 
         else:
             super(RandomIDModel, self).save(*args, **kwargs)

@@ -1,4 +1,0 @@
-#!/bin/bash
-../manage.py shell <<EOF
-exec(open('./test-data-setup.py').read())
-EOF

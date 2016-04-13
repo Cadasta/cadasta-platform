@@ -31,7 +31,8 @@ class ExceptionHandleTest(TestCase):
     def test_evaluate_json(self):
         response_data = {
             'contacts': [
-                '{"name": "This field is required.", "url": "\'blah\' is not a \'uri\'"}',
+                '{"name": "This field is required.", '
+                '"url": "\'blah\' is not a \'uri\'"}',
                 '{"name": "This field is required."}',
             ],
             'field': "Something went wrong"
@@ -41,7 +42,8 @@ class ExceptionHandleTest(TestCase):
 
         expected = {
             'contacts': [
-                {'name': "This field is required.", 'url': "\'blah\' is not a \'uri\'"},
+                {'name': "This field is required.",
+                 'url': "\'blah\' is not a \'uri\'"},
                 {'name': "This field is required."},
             ],
             'field': "Something went wrong"

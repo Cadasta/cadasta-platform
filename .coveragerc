@@ -5,3 +5,4 @@ omit =
     cadasta/*/__init__.py
     cadasta/config/*
     cadasta/manage.py
+    cadasta/core/management/commands/*

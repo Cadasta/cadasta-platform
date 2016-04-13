@@ -16,7 +16,7 @@ class UserManager(DjangoUserManager):
                 "User with username or email {} does not exist"
             ).format(identifier)
             raise self.model.DoesNotExist(error)
-        elif users_count > 1:
+        else:
             error = _(
                 "More than one user found for username or email {}"
             ).format(identifier)

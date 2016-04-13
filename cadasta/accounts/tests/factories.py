@@ -1,9 +1,10 @@
 import factory
 
+from core.tests.factories import ExtendedFactory
 from ..models import User
 
 
-class UserFactory(factory.django.DjangoModelFactory):
+class UserFactory(ExtendedFactory):
     class Meta:
         model = User
 

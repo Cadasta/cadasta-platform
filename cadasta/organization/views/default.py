@@ -1,8 +1,7 @@
 from django.http import Http404
 from django.db import transaction
 import django.views.generic as generic
-from django.shortcuts import redirect
-from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
@@ -215,7 +214,7 @@ class OrganizationMembersRemove(OrganizationMixin,
         return self.post(*args, **kwargs)
 
 
-class UserList(PermissionRequiredMixin, generic.ListView):
+class UserList(LoginPermissionRequiredMixin, generic.ListView):
     model = User
     template_name = 'organization/user_list.html'
     permission_required = 'user.list'
@@ -233,19 +232,18 @@ class UserList(PermissionRequiredMixin, generic.ListView):
         return context
 
 
-class UserActivation(generic.View):
+class UserActivation(LoginPermissionRequiredMixin, generic.View):
+    permission_required = 'user.update'
     permission_denied_message = error_messages.USERS_UPDATE
     new_state = None
 
+    def get_perms_objects(self):
+        return [get_object_or_404(User, username=self.kwargs['user'])]
+
     def post(self, request, user):
-        userobj = User.objects.get(username=user)
-        if userobj is not None:
-            userobj.is_active = self.new_state
-            userobj.save()
-        else:
-            msg = _("Wasn't able to modify user state "
-                    "for user '{username}'").format(username=user)
-            messages.add_message(request, messages.ERROR, msg)
+        userobj = get_object_or_404(User, username=user)
+        userobj.is_active = self.new_state
+        userobj.save()
         return redirect('user:list')
 
 
@@ -261,9 +259,21 @@ class ProjectList(PermissionRequiredMixin, generic.ListView):
         return context
 
 
-class ProjectDashboard(generic.DetailView):
+def assign_project_extent_context(context, project):
+    ext = project.extent.extent
+    context['extent'] = True
+    context['wlon'] = ext[0]
+    context['slat'] = ext[1]
+    context['elon'] = ext[2]
+    context['nlat'] = ext[3]
+    context['boundary'] = list(map(lambda t: [t[1], t[0]],
+                                   project.extent.coords[0]))
+
+
+class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
     model = Project
     template_name = 'organization/project_dashboard.html'
+    permission_required = 'project.view'
     permission_denied_message = error_messages.PROJ_VIEW
 
     def get_context_data(self, **kwargs):
@@ -274,15 +284,7 @@ class ProjectDashboard(generic.DetailView):
         if self.object.extent is None:
             context['extent'] = False
         else:
-            print(self.object.extent.coords)
-            ext = self.object.extent.extent
-            context['extent'] = True
-            context['wlon'] = ext[0]
-            context['slat'] = ext[1]
-            context['elon'] = ext[2]
-            context['nlat'] = ext[3]
-            context['boundary'] = list(map(lambda t: [t[1], t[0]],
-                                           self.object.extent.coords[0]))
+            assign_project_extent_context(context, self.object)
         return context
 
     def get_object(self, queryset=None):
@@ -308,13 +310,32 @@ PROJECT_ADD_TEMPLATES = {
 }
 
 
-class ProjectAddWizard(wizard.SessionWizardView):
+def add_wizard_permission_required(self, view, request):
+    if request.method != 'POST':
+        return ()
+    session = request.session.get('wizard_project_add_wizard', None)
+    if session is None or 'details' not in session['step_data']:
+        return ()
+    else:
+        return 'project.create'
+
+
+class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
+    permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
 
     def __init__(self, *args, **kwargs):
         self.organization = None
         self.members = None
         super().__init__(*args, **kwargs)
+
+    def get_perms_objects(self):
+        session = self.request.session.get('wizard_project_add_wizard', None)
+        if session is None or 'details' not in session['step_data']:
+            return []
+        else:
+            slug = session['step_data']['details']['details-organization'][0]
+            return [Organization.objects.get(slug=slug)]
 
     def get_template_names(self):
         return [PROJECT_ADD_TEMPLATES[self.steps.current]]
@@ -369,20 +390,21 @@ class ProjectAddWizard(wizard.SessionWizardView):
         url = form_data[1]['details-url']
         # private = form_data[1]['details-public'] != 'on'
         org = Organization.objects.get(slug=organization)
-        su_role = Role.objects.get(name='superuser')
-        oa_role = Role.objects.get(name=organization + '-oa')
+        try:
+            su_role = Role.objects.get(name='superuser')
+        except:
+            su_role = None
         usernames = []
         for user in org.users.all():
-            is_admin = False
-            for pol in user.assigned_policies():
-                if (isinstance(pol, Role) and
-                   (pol == su_role or pol == oa_role)):
+            is_admin = any([isinstance(pol, Role) and pol == su_role
+                            for pol in user.assigned_policies()])
+            if not is_admin:
+                if OrganizationRole.objects.get(organization=org,
+                                                user=user).admin:
                     is_admin = True
-                    break
             if not is_admin:
                 usernames.append(user.username)
         user_roles = [(k, form_data[2][k]) for k in usernames]
-        print('name:', name)
 
         with transaction.atomic():
             project = Project.objects.create(
@@ -391,7 +413,6 @@ class ProjectAddWizard(wizard.SessionWizardView):
             )
             for username, role in user_roles:
                 user = User.objects.get(username=username)
-                print(user, role)
                 ProjectRole.objects.create(
                     project=project, user=user, role=role
                 )

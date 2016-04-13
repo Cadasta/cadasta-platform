@@ -20,15 +20,11 @@ class OrganizationSerializerTest(TestCase):
         user = UserFactory.create()
         setattr(request, 'user', user)
 
-        org_data = {
-            'name': 'Test Organization',
-        }
+        org_data = {'name': 'Test Organization'}
 
         serializer = serializers.OrganizationSerializer(
             data=org_data,
-            context={
-                'request': request
-            }
+            context={'request': request}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -39,14 +35,8 @@ class OrganizationSerializerTest(TestCase):
                     organization=org_instance).count() == 1
 
     def test_slug_field_is_unique(self):
-        OrganizationFactory.create(**{
-            'slug': 'org-slug'
-        })
-
-        org_data = {
-            'name': 'Org Slug',
-            'slug': 'org-slug'
-        }
+        OrganizationFactory.create(slug='org-slug')
+        org_data = {'name': 'Org Slug', 'slug': 'org-slug'}
         serializer = serializers.OrganizationSerializer(data=org_data)
         assert not serializer.is_valid()
 
@@ -72,12 +62,9 @@ class ProjectSerializerTest(TestCase):
             'name': 'Project',
             'organization': organization
         }
-        context = {
-            'organization': organization
-        }
         serializer = serializers.ProjectSerializer(
             data=project_data,
-            context=context
+            context={'organization': organization}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -94,21 +81,19 @@ class ProjectGeometrySerializerTest(TestCase):
         assert test_data['properties']['org'] == project.organization.name
         assert test_data['properties']['url'] == reverse(
             'organization:project-dashboard',
-            kwargs={ 'organization': project.organization.slug,
-                     'project': project.project_slug })
+            kwargs={'organization': project.organization.slug,
+                    'project': project.project_slug})
 
 
 class OrganizationUserSerializerTest(TestCase):
     def test_to_represenation(self):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
-
         serializer = serializers.OrganizationUserSerializer(
             user,
-            context={
-                'organization': org
-            }
+            context={'organization': org}
         )
+
         assert serializer.data['username'] == user.username
         assert serializer.data['email'] == user.email
         assert serializer.data['role'] == 'User'
@@ -118,17 +103,10 @@ class OrganizationUserSerializerTest(TestCase):
         org_admin = UserFactory.create()
         org = OrganizationFactory.create(add_users=users)
         OrganizationRole.objects.create(
-            user=org_admin,
-            organization=org,
-            admin=True
+            user=org_admin, organization=org, admin=True
         )
-
         serializer = serializers.OrganizationUserSerializer(
-            org.users.all(),
-            many=True,
-            context={
-                'organization': org
-            }
+            org.users.all(), many=True, context={'organization': org}
         )
 
         assert len(serializer.data) == 3
@@ -142,12 +120,7 @@ class OrganizationUserSerializerTest(TestCase):
     def test_set_roles_with_username(self):
         user = UserFactory.create()
         org = OrganizationFactory.create()
-
-        data = {
-            'username': user.username,
-            'role': 'Admin'
-        }
-
+        data = {'username': user.username, 'role': 'Admin'}
         serializer = serializers.OrganizationUserSerializer(
             data=data,
             context={
@@ -166,12 +139,7 @@ class OrganizationUserSerializerTest(TestCase):
     def test_set_roles_with_email(self):
         user = UserFactory.create()
         org = OrganizationFactory.create()
-
-        data = {
-            'username': user.email,
-            'role': 'Admin'
-        }
-
+        data = {'username': user.email, 'role': 'Admin'}
         serializer = serializers.OrganizationUserSerializer(
             data=data,
             context={
@@ -189,17 +157,9 @@ class OrganizationUserSerializerTest(TestCase):
 
     def test_set_roles_for_user_that_does_not_exist(self):
         org = OrganizationFactory.create()
-
-        data = {
-            'username': 'some-user',
-            'role': 'Admin'
-        }
-
+        data = {'username': 'some-user', 'role': 'Admin'}
         serializer = serializers.OrganizationUserSerializer(
-            data=data,
-            context={
-                'organization': org
-            }
+            data=data, context={'organization': org}
         )
 
         with pytest.raises(ValidationError):
@@ -208,21 +168,30 @@ class OrganizationUserSerializerTest(TestCase):
                   'does not exist').format(username='some-user')
                 in serializer.errors['username'])
 
+    def test_set_roles_for_duplicate_username(self):
+        org = OrganizationFactory.create()
+        user1 = UserFactory.create(email='some-user@some.com')
+        UserFactory.create(email='some-user@some.com')
+        data = {'username': user1.email, 'role': 'Admin'}
+        serializer = serializers.OrganizationUserSerializer(
+            data=data, context={'organization': org}
+        )
+
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        print(serializer.errors)
+        assert (_('More than one user found for username or email '
+                  '{email}').format(email='some-user@some.com')
+                in serializer.errors['username'])
+
     def test_update_roles_for_user(self):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
-
-        data = {
-            'role': 'Admin'
-        }
-
         serializer = serializers.OrganizationUserSerializer(
             user,
-            data=data,
+            data={'role': 'Admin'},
             partial=True,
-            context={
-                'organization': org
-            }
+            context={'organization': org}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -235,12 +204,8 @@ class ProjectUserSerializerTest(TestCase):
     def test_to_represenation(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
-
         serializer = serializers.ProjectUserSerializer(
-            user,
-            context={
-                'project': project
-            }
+            user, context={'project': project}
         )
 
         assert serializer.data['username'] == user.username
@@ -252,17 +217,12 @@ class ProjectUserSerializerTest(TestCase):
         prj_admin = UserFactory.create()
         project = ProjectFactory.create(add_users=users)
         ProjectRole.objects.create(
-            user=prj_admin,
-            project=project,
-            role='PM'
+            user=prj_admin, project=project, role='PM'
         )
-
         serializer = serializers.ProjectUserSerializer(
             project.users.all(),
             many=True,
-            context={
-                'project': project
-            }
+            context={'project': project}
         )
 
         assert len(serializer.data) == 3
@@ -277,12 +237,7 @@ class ProjectUserSerializerTest(TestCase):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
         project = ProjectFactory.create(**{'organization': org})
-
-        data = {
-            'username': user.username,
-            'role': 'DC'
-        }
-
+        data = {'username': user.username, 'role': 'DC'}
         serializer = serializers.ProjectUserSerializer(
             data=data,
             context={'project': project}
@@ -296,17 +251,10 @@ class ProjectUserSerializerTest(TestCase):
     def test_set_roles_for_user_who_is_not_an_org_member(self):
         user = UserFactory.create()
         project = ProjectFactory.create()
-
-        data = {
-            'username': user.username,
-            'role': 'DC'
-        }
-
+        data = {'username': user.username, 'role': 'DC'}
         serializer = serializers.ProjectUserSerializer(
             data=data,
-            context={
-                'project': project
-            }
+            context={'project': project}
         )
 
         with pytest.raises(ValidationError):
@@ -317,17 +265,10 @@ class ProjectUserSerializerTest(TestCase):
 
     def test_set_roles_for_user_that_does_not_exist(self):
         project = ProjectFactory.create()
-
-        data = {
-            'username': 'some-user',
-            'role': 'DC'
-        }
-
+        data = {'username': 'some-user', 'role': 'DC'}
         serializer = serializers.ProjectUserSerializer(
             data=data,
-            context={
-                'project': project
-            }
+            context={'project': project}
         )
 
         with pytest.raises(ValidationError):
@@ -339,17 +280,12 @@ class ProjectUserSerializerTest(TestCase):
     def test_update_roles_for_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
-
-        data = {
-            'role': 'PM'
-        }
+        data = {'role': 'PM'}
         serializer = serializers.ProjectUserSerializer(
             user,
             partial=True,
             data=data,
-            context={
-                'project': project
-            }
+            context={'project': project}
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
