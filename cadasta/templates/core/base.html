@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load sass_tags %}
 {% load staticfiles %}
 
 <!DOCTYPE html>
@@ -10,7 +11,7 @@
     <title>Cadasta{% block title %}{% endblock %}</title>
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css"/>
-    <link href="{% static 'css/main.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
     {% block extra_head %}{% endblock %}
   </head>
   <body>

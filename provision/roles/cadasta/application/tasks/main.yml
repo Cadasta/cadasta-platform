@@ -13,11 +13,6 @@
       - python-virtualenv
       - git
 
-- name: Install SASS
-  become: yes
-  become_user: root
-  command: gem install sass
-
 - name: Create base directory for virtual environment
   become: yes
   become_user: root
@@ -29,6 +24,11 @@
   become_user: "{{ app_user }}"
   command: virtualenv {{ virtualenv_path }} --python=python3.5
            creates="{{ virtualenv_path }}bin"
+
+- name: Upgrade to latest PIP version
+  become: yes
+  become_user: "{{ app_user }}"
+  pip: name=pip state=latest virtualenv="{{ virtualenv_path }}"
 
 - name: Install requirements
   become: yes
@@ -52,11 +52,5 @@
 - name: Install Bootstrap for SASS processing
   become: yes
   become_user: "{{ app_user }}"
-  command: chdir="{{ application_path }}cadasta/core/sass"
+  command: chdir="{{ application_path }}cadasta/core"
            npm install bootstrap-sass
-
-- name: Convert SASS to CSS
-  become: yes
-  become_user: "{{ app_user }}"
-  command: chdir="{{ application_path }}cadasta/core/sass"
-           sass -I ./node_modules main.scss ../static/css/main.css

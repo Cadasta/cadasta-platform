@@ -3,24 +3,23 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Ian Ross <iross@cadasta.org>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-12 13:20+0000\n"
-"PO-Revision-Date: 2016-04-12 14:01+0000\n"
+"PO-Revision-Date: 2016-04-12 13:28+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
-"Language-Team: French (http://www.transifex.com/cadasta/cadasta-platform/language/fr/)\n"
+"Language-Team: Swahili (http://www.transifex.com/cadasta/cadasta-platform/language/sw/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: sw\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: accounts/forms.py:20 accounts/tests/test_forms.py:41
 msgid "Passwords do not match"
-msgstr "Les mots de passe ne correspondent pas"
+msgstr ""
 
 #: accounts/forms.py:28 accounts/forms.py:58 accounts/tests/test_forms.py:57
 msgid "Another user with this email already exists"
@@ -53,7 +52,7 @@ msgstr ""
 
 #: accounts/views/api.py:70
 msgid "The email has not been verified."
-msgstr "L'email n'a pas été verifié."
+msgstr ""
 
 #: accounts/views/default.py:23
 msgid "Successfully updated profile information"
@@ -65,32 +64,32 @@ msgstr ""
 
 #: config/settings/default.py:172
 msgid "English"
-msgstr "Anglais"
+msgstr ""
 
 #: config/settings/default.py:173
 msgid "French"
-msgstr "Français"
+msgstr ""
 
 #: config/settings/default.py:174
 msgid "German"
-msgstr "Allemand"
+msgstr ""
 
 #: config/settings/default.py:175
 msgid "Spanish"
-msgstr "Espagnol"
+msgstr ""
 
 #: core/mixins.py:13
 msgid "PERMISSION DENIED"
-msgstr "ACCES INTERDIT"
+msgstr ""
 
 #: core/tests/test_translations.py:11 templates/accounts/profile.html.py:31
 #: templates/accounts/snippets/registration_form.html:32
 msgid "First name"
-msgstr "Prénom"
+msgstr ""
 
 #: core/tests/test_validators.py:38 core/tests/test_validators.py:40
 msgid "Please provide either name or description"
-msgstr "Veuillez fournir soit nom soit déscription"
+msgstr ""
 
 #: core/tests/test_validators.py:55 core/validators.py:24
 #: organization/tests/test_validators.py:29
@@ -98,120 +97,120 @@ msgstr "Veuillez fournir soit nom soit déscription"
 #: organization/tests/test_validators.py:63
 #: organization/tests/test_views_api.py:1496
 msgid "This field is required."
-msgstr "Ce champ est obligatoire."
+msgstr ""
 
 #: core/tests/test_validators.py:70 organization/tests/test_validators.py:44
 #: organization/tests/test_validators.py:65
 #, python-brace-format
 msgid "'{value}' is not a '{type}'"
-msgstr "'{value}' n'est pas un '{type}'"
+msgstr ""
 
 #: core/validators.py:19
 msgid "Please provide either {}"
-msgstr "Veuillez fournir soit {}"
+msgstr ""
 
 #: core/validators.py:20
 msgid " or "
-msgstr "soit"
+msgstr ""
 
 #: core/views/api.py:17
 #, python-brace-format
 msgid "{name} not found."
-msgstr "{name} introuvable"
+msgstr ""
 
 #: organization/choices.py:4
 #: templates/organization/project_add_permissions.html:41
 msgid "Administrator"
-msgstr "Administrateur"
+msgstr ""
 
 #: organization/choices.py:5
 #: templates/organization/project_add_permissions.html:27
 #: templates/organization/user_list.html:15
 msgid "Member"
-msgstr "Membre"
+msgstr ""
 
 #: organization/choices.py:7
 #: templates/organization/project_add_permissions.html:45
 msgid "Project User"
-msgstr "Utilisateur du projet"
+msgstr ""
 
 #: organization/choices.py:8
 #: templates/organization/project_add_permissions.html:46
 msgid "Data Collector"
-msgstr "Collectionneur de données"
+msgstr ""
 
 #: organization/choices.py:9
 #: templates/organization/project_add_permissions.html:47
 msgid "Project Manager"
-msgstr "Directeur de Projet"
+msgstr ""
 
 #: organization/models.py:55
 msgid "List existing organizations"
-msgstr "Lister organisations actuelles"
+msgstr ""
 
 #: organization/models.py:58
 msgid "View existing organizations"
-msgstr "Voir organisations actuelles"
+msgstr ""
 
 #: organization/models.py:60
 msgid "Create organizations"
-msgstr "Créer organisations"
+msgstr ""
 
 #: organization/models.py:63
 msgid "Update an existing organization"
-msgstr "Mettre une organisation actuelle à jour"
+msgstr ""
 
 #: organization/models.py:65
 msgid "Archive an existing organization"
-msgstr "Archiver une organisation actuelle"
+msgstr ""
 
 #: organization/models.py:67
 msgid "Unarchive an existing organization"
-msgstr "Déarchiver une organisation actuelle"
+msgstr ""
 
 #: organization/models.py:69
 msgid "List members of an organization"
-msgstr "Lister membres d'une organisation"
+msgstr ""
 
 #: organization/models.py:71
 msgid "Add a member to an organization"
-msgstr "Ajouter un membre à une organisation"
+msgstr ""
 
 #: organization/models.py:73
 msgid "Remove a member from an organization"
-msgstr "Enlever un membre d'une organisation"
+msgstr ""
 
 #: organization/models.py:131
 msgid "List existing projects in an organization"
-msgstr "Lister projets actuels dans une organisation"
+msgstr ""
 
 #: organization/models.py:134
 msgid "Create projects in an organization"
-msgstr "Créer projets dans une organisation"
+msgstr ""
 
 #: organization/models.py:137
 msgid "View existing projects"
-msgstr "Voir projets actuels"
+msgstr ""
 
 #: organization/models.py:139
 msgid "Update an existing project"
-msgstr "Mettre un projet actuel à jour"
+msgstr ""
 
 #: organization/models.py:141
 msgid "Archive an existing project"
-msgstr "Archiver un projet actuel"
+msgstr ""
 
 #: organization/models.py:143
 msgid "Unarchive an existing project"
-msgstr "Déarchiver un projet actuel"
+msgstr ""
 
 #: organization/models.py:145
 msgid "List users within a project"
-msgstr "Lister utilisateurs dans un projet"
+msgstr ""
 
 #: organization/models.py:147
 msgid "Add user to a project"
-msgstr "Ajouter utilisateur à un projet"
+msgstr ""
 
 #: organization/models.py:149
 msgid "Edit roles of user in a project"
@@ -219,23 +218,23 @@ msgstr ""
 
 #: organization/models.py:151
 msgid "Remove user from a project"
-msgstr "Enlever utilisateur d'un projet"
+msgstr ""
 
 #: organization/serializers.py:185
 #, python-brace-format
 msgid "You have been added to organization {organization}"
-msgstr "On vous a ajouté à l'organisation {organization}"
+msgstr ""
 
 #: organization/serializers.py:205 organization/tests/test_serializers.py:314
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
-msgstr "Utilisateur {username} n'est pas membre de l'organisation du projet"
+msgstr ""
 
 #: organization/tests/test_serializers.py:207
 #: organization/tests/test_serializers.py:335
 #, python-brace-format
 msgid "User with username or email {username} does not exist"
-msgstr "Utilisateur avec nom d'utilisateur ou email {username} n'existe pas"
+msgstr ""
 
 #: organization/tests/test_views_api.py:534
 msgid "User with username or email some_username does not exist"
@@ -243,14 +242,14 @@ msgstr ""
 
 #: organization/tests/test_views_api.py:550
 msgid "Organization not found."
-msgstr "Organisation introuvable."
+msgstr ""
 
 #: organization/tests/test_views_api.py:796
 #: organization/tests/test_views_api.py:957
 #: organization/tests/test_views_api.py:971
 #: organization/tests/test_views_api.py:1564
 msgid "Project not found."
-msgstr "Project introuvable"
+msgstr ""
 
 #: organization/tests/test_views_api.py:836
 msgid "User with username or email some-user does not exist"
@@ -258,7 +257,7 @@ msgstr ""
 
 #: organization/tests/test_views_api.py:943
 msgid "User not found."
-msgstr "Utilisateur introuvable"
+msgstr ""
 
 #: organization/tests/test_views_api.py:1288
 msgid "Cannot update last_login"
@@ -266,7 +265,7 @@ msgstr ""
 
 #: organization/tests/test_views_api.py:1619
 msgid "This field may not be blank."
-msgstr "Ce champ ne peut pas rester vide."
+msgstr ""
 
 #: organization/views/default.py:217
 #, python-brace-format
@@ -297,7 +296,7 @@ msgstr ""
 #: templates/organization/email/org_invite.txt:11
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "L'équipe %(site_name)s"
+msgstr ""
 
 #: templates/accounts/email/activate_email_subject.txt:2
 #, python-format
@@ -316,12 +315,12 @@ msgstr ""
 #: templates/accounts/email/change_email.txt:10
 #, python-format
 msgid "The %(site_name)s Team. "
-msgstr "L'Équipe %(site_name)s."
+msgstr ""
 
 #: templates/accounts/email/change_email_subject.txt:2
 #, python-format
 msgid "Change of email on %(site_name)s"
-msgstr "Changement d'email sur %(site_name)s"
+msgstr ""
 
 #: templates/accounts/email/password_reset.txt:2
 #, python-format
@@ -340,32 +339,32 @@ msgstr ""
 
 #: templates/accounts/profile.html:6 templates/core/base.html.py:47
 msgid "Profile"
-msgstr "Profil"
+msgstr ""
 
 #: templates/accounts/profile.html:12
 msgid "Update your profile"
-msgstr "Mettre votre profil à jour"
+msgstr ""
 
 #: templates/accounts/profile.html:19
 #: templates/accounts/snippets/registration_form.html:11
 #: templates/organization/organization_dashboard.html:77
 msgid "Username"
-msgstr "Nom d'utilisateur"
+msgstr ""
 
 #: templates/accounts/profile.html:25
 #: templates/accounts/snippets/registration_form.html:18
 #: templates/organization/user_list.html:18
 msgid "Email"
-msgstr "Email"
+msgstr ""
 
 #: templates/accounts/profile.html:37
 #: templates/accounts/snippets/registration_form.html:39
 msgid "Last name"
-msgstr "Nom de famille"
+msgstr ""
 
 #: templates/accounts/profile.html:43
 msgid "Update profile"
-msgstr "Mettre votre profil à jour"
+msgstr ""
 
 #: templates/accounts/profile.html:46
 msgid "Password options"
@@ -374,39 +373,39 @@ msgstr ""
 #: templates/accounts/profile.html:50
 #: templates/allauth/account/password_change.html:34
 msgid "Change password"
-msgstr "Changer mot de passe"
+msgstr ""
 
 #: templates/accounts/profile.html:55
 #: templates/allauth/account/password_reset.html:26
 msgid "Reset password"
-msgstr "Réinitialiser mot de passe"
+msgstr ""
 
 #: templates/accounts/snippets/registration_form.html:3
 #: templates/allauth/account/signup.html:6
 #: templates/allauth/account/signup.html:96 templates/core/base.html.py:63
 msgid "Register"
-msgstr "S'inscrire"
+msgstr ""
 
 #: templates/accounts/snippets/registration_form.html:25
 msgid "Password"
-msgstr "Mot de passe"
+msgstr ""
 
 #: templates/accounts/snippets/registration_form.html:43
 msgid "Submit"
-msgstr "Soumettre"
+msgstr ""
 
 #: templates/allauth/account/account_inactive.html:5
 #: templates/allauth/account/account_inactive.html:8
 msgid "Account Inactive"
-msgstr "Compte inactif"
+msgstr ""
 
 #: templates/allauth/account/account_inactive.html:10
 msgid "This account is inactive."
-msgstr "Ce compte est inactif."
+msgstr ""
 
 #: templates/allauth/account/email.html:5
 msgid "Account"
-msgstr "Compte"
+msgstr ""
 
 #: templates/allauth/account/email.html:8
 msgid "E-mail Addresses"
@@ -418,19 +417,19 @@ msgstr ""
 
 #: templates/allauth/account/email.html:24
 msgid "Verified"
-msgstr "Verifié"
+msgstr ""
 
 #: templates/allauth/account/email.html:26
 msgid "Unverified"
-msgstr "Non verifié"
+msgstr ""
 
 #: templates/allauth/account/email.html:28
 msgid "Primary"
-msgstr "Primaire"
+msgstr ""
 
 #: templates/allauth/account/email.html:34
 msgid "Make Primary"
-msgstr "Faire primaire"
+msgstr ""
 
 #: templates/allauth/account/email.html:35
 msgid "Re-send Verification"
@@ -439,7 +438,7 @@ msgstr ""
 #: templates/allauth/account/email.html:36
 #: templates/allauth/socialaccount/connections.html:35
 msgid "Remove"
-msgstr "Enlever"
+msgstr ""
 
 #: templates/allauth/account/email.html:43
 msgid "Warning:"
@@ -619,11 +618,11 @@ msgstr ""
 
 #: templates/allauth/account/password_change.html:23
 msgid "New password"
-msgstr "Nouveau mot de passe"
+msgstr ""
 
 #: templates/allauth/account/password_change.html:28
 msgid "New password (again)"
-msgstr "Nouveau mot de pass (encore)"
+msgstr ""
 
 #: templates/allauth/account/password_reset.html:7
 #: templates/allauth/account/password_reset_done.html:6
@@ -664,7 +663,7 @@ msgstr ""
 #: templates/allauth/account/password_reset_from_key.html:20
 #: templates/allauth/account/password_reset_from_key_done.html:8
 msgid "Your password is now changed."
-msgstr "Votre mot de passe a été changé."
+msgstr ""
 
 #: templates/allauth/account/password_set.html:5
 #: templates/allauth/account/password_set.html:8
@@ -692,7 +691,7 @@ msgstr ""
 
 #: templates/allauth/account/snippets/already_logged_in.html:5
 msgid "Note"
-msgstr "Note"
+msgstr ""
 
 #: templates/allauth/account/snippets/already_logged_in.html:5
 #, python-format
@@ -817,14 +816,14 @@ msgstr ""
 #: templates/organization/organization_list.html:11
 #: templates/organization/user_list.html:21
 msgid "Organizations"
-msgstr "Organisations"
+msgstr ""
 
 #: templates/core/base.html:36
 #: templates/organization/organization_list.html:23
 #: templates/organization/project_list.html:5
 #: templates/organization/project_list.html:9
 msgid "Projects"
-msgstr "Projets"
+msgstr ""
 
 #: templates/core/base.html:41 templates/organization/user_list.html.py:5
 #: templates/organization/user_list.html:9
@@ -867,17 +866,17 @@ msgstr ""
 #: templates/organization/organization_dashboard.html:37
 #: templates/organization/project_list.html:28
 msgid "Project"
-msgstr "Projet"
+msgstr ""
 
 #: templates/core/dashboard.html:67
 #: templates/organization/organization_list.html:22
 #: templates/organization/project_list.html:27
 msgid "Organization"
-msgstr "Organisation"
+msgstr ""
 
 #: templates/core/dashboard.html:71
 msgid "Open project"
-msgstr "Ouvrir projet"
+msgstr ""
 
 #: templates/organization/email/org_invite.txt:2
 #, python-format
@@ -951,15 +950,15 @@ msgstr ""
 
 #: templates/organization/organization_dashboard.html:63
 msgid "Add new project"
-msgstr "Ajouter nouveau projet"
+msgstr ""
 
 #: templates/organization/organization_dashboard.html:66
 msgid "Add members"
-msgstr "Ajouter membres"
+msgstr ""
 
 #: templates/organization/organization_dashboard.html:74
 msgid "Members"
-msgstr "Membres"
+msgstr ""
 
 #: templates/organization/organization_dashboard.html:82
 msgid "View all"
@@ -1004,7 +1003,7 @@ msgstr ""
 
 #: templates/organization/project_add_details.html:63
 msgid "Project name"
-msgstr "Nom de projet"
+msgstr ""
 
 #: templates/organization/project_add_details.html:71
 msgid "Private"
@@ -1047,31 +1046,31 @@ msgstr ""
 
 #: templates/organization/project_add_permissions.html:29
 msgid "Permissions"
-msgstr "Droits d'accès"
+msgstr ""
 
 #: templates/organization/project_add_wrapper.html:9
 msgid "PROJECTS"
-msgstr "PROJETS"
+msgstr ""
 
 #: templates/organization/project_add_wrapper.html:9
 msgid "Add new"
-msgstr "Ajouter nouveau"
+msgstr ""
 
 #: templates/organization/project_add_wrapper.html:15
 msgid "Create Project Geometry"
-msgstr "Créer géométrie du projet"
+msgstr ""
 
 #: templates/organization/project_add_wrapper.html:19
 msgid "Add Details"
-msgstr "Ajouter detailles"
+msgstr ""
 
 #: templates/organization/project_add_wrapper.html:23
 msgid "Assign Permissions"
-msgstr "Assigner droits d'accès"
+msgstr ""
 
 #: templates/organization/project_add_wrapper.html:44
 msgid "Continue"
-msgstr "Continuer"
+msgstr ""
 
 #: templates/organization/project_dashboard.html:33
 msgid "Index"

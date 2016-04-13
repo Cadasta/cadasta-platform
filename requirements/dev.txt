@@ -3,3 +3,4 @@ pytest-cov
 factory_boy
 selenium
 transifex-client
+django-compressor

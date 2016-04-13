@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-31 12:59+0000\n"
-"PO-Revision-Date: 2016-03-31 13:23+0000\n"
+"POT-Creation-Date: 2016-04-12 13:20+0000\n"
+"PO-Revision-Date: 2016-04-12 14:03+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
 "Language-Team: German (http://www.transifex.com/cadasta/cadasta-platform/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -30,134 +30,25 @@ msgstr ""
 msgid "Another user with this username already exists"
 msgstr ""
 
-#: accounts/models.py:25
+#: accounts/manager.py:16 organization/serializers.py:107
+msgid "User with username or email {} does not exist"
+msgstr ""
+
+#: accounts/manager.py:21 organization/serializers.py:109
+msgid "More than one user found for username or email {}"
+msgstr ""
+
+#: accounts/models.py:29
 msgid "You don't have permission to view user details"
 msgstr ""
 
-#: accounts/models.py:28
+#: accounts/models.py:32
 msgid "You don't have permission to update user details"
 msgstr ""
 
 #: accounts/serializers.py:17 accounts/serializers.py:42
 #: accounts/tests/test_serializers.py:74
 msgid "Another user is already registered with this email address"
-msgstr ""
-
-#: accounts/templates/activate_email.txt:2
-#, python-format
-msgid ""
-"You're receiving this email because you created an account on %(site_name)s."
-msgstr ""
-
-#: accounts/templates/activate_email.txt:4
-msgid "Please go to the following page to activate account:"
-msgstr ""
-
-#: accounts/templates/activate_email.txt:9
-#: organization/templates/org_invite.txt:9
-msgid "Thanks for using our site!"
-msgstr ""
-
-#: accounts/templates/activate_email.txt:11
-#: accounts/templates/password_reset.txt:10
-#: organization/templates/org_invite.txt:11
-#, python-format
-msgid "The %(site_name)s team"
-msgstr ""
-
-#: accounts/templates/change_email.txt:3
-#, python-format
-msgid "You have recently changed your email address at %(site_name)s. "
-msgstr ""
-
-#: accounts/templates/change_email.txt:5
-msgid "Please go to the following page to confirm your new email address. "
-msgstr ""
-
-#: accounts/templates/change_email.txt:10
-#, python-format
-msgid "The %(site_name)s Team. "
-msgstr ""
-
-#: accounts/templates/change_email_subject.txt:2
-#, python-format
-msgid "Change of email on %(site_name)s"
-msgstr ""
-
-#: accounts/templates/password_reset.txt:2
-#, python-format
-msgid ""
-"You're receiving this email because you requested a password reset for your "
-"user account at %(site_name)s."
-msgstr ""
-
-#: accounts/templates/password_reset.txt:4
-msgid "Please go to the following page and choose a new password:"
-msgstr ""
-
-#: accounts/templates/password_reset.txt:8
-msgid "Your username, in case you've forgotten:"
-msgstr ""
-
-#: accounts/templates/profile.html:6 core/templates/core/base.html.py:36
-msgid "Profile"
-msgstr "Profil"
-
-#: accounts/templates/profile.html:12
-msgid "Update your profile"
-msgstr ""
-
-#: accounts/templates/profile.html:19
-#: accounts/templates/snippets/registration_form.html:11
-msgid "Username"
-msgstr ""
-
-#: accounts/templates/profile.html:25
-#: accounts/templates/snippets/registration_form.html:18
-#: organization/templates/organization/user_list.html:13
-msgid "Email"
-msgstr ""
-
-#: accounts/templates/profile.html:31
-#: accounts/templates/snippets/registration_form.html:32
-msgid "First name"
-msgstr "Vorname"
-
-#: accounts/templates/profile.html:37
-#: accounts/templates/snippets/registration_form.html:39
-msgid "Last name"
-msgstr "Familienname"
-
-#: accounts/templates/profile.html:43
-msgid "Update profile"
-msgstr "Profil aktualisieren"
-
-#: accounts/templates/profile.html:46
-msgid "Password options"
-msgstr ""
-
-#: accounts/templates/profile.html:50
-#: templates/allauth/account/password_change.html:34
-msgid "Change password"
-msgstr ""
-
-#: accounts/templates/profile.html:55
-#: templates/allauth/account/password_reset.html:26
-msgid "Reset password"
-msgstr ""
-
-#: accounts/templates/snippets/registration_form.html:3
-#: core/templates/core/base.html:52 templates/allauth/account/signup.html:6
-#: templates/allauth/account/signup.html:96
-msgid "Register"
-msgstr ""
-
-#: accounts/templates/snippets/registration_form.html:25
-msgid "Password"
-msgstr ""
-
-#: accounts/templates/snippets/registration_form.html:43
-msgid "Submit"
 msgstr ""
 
 #: accounts/views/api.py:70
@@ -172,74 +63,40 @@ msgstr ""
 msgid "Failed to update profile information"
 msgstr ""
 
+#: config/settings/default.py:172
+msgid "English"
+msgstr "Englisch"
+
+#: config/settings/default.py:173
+msgid "French"
+msgstr "Französisch"
+
+#: config/settings/default.py:174
+msgid "German"
+msgstr "Deutsch"
+
+#: config/settings/default.py:175
+msgid "Spanish"
+msgstr "Spanisch"
+
 #: core/mixins.py:13
 msgid "PERMISSION DENIED"
 msgstr ""
 
-#: core/templates/core/base.html:30
-#: organization/templates/organization/organization_list.html:11
-#: organization/templates/organization/user_list.html:14
-msgid "Organizations"
-msgstr ""
-
-#: core/templates/core/base.html:41
-msgid "Logout"
-msgstr ""
-
-#: core/templates/core/base.html:47
-msgid "Login"
-msgstr ""
-
-#: core/templates/core/base.html:83
-msgid "Copyright 2016 Cadasta. All Rights Reserved."
-msgstr ""
-
-#: core/templates/core/base.html:88
-msgid "About Us"
-msgstr ""
-
-#: core/templates/core/base.html:93
-msgid "Privacy"
-msgstr ""
-
-#: core/templates/core/base.html:98
-msgid "Terms of Service"
-msgstr ""
-
-#: core/templates/core/base.html:103
-msgid "Code of Conduct"
-msgstr ""
-
-#: core/templates/core/base.html:108
-msgid "Visit us on Github"
-msgstr ""
-
-#: core/templates/dashboard.html:7
-#: organization/templates/organization/organization_dashboard.html:23
-msgid "Dashboard"
-msgstr ""
-
-#: core/templates/dashboard.html:12
-msgid "Organization index"
-msgstr ""
-
-#: core/templates/dashboard.html:17
-msgid "Project index"
-msgstr ""
-
-#: core/templates/dashboard.html:22
-msgid "User index"
-msgstr ""
+#: core/tests/test_translations.py:11 templates/accounts/profile.html.py:31
+#: templates/accounts/snippets/registration_form.html:32
+msgid "First name"
+msgstr "Vorname"
 
 #: core/tests/test_validators.py:38 core/tests/test_validators.py:40
 msgid "Please provide either name or description"
 msgstr ""
 
 #: core/tests/test_validators.py:55 core/validators.py:24
-#: organization/tests/test_api.py:1504
 #: organization/tests/test_validators.py:29
 #: organization/tests/test_validators.py:43
 #: organization/tests/test_validators.py:63
+#: organization/tests/test_views_api.py:1496
 msgid "This field is required."
 msgstr ""
 
@@ -257,413 +114,285 @@ msgstr ""
 msgid " or "
 msgstr ""
 
-#: core/views.py:20
+#: core/views/api.py:17
 #, python-brace-format
 msgid "{name} not found."
 msgstr ""
 
-#: organization/forms.py:73
-#: organization/templates/organization/project_add_permissions.html:45
+#: organization/choices.py:4
+#: templates/organization/project_add_permissions.html:41
+msgid "Administrator"
+msgstr ""
+
+#: organization/choices.py:5
+#: templates/organization/project_add_permissions.html:27
+#: templates/organization/user_list.html:15
+msgid "Member"
+msgstr ""
+
+#: organization/choices.py:7
+#: templates/organization/project_add_permissions.html:45
 msgid "Project User"
 msgstr ""
 
-#: organization/forms.py:74
-#: organization/templates/organization/project_add_permissions.html:46
+#: organization/choices.py:8
+#: templates/organization/project_add_permissions.html:46
 msgid "Data Collector"
 msgstr ""
 
-#: organization/forms.py:75
-#: organization/templates/organization/project_add_permissions.html:47
+#: organization/choices.py:9
+#: templates/organization/project_add_permissions.html:47
 msgid "Project Manager"
 msgstr ""
 
-#: organization/models.py:53
+#: organization/models.py:55
 msgid "List existing organizations"
 msgstr ""
 
-#: organization/models.py:56
+#: organization/models.py:58
 msgid "View existing organizations"
 msgstr ""
 
-#: organization/models.py:58
+#: organization/models.py:60
 msgid "Create organizations"
 msgstr ""
 
-#: organization/models.py:61
+#: organization/models.py:63
 msgid "Update an existing organization"
 msgstr ""
 
-#: organization/models.py:63
+#: organization/models.py:65
 msgid "Archive an existing organization"
 msgstr ""
 
-#: organization/models.py:65
+#: organization/models.py:67
 msgid "Unarchive an existing organization"
 msgstr ""
 
-#: organization/models.py:67
+#: organization/models.py:69
 msgid "List members of an organization"
 msgstr ""
 
-#: organization/models.py:69
+#: organization/models.py:71
 msgid "Add a member to an organization"
 msgstr ""
 
-#: organization/models.py:71
+#: organization/models.py:73
 msgid "Remove a member from an organization"
 msgstr ""
 
-#: organization/models.py:129
+#: organization/models.py:131
 msgid "List existing projects in an organization"
 msgstr ""
 
-#: organization/models.py:132
+#: organization/models.py:134
 msgid "Create projects in an organization"
 msgstr ""
 
-#: organization/models.py:135
+#: organization/models.py:137
 msgid "View existing projects"
 msgstr ""
 
-#: organization/models.py:137
+#: organization/models.py:139
 msgid "Update an existing project"
 msgstr ""
 
-#: organization/models.py:139
+#: organization/models.py:141
 msgid "Archive an existing project"
 msgstr ""
 
-#: organization/models.py:141
+#: organization/models.py:143
 msgid "Unarchive an existing project"
 msgstr ""
 
-#: organization/models.py:143
+#: organization/models.py:145
 msgid "List users within a project"
 msgstr ""
 
-#: organization/models.py:145
+#: organization/models.py:147
 msgid "Add user to a project"
 msgstr ""
 
-#: organization/models.py:147
+#: organization/models.py:149
 msgid "Edit roles of user in a project"
 msgstr ""
 
-#: organization/models.py:149
+#: organization/models.py:151
 msgid "Remove user from a project"
 msgstr ""
 
-#: organization/serializers.py:76
-msgid "User with username or email {} does not exist"
-msgstr ""
-
-#: organization/serializers.py:78
-msgid "More than one user found for username or email {}"
-msgstr ""
-
-#: organization/serializers.py:156
+#: organization/serializers.py:185
 #, python-brace-format
 msgid "You have been added to organization {organization}"
 msgstr ""
 
-#: organization/serializers.py:175 organization/tests/test_serializers.py:304
+#: organization/serializers.py:205 organization/tests/test_serializers.py:314
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
 msgstr ""
 
-#: organization/templates/org_invite.txt:2
-#, python-format
-msgid ""
-"You're receiving this email because you have been added to %(organization)s "
-"on %(site_name)s."
-msgstr ""
-
-#: organization/templates/org_invite.txt:4
-msgid "Did you not want to be added to this organization, click here:"
-msgstr ""
-
-#: organization/templates/organization/organization_add.html:5
-#: organization/templates/organization/organization_add.html:19
-msgid "Add organization"
-msgstr ""
-
-#: organization/templates/organization/organization_add.html:26
-#: organization/templates/organization/organization_dashboard.html:56
-#: organization/templates/organization/organization_edit.html:30
-#: organization/templates/organization/project_add_wrapper.html:46
-msgid "Cancel"
-msgstr ""
-
-#: organization/templates/organization/organization_add.html:29
-#: organization/templates/organization/organization_list.html:13
-#: organization/templates/organization/project_dashboard.html:42
-#: organization/templates/organization/project_list.html:14
-msgid "Add"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:16
-#: organization/templates/organization/organization_edit.html:6
-msgid "Edit"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:17
-#: organization/templates/organization/organization_dashboard.html:59
-msgid "Archive"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:27
-msgid "You're ready to go"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:30
-msgid "Add new project"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:33
-msgid "Add members"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:49
-msgid "Archive organization"
-msgstr ""
-
-#: organization/templates/organization/organization_dashboard.html:52
-msgid "Are you sure you want to archive this organization?"
-msgstr ""
-
-#: organization/templates/organization/organization_edit.html:20
-msgid "Edit organization"
-msgstr ""
-
-#: organization/templates/organization/organization_edit.html:33
-msgid "Save"
-msgstr ""
-
-#: organization/templates/organization/organization_form.html:10
-msgid "Name"
-msgstr ""
-
-#: organization/templates/organization/organization_form.html:16
-#: organization/templates/organization/project_add_details.html:92
-msgid "Description"
-msgstr ""
-
-#: organization/templates/organization/organization_form.html:22
-msgid "URL"
-msgstr ""
-
-#: organization/templates/organization/organization_list.html:22
-#: organization/templates/organization/project_list.html:25
-msgid "Organization"
-msgstr ""
-
-#: organization/templates/organization/organization_list.html:23
-#: organization/templates/organization/project_list.html:7
-msgid "Projects"
-msgstr ""
-
-#: organization/templates/organization/project_add_details.html:6
-msgid "Add project details"
-msgstr ""
-
-#: organization/templates/organization/project_add_details.html:47
-msgid "Select organization"
-msgstr ""
-
-#: organization/templates/organization/project_add_details.html:63
-msgid "Project name"
-msgstr ""
-
-#: organization/templates/organization/project_add_details.html:71
-msgid "Private"
-msgstr ""
-
-#: organization/templates/organization/project_add_details.html:81
-msgid "Public"
-msgstr ""
-
-#: organization/templates/organization/project_add_details.html:100
-msgid "Project URL"
-msgstr ""
-
-#: organization/templates/organization/project_add_extents.html:14
-msgid "Create project geometry"
-msgstr ""
-
-#: organization/templates/organization/project_add_extents.html:17
-msgid ""
-"\n"
-"Find your location and use the drawing tools to draw your project\n"
-"geometry.  Once complete, select the \"Continue\" button.  For\n"
-"guidance, view our step-by-step video.\n"
-msgstr ""
-
-#: organization/templates/organization/project_add_permissions.html:5
-msgid "Assign project permissions"
-msgstr ""
-
-#: organization/templates/organization/project_add_permissions.html:8
-msgid ""
-"\n"
-"Not able to find a member?  Organization administrators must first\n"
-"invite users to join your organization before permissions can be assigned.\n"
-msgstr ""
-
-#: organization/templates/organization/project_add_permissions.html:27
-#: organization/templates/organization/user_list.html:12
-msgid "Member"
-msgstr ""
-
-#: organization/templates/organization/project_add_permissions.html:28
-msgid "Email address"
-msgstr ""
-
-#: organization/templates/organization/project_add_permissions.html:29
-msgid "Permissions"
-msgstr ""
-
-#: organization/templates/organization/project_add_permissions.html:41
-msgid "Administrator"
-msgstr ""
-
-#: organization/templates/organization/project_add_wrapper.html:10
-msgid "PROJECTS"
-msgstr ""
-
-#: organization/templates/organization/project_add_wrapper.html:10
-msgid "Add new"
-msgstr ""
-
-#: organization/templates/organization/project_add_wrapper.html:16
-msgid "Create Project Geometry"
-msgstr ""
-
-#: organization/templates/organization/project_add_wrapper.html:20
-msgid "Add Details"
-msgstr ""
-
-#: organization/templates/organization/project_add_wrapper.html:24
-msgid "Assign Permissions"
-msgstr ""
-
-#: organization/templates/organization/project_add_wrapper.html:45
-msgid "Continue"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:31
-msgid "Index"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:56
-msgid "Overview"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:61
-msgid "Parcels"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:66
-msgid "Questionnaires"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:71
-msgid "Resources"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:76
-msgid "Activity"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:81
-msgid "Reports"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:98
-msgid "Some statistics here..."
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:103
-msgid "You have successfully created your project."
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:107
-msgid "What would you like to do next?"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:112
-msgid "Add a parcel"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:115
-msgid "Upload data"
-msgstr ""
-
-#: organization/templates/organization/project_dashboard.html:120
-msgid "Not sure what to do next?  View our Getting Started demo."
-msgstr ""
-
-#: organization/templates/organization/project_list.html:26
-msgid "Project"
-msgstr ""
-
-#: organization/templates/organization/project_list.html:27
-msgid "Country"
-msgstr ""
-
-#: organization/templates/organization/project_list.html:28
-msgid "Last updated"
-msgstr ""
-
-#: organization/templates/organization/user_list.html:15
-msgid "Last login"
-msgstr ""
-
-#: organization/templates/organization/user_list.html:30
-msgid "Deactivate,Activate"
-msgstr ""
-
-#: organization/tests/test_api.py:534
-msgid "User with username or email some_username does not exist"
-msgstr ""
-
-#: organization/tests/test_api.py:550
-msgid "Organization not found."
-msgstr ""
-
-#: organization/tests/test_api.py:796 organization/tests/test_api.py:957
-#: organization/tests/test_api.py:971 organization/tests/test_api.py:1572
-msgid "Project not found."
-msgstr ""
-
-#: organization/tests/test_api.py:836
-msgid "User with username or email some-user does not exist"
-msgstr ""
-
-#: organization/tests/test_api.py:943
-msgid "User not found."
-msgstr ""
-
-#: organization/tests/test_api.py:1296
-msgid "Cannot update last_login"
-msgstr ""
-
-#: organization/tests/test_api.py:1627
-msgid "This field may not be blank."
-msgstr ""
-
-#: organization/tests/test_serializers.py:187
-#: organization/tests/test_serializers.py:328
+#: organization/tests/test_serializers.py:207
+#: organization/tests/test_serializers.py:335
 #, python-brace-format
 msgid "User with username or email {username} does not exist"
 msgstr ""
 
-#: organization/views/default.py:104
+#: organization/tests/test_views_api.py:534
+msgid "User with username or email some_username does not exist"
+msgstr ""
+
+#: organization/tests/test_views_api.py:550
+msgid "Organization not found."
+msgstr ""
+
+#: organization/tests/test_views_api.py:796
+#: organization/tests/test_views_api.py:957
+#: organization/tests/test_views_api.py:971
+#: organization/tests/test_views_api.py:1564
+msgid "Project not found."
+msgstr ""
+
+#: organization/tests/test_views_api.py:836
+msgid "User with username or email some-user does not exist"
+msgstr ""
+
+#: organization/tests/test_views_api.py:943
+msgid "User not found."
+msgstr ""
+
+#: organization/tests/test_views_api.py:1288
+msgid "Cannot update last_login"
+msgstr ""
+
+#: organization/tests/test_views_api.py:1619
+msgid "This field may not be blank."
+msgstr ""
+
+#: organization/views/default.py:217
 #, python-brace-format
 msgid "Wasn't able to modify user state for user '{username}'"
 msgstr ""
 
-#: organization/views/default.py:153
+#: organization/views/default.py:266
 msgid "No projects found matching the query"
+msgstr ""
+
+#: templates/accounts/email/activate_email.txt:2
+#, python-format
+msgid ""
+"You're receiving this email because you created an account on %(site_name)s."
+msgstr ""
+
+#: templates/accounts/email/activate_email.txt:4
+msgid "Please go to the following page to activate account:"
+msgstr ""
+
+#: templates/accounts/email/activate_email.txt:9
+#: templates/organization/email/org_invite.txt:9
+msgid "Thanks for using our site!"
+msgstr ""
+
+#: templates/accounts/email/activate_email.txt:11
+#: templates/accounts/email/password_reset.txt:10
+#: templates/organization/email/org_invite.txt:11
+#, python-format
+msgid "The %(site_name)s team"
+msgstr ""
+
+#: templates/accounts/email/activate_email_subject.txt:2
+#, python-format
+msgid "Account activation on %(site_name)s"
+msgstr ""
+
+#: templates/accounts/email/change_email.txt:3
+#, python-format
+msgid "You have recently changed your email address at %(site_name)s. "
+msgstr ""
+
+#: templates/accounts/email/change_email.txt:5
+msgid "Please go to the following page to confirm your new email address. "
+msgstr ""
+
+#: templates/accounts/email/change_email.txt:10
+#, python-format
+msgid "The %(site_name)s Team. "
+msgstr ""
+
+#: templates/accounts/email/change_email_subject.txt:2
+#, python-format
+msgid "Change of email on %(site_name)s"
+msgstr ""
+
+#: templates/accounts/email/password_reset.txt:2
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+
+#: templates/accounts/email/password_reset.txt:4
+msgid "Please go to the following page and choose a new password:"
+msgstr ""
+
+#: templates/accounts/email/password_reset.txt:8
+msgid "Your username, in case you've forgotten:"
+msgstr ""
+
+#: templates/accounts/profile.html:6 templates/core/base.html.py:47
+msgid "Profile"
+msgstr "Profil"
+
+#: templates/accounts/profile.html:12
+msgid "Update your profile"
+msgstr ""
+
+#: templates/accounts/profile.html:19
+#: templates/accounts/snippets/registration_form.html:11
+#: templates/organization/organization_dashboard.html:77
+msgid "Username"
+msgstr ""
+
+#: templates/accounts/profile.html:25
+#: templates/accounts/snippets/registration_form.html:18
+#: templates/organization/user_list.html:18
+msgid "Email"
+msgstr ""
+
+#: templates/accounts/profile.html:37
+#: templates/accounts/snippets/registration_form.html:39
+msgid "Last name"
+msgstr "Familienname"
+
+#: templates/accounts/profile.html:43
+msgid "Update profile"
+msgstr "Profil aktualisieren"
+
+#: templates/accounts/profile.html:46
+msgid "Password options"
+msgstr ""
+
+#: templates/accounts/profile.html:50
+#: templates/allauth/account/password_change.html:34
+msgid "Change password"
+msgstr ""
+
+#: templates/accounts/profile.html:55
+#: templates/allauth/account/password_reset.html:26
+msgid "Reset password"
+msgstr ""
+
+#: templates/accounts/snippets/registration_form.html:3
+#: templates/allauth/account/signup.html:6
+#: templates/allauth/account/signup.html:96 templates/core/base.html.py:63
+msgid "Register"
+msgstr ""
+
+#: templates/accounts/snippets/registration_form.html:25
+msgid "Password"
+msgstr ""
+
+#: templates/accounts/snippets/registration_form.html:43
+msgid "Submit"
 msgstr ""
 
 #: templates/allauth/account/account_inactive.html:5
@@ -805,7 +534,7 @@ msgid ""
 msgstr ""
 
 #: templates/allauth/account/login.html:7
-#: templates/allauth/account/login.html:70
+#: templates/allauth/account/login.html:71
 msgid "Sign In"
 msgstr ""
 
@@ -813,7 +542,7 @@ msgstr ""
 msgid "Sign in to your account"
 msgstr ""
 
-#: templates/allauth/account/login.html:53
+#: templates/allauth/account/login.html:54
 msgid "Forgotten password?"
 msgstr ""
 
@@ -1082,4 +811,320 @@ msgstr ""
 msgid ""
 "You are about to use your %(provider_name)s account to login to\n"
 "%(site_name)s. As a final step, please complete the following form:"
+msgstr ""
+
+#: templates/core/base.html:31 templates/organization/organization_list.html:6
+#: templates/organization/organization_list.html:11
+#: templates/organization/user_list.html:21
+msgid "Organizations"
+msgstr ""
+
+#: templates/core/base.html:36
+#: templates/organization/organization_list.html:23
+#: templates/organization/project_list.html:5
+#: templates/organization/project_list.html:9
+msgid "Projects"
+msgstr ""
+
+#: templates/core/base.html:41 templates/organization/user_list.html.py:5
+#: templates/organization/user_list.html:9
+msgid "Users"
+msgstr ""
+
+#: templates/core/base.html:52
+msgid "Logout"
+msgstr ""
+
+#: templates/core/base.html:58
+msgid "Login"
+msgstr ""
+
+#: templates/core/base.html:94
+msgid "Copyright 2016 Cadasta. All Rights Reserved."
+msgstr ""
+
+#: templates/core/base.html:100
+msgid "About Us"
+msgstr ""
+
+#: templates/core/base.html:105
+msgid "Privacy"
+msgstr ""
+
+#: templates/core/base.html:110
+msgid "Terms of Service"
+msgstr ""
+
+#: templates/core/base.html:115
+msgid "Code of Conduct"
+msgstr ""
+
+#: templates/core/base.html:120
+msgid "Visit us on Github"
+msgstr ""
+
+#: templates/core/dashboard.html:64
+#: templates/organization/organization_dashboard.html:37
+#: templates/organization/project_list.html:28
+msgid "Project"
+msgstr ""
+
+#: templates/core/dashboard.html:67
+#: templates/organization/organization_list.html:22
+#: templates/organization/project_list.html:27
+msgid "Organization"
+msgstr ""
+
+#: templates/core/dashboard.html:71
+msgid "Open project"
+msgstr ""
+
+#: templates/organization/email/org_invite.txt:2
+#, python-format
+msgid ""
+"You're receiving this email because you have been added to %(organization)s "
+"on %(site_name)s."
+msgstr ""
+
+#: templates/organization/email/org_invite.txt:4
+msgid "Did you not want to be added to this organization, click here:"
+msgstr ""
+
+#: templates/organization/organization_add.html:5
+msgid "Add new organization"
+msgstr ""
+
+#: templates/organization/organization_add.html:19
+msgid "Add organization"
+msgstr ""
+
+#: templates/organization/organization_add.html:26
+#: templates/organization/organization_dashboard.html:104
+#: templates/organization/organization_edit.html:30
+#: templates/organization/project_add_wrapper.html:45
+msgid "Cancel"
+msgstr ""
+
+#: templates/organization/organization_add.html:29
+#: templates/organization/organization_list.html:13
+#: templates/organization/project_dashboard.html:44
+#: templates/organization/project_list.html:16
+msgid "Add"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:19
+msgid "Dashboard"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:23
+#: templates/organization/organization_edit.html:6
+msgid "Edit"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:26
+#: templates/organization/organization_dashboard.html:107
+msgid "Archive"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:38
+#: templates/organization/project_list.html:29
+msgid "Country"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:39
+#: templates/organization/project_list.html:30
+msgid "Last updated"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:56
+msgid "You're ready to go"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:58
+msgid "You have successfully created your organization."
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:59
+#: templates/organization/project_dashboard.html:109
+msgid "What would you like to do next?"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:63
+msgid "Add new project"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:66
+msgid "Add members"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:74
+msgid "Members"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:82
+msgid "View all"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:95
+msgid "Archive organization"
+msgstr ""
+
+#: templates/organization/organization_dashboard.html:99
+msgid "Are you sure you want to archive this organization?"
+msgstr ""
+
+#: templates/organization/organization_edit.html:20
+msgid "Edit organization"
+msgstr ""
+
+#: templates/organization/organization_edit.html:33
+msgid "Save"
+msgstr ""
+
+#: templates/organization/organization_form.html:10
+msgid "Name"
+msgstr ""
+
+#: templates/organization/organization_form.html:16
+#: templates/organization/project_add_details.html:92
+msgid "Description"
+msgstr ""
+
+#: templates/organization/organization_form.html:22
+msgid "URL"
+msgstr ""
+
+#: templates/organization/project_add_details.html:6
+msgid "Add project details"
+msgstr ""
+
+#: templates/organization/project_add_details.html:47
+msgid "Select organization"
+msgstr ""
+
+#: templates/organization/project_add_details.html:63
+msgid "Project name"
+msgstr ""
+
+#: templates/organization/project_add_details.html:71
+msgid "Private"
+msgstr ""
+
+#: templates/organization/project_add_details.html:81
+msgid "Public"
+msgstr ""
+
+#: templates/organization/project_add_details.html:100
+msgid "Project URL"
+msgstr ""
+
+#: templates/organization/project_add_extents.html:14
+msgid "Create project geometry"
+msgstr ""
+
+#: templates/organization/project_add_extents.html:17
+msgid ""
+"\n"
+"Find your location and use the drawing tools to draw your project\n"
+"geometry.  Once complete, select the \"Continue\" button.  For\n"
+"guidance, view our step-by-step video.\n"
+msgstr ""
+
+#: templates/organization/project_add_permissions.html:5
+msgid "Assign project permissions"
+msgstr ""
+
+#: templates/organization/project_add_permissions.html:8
+msgid ""
+"\n"
+"Not able to find a member?  Organization administrators must first\n"
+"invite users to join your organization before permissions can be assigned.\n"
+msgstr ""
+
+#: templates/organization/project_add_permissions.html:28
+msgid "Email address"
+msgstr ""
+
+#: templates/organization/project_add_permissions.html:29
+msgid "Permissions"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:9
+msgid "PROJECTS"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:9
+msgid "Add new"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:15
+msgid "Create Project Geometry"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:19
+msgid "Add Details"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:23
+msgid "Assign Permissions"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:44
+msgid "Continue"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:33
+msgid "Index"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:58
+msgid "Overview"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:63
+msgid "Parcels"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:68
+msgid "Questionnaires"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:73
+msgid "Resources"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:78
+msgid "Activity"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:83
+msgid "Reports"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:100
+msgid "Some statistics here..."
+msgstr ""
+
+#: templates/organization/project_dashboard.html:105
+msgid "You have successfully created your project."
+msgstr ""
+
+#: templates/organization/project_dashboard.html:114
+msgid "Add a parcel"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:117
+msgid "Upload data"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:122
+msgid "Not sure what to do next?  View our Getting Started demo."
+msgstr ""
+
+#: templates/organization/user_list.html:24
+msgid "Last login"
+msgstr ""
+
+#: templates/organization/user_list.html:40
+msgid "Deactivate,Activate"
 msgstr ""
