@@ -8,7 +8,7 @@ from accounts.models import User
 
 from ..models import Organization
 from .. import serializers
-from ..mixins import OrganizationRoles, ProjectRoles
+from .mixins import OrganizationRoles, ProjectRoles
 
 
 class OrganizationList(APIPermissionRequiredMixin, generics.ListCreateAPIView):

@@ -22,9 +22,15 @@
     <a href="{% url 'organization:edit' object.slug %}">
       {% trans "Edit" %}
     </a> |
+    {% if object.archived %}
+    <a href="#unarchive_confirm" data-toggle="modal">
+      {% trans "Unarchive" %}
+    </a>
+    {% else %}
     <a href="#archive_confirm" data-toggle="modal">
       {% trans "Archive" %}
     </a>
+    {% endif %}
   </div>
 </div>
 
@@ -105,6 +111,33 @@
         </button>
         <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary">
           {% trans "Archive" %}
+        </a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="unarchive_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{% trans "Unarchive organization" %}</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Are you sure you want to unarchive this organization?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+        <a href="{% url 'organization:unarchive' object.slug %}"  class="btn btn-primary">
+          {% trans "Unarchive" %}
         </a>
       </div>
     </div><!-- /.modal-content -->

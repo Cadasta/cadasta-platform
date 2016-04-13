@@ -2,12 +2,18 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 
-from .models import Organization, Project
+from ..models import Organization, Project
 
 
 class OrganizationMixin:
     def get_organization(self):
-        return get_object_or_404(Organization, slug=self.kwargs['slug'])
+        if not hasattr(self, 'org'):
+            self.org = get_object_or_404(Organization,
+                                         slug=self.kwargs['slug'])
+        return self.org
+
+    def get_perms_objects(self):
+        return [self.get_organization()]
 
 
 class OrganizationRoles(OrganizationMixin):
@@ -24,9 +30,6 @@ class OrganizationRoles(OrganizationMixin):
         context['domain'] = get_current_site(self.request).domain
         context['sitename'] = settings.SITE_NAME
         return context
-
-    def get_perms_objects(self):
-        return [self.get_organization()]
 
 
 class ProjectMixin:

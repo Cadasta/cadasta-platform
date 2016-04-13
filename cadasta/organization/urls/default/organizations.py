@@ -23,6 +23,10 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/archive/$',
         default.OrganizationArchive.as_view(),
         name='archive'),
+    url(
+        r'^(?P<slug>[-\w]+)/unarchive/$',
+        default.OrganizationUnarchive.as_view(),
+        name='unarchive'),
     #
     # PROJECTS
     #
