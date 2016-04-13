@@ -12,7 +12,7 @@ from tutelary.models import Policy
 from core.models import RandomIDModel
 from .validators import validate_contact
 from .choices import ROLE_CHOICES
-from .import messages
+from . import messages
 
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
@@ -145,21 +145,29 @@ class Project(RandomIDModel):
              {'description': _("Create projects in an organization"),
               'permissions_object': 'organization'}),
             ('project.view',
-             {'description': _("View existing projects")}),
+             {'description': _("View existing projects"),
+              'error_message': messages.PROJ_VIEW}),
             ('project.update',
-             {'description': _("Update an existing project")}),
+             {'description': _("Update an existing project"),
+              'error_message': messages.PROJ_EDIT}),
             ('project.archive',
-             {'description': _("Archive an existing project")}),
+             {'description': _("Archive an existing project"),
+              'error_message': messages.PROJ_ARCHIVE}),
             ('project.unarchive',
-             {'description': _("Unarchive an existing project")}),
+             {'description': _("Unarchive an existing project"),
+              'error_message': messages.PROJ_UNARCHIVE}),
             ('project.users.list',
-             {'description': _("List users within a project")}),
+             {'description': _("List users within a project"),
+              'error_message': messages.PROJ_USERS_LIST}),
             ('project.users.add',
-             {'description': _("Add user to a project")}),
+             {'description': _("Add user to a project"),
+              'error_message': messages.PROJ_USERS_ADD}),
             ('project.users.edit',
-             {'description': _("Edit roles of user in a project")}),
+             {'description': _("Edit roles of user in a project"),
+              'error_message': messages.PROJ_USERS_EDIT}),
             ('project.users.remove',
-             {'description': _("Remove user from a project")}),
+             {'description': _("Remove user from a project"),
+              'error_message': messages.PROJ_USERS_REMOVE}),
         )
 
     def __str__(self):

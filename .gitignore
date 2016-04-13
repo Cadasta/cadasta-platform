@@ -24,6 +24,7 @@ node_modules/
 /.envrc
 /.virtualenv/
 
+functional_tests/screenshots
 ghostdriver.log
 npm-debug.log
 vagrant.retry

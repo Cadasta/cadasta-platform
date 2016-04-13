@@ -154,11 +154,6 @@ LEAFLET_CONFIG = {
     'RESET_VIEW': False
 }
 
-SASS_PROCESSOR_INCLUDE_DIRS = (
-    os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
-)
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
@@ -184,6 +179,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
+SASS_PROCESSOR_INCLUDE_DIRS = (
+    os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
+)
+
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
 STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = (

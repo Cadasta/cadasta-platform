@@ -14,23 +14,23 @@
 
 @font-face {
   font-family: 'roboto';
-  src: url('fonts/roboto_regular_macroman/roboto-regular-webfont.eot');
-  src: url('fonts/roboto_regular_macroman/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
-       url('fonts/roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
-       url('fonts/roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
-       url('fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
+  src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot');
+  src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
+       url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
+       url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'steelfish';
-  src: url('fonts/steelfish_regular_macroman/steelfish_rg-webfont.eot');
-  src: url('fonts/steelfish_regular_macroman/steelfish_rg-webfont.eot?#iefix') format('embedded-opentype'),
-       url('fonts/steelfish_regular_macroman/steelfish_rg-webfont.woff2') format('woff2'),
-       url('fonts/steelfish_regular_macroman/steelfish_rg-webfont.woff') format('woff'),
-       url('fonts/steelfish_regular_macroman/steelfish_rg-webfont.ttf') format('truetype'),
-       url('fonts/steelfish_regular_macroman/steelfish_rg-webfont.svg#steelfish') format('svg');
+  src: url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.eot');
+  src: url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.woff2') format('woff2'),
+       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.woff') format('woff'),
+       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.ttf') format('truetype'),
+       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.svg#steelfish') format('svg');
   font-weight: normal;
   font-style: normal;
 }
