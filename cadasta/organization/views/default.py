@@ -1,4 +1,5 @@
 from django.http import Http404
+from django.db import transaction
 import django.views.generic as generic
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -11,7 +12,7 @@ from tutelary.models import Role
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from accounts.models import User
 
-from ..models import Organization, Project, OrganizationRole
+from ..models import Organization, Project, OrganizationRole, ProjectRole
 from .mixins import OrganizationMixin
 from .. import forms
 from .. import messages as error_messages
@@ -218,6 +219,7 @@ class UserList(PermissionRequiredMixin, generic.ListView):
     model = User
     template_name = 'organization/user_list.html'
     permission_required = 'user.list'
+    permission_denied_message = error_messages.USERS_LIST
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
@@ -232,6 +234,7 @@ class UserList(PermissionRequiredMixin, generic.ListView):
 
 
 class UserActivation(generic.View):
+    permission_denied_message = error_messages.USERS_UPDATE
     new_state = None
 
     def post(self, request, user):
@@ -261,6 +264,7 @@ class ProjectList(PermissionRequiredMixin, generic.ListView):
 class ProjectDashboard(generic.DetailView):
     model = Project
     template_name = 'organization/project_dashboard.html'
+    permission_denied_message = error_messages.PROJ_VIEW
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDashboard, self).get_context_data(**kwargs)
@@ -363,7 +367,7 @@ class ProjectAddWizard(wizard.SessionWizardView):
         description = form_data[1]['details-description']
         organization = form_data[1]['details-organization']
         url = form_data[1]['details-url']
-        private = form_data[1]['details-public'] != 'on'
+        # private = form_data[1]['details-public'] != 'on'
         org = Organization.objects.get(slug=organization)
         su_role = Role.objects.get(name='superuser')
         oa_role = Role.objects.get(name=organization + '-oa')
@@ -377,19 +381,21 @@ class ProjectAddWizard(wizard.SessionWizardView):
                     break
             if not is_admin:
                 usernames.append(user.username)
-        print(form_data)
         user_roles = [(k, form_data[2][k]) for k in usernames]
         print('name:', name)
-        print('organization:', organization)
-        print('description:', description)
-        print('location:', location)
-        print('url:', url)
-        print('private:', private)
-        print('user_roles:', user_roles)
-        project = Project.objects.create(
-            name=name, organization=org, project_slug=slugify(name),
-            description=description, urls=[url], extent=location
-        )
+
+        with transaction.atomic():
+            project = Project.objects.create(
+                name=name, organization=org, project_slug=slugify(name),
+                description=description, urls=[url], extent=location
+            )
+            for username, role in user_roles:
+                user = User.objects.get(username=username)
+                print(user, role)
+                ProjectRole.objects.create(
+                    project=project, user=user, role=role
+                )
+
         return redirect('organization:project-dashboard',
                         organization=organization,
                         project=project.project_slug)
@@ -397,3 +403,4 @@ class ProjectAddWizard(wizard.SessionWizardView):
 
 class ProjectEdit(generic.TemplateView):
     template_name = 'organization/project_edit.html'
+    permission_denied_message = error_messages.PROJ_EDIT

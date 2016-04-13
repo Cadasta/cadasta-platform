@@ -1,30 +1,35 @@
----
 sudo: required
 dist: trusty
 language: python
 python:
-  - "3.5"
+- '3.5'
 addons:
-  postgresql: "9.4"
+  postgresql: '9.4'
   apt:
     packages:
-      - postgresql-9.4-postgis-2.1 # Workaround https://github.com/travis-ci/travis-ci/issues/5178
+    - postgresql-9.4-postgis-2.1
 before_install:
-  - export DEBIAN_FRONTEND=noninteractive;
-    sudo -E apt-get -yq update &>> ~/apt-get-update.log;
-    sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+- export DEBIAN_FRONTEND=noninteractive; sudo -E apt-get -yq update &>> ~/apt-get-update.log;
+  sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install
+  postgresql-9.4-postgis-2.2
+- export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" |
+  sed "s|::|:|g")
 install:
-  - pip install -r requirements/common.txt
-  - pip install -r requirements/dev.txt
-  - nvm install 4.0.0
-  - nvm alias default 4.0.0
+- pip install -r requirements/common.txt
+- pip install -r requirements/dev.txt
+- nvm install 4.0.0
+- nvm alias default 4.0.0
 before_script:
-  - psql template1 postgres -c 'create extension hstore;'
-  - psql -c 'create database cadasta;' -U postgres
-  - psql -U postgres -d cadasta -c "create extension postgis;"
-  - python cadasta/manage.py migrate --settings=config.settings.travis
+- psql template1 postgres -c 'create extension hstore;'
+- psql -c 'create database cadasta;' -U postgres
+- psql -U postgres -d cadasta -c "create extension postgis;"
+- python cadasta/manage.py migrate --settings=config.settings.travis
 script:
-  - py.test cadasta --cov=cadasta --ds=config.settings.travis
-  - cd functional_tests
-  - ./run.py --ds=config.settings.travis
+- py.test cadasta --cov=cadasta --ds=config.settings.travis
+- cd functional_tests
+- "./run.py --ds=config.settings.travis"
+notifications:
+  slack:
+    on_success: always
+    on_failure: change
+    secure: feHcuDtPoJ6M8C9wpQAu2nnuI98OhMZJLcPu/IgXC2GeFXHPybRzKdLvZJkDCxJZWCwqEt0DsJG/wk/Yh/jYQ/rORT6I5lYab6DvnFULl1c4C5tl7wdCEnXdwKUi3D1jxbN/FDa00GT0LEtNHaF9C08cgvalZ0WgQmVzw5gjnU7WTqqjSPVmP8Tf8Lknqwpy+v3SC5uRGn4/pr3sydfyUwg8b6DIvkKdNUDf5FsjBhjMpFcT2WERc+e34KkMMhY3/XhRW6fGjFzrkP+qyZj0Xr9B+Uuk4rzxzdwIS+E3BJ8HiPbP8AFzSVOm08YeA7cj/mleR9bY85dWH+qzmwXLhF6p7MyeRyFT2zxEajq/3PdNyi4c6im1zNFOKs+vchEQpqD0OWg2CBGeMPX9zBAgurdc6feLL6bazVzjm/Q+Xlob0QXgxWIOwhPDcGpGMbFdEonZN1POrBGQhZpXCUDVZsV9EwTmT8mNMRczsccIHlF8OxnTnMIaqIzOs2xs/TIqOz/PWIXP6R2eZEvNyY5KGFz/Eb1AJ5ayUy6bdQJeL+UTq7W376XKcP0BkSzBWaAYm1fTBtKAeiJ3owQg+z2UiagIM1EMiQBXp2NSMFqAZHUOXl0POr6K+cj9Iys/6WkBd5FvjZw63GpgY7urin6H7jfsqv1Qq28JmXD4HxfvKSY=

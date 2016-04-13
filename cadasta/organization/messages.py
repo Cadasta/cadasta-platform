@@ -12,3 +12,19 @@ ORG_USERS_EDIT = _("You don't have permission to edit roles of this "
                    "organization")
 ORG_USERS_REMOVE = _("You don't have permission to remove members from this "
                      "organization")
+
+PROJ_VIEW = _("You don't have permission to access this project")
+PROJ_EDIT = _("You don't have permission to update this project")
+PROJ_ARCHIVE = _("You don't have permission to archive this project")
+PROJ_UNARCHIVE = _("You don't have permission to unarchive this project")
+PROJ_USERS_LIST = _("You don't have permission to view members of this "
+                    "project")
+PROJ_USERS_ADD = _("You don't have permission to add members to this "
+                   "project")
+PROJ_USERS_EDIT = _("You don't have permission to edit roles of this "
+                    "project")
+PROJ_USERS_REMOVE = _("You don't have permission to remove members from this "
+                      "project")
+
+USERS_LIST = _("You don't have permission to view user details")
+USERS_UPDATE = _("You don't have permission to update user details")

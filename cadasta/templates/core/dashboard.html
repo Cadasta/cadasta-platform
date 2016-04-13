@@ -2,61 +2,30 @@
 
 {% block title %} | Dashboard{% endblock %}
 
+{% load staticfiles %}
 {% load i18n %}
 {% load leaflet_tags %}
 
 {% block extra_head %}
 {% leaflet_css %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
-<link rel="stylesheet" href="/static/css/MarkerCluster.css">
-<link rel="stylesheet" href="/static/css/MarkerCluster.Default.css">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
 {% leaflet_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
-<script src="/static/js/leaflet.markercluster.js"></script>
-<script src="/static/js/L.Map.Deflate.js"></script>
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="{% static 'js/map_utils.js' %}"></script>
 <script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
 <script>
-  function geoLocate(map) {
-    return function(event) {
-      map.locate({
-        setView: true
-      });
-    }
-  }
-
   function project_map_init(map, options) {
     var data = {{ geojson|safe }};
     map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
-    var geocoder = L.control.geocoder('search-QctWfva', {
-      markers: false
-    }).addTo(map);
-    geocoder.on('select', function (e) {
-      map.setZoomAround(e.latlng, 9);
-    });
 
-    var Geolocate = L.Control.extend({
-      options: {
-        position: 'topleft'
-      },
-
-      onAdd: function (map) {
-        var controlDiv = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-geolocate');
-        controlDiv.title = 'Go to my location';
-        L.DomEvent
-          .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
-          .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
-          .addListener(controlDiv, 'click', geoLocate(map));
-
-        L.DomUtil.create('span', 'glyphicon glyphicon-map-marker', controlDiv);
-
-        return controlDiv;
-      }
-    });
-
-    map.addControl(new Geolocate());
+    add_map_controls(map);
 
     var geoJson = L.geoJson(null, {
       onEachFeature: function(feature, layer) {
