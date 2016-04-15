@@ -9,7 +9,9 @@ from .factories import UserFactory
 class UserManagerTest(TestCase):
     def test_get_from_usernamel(self):
         user = UserFactory.create()
-        found = User.objects.get_from_username_or_email(identifier=user.username)
+        found = User.objects.get_from_username_or_email(
+            identifier=user.username
+        )
 
         assert found == user
 
@@ -28,4 +30,6 @@ class UserManagerTest(TestCase):
         UserFactory.create(email='user@example.com')
 
         with raises(User.MultipleObjectsReturned):
-            User.objects.get_from_username_or_email(identifier='user@example.com')
+            User.objects.get_from_username_or_email(
+                identifier='user@example.com'
+            )

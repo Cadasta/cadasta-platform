@@ -11,8 +11,7 @@ from tutelary.models import Role
 from accounts.models import User
 from .models import Organization, OrganizationRole, ProjectRole
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
-
-FORM_CHOICES = ROLE_CHOICES + (('Pb', 'Public User'),)
+FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
 
 
 class OrganizationForm(forms.ModelForm):
@@ -43,7 +42,6 @@ class OrganizationForm(forms.ModelForm):
         return contacts
 
     def save(self, *args, **kwargs):
-        print('save')
         instance = super(OrganizationForm, self).save(commit=False)
         create = not instance.id
 
@@ -169,16 +167,18 @@ class ProjectAddPermissions(forms.Form):
         if organization is not None:
             self.organization = organization
             org = Organization.objects.get(slug=organization)
-            su_role = Role.objects.get(name='superuser')
-            oa_role = Role.objects.get(name=organization + '-oa')
+            try:
+                su_role = Role.objects.get(name='superuser')
+            except Role.DoesNotExist:
+                su_role = None
             self.members = []
             for user, idx in zip(org.users.all(), itertools.count()):
-                is_admin = False
-                for pol in user.assigned_policies():
-                    if (isinstance(pol, Role) and
-                       (pol == su_role or pol == oa_role)):
+                is_admin = any([isinstance(pol, Role) and pol == su_role
+                                for pol in user.assigned_policies()])
+                if not is_admin:
+                    if OrganizationRole.objects.get(organization=org,
+                                                    user=user).admin:
                         is_admin = True
-                        break
                 f = None
                 if not is_admin:
                     f = forms.ChoiceField(choices=ROLE_CHOICES)

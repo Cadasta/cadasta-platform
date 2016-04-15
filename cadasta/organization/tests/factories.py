@@ -1,9 +1,10 @@
 import factory
 
+from core.tests.factories import ExtendedFactory
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
-class OrganizationFactory(factory.django.DjangoModelFactory):
+class OrganizationFactory(ExtendedFactory):
     class Meta:
         model = Organization
 
@@ -24,7 +25,7 @@ class OrganizationFactory(factory.django.DjangoModelFactory):
                 OrganizationRole.objects.create(organization=self, user=u)
 
 
-class ProjectFactory(factory.django.DjangoModelFactory):
+class ProjectFactory(ExtendedFactory):
     class Meta:
         model = Project
 

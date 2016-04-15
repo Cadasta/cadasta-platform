@@ -52,9 +52,9 @@ class UserSerializer(djoser_serializers.UserSerializer):
             'last_name',
             'email',
             'email_verified',
+            'last_login',
         )
         extra_kwargs = {
-            'password': {'write_only': True},
             'email': {'required': True, 'unique': True},
             'email_verified': {'read_only': True}
         }

@@ -79,8 +79,8 @@ class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
     def get_url(self, object):
         return reverse(
                   'organization:project-dashboard',
-                  kwargs={ 'organization': object.organization.slug,
-                           'project': object.project_slug })
+                  kwargs={'organization': object.organization.slug,
+                          'project': object.project_slug})
 
 
 class EntityUserSerializer(serializers.Serializer):

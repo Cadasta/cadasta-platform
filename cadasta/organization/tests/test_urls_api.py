@@ -7,62 +7,41 @@ from ..views import api
 
 class OrganizationUrlTest(TestCase):
     def test_organization_list(self):
-        self.assertEqual(
-            reverse(version_ns('organization:list')),
-            version_url('/organizations/')
-        )
+        assert (reverse(version_ns('organization:list')) ==
+                version_url('/organizations/'))
 
         resolved = resolve(version_url('/organizations/'))
-        self.assertEqual(
-            resolved.func.__name__,
-            api.OrganizationList.__name__)
+        assert resolved.func.__name__ == api.OrganizationList.__name__
 
     def test_organization_detail(self):
-        self.assertEqual(
-            reverse(
-                version_ns('organization:detail'),
-                kwargs={'slug': 'org-slug'}),
-            version_url('/organizations/org-slug/')
-        )
+        assert (reverse(version_ns('organization:detail'),
+                        kwargs={'slug': 'org-slug'}) ==
+                version_url('/organizations/org-slug/'))
 
         resolved = resolve(version_url('/organizations/org-slug/'))
-        self.assertEqual(
-            resolved.func.__name__,
-            api.OrganizationDetail.__name__)
-        self.assertEqual(resolved.kwargs['slug'], 'org-slug')
+        assert resolved.func.__name__ == api.OrganizationDetail.__name__
+        assert resolved.kwargs['slug'] == 'org-slug'
 
     def test_organization_users(self):
-        self.assertEqual(
-            reverse(
-                version_ns('organization:users'),
-                kwargs={'slug': 'org-slug'}),
-            version_url('/organizations/org-slug/users/')
-        )
+        assert (reverse(version_ns('organization:users'),
+                        kwargs={'slug': 'org-slug'}) ==
+                version_url('/organizations/org-slug/users/'))
 
         resolved = resolve(version_url('/organizations/org-slug/users/'))
-        self.assertEqual(
-            resolved.func.__name__,
-            api.OrganizationUsers.__name__)
-        self.assertEqual(resolved.kwargs['slug'], 'org-slug')
+        assert resolved.func.__name__ == api.OrganizationUsers.__name__
+        assert resolved.kwargs['slug'] == 'org-slug'
 
     def test_organization_users_detail(self):
-        self.assertEqual(
-            reverse(version_ns('organization:users_detail'),
-                    kwargs={
-                        'slug': 'org-slug',
-                        'username': 'n_smith'
-                    }),
-            version_url('/organizations/org-slug/users/n_smith/')
-        )
+        assert (reverse(version_ns('organization:users_detail'),
+                        kwargs={'slug': 'org-slug', 'username': 'n_smith'}) ==
+                version_url('/organizations/org-slug/users/n_smith/'))
 
         resolved = resolve(
             version_url('/organizations/org-slug/users/n_smith/'))
 
-        self.assertEqual(
-            resolved.func.__name__,
-            api.OrganizationUsersDetail.__name__)
-        self.assertEqual(resolved.kwargs['slug'], 'org-slug')
-        self.assertEqual(resolved.kwargs['username'], 'n_smith')
+        assert resolved.func.__name__ == api.OrganizationUsersDetail.__name__
+        assert resolved.kwargs['slug'] == 'org-slug'
+        assert resolved.kwargs['username'] == 'n_smith'
 
 
 class ProjectUrlTest(TestCase):

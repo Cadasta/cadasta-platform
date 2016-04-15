@@ -7,7 +7,7 @@ from django.utils.translation import ugettext as _
 import django.contrib.gis.db.models as gismodels
 
 from tutelary.decorators import permissioned_model
-from tutelary.models import Policy
+from tutelary.models import Policy, Role
 
 from core.models import RandomIDModel
 from .validators import validate_contact

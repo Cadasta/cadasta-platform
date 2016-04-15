@@ -10,6 +10,12 @@ from accounts.tests.factories import UserFactory
 
 
 class OrganzationAddTest(TestCase):
+    def _save(self, data, count=1):
+        form = forms.OrganizationForm(data, user=UserFactory.create())
+        form.save()
+        assert form.is_valid() is True
+        assert Organization.objects.count() == count
+
     def test_add_organization(self):
         data = {
             'name': 'Org',
@@ -17,15 +23,26 @@ class OrganzationAddTest(TestCase):
             'urls': '',
             'contacts': ''
         }
-        form = forms.OrganizationForm(data, user=UserFactory.create())
-        form.save()
-
-        assert form.is_valid() is True
-        assert Organization.objects.count() == 1
-
+        self._save(data)
         org = Organization.objects.first()
         assert org.slug == 'org'
         assert OrganizationRole.objects.filter(organization=org).count() == 1
+
+    def test_unique_slugs(self):
+        data = {
+            'name': 'Org',
+            'description': 'Org description #1',
+            'urls': '',
+            'contacts': ''
+        }
+        self._save(data)
+        org1 = Organization.objects.first()
+        assert org1.slug == 'org'
+        data['description'] = 'Org description #2'
+        self._save(data, count=2)
+        orgs = Organization.objects.all()
+        assert len(orgs) == 2
+        assert orgs[0].slug != orgs[1].slug
 
     def test_add_organization_with_url(self):
         data = {
@@ -34,12 +51,7 @@ class OrganzationAddTest(TestCase):
             'urls': 'http://example.com',
             'contacts': ''
         }
-        form = forms.OrganizationForm(data, user=UserFactory.create())
-        form.save()
-
-        assert form.is_valid() is True
-        assert Organization.objects.count() == 1
-
+        self._save(data)
         org = Organization.objects.first()
         assert org.urls == ['http://example.com']
 
@@ -48,22 +60,12 @@ class OrganzationAddTest(TestCase):
             'name': 'Org',
             'description': 'Org description',
             'urls': 'http://example.com',
-            'contacts': json.dumps([{
-                'name': 'Ringo Starr',
-                'tel': '555-5555'
-            }])
+            'contacts': json.dumps([{'name': 'Ringo Starr',
+                                     'tel': '555-5555'}])
         }
-        form = forms.OrganizationForm(data, user=UserFactory.create())
-        form.save()
-
-        assert form.is_valid() is True
-        assert Organization.objects.count() == 1
-
+        self._save(data)
         org = Organization.objects.first()
-        assert org.contacts == [{
-            'name': 'Ringo Starr',
-            'tel': '555-5555'
-        }]
+        assert org.contacts == [{'name': 'Ringo Starr', 'tel': '555-5555'}]
 
     def test_update_organization(self):
         org = OrganizationFactory.create(**{'slug': 'some-org'})
@@ -86,43 +88,32 @@ class OrganzationAddTest(TestCase):
 
 
 class AddOrganizationMemberFormTest(TestCase):
-    def test_add_with_username(self):
+    def _save(self, identifier=None, identifier_field=None, ok=True):
         org = OrganizationFactory.create()
         user = UserFactory.create()
-
-        data = {'identifier': user.username}
+        if identifier_field is not None:
+            identifier = getattr(user, identifier_field)
+        data = {'identifier': identifier}
         form = forms.AddOrganizationMemberForm(data, organization=org)
+        if ok:
+            form.save()
+            assert form.is_valid() is True
+            assert OrganizationRole.objects.filter(
+                organization=org, user=user).count() == 1
+        else:
+            with raises(ValueError):
+                form.save()
+            assert form.is_valid() is False
+            assert OrganizationRole.objects.count() == 0
 
-        form.save()
-
-        assert form.is_valid() is True
-        assert OrganizationRole.objects.filter(
-            organization=org, user=user).count() == 1
+    def test_add_with_username(self):
+        self._save(identifier_field='username')
 
     def test_add_with_email(self):
-        org = OrganizationFactory.create()
-        user = UserFactory.create()
-
-        data = {'identifier': user.email}
-        form = forms.AddOrganizationMemberForm(data, organization=org)
-
-        form.save()
-
-        assert form.is_valid() is True
-        assert OrganizationRole.objects.filter(
-            organization=org, user=user).count() == 1
+        self._save(identifier_field='email')
 
     def test_add_non_existing_user(self):
-        org = OrganizationFactory.create()
-
-        data = {'identifier': 'some-user'}
-        form = forms.AddOrganizationMemberForm(data, organization=org)
-
-        with raises(ValueError):
-            form.save()
-
-        assert form.is_valid() is False
-        assert OrganizationRole.objects.count() == 0
+        self._save(identifier='some-user', ok=False)
 
 
 class EditOrganizationMemberFormTest(TestCase):

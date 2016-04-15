@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from core.tests.factories import FixturesData
+from core.fixtures import FixturesData
 
 
 class Command(BaseCommand):
@@ -18,15 +18,15 @@ class Command(BaseCommand):
                             )
 
     def handle(self, *args, **options):
-        data = FixturesData
+        data = FixturesData()
 
         if options['delete']:
-            data.delete_test_users(self)
-            data.delete_test_organizations(self)
-            data.delete_test_projects(self)
+            data.delete_test_users()
+            data.delete_test_organizations()
+            data.delete_test_projects()
 
         else:
-            data.add_test_organizations(self)
-            data.add_test_users_and_roles(self)
-            data.add_test_projects(self)
+            data.add_test_organizations()
+            data.add_test_users_and_roles()
+            data.add_test_projects()
             self.stdout.write(self.style.SUCCESS("All test data loaded."))
