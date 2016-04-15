@@ -9,88 +9,88 @@ msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-12 13:20+0000\n"
-"PO-Revision-Date: 2016-04-15 14:52+0000\n"
+"PO-Revision-Date: 2016-04-17 13:20+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
-"Language-Team: German (http://www.transifex.com/cadasta/cadasta-platform/language/de/)\n"
+"Language-Team: Arabic (http://www.transifex.com/cadasta/cadasta-platform/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: accounts/forms.py:20 accounts/tests/test_forms.py:41
 msgid "Passwords do not match"
-msgstr "Passwörter stimmen nicht überein"
+msgstr "كلمة المرور غير مطابقة"
 
 #: accounts/forms.py:28 accounts/forms.py:58 accounts/tests/test_forms.py:57
 msgid "Another user with this email already exists"
-msgstr ""
+msgstr "مستخدم آخر مع هذا البريد الإلكتروني موجود بالفعل"
 
 #: accounts/forms.py:49
 msgid "Another user with this username already exists"
-msgstr ""
+msgstr "مستخدم آخر باستخدام اسم المستخدم هذا موجود بالفعل"
 
 #: accounts/manager.py:16 organization/serializers.py:107
 msgid "User with username or email {} does not exist"
-msgstr ""
+msgstr "المستخدم غير موجود مع اسم المستخدم أو البريد الإلكتروني {}"
 
 #: accounts/manager.py:21 organization/serializers.py:109
 msgid "More than one user found for username or email {}"
-msgstr ""
+msgstr "وجدت أكثر من مستخدم واحد لاسم المستخدم أو البريد الإلكتروني {}"
 
 #: accounts/models.py:29
 msgid "You don't have permission to view user details"
-msgstr ""
+msgstr "لم يكن لديك إذن لمشاهدة تفاصيل المستخدم"
 
 #: accounts/models.py:32
 msgid "You don't have permission to update user details"
-msgstr ""
+msgstr "لم يكن لديك إذن لتحديث تفاصيل المستخدم"
 
 #: accounts/serializers.py:17 accounts/serializers.py:42
 #: accounts/tests/test_serializers.py:74
 msgid "Another user is already registered with this email address"
-msgstr ""
+msgstr "يتم تسجيل مستخدم آخر بالفعل مع عنوان البريد الإلكتروني هذا"
 
 #: accounts/views/api.py:70
 msgid "The email has not been verified."
-msgstr ""
+msgstr "لم يتم التحقق من البريد الإلكتروني."
 
 #: accounts/views/default.py:23
 msgid "Successfully updated profile information"
-msgstr ""
+msgstr "معلومات الملف الشخصي تحديث بنجاح"
 
 #: accounts/views/default.py:28
 msgid "Failed to update profile information"
-msgstr ""
+msgstr "فشل تحديث معلومات الملف الشخصي"
 
 #: config/settings/default.py:172
 msgid "English"
-msgstr "Englisch"
+msgstr "الإنجليزية"
 
 #: config/settings/default.py:173
 msgid "French"
-msgstr "Französisch"
+msgstr "اللغة الفرنسية"
 
 #: config/settings/default.py:174
 msgid "German"
-msgstr "Deutsch"
+msgstr "ألماني"
 
 #: config/settings/default.py:175
 msgid "Spanish"
-msgstr "Spanisch"
+msgstr "الأسبانية"
 
 #: core/mixins.py:13
 msgid "PERMISSION DENIED"
-msgstr ""
+msgstr "طلب الاذن مرفوض"
 
 #: core/tests/test_translations.py:11 templates/accounts/profile.html.py:31
 #: templates/accounts/snippets/registration_form.html:32
 msgid "First name"
-msgstr "Vorname"
+msgstr "الاسم الاول"
 
 #: core/tests/test_validators.py:38 core/tests/test_validators.py:40
 msgid "Please provide either name or description"
-msgstr ""
+msgstr "يرجى تقديم أي اسم أو وصف"
 
 #: core/tests/test_validators.py:55 core/validators.py:24
 #: organization/tests/test_validators.py:29
@@ -98,211 +98,211 @@ msgstr ""
 #: organization/tests/test_validators.py:63
 #: organization/tests/test_views_api.py:1496
 msgid "This field is required."
-msgstr ""
+msgstr "هذه الخانة مطلوبه."
 
 #: core/tests/test_validators.py:70 organization/tests/test_validators.py:44
 #: organization/tests/test_validators.py:65
 #, python-brace-format
 msgid "'{value}' is not a '{type}'"
-msgstr ""
+msgstr "'{value}' ليست '{type}'"
 
 #: core/validators.py:19
 msgid "Please provide either {}"
-msgstr ""
+msgstr "يرجى تقديم إما {}"
 
 #: core/validators.py:20
 msgid " or "
-msgstr ""
+msgstr "أو"
 
 #: core/views/api.py:17
 #, python-brace-format
 msgid "{name} not found."
-msgstr ""
+msgstr "{name} غير موجود."
 
 #: organization/choices.py:4
 #: templates/organization/project_add_permissions.html:41
 msgid "Administrator"
-msgstr ""
+msgstr "مدير"
 
 #: organization/choices.py:5
 #: templates/organization/project_add_permissions.html:27
 #: templates/organization/user_list.html:15
 msgid "Member"
-msgstr ""
+msgstr "عضو"
 
 #: organization/choices.py:7
 #: templates/organization/project_add_permissions.html:45
 msgid "Project User"
-msgstr ""
+msgstr "المشروع العضو"
 
 #: organization/choices.py:8
 #: templates/organization/project_add_permissions.html:46
 msgid "Data Collector"
-msgstr ""
+msgstr "جامع البيانات"
 
 #: organization/choices.py:9
 #: templates/organization/project_add_permissions.html:47
 msgid "Project Manager"
-msgstr ""
+msgstr "مدير المشروع"
 
 #: organization/models.py:55
 msgid "List existing organizations"
-msgstr ""
+msgstr "قائمة المنظمات القائمة"
 
 #: organization/models.py:58
 msgid "View existing organizations"
-msgstr ""
+msgstr "عرض المنظمات القائمة"
 
 #: organization/models.py:60
 msgid "Create organizations"
-msgstr ""
+msgstr "إنشاء منظمات"
 
 #: organization/models.py:63
 msgid "Update an existing organization"
-msgstr ""
+msgstr "تحديث منظمة قائمة"
 
 #: organization/models.py:65
 msgid "Archive an existing organization"
-msgstr ""
+msgstr "أرشفة منظمة قائمة"
 
 #: organization/models.py:67
 msgid "Unarchive an existing organization"
-msgstr ""
+msgstr "إلغاء الأرشفة منظمة قائمة"
 
 #: organization/models.py:69
 msgid "List members of an organization"
-msgstr ""
+msgstr "أعضاء قائمة منظمة"
 
 #: organization/models.py:71
 msgid "Add a member to an organization"
-msgstr ""
+msgstr "إضافة عضو إلى منظمة"
 
 #: organization/models.py:73
 msgid "Remove a member from an organization"
-msgstr ""
+msgstr "اقالة اي عضو من منظمة"
 
 #: organization/models.py:131
 msgid "List existing projects in an organization"
-msgstr ""
+msgstr "قائمة المشاريع القائمة في المنظمة"
 
 #: organization/models.py:134
 msgid "Create projects in an organization"
-msgstr ""
+msgstr "إنشاء المشاريع في منظمة"
 
 #: organization/models.py:137
 msgid "View existing projects"
-msgstr ""
+msgstr "عرض المشاريع القائمة"
 
 #: organization/models.py:139
 msgid "Update an existing project"
-msgstr ""
+msgstr "تحديث مشروع قائم"
 
 #: organization/models.py:141
 msgid "Archive an existing project"
-msgstr ""
+msgstr "أرشفة مشروع قائم"
 
 #: organization/models.py:143
 msgid "Unarchive an existing project"
-msgstr ""
+msgstr "إلغاء الأرشفة مشروع قائم"
 
 #: organization/models.py:145
 msgid "List users within a project"
-msgstr ""
+msgstr "قائمة المستخدمين ضمن مشروع"
 
 #: organization/models.py:147
 msgid "Add user to a project"
-msgstr ""
+msgstr "إضافة المستخدم إلى المشروع"
 
 #: organization/models.py:149
 msgid "Edit roles of user in a project"
-msgstr ""
+msgstr "تعديل أدوار المستخدم في المشروع"
 
 #: organization/models.py:151
 msgid "Remove user from a project"
-msgstr ""
+msgstr "إزالة المستخدم من مشروع"
 
 #: organization/serializers.py:185
 #, python-brace-format
 msgid "You have been added to organization {organization}"
-msgstr ""
+msgstr "لقد تم إضافتها إلى منظمة {organization}"
 
 #: organization/serializers.py:205 organization/tests/test_serializers.py:314
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
-msgstr ""
+msgstr "العضو {username} ليس عضوا في تنظيم المشروع"
 
 #: organization/tests/test_serializers.py:207
 #: organization/tests/test_serializers.py:335
 #, python-brace-format
 msgid "User with username or email {username} does not exist"
-msgstr ""
+msgstr "المستخدم غير موجود مع اسم المستخدم أو البريد الإلكتروني {username}"
 
 #: organization/tests/test_views_api.py:534
 msgid "User with username or email some_username does not exist"
-msgstr ""
+msgstr "المستخدم غير موجود مع اسم المستخدم أو البريد الإلكتروني some_username"
 
 #: organization/tests/test_views_api.py:550
 msgid "Organization not found."
-msgstr ""
+msgstr "منظمة غير موجود."
 
 #: organization/tests/test_views_api.py:796
 #: organization/tests/test_views_api.py:957
 #: organization/tests/test_views_api.py:971
 #: organization/tests/test_views_api.py:1564
 msgid "Project not found."
-msgstr ""
+msgstr "مشروع غير موجود."
 
 #: organization/tests/test_views_api.py:836
 msgid "User with username or email some-user does not exist"
-msgstr ""
+msgstr "المستخدم مع اسم المستخدم أو البريد الإلكتروني غير موجود بعض المستخدم"
 
 #: organization/tests/test_views_api.py:943
 msgid "User not found."
-msgstr ""
+msgstr "المستخدم ليس موجود."
 
 #: organization/tests/test_views_api.py:1288
 msgid "Cannot update last_login"
-msgstr ""
+msgstr "لا يمكن تحديث LAST_LOGIN"
 
 #: organization/tests/test_views_api.py:1619
 msgid "This field may not be blank."
-msgstr ""
+msgstr "قد لا يكون هذا الحقل فارغا."
 
 #: organization/views/default.py:217
 #, python-brace-format
 msgid "Wasn't able to modify user state for user '{username}'"
-msgstr ""
+msgstr "لم يكن قادرا على تعديل حالة المستخدم للمستخدم '{username}'"
 
 #: organization/views/default.py:266
 msgid "No projects found matching the query"
-msgstr ""
+msgstr "أي مشاريع العثور على مطابقة الاستعلام"
 
 #: templates/accounts/email/activate_email.txt:2
 #, python-format
 msgid ""
 "You're receiving this email because you created an account on %(site_name)s."
-msgstr ""
+msgstr "كنت تتلقى هذا البريد الإلكتروني لأنك خلقت حساب على %(site_name)s."
 
 #: templates/accounts/email/activate_email.txt:4
 msgid "Please go to the following page to activate account:"
-msgstr ""
+msgstr "يرجى الدخول إلى الصفحة التالية لتنشيط الحساب:"
 
 #: templates/accounts/email/activate_email.txt:9
 #: templates/organization/email/org_invite.txt:9
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "شكرا لاستخدام موقعنا!"
 
 #: templates/accounts/email/activate_email.txt:11
 #: templates/accounts/email/password_reset.txt:10
 #: templates/organization/email/org_invite.txt:11
 #, python-format
 msgid "The %(site_name)s team"
-msgstr ""
+msgstr "و %(site_name)s فريق"
 
 #: templates/accounts/email/activate_email_subject.txt:2
 #, python-format
 msgid "Account activation on %(site_name)s"
-msgstr ""
+msgstr "تفعيل الحساب على %(site_name)s"
 
 #: templates/accounts/email/change_email.txt:3
 #, python-format
@@ -311,7 +311,7 @@ msgstr ""
 
 #: templates/accounts/email/change_email.txt:5
 msgid "Please go to the following page to confirm your new email address. "
-msgstr ""
+msgstr "يرجى الدخول إلى الصفحة التالية لتأكيد عنوان بريدك الإلكتروني الجديد."
 
 #: templates/accounts/email/change_email.txt:10
 #, python-format
@@ -332,137 +332,137 @@ msgstr ""
 
 #: templates/accounts/email/password_reset.txt:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "يرجى الدخول إلى الصفحة التالية واختيار كلمة مرور جديدة:"
 
 #: templates/accounts/email/password_reset.txt:8
 msgid "Your username, in case you've forgotten:"
-msgstr ""
+msgstr "اسم المستخدم الخاص بك، في حال كنت قد نسيت:"
 
 #: templates/accounts/profile.html:6 templates/core/base.html.py:47
 msgid "Profile"
-msgstr "Profil"
+msgstr "الملف الشخصي"
 
 #: templates/accounts/profile.html:12
 msgid "Update your profile"
-msgstr ""
+msgstr "تحديث ملفك الشخصي"
 
 #: templates/accounts/profile.html:19
 #: templates/accounts/snippets/registration_form.html:11
 #: templates/organization/organization_dashboard.html:77
 msgid "Username"
-msgstr ""
+msgstr "اسم المستخدم"
 
 #: templates/accounts/profile.html:25
 #: templates/accounts/snippets/registration_form.html:18
 #: templates/organization/user_list.html:18
 msgid "Email"
-msgstr ""
+msgstr "البريد الإلكتروني"
 
 #: templates/accounts/profile.html:37
 #: templates/accounts/snippets/registration_form.html:39
 msgid "Last name"
-msgstr "Familienname"
+msgstr "الكنية"
 
 #: templates/accounts/profile.html:43
 msgid "Update profile"
-msgstr "Profil aktualisieren"
+msgstr "تحديث الملف"
 
 #: templates/accounts/profile.html:46
 msgid "Password options"
-msgstr ""
+msgstr "خيارات كلمة المرور"
 
 #: templates/accounts/profile.html:50
 #: templates/allauth/account/password_change.html:34
 msgid "Change password"
-msgstr ""
+msgstr "تغيير كلمة السر"
 
 #: templates/accounts/profile.html:55
 #: templates/allauth/account/password_reset.html:26
 msgid "Reset password"
-msgstr ""
+msgstr "اعادة تعيين كلمة السر"
 
 #: templates/accounts/snippets/registration_form.html:3
 #: templates/allauth/account/signup.html:6
 #: templates/allauth/account/signup.html:96 templates/core/base.html.py:63
 msgid "Register"
-msgstr ""
+msgstr "تسجيل"
 
 #: templates/accounts/snippets/registration_form.html:25
 msgid "Password"
-msgstr ""
+msgstr "كلمه السر"
 
 #: templates/accounts/snippets/registration_form.html:43
 msgid "Submit"
-msgstr ""
+msgstr "عرض"
 
 #: templates/allauth/account/account_inactive.html:5
 #: templates/allauth/account/account_inactive.html:8
 msgid "Account Inactive"
-msgstr ""
+msgstr "غير فعال حساب"
 
 #: templates/allauth/account/account_inactive.html:10
 msgid "This account is inactive."
-msgstr ""
+msgstr "هذا الحساب غير نشط."
 
 #: templates/allauth/account/email.html:5
 msgid "Account"
-msgstr ""
+msgstr "حساب"
 
 #: templates/allauth/account/email.html:8
 msgid "E-mail Addresses"
-msgstr ""
+msgstr "عناوين البريد الإلكتروني"
 
 #: templates/allauth/account/email.html:10
 msgid "The following e-mail addresses are associated with your account:"
-msgstr ""
+msgstr "ترتبط عناوين البريد الإلكتروني التالي مع حسابك:"
 
 #: templates/allauth/account/email.html:24
 msgid "Verified"
-msgstr ""
+msgstr "التحقق"
 
 #: templates/allauth/account/email.html:26
 msgid "Unverified"
-msgstr ""
+msgstr "غير مثبت عليه"
 
 #: templates/allauth/account/email.html:28
 msgid "Primary"
-msgstr ""
+msgstr "ابتدائي"
 
 #: templates/allauth/account/email.html:34
 msgid "Make Primary"
-msgstr ""
+msgstr "جعل الابتدائية"
 
 #: templates/allauth/account/email.html:35
 msgid "Re-send Verification"
-msgstr ""
+msgstr "إعادة إرسال التأكيد"
 
 #: templates/allauth/account/email.html:36
 #: templates/allauth/socialaccount/connections.html:35
 msgid "Remove"
-msgstr ""
+msgstr "إزالة"
 
 #: templates/allauth/account/email.html:43
 msgid "Warning:"
-msgstr ""
+msgstr "تحذير:"
 
 #: templates/allauth/account/email.html:43
 msgid ""
 "You currently do not have any e-mail address set up. You should really add "
 "an e-mail address so you can receive notifications, reset your password, "
 "etc."
-msgstr ""
+msgstr "أنت حاليا لم يكن لديك أي عنوان البريد الإلكتروني اقامة. يجب أن تضيف قيمة حقيقية عنوان البريد الإلكتروني حتى تتمكن من تلقي الإخطارات، إعادة تعيين كلمة المرور الخاصة بك، الخ"
 
 #: templates/allauth/account/email.html:48
 msgid "Add E-mail Address"
-msgstr ""
+msgstr "إضافة عنوان البريد الإلكتروني"
 
 #: templates/allauth/account/email.html:53
 msgid "Add E-mail"
-msgstr ""
+msgstr "أضف بريدك الإلكتروني"
 
 #: templates/allauth/account/email.html:62
 msgid "Do you really want to remove the selected e-mail address?"
-msgstr ""
+msgstr "هل تريد حقا لإزالة عنوان البريد الإلكتروني المحدد؟"
 
 #: templates/allauth/account/email/email_confirmation_message.txt:1
 #, python-format
@@ -483,7 +483,7 @@ msgstr ""
 
 #: templates/allauth/account/email/email_confirmation_subject.txt:3
 msgid "Please Confirm Your E-mail Address"
-msgstr ""
+msgstr "يرجى تأكيد عنوان البريد الإلكتروني الخاص بك"
 
 #: templates/allauth/account/email/password_reset_key_message.txt:1
 #, python-format
@@ -508,12 +508,12 @@ msgstr ""
 
 #: templates/allauth/account/email/password_reset_key_subject.txt:3
 msgid "Password Reset E-mail"
-msgstr ""
+msgstr "إعادة تعيين كلمة المرور البريد الإلكتروني"
 
 #: templates/allauth/account/email_confirm.html:6
 #: templates/allauth/account/email_confirm.html:10
 msgid "Confirm E-mail Address"
-msgstr ""
+msgstr "أكد عنوانك الإلكتروني"
 
 #: templates/allauth/account/email_confirm.html:16
 #, python-format
@@ -524,7 +524,7 @@ msgstr ""
 
 #: templates/allauth/account/email_confirm.html:20
 msgid "Confirm"
-msgstr ""
+msgstr "أكد"
 
 #: templates/allauth/account/email_confirm.html:27
 #, python-format
@@ -536,25 +536,25 @@ msgstr ""
 #: templates/allauth/account/login.html:7
 #: templates/allauth/account/login.html:71
 msgid "Sign In"
-msgstr ""
+msgstr "تسجيل الدخول"
 
 #: templates/allauth/account/login.html:27
 msgid "Sign in to your account"
-msgstr ""
+msgstr "تسجيل الدخول إلى حسابك"
 
 #: templates/allauth/account/login.html:54
 msgid "Forgotten password?"
-msgstr ""
+msgstr "كلمة سر منسية؟"
 
 #: templates/allauth/account/logout.html:5
 #: templates/allauth/account/logout.html:8
 #: templates/allauth/account/logout.html:17
 msgid "Sign Out"
-msgstr ""
+msgstr "خروج"
 
 #: templates/allauth/account/logout.html:10
 msgid "Are you sure you want to sign out?"
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد الخروج؟"
 
 #: templates/allauth/account/messages/cannot_delete_primary_email.txt:2
 #, python-format
@@ -583,23 +583,23 @@ msgstr ""
 
 #: templates/allauth/account/messages/logged_out.txt:2
 msgid "You have signed out."
-msgstr ""
+msgstr "كنت قد وقعت بها."
 
 #: templates/allauth/account/messages/password_changed.txt:2
 msgid "Password successfully changed."
-msgstr ""
+msgstr "الرقم السري تغير بنجاح."
 
 #: templates/allauth/account/messages/password_set.txt:2
 msgid "Password successfully set."
-msgstr ""
+msgstr "ضبط كلمة السر بنجاح."
 
 #: templates/allauth/account/messages/primary_email_set.txt:2
 msgid "Primary e-mail address set."
-msgstr ""
+msgstr "الابتدائي عنوان البريد الإلكتروني مجموعة."
 
 #: templates/allauth/account/messages/unverified_primary_email.txt:2
 msgid "Your primary e-mail address must be verified."
-msgstr ""
+msgstr "يجب التحقق من عنوان البريد الإلكتروني الأساسي الخاص بك."
 
 #: templates/allauth/account/password_change.html:6
 #: templates/allauth/account/password_reset_from_key.html:4
@@ -607,47 +607,47 @@ msgstr ""
 #: templates/allauth/account/password_reset_from_key_done.html:4
 #: templates/allauth/account/password_reset_from_key_done.html:7
 msgid "Change Password"
-msgstr ""
+msgstr "تغيير كلمة السر"
 
 #: templates/allauth/account/password_change.html:13
 msgid "Change your password"
-msgstr ""
+msgstr "تغيير كلمة المرور الخاصة بك"
 
 #: templates/allauth/account/password_change.html:18
 msgid "Current password"
-msgstr ""
+msgstr "كلمة السر الحالية"
 
 #: templates/allauth/account/password_change.html:23
 msgid "New password"
-msgstr ""
+msgstr "كلمة السر الجديدة"
 
 #: templates/allauth/account/password_change.html:28
 msgid "New password (again)"
-msgstr ""
+msgstr "كلمة السر الجديدة (مرة أخرى)"
 
 #: templates/allauth/account/password_reset.html:7
 #: templates/allauth/account/password_reset_done.html:6
 #: templates/allauth/account/password_reset_done.html:9
 msgid "Password Reset"
-msgstr ""
+msgstr "إعادة ضبط كلمة المرور"
 
 #: templates/allauth/account/password_reset.html:13
 msgid "Reset your password"
-msgstr ""
+msgstr "إعادة تعيين كلمة المرور الخاصة بك"
 
 #: templates/allauth/account/password_reset.html:22
 msgid "Enter email"
-msgstr ""
+msgstr "أدخل البريد الإلكتروني"
 
 #: templates/allauth/account/password_reset_done.html:15
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr ""
+msgstr "لقد قمنا بإرسال رسالة عبر البريد الإلكتروني. يرجى الاتصال بنا إذا كنت لا تحصل عليه في غضون بضع دقائق."
 
 #: templates/allauth/account/password_reset_from_key.html:7
 msgid "Bad Token"
-msgstr ""
+msgstr "سيئة رمز"
 
 #: templates/allauth/account/password_reset_from_key.html:11
 #, python-format
@@ -659,22 +659,22 @@ msgstr ""
 
 #: templates/allauth/account/password_reset_from_key.html:17
 msgid "change password"
-msgstr ""
+msgstr "تغيير كلمة السر"
 
 #: templates/allauth/account/password_reset_from_key.html:20
 #: templates/allauth/account/password_reset_from_key_done.html:8
 msgid "Your password is now changed."
-msgstr ""
+msgstr "تم تغيير كلمة المرور الخاصة بك الآن."
 
 #: templates/allauth/account/password_set.html:5
 #: templates/allauth/account/password_set.html:8
 #: templates/allauth/account/password_set.html:13
 msgid "Set Password"
-msgstr ""
+msgstr "تعيين كلمة المرور"
 
 #: templates/allauth/account/signup.html:27
 msgid "Sign up for a free account"
-msgstr ""
+msgstr "التسجيل للحصول على حساب مجاني"
 
 #: templates/allauth/account/signup.html:100
 #, python-format
@@ -684,15 +684,15 @@ msgstr ""
 #: templates/allauth/account/signup_closed.html:5
 #: templates/allauth/account/signup_closed.html:8
 msgid "Sign Up Closed"
-msgstr ""
+msgstr "الاشتراك مغلق"
 
 #: templates/allauth/account/signup_closed.html:10
 msgid "We are sorry, but the sign up is currently closed."
-msgstr ""
+msgstr "نحن آسفون، ولكن يتم إغلاق الاشتراك حاليا."
 
 #: templates/allauth/account/snippets/already_logged_in.html:5
 msgid "Note"
-msgstr ""
+msgstr "ملاحظة"
 
 #: templates/allauth/account/snippets/already_logged_in.html:5
 #, python-format
@@ -704,28 +704,28 @@ msgstr ""
 #: templates/allauth/account/verified_email_required.html:5
 #: templates/allauth/account/verified_email_required.html:8
 msgid "Verify Your E-mail Address"
-msgstr ""
+msgstr "أكد بريدك الالكتروني"
 
 #: templates/allauth/account/verification_sent.html:10
 msgid ""
 "We have sent an e-mail to you for verification. Follow the link provided to "
 "finalize the signup process. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr ""
+msgstr "لقد قمنا بإرسال رسالة عبر البريد الإلكتروني لك للتحقق منها. اتبع الرابط المقدم لإتمام عملية التسجيل. يرجى الاتصال بنا إذا كنت لا تحصل عليه في غضون بضع دقائق."
 
 #: templates/allauth/account/verified_email_required.html:12
 msgid ""
 "This part of the site requires us to verify that\n"
 "you are who you claim to be. For this purpose, we require that you\n"
 "verify ownership of your e-mail address. "
-msgstr ""
+msgstr "هذا الجزء من الموقع يتطلب منا للتحقق من أنك أنت الذي يدعي أن يكون. لهذا الغرض، نطلب منك التحقق من ملكية عنوان البريد الإلكتروني الخاص بك."
 
 #: templates/allauth/account/verified_email_required.html:16
 msgid ""
 "We have sent an e-mail to you for\n"
 "verification. Please click on the link inside this e-mail. Please\n"
 "contact us if you do not receive it within a few minutes."
-msgstr ""
+msgstr "لقد قمنا بإرسال رسالة عبر البريد الإلكتروني لك للتحقق منها. الرجاء النقر على الرابط داخل هذا البريد الإلكتروني. يرجى الاتصال بنا إذا كنت لا تحصل عليه في غضون بضع دقائق."
 
 #: templates/allauth/account/verified_email_required.html:20
 #, python-format
@@ -736,46 +736,46 @@ msgstr ""
 
 #: templates/allauth/openid/login.html:9
 msgid "OpenID Sign In"
-msgstr ""
+msgstr "رض تسجيل الدخول"
 
 #: templates/allauth/shopify/login.html:9
 msgid "Shopify Sign In"
-msgstr ""
+msgstr "Shopify تسجيل الدخول"
 
 #: templates/allauth/socialaccount/authentication_error.html:5
 #: templates/allauth/socialaccount/authentication_error.html:8
 msgid "Social Network Login Failure"
-msgstr ""
+msgstr "الشبكة الاجتماعية دخول الفشل"
 
 #: templates/allauth/socialaccount/authentication_error.html:10
 msgid ""
 "An error occurred while attempting to login via your social network account."
-msgstr ""
+msgstr "حدث خطأ أثناء محاولة الدخول عبر حساب الشبكة الاجتماعية."
 
 #: templates/allauth/socialaccount/connections.html:5
 #: templates/allauth/socialaccount/connections.html:8
 msgid "Account Connections"
-msgstr ""
+msgstr "اتصالات حساب"
 
 #: templates/allauth/socialaccount/connections.html:11
 msgid ""
 "You can sign in to your account using any of the following third party "
 "accounts:"
-msgstr ""
+msgstr "يمكنك تسجيل الدخول إلى حسابك باستخدام أي من حسابات طرف ثالث التالية:"
 
 #: templates/allauth/socialaccount/connections.html:43
 msgid ""
 "You currently have no social network accounts connected to this account."
-msgstr ""
+msgstr "ليس لديك أي حسابات الشبكة الاجتماعية مرتبطة بهذا الحساب."
 
 #: templates/allauth/socialaccount/connections.html:46
 msgid "Add a 3rd Party Account"
-msgstr ""
+msgstr "إضافة حساب الحزب 3"
 
 #: templates/allauth/socialaccount/login_cancelled.html:5
 #: templates/allauth/socialaccount/login_cancelled.html:9
 msgid "Login Cancelled"
-msgstr ""
+msgstr "تسجيل الدخول ألغي"
 
 #: templates/allauth/socialaccount/login_cancelled.html:13
 #, python-format
@@ -787,24 +787,24 @@ msgstr ""
 
 #: templates/allauth/socialaccount/messages/account_connected.txt:2
 msgid "The social account has been connected."
-msgstr ""
+msgstr "وقد تم ربط الحساب الاجتماعي."
 
 #: templates/allauth/socialaccount/messages/account_connected_other.txt:2
 msgid "The social account is already connected to a different account."
-msgstr ""
+msgstr "الحساب الاجتماعي يرتبط بالفعل إلى حساب مختلف."
 
 #: templates/allauth/socialaccount/messages/account_disconnected.txt:2
 msgid "The social account has been disconnected."
-msgstr ""
+msgstr "وقد قطع الحساب الاجتماعي."
 
 #: templates/allauth/socialaccount/signup.html:5
 msgid "Signup"
-msgstr ""
+msgstr "سجل"
 
 #: templates/allauth/socialaccount/signup.html:8
 #: templates/allauth/socialaccount/signup.html:19
 msgid "Sign Up"
-msgstr ""
+msgstr "سجل"
 
 #: templates/allauth/socialaccount/signup.html:10
 #, python-format
@@ -817,67 +817,67 @@ msgstr ""
 #: templates/organization/organization_list.html:11
 #: templates/organization/user_list.html:21
 msgid "Organizations"
-msgstr ""
+msgstr "المنظمات"
 
 #: templates/core/base.html:36
 #: templates/organization/organization_list.html:23
 #: templates/organization/project_list.html:5
 #: templates/organization/project_list.html:9
 msgid "Projects"
-msgstr ""
+msgstr "مشاريع"
 
 #: templates/core/base.html:41 templates/organization/user_list.html.py:5
 #: templates/organization/user_list.html:9
 msgid "Users"
-msgstr ""
+msgstr "المستخدمين"
 
 #: templates/core/base.html:52
 msgid "Logout"
-msgstr ""
+msgstr "خروج"
 
 #: templates/core/base.html:58
 msgid "Login"
-msgstr ""
+msgstr "تسجيل الدخول"
 
 #: templates/core/base.html:94
 msgid "Copyright 2016 Cadasta. All Rights Reserved."
-msgstr ""
+msgstr "حقوق التأليف والنشر 2016 Cadasta. كل الحقوق محفوظة."
 
 #: templates/core/base.html:100
 msgid "About Us"
-msgstr ""
+msgstr "معلومات عنا"
 
 #: templates/core/base.html:105
 msgid "Privacy"
-msgstr ""
+msgstr "خصوصية"
 
 #: templates/core/base.html:110
 msgid "Terms of Service"
-msgstr ""
+msgstr "شروط الخدمة"
 
 #: templates/core/base.html:115
 msgid "Code of Conduct"
-msgstr ""
+msgstr "القواعد السلوكية"
 
 #: templates/core/base.html:120
 msgid "Visit us on Github"
-msgstr ""
+msgstr "تابعونا على جيثب"
 
 #: templates/core/dashboard.html:64
 #: templates/organization/organization_dashboard.html:37
 #: templates/organization/project_list.html:28
 msgid "Project"
-msgstr ""
+msgstr "مشروع"
 
 #: templates/core/dashboard.html:67
 #: templates/organization/organization_list.html:22
 #: templates/organization/project_list.html:27
 msgid "Organization"
-msgstr ""
+msgstr "منظمة"
 
 #: templates/core/dashboard.html:71
 msgid "Open project"
-msgstr ""
+msgstr "مشروع مفتوح"
 
 #: templates/organization/email/org_invite.txt:2
 #, python-format
@@ -888,139 +888,139 @@ msgstr ""
 
 #: templates/organization/email/org_invite.txt:4
 msgid "Did you not want to be added to this organization, click here:"
-msgstr ""
+msgstr "هل لا تريد أن تضاف إلى هذه المنظمة، انقر هنا:"
 
 #: templates/organization/organization_add.html:5
 msgid "Add new organization"
-msgstr ""
+msgstr "إضافة مؤسسة جديدة"
 
 #: templates/organization/organization_add.html:19
 msgid "Add organization"
-msgstr ""
+msgstr "إضافة مؤسسة"
 
 #: templates/organization/organization_add.html:26
 #: templates/organization/organization_dashboard.html:104
 #: templates/organization/organization_edit.html:30
 #: templates/organization/project_add_wrapper.html:45
 msgid "Cancel"
-msgstr ""
+msgstr "إلغاء"
 
 #: templates/organization/organization_add.html:29
 #: templates/organization/organization_list.html:13
 #: templates/organization/project_dashboard.html:44
 #: templates/organization/project_list.html:16
 msgid "Add"
-msgstr ""
+msgstr "إضافة"
 
 #: templates/organization/organization_dashboard.html:19
 msgid "Dashboard"
-msgstr ""
+msgstr "لوحة القيادة"
 
 #: templates/organization/organization_dashboard.html:23
 #: templates/organization/organization_edit.html:6
 msgid "Edit"
-msgstr ""
+msgstr "تحرير"
 
 #: templates/organization/organization_dashboard.html:26
 #: templates/organization/organization_dashboard.html:107
 msgid "Archive"
-msgstr ""
+msgstr "أرشيف"
 
 #: templates/organization/organization_dashboard.html:38
 #: templates/organization/project_list.html:29
 msgid "Country"
-msgstr ""
+msgstr "بلد"
 
 #: templates/organization/organization_dashboard.html:39
 #: templates/organization/project_list.html:30
 msgid "Last updated"
-msgstr ""
+msgstr "آخر تحديث"
 
 #: templates/organization/organization_dashboard.html:56
 msgid "You're ready to go"
-msgstr ""
+msgstr "كنت على استعداد للذهاب"
 
 #: templates/organization/organization_dashboard.html:58
 msgid "You have successfully created your organization."
-msgstr ""
+msgstr "لقد نجحت في انشاء المؤسسة الخاصة بك."
 
 #: templates/organization/organization_dashboard.html:59
 #: templates/organization/project_dashboard.html:109
 msgid "What would you like to do next?"
-msgstr ""
+msgstr "ماذا تريد أن تفعل بعد ذلك؟"
 
 #: templates/organization/organization_dashboard.html:63
 msgid "Add new project"
-msgstr ""
+msgstr "إضافة مشروع جديد"
 
 #: templates/organization/organization_dashboard.html:66
 msgid "Add members"
-msgstr ""
+msgstr "إضافة أعضاء"
 
 #: templates/organization/organization_dashboard.html:74
 msgid "Members"
-msgstr ""
+msgstr "أعضاء"
 
 #: templates/organization/organization_dashboard.html:82
 msgid "View all"
-msgstr ""
+msgstr "مشاهدة الكل"
 
 #: templates/organization/organization_dashboard.html:95
 msgid "Archive organization"
-msgstr ""
+msgstr "منظمة الأرشيف"
 
 #: templates/organization/organization_dashboard.html:99
 msgid "Are you sure you want to archive this organization?"
-msgstr ""
+msgstr "هل أنت متأكد أنك تريد أرشفة هذه المنظمة؟"
 
 #: templates/organization/organization_edit.html:20
 msgid "Edit organization"
-msgstr ""
+msgstr "منظمة تحرير"
 
 #: templates/organization/organization_edit.html:33
 msgid "Save"
-msgstr ""
+msgstr "حفظ"
 
 #: templates/organization/organization_form.html:10
 msgid "Name"
-msgstr ""
+msgstr "اسم"
 
 #: templates/organization/organization_form.html:16
 #: templates/organization/project_add_details.html:92
 msgid "Description"
-msgstr ""
+msgstr "وصف"
 
 #: templates/organization/organization_form.html:22
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: templates/organization/project_add_details.html:6
 msgid "Add project details"
-msgstr ""
+msgstr "إضافة تفاصيل المشروع"
 
 #: templates/organization/project_add_details.html:47
 msgid "Select organization"
-msgstr ""
+msgstr "اختر المنظمة"
 
 #: templates/organization/project_add_details.html:63
 msgid "Project name"
-msgstr ""
+msgstr "اسم المشروع"
 
 #: templates/organization/project_add_details.html:71
 msgid "Private"
-msgstr ""
+msgstr "خاص"
 
 #: templates/organization/project_add_details.html:81
 msgid "Public"
-msgstr ""
+msgstr "عامة"
 
 #: templates/organization/project_add_details.html:100
 msgid "Project URL"
-msgstr ""
+msgstr "عنوان المشروع"
 
 #: templates/organization/project_add_extents.html:14
 msgid "Create project geometry"
-msgstr ""
+msgstr "إنشاء مشروع هندسة"
 
 #: templates/organization/project_add_extents.html:17
 msgid ""
@@ -1032,7 +1032,7 @@ msgstr ""
 
 #: templates/organization/project_add_permissions.html:5
 msgid "Assign project permissions"
-msgstr ""
+msgstr "تعيين أذونات المشروع"
 
 #: templates/organization/project_add_permissions.html:8
 msgid ""
@@ -1043,88 +1043,88 @@ msgstr ""
 
 #: templates/organization/project_add_permissions.html:28
 msgid "Email address"
-msgstr ""
+msgstr "عنوان البريد الإلكتروني"
 
 #: templates/organization/project_add_permissions.html:29
 msgid "Permissions"
-msgstr ""
+msgstr "أذونات"
 
 #: templates/organization/project_add_wrapper.html:9
 msgid "PROJECTS"
-msgstr ""
+msgstr "المشاريع"
 
 #: templates/organization/project_add_wrapper.html:9
 msgid "Add new"
-msgstr ""
+msgstr "اضف جديد"
 
 #: templates/organization/project_add_wrapper.html:15
 msgid "Create Project Geometry"
-msgstr ""
+msgstr "إنشاء مشروع الهندسة"
 
 #: templates/organization/project_add_wrapper.html:19
 msgid "Add Details"
-msgstr ""
+msgstr "إضافة تفاصيل"
 
 #: templates/organization/project_add_wrapper.html:23
 msgid "Assign Permissions"
-msgstr ""
+msgstr "تعيين أذونات"
 
 #: templates/organization/project_add_wrapper.html:44
 msgid "Continue"
-msgstr ""
+msgstr "استمر"
 
 #: templates/organization/project_dashboard.html:33
 msgid "Index"
-msgstr ""
+msgstr "فهرس"
 
 #: templates/organization/project_dashboard.html:58
 msgid "Overview"
-msgstr ""
+msgstr "نظرة عامة"
 
 #: templates/organization/project_dashboard.html:63
 msgid "Parcels"
-msgstr ""
+msgstr "الطرود"
 
 #: templates/organization/project_dashboard.html:68
 msgid "Questionnaires"
-msgstr ""
+msgstr "الاستبيانات"
 
 #: templates/organization/project_dashboard.html:73
 msgid "Resources"
-msgstr ""
+msgstr "موارد"
 
 #: templates/organization/project_dashboard.html:78
 msgid "Activity"
-msgstr ""
+msgstr "نشاط"
 
 #: templates/organization/project_dashboard.html:83
 msgid "Reports"
-msgstr ""
+msgstr "تقارير"
 
 #: templates/organization/project_dashboard.html:100
 msgid "Some statistics here..."
-msgstr ""
+msgstr "بعض الإحصاءات هنا ..."
 
 #: templates/organization/project_dashboard.html:105
 msgid "You have successfully created your project."
-msgstr ""
+msgstr "لقد نجحت في انشاء المشروع."
 
 #: templates/organization/project_dashboard.html:114
 msgid "Add a parcel"
-msgstr ""
+msgstr "إضافة قطعة"
 
 #: templates/organization/project_dashboard.html:117
 msgid "Upload data"
-msgstr ""
+msgstr "تحميل البيانات"
 
 #: templates/organization/project_dashboard.html:122
 msgid "Not sure what to do next?  View our Getting Started demo."
-msgstr ""
+msgstr "لست متأكدا ما يجب القيام به بعد ذلك؟ عرض الخطوات الأولى التجريبي."
 
 #: templates/organization/user_list.html:24
 msgid "Last login"
-msgstr ""
+msgstr "آخر تسجيل دخول"
 
 #: templates/organization/user_list.html:40
 msgid "Deactivate,Activate"
-msgstr ""
+msgstr "تعطيل، وتنشيط"
