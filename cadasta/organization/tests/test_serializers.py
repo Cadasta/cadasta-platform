@@ -32,7 +32,7 @@ class OrganizationSerializerTest(TestCase):
         org_instance = serializer.instance
         assert org_instance.slug == slugify(org_data['name'])
         assert OrganizationRole.objects.filter(
-                    organization=org_instance).count() == 1
+            organization=org_instance).count() == 1
 
     def test_slug_field_is_unique(self):
         OrganizationFactory.create(slug='org-slug')

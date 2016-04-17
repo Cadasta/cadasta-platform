@@ -7,7 +7,7 @@ ID_FIELD_LENGTH = 24
 alphabet = string.ascii_lowercase + string.digits
 for loser in 'l1o0':
     i = alphabet.index(loser)
-    alphabet = alphabet[:i] + alphabet[i+1:]
+    alphabet = alphabet[:i] + alphabet[i + 1:]
 
 
 def byte_to_base32_chr(byte):

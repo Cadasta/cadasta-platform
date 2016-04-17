@@ -20,6 +20,12 @@ class FunctionalTest(StaticLiveServerTestCase):
     DEFAULT_WAIT = 5
 
     BY_ALERT = (By.CLASS_NAME, 'alert')
+    BY_MODAL = (By.CLASS_NAME, 'modal-content')
+    BY_MODAL_FADE = (By.CSS_SELECTOR, "div.modal.fade.in")
+    BY_ORG_MEMBERS = (By.CLASS_NAME, 'members-org-name')
+    BY_MEMBER_PAGE = (By.CLASS_NAME, 'org-member-edit')
+    BY_ORG_DASH = (By.CLASS_NAME, 'dashboard-org-name')
+    BY_NEW_PROJ = (By.CLASS_NAME, 'new-project-page')
 
     @classmethod
     def setUpClass(cls):
@@ -46,6 +52,11 @@ class FunctionalTest(StaticLiveServerTestCase):
         cls.browser.quit()
         super(FunctionalTest, cls).tearDownClass()
 
+    def container(self, field):
+        """Find container"""
+        return self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'container')]" + field)
+
     def form(self, f):
         """Find a form of a given class."""
         return self.browser.find_element_by_xpath(
@@ -55,6 +66,51 @@ class FunctionalTest(StaticLiveServerTestCase):
     def form_field(self, f, field):
         """Find a field in a form of a given class."""
         return self.form(f).find_element_by_xpath("//" + field)
+
+    def table(self, f):
+        """Find a table of a given class."""
+        return self.browser.find_element_by_xpath(
+            "//table[contains(@id, '{}')]".format(f)
+        )
+
+    def table_head(self, f, field):
+        """Find the head in a table."""
+        return self.table(f).find_element_by_xpath("//thead" + field)
+
+    def table_body(self, f, field):
+        """Find the body in a table."""
+        return self.table(f).find_element_by_xpath("//tbody" + field)
+
+    def search_box(self, f):
+        """Find the search box connected to table"""
+        return self.browser.find_element_by_xpath(
+            "//div[contains(@id, '{}_filter')]//input".format(f))
+
+    def link(self, f):
+        """Find a link with a specific class"""
+        return self.browser.find_element_by_xpath(
+            "//a[contains(@class, '{}')]".format(f))
+
+    def button(self, f):
+        """Find a button with a specific name"""
+        return self.browser.find_element_by_xpath(
+            "//button[@name='{}']".format(f))
+
+    def button_class(self, f):
+        """Find a button with a specific class"""
+        return self.browser.find_element_by_xpath(
+            "//button[contains(@class, '{}')]".format(f))
+
+    def modal(self):
+        """Find a modal with a specific title"""
+        return self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'modal-content')]"
+            )
+
+    def organization_name(self, f):
+        """Find organization name in dashboard"""
+        return self.browser.find_element_by_xpath(
+         "//h1[contains(@class, '{}')]".format(f))
 
     def wait_for(self, function_with_assertion, timeout=DEFAULT_WAIT):
         """Wait for an assertion to become true."""
@@ -80,10 +136,31 @@ class FunctionalTest(StaticLiveServerTestCase):
                 f.write(base64.b64decode(exc.screen))
             raise
 
+    def click_through_close(self, button, wait, screenshot=None):
+        """Click a button or link and wait for something to appear."""
+        button.click()
+        if screenshot is not None:
+            self.screenshot(screenshot)
+        try:
+            WebDriverWait(self.browser, 10).until_not(
+                EC.presence_of_element_located(wait)
+            )
+        except TimeoutException as exc:
+            with open('exception.png', 'wb') as f:
+                f.write(base64.b64decode(exc.screen))
+            raise
+
     def wait_for_no_alerts(self):
         """Wait for all alerts to be cleared by a page reload."""
         WebDriverWait(self.browser, 10).until_not(
             EC.presence_of_element_located((By.CLASS_NAME, 'alert'))
+        )
+
+    # if all forms are going to have has-error, this won't be necessary.
+    def assert_has_error_list(self):
+        """Check for the presence of an error list containing given text."""
+        assert self.browser.find_element_by_xpath(
+            "//ul[contains(@class, 'errorlist')]"
         )
 
     def assert_has_message(self, msg_type, msg):

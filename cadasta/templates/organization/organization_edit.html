@@ -12,7 +12,7 @@ organization{% extends "organization/organization_dashboard.html" %}
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <form method="POST"
-              action="{% url 'organization:edit' form.instance.slug %}">
+              action="{% url 'organization:edit' form.instance.slug %}" class="edit-org">
           <div class="modal-header">
             <a class="close" href="{% url 'organization:dashboard' form.instance.slug %}">
               <span aria-hidden="true">&times;</span>
@@ -25,11 +25,11 @@ organization{% extends "organization/organization_dashboard.html" %}
           </div>
 
           <div class="modal-footer">
-            <a class="btn btn-link"
+            <a class="btn btn-link cancel"
                href="{% url 'organization:dashboard' form.instance.slug %}">
               {% trans "Cancel" %}
             </a>
-            <button type="submit" class="btn btn-default text-uppercase">
+            <button type="submit" class="btn btn-default text-uppercase" name="submit">
               {% trans "Save" %}
             </button>
           </div>

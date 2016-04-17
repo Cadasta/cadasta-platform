@@ -1,4 +1,4 @@
-from .default import *
+from .default import *  # NOQA
 
 DEBUG = True
 
@@ -15,6 +15,6 @@ DATABASES = {
     }
 }
 
-DJOSER.update({
+DJOSER.update({  # NOQA
     'SEND_ACTIVATION_EMAIL': False,
 })

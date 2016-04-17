@@ -2,32 +2,44 @@ sudo: required
 dist: trusty
 language: python
 python:
-- '3.5'
+  - '3.5'
 addons:
   postgresql: '9.4'
   apt:
     packages:
-    - postgresql-9.4-postgis-2.1
+      - postgresql-9.4-postgis-2.1
+
 before_install:
-- export DEBIAN_FRONTEND=noninteractive; sudo -E apt-get -yq update &>> ~/apt-get-update.log;
-  sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install
-  postgresql-9.4-postgis-2.2
-- export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" |
-  sed "s|::|:|g")
+  - export DEBIAN_FRONTEND=noninteractive
+  - sudo -E apt-get -yq update &>> ~/apt-get-update.log
+  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+
 install:
-- pip install -r requirements/common.txt
-- pip install -r requirements/dev.txt
-- nvm install 4.0.0
-- nvm alias default 4.0.0
+  - pip install -r requirements/common.txt
+  - pip install -r requirements/dev.txt
+  - nvm install 4.0.0
+  - nvm alias default 4.0.0
+
 before_script:
-- psql template1 postgres -c 'create extension hstore;'
-- psql -c 'create database cadasta;' -U postgres
-- psql -U postgres -d cadasta -c "create extension postgis;"
-- python cadasta/manage.py migrate --settings=config.settings.travis
+  - export DJANGO_SETTINGS_MODULE=config.settings.travis
+  - psql template1 postgres -c 'create extension hstore;'
+  - psql -c 'create database cadasta;' -U postgres
+  - psql -U postgres -d cadasta -c "create extension postgis;"
+  - python cadasta/manage.py migrate
+
+env:
+  matrix:
+    - TOX_ENV=py35-flake8
+    - TOX_ENV=py35-django1.9-unit
+    - TOX_ENV=py35-django1.9-functional
+
+matrix:
+  fast_finish: true
+
 script:
-- py.test cadasta --cov=cadasta --ds=config.settings.travis
-- cd functional_tests
-- "./run.py --ds=config.settings.travis"
+  - tox -e $TOX_ENV
+
 notifications:
   slack:
     on_success: always

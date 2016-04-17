@@ -1,5 +1,5 @@
 import os
-from .default import *
+from .default import *  # NOQA
 
 
 DEBUG = False
@@ -16,7 +16,7 @@ DATABASES = {
     }
 }
 
-DJOSER.update({
+DJOSER.update({  # NOQA
     'DOMAIN': os.environ['DOMAIN'],
 })
 

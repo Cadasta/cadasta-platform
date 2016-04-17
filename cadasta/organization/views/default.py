@@ -299,13 +299,13 @@ class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
         return obj
 
 
-PROJECT_ADD_FORMS = [('extents',     forms.ProjectAddExtents),
-                     ('details',     forms.ProjectAddDetails),
+PROJECT_ADD_FORMS = [('extents', forms.ProjectAddExtents),
+                     ('details', forms.ProjectAddDetails),
                      ('permissions', forms.ProjectAddPermissions)]
 
 PROJECT_ADD_TEMPLATES = {
-    'extents':     'organization/project_add_extents.html',
-    'details':     'organization/project_add_details.html',
+    'extents': 'organization/project_add_extents.html',
+    'details': 'organization/project_add_details.html',
     'permissions': 'organization/project_add_permissions.html'
 }
 

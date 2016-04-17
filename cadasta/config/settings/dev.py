@@ -1,4 +1,4 @@
-from .default import *
+from .default import *  # NOQA
 
 DEBUG = True
 
@@ -18,9 +18,9 @@ DATABASES = {
 # devserver must be first thing in the list of insalled apps
 INSTALLED_APPS = (
     # 'devserver',
-) + INSTALLED_APPS
+) + INSTALLED_APPS  # NOQA
 
-DJOSER.update({
+DJOSER.update({  # NOQA
     'DOMAIN': 'localhost:8080',
     'SEND_ACTIVATION_EMAIL': False,
 })

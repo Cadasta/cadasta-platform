@@ -78,9 +78,9 @@ class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
 
     def get_url(self, object):
         return reverse(
-                  'organization:project-dashboard',
-                  kwargs={'organization': object.organization.slug,
-                          'project': object.project_slug})
+            'organization:project-dashboard',
+            kwargs={'organization': object.organization.slug,
+                    'project': object.project_slug})
 
 
 class EntityUserSerializer(serializers.Serializer):
@@ -182,10 +182,11 @@ class OrganizationUserSerializer(EntityUserSerializer):
         message = template.render(context)
         print(message)
 
-        subject = _("You have been added to organization "
-                    "{organization}").format(
-                        organization=self.context['organization'].name
-                    )
+        subject = _(
+            "You have been added to organization {organization}"
+        ).format(
+            organization=self.context['organization'].name
+        )
         from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None),
         send_mail(subject, message, from_email, [self.user.email])
 

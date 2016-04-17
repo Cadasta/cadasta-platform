@@ -51,8 +51,8 @@ class ProjectListTest(TestCase):
             'clause': [
                 clause('allow', ['project.list'], ['organization/*']),
                 clause('allow', ['project.view'], ['project/*/*']),
-                clause('deny',  ['project.view'], ['project/unauth-org/*']),
-                clause('deny',  ['project.view'], ['project/*/unauth-proj'])
+                clause('deny', ['project.view'], ['project/unauth-org/*']),
+                clause('deny', ['project.view'], ['project/*/unauth-proj'])
             ]
         }
         self.policy = Policy.objects.create(
