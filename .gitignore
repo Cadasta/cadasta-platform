@@ -36,3 +36,5 @@ vagrant.retry
 /.tox/
 /cadasta_platform.egg-info/
 /pytest.txt
+
+/cadasta/geography/data
