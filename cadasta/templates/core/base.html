@@ -2,6 +2,8 @@
 {% load sass_tags %}
 {% load staticfiles %}
 
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -12,6 +14,10 @@
     <link rel="stylesheet" type="text/css"
           href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css"/>
     <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
+    {% if LANGUAGE_BIDI %}
+    <link rel="stylesheet" type="text/css"
+          href="//cdn.rawgit.com/morteza/bootstrap-rtl/v3.3.4/dist/css/bootstrap-rtl.min.css">
+    {% endif %}
     {% block extra_head %}{% endblock %}
   </head>
   <body>

@@ -164,6 +164,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 LANGUAGES = [
+    ('ar', _('Arabic')),
     ('en', _('English')),
     ('fr', _('French')),
     ('de', _('German')),
