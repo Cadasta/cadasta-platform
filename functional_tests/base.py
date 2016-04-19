@@ -7,6 +7,7 @@ import os.path
 import shutil
 import base64
 
+from urllib.parse import urlparse
 from selenium import webdriver
 from selenium.common.exceptions import (
     NoSuchElementException, WebDriverException, TimeoutException
@@ -15,17 +16,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from accounts.tests.factories import UserFactory
+from core.tests.factories import PolicyFactory, RoleFactory
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+from organization.models import OrganizationRole
+
 
 class FunctionalTest(StaticLiveServerTestCase):
-    DEFAULT_WAIT = 5
 
+    DEFAULT_WAIT = 5
     BY_ALERT = (By.CLASS_NAME, 'alert')
-    BY_MODAL = (By.CLASS_NAME, 'modal-content')
-    BY_MODAL_FADE = (By.CSS_SELECTOR, "div.modal.fade.in")
-    BY_ORG_MEMBERS = (By.CLASS_NAME, 'page-title')
-    BY_MEMBER_PAGE = (By.CLASS_NAME, 'org-member-edit')
-    BY_ORG_DASH = (By.CLASS_NAME, 'org-logo')
-    BY_NEW_PROJ = (By.CLASS_NAME, 'new-project-page')
+    superuser_role = None
 
     @classmethod
     def setUpClass(cls):
@@ -73,10 +74,6 @@ class FunctionalTest(StaticLiveServerTestCase):
             "//table[contains(@id, '{}')]".format(f)
         )
 
-    def table_head(self, f, field):
-        """Find the head in a table."""
-        return self.table(f).find_element_by_xpath("//thead" + field)
-
     def table_body(self, f, field):
         """Find the body in a table."""
         return self.table(f).find_element_by_xpath("//tbody" + field)
@@ -101,16 +98,13 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self.browser.find_element_by_xpath(
             "//button[contains(@class, '{}')]".format(f))
 
-    def modal(self):
-        """Find a modal with a specific title"""
+    def h1(self, f):
+        """Find a header given a specific class"""
         return self.browser.find_element_by_xpath(
-            "//div[contains(@class, 'modal-content')]"
-            )
+         "//h1[contains(@class, '{}')]".format(f))
 
-    def organization_name(self, f):
-        """Find organization name in dashboard"""
-        return self.browser.find_element_by_xpath(
-         "//div[contains(@class, '{}')]".format(f))
+    def page_title(self):
+        return self.container("//div[contains(@class, 'page-title')]//h2")
 
     def wait_for(self, function_with_assertion, timeout=DEFAULT_WAIT):
         """Wait for an assertion to become true."""
@@ -137,7 +131,7 @@ class FunctionalTest(StaticLiveServerTestCase):
             raise
 
     def click_through_close(self, button, wait, screenshot=None):
-        """Click a button or link and wait for something to appear."""
+        """Click a button or link and wait for something to disappear."""
         button.click()
         if screenshot is not None:
             self.screenshot(screenshot)
@@ -165,9 +159,10 @@ class FunctionalTest(StaticLiveServerTestCase):
     # if all forms are going to have has-error, this won't be necessary.
     def assert_has_error_list(self):
         """Check for the presence of an error list containing given text."""
-        assert self.browser.find_element_by_xpath(
+        error_list = self.browser.find_element_by_xpath(
             "//ul[contains(@class, 'errorlist')]"
         )
+        return error_list
 
     def assert_has_message(self, msg_type, msg):
         """Check for the presence of a message of a particular type containing
@@ -187,26 +182,23 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def assert_field_has_error(self, field):
         """Check whether a form field has an error marker: this will be a
-        ``has_error`` class on the field's immediate parent.
-
-        """
+        ``has_error`` class on the field's immediate parent."""
         cls = field.find_element_by_xpath('..').get_attribute('class')
         assert re.search(r'\bhas-error\b', cls)
 
     def assert_field_has_no_error(self, field):
         """Check that a form field has no error marker: this will be a
-        ``has_error`` class on the field's immediate parent.
-
-        """
+        ``has_error`` class on the field's immediate parent."""
         cls = field.find_element_by_xpath('..').get_attribute('class')
         assert not re.search(r'\bhas-error\b', cls)
 
     def get_url_path(self):
-        """Return the path+query+fragment component of the current URL."""
-        return re.sub(
-            '^https?://[\w.]+(?::\d+)?', '',
-            self.browser.current_url
-        )
+        """Return the path component of the current URL."""
+        return urlparse(self.browser.current_url).path
+
+    def get_url_query(self):
+        """Return the query component of the current URL."""
+        return urlparse(self.browser.current_url).query
 
     def logout(self):
         """Click the logout link."""
@@ -214,6 +206,38 @@ class FunctionalTest(StaticLiveServerTestCase):
             self.browser.find_element_by_xpath(self.xpath('a', 'Logout')),
             self.BY_ALERT
         )
+        self.assert_has_message('alert', "signed out")
+
+    def try_cancel_and_close(self,
+                             click_on_button,
+                             fill_inputbox=None,
+                             check_input=None):
+        close_buttons = ['btn-link', 'close']
+        for close in close_buttons:
+            if fill_inputbox:
+                fill_inputbox()
+
+            cancel = self.link(close)
+            self.click_through_close(
+                cancel, (By.CLASS_NAME, 'modal-backdrop'))
+
+            click_on_button()
+
+            if check_input:
+                check_input()
+
+    def try_cancel_and_close_confirm_modal(self,
+                                           click_on_button,
+                                           check_input=None):
+        close_buttons = ['btn-link', 'close']
+        for close in close_buttons:
+            click_on_button()
+            cancel = self.button_class(close)
+            self.click_through_close(
+                cancel, (By.CLASS_NAME, 'modal-backdrop'))
+
+            if check_input:
+                check_input()
 
     def screenshot(self, title=None):
         if title is not None:
@@ -226,6 +250,114 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def xpath(self, tag, contents):
         return "//{}[normalize-space(.)='{}']".format(tag, contents)
+
+    def create_superuser(
+        self,
+        username='testsuperuser',
+        password='password',
+        email=None
+    ):
+        if email:
+            superuser = UserFactory.create(
+                username=username,
+                password=password,
+                email=email
+            )
+        else:
+            superuser = UserFactory.create(
+                username=username,
+                password=password
+            )
+
+        # Create superuser policy and role if not yet created
+        if not self.superuser_role:
+            PolicyFactory.set_directory('../cadasta/config/permissions')
+            superuser_pol = PolicyFactory.create(
+                name='superuser', file='superuser.json'
+            )
+            self.superuser_role = RoleFactory.create(
+                name='superuser', policies=[superuser_pol]
+            )
+
+        superuser.assign_policies(self.superuser_role)
+        return superuser
+
+    def create_test_organizations(self, users=None):
+        orgs = []
+        orgs.append(OrganizationFactory.create(
+            name="Organization #0", description='This is a test.',
+            add_users=users)
+        )
+        orgs.append(OrganizationFactory.create(
+            name="Organization #1", description='This is a test.')
+        )
+        return orgs
+
+    def create_test_users(self):
+        users = []
+        users.append(UserFactory.create(
+            username='testuser',
+            email='testuser@example.com',
+            first_name='Test',
+            last_name='User',
+            password='password')
+        )
+        users.append(UserFactory.create())
+        return users
+
+    def create_test_projects(self, orgs):
+        projs = []
+        projs.append(ProjectFactory.create(
+            name='Organization #0 Test Project',
+            project_slug='test-project',
+            description="""This is a test project.  This is a test project.
+            This is a test project.  This is a test project.  This is a test
+            project.  This is a test project.  This is a test project.  This
+            is a test project.  This is a test project.""",
+            organization=orgs[0],
+            country='KE',
+            extent=('SRID=4326;'
+                    'POLYGON ((-5.1031494140625000 8.1299292850467957, '
+                    '-5.0482177734375000 7.6837733211111425, '
+                    '-4.6746826171875000 7.8252894725496338, '
+                    '-4.8641967773437491 8.2278005261522775, '
+                    '-5.1031494140625000 8.1299292850467957))')
+        ))
+
+    def add_all_test_data(self):
+        self.create_superuser()
+        orgs = self.create_test_organizations(users=self.create_test_users())
+        self.create_test_projects(orgs)
+        return orgs
+
+    def load_test_data(self, data):
+
+        # Load users
+        if 'users' in data:
+            user_objs = []  # For assigning members to orgs later
+            for user in data['users']:
+                if '_is_superuser' in user and user['_is_superuser']:
+                    user_objs.append(self.create_superuser(
+                        username=user['username'],
+                        password=user['password'],
+                        email=user['email'] if ('email' in user) else None
+                    ))
+                else:
+                    user_objs.append(UserFactory.create(**user))
+
+        # Load orgs
+        if 'orgs' in data:
+            for org in data['orgs']:
+                kwargs = org.copy()
+                if '_members' in org:
+                    del kwargs['_members']
+                org_obj = OrganizationFactory.create(**kwargs)
+                if '_members' in org:
+                    for member_idx in org['_members']:
+                        OrganizationRole.objects.create(
+                            organization=org_obj,
+                            user=user_objs[member_idx],
+                        )
 
 
 def unique_file(dir, base, startidx):

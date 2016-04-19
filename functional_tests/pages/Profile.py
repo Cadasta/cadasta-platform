@@ -2,9 +2,16 @@ from .base import Page
 
 
 class ProfilePage(Page):
+
+    path = '/account/profile/'
+
     def __init__(self, test):
         super().__init__(test)
-        self.url = self.base_url + '/account/profile/'
+        self.url = self.base_url + self.path
+
+    def is_on_page(self):
+        """Returns True if user is on this page"""
+        return self.test.get_url_path() == self.path
 
     def go_to(self):
         self.browser.get(self.url)
@@ -40,3 +47,15 @@ class ProfilePage(Page):
             'last_name':  self.get_last_name_input(),
             'update':     self.get_update_button()
         }
+
+    def submit_form(self):
+        self.test.click_through(
+            self.get_update_button(),
+            self.test.BY_ALERT
+        )
+
+    def assert_profile_is_updated(self):
+        self.test.assert_has_message(
+            'alert',
+            "Successfully updated profile information"
+        )
