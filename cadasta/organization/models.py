@@ -10,6 +10,7 @@ from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
 
 from core.models import RandomIDModel
+from geography.models import WorldBorder
 from .validators import validate_contact
 from .choices import ROLE_CHOICES
 from . import messages
@@ -172,6 +173,17 @@ class Project(RandomIDModel):
 
     def __str__(self):
         return "<Project: {name}>".format(name=self.name)
+
+    def save(self, *args, **kwargs):
+        if ((self.country is None or self.country == '') and
+           self.extent is not None):
+            try:
+                self.country = WorldBorder.objects.get(
+                    mpoly__contains=self.extent.centroid
+                ).iso2
+            except:
+                pass
+        super().save(*args, **kwargs)
 
 
 class ProjectRole(RandomIDModel):

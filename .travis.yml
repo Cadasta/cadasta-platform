@@ -27,6 +27,11 @@ before_script:
   - psql -c 'create database cadasta;' -U postgres
   - psql -U postgres -d cadasta -c "create extension postgis;"
   - python cadasta/manage.py migrate
+  - mkdir cadasta/geography/data
+  - export WBDATA=TM_WORLD_BORDERS-0.3.zip
+  - export DATADIR=cadasta/geography/data
+  - wget -O $DATADIR/$WBDATA http://thematicmapping.org/downloads/$WBDATA
+  - unzip $DATADIR/$WBDATA -d $DATADIR
 
 env:
   matrix:

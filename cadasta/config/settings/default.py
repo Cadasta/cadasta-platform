@@ -43,6 +43,7 @@ INSTALLED_APPS = (
     'corsheaders',
 
     'core',
+    'geography',
     'accounts',
     'organization',
 

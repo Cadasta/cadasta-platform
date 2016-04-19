@@ -12,6 +12,7 @@
       - python3.5-dev
       - python-virtualenv
       - git
+      - unzip
 
 - name: Create base directory for virtual environment
   become: yes
@@ -41,10 +42,36 @@
   become_user: root
   file: path=/var/log/django state=directory owner="{{ app_user }}"
 
+- name: Create temporary data processing directory
+  become: yes
+  become_user: "{{ app_user }}"
+  file: path="{{ application_path }}cadasta/geography/data" state=directory
+
+- name: Download world boundary data files
+  become: yes
+  become_user: "{{ app_user }}"
+  get_url: url=http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+           dest="{{ application_path }}cadasta/geography/data"
+
+- name: Unzip world boundary data files
+  become: yes
+  become_user: "{{ app_user }}"
+  unarchive: creates="{{ application_path }}cadasta/geography/data/TM_WORLD_BORDERS-0.3.shp"
+             src="{{ application_path }}cadasta/geography/data/TM_WORLD_BORDERS-0.3.zip"
+             dest="{{ application_path }}cadasta/geography/data" copy=no
+
 - name: Django migrate
   become: yes
   become_user: "{{ app_user }}"
   django_manage: command=migrate
+                 app_path="{{ application_path }}cadasta"
+                 virtualenv="{{ virtualenv_path }}"
+                 settings="{{ django_settings }}"
+
+- name: Load country boundary data
+  become: yes
+  become_user: "{{ app_user }}"
+  django_manage: command=loadcountries
                  app_path="{{ application_path }}cadasta"
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"

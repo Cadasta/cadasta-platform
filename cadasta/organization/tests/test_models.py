@@ -4,6 +4,7 @@ from django.test import TestCase
 from tutelary.models import Policy
 
 from accounts.tests.factories import UserFactory
+from geography import load as load_countries
 from .factories import OrganizationFactory, ProjectFactory
 from ..models import OrganizationRole, ProjectRole
 
@@ -12,7 +13,7 @@ PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 class OrganizationTest(TestCase):
     def test_str(self):
-        org = OrganizationFactory.create(**{'name': 'Org'})
+        org = OrganizationFactory.create(name='Org')
         assert str(org) == '<Organization: Org>'
 
     def test_has_random_id(self):
@@ -75,12 +76,36 @@ class OrganizationRoleTest(TestCase):
 
 class ProjectTest(TestCase):
     def test_str(self):
-        project = ProjectFactory.create(**{'name': 'Project'})
+        project = ProjectFactory.create(name='Project')
         assert str(project) == '<Project: Project>'
 
     def test_has_random_id(self):
         project = ProjectFactory.create()
         assert type(project.id) is not int
+
+    def test_country_assignment(self):
+        load_countries.run()
+        project = ProjectFactory.create(
+            extent='SRID=4326;POLYGON(('
+            '11.36667 47.25000, '
+            '11.41667 47.25000, '
+            '11.41667 47.28333, '
+            '11.36667 47.28333, '
+            '11.36667 47.25000))'
+        )
+        assert project.country == 'AT'
+
+    def test_country_assignment_for_invalid_geometry(self):
+        load_countries.run()
+        project = ProjectFactory.create(
+            extent='SRID=4326;POLYGON(('
+            '0.00000 0.00000, '
+            '0.00001 0.00000, '
+            '0.00001 0.00001, '
+            '0.00000 0.00001, '
+            '0.00000 0.00000))'
+        )
+        assert project.country == ''
 
 
 class ProjectRoleTest(TestCase):
