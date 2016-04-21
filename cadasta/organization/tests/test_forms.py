@@ -68,7 +68,7 @@ class OrganzationAddTest(TestCase):
         assert org.contacts == [{'name': 'Ringo Starr', 'tel': '555-5555'}]
 
     def test_update_organization(self):
-        org = OrganizationFactory.create(**{'slug': 'some-org'})
+        org = OrganizationFactory.create(slug='some-org')
 
         data = {
             'name': 'Org',

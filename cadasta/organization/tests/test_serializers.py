@@ -276,7 +276,7 @@ class ProjectUserSerializerTest(TestCase):
     def test_set_roles_for_existing_user(self):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
-        project = ProjectFactory.create(**{'organization': org})
+        project = ProjectFactory.create(organization=org)
         data = {'username': user.username, 'role': 'DC'}
         serializer = serializers.ProjectUserSerializer(
             data=data,

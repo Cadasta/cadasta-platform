@@ -24,7 +24,7 @@ class OrganizationListTest(TestCase):
         setattr(self.request, 'user', AnonymousUser())
 
         self.orgs = OrganizationFactory.create_batch(2)
-        OrganizationFactory.create(**{'slug': 'unauthorized'})
+        OrganizationFactory.create(slug='unauthorized')
 
         clauses = {
             'clause': [
@@ -111,6 +111,9 @@ class OrganizationAddTest(TestCase):
         response = self._post(status=302, count=1)
         org = Organization.objects.first()
         assert '/organizations/{}/'.format(org.slug) in response['location']
+        assert OrganizationRole.objects.get(
+            organization=org, user=self.user
+        ).admin
 
     def test_get_with_unauthenticated_user(self):
         response = self._get(status=302)
@@ -152,10 +155,8 @@ class OrganizationDashboardTest(TestCase):
             assert response.status_code == status
         return response
 
-    def test_get_with_authorized_user(self):
-        assign_user_policies(self.user, self.policy)
-        response = self._get(self.org.slug, status=200).render()
-        content = response.content.decode('utf-8')
+    def _check_ok(self, response):
+        content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
         context['object'] = self.org
@@ -166,10 +167,14 @@ class OrganizationDashboardTest(TestCase):
 
         assert expected == content
 
+    def test_get_with_authorized_user(self):
+        assign_user_policies(self.user, self.policy)
+        response = self._get(self.org.slug, status=200)
+        self._check_ok(response)
+
     def test_get_with_unauthorized_user(self):
-        self._get(self.org.slug, status=302)
-        assert ("You don't have permission to access this organization"
-                in [str(m) for m in get_messages(self.request)])
+        response = self._get(self.org.slug, status=200)
+        self._check_ok(response)
 
 
 class OrganizationEditTest(TestCase):

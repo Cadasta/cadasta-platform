@@ -31,16 +31,17 @@ class ProjectListTest(TestCase):
         self.projs = []
         self.projs += ProjectFactory.create_batch(2, organization=self.ok_org1)
         self.projs += ProjectFactory.create_batch(2, organization=self.ok_org2)
-        ProjectFactory.create(
+        self.unauth_projs = []
+        self.unauth_projs.append(ProjectFactory.create(
             name='Unauthorized project',
             project_slug='unauth-proj',
             organization=self.ok_org2
-        )
-        ProjectFactory.create(
+        ))
+        self.unauth_projs.append(ProjectFactory.create(
             name='Project in unauthorized org',
             project_slug='proj-in-unauth-org',
             organization=self.unauth_org
-        )
+        ))
         self.priv_proj1 = ProjectFactory.create(
             organization=self.ok_org1, access='private'
         )
@@ -66,7 +67,9 @@ class ProjectListTest(TestCase):
             name='allow',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
-        self.user.assign_policies(self.policy)
+        assigned_policies = self.user.assigned_policies()
+        assigned_policies.append(self.policy)
+        self.user.assign_policies(*assigned_policies)
 
     def _get(self, user=None, status=None, projs=None,
              make_org_member=None):
@@ -106,7 +109,12 @@ class ProjectListTest(TestCase):
         self._get(status=200, user=AnonymousUser(), projs=[])
 
     def test_get_with_unauthorized_user(self):
-        self._get(status=200, user=UserFactory.create(), projs=[])
+        # Slight weirdness here: an unauthorized user can see *more*
+        # projects than a user authorized with the policy defined
+        # above because the policy includes clauses denying access to
+        # some projects.
+        self._get(status=200, user=UserFactory.create(),
+                  projs=self.projs+self.unauth_projs)
 
     def test_get_with_org_membership(self):
         self._get(status=200, make_org_member=[self.ok_org1],
@@ -226,8 +234,9 @@ class ProjectDashboardTest(TestCase):
         self._check_render(response, self.project1)
 
     def test_get_with_unauthorized_user(self):
-        self._get(self.project1, user=UserFactory.create(), status=302)
-        self._check_fail()
+        response = self._get(self.project1, user=UserFactory.create(),
+                             status=200)
+        self._check_render(response, self.project1)
 
     def test_get_non_existent_project(self):
         setattr(self.request, 'user', self.user)
@@ -243,7 +252,7 @@ class ProjectDashboardTest(TestCase):
         response, prj = self._get_private(status=200)
         self._check_render(response, prj)
 
-    def test_get_private_project_with_unauthorized_user(self):
+    def test_get_private_project_with_unauthenticated_user(self):
         self._get_private(user=AnonymousUser(), status=302)
         self._check_fail()
 

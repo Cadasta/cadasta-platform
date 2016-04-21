@@ -84,20 +84,17 @@ def is_class(string):
 
 
 if __name__ == "__main__":
-    try:
-        sys.argv.remove('--nolint')
-    except ValueError:
-        run_flake8 = True
-    else:
-        run_flake8 = False
+    run_flake8 = False
+    run_tests = True
+    run_functional = False
 
     try:
-        sys.argv.remove('--lintonly')
+        sys.argv.remove('--lint')
     except ValueError:
-        run_tests = True
+        pass
     else:
+        run_flake8 = True
         run_tests = False
-        run_functional = False
 
     try:
         sys.argv.remove('--fast')
@@ -105,16 +102,15 @@ if __name__ == "__main__":
         style = 'default'
     else:
         style = 'fast'
-        run_flake8 = False
 
     try:
         sys.argv.remove('--functional')
     except ValueError:
-        run_functional = False
+        pass
     else:
         run_flake8 = False
-        run_functional = True
         run_tests = False
+        run_functional = True
 
     if len(sys.argv) > 1:
         pytest_args = sys.argv[1:]

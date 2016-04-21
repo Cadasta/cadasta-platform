@@ -59,7 +59,8 @@ class OrganizationForm(forms.ModelForm):
         if create:
             OrganizationRole.objects.create(
                 organization=instance,
-                user=self.user
+                user=self.user,
+                admin=True
             )
 
         return instance

@@ -160,13 +160,13 @@ class UserDetailAPITest(TestCase):
         return content
 
     def test_get_user(self):
-        user = UserFactory.create(**{'username': 'test-user'})
+        user = UserFactory.create(username='test-user')
         content = self._get(user.username, status=200)
         assert content['username'] == user.username
         assert 'organizations' in content
 
     def test_get_user_with_unauthorized_user(self):
-        user = UserFactory.create(**{'username': 'test-user'})
+        user = UserFactory.create(username='test-user')
         content = self._get(user.username, user=AnonymousUser(), status=403)
         assert content['detail'] == PermissionDenied.default_detail
 
@@ -175,7 +175,7 @@ class UserDetailAPITest(TestCase):
         assert content['detail'] == "User not found."
 
     def test_valid_update(self):
-        user = UserFactory.create(**{'username': 'test-user'})
+        user = UserFactory.create(username='test-user')
         assert user.is_active
         data = {'is_active': False}
         self._patch(user.username, data, status=200)
@@ -183,8 +183,7 @@ class UserDetailAPITest(TestCase):
         assert user.is_active == data.get('is_active')
 
     def test_update_with_unauthorized_user(self):
-        user = UserFactory.create(**{'last_name': 'Smith',
-                                     'username': 'test-user'})
+        user = UserFactory.create(last_name='Smith', username='test-user')
         self._patch(user.username, {'last_name': 'Jones'},
                     user=AnonymousUser(), status=403)
         user.refresh_from_db()
@@ -193,8 +192,7 @@ class UserDetailAPITest(TestCase):
     def test_invalid_update(self):
         t1 = datetime(12, 10, 30, tzinfo=timezone.utc)
         t2 = t1 + timedelta(seconds=10)
-        user = UserFactory.create(**{'last_login': t1,
-                                     'username': 'test-user'})
+        user = UserFactory.create(last_login=t1, username='test-user')
         content = self._patch(user.username, {'last_login': t2}, status=400)
         user.refresh_from_db()
         assert user.last_login == t1

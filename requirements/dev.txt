@@ -1,8 +1,9 @@
-pytest-django
-pytest-cov
-factory_boy
-selenium
-transifex-client
-django-compressor
-tox
-flake8
+-r common.txt
+pytest-django==2.9.1
+pytest-cov==2.2.1
+factory_boy==2.7.0
+selenium==2.53.2
+transifex-client==0.11
+django-compressor==2.0
+tox==2.3.1
+flake8==2.5.4

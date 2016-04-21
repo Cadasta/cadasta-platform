@@ -65,7 +65,10 @@ class FixturesData:
         pols = {}
         for pol in ['default', 'superuser', 'org-admin', 'org-member',
                     'project-manager', 'data-collector', 'project-user']:
-            pols[pol] = PolicyFactory.create(name=pol, file=pol + '.json')
+            try:
+                pols[pol] = Policy.objects.get(name=pol)
+            except Policy.DoesNotExist:
+                pols[pol] = PolicyFactory.create(name=pol, file=pol + '.json')
 
         roles = {}
         roles['superuser'] = RoleFactory.create(

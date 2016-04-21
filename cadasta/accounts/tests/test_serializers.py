@@ -60,9 +60,7 @@ class RegistrationSerializerTest(TestCase):
         """Serialiser should be invalid when another user with the same email
            address is already registered."""
 
-        UserFactory.create(**{
-            'email': 'john@beatles.uk',
-        })
+        UserFactory.create(email='john@beatles.uk')
 
         data = {
             'username': 'imagine71',
@@ -137,11 +135,9 @@ class AccountLoginSerializerTest(TestCase):
         """Serializer should raise EmailNotVerifiedError exeception when the
            user has not verified their email address within 48 hours"""
 
-        UserFactory.create(**{
-            'username': 'sgt_pepper',
-            'password': 'iloveyoko79',
-            'verify_email_by': datetime.now()
-        })
+        UserFactory.create(username='sgt_pepper',
+                           password='iloveyoko79',
+                           verify_email_by=datetime.now())
 
         with pytest.raises(EmailNotVerifiedError):
             AccountLoginSerializer().validate(attrs={

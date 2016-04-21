@@ -63,9 +63,9 @@ class ProjectRoles(ProjectMixin):
 class ProjectQuerySetMixin:
     def get_queryset(self):
         if hasattr(self.request.user, 'organizations'):
-            return Project.objects.filter(
-                Q(access='public') |
-                Q(organization__in=self.request.user.organizations.all())
-            )
-        else:
-            return Project.objects.filter(access='public')
+            orgs = self.request.user.organizations.all()
+            if len(orgs) > 0:
+                return Project.objects.filter(
+                    Q(access='public') | Q(organization__in=orgs)
+                )
+        return Project.objects.filter(access='public')

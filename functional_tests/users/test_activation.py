@@ -6,6 +6,7 @@ from accounts.models import User
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory, RoleFactory
 from selenium.webdriver.common.by import By
+from tutelary.models import Policy
 
 
 class ActivationTest(FunctionalTest):
@@ -34,9 +35,9 @@ class ActivationTest(FunctionalTest):
 
         pols = {}
         PolicyFactory.set_directory('../cadasta/config/permissions')
-        pols['default'] = PolicyFactory.create(
-            name='default',   file='default.json'
-        )
+        # Default policy is installed automatically when first user is
+        # created.
+        pols['default'] = Policy.objects.get(name='default')
         pols['superuser'] = PolicyFactory.create(
             name='superuser', file='superuser.json'
         )

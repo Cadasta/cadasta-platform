@@ -38,7 +38,8 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
 
         OrganizationRole.objects.create(
             organization=org,
-            user=self.context['request'].user
+            user=self.context['request'].user,
+            admin=True
         )
 
         return org

@@ -36,7 +36,7 @@ class ProjectUsersAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clause))
         self.user = UserFactory.create()
         self.user.assign_policies(policy)
@@ -142,7 +142,7 @@ class ProjectUsersDetailAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clause))
         self.user = UserFactory.create()
         self.user.assign_policies(policy)
@@ -271,7 +271,7 @@ class OrganizationProjectListAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clause))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -370,7 +370,7 @@ class ProjectListAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clause))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -500,7 +500,7 @@ class ProjectListAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clause)
         )
         for user in users:
@@ -545,7 +545,7 @@ class ProjectCreateAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -596,7 +596,7 @@ class ProjectDetailAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -774,7 +774,7 @@ class ProjectDetailAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clauses)
         )
         org_user = UserFactory.create()

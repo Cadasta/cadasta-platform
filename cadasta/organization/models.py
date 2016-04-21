@@ -88,6 +88,9 @@ class Organization(RandomIDModel):
     def __str__(self):
         return "<Organization: {name}>".format(name=self.name)
 
+    def __repr__(self):
+        return str(self)
+
 
 class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)
@@ -200,6 +203,9 @@ class Project(RandomIDModel):
 
     def __str__(self):
         return "<Project: {name}>".format(name=self.name)
+
+    def __repr__(self):
+        return str(self)
 
     def save(self, *args, **kwargs):
         if ((self.country is None or self.country == '') and

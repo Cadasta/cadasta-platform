@@ -65,7 +65,7 @@ class OrganizationRoleTest(TestCase):
 
     def test_delete_project_roles(self):
         ProjectFactory.create_batch(2, add_users=[self.user],
-                                    **{'organization': self.org})
+                                    organization=self.org)
         ProjectFactory.create_batch(2, add_users=[self.user])
         assert ProjectRole.objects.filter(user=self.user).count() == 4
 

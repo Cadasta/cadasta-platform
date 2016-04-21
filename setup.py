@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
 import os
-import sys
 from setuptools import setup
 
+BASE_DIR = os.path.dirname(__file__)
 
 name = 'cadasta-platform'
 package = 'cadasta'
@@ -13,8 +12,10 @@ url = 'https://github.com/Cadasta/cadasta-platform'
 author = 'Cadasta development team'
 author_email = 'dev@cadasta.org'
 license = 'GNU Affero'
+req_file = os.path.join(BASE_DIR, 'requirements/common.txt')
+requirements = open(req_file).read().splitlines()
 
-readme_file = os.path.join(os.path.dirname(__file__), 'README.rst')
+readme_file = os.path.join(BASE_DIR, 'README.rst')
 with open(readme_file, 'r') as f:
     long_description = f.readline().strip()
 
@@ -62,28 +63,7 @@ setup(
     author_email=author_email,
     packages=get_packages(package),
     package_data=get_package_data(package),
-    install_requires=[
-        'Django==1.9.4',
-        'djangorestframework==3.3.3',
-        'psycopg2==2.6.1',
-        'djoser==0.4.3',
-        'django-allauth==0.25.2',
-        'django-cors-headers==1.1.0',
-        'django-filter==0.12.0',
-        'django-crispy-forms==1.6.0',
-        'django-formtools==1.0',
-        'django-countries==3.4.1',
-        'django-leaflet==0.18.0',
-        'django-sass-processor==0.3.4',
-        'djangorestframework-gis==0.10.1',
-        'jsonschema==2.5.1',
-        'rfc3987==1.3.5',
-        'drfdocs==0.0.9',
-        'django-tutelary==0.1.11',
-        'django-audit-log==0.7.0',
-        'simplejson==3.8.1',
-        'django-widget-tweaks==1.4.1'
-    ],
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
