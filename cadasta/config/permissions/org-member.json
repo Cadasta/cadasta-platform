@@ -1,0 +1,12 @@
+{
+  "clause": [
+    // In addition to the permissions provided by the default
+    // policy, organization members are able to view private projects
+    // within an organization.
+    {
+      "effect": "allow",
+      "action": ["project.view_private"],
+      "object": ["project/$organization/*"]
+    }
+  ]
+}

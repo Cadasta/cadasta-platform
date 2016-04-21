@@ -17,7 +17,7 @@ class FixturesTest(TestCase):
         data.add_test_projects()
 
         assert User.objects.count() == 20
-        assert Policy.objects.count() == 6
+        assert Policy.objects.count() == 7
         assert Organization.objects.count() == 2
         assert Project.objects.count() == 6
 

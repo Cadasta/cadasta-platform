@@ -95,19 +95,35 @@ class OrganizationRole(RandomIDModel):
     admin = models.BooleanField(default=False)
 
 
-@receiver(models.signals.post_save, sender=OrganizationRole)
-def assign_org_permissions(sender, instance, **kwargs):
-    policy_instance = get_policy_instance('org-admin', {
-        'organization': instance.organization.slug})
+def reassign_user_policies(instance, adding):
     assigned_policies = instance.user.assigned_policies()
-    has_policy = policy_instance in assigned_policies
 
-    if not has_policy and instance.admin:
-        assigned_policies.append(policy_instance)
-    elif has_policy and not instance.admin:
-        assigned_policies.remove(policy_instance)
+    org_admin = get_policy_instance('org-admin', {
+        'organization': instance.organization.slug
+    })
+    is_admin = org_admin in assigned_policies
+
+    org_member = get_policy_instance('org-member', {
+        'organization': instance.organization.slug
+    })
+    is_member = org_member in assigned_policies
+
+    if not is_admin and instance.admin:
+        assigned_policies.append(org_admin)
+    elif is_admin and not instance.admin:
+        assigned_policies.remove(org_admin)
+
+    if not is_member and adding:
+        assigned_policies.append(org_member)
+    elif is_member and not adding:
+        assigned_policies.remove(org_member)
 
     instance.user.assign_policies(*assigned_policies)
+
+
+@receiver(models.signals.post_save, sender=OrganizationRole)
+def assign_org_permissions(sender, instance, **kwargs):
+    reassign_user_policies(instance, True)
 
 
 @receiver(models.signals.pre_delete, sender=OrganizationRole)
@@ -115,10 +131,15 @@ def remove_project_membership(sender, instance, **kwargs):
     prjs = instance.organization.projects.values_list('id', flat=True)
     ProjectRole.objects.filter(user=instance.user,
                                project_id__in=prjs).delete()
+    reassign_user_policies(instance, False)
 
 
 @permissioned_model
 class Project(RandomIDModel):
+    ACCESS_CHOICES = [
+        ("public", _("Public")),
+        ("private", _("Private")),
+    ]
     name = models.CharField(max_length=100)
     project_slug = models.SlugField(max_length=50, unique=True, null=True)
     organization = models.ForeignKey(Organization, related_name='projects')
@@ -131,6 +152,9 @@ class Project(RandomIDModel):
     users = models.ManyToManyField('accounts.User', through='ProjectRole')
     last_updated = models.DateTimeField(auto_now=True)
     extent = gismodels.PolygonField(null=True)
+    access = models.CharField(
+        default="public", choices=ACCESS_CHOICES, max_length=8
+    )
 
     class Meta:
         ordering = ('organization', 'name')
@@ -147,6 +171,9 @@ class Project(RandomIDModel):
               'permissions_object': 'organization'}),
             ('project.view',
              {'description': _("View existing projects"),
+              'error_message': messages.PROJ_VIEW}),
+            ('project.view_private',
+             {'description': _("View private projects"),
               'error_message': messages.PROJ_VIEW}),
             ('project.update',
              {'description': _("Update an existing project"),
@@ -184,6 +211,9 @@ class Project(RandomIDModel):
             except:
                 pass
         super().save(*args, **kwargs)
+
+    def public(self):
+        return self.access == 'public'
 
 
 class ProjectRole(RandomIDModel):

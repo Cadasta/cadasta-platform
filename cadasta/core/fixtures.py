@@ -63,8 +63,8 @@ class FixturesData:
         )
 
         pols = {}
-        for pol in ['default', 'superuser', 'org-admin', 'project-manager',
-                    'data-collector', 'project-user']:
+        for pol in ['default', 'superuser', 'org-admin', 'org-member',
+                    'project-manager', 'data-collector', 'project-user']:
             pols[pol] = PolicyFactory.create(name=pol, file=pol + '.json')
 
         roles = {}

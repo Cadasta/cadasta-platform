@@ -19,7 +19,7 @@ PYTEST_ARGS_FUNCTIONAL = {
     'fast': BASE_PYTEST_ARGS_FUNCTIONAL + ['-q'],
 }
 
-FLAKE8_ARGS = ['cadasta', '--ignore=E501']
+FLAKE8_ARGS = ['cadasta', '--exclude=migrations']
 
 
 sys.path.append(os.path.dirname(__file__))

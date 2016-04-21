@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from ..models import Organization, Project
 
@@ -57,3 +58,14 @@ class ProjectRoles(ProjectMixin):
         context['project'] = self.get_project()
 
         return context
+
+
+class ProjectQuerySetMixin:
+    def get_queryset(self):
+        if hasattr(self.request.user, 'organizations'):
+            return Project.objects.filter(
+                Q(access='public') |
+                Q(organization__in=self.request.user.organizations.all())
+            )
+        else:
+            return Project.objects.filter(access='public')
