@@ -32,21 +32,6 @@
             </h1>
             <div class="reg-links pull-right">
               <ul class="list-inline">
-                <li>
-                  <a href="{% url 'organization:list' %}">
-                    {% trans "Organizations" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'project:list' %}">
-                    {% trans "Projects" %}
-                  </a>
-                </li>
-                <li class="reg-links-divider">
-                  <a href="{% url 'user:list' %}">
-                    {% trans "Users" %}
-                  </a>
-                </li>
                 {% if user.is_authenticated %}
                 <li>
                   <a href="{% url 'account:profile' %}">
@@ -72,6 +57,25 @@
                 {% endif %}
               </ul>
             </div>
+            <nav class="nav" role="navigation">
+              <ul class="list-inline">
+                <li>
+                  <a href="{% url 'project:list' %}">
+                    {% trans "Projects" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'organization:list' %}">
+                    {% trans "Organizations" %}
+                  </a>
+                </li>
+                <li>
+                  <a href="{% url 'user:list' %}">
+                    {% trans "Users" %}
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </header>
 
@@ -97,7 +101,7 @@
         <footer class="footer">
           <div class="container">
             <p class="pull-left">
-              {% trans "Copyright 2016 Cadasta. All Rights Reserved." %}
+              {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
             </p>
             <div class="pull-right">
               <ul class="list-inline">
@@ -160,6 +164,7 @@
     <script>
      $(document).ready(function () {
        $('.datatable').DataTable();
+       $('.dropdown-toggle').dropdown();
        $('#language').change(function() { this.form.submit(); });
      });
     </script>

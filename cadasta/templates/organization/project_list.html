@@ -6,41 +6,50 @@
 
 {% block content %}
 
-<h1>{% trans "Projects" %}</h1>
-
-<div class="pull-right">
-  {% if add_allowed %}
-  <a href={% url 'project:add' %} class="btn btn-default">
-    <span>
-      <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
-      {% trans "Add" %}
-    </span>
-  </a>
-  {% endif %}
+<div class="row">
+  <div class="col-md-10">
+    <h1>{% trans "Projects" %}</h1>
+  </div>
+  <div class="col-md-2">
+    {% if add_allowed %}
+    <div class="top-btn pull-right">
+      <a href={% url 'project:add' %} class="btn btn-default">
+        <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
 </div>
-<div class="clearfix"></div>
-<br/>
 
-<table class="table table-hover datatable" data-paging-type="simple">
-  <thead>
-    <tr>
-      <th class="col-md-2">{% trans "Organization" %}</th>
-      <th class="col-md-6">{% trans "Project" %}</th>
-      <th class="col-md-2">{% trans "Country" %}</th>
-      <th class="col-md-2">{% trans "Last updated" %}</th>
-    </tr>
-  </thead>
-  {% for proj in object_list %}
-  <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.project_slug %}';">
-    <td><img src="{{ proj.organization.logo }}" style="width: 100%;" /></td>
-    <td>
-      <strong>{{ proj.name }}</strong>
-      <br/>
-      <p>{{ proj.description }}</p>
-    </td>
-    <td>{{ proj.country.name }}</td>
-    <td>{{ proj.last_updated|default_if_none:"&mdash;" }}</td>
-  </tr>
-  {% endfor %}
-</table>
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-hover datatable" data-paging-type="simple">
+      <thead>
+        <tr>
+          <th class="col-md-2">{% trans "Organization" %}</th>
+          <th class="col-md-6">{% trans "Project" %}</th>
+          <th class="col-md-2">{% trans "Country" %}</th>
+          <th class="col-md-2">{% trans "Last updated" %}</th>
+        </tr>
+      </thead>
+      {% for proj in object_list %}
+      <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.project_slug %}';">
+        <td>
+          <div class="org-logo">
+            <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
+            <img src="{{ proj.organization.logo }}" class="org-logo" alt="{{ proj.organization.name }}"/>
+          </div>
+        </td>
+        <td>
+          <h4>{{ proj.name }}</h4>
+          <p>{{ proj.description }}</p>
+        </td>
+        <td>{{ proj.country.name }}</td>
+        <td>{{ proj.last_updated|default_if_none:"&mdash;" }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
 {% endblock %}

@@ -93,27 +93,26 @@ class OrganizationsTest(FunctionalTest):
         page.go_to()
 
         sorters = []
-        sorters.append(page.get_id_sorter())
         sorters.append(page.get_name_sorter())
         sorters.append(page.get_project_sorter())
 
         # by id?
 
         # by organization name
-        self.click_through(sorters[1], (By.CLASS_NAME, 'sorting_asc'))
+        self.click_through(sorters[0], (By.CLASS_NAME, 'sorting_desc'))
+        organization_title = page.get_organization_titles()
+        assert organization_title.text == 'Organization #1'
+
+        self.click_through(sorters[0], (By.CLASS_NAME, 'sorting_asc'))
         organization_title = page.get_organization_titles()
         assert organization_title.text == 'Organization #0'
 
-        self.click_through(sorters[1], (By.CLASS_NAME, 'sorting_desc'))
-        organization_title = page.get_organization_titles()
-        assert organization_title.text == 'Organization #1'
-
         # by number of projects
-        self.click_through(sorters[2], (By.CLASS_NAME, 'sorting_asc'))
+        self.click_through(sorters[1], (By.CLASS_NAME, 'sorting_asc'))
         organization_title = page.get_organization_titles()
         assert organization_title.text == 'Organization #1'
 
-        self.click_through(sorters[2], (By.CLASS_NAME, 'sorting_desc'))
+        self.click_through(sorters[1], (By.CLASS_NAME, 'sorting_desc'))
         organization_title = page.get_organization_titles()
         assert organization_title.text == 'Organization #0'
 
@@ -157,9 +156,9 @@ class OrganizationsTest(FunctionalTest):
         fields = page.get_fields()
         fields['urls'].clear()
         self.click_through(fields['add'], self.BY_ORG_DASH)
-        organization_name = page.get_organization_name_from_dashboard()
+        organization_name = page.get_organization_logo_alt_text()
 
-        assert organization_name.text == 'ORGANIZATION #2'
+        assert organization_name == 'Organization #2'
 
     def test_cancelling_adding_an_organization(self):
         """A superuser can cancel adding an organization

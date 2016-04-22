@@ -8,35 +8,47 @@
 {% block content %}
 
 <div class="row">
-  <h1 class="pull-left">{% trans "Organizations" %}</h1>
-  <a class="btn btn-default pull-right add-org" href="{% url 'organization:add' %}">
-    {% trans "Add" %}
-  </a>
+  <div class="col-md-10">
+    <h1>{% trans "Organizations" %}</h1>
+  </div>
+  <div class="col-md-2">
+    <div class="top-btn pull-right">
+      <a href="{% url 'organization:add' %}" class="btn btn-default add-org">
+        <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
+      </a>
+    </div>
+  </div>
 </div>
 
 <div class="row">
-  <table class="table table-hover datatable" data-paging-type="simple">
-    <thead>
-      <tr>
-        <th class="col-md-2"></th>
-        <th class="col-md-8">{% trans "Organization" %}</th>
-        <th class="col-md-2">{% trans "Projects" %}</th>
+  <div class="col-md-12">
+    <table class="table table-hover datatable" data-paging-type="simple">
+      <thead>
+        <tr>
+          <th class="col-md-9">{% trans "Organization" %}</th>
+          <th class="col-md-3">{% trans "Projects" %}</th>
+        </tr>
+      </thead>
+      {% for org in object_list %}
+      <tr onclick="window.document.location='{% url 'organization:dashboard' slug=org.slug %}';">
+        <td>
+          {% if org.logo %}
+          <div class="org-logo">
+            <img src="{{ org.logo }}" class="org-logo" alt="{{ org.name }}"/>
+          </div>
+          {% endif %}
+          <div class="org-text">
+            <h4>{{ org.name }}</h4>
+            {% if org.description %}
+              <p>{{ org.description }}</p>
+            {% endif %}
+          </div>
+        </td>
+        <td>{{ org.projects.count }}</td>
       </tr>
-    </thead>
-    {% for org in object_list %}
-    <tr onclick="window.document.location='{% url 'organization:dashboard' slug=org.slug %}';">
-      <td>{% if org.logo %}
-        <img src="{{ org.logo }}" style="width: 100%; float: left;" />
-        {% endif %}
-      </td>
-      <td>
-        <h4>{{ org.name }}</h4>
-        {% if org.description %}<p>{{ org.description }}</p>{% endif %}
-      </td>
-      <td>{{ org.projects.count }}</td>
-    </tr>
-    {% endfor %}
-  </table>
+      {% endfor %}
+    </table>
+  </div>
 </div>
 
 {% endblock %}

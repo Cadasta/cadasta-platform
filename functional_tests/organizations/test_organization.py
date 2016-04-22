@@ -66,7 +66,6 @@ class OrganizationTest(FunctionalTest):
                     '-5.1031494140625000 8.1299292850467957))')
         ))
 
-    # Are we viewing the correct organization?
     def test_organization_view(self):
         """A registered user can view an organization's dashboard.
            Org description and users are displayed."""
@@ -84,7 +83,6 @@ class OrganizationTest(FunctionalTest):
         assert "Test User" in info.text
         assert "Username: testuser" in info.text
 
-    # Can I edit the organization?
     def test_edit_organization(self):
         """A registered user can edit an organization's information."""
         LoginPage(self).login('testsuperuser', 'password')
@@ -92,8 +90,7 @@ class OrganizationTest(FunctionalTest):
         page = OrganizationPage(self)
         page.go_to(org.slug)
 
-        edit = page.get_edit_button()
-        self.click_through(edit, (By.CLASS_NAME, 'modal-backdrop'))
+        page.get_edit_button()
         fields = page.get_fields()
 
         assert fields["name"].get_attribute("value") == "Organization #0"
@@ -103,12 +100,11 @@ class OrganizationTest(FunctionalTest):
         fields["name"].clear()
         fields["name"].send_keys("Modified organization name")
         submit = page.get_submit()
-        self.click_through(submit, self.BY_ORG_DASH)
+        self.click_through_close(submit, (By.CLASS_NAME, 'modal-backdrop'))
 
-        name = page.get_organization()
-        assert "MODIFIED ORGANIZATION NAME" in name.text
+        name = page.get_organization_logo_alt_text()
+        assert "Modified organization name" in name
 
-    # Can I archive the organization?
     def test_archiving_organization(self):
         """A registered user can archive/unarchive an organization."""
         LoginPage(self).login('testsuperuser', 'password')
@@ -117,22 +113,20 @@ class OrganizationTest(FunctionalTest):
         page.go_to(org.slug)
 
         archive = page.get_archive_button()
-        assert archive.text == "Archive"
+        assert archive.text == "Archive organization"
+
         self.click_through(archive, self.BY_MODAL_FADE)
         final = page.get_archive_final()
         self.click_through_close(final, self.BY_MODAL_FADE)
         archive = page.get_archive_button()
-        assert archive.text == "Unarchive"
+        assert archive.text == "Unarchive organization"
 
-        archive = page.get_archive_button()
-        assert archive.text == "Unarchive"
         self.click_through(archive, self.BY_MODAL_FADE)
         final = page.get_unarchive_final()
         self.click_through_close(final, self.BY_MODAL_FADE)
         archive = page.get_archive_button()
-        assert archive.text == "Archive"
+        assert archive.text == "Archive organization"
 
-    # Can I get to the users list from here?
     def test_getting_to_the_user_list(self):
         """A registered user can search for an organization's project."""
         LoginPage(self).login('testsuperuser', 'password')
@@ -143,7 +137,6 @@ class OrganizationTest(FunctionalTest):
         users_btn = page.get_users_page()
         self.click_through(users_btn, self.BY_ORG_MEMBERS)
 
-    # Can I get to a project page from here?
     def test_navigating_to_project_page(self):
         """A registered user can edit an organization's information."""
         LoginPage(self).login('testsuperuser', 'password')
@@ -152,11 +145,10 @@ class OrganizationTest(FunctionalTest):
         page.go_to(org.slug)
 
         project = page.get_project()
-        self.click_through(project, (By.CLASS_NAME, "project-overview-header"))
+        self.click_through(project, (By.CLASS_NAME, "main-map"))
         title = page.get_project_title()
-        assert title.text == "Organization #0 Test Project".upper()
+        assert title == "Organization #0 Test Project".upper()
 
-    # New organization:
     def test_new_organization_view(self):
         """An organization without projects has a different view."""
         LoginPage(self).login('testsuperuser', 'password')
@@ -165,11 +157,12 @@ class OrganizationTest(FunctionalTest):
         page.go_to(org.slug)
         # Is there a welcome message?
         welcome = page.get_welcome_message()
-        assert "You're ready to go" in welcome.text
+        assert "You're ready to go".upper() in welcome.text
 
         # Can I add a new project?
         new_proj = page.get_new_project()
         self.click_through(new_proj, self.BY_NEW_PROJ)
+        self.screenshot()
 
         # Can I add new members? (currently not working)
         page = OrganizationPage(self)
