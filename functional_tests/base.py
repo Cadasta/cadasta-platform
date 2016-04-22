@@ -24,7 +24,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     BY_MODAL_FADE = (By.CSS_SELECTOR, "div.modal.fade.in")
     BY_ORG_MEMBERS = (By.CLASS_NAME, 'members-org-name')
     BY_MEMBER_PAGE = (By.CLASS_NAME, 'org-member-edit')
-    BY_ORG_DASH = (By.CLASS_NAME, 'dashboard-org-name')
+    BY_ORG_DASH = (By.CLASS_NAME, 'org-logo')
     BY_NEW_PROJ = (By.CLASS_NAME, 'new-project-page')
 
     @classmethod
@@ -110,7 +110,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def organization_name(self, f):
         """Find organization name in dashboard"""
         return self.browser.find_element_by_xpath(
-         "//h1[contains(@class, '{}')]".format(f))
+         "//div[contains(@class, '{}')]".format(f))
 
     def wait_for(self, function_with_assertion, timeout=DEFAULT_WAIT):
         """Wait for an assertion to become true."""

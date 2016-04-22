@@ -11,6 +11,13 @@
 @import "bootstrap-sass/assets/stylesheets/bootstrap/modals";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/tables";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/glyphicons";
+@import "bootstrap-sass/assets/stylesheets/bootstrap/dropdowns";
+@import "wizard";
+@import "toggle";
+@import "geolocate";
+
+/* =Fonts
+-------------------------------------------------------------- */
 
 @font-face {
   font-family: 'roboto';
@@ -35,28 +42,25 @@
   font-style: normal;
 }
 
-@import "wizard";
-@import "toggle";
-@import "geolocate";
-
 /* =Basics
 -------------------------------------------------------------- */
 
 html, body {
   height: 100%;
   overflow: auto;
+  background: #f1f2f3;
 }
 
 #cadasta {
-  padding-top: 120px;
+  padding-top: 80px;
   margin-bottom: 30px;
 }
 
 .wrapper {
-  padding-bottom: 40px;
+  padding-bottom: 80px;
 }
 
-h1 {
+h1, h2 {
   font-family: 'steelfish', Georgia, Arial, sans-serif;
   color: $brand-primary;
   text-transform: uppercase;
@@ -66,6 +70,7 @@ h1 {
 label {
   font-weight: 400;
 }
+
 a {
   outline: none;
 }
@@ -79,79 +84,303 @@ input::-moz-focus-inner {
 
 header {
   width: 100%;
-  height: 100px;
-  background-color: #2069b3;
+  height: 80px;
+  background-color: $brand-primary;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 999;
   overflow: hidden;
-}
-header h1#logo {
-  display: inline-block;
-  line-height: 100px;
-  font-size: 29px;
-  margin: 0 auto;
-  padding: 0;
-}
-header #logo img {
-  height: 29px;
-  width: 200px;
-}
-/* for future resizing header
-header.smaller {
-  height: 75px;
-}
-header.smaller h1#logo {
-  height: 28px;
-  line-height: 40px;
-  font-size: 24px;
-}*/
-header nav {
-  display: inline-block;
-  float: right;
-}
-header nav a {
-  line-height: 80px;
-  margin-left: 20px;
-  color: #eee;
-  font-weight: 700;
-  font-size: 18px;
-}
-header nav a:hover {
-  color: white;
+  h1#logo {
+    display: inline-block;
+    line-height: 100px;
+    font-size: 22px;
+    margin: 0 auto;
+    padding: 0;
+  }
+  #logo img {
+    height: 16px;
+    width: 110px;
+  }
+  nav {
+    display: inline-block;
+    float: right;
+    margin-right: 40px;
+    li.active {
+      border-top: solid 4px $brand-gold;
+    }
+    a {
+      line-height: 100px;
+      color: #eee;
+      font-size: 13px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+    a:hover {
+      color: white;
+    }
+  }
 }
 
 /* =User links & links in registration
 -------------------------------------------------------------- */
 
-.user-links ul, .reg-links ul {
+.reg-links {
+  ul {
   margin-top: 36px;
-}
-.reg-links ul {
   border: solid 1px #eee;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
-}
-.reg-links-divider {
-   border-right: solid 1px #eee;
+  }
+  .reg-links-divider {
+     border-left: solid 1px #eee;
+  }
+  .list-inline > li {
+    padding: 0;
+    a {
+      padding: 4px 20px;
+      color: #fff;
+      font-size: 12px;
+      display: block;
+      text-decoration: none;
+      transition: all 0.3s ease 0s;
+    }
+    a:hover {
+      background: #013c78;
+      text-decoration: none;
+    }
+  }
+  .list-inline > li:first-child {
+    border-right: solid 1px #eee;
+  }
 }
 
-.reg-links .list-inline > li {
-  padding: 0;
+/* =Inner Header
+-------------------------------------------------------------- */
+
+.inner-header {
+  background-color: $gray-light;
+  height: 82px;
+  border-bottom: solid 1px #fff;
+  padding-top: 12px;
+  padding-right: 30px;
+  position: fixed;
+  top: 80px;
+  right: 0;
+  left: 0;
+  z-index: 998;
+  width: 100%;
+  a.index-link {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 0;
+    color: #ccc;
+    position: relative;
+    top: 8px;
+    display: inline-block;
+  }
+  div.org-logo {
+    display: inline-block;
+    margin-left: 30px;
+    height: 50px;
+    position: relative;
+    float: none;
+    background: transparent;
+    padding: 0;
+  }
+  h2 {
+    display: inline-block;
+    margin-left: 10px;
+    margin-top: 0;
+    position: relative;
+    top: 8px;
+    border-left: solid 1px #d4d4d4;
+    padding-left: 30px;
+  }
+  .top-btn {
+    margin-top: 14px;
+  }
+  .btn-add {
+    margin-right: 14px;
+  }
+  .icon {
+    margin-top: 0;
+  }
 }
-.user-links .list-inline li a, .reg-links .list-inline li a {
-  padding: 6px 20px;
-  color: #fff;
-  font-size: 13px;
+
+/* =Sidebar and inner navigation
+-------------------------------------------------------------- */
+
+.sidebar {
+  position: fixed;
+  top: 158px;
+  bottom: 0;
+  left: 0;
+  z-index: 900;
   display: block;
-  text-decoration: none;
-  transition: all 0.3s ease 0s;
+  padding: 0 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: $gray-light;
+  border-right: 1px solid #eee;
 }
-.reg-links li a:hover {
-  background: #013c78;
-  text-decoration: none;
+
+.nav-sidebar {
+  margin-right: -21px;
+  margin-bottom: 20px;
+  margin-left: -20px;
+  > li {
+    position: relative;
+    display: block;
+    height: 60px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-top: 20px;
+    border-bottom: solid 1px #ddd;
+  }
+  > .active {
+  background-color: #d4d4d4;
+  border-left: solid 4px $brand-gold;
+  }
+}
+
+/* =Main content to right of sidebar
+-------------------------------------------------------------- */
+
+.main {
+  z-index: 800;
+  background: #fff;
+  position: fixed;
+  top: 158px;
+  left: 0;
+  bottom: 0;
+  z-index: 900;
+  display: block;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+  .col-map { // for map to expand need height
+    height: 100%;
+  }
+  h3 {
+    display: inline-block;
+  }
+  h4 {
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 30px;
+    margin-bottom: 16px;
+  }
+  .btn-view {
+    text-align: center;
+    padding: 10px;
+    .btn {
+      min-width: 160px;
+    }
+  }
+}
+
+.main-map > .row { // for map to expand need height
+  height: 100%;
+}
+
+/* =Map in main content
+-------------------------------------------------------------- */
+
+#project-map {
+  height: 100%;
+  min-height: 650px;
+}
+
+/* = Text and Detail in main content
+-------------------------------------------------------------- */
+
+.col-text { // left area of main
+  padding: 0 50px;
+  h3 {
+    letter-spacing: -0.5px;
+  }
+}
+
+.col-detail { // right column of main
+  min-height: 650px;
+  padding: 30px 50px 20px 30px;
+  .desc {
+    padding-bottom: 30px;
+    margin-bottom: 14px;
+    border-bottom: 6px solid #dbe1e5;
+  }
+  .members p {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #dbe1e5;
+  }
+}
+
+.org-detail { // right column of main on organization overview
+  background: $gray-light;
+}
+
+/* =Index views
+-------------------------------------------------------------- */
+
+.table.dataTable {
+  font-size: 13px;
+  background: #fff;
+  border-bottom: 3px solid #dbe1e5;
+  h4 {
+    font-weight: bold;
+    margin-top: 0;
+  }
+  > thead {
+    background: #8f939c;
+    color: #fff;
+    font-size: 80%;
+    > tr > th {
+      border-bottom: 0;
+      border-right: solid 1px #ccc;
+      font-weight: 300;
+    }
+  }
+  > tbody  > tr > td {
+      padding: 20px;
+  }
+}
+
+/* =Organizations
+-------------------------------------------------------------- */
+
+div.org-logo {
+  float: left;
+  padding: 10px;
+  background: #fff;
+}
+
+.org-text {
+  margin-left: 160px;
+}
+
+/* =Img sizing
+-------------------------------------------------------------- */
+
+#dashboard-map {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 80px;
+  bottom: 30px;
+}
+
+/* =Img sizing
+-------------------------------------------------------------- */
+
+img.org-logo, img#org-logo {
+  max-width: 120px;
+  max-height: 50px;
 }
 
 /* =Narrow form
@@ -166,24 +395,33 @@ header nav a:hover {
   -webkit-border-radius: 5px;
   padding: 30px 40px;
   margin-top: 30px;
+  h1 {
+    text-align: center;
+    margin: 4px auto 24px;
+  }
+  h5 {
+    border-top: 1px dashed #ddd;
+    padding-top: 20px;
+  }
+  .btn-block {
+    margin-bottom: 20px;
+  }
+  .checkbox.pull-left {
+    margin-top: 0;
+  }
 }
 
-.form-narrow h1 {
-  text-align: center;
-  margin: 4px auto 24px;
-}
+/* =Buttons
+-------------------------------------------------------------- */
 
-.form-narrow h5 {
-  border-top: 1px dashed #ddd;
-  padding-top: 20px;
-}
-
-.form-narrow .btn-block {
-  margin-bottom: 20px;
-}
-
-.form-narrow .checkbox.pull-left {
-  margin-top: 0;
+.top-btn {
+  margin-top: 20px;
+  .btn {
+    min-width: 100px;
+  }
+  .btn-rt {
+    min-width: 20px;
+  }
 }
 
 /* =Alerts
@@ -210,98 +448,52 @@ footer {
   font-size: 11px;
   white-space: nowrap;
   padding-top: 4px;
+  z-index: 910;
+  .list-inline {
+    display: inline-block;
+  }
+  form {
+    display: inline-block;
+    padding-left: 24px;
+    color: rgb(21, 51, 103);
+  }
+  .list-inline > li {
+    padding-left: 24px;
+    text-align: right;
+  }
 }
 
-footer .list-inline {
-  display: inline-block;
-}
-
-footer form {
-  display: inline-block;
-  padding-left: 24px;
-  color: rgb(21, 51, 103);
-}
-
-footer .list-inline > li {
-  padding-left: 24px;
-  text-align: right;
-}
-
-/* =Footer
+/* =Icons
 -------------------------------------------------------------- */
 
-div.project-overview-header {
-  background-color: #ddd;
-
-  a.index-link {
-    background-color: #bbb;
-    padding: 10px;
-    border: 1px solid;
-    color: #666;
-  }
-
-  img.org-logo {
-    margin-bottom: 10px;
-    margin-left: 20px;
-    padding-right: 10px;
-    border-right: 1px solid grey;
-  }
-
-  div.project-name {
-    display: inline-block;
-    font-family: 'steelfish', Georgia, Arial, sans-serif;
-    color: $brand-primary;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 29px;
-    margin-left: 20px;
-    margin-top: 10px;
-  }
-
-  span.menus {
-    margin-top: 10px;
-    margin-right: 10px;
-  }
+@mixin sprite-position($row, $col) {
+	background-position: (-1 * $icon-width * ($col - 1) ) (-1 * $icon-height * ($row - 1));
 }
 
-div.project-overview-button-bar {
-  background-color: #eee;
+.icon {
+	float: left;
+	margin: 10px;
+    background-image: url('/static/img/sprite.png');
+    background-size: $sprite-cols*$icon-width $sprite-rows*$icon-height;
+    width: $icon-width;
+    height: $icon-height;
+    display: block;
+    &.vertically-centered {
+		margin-top: -1 * ($icon-height / 2);
+    }
 }
 
-div.project-overview-button {
-  padding-top: 20px;
-  width: 100%;
-  height: 0;
-  padding-bottom: 90%;
-  border-bottom: 1px solid;
-  text-align: center;
-  font-size: 75%;
-  span.glyphicon {
-    font-size: 300%;
-  }
+.kabob-icon {
+	@include sprite-position(1, 1);
 }
 
-div.project-overview-button.active {
-  background-color: #ddd;
-}
-
-div.project-overview-content {
-  margin-top: 10px;
-}
-
-div.project-overview-text {
-  margin-bottom: 20px;
-  border-bottom: 5px solid #ccc;
-}
+/* =CLEAN UP BELOW
+-------------------------------------------------------------- */
 
 div.project-getting-started {
   p.larger {
     font-size: 125%;
   }
-}
-
-div#project-overview-map {
-  height: 650px;
 }
 
 div#id_extents_location_map {
@@ -310,20 +502,4 @@ div#id_extents_location_map {
 
 label[for="id_extents-location"] {
   display: none;
-}
-
-img.org-logo-hidden {
-  display: none;
-}
-
-img#org-logo {
-  width: 120px;
-}
-
-div#dashboard-map {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100px;
-  bottom: 30px;
 }

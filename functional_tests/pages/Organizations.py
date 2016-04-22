@@ -23,14 +23,11 @@ class OrganizationsPage(Page):
     def get_th(self, xpath):
         return self.get_table_head_row("//th" + xpath)
 
-    def get_id_sorter(self):
+    def get_name_sorter(self):
         return self.get_th("[1]")
 
-    def get_name_sorter(self):
-        return self.get_th("[2]")
-
     def get_project_sorter(self):
-        return self.get_th("[3]")
+        return self.get_th("[2]")
 
     def get_table_body(self, xpath):
         return self.test.table_body('DataTables_Table_0', xpath)
@@ -83,8 +80,12 @@ class OrganizationsPage(Page):
             'add':         self.get_submit()
         }
 
-    def get_organization_name_from_dashboard(self):
-        return self.test.organization_name('dashboard-org-name')
+    def get_organization(self):
+        return self.test.organization_name("org-logo")
+
+    def get_organization_logo_alt_text(self):
+        return self.get_organization().find_element_by_xpath(
+            "//img[@class='org-logo']").get_attribute('alt')
 
     def try_submit(self, err=None, ok=None):
         fields = self.get_fields()

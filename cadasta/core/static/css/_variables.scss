@@ -3,7 +3,9 @@
 //== Colors
 
 $gray-dark:              #595a5c;  // Cadasta gray
+$gray-light:             #f1f2f3;  // Cadasta light gray
 $brand-primary:          #2e51a3;  // Cadasta blue
+$brand-gold:             #edaa00;  // Cadasta gold
 
 //== Scaffolding
 
@@ -27,7 +29,11 @@ $btn-default-border:             #009975;
 
 //== Icons
 
-$icon-font-path: '/static/fonts/bootstrap/';
+$icon-font-path:                '/static/fonts/bootstrap/';
+$icon-width:                    32px;
+$icon-height:                   32px;
+$sprite-rows:                   42;
+$sprite-cols:                   3;
 
 //== Modals
 

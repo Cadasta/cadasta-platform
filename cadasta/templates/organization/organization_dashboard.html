@@ -9,107 +9,160 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-sm-8">
-    <h1 class="dashboard-org-name">{{ object.name }}</h1>
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-8">
-    <h2>{% trans "Dashboard" %}</h2>
-  </div>
-  <div class="col-sm-4">
-    <a class="edit" href="{% url 'organization:edit' object.slug %}">
-      {% trans "Edit" %}
-    </a> |
-    {% if object.archived %}
-    <a class="archive" href="#unarchive_confirm" data-toggle="modal">
-      {% trans "Unarchive" %}
-    </a>
-    {% else %}
-    <a class="archive" href="#archive_confirm" data-toggle="modal">
-      {% trans "Archive" %}
-    </a>
-    {% endif %}
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-sm-8 org-proj-list">
-    {% if object.projects.all  %}
-    <table class="table table-hover datatable" data-paging-type="simple">
-      <thead>
-        <tr>
-          <th class="col-md-6">{% trans "Project" %}</th>
-          <th class="col-md-2">{% trans "Country" %}</th>
-          <th class="col-md-2">{% trans "Last updated" %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for prj in object.projects.all %}
-        <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.project_slug %}';">
-          <td>{{ prj.name }}</td>
-          <td>{{ prj.country }}</td>
-          <td>{{ prj.last_updated }}</td>
-        </tr>
-        <div>{{ prj.name }}</div>
-        {% empty %}
-
-        {% endfor %}
-      </tbody>
-    </table>
-    {% else %}
-    <h4>{% trans "You're ready to go" %}</h4>
-    <p>
-      {% trans "You have successfully created your organization." %}
-      {% trans "What would you like to do next?" %}
-    </p>
-    <p>
-      <a href="{% url 'project:add' %}" class="btn btn-default add-new-project">
-        {% trans "Add new project" %}
+  <div class="col-md-12">
+    <div class="inner-header">
+      <a class="index-link" href="{% url 'organization:list' %}">
+        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
       </a>
-      <a href="#" class="btn btn-default add-members">
-        {% trans "Add members" %}
-      </a>
-    </p>
-    {% endif %}
-  </div>
-  <div class="col-sm-4 org-desc-members">
-    {{ object.description }}
-
-    <h4>{% trans "Members" %}</h4>
-    {% for user in object.users.all %}
-    <b>{{ user.get_full_name }}</b><br>
-    {% trans "Username" %}: {{ user.username }}
-    <hr>
-    {% endfor %}
-    <a href="{% url 'organization:members' object.slug %}"
-       class="btn btn-default view-all">
-      {% trans "View all" %}
-    </a>
+      <div class="org-logo">
+        <img src="{{ object.logo }}" alt="{{ object.name }}" class="org-logo" />
+      </div>
+      <div class="top-btn pull-right">
+        <!-- More options menu -->
+        <div class="dropdown pull-right btn-more">
+          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+            <span class="icon kabob-icon"></span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="dLabel">
+            <li><a class="edit" href="{% url 'organization:edit' object.slug %}">{% trans "Edit organization" %}</a></li>
+            <li role="separator" class="divider"></li>
+            <li>
+              {% if object.archived %}
+              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
+              {% else %}
+              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+        <!-- Split add button -->
+        <div class="btn-group pull-right btn-add">
+          <button type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add project" %}
+          </button>
+          <button type="button" class="btn btn-default btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Add</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#">Add new member</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-md-1 sidebar">
+    <ul class="nav nav-sidebar">
+      <li class="active">
+        {% trans "Overview" %}
+      </li>
+      <li>
+        {% trans "Projects" %}
+      </li>
+      <li>
+        {% trans "Members" %}
+      </li>
+      <li>
+        {% trans "Reports" %}
+      </li>
+      <li>
+        {% trans "Activity" %}
+      </li>
+    </ul>
+  </div>
+  <!-- /.sidebar -->
+  <!-- Main content -->
+  <div class="col-md-11 col-md-offset-1 main">
+    <div class="row">
+      <!-- Left column text  -->
+      <div class="col-md-8 col-text">
+        <h3>{% trans "Overview" %}</h3>
+        <div class="project-list">
+          {% if object.projects.all  %}
+          <table class="table table-hover datatable" data-paging-type="simple">
+            <thead>
+              <tr>
+                <th class="col-md-6">{% trans "Project" %}</th>
+                <th class="col-md-2">{% trans "Country" %}</th>
+                <th class="col-md-2">{% trans "Last updated" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for prj in object.projects.all %}
+              <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.project_slug %}';">
+                <td>{{ prj.name }}</td>
+                <td>{{ prj.country }}</td>
+                <td>{{ prj.last_updated }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <!-- Starter text -->
+          <h4>{% trans "You're ready to go" %}</h4>
+          <p>
+            {% trans "You have successfully created your organization." %}
+            {% trans "What would you like to do next?" %}
+          </p>
+          <p>
+            <a href="{% url 'project:add' %}" class="btn btn-default" role="button">
+              {% trans "Add new project" %}
+            </a>
+            <a href="#" class="btn btn-default" role="button">
+              {% trans "Add members" %}
+            </a>
+          </p>
+          {% endif %}
+        </div>
+
+      </div>
+      <!-- /.col-text -->
+      <!-- Right column detail  -->
+      <div class="col-md-4 col-detail org-detail">
+        <section class="desc">
+          <p>{{ object.description }}<p>
+        </section>
+        <section class="members">
+          <h4>{% trans "Members" %}</h4>
+          {% for user in object.users.all %}
+          <p>
+            <b>{{ user.get_full_name }}</b><br />{% trans "Username" %}: {{ user.username }}
+          </p>
+          {% endfor %}
+          <div class="btn-view">
+            <a href="{% url 'organization:members' object.slug %}" class="btn btn-default" role="button">
+              {% trans "View all" %}
+            </a>
+          </div>
+        </section>
+      </div>
+      <!-- /.col-detail -->
+    </div>
+  </div>
+  <!-- /.main -->
 </div>
 
 <div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"
-                aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">{% trans "Archive organization" %}</h4>
       </div>
       <div class="modal-body">
-        <p>
-          {% trans "Are you sure you want to archive this organization?" %}
-        </p>
+        <p>{% trans "Are you sure you want to archive this organization?" %}</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary archive-final">
+        <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary archive-final" role="button">
           {% trans "Archive" %}
         </a>
       </div>
@@ -121,8 +174,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close-u" data-dismiss="modal"
-                aria-label="Close">
+        <button type="button" class="close-u" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">{% trans "Unarchive organization" %}</h4>
@@ -136,7 +188,7 @@
         <button type="button" class="btn btn-link cancel-u" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:unarchive' object.slug %}"  class="btn btn-primary unarchive-final">
+        <a href="{% url 'organization:unarchive' object.slug %}"  class="btn btn-primary unarchive-final" role="button">
           {% trans "Unarchive" %}
         </a>
       </div>
