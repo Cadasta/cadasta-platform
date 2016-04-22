@@ -16,17 +16,13 @@ before_install:
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
 
 install:
-  - pip install -r requirements/common.txt
-  - pip install -r requirements/dev.txt
-  - nvm install 4.0.0
-  - nvm alias default 4.0.0
+  - pip install tox==2.3.1
 
 before_script:
   - export DJANGO_SETTINGS_MODULE=config.settings.travis
   - psql template1 postgres -c 'create extension hstore;'
   - psql -c 'create database cadasta;' -U postgres
   - psql -U postgres -d cadasta -c "create extension postgis;"
-  - python cadasta/manage.py migrate
   - mkdir cadasta/geography/data
   - export WBDATA=TM_WORLD_BORDERS-0.3.zip
   - export DATADIR=cadasta/geography/data
