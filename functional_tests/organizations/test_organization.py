@@ -7,6 +7,7 @@ from organization.tests.factories import OrganizationFactory, ProjectFactory
 from core.tests.factories import PolicyFactory, RoleFactory
 from organization.models import Organization
 from selenium.webdriver.common.by import By
+from tutelary.models import Policy
 
 
 class OrganizationTest(FunctionalTest):
@@ -25,7 +26,10 @@ class OrganizationTest(FunctionalTest):
 
         PolicyFactory.set_directory('../cadasta/config/permissions')
         pols = {}
-        for pol in ['default', 'superuser', 'org-admin', 'project-manager',
+        # Default policy is installed automatically when first user is
+        # created.
+        pols['default'] = Policy.objects.get(name='default')
+        for pol in ['superuser', 'org-admin', 'project-manager',
                     'data-collector', 'project-user']:
             pols[pol] = PolicyFactory.create(name=pol, file=pol + '.json')
         roles = {}

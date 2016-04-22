@@ -10,6 +10,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory, RoleFactory
 from organization.tests.factories import OrganizationFactory
 from organization.models import OrganizationRole
+from tutelary.models import Policy
 
 
 class PageListTest(FunctionalTest):
@@ -44,9 +45,9 @@ class PageListTest(FunctionalTest):
 
         pols = {}
         PolicyFactory.set_directory('../cadasta/config/permissions')
-        pols['default'] = PolicyFactory.create(
-            name='default',   file='default.json'
-        )
+        # Default policy is installed automatically when first user is
+        # created.
+        pols['default'] = Policy.objects.get(name='default')
         pols['superuser'] = PolicyFactory.create(
             name='superuser', file='superuser.json'
         )

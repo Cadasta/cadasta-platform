@@ -61,10 +61,8 @@ class RegisterFormTest(TestCase):
 
 class ProfileFormTest(TestCase):
     def test_update_user(self):
-        user = UserFactory.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk'
-        })
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
@@ -80,10 +78,8 @@ class ProfileFormTest(TestCase):
 
     def test_update_user_with_existing_username(self):
         UserFactory.create(username='existing')
-        user = UserFactory.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk'
-        })
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
         data = {
             'username': 'existing',
             'email': 'john@beatles.uk',
@@ -95,10 +91,8 @@ class ProfileFormTest(TestCase):
 
     def test_update_user_with_existing_email(self):
         UserFactory.create(email='existing@example.com')
-        user = UserFactory.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk'
-        })
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
         data = {
             'username': 'imagine71',
             'email': 'existing@example.com',

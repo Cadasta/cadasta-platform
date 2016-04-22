@@ -252,7 +252,9 @@ class ProjectList(PermissionRequiredMixin, ProjectQuerySetMixin,
     model = Project
     template_name = 'organization/project_list.html'
     permission_required = 'project.list'
-    permission_filter_queryset = ('project.view',)
+    permission_filter_queryset = (lambda self, view, p: ('project.view',)
+                                  if p.access == 'public'
+                                  else ('project.view_private',))
 
     def get_context_data(self, **kwargs):
         context = super(ProjectList, self).get_context_data(**kwargs)

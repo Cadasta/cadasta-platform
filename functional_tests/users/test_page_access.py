@@ -4,6 +4,7 @@ from pages.Users import UsersPage
 from pages.Login import LoginPage
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory, RoleFactory
+from tutelary.models import Policy
 
 
 class PageAccessTest(FunctionalTest):
@@ -26,9 +27,9 @@ class PageAccessTest(FunctionalTest):
 
         pols = {}
         PolicyFactory.set_directory('../cadasta/config/permissions')
-        pols['default'] = PolicyFactory.create(
-            name='default',   file='default.json'
-        )
+        # Default policy is installed automatically when first user is
+        # created.
+        pols['default'] = Policy.objects.get(name='default')
         pols['superuser'] = PolicyFactory.create(
             name='superuser', file='superuser.json'
         )

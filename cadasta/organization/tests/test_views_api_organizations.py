@@ -23,7 +23,7 @@ class OrganizationListAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -128,7 +128,7 @@ class OrganizationCreateAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy-1',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -140,12 +140,13 @@ class OrganizationCreateAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy-2',
             body=json.dumps(clauses))
         self.unauth_user = UserFactory.create()
         assign_user_policies(self.unauth_user, policy)
 
-    def _post(self, data, user=None, status=None, count=None):
+    def _post(self, data, user=None, status=None, count=None,
+              check_admin=False):
         if user is None:
             user = self.user
         url = '/v1/organizations/'
@@ -157,11 +158,16 @@ class OrganizationCreateAPITest(TestCase):
             assert response.status_code == status
         if count is not None:
             assert Organization.objects.count() == count
+        if check_admin:
+            org = Organization.objects.get(pk=content['id'])
+            assert OrganizationRole.objects.get(
+                organization=org, user=user
+            ).admin
         return content
 
     def test_create_valid_organization(self):
         data = {'name': 'Org Name', 'description': 'Org description'}
-        self._post(data, status=201, count=1)
+        self._post(data, status=201, count=1, check_admin=True)
 
     def test_create_invalid_organization(self):
         data = {'description': 'Org description'}
@@ -185,7 +191,7 @@ class OrganizationDetailAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy-1',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -197,7 +203,7 @@ class OrganizationDetailAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy-2',
             body=json.dumps(clauses))
         self.unauth_user = UserFactory.create()
         assign_user_policies(self.unauth_user, policy)
@@ -227,13 +233,13 @@ class OrganizationDetailAPITest(TestCase):
         return content
 
     def test_get_organization(self):
-        org = OrganizationFactory.create(**{'slug': 'org'})
+        org = OrganizationFactory.create(slug='org')
         content = self._get(org.slug, status=200)
         assert content['id'] == org.id
         assert 'users' in content
 
     def test_get_organization_with_unauthorized_user(self):
-        org = OrganizationFactory.create(**{'slug': 'org'})
+        org = OrganizationFactory.create(slug='org')
         content = self._get(org.slug, user=AnonymousUser(), status=403)
         assert content['detail'] == PermissionDenied.default_detail
 
@@ -242,21 +248,21 @@ class OrganizationDetailAPITest(TestCase):
         assert content['detail'] == "Organization not found."
 
     def test_valid_update(self):
-        org = OrganizationFactory.create(**{'slug': 'org'})
+        org = OrganizationFactory.create(slug='org')
         data = {'name': 'Org Name'}
         self._patch(org.slug, data, status=200)
         org.refresh_from_db()
         assert org.name == data.get('name')
 
     def test_update_with_unauthorized_user(self):
-        org = OrganizationFactory.create(**{'name': 'Org name', 'slug': 'org'})
+        org = OrganizationFactory.create(name='Org name', slug='org')
         data = {'name': 'Org Name'}
         self._patch(org.slug, data, user=AnonymousUser(), status=403)
         org.refresh_from_db()
         assert org.name == 'Org name'
 
     def test_invalid_update(self):
-        org = OrganizationFactory.create(**{'name': 'Org name', 'slug': 'org'})
+        org = OrganizationFactory.create(name='Org name', slug='org')
         data = {'name': ''}
         content = self._patch(org.slug, data, status=400)
         org.refresh_from_db()
@@ -264,28 +270,28 @@ class OrganizationDetailAPITest(TestCase):
         assert content['name'][0] == 'This field may not be blank.'
 
     def test_archive(self):
-        org = OrganizationFactory.create(**{'name': 'Org name', 'slug': 'org'})
+        org = OrganizationFactory.create(name='Org name', slug='org')
         data = {'archived': True}
         self._patch(org.slug, data, status=200)
         org.refresh_from_db()
         assert org.archived
 
     def test_archive_with_unauthorized_user(self):
-        org = OrganizationFactory.create(**{'slug': 'org'})
+        org = OrganizationFactory.create(slug='org')
         data = {'archived': True}
         self._patch(org.slug, data, user=self.unauth_user, status=403)
         org.refresh_from_db()
         assert not org.archived
 
     def test_unarchive(self):
-        org = OrganizationFactory.create(**{'slug': 'org', 'archived': True})
+        org = OrganizationFactory.create(slug='org', archived=True)
         data = {'archived': False}
         self._patch(org.slug, data, status=200)
         org.refresh_from_db()
         assert not org.archived
 
     def test_unarchive_unauthorized_user(self):
-        org = OrganizationFactory.create(**{'slug': 'org', 'archived': True})
+        org = OrganizationFactory.create(slug='org', archived=True)
         data = {'archived': False}
         self._patch(org.slug, data, user=self.unauth_user, status=403)
         org.refresh_from_db()
@@ -303,7 +309,7 @@ class OrganizationUsersAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
@@ -391,7 +397,7 @@ class OrganizationUsersDetailAPITest(TestCase):
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-policy',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)

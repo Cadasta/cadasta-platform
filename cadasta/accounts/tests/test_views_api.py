@@ -103,11 +103,9 @@ class AccountSignupTest(TestCase):
 
 class AccountLoginTest(TestCase):
     def setUp(self):
-        self.user = UserFactory.create(**{
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'password': 'iloveyoko79'
-        })
+        self.user = UserFactory.create(username='imagine71',
+                                       email='john@beatles.uk',
+                                       password='iloveyoko79')
 
     def _post(self, data, status=None, token=None):
         url = '/v1/account/login/'

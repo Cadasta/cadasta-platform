@@ -1,10 +1,16 @@
 from datetime import datetime, timezone, timedelta
+from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.contrib.auth.models import AbstractUser
+from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
 
 from .manager import UserManager
+
+
+PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 
 def now_plus_48_hours():
@@ -30,3 +36,18 @@ class User(AbstractUser):
                    ('user.update',
                     {'error_message':
                      _("You don't have permission to update user details")})]
+
+
+@receiver(models.signals.post_save, sender=User)
+def assign_default_policy(sender, instance, **kwargs):
+    try:
+        policy = Policy.objects.get(name='default')
+    except Policy.DoesNotExist:
+        policy = Policy.objects.create(
+            name='default',
+            body=open(PERMISSIONS_DIR + 'default.json').read()
+        )
+    assigned_policies = instance.assigned_policies()
+    if policy not in assigned_policies:
+        assigned_policies.insert(0, policy)
+    instance.assign_policies(*assigned_policies)
