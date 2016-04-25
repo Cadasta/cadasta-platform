@@ -9,7 +9,7 @@ Install for development
 
 Install:
 
-- `VirtualBox <https://www.virtualbox.org/`_
+- `VirtualBox <https://www.virtualbox.org/>`_
 - `Vagrant <https://www.vagrantup.com/>`_
 - `Ansible <http://www.ansible.com/>`_ (version 2: install with PIP for a recent version)
 
