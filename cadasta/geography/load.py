@@ -4,22 +4,20 @@ from .models import WorldBorder
 
 
 world_mapping = {
-    'fips': 'FIPS',
-    'iso2': 'ISO2',
-    'iso3': 'ISO3',
-    'un': 'UN',
+    'fips': 'FIPS_10_',
+    'iso2': 'ISO_A2',
+    'iso3': 'ISO_A3',
+    'un': 'UN_A3',
     'name': 'NAME',
-    'area': 'AREA',
-    'pop2005': 'POP2005',
-    'region': 'REGION',
+    'pop_est': 'POP_EST',
+    'region': 'REGION_UN',
     'subregion': 'SUBREGION',
-    'lon': 'LON',
-    'lat': 'LAT',
     'mpoly': 'MULTIPOLYGON',
 }
 
-world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         'data', 'TM_WORLD_BORDERS-0.3.shp'))
+world_shp = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), 'data', 'ne_10m_admin_0_countries.shp'
+))
 
 
 def run(verbose=True):
