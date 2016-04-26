@@ -49,7 +49,7 @@
     {% render_field form.password class+="form-control input-lg" placeholder="" %}
   </div>
 
-  <div class="small">
+  <div class="small pull-right">
     <a href="{% url 'account_reset_password' %}">
       {% trans "Forgotten password?" %}
     </a>
@@ -67,7 +67,7 @@
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
   <button name="sign-in" type="submit"
-          class="btn btn-default btn-lg btn-block text-uppercase">
+          class="btn btn-primary btn-lg btn-block text-uppercase">
     {% trans "Sign In" %}
   </button>
 
@@ -76,5 +76,7 @@
     <a href="{% url 'account_signup' %}">Register here</a>
   </p>
 </form>
+
+<div class="tinted-bg"></div>
 
 {% endblock %}

@@ -22,7 +22,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     BY_ALERT = (By.CLASS_NAME, 'alert')
     BY_MODAL = (By.CLASS_NAME, 'modal-content')
     BY_MODAL_FADE = (By.CSS_SELECTOR, "div.modal.fade.in")
-    BY_ORG_MEMBERS = (By.CLASS_NAME, 'members-org-name')
+    BY_ORG_MEMBERS = (By.CLASS_NAME, 'page-title')
     BY_MEMBER_PAGE = (By.CLASS_NAME, 'org-member-edit')
     BY_ORG_DASH = (By.CLASS_NAME, 'org-logo')
     BY_NEW_PROJ = (By.CLASS_NAME, 'new-project-page')

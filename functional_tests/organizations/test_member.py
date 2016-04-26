@@ -8,6 +8,7 @@ from core.tests.factories import PolicyFactory, RoleFactory
 from organization.models import Organization
 from tutelary.models import Policy
 
+from selenium.webdriver.common.by import By
 
 class MemberTest(FunctionalTest):
     def setUp(self):
@@ -109,13 +110,16 @@ class MemberTest(FunctionalTest):
         page = MemberPage(self)
         page.go_to(org.slug)
 
-        remove = page.get_button("remove")
+        remove = page.get_remove_button()
         self.click_through(remove, self.BY_MODAL_FADE)
-        confirm = page.get_link("confirm")
+        confirm = page.get_confirm_button()
         self.click_through(confirm, self.BY_ORG_MEMBERS)
 
-        members = page.get_members_row('')
-        assert "Test User" not in members.text
+        page_title = page.get_members_title()
+        assert page_title == "Members".upper()
+
+        members = page.get_members_row('').text
+        assert "Test User" not in members
 
     # Can I change their permissions on a project?
     def test_changing_member_project_permissions(self):

@@ -37,10 +37,10 @@
         </div>
         <!-- Split add button -->
         <div class="btn-group pull-right btn-add">
-          <button type="button" class="btn btn-default">
+          <button type="button" class="btn btn-primary">
             <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add project" %}
           </button>
-          <button type="button" class="btn btn-default btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
             <span class="sr-only">Toggle Add</span>
           </button>
@@ -80,7 +80,7 @@
     <div class="row">
       <!-- Left column text  -->
       <div class="col-md-8 col-text">
-        <h3>{% trans "Overview" %}</h3>
+        <h2 class="page-title">{% trans "Overview" %}</h2>
         <div class="project-list">
           {% if object.projects.all  %}
           <table class="table table-hover datatable" data-paging-type="simple">
@@ -109,10 +109,10 @@
             {% trans "What would you like to do next?" %}
           </p>
           <p>
-            <a href="{% url 'project:add' %}" class="btn btn-default" role="button">
+            <a href="{% url 'project:add' %}" class="btn btn-primary" role="button">
               {% trans "Add new project" %}
             </a>
-            <a href="#" class="btn btn-default" role="button">
+            <a href="#" class="btn btn-primary" role="button">
               {% trans "Add members" %}
             </a>
           </p>
@@ -134,7 +134,7 @@
           </p>
           {% endfor %}
           <div class="btn-view">
-            <a href="{% url 'organization:members' object.slug %}" class="btn btn-default" role="button">
+            <a href="{% url 'organization:members' object.slug %}" class="btn btn-primary" role="button">
               {% trans "View all" %}
             </a>
           </div>
