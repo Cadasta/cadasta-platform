@@ -5,11 +5,15 @@ from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
+from django.contrib import messages
+
 import formtools.wizard.views as wizard
 from tutelary.models import Role
 
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from accounts.models import User
+from questionnaires.models import Questionnaire
+from questionnaires.exceptions import InvalidXLSForm
 
 from ..models import Organization, Project, OrganizationRole, ProjectRole
 from .mixins import OrganizationMixin, ProjectQuerySetMixin
@@ -397,6 +401,7 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
         description = form_data[1]['details-description']
         organization = form_data[1]['details-organization']
         url = form_data[1]['details-url']
+        questionaire = form_data[1].get('details-questionaire')
         # private = form_data[1]['details-public'] != 'on'
         org = Organization.objects.get(slug=organization)
         try:
@@ -425,6 +430,15 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
                 ProjectRole.objects.create(
                     project=project, user=user, role=role
                 )
+
+            if questionaire:
+                try:
+                    Questionnaire.objects.create_from_form(
+                        project=project,
+                        xls_form=questionaire
+                    )
+                except InvalidXLSForm as e:
+                    messages.warning(self.request, e)
 
         return redirect('organization:project-dashboard',
                         organization=organization,

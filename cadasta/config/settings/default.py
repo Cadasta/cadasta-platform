@@ -46,6 +46,8 @@ INSTALLED_APPS = (
     'geography',
     'accounts',
     'organization',
+    'questionnaires',
+    'buckets',
 
     'crispy_forms',
     'widget_tweaks',

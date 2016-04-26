@@ -38,3 +38,4 @@ vagrant.retry
 /pytest.txt
 
 /cadasta/geography/data
+/cadasta/core/media/

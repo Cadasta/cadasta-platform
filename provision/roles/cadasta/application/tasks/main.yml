@@ -13,6 +13,20 @@
       - python-virtualenv
       - git
       - unzip
+      - libxslt1-dev
+      - libxml2-dev
+
+- name: dev locale
+  become: yes
+  become_user: root
+  action: command update-locale LC_ALL=en_US.UTF-8
+
+- name: set default locale
+  become: yes
+  become_user: root
+  lineinfile: dest=/etc/default/locale
+    regexp="LC_ALL"
+    line="LC_ALL=\"en_US.UTF-8\""
 
 - name: Create base directory for virtual environment
   become: yes
