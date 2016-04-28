@@ -13,6 +13,7 @@
 @import "bootstrap-sass/assets/stylesheets/bootstrap/glyphicons";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/dropdowns";
 @import "wizard";
+@import "reg";
 @import "toggle";
 @import "geolocate";
 
@@ -454,47 +455,6 @@ img.org-logo, img#org-logo {
 .avatar-lg {
   width: 120px;
   height: 120px;
-}
-
-/* =Registration area & narrow form
--------------------------------------------------------------- */
-
-.tinted-bg { // photo for login and register forms
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 1;
-    background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
-    background-size: cover;
-}
-
-.form-narrow {
-  margin: 0 auto;
-  max-width: 500px;
-  background: #fff;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  padding: 30px 40px;
-  margin-top: 30px;
-  z-index: 100;
-  position: relative;
-  h1 {
-    text-align: center;
-    margin: 4px auto 24px;
-  }
-  h5 {
-    border-top: 1px dashed #ddd;
-    padding-top: 20px;
-  }
-  .btn-block {
-    margin-bottom: 20px;
-  }
-  .checkbox.pull-left {
-    margin-top: 0;
-  }
 }
 
 /* =Buttons
