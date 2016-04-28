@@ -1,9 +1,7 @@
-{% extends "core/base.html" %}
+{% extends "organization/project_wrapper.html" %}
 
-{% block title %} | {{ project.name }}{% endblock %}
-
-{% load leaflet_tags %}
 {% load i18n %}
+{% load leaflet_tags %}
 
 {% block extra_head %}
 {% leaflet_css %}
@@ -25,83 +23,8 @@
 </script>
 {% endblock %}
 
-{% block content %}
+{% block project_main %}
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="inner-header">
-      <a class="index-link" href="{% url 'project:list' %}">
-        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-      </a>
-      <div class="org-logo">
-        <img src="{{ object.organization.logo }}" alt="{{ object.organization.name }}" class="org-logo" />
-      </div>
-      <h2>{{ object.name }}</h2>
-      <div class="top-btn pull-right">
-        <!-- More options menu -->
-        <div class="dropdown pull-right btn-more">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-            <span class="icon kabob-icon"></span>
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a class="edit" href="#">{% trans "Edit project geometry" %}</a></li>
-            <li><a class="edit" href="#">{% trans "Edit project details" %}</a></li>
-            <li><a class="edit" href="#">{% trans "Edit project member permissions" %}</a></li>
-            <li role="separator" class="divider"></li>
-            <li>
-              {% if object.archived %}
-              <a class="archive" href="#" data-toggle="modal">{% trans "Unarchive project" %}</a>
-              {% else %}
-              <a class="archive" href="#" data-toggle="modal">{% trans "Archive project" %}</a>
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-        <!-- Split add button -->
-        <div class="btn-group pull-right btn-add">
-          <button type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add location" %}
-          </button>
-          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Add</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#">Add project resource</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a class="edit" href="#">{% trans "Import field data" %}</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <!-- Sidebar -->
-  <div class="col-md-1 sidebar">
-    <ul class="nav nav-sidebar">
-      <li class="active">
-        {% trans "Overview" %}
-      </li>
-      <li>
-        {% trans "Map" %}
-      </li>
-      <li>
-        {% trans "Records" %}
-      </li>
-      <li>
-        {% trans "Resources" %}
-      </li>
-      <li>
-        {% trans "Reports" %}
-      </li>
-      <li>
-        {% trans "Activity" %}
-      </li>
-    </ul>
-  </div>
-  <!-- /.sidebar -->
   <!-- Main content -->
   <div class="col-md-11 col-md-offset-1 main main-map">
     <div class="row">
@@ -147,6 +70,5 @@
     </div>
   </div>
   <!-- /.main -->
-</div>
 
 {% endblock %}
