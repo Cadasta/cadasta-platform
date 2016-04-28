@@ -8,12 +8,10 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-md-10">
-    <h1>{% trans "Organizations" %}</h1>
-  </div>
-  <div class="col-md-2">
+  <div class="col-md-12 page-title">
+    <h2>{% trans "Organizations" %}</h2>
     <div class="top-btn pull-right">
-      <a href="{% url 'organization:add' %}" class="btn btn-default add-org">
+      <a href="{% url 'organization:add' %}" class="btn btn-primary add-org">
         <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
       </a>
     </div>

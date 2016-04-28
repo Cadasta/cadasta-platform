@@ -60,11 +60,8 @@ html, body {
   padding-bottom: 80px;
 }
 
-h1, h2 {
-  font-family: 'steelfish', Georgia, Arial, sans-serif;
-  color: $brand-primary;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+h1, h2, .category {
+  font-family: 'Roboto Condensed', Georgia, Arial, sans-serif;
 }
 
 label {
@@ -161,9 +158,9 @@ header {
 
 .inner-header {
   background-color: $gray-light;
-  height: 82px;
+  height: 102px;
   border-bottom: solid 1px #fff;
-  padding-top: 12px;
+  padding-top: 20px;
   padding-right: 30px;
   position: fixed;
   top: 80px;
@@ -179,13 +176,22 @@ header {
     border-bottom-left-radius: 0;
     border-left: 0;
     color: #ccc;
-    position: relative;
-    top: 8px;
+    position: fixed;
+    top: 110px;
     display: inline-block;
+  }
+  .category {
+    font-size: 10px;
+    color: #ccc;
+    text-transform: uppercase;
+    margin: 0 0 6px 0;
+    font-weight: 600;
+    display: block;
+    display: none;
   }
   div.org-logo {
     display: inline-block;
-    margin-left: 30px;
+    margin-left: 60px;
     height: 50px;
     position: relative;
     float: none;
@@ -217,7 +223,7 @@ header {
 
 .sidebar {
   position: fixed;
-  top: 158px;
+  top: 178px;
   bottom: 0;
   left: 0;
   z-index: 900;
@@ -225,7 +231,7 @@ header {
   padding: 0 20px;
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: $gray-light;
+  background-color: $gray-lighter;
   border-right: 1px solid #eee;
 }
 
@@ -255,7 +261,7 @@ header {
   z-index: 800;
   background: #fff;
   position: fixed;
-  top: 158px;
+  top: 178px;
   left: 0;
   bottom: 0;
   z-index: 900;
@@ -263,10 +269,6 @@ header {
   padding: 0;
   overflow-x: hidden;
   overflow-y: auto;
-  height: 100%;
-  .col-map { // for map to expand need height
-    height: 100%;
-  }
   h3 {
     display: inline-block;
   }
@@ -280,13 +282,23 @@ header {
     text-align: center;
     padding: 10px;
     .btn {
-      min-width: 160px;
+      min-width: 140px;
     }
   }
 }
 
-.main-map > .row { // for map to expand need height
-  height: 100%;
+.main-map { // container for project map
+  bottom: 0;
+  > .row { // for map to expand need height
+    height: 100%;
+    height: -webkit-calc(100% - 30px);
+    height: -moz-calc(100% - 30px);
+    height: calc(100% - 30px);
+    margin-right: 0;
+  }
+  .col-map { // for map to expand need height
+    height: 100%;
+  }
 }
 
 /* =Map in main content
@@ -309,7 +321,7 @@ header {
 
 .col-detail { // right column of main
   min-height: 650px;
-  padding: 30px 50px 20px 30px;
+  padding: 0 50px 20px 30px;
   .desc {
     padding-bottom: 30px;
     margin-bottom: 14px;
@@ -322,14 +334,28 @@ header {
 }
 
 .org-detail { // right column of main on organization overview
+  padding-top: 30px;
   background: $gray-light;
+}
+
+/* =Page title
+-------------------------------------------------------------- */
+
+.page-title { // col or div with page title
+  padding-top: 24px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid gray;
+  text-transform: uppercase;
+  h2 {
+    display: inline-block;
+  }
 }
 
 /* =Index views
 -------------------------------------------------------------- */
 
 .table.dataTable {
-  font-size: 13px;
   background: #fff;
   border-bottom: 3px solid #dbe1e5;
   h4 {
@@ -364,7 +390,39 @@ div.org-logo {
   margin-left: 160px;
 }
 
-/* =Img sizing
+.member-pic {
+  padding-bottom: 12px;
+  img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+   }
+}
+
+.member-detail {
+  min-height: 100px;
+  display: inline-block;
+  padding: 0 0 20px 0;
+  h5 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+}
+
+.member-role {
+  padding: 30px 0;
+  border-top: solid 1px #dbe1e5;
+  border-bottom: solid 1px #dbe1e5;
+  clear: both;
+  margin: 30px 0;
+}
+
+#projects-permissions .form-control {
+  min-width: 70%;
+}
+
+/* =Dashboard map
 -------------------------------------------------------------- */
 
 #dashboard-map {
@@ -383,18 +441,46 @@ img.org-logo, img#org-logo {
   max-height: 50px;
 }
 
-/* =Narrow form
+.avatar {
+  width: 48px;
+  height: 48px;
+}
+
+.avatar-sm {
+  width: 24px;
+  height: 24px;
+}
+
+.avatar-lg {
+  width: 120px;
+  height: 120px;
+}
+
+/* =Registration area & narrow form
 -------------------------------------------------------------- */
+
+.tinted-bg { // photo for login and register forms
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
+    background-size: cover;
+}
 
 .form-narrow {
   margin: 0 auto;
-  max-width: 400px;
+  max-width: 500px;
   background: #fff;
   border-radius: 5px;
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px;
   padding: 30px 40px;
   margin-top: 30px;
+  z-index: 100;
+  position: relative;
   h1 {
     text-align: center;
     margin: 4px auto 24px;
@@ -424,6 +510,16 @@ img.org-logo, img#org-logo {
   }
 }
 
+.btn-full {
+  background: $gray-lighter;
+  text-align: center;
+  padding: 20px;
+  margin: 20px 0;
+  .btn {
+    min-width: 160px;
+  }
+}
+
 /* =Alerts
 -------------------------------------------------------------- */
 
@@ -433,6 +529,11 @@ img.org-logo, img#org-logo {
 
 .translation-wrapper {
   background-color: fuchsia;
+}
+
+#messages { // success messages on top of map
+  position: relative;
+  z-index: 100;
 }
 
 /* =Footer
@@ -449,6 +550,7 @@ footer {
   white-space: nowrap;
   padding-top: 4px;
   z-index: 910;
+  overflow: hidden;
   .list-inline {
     display: inline-block;
   }

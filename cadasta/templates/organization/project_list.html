@@ -7,13 +7,11 @@
 {% block content %}
 
 <div class="row">
-  <div class="col-md-10">
-    <h1>{% trans "Projects" %}</h1>
-  </div>
-  <div class="col-md-2">
+  <div class="col-md-12 page-title">
+    <h2>{% trans "Projects" %}</h2>
     {% if add_allowed %}
     <div class="top-btn pull-right">
-      <a href={% url 'project:add' %} class="btn btn-default">
+      <a href={% url 'project:add' %} class="btn btn-primary">
         <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
       </a>
     </div>

@@ -51,6 +51,10 @@ class MemberPage(Page):
             "selected": self.get_selected_option()
         }
 
+    def get_members_title(self):
+        return self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'page-title')]//h2").text
+
     def get_members_row(self, member):
         return self.get_table_body("//tr" + member)
 
@@ -84,3 +88,10 @@ class MemberPage(Page):
             'pb':       self.get_public_user(),
             'selected': self.get_selected_permission()
         }
+
+    def get_remove_button(self):
+        return self.browser.find_element_by_xpath("//button[@name='remove']")
+
+    def get_confirm_button(self):
+        return self.browser.find_element_by_xpath(
+            "//a[contains(@class, 'confirm')]")

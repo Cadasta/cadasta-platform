@@ -59,10 +59,10 @@
         </div>
         <!-- Split add button -->
         <div class="btn-group pull-right btn-add">
-          <button type="button" class="btn btn-default">
+          <button type="button" class="btn btn-primary">
             <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add location" %}
           </button>
-          <button type="button" class="btn btn-default btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
             <span class="sr-only">Toggle Add</span>
           </button>
@@ -106,14 +106,14 @@
   <div class="col-md-11 col-md-offset-1 main main-map">
     <div class="row">
       <!-- Left column map  -->
-      <div class="col-md-8 col-map">
+      <div class="col-md-7 col-map">
         {% leaflet_map "project-map" callback="project_map_init" %}
       </div>
       <!-- /.col-map -->
       <!-- Right column detail  -->
-      <div class="col-md-4 col-detail">
+      <div class="col-md-5 col-detail">
         <section class="desc">
-          <h3>Project Overview</h3>
+          <h2 class="page-title">Project Overview</h2>
           <p>{{ object.description }}</p>
         </section>
         {% if has_content %}
@@ -127,10 +127,10 @@
           <p class="larger">{% trans "What would you like to do next?" %}</p>
 
           <div class="btn-view">
-            <button class="btn btn-default btn-lg">
+            <button class="btn btn-primary btn-lg">
               {% trans "Add a parcel" %}
             </button>
-            <button class="btn btn-default btn-lg">
+            <button class="btn btn-primary btn-lg">
               {% trans "Upload data" %}
             </button>
           </div>

@@ -147,7 +147,7 @@ class OrganizationTest(FunctionalTest):
         project = page.get_project()
         self.click_through(project, (By.CLASS_NAME, "main-map"))
         title = page.get_project_title()
-        assert title == "Organization #0 Test Project".upper()
+        assert title == "Organization #0 Test Project"
 
     def test_new_organization_view(self):
         """An organization without projects has a different view."""
