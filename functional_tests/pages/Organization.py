@@ -3,36 +3,64 @@ from selenium.webdriver.common.by import By
 
 
 class OrganizationPage(Page):
+    BY_MODAL_FADE = (By.CSS_SELECTOR, "div.modal.fade.in")
+    BY_MODAL_BACKDROP = (By.CLASS_NAME, 'modal-backdrop')
+    BY_ORG_LOGO = (By.CLASS_NAME, 'org-logo')
+
     def __init__(self, test):
         super().__init__(test)
-        self.url = self.base_url + '/organizations/{}/'
+        self.url = self.base_url + '/organizations/'
 
-    def go_to(self, org):
-        self.browser.get(self.url.format(org))
-        self.test.wait_for(self.get_organization)
+    def go_to(self):
+        self.browser.get(self.url)
+        self.test.wait_for(self.get_org_list_title)
         return self
 
-    def get_organization(self):
-        return self.test.organization_name("org-logo")
+    def get_org_list_title(self):
+        title = self.test.page_title()
+        assert title.text == "Organizations".upper()
+        return title
 
-    def get_organization_logo_alt_text(self):
-        return self.get_organization().find_element_by_xpath(
-            "//img[@class='org-logo']").get_attribute('alt')
+    def click_through(self, button, wait):
+        return self.test.click_through(button, wait)
+
+    def click_through_close(self, button, wait):
+        return self.test.click_through_close(button, wait)
 
     def get_container(self, xpath):
         return self.test.container(xpath)
 
+    def get_table_row(self, xpath=""):
+        return self.test.table_body('DataTables_Table_0', "//tr" + xpath)
+
+    def go_to_organization_page(self, new=False):
+        row = "[2]" if new else "[1]"
+        org_page = self.get_table_row(row)
+        self.click_through(org_page, self.BY_ORG_LOGO)
+
+    def get_organization_title(self):
+        organization = self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'org-logo')]")
+        return organization.find_element_by_xpath(
+            "//img[@class='org-logo']").get_attribute('alt')
+
     def get_org_description_and_members(self):
         return self.get_container(
-            "//div[contains(@class, 'org-detail')]")
+            "//div[contains(@class, 'org-detail')]").text
 
-    def get_edit_button(self):
+    def click_on_more_button(self):
         more = self.browser.find_element_by_xpath(
-            "//div[contains(@class, 'btn-more')]")
-        self.test.click_through(
+                "//div[contains(@class, 'btn-more')]")
+        self.click_through(
             more, (By.CSS_SELECTOR, "div.dropdown.pull-right.btn-more.open"))
+
+    def click_on_edit_button(self, success=True):
+        self.click_on_more_button()
         edit = self.get_container("//a[@class='edit']")
-        self.test.click_through(edit, (By.CLASS_NAME, 'modal-backdrop'))
+        if success:
+            self.test.click_through(edit, self.BY_MODAL_BACKDROP)
+        else:
+            self.click_through_close(edit, self.BY_MODAL_BACKDROP)
 
     def get_edit_modal_form(self, xpath):
         return self.test.form_field('edit-org', xpath)
@@ -46,53 +74,98 @@ class OrganizationPage(Page):
     def get_urls_input(self):
         return self.get_edit_modal_form("input[@name='urls']")
 
-    def get_submit(self):
-        return self.get_edit_modal_form("button[@name='submit']")
+    def click_on_submit_button(self):
+        submit = self.get_edit_modal_form("button[@name='submit']")
+        self.click_through(submit, self.BY_ORG_LOGO)
 
     def get_fields(self):
         return {
             'name':        self.get_name_input(),
             'description': self.get_description_input(),
             'urls':        self.get_urls_input(),
-            'add':         self.get_submit()
         }
 
-    def get_close(self, xpath):
-        return self.test.button_class("{}".format(xpath))
+    def fill_inputboxes(self):
+        fields = self.get_fields()
+        fields['name'].clear()
+        fields['name'].send_keys("Evil Coorporation")
+        fields['description'].clear()
+        fields['description'].send_keys("Planning world domination.")
+        fields['urls'].clear()
+        fields['urls'].send_keys("notstaying.com")
 
-    def get_archive_button(self):
-        more = self.browser.find_element_by_xpath(
-            "//div[contains(@class, 'btn-more')]")
-        self.test.click_through(
-            more, (By.CSS_SELECTOR, "div.dropdown.pull-right.btn-more.open"))
+    def check_inputboxes(self):
+        fields = self.get_fields()
+        assert fields["name"].get_attribute('value') == "Organization #0"
+        assert fields["description"].text == "This is a test."
+        assert fields["urls"].text == ""
+
+    def try_cancel_and_close(self):
+        self.test.try_cancel_and_close(
+            self.click_on_edit_button,
+            self.fill_inputboxes,
+            self.check_inputboxes
+        )
+
+    def get_archive_container(self):
         return self.get_container("//a[@class='archive']")
 
-    def get_archive_final(self):
-        return self.test.link("archive-final")
+    def get_archive_button(self):
+        self.click_on_more_button()
+        return self.get_archive_container()
 
-    def get_unarchive_final(self):
-        return self.test.link("unarchive-final")
+    def click_on_archive_and_confirm(self, unarchive=False):
+        archive = self.get_archive_container()
+        self.click_through(archive, self.BY_MODAL_FADE)
 
-    def get_projects_table(self, xpath):
-        return self.test.table_body("DataTables_Table_0", xpath)
+        final = "unarchive-final" if unarchive else "archive-final"
+        final = self.test.link(final)
+        self.click_through_close(final, self.BY_MODAL_FADE)
+        return self.get_archive_button().text
 
-    def get_project(self):
-        return self.get_projects_table("//tr")
+    def try_cancel_and_close_archive(self):
+        close_buttons = ["cancel", "close"]
+        for close in close_buttons:
+            archive = self.get_archive_button()
+            assert "Archive" in archive.text
 
-    def get_project_title(self):
-        return self.browser.find_element_by_xpath(
-            "//div[contains(@class, 'inner-header')]/h2").text
+            self.click_through(archive, self.BY_MODAL_FADE)
 
-    def get_users_page(self):
+            cancel = self.test.button_class(close)
+            self.click_through_close(cancel, self.BY_MODAL_BACKDROP)
+
+    def get_view_all_button(self):
         return self.browser.find_element_by_xpath(
             "//div[contains(@class, 'btn-view')]")
 
+    def click_on_view_all_button(self, successful=True):
+        view_all = self.get_view_all_button()
+
+        if not successful:
+            self.click_through(view_all, (By.CLASS_NAME, 'project-list'))
+        else:
+            self.click_through(view_all, (By.CLASS_NAME, 'page-title'))
+            view_all = self.test.page_title().text
+            return view_all
+
+    def click_on_project(self):
+        project = self.get_table_row("[1]")
+        self.click_through(project, (By.CLASS_NAME, "main-map"))
+        project_title = self.get_container(
+            "//div[contains(@class, 'inner-header')]//h2")
+        return project_title.text
+
     def get_welcome_message(self):
-        return self.get_container("//div[contains(@class, 'project-list')]")
+        return self.get_container(
+            "//div[contains(@class, 'project-list')]").text
 
-    def get_new_project(self):
-        return self.browser.find_element_by_xpath(
-            "//a[@href='/projects/new/']")
+    def click_add_new_project_button(self):
+        new_proj = self.browser.find_element_by_xpath(
+            '//a[@href="/projects/new/"]')
+        self.click_through(new_proj, (By.CLASS_NAME, 'new-project-page'))
+        title = self.test.h1("new-project-page").text
+        return title
 
-    def get_add_members(self):
-        return self.test.link("add-members")
+    def go_back_to_organization_list(self):
+        back_button = self.test.link('index-link')
+        self.click_through(back_button, (By.CLASS_NAME, 'add-org'))

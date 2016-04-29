@@ -1,0 +1,120 @@
+from base import FunctionalTest
+from pages.OrganizationMember import OrganizationMemberPage
+from pages.Organization import OrganizationPage
+from pages.OrganizationList import OrganizationListPage
+from pages.OrganizationMemberList import OrganizationMemberListPage
+from pages.Login import LoginPage
+
+from accounts.tests.factories import UserFactory
+from organization.models import OrganizationRole
+
+
+class OrganizationMemberTest(FunctionalTest):
+    def setUp(self):
+        super().setUp()
+        orgs = self.add_all_test_data()
+        OrganizationRole.objects.create(
+                organization=orgs[0],
+                user=UserFactory.create(
+                        username='admin_user',
+                        password='password'),
+                admin=True)
+
+    def test_that_an_individual_members_information_displays(self):
+        """The organization's individual member page
+        displays with the correct user information."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+
+        testuser_title = page.go_to_testuser_member_page()
+        assert "MEMBER: Test User" == testuser_title
+
+        member_form = page.get_displayed_member_info()
+
+        assert "Test User" in member_form.text
+        assert "testuser" in member_form.text
+        assert "testuser@example.com" in member_form.text
+        assert "Last login:" in member_form.text
+
+    def test_changing_a_members_organizational_role(self):
+        """An admin member can change a member's role in the organization."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+        page.go_to_testuser_member_page()
+
+        roles = page.get_role_options()
+        assert roles["member"].text == roles["selected"].text
+
+        roles["admin"].click()
+        page.click_submit_button()
+        page.go_to_testuser_member_page()
+
+        roles = page.get_role_options()
+        assert roles["admin"].text == roles["selected"].text
+
+    def test_removing_a_member_from_an_organization(self):
+        """An admin member can remove a member from an organization."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+        page.go_to_testuser_member_page()
+
+        page.try_cancel_and_close()
+        assert page.get_member_title() == "MEMBER: Test User"
+
+        page.click_remove_member_and_confirm_buttons()
+
+        members = page.get_table_row().text
+        assert "Test User" not in members
+
+    def test_changing_member_project_permissions(self):
+        """An admin user can change a member's permissions
+        on individual projects."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+        page.go_to_testuser_member_page()
+
+        options = page.get_permission_options()
+        assert options['selected'].text == options['pb'].text
+        options["pm"].click()
+
+        page.click_submit_button()
+        page.go_to_testuser_member_page()
+
+        options = page.get_permission_options()
+        assert options['selected'].text == options['pm'].text
+
+    def test_admin_creation_when_adding_organization(self):
+        """A user that can create a new organization and
+        is automatically made an admin."""
+
+        LoginPage(self).login('testuser', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+
+        OrganizationListPage(self).click_add_button()
+        fields = OrganizationListPage(self).get_fields()
+        fields['name'].send_keys('Organization #2')
+        fields['description'].send_keys('This is a test organization')
+        OrganizationListPage(self).click_submit_button()
+
+        OrganizationMemberListPage(self).go_to_member_list_page()
+        page.go_to_testuser_member_page()
+
+        roles = page.get_role_options()
+        assert roles["admin"].text == roles["selected"].text

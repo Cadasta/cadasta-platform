@@ -5,12 +5,6 @@ from django.utils import formats
 from base import FunctionalTest
 from pages.Users import UsersPage
 from pages.Login import LoginPage
-from accounts.models import User
-from accounts.tests.factories import UserFactory
-from core.tests.factories import PolicyFactory, RoleFactory
-from organization.tests.factories import OrganizationFactory
-from organization.models import OrganizationRole
-from tutelary.models import Policy
 
 
 class PageListTest(FunctionalTest):
@@ -18,15 +12,15 @@ class PageListTest(FunctionalTest):
     def setUp(self):
         super().setUp()
 
-        users = {}
-        users['superuser'] = UserFactory.create(
-            username='superuser',
-            password='password2',
-            email='superuser@cadasta.org',
-            email_verified=True,
-            last_login=datetime.now(tz=timezone.utc),
-            is_active=True,
-        )
+        # Define 1 superuser and 9 other users
+        users = []
+        users.append({
+            'username': 'superuser',
+            'password': 'password3',
+            'email': "superuser@example.com",
+            'is_active': True,
+            '_is_superuser': True,
+        })
         for uid in range(1, 10):
             if uid < 5:
                 last_login_val = (
@@ -35,120 +29,98 @@ class PageListTest(FunctionalTest):
                 )
             else:
                 last_login_val = None
-            users["default" + str(uid)] = UserFactory.create(
-                username="default" + str(uid),
-                password='password1',
-                email="default" + str(uid) + "@example.com",
-                last_login=last_login_val,
-                is_active=(uid % 2 == 1),
-            )
+            users.append({
+                'username': 'default' + str(uid),
+                'password': 'password1',
+                'email': "default" + str(uid) + "@example.com",
+                'last_login': last_login_val,
+                'is_active': (uid % 2 == 1),
+            })
+        self.test_data = {
+            'users': users,
+            'superuser': users[0],
+        }
 
-        pols = {}
-        PolicyFactory.set_directory('../cadasta/config/permissions')
-        # Default policy is installed automatically when first user is
-        # created.
-        pols['default'] = Policy.objects.get(name='default')
-        pols['superuser'] = PolicyFactory.create(
-            name='superuser', file='superuser.json'
-        )
+        # Define 2 orgs and their members
+        self.test_data['orgs'] = [
+            {
+                'name': "Organization One",
+                '_members': (1, 2, 3, 4),
+            },
+            {
+                'name': "Organization Two",
+                '_members': (3, 4, 5, 6),
+            },
+        ]
 
-        roles = {}
-        roles['superuser'] = RoleFactory.create(
-            name='superuser',
-            policies=[pols['default'], pols['superuser']],
-        )
-
-        users['superuser'].assign_policies(roles['superuser'])
-
-        orgs = {}
-        orgs['org1'] = OrganizationFactory.create(
-            name='Organization One',
-            slug='organization1',
-            description="Description One",
-            urls=['http://www.organization1.org'],
-            logo='https://s3.amazonaws.com/cadasta-dev-tmp/logos/h4h.png',
-            contacts=[{'email': 'info@organization1.org'}],
-        )
-        orgs['co2'] = OrganizationFactory.create(
-            name='Company Two',
-            slug='company2',
-            description="Description Two",
-            urls=['http://www.company2.org'],
-            logo='https://s3.amazonaws.com/cadasta-dev-tmp/logos/cadasta.png',
-            contacts=[{'email': 'company2.org'}]
-        )
-
-        OrganizationRole.objects.create(
-            organization=orgs['org1'], user=users['default1']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['org1'], user=users['default2']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['org1'], user=users['default3']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['org1'], user=users['default7']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['co2'], user=users['default4']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['co2'], user=users['default5']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['co2'], user=users['default6']
-        )
-        OrganizationRole.objects.create(
-            organization=orgs['co2'], user=users['default7']
-        )
+        self.load_test_data(self.test_data)
 
     def test_list(self):
         """The index page should display the complete and correct user
         information."""
 
-        LoginPage(self).login('superuser', 'password2')
-        UsersPage(self).go_to()
+        # Get time now for superuser's last login time
+        login_time = datetime.now(tz=timezone.utc)
 
-        tableBody = self.browser.find_element_by_xpath(
-            "//table[@id='DataTables_Table_0']/tbody"
+        LoginPage(self).login(
+            self.test_data['superuser']['username'],
+            self.test_data['superuser']['password'],
         )
-        rows = tableBody.find_elements_by_xpath("tr")
-        users = User.objects.all()
-        assert len(rows) == len(users)
+
+        users_page = UsersPage(self)
+        users_page.go_to()
+
+        users = self.test_data['users']
+        assert users_page.get_num_users() == len(users)
+
+        # Construct list of orgs each user is in
+        # (Basically, invert the '_members' test data)
+        for user in users:
+            user['orgs'] = []
+        for org in self.test_data['orgs']:
+            for idx in org['_members']:
+                users[idx]['orgs'].append(org)
 
         for user in users:
-            # User's row must exist
-            row = tableBody.find_element_by_xpath(
-                "tr[./td[1][text()='{}' and not(*[2])]]".format(user.username)
-            )
 
-            formatted_email = user.email or '—'
-            row.find_element_by_xpath(
-                "td[2][text()='{}' and not(*[2])]".format(formatted_email)
-            )
+            username = user['username']
 
-            if user.organizations.count() == 0:
-                row.find_element_by_xpath(
-                    "td[3][text()='—' and not(*[2])]"
-                )
+            # Check email is displayed correctly
+            expected_email = user['email'] or '—'
+            actual_email = users_page.get_user_email(username)
+            assert actual_email == expected_email
+
+            # Check organizations are displayed correctly
+            actual_orgs = users_page.get_user_orgs(username)
+            if len(user['orgs']) == 0:
+                assert actual_orgs == '—'
             else:
-                cell_text = row.find_element_by_xpath("td[3][not(*[2])]").text
-                for org in user.organizations.all():
-                    assert org.name in cell_text
-                    cell_text = cell_text.replace(org.name, '')
-                assert re.match('^[, ]*$', cell_text)
+                for org in user['orgs']:
+                    assert org['name'] in actual_orgs
+                    actual_orgs = actual_orgs.replace(org['name'], '')
+                assert re.match('^[, ]*$', actual_orgs)
 
-            formatted_last_login = (
-                formats.date_format(user.last_login, "DATETIME_FORMAT")
-                if user.last_login else '—'
-            )
-            row.find_element_by_xpath(
-                "td[4][text()='{}' and not(*[2])]".format(formatted_last_login)
+            # Check last login is displayed correctly
+            if user == self.test_data['superuser']:
+                # Fuzzy checking for superuser
+                try:
+                    self.check_last_login(username, login_time)
+                except AssertionError:
+                    login_time = login_time + timedelta(minutes=1)
+                    self.check_last_login(username, login_time)
+            else:
+                self.check_last_login(username, user['last_login'])
+
+            # Check active status is displayed correctly
+            assert (
+                users_page.is_user_active(username) ==
+                bool(user['is_active'])
             )
 
-            action_slug = 'deactivate' if user.is_active else 'activate'
-            row.find_element_by_xpath(
-                "td[5][form[@action='/users/{}/{}/']]".format(user.username,
-                                                              action_slug)
-            )
+    def check_last_login(self, username, expected_time):
+        actual = UsersPage(self).get_user_last_login(username)
+        expected = (
+            formats.date_format(expected_time, "DATETIME_FORMAT")
+            if expected_time else '—'
+        )
+        assert actual == expected

@@ -1,12 +1,19 @@
 from base import FunctionalTest
 from pages.Registration import RegistrationPage
 from pages.Login import LoginPage
-from accounts.tests.factories import UserFactory
+from pages.Dashboard import DashboardPage
 
 
 class RegistrationTest(FunctionalTest):
     def setUp(self):
-        UserFactory.create(username='user1', password='user1pwd')
+        super().setUp()
+        self.test_data = {
+            'users': [{
+                'username': 'default1',
+                'password': 'password1',
+            }]
+        }
+        self.load_test_data(self.test_data)
 
     def test_register_user(self):
         """An unregistered user can register with valid user details."""
@@ -37,8 +44,7 @@ class RegistrationTest(FunctionalTest):
         page.try_submit(err=['password1'],
                         ok=['username', 'email', 'password2'])
 
-        # Fill in extra fields, fill in final required form and
-        # submit.
+        # Fill in extra fields, fill in final required form and submit
         fields = page.get_fields()
         fields['first_name'].send_keys('User')
         fields['last_name'].send_keys('Three')
@@ -48,34 +54,36 @@ class RegistrationTest(FunctionalTest):
         fields['password2'].send_keys('very_secret')
         self.click_through(fields['register'], self.BY_ALERT)
         self.assert_has_message('alert', "signed in")
-        self.browser.find_element_by_id('dashboard-map')
 
-        # Log out.
-        self.click_through(
-            self.browser.find_element_by_xpath(self.xpath('a', 'Logout')),
-            self.BY_ALERT
-        )
-        self.assert_has_message('alert', "signed out")
+        dashboard_page = DashboardPage(self)
+        assert dashboard_page.is_on_page()
+        dashboard_page.get_dashboard_map()
 
-        # Log in as new user.
+        self.logout()
+
+        # Log in as new user
         sign_in = LoginPage(self).setup('user3', 'very_secret')
         self.click_through(sign_in, self.BY_ALERT)
-        self.browser.find_element_by_id('dashboard-map')
+
+        assert dashboard_page.is_on_page()
+        dashboard_page.get_dashboard_map()
 
     def test_register_duplicate_user(self):
+        """Check that user cannot register with an existing username."""
+
         page = RegistrationPage(self)
         page.go_to()
         fields = page.get_fields()
 
-        fields['username'].send_keys('user1')
+        fields['username'].send_keys(self.test_data['users'][0]['username'])
         fields['email'].send_keys('b@lah.net')
         fields['password1'].send_keys('password123')
         fields['password2'].send_keys('password123')
         fields['first_name'].send_keys('Jane')
         fields['last_name'].send_keys('Doe')
-        page.try_submit(err=['username'],
-                        ok=['email', 'password1', 'password2',
-                            'first_name', 'last_name'])
-        self.browser.find_element_by_xpath(
-            self.xpath('h1', 'Sign up for a free account')
+        page.try_submit(
+            err=['username'],
+            ok=['email', 'password1', 'password2',
+                'first_name', 'last_name'],
         )
+        assert page.is_on_page()
