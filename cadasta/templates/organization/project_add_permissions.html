@@ -32,7 +32,7 @@ invite users to join your organization before permissions can be assigned.
   {% for user in members %}
   <tr>
     <td>
-      <p>{{ user.first_name }} {{ user.last_name }}</p>
+      <p>{{ user.full_name }}</p>
       <p>{{ user.username }}</p>
     </td>
     <td>{{ user.email }}</td>

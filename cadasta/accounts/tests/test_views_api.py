@@ -84,8 +84,7 @@ class AccountSignupTest(TestCase):
             'username': 'imagine71',
             'email': 'john@beatles.uk',
             'password': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         self._post(data, status=201, count=1)
 
@@ -95,8 +94,7 @@ class AccountSignupTest(TestCase):
         data = {
             'username': 'imagine71',
             'password': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         self._post(data, status=400, count=0)
 

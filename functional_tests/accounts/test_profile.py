@@ -26,13 +26,10 @@ class ProfileTest(FunctionalTest):
         page.go_to()
         fields = page.get_fields()
 
-        new_first_name = 'Kenny'
-        new_last_name = 'Everett'
+        new_full_name = 'Kenny Everett'
 
-        fields['first_name'].clear()
-        fields['first_name'].send_keys(new_first_name)
-        fields['last_name'].clear()
-        fields['last_name'].send_keys(new_last_name)
+        fields['full_name'].clear()
+        fields['full_name'].send_keys(new_full_name)
         page.submit_form()
         page.assert_profile_is_updated()
 
@@ -45,5 +42,4 @@ class ProfileTest(FunctionalTest):
 
         page.go_to()
         fields = page.get_fields()
-        assert fields['first_name'].get_attribute('value') == new_first_name
-        assert fields['last_name'].get_attribute('value') == new_last_name
+        assert fields['full_name'].get_attribute('value') == new_full_name

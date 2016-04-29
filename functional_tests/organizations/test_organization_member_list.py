@@ -22,8 +22,7 @@ class OrganizationMemberListTest(FunctionalTest):
         UserFactory.create(
             username='hansolo',
             email='millenniumfalcon@example.com',
-            first_name="Han",
-            last_name="Solo",
+            full_name="Han Solo",
             password='password')
 
     def test_registered_user_view(self):

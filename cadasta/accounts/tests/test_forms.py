@@ -14,8 +14,7 @@ class RegisterFormTest(TestCase):
             'email': 'john@beatles.uk',
             'password1': 'iloveyoko79',
             'password2': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         form = RegisterForm(data)
         form.save()
@@ -32,8 +31,7 @@ class RegisterFormTest(TestCase):
             'email': 'john@beatles.uk',
             'password1': 'iloveyoko79',
             'password2': 'iloveyoko68',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         form = RegisterForm(data)
 
@@ -48,8 +46,7 @@ class RegisterFormTest(TestCase):
             'email': 'john@beatles.uk',
             'password1': 'iloveyoko79',
             'password2': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         form = RegisterForm(data)
 
@@ -66,15 +63,13 @@ class ProfileFormTest(TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         form = ProfileForm(data, instance=user)
         form.save()
 
         user.refresh_from_db()
-        assert user.first_name == 'John'
-        assert user.last_name == 'Lennon'
+        assert user.full_name == 'John Lennon'
 
     def test_update_user_with_existing_username(self):
         UserFactory.create(username='existing')
@@ -83,8 +78,7 @@ class ProfileFormTest(TestCase):
         data = {
             'username': 'existing',
             'email': 'john@beatles.uk',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         form = ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -96,8 +90,7 @@ class ProfileFormTest(TestCase):
         data = {
             'username': 'imagine71',
             'email': 'existing@example.com',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
         form = ProfileForm(data, instance=user)
         assert form.is_valid() is False
