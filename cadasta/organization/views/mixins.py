@@ -1,7 +1,10 @@
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+
+from tutelary.models import Role
 
 from ..models import Organization, Project
 
@@ -64,10 +67,22 @@ class ProjectRoles(ProjectMixin):
 
 class ProjectQuerySetMixin:
     def get_queryset(self):
+        if not hasattr(self, 'su_role'):
+            try:
+                self.su_role = Role.objects.get(name='superuser')
+            except Role.DoesNotExist:
+                self.su_role = None
+
+        if (not isinstance(self.request.user, AnonymousUser) and
+            any([isinstance(pol, Role) and pol == self.su_role
+                 for pol in self.request.user.assigned_policies()])):
+            return Project.objects.all()
+
         if hasattr(self.request.user, 'organizations'):
             orgs = self.request.user.organizations.all()
             if len(orgs) > 0:
                 return Project.objects.filter(
                     Q(access='public') | Q(organization__in=orgs)
                 )
+
         return Project.objects.filter(access='public')

@@ -1,6 +1,7 @@
 import json
 
 from django.test import TestCase
+from django.conf import settings
 from django.utils.translation import gettext as _
 from django.http import QueryDict
 from django.contrib.auth.models import AnonymousUser
@@ -9,6 +10,7 @@ from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
 from accounts.tests.factories import UserFactory
+from core.tests.factories import PolicyFactory, RoleFactory
 from .factories import OrganizationFactory, ProjectFactory, clause
 from ..models import Project, ProjectRole, OrganizationRole
 from ..views import api
@@ -375,6 +377,12 @@ class ProjectListAPITest(TestCase):
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
 
+        self.super_user = UserFactory.create()
+        PolicyFactory.set_directory(settings.BASE_DIR + '/permissions/')
+        su_pol = PolicyFactory.create(name='superuser', file='superuser.json')
+        su_role = RoleFactory.create(name='superuser', policies=[su_pol])
+        self.super_user.assign_policies(su_role)
+
     def _get(self, user=None, query=None, status=None, length=None):
         if user is None:
             user = self.user
@@ -401,6 +409,15 @@ class ProjectListAPITest(TestCase):
         ProjectFactory.create_batch(2, organization=organization)
         ProjectFactory.create_batch(2)
         self._get(status=200, length=4)
+
+    def test_full_list_with_superuser(self):
+        """
+        It should return all projects.
+        """
+        organization = OrganizationFactory.create(slug='habitat')
+        ProjectFactory.create_batch(2, organization=organization)
+        ProjectFactory.create_batch(2)
+        self._get(user=self.super_user, status=200, length=4)
 
     def test_full_list_with_unauthorized_user(self):
         """

@@ -61,12 +61,12 @@ class RegistrationPage(Page):
         return fields['register']
 
     def register(self, values):
-        self.test.click_through(self.setup(values),
-                                self.test.BY_ALERT)
+        self.test.click_through(self.setup(values), self.test.BY_ALERT)
 
     def try_submit(self, err=None, ok=None):
         fields = self.get_fields()
-        fields['register'].click()
+        sel = self.test.BY_ALERT if err is None else self.test.BY_FIELD_ERROR
+        self.test.click_through(fields['register'], sel, screenshot='tst')
         fields = self.get_fields()
         if err is not None:
             for f in err:
