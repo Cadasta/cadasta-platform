@@ -1,4 +1,5 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.conf import settings
 
 import time
 import re
@@ -287,7 +288,9 @@ class FunctionalTest(StaticLiveServerTestCase):
 
         # Create superuser policy and role if not yet created
         if not self.superuser_role:
-            PolicyFactory.set_directory('../cadasta/config/permissions')
+            PolicyFactory.set_directory(
+                os.path.join(settings.BASE_DIR, 'permissions')
+            )
             superuser_pol = PolicyFactory.create(
                 name='superuser', file='superuser.json'
             )

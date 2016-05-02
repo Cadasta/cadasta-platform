@@ -11,6 +11,8 @@ from tutelary.models import Policy, Role, PolicyInstance, RolePolicyAssign
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from core.tests.factories import PolicyFactory, RoleFactory
+from spatial.tests.factories import (
+    SpatialUnitFactory, SpatialUnitRelationshipFactory)
 
 
 class FixturesData:
@@ -181,7 +183,7 @@ class FixturesData:
             country='MM'
         ))
         projs.append(ProjectFactory.create(
-            name='London 1',
+            name='London 1 Test Project',
             slug='london-1',
             description=""""This is another test project.  This is another test
             project. This is another test project.  This is another test
@@ -203,7 +205,7 @@ class FixturesData:
                 '[-0.17329216003417966,51.51194758264939]]]}')
         ))
         projs.append(ProjectFactory.create(
-            name='London 2',
+            name='London 2 Test Project',
             slug='london-2',
             description=""""This is another test project.  This is another test
             project. This is another test project.  This is another test
@@ -222,8 +224,128 @@ class FixturesData:
                 '[-0.18642425537109375,51.509864277798705],'
                 '[-0.1878833770751953,51.509864277798705]]]}')
         ))
+
+        projs.append(ProjectFactory.create(
+            name='Pekapuran Laut Test Project',
+            slug='pekapuran-laut',
+            description=""""This is another test project.  This is another test
+            project. This is another test project.  This is another test
+            project. This is another test project.  This is a test project.
+            This is another test project.  This is another test project.
+            This is another test project.""",
+            organization=orgs[0],
+            extent=GEOSGeometry(
+                '{"type": "Polygon",'
+                '"coordinates": [['
+                '[-245.39695501327512, -3.328635665488632],'
+                '[-245.3934359550476, -3.3269219462897452],'
+                '[-245.38717031478882, -3.3309920245190616],'
+                '[-245.38652658462524, -3.3319559879515452],'
+                '[-245.38832902908322, -3.3329627931951515],'
+                '[-245.3892731666565, -3.334226653638199],'
+                '[-245.39219141006467, -3.335747568289181],'
+                '[-245.3928780555725, -3.3340124401180784],'
+                '[-245.39435863494873, -3.3346122378568293],'
+                '[-245.39596796035767, -3.3346336591978782],'
+                '[-245.3983497619629, -3.333219849687997],'
+                '[-245.3981566429138, -3.331934566552203],'
+                '[-245.39695501327512, -3.328635665488632]]]}')
+        ))
         print('\nSuccessfully added organizations {}'.
               format(Project.objects.all()))
+
+    def add_test_spatial_units(self):
+        project = Project.objects.get(
+            name__contains='Pekapuran Laut Test Project')
+
+        su1 = SpatialUnitFactory(
+            name='Building Unit (Test)',
+            geometry=GEOSGeometry('{"type": "Polygon",'
+                                  '"coordinates": [['
+                                  '[-245.3920519351959, -3.3337982265513184],'
+                                  '[-245.39097905158997,  -3.333284113800722],'
+                                  '[-245.39072155952454, -3.3345908165153215],'
+                                  '[-245.39169788360596, -3.3351691925723728],'
+                                  '[-245.3920519351959, -3.3337982265513184]]]'
+                                  '}'
+                                  ),
+            project=project,
+            type='BU')
+
+        su2 = SpatialUnitFactory(
+            name='Apartment Unit (Test)',
+            geometry=GEOSGeometry('{"type": "Polygon",'
+                                  '"coordinates": [['
+                                  '[-245.39200901985168,  -3.333808937230755],'
+                                  '[-245.39147257804868, -3.3335304595272377],'
+                                  '[-245.391343832016, -3.3340338614721934],'
+                                  '[-245.39186954498288, -3.3342480749876575],'
+                                  '[-245.39200901985168,  -3.333808937230755]]'
+                                  ']}'
+                                  ),
+            project=project,
+            type='AP',
+            attributes={"testing": "attributes"})
+
+        SpatialUnitRelationshipFactory(
+            su1=su1, su2=su2, type='C', project=project)
+
+        su3 = SpatialUnitFactory(
+            name='Parcel (Test)',
+            geometry=GEOSGeometry('{"type": "Polygon",'
+                                  '"coordinates": [['
+                                  '[-245.39088249206543,  -3.333262692430284],'
+                                  '[-245.39021730422974, -3.3330699000753414],'
+                                  '[-245.39001345634458,  -3.334312339033184],'
+                                  '[-245.39063572883606,  -3.334580105844384],'
+                                  '[-245.39088249206543,  -3.333262692430284]]'
+                                  ']}'
+                                  ),
+            project=project,
+            type='PA')
+
+        su4 = SpatialUnitFactory(
+            name='Point Inside Parcel (Test)',
+            geometry=GEOSGeometry('{"type": "Point",'
+                                  '"coordinates": ['
+                                  '-245.39034605026242, -3.333294824485769]}'
+                                  ),
+            project=project,
+            type='PA',
+            attributes={"testing": "attributes"})
+
+        SpatialUnitRelationshipFactory(
+            su1=su3, su2=su4, type='C', project=project)
+
+        SpatialUnitFactory(
+            name='Line (Test)',
+            geometry=GEOSGeometry('{"type": "LineString",'
+                                  '"coordinates": ['
+                                  '[-245.3934037685394, -3.334258785662196],'
+                                  '[-245.39109706878662, -3.3331984283161726],'
+                                  '[-245.3895306587219, -3.3328342649235454]]}'
+                                  ),
+            project=project,
+            type='RW')
+
+        SpatialUnitFactory(
+            name='Uncontained Point (Test)',
+            geometry=GEOSGeometry('{"type": "Point",'
+                                  '"coordinates": ['
+                                  '-245.39366126060483, -3.334130257559935]}'
+                                  ),
+            project=project,
+            type='MI')
+
+        SpatialUnitFactory(
+            name='Kibera Test Spatial Unit (Test)',
+            geometry=GEOSGeometry('{"type": "Point",'
+                                  '"coordinates": ['
+                                  '-4.9383544921875,'
+                                  '7.833452408875349'
+                                  ']}'),
+            project=Project.objects.get(name='Kibera Test Project'),
+            type='MI')
 
     def delete_test_organizations(self):
         orgs = Organization.objects.filter(name__contains='Test')

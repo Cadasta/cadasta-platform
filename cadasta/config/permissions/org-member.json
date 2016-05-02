@@ -5,8 +5,8 @@
     // within an organization.
     {
       "effect": "allow",
-      "action": ["project.view_private"],
-      "object": ["project/$organization/*"]
+      "action": ["project.view_private", "spatial.view", "spatial.list"],
+      "object": ["project/$organization/*", "project/$organization/*/*"]
     }
   ]
 }

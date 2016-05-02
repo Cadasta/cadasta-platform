@@ -29,4 +29,5 @@ class Command(BaseCommand):
             data.add_test_organizations()
             data.add_test_users_and_roles()
             data.add_test_projects()
+            data.add_test_spatial_units()
             self.stdout.write(self.style.SUCCESS("All test data loaded."))
