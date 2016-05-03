@@ -13,7 +13,7 @@
 
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*"],
+      "action": ["project.*", "project.*.*", "questionaire.*"],
       "object": ["project/$organization/*"]
     }
   ]

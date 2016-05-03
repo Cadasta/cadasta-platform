@@ -18,3 +18,5 @@ django-tutelary==0.1.12
 django-audit-log==0.7.0
 simplejson==3.8.1
 django-widget-tweaks==1.4.1
+django-buckets==0.1.1
+pyxform-cadasta==0.9.22

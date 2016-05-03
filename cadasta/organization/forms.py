@@ -1,16 +1,20 @@
 import itertools
 import json
+
 from django import forms
 from django.contrib.postgres import forms as pg_forms
 from django.contrib.gis import forms as gisforms
-from leaflet.forms.widgets import LeafletWidget
 from django.utils.translation import ugettext as _
 from django.utils.text import slugify
+
+from leaflet.forms.widgets import LeafletWidget
 from tutelary.models import Role
+from buckets.widgets import S3FileUploadWidget
 
 from accounts.models import User
 from .models import Organization, OrganizationRole, ProjectRole
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
+
 FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
 
 
@@ -154,6 +158,7 @@ class ProjectAddDetails(forms.Form):
     description = forms.CharField(required=False, widget=forms.Textarea)
     public = forms.BooleanField(initial=True)
     url = forms.URLField(required=False)
+    questionaire = forms.CharField(required=False, widget=S3FileUploadWidget)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

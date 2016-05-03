@@ -1,4 +1,6 @@
+import os
 import json
+from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, Http404
@@ -10,9 +12,12 @@ from django.contrib.messages.api import get_messages
 import pytest
 
 from tutelary.models import Policy, assign_user_policies
+from buckets.test.utils import ensure_dirs
+from buckets.test.storage import FakeS3Storage
 
 from accounts.tests.factories import UserFactory
 from organization.models import OrganizationRole, Project, ProjectRole
+from questionnaires.models import Questionnaire
 from ..views import default
 from .factories import OrganizationFactory, ProjectFactory, clause
 
@@ -349,6 +354,17 @@ class ProjectAddTest(TestCase):
     def test_initial_get_with_unauthenticated_user(self):
         self._get(status=302, login_redirect=True)
 
+    def _get_xls_form(self, form_name):
+        ensure_dirs()
+
+        path = os.path.dirname(settings.BASE_DIR)
+        storage = FakeS3Storage()
+        file = open(
+            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
+            'rb')
+        form = storage.save(form_name + '.xlsx', file)
+        return form
+
     EXTENTS_POST_DATA = {
         'project_add_wizard-current_step': 'extents',
         'extents-location':
@@ -365,7 +381,7 @@ class ProjectAddTest(TestCase):
         'details-name': 'Test Project',
         'details-description': 'This is a test project',
         'details-public': 'true',
-        'details-url': 'http://www.test.org'
+        'details-url': 'http://www.test.org',
     }
     PERMISSIONS_POST_DATA = {
         'project_add_wizard-current_step': 'permissions',
@@ -387,6 +403,8 @@ class ProjectAddTest(TestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
+        self.DETAILS_POST_DATA['details-questionaire'] = self._get_xls_form(
+            'xls-form')
         details_response = self.client.post(
             reverse('project:add'), self.DETAILS_POST_DATA
         )
@@ -410,4 +428,40 @@ class ProjectAddTest(TestCase):
                 assert r.role == 'PU'
             else:
                 assert False
+
+        assert Questionnaire.objects.filter(project=proj).exists() is True
         # assert proj.public
+
+    def test_full_flow_invalid_xlsform(self):
+        self.client.force_login(self.user)
+        extents_response = self.client.post(
+            reverse('project:add'), self.EXTENTS_POST_DATA
+        )
+        assert extents_response.status_code == 200
+        self.DETAILS_POST_DATA['details-questionaire'] = self._get_xls_form(
+            'xls-form-invalid')
+        details_response = self.client.post(
+            reverse('project:add'), self.DETAILS_POST_DATA
+        )
+        assert details_response.status_code == 200
+        permissions_response = self.client.post(
+            reverse('project:add'), self.PERMISSIONS_POST_DATA
+        )
+        assert permissions_response.status_code == 302
+        assert ('/organizations/test-org/projects/test-project/' in
+                permissions_response['location'])
+
+        proj = Project.objects.get(organization=self.org, name='Test Project')
+        assert proj.project_slug == 'test-project'
+        assert proj.description == 'This is a test project'
+        for r in ProjectRole.objects.filter(project=proj):
+            if r.user.username == 'org_member_1':
+                assert r.role == 'PM'
+            elif r.user.username == 'org_member_2':
+                assert r.role == 'DC'
+            elif r.user.username == 'org_member_3':
+                assert r.role == 'PU'
+            else:
+                assert False
+
+        assert Questionnaire.objects.filter(project=proj).exists() is False

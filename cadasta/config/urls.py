@@ -25,6 +25,10 @@ api_v1 = [
     url(r'^projects/',
         include('organization.urls.api.projects',
                 namespace='project')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project_id>[-\w]+)/',
+        include('questionnaires.urls.api',
+                namespace='questionnaires')),
     url(r'^users/',
         include('organization.urls.api.users', namespace='user')),
 ]
@@ -60,4 +64,6 @@ urlpatterns = [
 
     url(r'^i18n/',
         include('django.conf.urls.i18n')),
+
+    url(r'', include('buckets.test.urls')),
 ]
