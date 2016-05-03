@@ -39,12 +39,12 @@ class ProjectListTest(TestCase):
         self.unauth_projs = []
         self.unauth_projs.append(ProjectFactory.create(
             name='Unauthorized project',
-            project_slug='unauth-proj',
+            slug='unauth-proj',
             organization=self.ok_org2
         ))
         self.unauth_projs.append(ProjectFactory.create(
             name='Project in unauthorized org',
-            project_slug='proj-in-unauth-org',
+            slug='proj-in-unauth-org',
             organization=self.unauth_org
         ))
         self.priv_proj1 = ProjectFactory.create(
@@ -95,7 +95,7 @@ class ProjectListTest(TestCase):
             'organization/project_list.html',
             {'object_list':
              sorted(projs,
-                    key=lambda p: p.organization.slug + ':' + p.project_slug),
+                    key=lambda p: p.organization.slug + ':' + p.slug),
              'add_allowed': True,
              'user': self.request.user},
             request=self.request)
@@ -190,7 +190,7 @@ class ProjectDashboardTest(TestCase):
         setattr(self.request, 'user', user)
         response = self.view(self.request,
                              organization=project.organization.slug,
-                             project=project.project_slug)
+                             project=project.slug)
         if status is not None:
             assert response.status_code == status
         return response
@@ -201,7 +201,7 @@ class ProjectDashboardTest(TestCase):
             user = self.user
         org = OrganizationFactory.create(slug='namati')
         prj = ProjectFactory.create(
-            project_slug='project', organization=org,
+            slug='project', organization=org,
             name='Test Project', access='private'
         )
         if make_org_member:
@@ -417,7 +417,7 @@ class ProjectAddTest(TestCase):
                 permissions_response['location'])
 
         proj = Project.objects.get(organization=self.org, name='Test Project')
-        assert proj.project_slug == 'test-project'
+        assert proj.slug == 'test-project'
         assert proj.description == 'This is a test project'
         for r in ProjectRole.objects.filter(project=proj):
             if r.user.username == 'org_member_1':
@@ -452,7 +452,7 @@ class ProjectAddTest(TestCase):
                 permissions_response['location'])
 
         proj = Project.objects.get(organization=self.org, name='Test Project')
-        assert proj.project_slug == 'test-project'
+        assert proj.slug == 'test-project'
         assert proj.description == 'This is a test project'
         for r in ProjectRole.objects.filter(project=proj):
             if r.user.username == 'org_member_1':

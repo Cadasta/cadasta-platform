@@ -25,6 +25,7 @@ class OrganzationAddTest(TestCase):
         }
         self._save(data)
         org = Organization.objects.first()
+
         assert org.slug == 'org'
         assert OrganizationRole.objects.filter(organization=org).count() == 1
 

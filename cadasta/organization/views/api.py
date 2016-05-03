@@ -168,7 +168,8 @@ class ProjectDetail(APIPermissionRequiredMixin,
     filter_fields = ('archived',)
     # search_fields = ('name', 'organization', 'country', 'description',)
     # ordering_fields = ('name', 'organization', 'country', 'description',)
-    lookup_field = 'project_slug'
+    lookup_url_kwarg = 'project_slug'
+    lookup_field = 'slug'
     permission_required = {
         'GET': get_actions,
         'PATCH': patch_actions,

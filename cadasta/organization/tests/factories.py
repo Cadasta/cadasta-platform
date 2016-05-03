@@ -30,7 +30,7 @@ class ProjectFactory(ExtendedFactory):
         model = Project
 
     name = factory.Sequence(lambda n: "Project #%s" % n)
-    project_slug = factory.Sequence(lambda n: "project-%s" % n)
+    slug = factory.Sequence(lambda n: "project-%s" % n)
     organization = factory.SubFactory(OrganizationFactory)
     description = factory.Sequence(
         lambda n: "Project #%s description" % n)

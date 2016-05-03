@@ -1,3 +1,5 @@
+import itertools
+from django.utils.text import slugify
 from django.db import models
 
 from .util import random_id, ID_FIELD_LENGTH
@@ -23,3 +25,25 @@ class RandomIDModel(models.Model):
 
         else:
             super(RandomIDModel, self).save(*args, **kwargs)
+
+
+class SlugModel:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_slug = self.slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        orig = self.slug
+
+        if self.__original_slug != self.slug:
+            for x in itertools.count(1):
+                if not type(self).objects.filter(slug=self.slug).exists():
+                    break
+                self.slug = '{}-{}'.format(orig, x)
+
+        self.__original_slug = self.slug
+
+        return super().save(*args, **kwargs)

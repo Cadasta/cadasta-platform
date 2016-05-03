@@ -71,6 +71,7 @@ class OrganizationListAPITest(TestCase):
         """
         OrganizationFactory.create_from_kwargs([{}, {'slug': 'unauthorized'}])
         content = self._get(user=self.unauth_user, status=200, length=1)
+        print(content[0])
         assert content[0]['slug'] != 'unauthorized'
 
     def test_full_list_with_unauthorized_user(self):

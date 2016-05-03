@@ -31,7 +31,7 @@
         </tr>
       </thead>
       {% for proj in object_list %}
-      <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.project_slug %}';">
+      <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}';">
         <td>
           <div class="org-logo">
             <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
