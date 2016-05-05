@@ -30,11 +30,8 @@ class ProfilePage(Page):
     def get_email_input(self):
         return self.get_form_field("input[@name='email']")
 
-    def get_first_name_input(self):
-        return self.get_form_field("input[@name='first_name']")
-
-    def get_last_name_input(self):
-        return self.get_form_field("input[@name='last_name']")
+    def get_full_name_input(self):
+        return self.get_form_field("input[@name='full_name']")
 
     def get_update_button(self):
         return self.get_form_field("button[@name='update']")
@@ -43,8 +40,7 @@ class ProfilePage(Page):
         return {
             'username':   self.get_username_input(),
             'email':      self.get_email_input(),
-            'first_name': self.get_first_name_input(),
-            'last_name':  self.get_last_name_input(),
+            'full_name': self.get_full_name_input(),
             'update':     self.get_update_button()
         }
 

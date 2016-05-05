@@ -1,5 +1,4 @@
 import os.path
-import factory
 from faker import Factory
 from django.contrib.gis.geos import GEOSGeometry
 from django.conf import settings
@@ -20,20 +19,18 @@ class FixturesData:
         # the first two named users will have superuser access
         named_users = [
             {'username': 'iross', 'email': 'iross@cadasta.org',
-             'first_name': 'Ian', 'last_name': 'Ross'},
+             'full_name': 'Ian Ross'},
             {'username': 'oroick', 'email': 'oroick@cadasta.org',
-             'first_name': 'Oliver', 'last_name': 'Roick'}]
+             'full_name': 'Oliver Roick'}]
         # add user's with names in languages that need to be tested.
         languages = ['el_GR', 'ja_JP', 'hi_IN', 'hr_HR', 'lt_LT']
         named_users.append({
-            'first_name': 'עזרא',
-            'last_name': 'ברש'
+            'full_name': 'עזרא ברש'
         })
         for lang in languages:
             fake = Factory.create(lang)
             named_users.append({
-                'first_name': fake.first_name(),
-                'last_name': fake.last_name()
+                'full_name': fake.name()
             })
         for n in range(20):
             if n < len(named_users):
@@ -48,8 +45,7 @@ class FixturesData:
                 users.append(UserFactory.create(
                     password='password',
                     is_active=(n < 8),
-                    first_name=factory.Faker('first_name'),
-                    last_name=factory.Faker('last_name'),
+                    full_name=fake.name(),
                 ))
         print('Successfully added test users.')
         return users

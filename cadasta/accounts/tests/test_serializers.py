@@ -18,8 +18,7 @@ BASIC_TEST_DATA = {
     'username': 'imagine71',
     'email': 'john@beatles.uk',
     'password': 'iloveyoko79',
-    'first_name': 'John',
-    'last_name': 'Lennon',
+    'full_name': 'John Lennon',
 }
 
 
@@ -49,8 +48,7 @@ class RegistrationSerializerTest(TestCase):
             'username': 'imagine71',
             'password': 'iloveyoko79',
             'password_repeat': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
 
         serializer = RegistrationSerializer(data=data)
@@ -67,8 +65,7 @@ class RegistrationSerializerTest(TestCase):
             'email': 'john@beatles.uk',
             'password': 'iloveyoko79',
             'password_repeat': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         }
 
         serializer = RegistrationSerializer(data=data)
@@ -89,8 +86,7 @@ class UserSerializerTest(TestCase):
             'username': 'imagine71',
             'email': 'john@beatles.uk',
             'password': 'iloveyoko79',
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00'
         }
         serializer = UserSerializer(data=data)

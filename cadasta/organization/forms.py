@@ -192,5 +192,5 @@ class ProjectAddPermissions(forms.Form):
                 self.members.append({
                     'index': idx, 'field': f,
                     'username': user.username, 'email': user.email,
-                    'name': user.first_name + ' ' + user.last_name,
+                    'name': user.full_name,
                     'is_admin': is_admin})

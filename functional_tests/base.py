@@ -298,8 +298,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         users.append(UserFactory.create(
             username='testuser',
             email='testuser@example.com',
-            first_name='Test',
-            last_name='User',
+            full_name='Test User',
             password='password')
         )
         users.append(UserFactory.create())

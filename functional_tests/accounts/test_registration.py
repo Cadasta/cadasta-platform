@@ -46,8 +46,7 @@ class RegistrationTest(FunctionalTest):
 
         # Fill in extra fields, fill in final required form and submit
         fields = page.get_fields()
-        fields['first_name'].send_keys('User')
-        fields['last_name'].send_keys('Three')
+        fields['full_name'].send_keys('User Three')
         fields['password1'].clear()
         fields['password1'].send_keys('very_secret')
         fields['password2'].clear()
@@ -79,11 +78,8 @@ class RegistrationTest(FunctionalTest):
         fields['email'].send_keys('b@lah.net')
         fields['password1'].send_keys('password123')
         fields['password2'].send_keys('password123')
-        fields['first_name'].send_keys('Jane')
-        fields['last_name'].send_keys('Doe')
-        page.try_submit(
-            err=['username'],
-            ok=['email', 'password1', 'password2',
-                'first_name', 'last_name'],
-        )
+        fields['full_name'].send_keys('Jane Doe')
+        page.try_submit(err=['username'],
+                        ok=['email', 'password1', 'password2',
+                            'full_name'])
         assert page.is_on_page()

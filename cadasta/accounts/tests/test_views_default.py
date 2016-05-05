@@ -46,15 +46,13 @@ class ProfileTest(TestCase):
         setattr(self.request, 'POST', {
             'username': 'John',
             'email': user.email,
-            'first_name': 'John',
-            'last_name': 'Lennon',
+            'full_name': 'John Lennon',
         })
 
         self.view(self.request)
 
         user.refresh_from_db()
-        assert user.first_name == 'John'
-        assert user.last_name == 'Lennon'
+        assert user.full_name == 'John Lennon'
 
     def test_get_profile_when_no_user_is_signed_in(self):
         response = self.view(self.request)
@@ -70,16 +68,14 @@ class ProfileTest(TestCase):
 
     def test_update_profile_duplicate_email(self):
         user1 = UserFactory.create(username='John',
-                                   first_name='John',
-                                   last_name='Lennon')
+                                   full_name='John Lennon')
         user2 = UserFactory.create(username='Bill')
         setattr(self.request, 'user', user2)
         setattr(self.request, 'method', 'POST')
         setattr(self.request, 'POST', {
             'username': 'Bill',
             'email': user1.email,
-            'first_name': 'Bill',
-            'last_name': 'Bloggs',
+            'full_name': 'Bill Bloggs',
         })
 
         self.view(self.request)

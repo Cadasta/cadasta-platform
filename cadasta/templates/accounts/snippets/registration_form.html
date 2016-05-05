@@ -27,18 +27,11 @@
       {{ form.password }}
     </div>
     <div class="fieldWrapper">
-      {{ form.first_name.errors }}
-      <label for="{{ form.first_name.id_for_label }}">
-        {% trans "First name" %}:
+      {{ form.full_name.errors }}
+      <label for="{{ form.full_name.id_for_label }}">
+        {% trans "Full name" %}:
       </label>
-      {{ form.first_name }}
-    </div>
-    <div class="fieldWrapper">
-      {{ form.last_name.errors }}
-      <label for="{{ form.last_name.id_for_label }}">
-        {% trans "Last name" %}:
-      </label>
-      {{ form.last_name }}
+      {{ form.full_name }}
     </div>
     <button type="submit">{% trans "Submit" %}</button>
 </form>

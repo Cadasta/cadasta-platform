@@ -79,8 +79,8 @@ class UserAdminList(APIPermissionRequiredMixin, generics.ListAPIView):
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('is_active',)
-    search_fields = ('username', 'first_name', 'last_name', 'email')
-    ordering_fields = ('username', 'first_name', 'last_name')
+    search_fields = ('username', 'full_name', 'email')
+    ordering_fields = ('username', 'full_name')
     permission_required = 'user.list'
 
 

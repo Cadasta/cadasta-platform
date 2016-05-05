@@ -23,8 +23,7 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
         model = User
         fields = (
             'username',
-            'first_name',
-            'last_name',
+            'full_name',
             'email',
             'password',
             'email_verified',
@@ -48,8 +47,7 @@ class UserSerializer(djoser_serializers.UserSerializer):
         model = User
         fields = (
             'username',
-            'first_name',
-            'last_name',
+            'full_name',
             'email',
             'email_verified',
             'last_login',

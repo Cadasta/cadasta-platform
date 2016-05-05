@@ -92,7 +92,7 @@ class UserListAPITest(TestCase):
         It should return only two matching users.
         """
         UserFactory.create_from_kwargs([
-            {'last_name': 'Match'},
+            {'full_name': 'Match'},
             {'username': 'ivegotamatch'},
             {'username': 'excluded'}
         ])
@@ -183,11 +183,11 @@ class UserDetailAPITest(TestCase):
         assert user.is_active == data.get('is_active')
 
     def test_update_with_unauthorized_user(self):
-        user = UserFactory.create(last_name='Smith', username='test-user')
-        self._patch(user.username, {'last_name': 'Jones'},
+        user = UserFactory.create(full_name='Smith', username='test-user')
+        self._patch(user.username, {'full_name': 'Jones'},
                     user=AnonymousUser(), status=403)
         user.refresh_from_db()
-        assert user.last_name == 'Smith'
+        assert user.full_name == 'Smith'
 
     def test_invalid_update(self):
         t1 = datetime(12, 10, 30, tzinfo=timezone.utc)
