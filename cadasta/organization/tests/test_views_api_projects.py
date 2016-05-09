@@ -633,11 +633,11 @@ class ProjectDetailAPITest(TestCase):
             user = self.user
         url = '/v1/organizations/{org}/projects/{slug}/'
         request = APIRequestFactory().patch(
-            url.format(org=org, slug=project.project_slug), data
+            url.format(org=org, slug=project.slug), data
         )
         force_authenticate(request, user=user)
         response = self.view(request, slug=org,
-                             project_slug=project.project_slug).render()
+                             project_slug=project.slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -646,7 +646,7 @@ class ProjectDetailAPITest(TestCase):
 
     def _test_objs(self, archived=False, access='public'):
         organization = OrganizationFactory.create(slug='namati')
-        project = ProjectFactory.create(project_slug='project',
+        project = ProjectFactory.create(slug='project',
                                         organization=organization,
                                         name='Test Project',
                                         archived=archived,
@@ -657,7 +657,7 @@ class ProjectDetailAPITest(TestCase):
                                  check_ok=False, check_error=False,
                                  non_existent=False):
         organization, project = self._test_objs()
-        slug = project.project_slug
+        slug = project.slug
         if non_existent:
             slug = 'some-project'
         content = self._get('namati', slug, user=user, status=status)
@@ -695,7 +695,7 @@ class ProjectDetailAPITest(TestCase):
         if make_other_org_member:
             other_org = OrganizationFactory.create()
             OrganizationRole.objects.create(organization=other_org, user=user)
-        cont = self._get('namati', prj.project_slug, user=user, status=status)
+        cont = self._get('namati', prj.slug, user=user, status=status)
         if check_ok:
             assert cont['id'] == prj.id
             assert 'users' in cont
@@ -789,25 +789,25 @@ class ProjectDetailAPITest(TestCase):
         prj = ProjectFactory.create(organization=org, access='public')
 
         # User in org SHOULD be able to see project.
-        self._get(org.slug, prj.project_slug, user=org_user, status=200)
+        self._get(org.slug, prj.slug, user=org_user, status=200)
         # User NOT in org SHOULD be able to see project.
-        self._get(org.slug, prj.project_slug, user=non_org_user, status=200)
+        self._get(org.slug, prj.slug, user=non_org_user, status=200)
 
         # Patch visibility to private.
         self._patch(org.slug, prj, {'access': 'private'}, status=200)
 
         # User in org SHOULD be able to see project.
-        self._get(org.slug, prj.project_slug, user=org_user, status=200)
+        self._get(org.slug, prj.slug, user=org_user, status=200)
         # User not in org SHOULD NOT be able to see project.
-        self._get(org.slug, prj.project_slug, user=non_org_user, status=403)
+        self._get(org.slug, prj.slug, user=non_org_user, status=403)
 
         # Patch visibility to public.
         self._patch(org.slug, prj, {'access': 'public'}, status=200)
 
         # User in org SHOULD be able to see project.
-        self._get(org.slug, prj.project_slug, user=org_user, status=200)
+        self._get(org.slug, prj.slug, user=org_user, status=200)
         # User NOT in org SHOULD be able to see project.
-        self._get(org.slug, prj.project_slug, user=non_org_user, status=200)
+        self._get(org.slug, prj.slug, user=non_org_user, status=200)
 
     def test_invalid_visibility_patching(self):
         organization, project = self._test_objs(archived=True)

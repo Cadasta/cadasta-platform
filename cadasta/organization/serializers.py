@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.utils.text import slugify
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
@@ -23,15 +22,9 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
     class Meta:
         model = Organization
         fields = ('id', 'slug', 'name', 'description', 'archived', 'urls',
-                  'contacts', 'users')
-        read_only_fields = ('id',)
+                  'contacts', 'users',)
+        read_only_fields = ('id', 'slug',)
         detail_only_fields = ('users',)
-
-    def to_internal_value(self, data):
-        if not data.get('slug'):
-            data['slug'] = slugify(data.get('name'))
-
-        return super(OrganizationSerializer, self).to_internal_value(data)
 
     def create(self, *args, **kwargs):
         org = super(OrganizationSerializer, self).create(*args, **kwargs)
@@ -53,8 +46,8 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'organization', 'country', 'name', 'description',
-                  'archived', 'urls', 'contacts', 'users', 'access',)
-        read_only_fields = ('id', 'country',)
+                  'archived', 'urls', 'contacts', 'users', 'access', 'slug')
+        read_only_fields = ('id', 'country', 'slug')
         detail_only_fields = ('users',)
 
     def create(self, validated_data):
@@ -81,7 +74,7 @@ class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
         return reverse(
             'organization:project-dashboard',
             kwargs={'organization': object.organization.slug,
-                    'project': object.project_slug})
+                    'project': object.slug})
 
 
 class EntityUserSerializer(serializers.Serializer):

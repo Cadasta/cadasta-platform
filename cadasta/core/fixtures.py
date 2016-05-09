@@ -121,7 +121,7 @@ class FixturesData:
 
         projs.append(ProjectFactory.create(
             name='Kibera Test Project',
-            project_slug='kibera',
+            slug='kibera',
             description="""This is a test project.  This is a test project.
             This is a test project.  This is a test project.  This is a test
             project.  This is a test project.  This is a test project.  This
@@ -137,7 +137,7 @@ class FixturesData:
         ))
         projs.append(ProjectFactory.create(
             name='H4H Test Project',
-            project_slug='h4h-test-project',
+            slug='h4h-test-project',
             description="""This is a test project.  This is a test project.
             This is a test project.  This is a test project.  This is a test
             project.  This is a test project.  This is a test project.  This
@@ -153,7 +153,7 @@ class FixturesData:
         ))
         projs.append(ProjectFactory.create(
             name='Cadasta Indonesia Test Project',
-            project_slug='cadasta-indonesia-test-project',
+            slug='cadasta-indonesia-test-project',
             description="""This is another test project.  This is another test
             project. This is another test project.  This is another test
             project. This is another test project.  This is a test project.
@@ -171,7 +171,7 @@ class FixturesData:
         ))
         projs.append(ProjectFactory.create(
             name='Cadasta Myanmar Test Project',
-            project_slug='cadasta-myanmar-test-project',
+            slug='cadasta-myanmar-test-project',
             description=""""This is another test project.  This is another test
             project. This is another test project.  This is another test
             project. This is another test project.  This is a test project.
@@ -182,7 +182,7 @@ class FixturesData:
         ))
         projs.append(ProjectFactory.create(
             name='London 1',
-            project_slug='london-1',
+            slug='london-1',
             description=""""This is another test project.  This is another test
             project. This is another test project.  This is another test
             project. This is another test project.  This is a test project.
@@ -204,7 +204,7 @@ class FixturesData:
         ))
         projs.append(ProjectFactory.create(
             name='London 2',
-            project_slug='london-2',
+            slug='london-2',
             description=""""This is another test project.  This is another test
             project. This is another test project.  This is another test
             project. This is another test project.  This is a test project.

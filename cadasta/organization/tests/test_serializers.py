@@ -34,12 +34,6 @@ class OrganizationSerializerTest(TestCase):
         assert OrganizationRole.objects.filter(
             organization=org_instance).count() == 1
 
-    def test_slug_field_is_unique(self):
-        OrganizationFactory.create(slug='org-slug')
-        org_data = {'name': 'Org Slug', 'slug': 'org-slug'}
-        serializer = serializers.OrganizationSerializer(data=org_data)
-        assert not serializer.is_valid()
-
     def test_users_are_not_serialized(self):
         users = UserFactory.create_batch(2)
         org = OrganizationFactory.create(add_users=users)
@@ -122,7 +116,7 @@ class ProjectGeometrySerializerTest(TestCase):
         assert test_data['properties']['url'] == reverse(
             'organization:project-dashboard',
             kwargs={'organization': project.organization.slug,
-                    'project': project.project_slug})
+                    'project': project.slug})
 
 
 class OrganizationUserSerializerTest(TestCase):

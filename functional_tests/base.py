@@ -308,7 +308,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         projs = []
         projs.append(ProjectFactory.create(
             name='Organization #0 Test Project',
-            project_slug='test-project',
+            slug='test-project',
             description="""This is a test project.  This is a test project.
             This is a test project.  This is a test project.  This is a test
             project.  This is a test project.  This is a test project.  This

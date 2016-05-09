@@ -6,10 +6,11 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 import django.contrib.gis.db.models as gismodels
 
+
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
 
-from core.models import RandomIDModel
+from core.models import RandomIDModel, SlugModel
 from geography.models import WorldBorder
 from .validators import validate_contact
 from .choices import ROLE_CHOICES
@@ -31,7 +32,7 @@ def get_policy_instance(policy_name, variables):
 
 
 @permissioned_model
-class Organization(RandomIDModel):
+class Organization(SlugModel, RandomIDModel):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
@@ -138,13 +139,13 @@ def remove_project_membership(sender, instance, **kwargs):
 
 
 @permissioned_model
-class Project(RandomIDModel):
+class Project(SlugModel, RandomIDModel):
     ACCESS_CHOICES = [
         ("public", _("Public")),
         ("private", _("Private")),
     ]
     name = models.CharField(max_length=100)
-    project_slug = models.SlugField(max_length=50, unique=True, null=True)
+    slug = models.SlugField(max_length=50, unique=True, null=True)
     organization = models.ForeignKey(Organization, related_name='projects')
     country = CountryField(null=True)
     description = models.TextField(null=True, blank=True)
@@ -164,7 +165,7 @@ class Project(RandomIDModel):
 
     class TutelaryMeta:
         perm_type = 'project'
-        path_fields = ('organization', 'project_slug')
+        path_fields = ('organization', 'slug')
         actions = (
             ('project.list',
              {'description': _("List existing projects in an organization"),
@@ -239,19 +240,19 @@ def assign_project_permissions(sender, instance, **kwargs):
 
     project_manager = get_policy_instance('project-manager', {
         'organization': instance.project.organization.slug,
-        'project': instance.project.project_slug
+        'project': instance.project.slug
     })
     is_manager = project_manager in assigned_policies
 
     project_user = get_policy_instance('project-user', {
         'organization': instance.project.organization.slug,
-        'project': instance.project.project_slug
+        'project': instance.project.slug
     })
     is_user = project_user in assigned_policies
 
     data_collector = get_policy_instance('data-collector', {
         'organization': instance.project.organization.slug,
-        'project': instance.project.project_slug
+        'project': instance.project.slug
     })
     is_collector = data_collector in assigned_policies
 

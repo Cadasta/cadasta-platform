@@ -93,7 +93,7 @@
             </thead>
             <tbody>
               {% for prj in object.projects.all %}
-              <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.project_slug %}';">
+              <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.slug %}';">
                 <td>{{ prj.name }}</td>
                 <td>{{ prj.country }}</td>
                 <td>{{ prj.last_updated }}</td>

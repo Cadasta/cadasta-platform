@@ -5,7 +5,6 @@ from django import forms
 from django.contrib.postgres import forms as pg_forms
 from django.contrib.gis import forms as gisforms
 from django.utils.translation import ugettext as _
-from django.utils.text import slugify
 
 from leaflet.forms.widgets import LeafletWidget
 from tutelary.models import Role
@@ -48,15 +47,6 @@ class OrganizationForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         instance = super(OrganizationForm, self).save(commit=False)
         create = not instance.id
-
-        # ensuring slug is unique
-        if not instance.slug:
-            instance.slug = orig = slugify(instance.name)
-            for x in itertools.count(1):
-                if not Organization.objects.filter(
-                        slug=instance.slug).exists():
-                    break
-                instance.slug = '{}-{}'.format(orig, x)
 
         instance.save()
 

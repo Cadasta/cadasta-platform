@@ -1,9 +1,10 @@
 import random
+from django.db.models import SlugField, CharField, Model
 from django.test import TestCase
-from ..models import RandomIDModel
+from ..models import RandomIDModel, SlugModel
 
 
-class MyTestModel(RandomIDModel):
+class MyRandomIdModel(RandomIDModel):
     class Meta:
         app_label = 'core'
 
@@ -12,15 +13,85 @@ class RandomIDModelTest(TestCase):
     abstract_model = RandomIDModel
 
     def test_save(self):
-        instance = MyTestModel()
+        instance = MyRandomIdModel()
         instance.save()
         assert instance.id is not None
 
     def test_duplicate_ids(self):
         random.seed(a=10)
-        instance1 = MyTestModel()
+        instance1 = MyRandomIdModel()
         instance1.save()
         random.seed(a=10)
-        instance2 = MyTestModel()
+        instance2 = MyRandomIdModel()
         instance2.save()
         assert instance1.id != instance2.id
+
+
+class MySlugModel(SlugModel, Model):
+    slug = SlugField(max_length=50, unique=True)
+
+    class Meta:
+        app_label = 'core'
+
+
+class SlugModelTest(TestCase):
+    name = CharField(max_length=200)
+    abstract_model = SlugModel
+
+    def test_save(self):
+        instance = MySlugModel()
+        instance.name = 'Test Name'
+        instance.save()
+
+        instance.refresh_from_db()
+        assert instance.slug == 'test-name'
+
+    def test_save_slug_is_set(self):
+        instance = MySlugModel()
+        instance.name = 'Test Name'
+        instance.slug = 'slug'
+        instance.save()
+
+        instance.refresh_from_db()
+        assert instance.slug == 'slug'
+
+    def test_duplicate_slug(self):
+        instance1 = MySlugModel()
+        instance1.name = 'Test Name'
+        instance1.save()
+
+        instance2 = MySlugModel()
+        instance2.name = 'Test Name'
+        instance2.save()
+
+        instance1.refresh_from_db()
+        instance2.refresh_from_db()
+        assert instance1.slug != instance2.slug
+        assert instance2.slug == 'test-name-1'
+
+    def test_duplicate_slug_is_set(self):
+        instance1 = MySlugModel()
+        instance1.name = 'Test Name'
+        instance1.save()
+
+        instance2 = MySlugModel()
+        instance2.name = 'Some Name'
+        instance2.slug = instance1.slug
+        instance2.save()
+
+        instance1.refresh_from_db()
+        instance2.refresh_from_db()
+        assert instance1.slug != instance2.slug
+        assert instance2.slug == 'test-name-1'
+
+    def test_keep_slug(self):
+        instance = MySlugModel()
+        instance.name = 'Test Name'
+        instance.save()
+
+        instance.name = 'Other Name'
+        instance.save()
+
+        instance.refresh_from_db()
+        assert instance.name == 'Other Name'
+        assert instance.slug == 'test-name'

@@ -303,7 +303,7 @@ class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
     def get_object(self, queryset=None):
         queryset = Project.objects.filter(
             organization__slug=self.kwargs.get('organization'),
-            project_slug=self.kwargs.get('project')
+            slug=self.kwargs.get('project')
         )
         try:
             obj = queryset.get()
@@ -422,7 +422,7 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
 
         with transaction.atomic():
             project = Project.objects.create(
-                name=name, organization=org, project_slug=slugify(name),
+                name=name, organization=org, slug=slugify(name),
                 description=description, urls=[url], extent=location
             )
             for username, role in user_roles:
@@ -442,7 +442,7 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
 
         return redirect('organization:project-dashboard',
                         organization=organization,
-                        project=project.project_slug)
+                        project=project.slug)
 
 
 class ProjectEdit(generic.TemplateView):
