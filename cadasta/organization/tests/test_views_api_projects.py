@@ -47,7 +47,7 @@ class ProjectUsersAPITest(TestCase):
         url = '/v1/organizations/{org}/projects/{prj}/users/'
         request = APIRequestFactory().get(url.format(org=org, prj=prj))
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org, project_id=prj).render()
+        response = self.view(request, organization=org, project=prj).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -58,13 +58,13 @@ class ProjectUsersAPITest(TestCase):
     def _post(self, org, project, data, user=None, status=None, count=None):
         if user is None:
             user = self.user
-        prj = project.id
+        prj = project.slug
         url = '/v1/organizations/{org}/projects/{prj}/users/'
         request = APIRequestFactory().post(
             url.format(org=org, prj=prj), data, format='json'
         )
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org, project_id=prj).render()
+        response = self.view(request, organization=org, project=prj).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -79,18 +79,18 @@ class ProjectUsersAPITest(TestCase):
         prj_users = UserFactory.create_batch(2)
         other_user = UserFactory.create()
         project = ProjectFactory.create(add_users=prj_users)
-        content = self._get(project.organization.slug, project.id,
+        content = self._get(project.organization.slug, project.slug,
                             status=200, length=2)
         assert other_user.username not in [u['username'] for u in content]
 
     def test_full_list_with_unauthorized_user(self):
         project = ProjectFactory.create()
-        self._get(project.organization.slug, project.id,
+        self._get(project.organization.slug, project.slug,
                   user=AnonymousUser(), status=403)
 
     def test_get_full_list_organization_does_not_exist(self):
         project = ProjectFactory.create()
-        content = self._get('some-org', project.id, status=404)
+        content = self._get('some-org', project.slug, status=404)
         assert content['detail'] == "Project not found."
 
     def test_get_full_list_project_does_not_exist(self):
@@ -155,7 +155,7 @@ class ProjectUsersDetailAPITest(TestCase):
             url.format(org=org, prj=prj, user=user)
         )
         force_authenticate(request, user=auth)
-        response = self.view(request, slug=org, project_id=prj,
+        response = self.view(request, organization=org, project=prj,
                              username=user).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
@@ -171,7 +171,7 @@ class ProjectUsersDetailAPITest(TestCase):
             data, format='json'
         )
         force_authenticate(request, user=auth)
-        response = self.view(request, slug=org, project_id=prj,
+        response = self.view(request, organization=org, project=prj,
                              username=user).render()
         content = None
         if len(response.content) > 0:
@@ -183,13 +183,13 @@ class ProjectUsersDetailAPITest(TestCase):
     def _delete(self, org, project, user, auth=None, status=None, count=None):
         if auth is None:
             auth = self.user
-        prj = project.id
+        prj = project.slug
         url = '/v1/organizations/{org}/projects/{prj}/users/{user}'
         request = APIRequestFactory().delete(
             url.format(org=org, prj=prj, user=user)
         )
         force_authenticate(request, user=auth)
-        response = self.view(request, slug=org, project_id=prj,
+        response = self.view(request, organization=org, project=prj,
                              username=user).render()
         if status is not None:
             assert response.status_code == status
@@ -199,27 +199,27 @@ class ProjectUsersDetailAPITest(TestCase):
     def test_get_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
-        content = self._get(project.organization.slug, project.id,
+        content = self._get(project.organization.slug, project.slug,
                             user.username, status=200)
         assert content['username'] == user.username
 
     def test_get_user_with_unauthorized_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
-        self._get(project.organization.slug, project.id, user.username,
+        self._get(project.organization.slug, project.slug, user.username,
                   auth=AnonymousUser(), status=403)
 
     def test_get_user_that_does_not_exist(self):
         user = UserFactory.create()
         project = ProjectFactory.create()
-        content = self._get(project.organization.slug, project.id,
+        content = self._get(project.organization.slug, project.slug,
                             user.username, status=404)
         assert content['detail'] == _("User not found.")
 
     def test_get_user_from_org_that_does_not_exist(self):
         user = UserFactory.create()
         project = ProjectFactory.create()
-        content = self._get('some-org', project.id, user.username,
+        content = self._get('some-org', project.slug, user.username,
                             status=404)
         assert content['detail'] == _("Project not found.")
 
@@ -233,7 +233,7 @@ class ProjectUsersDetailAPITest(TestCase):
     def test_update_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
-        self._patch(project.organization.slug, project.id,
+        self._patch(project.organization.slug, project.slug,
                     user.username, {'role': 'PM'}, status=200)
         role = ProjectRole.objects.get(project=project, user=user)
         assert role.role == 'PM'
@@ -241,7 +241,7 @@ class ProjectUsersDetailAPITest(TestCase):
     def test_update_user_with_unauthorized_user(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
-        self._patch(project.organization.slug, project.id, user.username,
+        self._patch(project.organization.slug, project.slug, user.username,
                     {'role': 'PM'}, auth=AnonymousUser(), status=403)
         role = ProjectRole.objects.get(project=project, user=user)
         assert role.role == 'PU'
@@ -622,7 +622,7 @@ class ProjectDetailAPITest(TestCase):
         url = '/v1/organizations/{org}/projects/{slug}'
         request = APIRequestFactory().get(url.format(org=org, slug=slug))
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org, project_slug=slug).render()
+        response = self.view(request, organization=org, project=slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -636,8 +636,8 @@ class ProjectDetailAPITest(TestCase):
             url.format(org=org, slug=project.slug), data
         )
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org,
-                             project_slug=project.slug).render()
+        response = self.view(request, organization=org,
+                             project=project.slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status

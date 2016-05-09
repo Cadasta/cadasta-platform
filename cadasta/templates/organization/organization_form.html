@@ -5,10 +5,18 @@
 
 {{ form.non_field_errors }}
 
-<div class="form-group">
-  {{ form.name.errors }}
-  <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-  {% render_field form.name class+="form-control input-lg" %}
+<div class="row">
+  <div class="col-sm-8">
+    <div class="form-group">
+      {{ form.name.errors }}
+      <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
+      {% render_field form.name class+="form-control input-lg" %}
+    </div>
+  </div>
+
+  <div class="col-sm-4">
+    {{ form.access }}
+  </div>
 </div>
 
 <div class="form-group">

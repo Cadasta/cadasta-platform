@@ -2,15 +2,16 @@ from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.shortcuts import redirect
 
 from ..models import Organization, Project
 
 
 class OrganizationMixin:
-    def get_organization(self):
+    def get_organization(self, lookup_kwarg='slug'):
         if not hasattr(self, 'org'):
             self.org = get_object_or_404(Organization,
-                                         slug=self.kwargs['slug'])
+                                         slug=self.kwargs[lookup_kwarg])
         return self.org
 
     def get_perms_objects(self):
@@ -37,8 +38,8 @@ class ProjectMixin:
     def get_project(self):
         return get_object_or_404(
             Project,
-            organization__slug=self.kwargs['slug'],
-            pk=self.kwargs['project_id']
+            organization__slug=self.kwargs['organization'],
+            slug=self.kwargs['project']
         )
 
 
@@ -69,3 +70,12 @@ class ProjectQuerySetMixin:
                     Q(access='public') | Q(organization__in=orgs)
                 )
         return Project.objects.filter(access='public')
+
+
+class ArchiveMixin:
+    def archive(self, archived):
+        self.object = self.get_object()
+        self.object.archived = archived
+        self.object.save()
+
+        return redirect(self.get_success_url())

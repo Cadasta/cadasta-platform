@@ -8,7 +8,7 @@ from accounts.models import User
 
 from ..models import Organization
 from .. import serializers
-from .mixins import OrganizationRoles, ProjectRoles, ProjectQuerySetMixin
+from . import mixins
 
 
 class OrganizationList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
@@ -49,7 +49,7 @@ class OrganizationDetail(APIPermissionRequiredMixin,
 
 
 class OrganizationUsers(APIPermissionRequiredMixin,
-                        OrganizationRoles,
+                        mixins.OrganizationRoles,
                         generics.ListCreateAPIView):
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = {
@@ -59,7 +59,7 @@ class OrganizationUsers(APIPermissionRequiredMixin,
 
 
 class OrganizationUsersDetail(APIPermissionRequiredMixin,
-                              OrganizationRoles,
+                              mixins.OrganizationRoles,
                               generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = 'org.users.remove'
@@ -96,7 +96,8 @@ class UserAdminDetail(APIPermissionRequiredMixin,
 
 
 class OrganizationProjectList(APIPermissionRequiredMixin,
-                              ProjectQuerySetMixin,
+                              mixins.OrganizationMixin,
+                              mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -109,16 +110,6 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
         'GET': 'project.list',
         'POST': 'project.create'
     }
-
-    def get_organization(self):
-        if not hasattr(self, 'organization_object'):
-            org_slug = self.kwargs['slug']
-            self.organization_object = Organization.objects.get(slug=org_slug)
-
-        return self.organization_object
-
-    def get_perms_objects(self):
-        return [self.get_organization()]
 
     def get_serializer_context(self, *args, **kwargs):
         org = self.get_organization()
@@ -134,7 +125,7 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
         )
 
 
-class ProjectList(APIPermissionRequiredMixin, ProjectQuerySetMixin,
+class ProjectList(APIPermissionRequiredMixin, mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -147,6 +138,7 @@ class ProjectList(APIPermissionRequiredMixin, ProjectQuerySetMixin,
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
+                    mixins.OrganizationMixin,
                     generics.RetrieveUpdateDestroyAPIView):
     def get_actions(self, request):
         if self.get_object().public():
@@ -168,34 +160,23 @@ class ProjectDetail(APIPermissionRequiredMixin,
     filter_fields = ('archived',)
     # search_fields = ('name', 'organization', 'country', 'description',)
     # ordering_fields = ('name', 'organization', 'country', 'description',)
-    lookup_url_kwarg = 'project_slug'
+    lookup_url_kwarg = 'project'
     lookup_field = 'slug'
     permission_required = {
         'GET': get_actions,
         'PATCH': patch_actions,
     }
 
-    def get_organization(self):
-        if not hasattr(self, 'organization_object'):
-            org_slug = self.kwargs['slug']
-            self.organization_object = Organization.objects.get(slug=org_slug)
-
-        return self.organization_object
-
-    def get_serializer_context(self, *args, **kwargs):
-        org = self.get_organization()
-        context = super(ProjectDetail,
-                        self).get_serializer_context(*args, **kwargs)
-        context['organization'] = org
-
-        return context
+    def get_perms_objects(self):
+        return [self.get_object()]
 
     def get_queryset(self):
-        return self.get_organization().projects.all()
+        return self.get_organization(
+            lookup_kwarg='organization').projects.all()
 
 
 class ProjectUsers(APIPermissionRequiredMixin,
-                   ProjectRoles,
+                   mixins.ProjectRoles,
                    generics.ListCreateAPIView):
     serializer_class = serializers.ProjectUserSerializer
     permission_required = {
@@ -205,7 +186,7 @@ class ProjectUsers(APIPermissionRequiredMixin,
 
 
 class ProjectUsersDetail(APIPermissionRequiredMixin,
-                         ProjectRoles,
+                         mixins.ProjectRoles,
                          generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProjectUserSerializer
 

@@ -30,15 +30,37 @@ urlpatterns = [
     #
     # PROJECTS
     #
-
+    url(
+        r'^(?P<organization>[-\w]+)/projects/new/$',
+        default.ProjectAddWizard.as_view(),
+        name='project-add'),
     url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/$',
         default.ProjectDashboard.as_view(),
         name='project-dashboard'),
     url(
-        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/$',
-        default.ProjectEdit.as_view(),
-        name='project-edit'),
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/'
+        'geometry/$',
+        default.ProjectEditGeometry.as_view(),
+        name='project-edit-geometry'),
+    url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/'
+        'details/$',
+        default.ProjectEditDetails.as_view(),
+        name='project-edit-details'),
+    url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/'
+        'permissions/$',
+        default.ProjectEditPermissions.as_view(),
+        name='project-edit-permissions'),
+    url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/archive/$',
+        default.ProjectArchive.as_view(),
+        name='project-archive'),
+    url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/unarchive/$',
+        default.ProjectUnarchive.as_view(),
+        name='project-unarchive'),
 
     #
     # MEMBERS

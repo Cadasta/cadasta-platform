@@ -1,11 +1,20 @@
+import os
 import json
-from django.test import TestCase
 from pytest import raises
+
+from django.test import TestCase
+from django.conf import settings
+
+from buckets.test.utils import ensure_dirs
+from buckets.test.storage import FakeS3Storage
 
 from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
+from core.tests.factories import PolicyFactory, RoleFactory
+from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
 
 
@@ -165,3 +174,205 @@ class EditOrganizationMemberFormTest(TestCase):
                 is False)
         assert (ProjectRole.objects.filter(user=user, project=prj_4).exists()
                 is False)
+
+
+class ProjectEditDetailsTest(TestCase):
+    def _get_form(self, form_name):
+        path = os.path.dirname(settings.BASE_DIR)
+        ensure_dirs()
+
+        storage = FakeS3Storage()
+        file = open(
+            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
+            'rb'
+        )
+        form = storage.save('{}.xlsx'.format(form_name), file)
+        return form
+
+    def test_add_new_questionnaire(self):
+        project = ProjectFactory.create()
+        data = {
+            'name': 'New name',
+            'questionnaire': self._get_form('xls-form'),
+            'access': project.access
+        }
+
+        form = forms.ProjectEditDetails(instance=project, data=data)
+        form.save()
+
+        project.refresh_from_db()
+        assert project.name == data['name']
+        assert (project.questionnaires.get(
+                    id=project.current_questionnaire
+                ).xls_form.url == data['questionnaire'])
+
+    def test_add_invalid_questionnaire(self):
+        project = ProjectFactory.create()
+        data = {
+            'name': 'New name',
+            'questionnaire': self._get_form('xls-form-invalid'),
+            'access': project.access
+        }
+
+        form = forms.ProjectEditDetails(instance=project, data=data)
+        with raises(InvalidXLSForm):
+            form.save()
+
+        project.refresh_from_db()
+        assert project.name != data['name']
+        assert project.current_questionnaire is None
+
+    def test_replace_questionnaire(self):
+        project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(
+            project=project,
+            xls_form=self._get_form('xls-form'))
+        data = {
+            'name': 'New name',
+            'questionnaire': self._get_form('xls-form-copy'),
+            'access': project.access
+        }
+
+        form = forms.ProjectEditDetails(
+            instance=project,
+            data=data,
+            initial={'questionnaire': questionnaire.xls_form.url})
+        form.save()
+
+        project.refresh_from_db()
+        assert project.name == data['name']
+        assert (project.questionnaires.get(
+                    id=project.current_questionnaire
+                ).xls_form.url == data['questionnaire'])
+
+    def test_delete_questionnaire(self):
+        project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(
+            project=project,
+            xls_form=self._get_form('xls-form'))
+        data = {
+            'name': 'New name',
+            'questionnaire': '',
+            'access': project.access
+        }
+
+        form = forms.ProjectEditDetails(
+            instance=project,
+            data=data,
+            initial={'questionnaire': questionnaire.xls_form.url})
+        form.save()
+
+        project.refresh_from_db()
+        assert project.name == data['name']
+        assert not project.current_questionnaire
+
+
+class UpdateProjectRolesTest(TestCase):
+    def setUp(self):
+        self.project = ProjectFactory.create()
+        self.user = UserFactory.create()
+
+    def test_create_new_role(self):
+        """New ProjectRole instance should be created when role != Pb"""
+        forms.create_update_or_delete_project_role(
+            self.project.id, self.user, 'PM')
+
+        assert ProjectRole.objects.count() == 1
+        assert ProjectRole.objects.first().role == 'PM'
+
+    def test_do_not_create_new_role_for_public_user(self):
+        """No ProjectRole instance should be created when role == Pb"""
+        forms.create_update_or_delete_project_role(
+            self.project.id, self.user, 'Pb')
+
+        assert ProjectRole.objects.count() == 0
+
+    def test_update_existing_role(self):
+        ProjectRole.objects.create(
+            project=self.project,
+            user=self.user,
+            role='DC')
+        forms.create_update_or_delete_project_role(
+            self.project.id, self.user, 'PM')
+
+        role = ProjectRole.objects.get(project=self.project, user=self.user)
+        assert role.role == 'PM'
+
+    def test_delete_existing_role(self):
+        """If role is updated to Pb (public user) the Project Role instance
+           should be deleted"""
+        ProjectRole.objects.create(
+            project=self.project,
+            user=self.user,
+            role='DC')
+        forms.create_update_or_delete_project_role(
+            self.project.id, self.user, 'Pb')
+        assert ProjectRole.objects.count() == 0
+
+
+class ProjectEditPermissionsTest(TestCase):
+    def setUp(self):
+        self.project = ProjectFactory.create()
+
+        self.super_user = UserFactory.create()
+        OrganizationRole.objects.create(user=self.super_user,
+                                        organization=self.project.organization,
+                                        admin=False)
+
+        PolicyFactory.set_directory(settings.BASE_DIR + '/permissions/')
+        su_pol = PolicyFactory.create(name='superuser', file='superuser.json')
+        su_role = RoleFactory.create(
+            name='superuser',
+            policies=[su_pol]
+        )
+        self.super_user.assign_policies(su_role)
+
+        self.org_admin = UserFactory.create()
+        OrganizationRole.objects.create(user=self.org_admin,
+                                        organization=self.project.organization,
+                                        admin=True)
+        self.project_user_1 = UserFactory.create()
+        OrganizationRole.objects.create(user=self.project_user_1,
+                                        organization=self.project.organization,
+                                        admin=False)
+        ProjectRole.objects.create(user=self.project_user_1,
+                                   project=self.project,
+                                   role='DC')
+        self.project_user_2 = UserFactory.create()
+        OrganizationRole.objects.create(user=self.project_user_2,
+                                        organization=self.project.organization,
+                                        admin=False)
+
+    def test_init(self):
+        form = forms.ProjectEditPermissions(instance=self.project)
+        assert len(form.fields) == 4
+
+        for k, field in form.fields.items():
+            if field.user == self.project_user_2:
+                assert field.initial == 'Pb'
+            elif field.user == self.project_user_1:
+                assert field.initial == 'DC'
+            elif field.user == self.org_admin:
+                assert field.initial == 'A'
+            elif field.user == self.super_user:
+                assert field.initial == 'A'
+
+    def test_save(self):
+        data = {
+            self.project_user_1.username: 'PM',
+            self.project_user_2.username: 'DC'
+        }
+        form = forms.ProjectEditPermissions(instance=self.project, data=data)
+        form.save()
+
+        role_1 = ProjectRole.objects.get(
+            project=self.project,
+            user=self.project_user_1
+        )
+        assert role_1.role == 'PM'
+
+        role_2 = ProjectRole.objects.get(
+            project=self.project,
+            user=self.project_user_2
+        )
+        assert role_2.role == 'DC'
