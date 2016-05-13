@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'spatial',
     'questionnaires',
     'buckets',
+    'party',
 
     'crispy_forms',
     'widget_tweaks',
