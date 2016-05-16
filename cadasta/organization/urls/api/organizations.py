@@ -24,16 +24,16 @@ urlpatterns = [
         api.OrganizationProjectList.as_view(),
         name='project_list'),
     url(
-        r'^(?P<slug>[-\w]+)/projects/(?P<project_slug>[-\w]+)/$',
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/$',
         api.ProjectDetail.as_view(),
         name='project_detail'),
     url(
-        r'^(?P<slug>[-\w]+)/projects/(?P<project_id>[-\w]+)/users/$',
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/users/$',
         api.ProjectUsers.as_view(),
         name='project_users'),
     url(
-        r'^(?P<slug>[-\w]+)/projects/'
-        '(?P<project_id>[-\w]+)/users/(?P<username>[-\w]+)/$',
+        r'^(?P<organization>[-\w]+)/projects/'
+        '(?P<project>[-\w]+)/users/(?P<username>[-\w]+)/$',
         api.ProjectUsersDetail.as_view(),
         name='project_users_detail'),
 ]

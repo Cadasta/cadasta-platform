@@ -15,6 +15,11 @@ class QuestionnaireFactory(ExtendedFactory):
     xls_form = 'http://example.com/test.txt'
     project = factory.SubFactory(ProjectFactory)
 
+    @factory.post_generation
+    def add_current_questionnaire(self, create, extracted, **kwargs):
+        self.project.current_questionnaire = self.id
+        self.project.save()
+
 
 class QuestionGroupFactory(ExtendedFactory):
     class Meta:

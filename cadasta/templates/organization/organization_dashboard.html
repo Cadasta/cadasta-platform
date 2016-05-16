@@ -15,7 +15,11 @@
         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
       </a>
       <div class="org-logo">
+        {% if org.logo %}
         <img src="{{ object.logo }}" alt="{{ object.name }}" class="org-logo" />
+        {% else %}
+        <h2>{{ object.name }}</h2>
+        {% endif %}
       </div>
       <div class="top-btn pull-right">
         <!-- More options menu -->
@@ -36,16 +40,15 @@
           </ul>
         </div>
         <!-- Split add button -->
-        <div class="btn-group pull-right btn-add">
-          <button type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add project" %}
-          </button>
+        <div class="dropdown pull-right btn-add">
           <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
+            {% trans "Add" %}
             <span class="caret"></span>
-            <span class="sr-only">Toggle Add</span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">Add new member</a></li>
+            <li><a href="{% url 'organization:project-add' object.slug %}">{% trans "Add new project" %}</a></li>
+            <li><a href="#">{% trans "Add new member" %}</a></li>
           </ul>
         </div>
       </div>
@@ -109,7 +112,7 @@
             {% trans "What would you like to do next?" %}
           </p>
           <p>
-            <a href="{% url 'project:add' %}" class="btn btn-primary" role="button">
+            <a href="{% url 'organization:project-add' object.slug %}" class="btn btn-primary" role="button">
               {% trans "Add new project" %}
             </a>
             <a href="#" class="btn btn-primary" role="button">
@@ -174,7 +177,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close-u" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
         <h4 class="modal-title">{% trans "Unarchive organization" %}</h4>
@@ -185,7 +188,7 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-link cancel-u" data-dismiss="modal">
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
         <a href="{% url 'organization:unarchive' object.slug %}"  class="btn btn-primary unarchive-final" role="button">

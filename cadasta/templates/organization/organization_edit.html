@@ -1,4 +1,4 @@
-organization{% extends "organization/organization_dashboard.html" %}
+{% extends "organization/organization_dashboard.html" %}
 
 {% load i18n %}
 {% load widget_tweaks %}
@@ -39,4 +39,8 @@ organization{% extends "organization/organization_dashboard.html" %}
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_script %}
+  {{ form.media }}
 {% endblock %}

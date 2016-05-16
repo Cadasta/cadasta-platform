@@ -53,7 +53,8 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
     def get_object(self):
         if not hasattr(self, 'object'):
             prj = self.get_project()
-            self.object = Questionnaire.objects.get(project=prj)
+            self.object = Questionnaire.objects.get(
+                id=prj.current_questionnaire)
 
         return self.object
 
@@ -69,8 +70,4 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
             raise Http404('No Questionnaire matches the given query.')
 
     def put(self, request, *args, **kwargs):
-        try:
-            self.get_object()
-            # return self.update(request)
-        except Questionnaire.DoesNotExist:
-            return self.create(request)
+        return self.create(request)

@@ -1,0 +1,55 @@
+{% extends "organization/project_wrapper.html" %}
+
+{% load staticfiles %}
+{% load i18n %}
+{% load leaflet_tags %}
+
+{% block extra_head %}
+{% leaflet_css plugins="draw,forms" %}
+<style type="text/css">
+  #id_extent_map {
+    height: 100%;
+  }  
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+{% endblock %}
+
+{% block extra_script %}
+{% leaflet_js plugins="draw,forms" %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+<script src="{% static 'js/map_utils.js' %}"></script>
+<script>
+ $(document).ready(function () {
+   $(window).on('map:init', function(e) {
+     add_map_controls(e.originalEvent.detail.map);
+   });
+ });
+</script>
+{% endblock %}
+
+{% block project_main %}
+
+<!-- Main content -->
+  <form class="col-md-11 col-md-offset-1 main main-map" method="POST" action="{% url 'organization:project-edit-geometry' project.organization.slug project.slug %}">
+    {% csrf_token %}
+    <div class="row">
+      <!-- Left column map  -->
+      <div class="col-md-7 col-map">
+        {{ form.extent }}
+      </div>
+      <!-- /.col-map -->
+      <!-- Right column detail  -->
+      <div class="col-md-5 col-detail">
+        <h2 class="page-title">{% trans "Edit project geometry" %}</h2>
+        <p>{% trans "Use the map tools to modify your project geometry. Once complete, select the continue button." %}</p>
+
+        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+        <a class="btn btn-link" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
+      </div>
+      <!-- /.col-detail -->
+    </div>
+  </form>
+  <!-- /.main -->
+</div>
+
+{% endblock %}

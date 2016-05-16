@@ -83,7 +83,7 @@ class QuestionnaireDetailTest(TestCase):
 
         return content
 
-    def test_get_questionnaire(self):  #
+    def test_get_questionnaire(self):
         questionnaire = QuestionnaireFactory.create(project=self.prj)
 
         content = self._get(status=200)

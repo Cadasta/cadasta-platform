@@ -58,6 +58,9 @@ class QuestionnaireManager(models.Manager):
             instance.version = version
             instance.save()
 
+            project.current_questionnaire = instance.id
+            project.save()
+
             errors = []
 
             create_children(

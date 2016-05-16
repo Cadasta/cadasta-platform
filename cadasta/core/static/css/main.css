@@ -3433,56 +3433,6 @@ table th[class*="col-"] {
   .form-narrow .checkbox.pull-left {
     margin-top: 0; }
 
-div.switch {
-  margin-left: 10px; }
-
-.toggle {
-  position: absolute;
-  margin-left: -9999px;
-  visibility: hidden; }
-
-.toggle + label {
-  display: block;
-  position: relative;
-  cursor: pointer;
-  outline: none;
-  user-select: none; }
-
-input.toggle-round + label {
-  padding: 2px;
-  width: 60px;
-  height: 30px;
-  background-color: #dddddd;
-  border-radius: 30px; }
-
-input.toggle-round + label:before,
-input.toggle-round + label:after {
-  display: block;
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  bottom: 1px;
-  content: ""; }
-
-input.toggle-round + label:before {
-  right: 1px;
-  background-color: #f10000;
-  border-radius: 60px;
-  transition: background 0.4s; }
-
-input.toggle-round + label:after {
-  width: 29px;
-  background-color: #fff;
-  border-radius: 100%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  transition: margin 0.4s; }
-
-input.toggle-round:checked + label:before {
-  background-color: #8ce196; }
-
-input.toggle-round:checked + label:after {
-  margin-left: 30px; }
-
 .leaflet-control-geolocate {
   width: 25px;
   height: 25px;
@@ -3499,6 +3449,23 @@ input.toggle-round:checked + label:after {
   line-height: 25px;
   vertical-align: middle;
   cursor: pointer; }
+
+.public-private-widget > label {
+  display: block; }
+
+.public-private-widget > div {
+  width: 60px;
+  float: left;
+  text-align: center;
+  margin-right: 15px; }
+
+.public-private-widget > div:nth-child(2) {
+  width: 40px;
+  text-align: right; }
+
+.public-private-widget > div:last-child {
+  width: 40px;
+  text-align: left; }
 
 /* =Fonts
 -------------------------------------------------------------- */

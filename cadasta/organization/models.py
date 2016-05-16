@@ -13,7 +13,7 @@ from tutelary.models import Policy
 from core.models import RandomIDModel, SlugModel
 from geography.models import WorldBorder
 from .validators import validate_contact
-from .choices import ROLE_CHOICES
+from .choices import ROLE_CHOICES, ACCESS_CHOICES
 from . import messages
 
 
@@ -46,6 +46,9 @@ class Organization(SlugModel, RandomIDModel):
     logo = models.URLField(null=True)
     # logo = TemporalForeignKey('Resource')
     last_updated = models.DateTimeField(auto_now=True)
+    access = models.CharField(
+        default="public", choices=ACCESS_CHOICES, max_length=8
+    )
 
     class Meta:
         ordering = ('name',)
@@ -140,10 +143,6 @@ def remove_project_membership(sender, instance, **kwargs):
 
 @permissioned_model
 class Project(SlugModel, RandomIDModel):
-    ACCESS_CHOICES = [
-        ("public", _("Public")),
-        ("private", _("Private")),
-    ]
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, unique=True, null=True)
     organization = models.ForeignKey(Organization, related_name='projects')
@@ -158,6 +157,9 @@ class Project(SlugModel, RandomIDModel):
     extent = gismodels.PolygonField(null=True)
     access = models.CharField(
         default="public", choices=ACCESS_CHOICES, max_length=8
+    )
+    current_questionnaire = models.CharField(
+      max_length=24, null=True, blank=True
     )
 
     class Meta:

@@ -8,7 +8,6 @@ from django.utils.translation import gettext as _
 from django.contrib import messages
 
 import formtools.wizard.views as wizard
-from tutelary.models import Role
 
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from accounts.models import User
@@ -16,7 +15,7 @@ from questionnaires.models import Questionnaire
 from questionnaires.exceptions import InvalidXLSForm
 
 from ..models import Organization, Project, OrganizationRole, ProjectRole
-from .mixins import OrganizationMixin, ProjectQuerySetMixin
+from . import mixins
 from .. import forms
 from .. import messages as error_messages
 
@@ -70,44 +69,32 @@ class OrganizationEdit(LoginPermissionRequiredMixin,
         )
 
 
-class OrganizationArchive(LoginPermissionRequiredMixin,
-                          generic.DetailView):
+class OrgArchiveView(LoginPermissionRequiredMixin,
+                     mixins.ArchiveMixin,
+                     generic.DetailView):
     model = Organization
+
+    def get_success_url(self):
+        return reverse(
+            'organization:dashboard',
+            kwargs={'slug': self.object.slug}
+        )
+
+
+class OrganizationArchive(OrgArchiveView):
     permission_required = 'org.archive'
     permission_denied_message = error_messages.ORG_ARCHIVE
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.archived = True
-        self.object.save()
-
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse(
-            'organization:dashboard',
-            kwargs={'slug': self.object.slug}
-        )
+        return self.archive(True)
 
 
-class OrganizationUnarchive(LoginPermissionRequiredMixin,
-                            generic.DetailView):
-    model = Organization
+class OrganizationUnarchive(OrgArchiveView):
     permission_required = 'org.unarchive'
     permission_denied_message = error_messages.ORG_UNARCHIVE
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        self.object.archived = False
-        self.object.save()
-
-        return redirect(self.get_success_url())
-
-    def get_success_url(self):
-        return reverse(
-            'organization:dashboard',
-            kwargs={'slug': self.object.slug}
-        )
+        return self.archive(False)
 
 
 class OrganizationMembers(LoginPermissionRequiredMixin, generic.DetailView):
@@ -117,7 +104,7 @@ class OrganizationMembers(LoginPermissionRequiredMixin, generic.DetailView):
     permission_denied_message = error_messages.ORG_USERS_LIST
 
 
-class OrganizationMembersAdd(OrganizationMixin,
+class OrganizationMembersAdd(mixins.OrganizationMixin,
                              LoginPermissionRequiredMixin,
                              generic.CreateView):
     model = OrganizationRole
@@ -147,7 +134,7 @@ class OrganizationMembersAdd(OrganizationMixin,
         )
 
 
-class OrganizationMembersEdit(OrganizationMixin,
+class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
                               generic.edit.FormMixin,
                               generic.DetailView):
@@ -196,7 +183,7 @@ class OrganizationMembersEdit(OrganizationMixin,
         return super().form_valid(form)
 
 
-class OrganizationMembersRemove(OrganizationMixin,
+class OrganizationMembersRemove(mixins.OrganizationMixin,
                                 LoginPermissionRequiredMixin,
                                 generic.DeleteView):
     permission_required = 'org.users.remove'
@@ -251,7 +238,7 @@ class UserActivation(LoginPermissionRequiredMixin, generic.View):
         return redirect('user:list')
 
 
-class ProjectList(PermissionRequiredMixin, ProjectQuerySetMixin,
+class ProjectList(PermissionRequiredMixin, mixins.ProjectQuerySetMixin,
                   generic.ListView):
     model = Project
     template_name = 'organization/project_list.html'
@@ -337,10 +324,13 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
     permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
 
-    def __init__(self, *args, **kwargs):
-        self.organization = None
-        self.members = None
-        super().__init__(*args, **kwargs)
+    def get_form_initial(self, step):
+        initial = super().get_form_initial(step)
+
+        if step == 'details' and self.kwargs.get('organization'):
+            initial['organization'] = self.kwargs.get('organization')
+
+        return initial
 
     def get_perms_objects(self):
         session = self.request.session.get('wizard_project_add_wizard', None)
@@ -374,7 +364,6 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
                 'permissions': ''
             }
         elif isinstance(form, forms.ProjectAddPermissions):
-            context['members'] = context['wizard']['form'].members
             context['wizard_step_classes'] = {
                 'extent': 'enabled complete',
                 'details': 'enabled complete',
@@ -384,46 +373,43 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
 
     def process_step(self, form):
         result = self.get_form_step_data(form)
+
         if 'details-organization' in result:
             self.organization = result['details-organization']
+
         return result
 
     def get_form_kwargs(self, step=None):
         if step == 'permissions':
-            return {'organization': self.organization}
+            return {
+                'organization': self.get_cleaned_data_for_step(
+                    'details').get('organization')
+            }
         else:
             return {}
 
     def done(self, form_list, form_dict, **kwargs):
-        form_data = [form.data for form in form_list]
-        location = form_data[0]['extents-location']
-        name = form_data[1]['details-name']
-        description = form_data[1]['details-description']
-        organization = form_data[1]['details-organization']
-        url = form_data[1]['details-url']
-        questionaire = form_data[1].get('details-questionaire')
-        # private = form_data[1]['details-public'] != 'on'
+        form_data = [form.cleaned_data for form in form_list]
+        extent = form_data[0]['extent']
+        name = form_data[1]['name']
+        description = form_data[1]['description']
+        organization = form_data[1]['organization']
+        url = form_data[1]['url']
+        questionaire = form_data[1].get('questionaire')
+        access = form_data[1].get('access')
         org = Organization.objects.get(slug=organization)
-        try:
-            su_role = Role.objects.get(name='superuser')
-        except:
-            su_role = None
-        usernames = []
+
+        user_roles = []
         for user in org.users.all():
-            is_admin = any([isinstance(pol, Role) and pol == su_role
-                            for pol in user.assigned_policies()])
-            if not is_admin:
-                if OrganizationRole.objects.get(organization=org,
-                                                user=user).admin:
-                    is_admin = True
-            if not is_admin:
-                usernames.append(user.username)
-        user_roles = [(k, form_data[2][k]) for k in usernames]
+            role = form_data[2].get(user.username, None)
+            if role:
+                user_roles.append((user, role))
 
         with transaction.atomic():
             project = Project.objects.create(
                 name=name, organization=org, slug=slugify(name),
-                description=description, urls=[url], extent=location
+                description=description, urls=[url], extent=extent,
+                access=access
             )
             for username, role in user_roles:
                 user = User.objects.get(username=username)
@@ -445,6 +431,74 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
                         project=project.slug)
 
 
-class ProjectEdit(generic.TemplateView):
-    template_name = 'organization/project_edit.html'
+class ProjectEdit(mixins.ProjectMixin,
+                  LoginPermissionRequiredMixin):
+    model = Project
+    permission_required = 'project.update'
+
+    def get_object(self):
+        return self.get_project()
+
+    def get_success_url(self):
+        return reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.object.organization.slug,
+                'project': self.object.slug
+            }
+        )
+
+
+class ProjectEditGeometry(ProjectEdit, generic.UpdateView):
+    form_class = forms.ProjectAddExtents
+    template_name = 'organization/project_edit_geometry.html'
     permission_denied_message = error_messages.PROJ_EDIT
+
+
+class ProjectEditDetails(ProjectEdit, generic.UpdateView):
+    form_class = forms.ProjectEditDetails
+    template_name = 'organization/project_edit_details.html'
+    permission_denied_message = error_messages.PROJ_EDIT
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        try:
+            questionnaire = Questionnaire.objects.get(
+                id=self.object.current_questionnaire)
+            initial['questionnaire'] = questionnaire.xls_form.url
+        except Questionnaire.DoesNotExist:
+            pass
+
+        return initial
+
+    def post(self, *args, **kwargs):
+        try:
+            return super().post(*args, **kwargs)
+        except InvalidXLSForm as e:
+            form = self.get_form()
+            for err in e.errors:
+                form.add_error('questionnaire', err)
+            return self.form_invalid(form)
+
+
+class ProjectEditPermissions(ProjectEdit, generic.UpdateView):
+    form_class = forms.ProjectEditPermissions
+    template_name = 'organization/project_edit_permissions.html'
+    permission_denied_message = error_messages.PROJ_EDIT
+
+
+class ProjectArchive(ProjectEdit, mixins.ArchiveMixin, generic.DetailView):
+    permission_required = 'project.archive'
+    permission_denied_message = error_messages.PROJ_ARCHIVE
+
+    def get(self, request, *args, **kwargs):
+        return self.archive(True)
+
+
+class ProjectUnarchive(ProjectEdit, mixins.ArchiveMixin, generic.DetailView):
+    permission_required = 'project.unarchive'
+    permission_denied_message = error_messages.PROJ_UNARCHIVE
+
+    def get(self, request, *args, **kwargs):
+        return self.archive(False)

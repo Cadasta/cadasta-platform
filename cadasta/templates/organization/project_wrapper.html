@@ -14,7 +14,11 @@
         <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
       </a>
       <div class="org-logo">
-        <img src="{{ object.organization.logo }}" alt="{{ object.organization.name }}" class="org-logo" />
+        {% if object.organization.logo %}
+        <img src="{{ object.organization.logo }}" alt="{{ object.name }}" class="org-logo" />
+        {% else %}
+        <h2>{{ object.organization.name }}</h2>
+        {% endif %}
       </div>
       <h2>{{ object.name }}</h2>
       <div class="top-btn pull-right">
@@ -24,15 +28,15 @@
             <span class="icon kabob-icon"></span>
           </a>
           <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a class="edit" href="#">{% trans "Edit project geometry" %}</a></li>
-            <li><a class="edit" href="#">{% trans "Edit project details" %}</a></li>
-            <li><a class="edit" href="#">{% trans "Edit project member permissions" %}</a></li>
+            <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project geometry" %}</a></li>
+            <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
+            <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit project member permissions" %}</a></li>
             <li role="separator" class="divider"></li>
             <li>
               {% if object.archived %}
-              <a class="archive" href="#" data-toggle="modal">{% trans "Unarchive project" %}</a>
+              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive project" %}</a>
               {% else %}
-              <a class="archive" href="#" data-toggle="modal">{% trans "Archive project" %}</a>
+              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive project" %}</a>
               {% endif %}
             </li>
           </ul>
@@ -40,14 +44,15 @@
         <!-- Split add button -->
         <div class="btn-group pull-right btn-add">
           <button type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add location" %}
+            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
           </button>
           <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
             <span class="sr-only">Toggle Add</span>
           </button>
           <ul class="dropdown-menu">
-            <li><a href="#">Add project resource</a></li>
+            <li><a href="#">Add new location</a></li>
+            <li><a href="#">Add new ressource</a></li>
             <li role="separator" class="divider"></li>
             <li><a class="edit" href="#">{% trans "Import field data" %}</a></li>
           </ul>
@@ -87,5 +92,55 @@
   {% block project_main %}{% endblock %}
 
 </div>
+
+<div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{% trans "Archive project" %}</h4>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "Are you sure you want to archive this project?" %}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+        <a href="{% url 'organization:project-archive' object.organization.slug object.slug %}"  class="btn btn-primary archive-final" role="button">
+          {% trans "Archive" %}
+        </a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="unarchive_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{% trans "Unarchive project" %}</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Are you sure you want to unarchive this project?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-link cancel-u" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+        <a href="{% url 'organization:project-unarchive' object.organization.slug object.slug %}"  class="btn btn-primary unarchive-final" role="button">
+          {% trans "Unarchive" %}
+        </a>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 {% endblock %}

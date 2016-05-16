@@ -74,7 +74,7 @@ class ProjectUrlTest(TestCase):
     def test_project_users(self):
         actual = reverse(
             version_ns('organization:project_users'),
-            kwargs={'slug': 'habitat', 'project_id': '123abc'}
+            kwargs={'organization': 'habitat', 'project': '123abc'}
         )
         expected = version_url('/organizations/habitat/projects/123abc/users/')
         assert actual == expected
@@ -82,14 +82,14 @@ class ProjectUrlTest(TestCase):
         resolved = resolve(version_url(
             '/organizations/habitat/projects/123abc/users/'))
         assert resolved.func.__name__ == api.ProjectUsers.__name__
-        assert resolved.kwargs['slug'] == 'habitat'
-        assert resolved.kwargs['project_id'] == '123abc'
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
 
     def test_project_users_detail(self):
         actual = reverse(
             version_ns('organization:project_users_detail'),
-            kwargs={'slug': 'habitat',
-                    'project_id': '123abc',
+            kwargs={'organization': 'habitat',
+                    'project': '123abc',
                     'username': 'barbara'}
         )
         expected = version_url(
@@ -99,6 +99,6 @@ class ProjectUrlTest(TestCase):
         resolved = resolve(version_url(
             '/organizations/habitat/projects/123abc/users/barbara/'))
         assert resolved.func.__name__ == api.ProjectUsersDetail.__name__
-        assert resolved.kwargs['slug'] == 'habitat'
-        assert resolved.kwargs['project_id'] == '123abc'
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
         assert resolved.kwargs['username'] == 'barbara'

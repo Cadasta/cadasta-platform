@@ -1,5 +1,6 @@
 from .base import Page
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 
 
 class OrganizationPage(Page):
@@ -41,8 +42,11 @@ class OrganizationPage(Page):
     def get_organization_title(self):
         organization = self.browser.find_element_by_xpath(
             "//div[contains(@class, 'org-logo')]")
-        return organization.find_element_by_xpath(
-            "//img[@class='org-logo']").get_attribute('alt')
+        try:
+            return organization.find_element_by_xpath(
+                "//img[@class='org-logo']").get_attribute('alt')
+        except NoSuchElementException:
+            return organization.find_element_by_xpath("//h2").text
 
     def get_org_description_and_members(self):
         return self.get_container(
@@ -152,7 +156,7 @@ class OrganizationPage(Page):
         project = self.get_table_row("[1]")
         self.click_through(project, (By.CLASS_NAME, "main-map"))
         project_title = self.get_container(
-            "//div[contains(@class, 'inner-header')]//h2")
+            "//div[contains(@class, 'inner-header')]/h2")
         return project_title.text
 
     def get_welcome_message(self):
@@ -160,8 +164,11 @@ class OrganizationPage(Page):
             "//div[contains(@class, 'project-list')]").text
 
     def click_add_new_project_button(self):
-        new_proj = self.browser.find_element_by_xpath(
-            '//a[@href="/projects/new/"]')
+        add_btn = self.browser.find_element_by_xpath(
+            "//button[contains(@class, 'btn-rt')]")
+        add_btn.click()
+
+        new_proj = self.browser.find_element_by_link_text('Add new project')
         self.click_through(new_proj, (By.CLASS_NAME, 'new-project-page'))
         title = self.test.h1("new-project-page").text
         return title
