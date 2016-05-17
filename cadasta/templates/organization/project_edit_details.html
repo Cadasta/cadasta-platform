@@ -48,6 +48,8 @@
           {{ form.questionnaire }}
         </div>
 
+        {% render_field form.contacts class+="form-control input-lg" %}
+
         <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
         <a href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
       </div>

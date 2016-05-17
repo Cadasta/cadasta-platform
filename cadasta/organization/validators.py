@@ -11,13 +11,13 @@ SCHEMA_CONTACT = {
     "type": "object",
     "properties": {
         "name": {"type": "string"},
-        "email": {"type": "string", "format": "email"},
+        "email": {"type": ["string", "null"], "format": "email"},
         "url": {"type": "string", "format": "uri"},
         "street-address": {"type": "string"},
         "locality": {"type": "string"},
         "postal-code": {"type": "string"},
         "country-name": {"type": "string"},
-        "tel": {"type": "string"},
+        "tel": {"type": ["string", "null"]},
         "job-title": {"type": "string"}
     },
     "anyOf": [

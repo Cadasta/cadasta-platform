@@ -10,7 +10,8 @@ import base64
 from urllib.parse import urlparse
 from selenium import webdriver
 from selenium.common.exceptions import (
-    NoSuchElementException, WebDriverException, TimeoutException
+    NoSuchElementException, WebDriverException, TimeoutException,
+    ElementNotVisibleException
 )
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -118,7 +119,12 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def click_through(self, button, wait, screenshot=None):
         """Click a button or link and wait for something to appear."""
-        button.click()
+        try:
+            button.click()
+        except ElementNotVisibleException:
+            self.browser.execute_script(
+                "return arguments[0].scrollIntoView();", button)
+            button.click()
         if screenshot is not None:
             self.screenshot(screenshot)
         try:
@@ -132,7 +138,13 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def click_through_close(self, button, wait, screenshot=None):
         """Click a button or link and wait for something to disappear."""
-        button.click()
+        try:
+            button.click()
+        except ElementNotVisibleException:
+            self.browser.execute_script(
+                "return arguments[0].scrollIntoView();", button)
+            button.click()
+
         if screenshot is not None:
             self.screenshot(screenshot)
         try:
