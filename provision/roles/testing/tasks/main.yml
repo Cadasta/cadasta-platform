@@ -1,13 +1,33 @@
-- name: Install Firefox and Xvfb
+- name: Install Firefox, Xvfb and Squid
   become: yes
   become_user: root
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
       - firefox
       - xvfb
+      - squid3
 
 - name: Install Python Selenium driver
   become: yes
   become_user: "{{ app_user }}"
   pip: virtualenv="{{ virtualenv_path }}"
        name=selenium
+
+- name: Set up Squid configuration
+  become: yes
+  become_user: root
+  copy: src=squid.conf dest=/etc/squid3/squid.conf owner=root mode=644
+  notify:
+    - Restart Squid
+
+- name: Set up HTTP proxy
+  become: yes
+  become_user: "{{ app_user }}"
+  lineinfile: dest=/home/vagrant/.bashrc
+              line="export http_proxy=http://localhost:3128/"
+
+- name: Set up HTTPS proxy
+  become: yes
+  become_user: "{{ app_user }}"
+  lineinfile: dest=/home/vagrant/.bashrc
+              line="export https_proxy=https://localhost:3128/"

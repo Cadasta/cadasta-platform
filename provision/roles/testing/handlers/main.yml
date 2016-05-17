@@ -1,0 +1,4 @@
+- name: Restart Squid
+  become: yes
+  become_user: root
+  service: name=squid3 state=restarted enabled=yes
