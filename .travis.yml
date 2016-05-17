@@ -12,13 +12,17 @@ addons:
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
   - sudo -E apt-get -yq update &>> ~/apt-get-update.log
-  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2
+  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2 squid3
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
 
 install:
   - pip install tox==2.3.1
 
 before_script:
+  - sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf
+  - sudo service squid3 restart
+  - export http_proxy=http://localhost:3128/
+  - export https_proxy=https://localhost:3128/
   - export DJANGO_SETTINGS_MODULE=config.settings.travis
   - psql template1 postgres -c 'create extension hstore;'
   - psql -c 'create database cadasta;' -U postgres
