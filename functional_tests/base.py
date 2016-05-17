@@ -202,10 +202,14 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def logout(self):
         """Click the logout link."""
-        self.click_through(
-            self.browser.find_element_by_xpath(self.xpath('a', 'Logout')),
-            self.BY_ALERT
+        reg_links = self.browser.find_element_by_css_selector(
+            '.reg-links button'
         )
+        reg_links.click()
+        logout_link = self.browser.find_element_by_xpath(
+            self.xpath('a', 'Logout')
+        )
+        self.click_through(logout_link, self.BY_ALERT)
         self.assert_has_message('alert', "signed out")
 
     def try_cancel_and_close(self,

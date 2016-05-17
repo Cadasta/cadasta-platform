@@ -22,136 +22,132 @@
   </head>
   <body>
     <div id="cadasta">
-      <div class="wrapper">
-        <header>
-          <div class="container">
-            <h1 id="logo" class="pull-left">
-              <a href="/">
-                <img src="{% static 'img/logo-white.png' %}" />
-              </a>
-            </h1>
-            <div class="reg-links pull-right">
-              <ul class="list-inline">
-                {% if user.is_authenticated %}
-                <li>
-                  <a href="{% url 'account:profile' %}">
-                    {% trans "Profile" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'account_logout' %}">
-                    {% trans "Logout" %}
-                  </a>
-                </li>
-                {% else %}
-                <li>
-                  <a href="{% url 'account_login' %}">
-                    {% trans "Login" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'account_signup' %}">
-                    {% trans "Register" %}
-                  </a>
-                </li>
-                {% endif %}
-              </ul>
-            </div>
-            <nav class="nav" role="navigation">
-              <ul class="list-inline">
-                <li>
-                  <a href="{% url 'project:list' %}">
-                    {% trans "Projects" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'organization:list' %}">
-                    {% trans "Organizations" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="{% url 'user:list' %}">
-                    {% trans "Users" %}
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </header>
-
+      <header>
         <div class="container">
-          {% if messages %}
-          <div id="messages">
-            {% for message in messages %}
-            <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}"
-                 role="alert">
-              <button type="button" class="close" data-dismiss="alert"
-                      aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              {{message}}
-            </div>
-            {% endfor %}
+          <div id="logo" class="pull-left">
+            <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>
           </div>
-          {% endif %}
-
-          {% block content %}{% endblock %}
-        </div>
-
-        <footer class="footer">
-          <div class="container">
-            <p class="pull-left">
-              {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
-            </p>
-            <div class="pull-right">
-              <ul class="list-inline">
+          <div class="reg-links pull-right">
+            {% if user.is_authenticated %}
+            <!-- User menu -->
+            <div class="btn-group divider" role="group">
+              <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown" 
+              aria-haspopup="true" aria-expanded="false">
+                <img src="/static/img/avatar.jpg" class="avatar thumbnail">
+                {{ user.full_name }} <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
                 <li>
-                  <a href="http://cadasta.org/about-us">
-                    {% trans "About Us" %}
-                  </a>
+                  <a href="{% url 'account:profile' %}">{% trans "My Profile" %}</a>
                 </li>
+                <li role="separator" class="divider"></li>
                 <li>
-                  <a href="#">
-                    {% trans "Privacy" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    {% trans "Terms of Service" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="http://cadasta.org/code-of-conduct">
-                    {% trans "Code of Conduct" %}
-                  </a>
-                </li>
-                <li>
-                  <a href="http://github.com/Cadasta">
-                    {% trans "Visit us on Github" %}
-                  </a>
+                  <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
                 </li>
               </ul>
-
-              <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
-                <select id="language" name="language">
-                  {% get_current_language as LANGUAGE_CODE %}
-                  {% get_available_languages as LANGUAGES %}
-                  {% get_language_info_list for LANGUAGES as languages %}
-                  {% for language in languages %}
-                  <option value="{{ language.code }}"
-                          {% if language.code == LANGUAGE_CODE %}
-                          selected="selected"
-                          {% endif %}>
-                    {{ language.name_local|capfirst }} ({{ language.code }})
-                  </option>
-                  {% endfor %}
-                </select>
-                <input hidden="true" type="submit" value="Go" />
-              </form>
             </div>
+            {% else %}
+            <!-- New user menu -->
+            <div class="btn-group" role="group">
+              <a href="{% url 'account_login' %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a> 
+              <a href="{% url 'account_signup' %}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
+            </div>
+            {% endif %}
           </div>
-        </footer>
+          <nav class="nav" role="navigation">
+            <ul class="list-inline">
+              <li>
+                <a href="{% url 'project:list' %}">
+                  {% trans "Projects" %}
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'organization:list' %}">
+                  {% trans "Organizations" %}
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'user:list' %}">
+                  {% trans "Users" %}
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <div class="container">
+        {% if messages %}
+        <div id="messages">
+          {% for message in messages %}
+          <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}"
+               role="alert">
+            <button type="button" class="close" data-dismiss="alert"
+                    aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            {{message}}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
       </div>
+
+      <footer class="footer">
+        <div class="container">
+          <p class="pull-left">
+            {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
+          </p>
+          <div class="pull-right">
+            <ul class="list-inline">
+              <li>
+                <a href="http://cadasta.org/about-us">
+                  {% trans "About Us" %}
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  {% trans "Privacy" %}
+                </a>
+              </li>
+              <li>
+                <a href="#">
+                  {% trans "Terms of Service" %}
+                </a>
+              </li>
+              <li>
+                <a href="http://cadasta.org/code-of-conduct">
+                  {% trans "Code of Conduct" %}
+                </a>
+              </li>
+              <li>
+                <a href="http://github.com/Cadasta">
+                  {% trans "Visit us on Github" %}
+                </a>
+              </li>
+            </ul>
+
+            <form action="{% url 'set_language' %}" method="post">{% csrf_token %}
+              <select id="language" name="language">
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                <option value="{{ language.code }}"
+                        {% if language.code == LANGUAGE_CODE %}
+                        selected="selected"
+                        {% endif %}>
+                  {{ language.name_local|capfirst }} ({{ language.code }})
+                </option>
+                {% endfor %}
+              </select>
+              <input hidden="true" type="submit" value="Go" />
+            </form>
+          </div>
+        </div>
+      </footer>
     </div>
     {% block modals %} {% endblock %}
 
