@@ -15,7 +15,7 @@
       </a>
       <div class="org-logo">
         {% if object.organization.logo %}
-        <img src="{{ object.organization.logo }}" alt="{{ object.name }}" class="org-logo" />
+        <img src="{{ object.organization.logo }}" alt="{{ object.organization.name }}" class="org-logo" />
         {% else %}
         <h2>{{ object.organization.name }}</h2>
         {% endif %}
