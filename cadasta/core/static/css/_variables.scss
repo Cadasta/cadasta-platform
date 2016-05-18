@@ -9,17 +9,21 @@ $brand-gold:             #edaa00;  // Cadasta gold
 
 //== Scaffolding
 
- $body-bg:               #eee;
+$body-bg:               #eee;
 
 //== Typography
 
-$font-family-sans-serif:  'roboto', Helvetica, Arial, sans-serif;
+$font-family-sans-serif: 'roboto', Helvetica, Arial, sans-serif;
 
 //== Buttons
 
 $btn-primary-color:              #fff;
 $btn-primary-bg:                 #00b288;  // Cadasta green
-$btn-primary-border:             #009975;
+$btn-primary-border:            darken($btn-primary-bg, 5%);
+
+$btn-blue-color:                #fff;
+$btn-blue-bg:                   $brand-primary;
+$btn-blue-border:               lighten($btn-blue-bg, 5%);
 
 //== Icons
 
@@ -32,6 +36,10 @@ $sprite-cols:                   3;
 //== Modals
 
 $modal-backdrop-bg:              rgba(0, 0, 0, 0.6);
+
+//== Tables
+
+$table-cell-padding:            12px 24px !default;
 
 // End Override
 

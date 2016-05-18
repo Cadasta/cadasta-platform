@@ -27,38 +27,33 @@
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'steelfish';
-  src: url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.eot');
-  src: url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.woff2') format('woff2'),
-       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.woff') format('woff'),
-       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.ttf') format('truetype'),
-       url('/static/fonts/steelfish_regular_macroman/steelfish_rg-webfont.svg#steelfish') format('svg');
-  font-weight: normal;
+  font-weight: 300;
   font-style: normal;
 }
 
 /* =Basics
 -------------------------------------------------------------- */
 
+html {
+  font-family: sans-serif;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
 html, body {
   height: 100%;
   overflow: auto;
-  background: #f1f2f3;
+  background: #f2f2f2;
 }
 
 #cadasta {
-  padding-top: 80px;
-  margin-bottom: 30px;
-}
-
-.wrapper {
-  padding-bottom: 80px;
+  padding-top: 80px; // for header above
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
 
 h1, h2, .category {
@@ -84,33 +79,37 @@ header {
   width: 100%;
   height: 80px;
   background-color: $brand-primary;
+  background: -moz-linear-gradient(top, $brand-primary 0%, #283e8c 100%); 
+  background: -webkit-linear-gradient(top, $brand-primary 0%,#283e8c 100%); 
+  background: linear-gradient(to bottom, $brand-primary 0%,#283e8c 100%); 
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$brand-primary', endColorstr='#283e8c',GradientType=0 );
+  box-shadow: 0 1px 4px rgba(31,54,79,.2);
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 999;
-  overflow: hidden;
-  h1#logo {
+  z-index: 1000;
+  #logo {
     display: inline-block;
-    line-height: 100px;
+    line-height: 80px;
     font-size: 22px;
     margin: 0 auto;
     padding: 0;
   }
   #logo img {
-    height: 16px;
-    width: 110px;
+    height: 18px;
+    width: 124px;
   }
   nav {
     display: inline-block;
     float: right;
     margin-right: 40px;
+    height: 80px;
     li.active {
       border-top: solid 4px $brand-gold;
     }
     a {
-      line-height: 100px;
+      line-height: 80px;
       color: #eee;
-      font-size: 13px;
       padding-left: 20px;
       padding-right: 20px;
     }
@@ -124,33 +123,46 @@ header {
 -------------------------------------------------------------- */
 
 .reg-links {
-  ul {
-  margin-top: 36px;
-  border: solid 1px #eee;
-  -webkit-border-radius: 2px;
-  -moz-border-radius: 2px;
-  border-radius: 2px;
+  .btn-group.divider {
+    border-left: solid 1px $btn-blue-border;
   }
-  .reg-links-divider {
-     border-left: solid 1px #eee;
+  .dropdown-menu {
+    min-width: 202px;
   }
-  .list-inline > li {
-    padding: 0;
-    a {
-      padding: 4px 20px;
-      color: #fff;
-      font-size: 12px;
-      display: block;
-      text-decoration: none;
+  .caret {
+    margin-left: 14px;
+    color: lighten($btn-blue-bg, 20%);
+    transition: all 0.3s ease 0s;
+  }
+  .btn-user { // user profile links
+    border-radius: 0;
+    min-width: 202px;
+    height: 80px;
+    border: none;
+    font-size: 13px;
+    @include button-variant(#eee, transparent, $btn-blue-bg);
+    &:hover {
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+      transition: all 0.3s ease 0s;
+       .caret {
+         color: #fff;
+       }
+    }
+    .thumbnail {
+      display: inline-block;
+      margin-bottom: 0;
+      margin-right: 14px;
+      background-color: transparent;
+    }
+  }
+  .btn-reg { // login and register links
+    margin-top: 22px;
+    min-width: 102px;
+    @include button-variant(#eee, lighten($btn-blue-bg, 5%), #fff);
+    &:hover {
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), #fff);
       transition: all 0.3s ease 0s;
     }
-    a:hover {
-      background: #013c78;
-      text-decoration: none;
-    }
-  }
-  .list-inline > li:first-child {
-    border-right: solid 1px #eee;
   }
 }
 
