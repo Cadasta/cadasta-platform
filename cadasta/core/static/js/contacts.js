@@ -20,8 +20,8 @@ $(document).ready(function () {
         var prefix = target.attr('data-prefix');
 
         var row = target.parents('tr');
-        row.hide()
-        row.find('[name="' + prefix + '-remove"]').val('on')
+        row.hide();
+        row.find('[name="' + prefix + '-remove"]').val('on');
     }
 
     function replaceAttr(el, attr, prefix, newPrefix) {

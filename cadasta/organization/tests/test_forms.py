@@ -17,7 +17,7 @@ from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
 
 
-class OrganzationAddTest(TestCase):
+class OrganzationTest(TestCase):
     def setUp(self):
         self.data = {
             'name': 'Org',
@@ -87,6 +87,43 @@ class OrganzationAddTest(TestCase):
         assert org.name == self.data['name']
         assert org.description == self.data['description']
         assert org.slug == 'some-org'
+
+    def test_remove_all_contacts(self):
+        org = OrganizationFactory.create(
+            slug='some-org',
+            contacts=[{
+                'name': 'User A',
+                'email': 'a@example.com',
+                'tel': ''
+            }, {
+                'name': 'User B',
+                'email': '',
+                'tel': '555-5555'
+            }]
+        )
+        data = {
+            'name': 'New Name',
+            'contacts-TOTAL_FORMS': 3,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-MIN_NUM_FORMS': 0,
+            'contacts-MAX_NUM_FORMS': 1000,
+            'contacts-0-name': 'User A',
+            'contacts-0-email': 'a@example.com',
+            'contacts-0-tel': '',
+            'contacts-0-remove': 'on',
+            'contacts-1-name': 'User B',
+            'contacts-1-email': '',
+            'contacts-1-tel': '555-5555',
+            'contacts-1-remove': 'on',
+            'contacts-2-name': '',
+            'contacts-2-email': '',
+            'contacts-3-tel': ''
+        }
+        form = forms.OrganizationForm(data, instance=org)
+        form.is_valid()
+        form.save()
+        org.refresh_from_db()
+        assert org.contacts == []
 
 
 class AddOrganizationMemberFormTest(TestCase):
