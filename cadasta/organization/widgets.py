@@ -74,3 +74,63 @@ class PublicPrivateToggle(Widget):
             private=_("Private"),
             checked=('checked' if value != 'public' else '')
         )
+
+
+class ContactsWidget(Widget):
+    html = (
+        '<table class="table">'
+        '  <thead>'
+        '    <tr>'
+        '      <th>{name}</th>'
+        '      <th>{email}</th>'
+        '      <th>{phone}</th>'
+        '      <th></th>'
+        '    </tr>'
+        '  </thead>'
+        '  <tbody>'
+        '    {table}'
+        '  </tbody>'
+        '  <tfoot>'
+        '    <tr>'
+        '      <td colspan="4">'
+        '        <button data-prefix="{prefix}" type="button" '
+        '                class="btn btn-primary pull-right" '
+        '                id="add-contact">{add_contact}</button>'
+        '      </td>'
+        '    </tr>'
+        '  </tfoot>'
+        '</table>'
+    )
+
+    class Media:
+        js = (
+            '/static/js/contacts.js',
+        )
+
+    def value_from_datadict(self, data, files, name):
+        return self.attrs['formset'](data, files, prefix=name)
+
+    def render(self, name, value, attrs=None):
+        if not isinstance(value, self.attrs['formset']):
+            value = self.attrs['formset'](prefix=name, initial=value)
+
+        # This is a bit naughty: Here we're passing on the widget's HTML class
+        # attributes to each field in each form of the formset. This is
+        # necessary to render the fields using bootstrap styles.
+        if attrs and 'class' in attrs:
+            for form in value.forms:
+                for field in form:
+                    widget_attrs = {}
+                    if field.field.widget.attrs:
+                        widget_attrs = field.field.widget.attrs.copy()
+                    widget_attrs['class'] = attrs['class']
+                    field.field.widget.attrs = widget_attrs
+
+        return self.html.format(
+            name=_("Name"),
+            phone=_("Phone"),
+            email=_("Email"),
+            add_contact=_("Add contact"),
+            table=value,
+            prefix=name
+        )

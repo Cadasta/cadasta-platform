@@ -1,7 +1,9 @@
 from django.test import TestCase
+from django.http.request import QueryDict
+from django.forms import formset_factory
 
-from ..forms import FORM_CHOICES
-from ..widgets import ProjectRoleWidget, PublicPrivateToggle
+from ..forms import FORM_CHOICES, ContactsForm
+from ..widgets import ProjectRoleWidget, PublicPrivateToggle, ContactsWidget
 
 from accounts.tests.factories import UserFactory
 
@@ -105,3 +107,63 @@ class PublicPrivateToggleTest(TestCase):
         )
 
         assert expected == html
+
+
+class ContactsWidgetTest(TestCase):
+    def test_value_from_datadict(self):
+        formset = formset_factory(ContactsForm)
+        widget = ContactsWidget(attrs={'formset': formset})
+        data = {
+            'contacts-TOTAL_FORMS': '2',
+            'contacts-INITIAL_FORMS': '1',
+            'contacts-MAX_NUM_FORMS': '0',
+            'contacts-MAX_NUM_FORMS': '1000',
+            'contacts-0-name': 'Ringo',
+            'contacts-0-email': 'ringo@beatles.uk',
+            'contacts-0-tel': '555-555',
+            'contacts-1-name': '',
+            'contacts-1-email': '',
+            'contacts-1-tel': ''
+        }
+        q_dict = QueryDict('', mutable=True)
+        q_dict.update(data)
+        value = widget.value_from_datadict(q_dict, {}, 'contacts')
+        assert isinstance(value, formset)
+
+    def test_render_with_formset(self):
+        value = [{
+                    'name': 'Ringo',
+                    'email': 'ringo@beatles.uk',
+                    'tel': '555-555',
+                }]
+        formset = formset_factory(ContactsForm)
+        value = formset(initial=value, prefix='contacts')
+
+        for form in value.forms:
+            for field in form:
+                field.field.widget.attrs = {'some': 'attr'}
+
+        widget = ContactsWidget(attrs={'formset': formset})
+        html = widget.render('contacts', value, attrs={'class': 'some'})
+        assert ('<table class="table">'
+                '  <thead>'
+                '    <tr>'
+                '      <th>Name</th>'
+                '      <th>Email</th>'
+                '      <th>Phone</th>'
+                '      <th></th>'
+                '    </tr>'
+                '  </thead>' in html)
+        assert ('  <tfoot>'
+                '    <tr>'
+                '      <td colspan="4">'
+                '        <button data-prefix="contacts" type="button" '
+                '                class="btn btn-primary pull-right" '
+                '                id="add-contact">Add contact</button>'
+                '      </td>'
+                '    </tr>'
+                '  </tfoot>'
+                '</table>' in html)
+
+        assert 'contacts-0-name' in html
+        assert 'contacts-1-name' in html

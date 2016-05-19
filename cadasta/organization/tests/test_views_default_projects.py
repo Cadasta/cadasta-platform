@@ -407,6 +407,11 @@ class ProjectAddTest(TestCase):
         'details-description': 'This is a test project',
         'details-access': 'on',
         'details-url': 'http://www.test.org',
+        'details-contacts-TOTAL_FORMS': 1,
+        'details-contacts-INITIAL_FORMS': 0,
+        'details-contacts-0-name': '',
+        'details-contacts-0-email': '',
+        'details-contacts-0-tel': ''
     }
     PERMISSIONS_POST_DATA = {
         'project_add_wizard-current_step': 'permissions',
@@ -603,7 +608,12 @@ class ProjectEditDetailsTest(TestCase):
         'description': 'New Description',
         'access': 'public',
         'urls': '',
-        'questionnaire': ''
+        'questionnaire': '',
+        'contacts-TOTAL_FORMS': 1,
+        'contacts-INITIAL_FORMS': 0,
+        'contacts-0-name': '',
+        'contacts-0-email': '',
+        'contacts-0-tel': ''
     }
 
     def setUp(self):

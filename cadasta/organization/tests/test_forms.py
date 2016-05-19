@@ -1,5 +1,4 @@
 import os
-import json
 from pytest import raises
 
 from django.test import TestCase
@@ -19,6 +18,20 @@ from accounts.tests.factories import UserFactory
 
 
 class OrganzationAddTest(TestCase):
+    def setUp(self):
+        self.data = {
+            'name': 'Org',
+            'description': 'Org description',
+            'urls': '',
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-MIN_NUM_FORMS': 0,
+            'contacts-MAX_NUM_FORMS': 1000,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+
     def _save(self, data, count=1):
         form = forms.OrganizationForm(data, user=UserFactory.create())
         form.save()
@@ -26,74 +39,53 @@ class OrganzationAddTest(TestCase):
         assert Organization.objects.count() == count
 
     def test_add_organization(self):
-        data = {
-            'name': 'Org',
-            'description': 'Org description',
-            'urls': '',
-            'contacts': ''
-        }
-        self._save(data)
+        self._save(self.data)
         org = Organization.objects.first()
 
         assert org.slug == 'org'
         assert OrganizationRole.objects.filter(organization=org).count() == 1
 
     def test_unique_slugs(self):
-        data = {
-            'name': 'Org',
-            'description': 'Org description #1',
-            'urls': '',
-            'contacts': ''
-        }
-        self._save(data)
+        self.data['description'] = 'Org description #1'
+        self._save(self.data)
         org1 = Organization.objects.first()
         assert org1.slug == 'org'
-        data['description'] = 'Org description #2'
-        self._save(data, count=2)
+
+        self.data['description'] = 'Org description #2'
+        self._save(self.data, count=2)
         orgs = Organization.objects.all()
         assert len(orgs) == 2
         assert orgs[0].slug != orgs[1].slug
 
     def test_add_organization_with_url(self):
-        data = {
-            'name': 'Org',
-            'description': 'Org description',
-            'urls': 'http://example.com',
-            'contacts': ''
-        }
-        self._save(data)
+        self.data['urls'] = 'http://example.com'
+        self._save(self.data)
         org = Organization.objects.first()
         assert org.urls == ['http://example.com']
 
     def test_add_organization_with_contact(self):
-        data = {
-            'name': 'Org',
-            'description': 'Org description',
-            'urls': 'http://example.com',
-            'contacts': json.dumps([{'name': 'Ringo Starr',
-                                     'tel': '555-5555'}])
-        }
-        self._save(data)
+        self.data['contacts-0-name'] = 'Ringo Starr'
+        self.data['contacts-0-email'] = 'ringo@beatles.uk'
+        self.data['contacts-0-tel'] = '555-5555'
+        self._save(self.data)
         org = Organization.objects.first()
-        assert org.contacts == [{'name': 'Ringo Starr', 'tel': '555-5555'}]
+        assert org.contacts == [{
+            'name': 'Ringo Starr',
+            'tel': '555-5555',
+            'email': 'ringo@beatles.uk'
+        }]
 
     def test_update_organization(self):
         org = OrganizationFactory.create(slug='some-org')
-
-        data = {
-            'name': 'Org',
-            'description': 'Org description',
-            'urls': '',
-            'contacts': ''
-        }
-        form = forms.OrganizationForm(data, instance=org)
+        self.data['description'] = 'Org description'
+        form = forms.OrganizationForm(self.data, instance=org)
         form.save()
 
         org.refresh_from_db()
 
         assert form.is_valid() is True
-        assert org.name == data['name']
-        assert org.description == data['description']
+        assert org.name == self.data['name']
+        assert org.description == self.data['description']
         assert org.slug == 'some-org'
 
 
@@ -194,7 +186,12 @@ class ProjectEditDetailsTest(TestCase):
         data = {
             'name': 'New name',
             'questionnaire': self._get_form('xls-form'),
-            'access': project.access
+            'access': project.access,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
         }
 
         form = forms.ProjectEditDetails(instance=project, data=data)
@@ -211,7 +208,12 @@ class ProjectEditDetailsTest(TestCase):
         data = {
             'name': 'New name',
             'questionnaire': self._get_form('xls-form-invalid'),
-            'access': project.access
+            'access': project.access,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
         }
 
         form = forms.ProjectEditDetails(instance=project, data=data)
@@ -230,7 +232,12 @@ class ProjectEditDetailsTest(TestCase):
         data = {
             'name': 'New name',
             'questionnaire': self._get_form('xls-form-copy'),
-            'access': project.access
+            'access': project.access,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
         }
 
         form = forms.ProjectEditDetails(
@@ -253,7 +260,12 @@ class ProjectEditDetailsTest(TestCase):
         data = {
             'name': 'New name',
             'questionnaire': '',
-            'access': project.access
+            'access': project.access,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
         }
 
         form = forms.ProjectEditDetails(
@@ -376,3 +388,115 @@ class ProjectEditPermissionsTest(TestCase):
             user=self.project_user_2
         )
         assert role_2.role == 'DC'
+
+
+class ContactsFormTest(TestCase):
+    def test_as_table(self):
+        form = forms.ContactsForm(prefix='c')
+        html = form.as_table()
+
+        expected = (
+            '<tr><td><input id="id_c-name" name="c-name" type="text" /></td>\n'
+            '<td><input id="id_c-email" name="c-email" type="email" /></td>\n'
+            '<td><input id="id_c-tel" name="c-tel" type="text" />'
+            '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
+            '<td><a data-prefix="c" '
+            'class="close remove-contact" href="#">'
+            '<span aria-hidden="true">&times;</span></a></td></tr>'
+        )
+        assert expected == html
+
+    def test_clean_string(self):
+        form = forms.ContactsForm()
+        assert form.clean_string('') is None
+        assert form.clean_string('somthing') == 'somthing'
+
+    def test_clean_email(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': 'john@beatles.uk'
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        form.full_clean()
+        assert form.clean_email() == data['contacts-email']
+
+    def test_clean_email_empty_string(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': '',
+            'contacts-tel': '555-555'
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        form.full_clean()
+        assert form.clean_email() is None
+
+    def test_clean_tel(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-tel': '555-5555'
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        form.full_clean()
+        assert form.clean_tel() == data['contacts-tel']
+
+    def test_clean_tel_empty_string(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': 'john@beatles.uk',
+            'contacts-tel': ''
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        form.full_clean()
+        assert form.clean_tel() is None
+
+    def test_full_clean(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': 'john@beatles.uk'
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        form.full_clean()
+        assert form.cleaned_data == {
+            'name': 'John',
+            'email': 'john@beatles.uk',
+            'tel': None,
+            'remove': False
+        }
+
+    def test_full_clean_remove(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': 'john@beatles.uk',
+            'contacts-remove': 'on'
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        form.full_clean()
+        assert form.cleaned_data == {'remove': True}
+
+    def test_validate_valid_form_with_email(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': 'john@beatles.uk',
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        assert form.is_valid() is True
+
+    def test_validate_valid_form_with_tel(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': '',
+            'contacts-tel': '555-555'
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        assert form.is_valid() is True
+
+    def test_validate_invalid_form(self):
+        data = {
+            'contacts-name': 'John',
+            'contacts-email': '',
+            'contacts-tel': ''
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        assert form.is_valid() is False
+        assert ("Please provide either email or phone number" in
+                form.errors['__all__'])

@@ -1,5 +1,6 @@
 from .base import Page
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import ElementNotVisibleException
 
 
 class OrganizationListPage(Page):
@@ -111,7 +112,14 @@ class OrganizationListPage(Page):
 
     def try_submit(self, err=None, ok=None):
         fields = self.get_fields()
-        fields['add'].click()
+
+        try:
+            fields['add'].click()
+        except ElementNotVisibleException:
+            self.browser.execute_script(
+                "return arguments[0].scrollIntoView();", fields['add'])
+            fields['add'].click()
+
         fields = self.get_fields()
         if err is not None:
             for f in err:

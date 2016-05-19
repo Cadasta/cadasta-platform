@@ -82,7 +82,13 @@ class OrganizationAddTest(TestCase):
         setattr(self.request, 'POST', {
             'name': 'Org',
             'description': 'Some description',
-            'url': 'http://example.com'
+            'url': 'http://example.com',
+            'contacts-TOTAL_FORMS': '1',
+            'contacts-INITIAL_FORMS': '0',
+            'contacts-MAX_NUM_FORMS': '0',
+            'contact-0-name': '',
+            'contact-0-email': '',
+            'contact-0-tel': '',
         })
         response = self.view(self.request)
         if status is not None:
@@ -229,7 +235,13 @@ class OrganizationEditTest(TestCase):
         setattr(self.request, 'POST', {
             'name': 'Org',
             'description': 'Some description',
-            'urls': 'http://example.com'
+            'urls': 'http://example.com',
+            'contacts-TOTAL_FORMS': '1',
+            'contacts-INITIAL_FORMS': '0',
+            'contacts-MAX_NUM_FORMS': '0',
+            'contact-0-name': '',
+            'contact-0-email': '',
+            'contact-0-tel': '',
         })
 
         response = self.view(self.request, slug=self.org.slug)

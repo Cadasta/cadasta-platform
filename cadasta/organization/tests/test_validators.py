@@ -39,12 +39,10 @@ class ValidateContactTest(TestCase):
         assert len(exc.value.error_list) == 1
 
         actual = json.loads(exc.value.error_list[0].messages[0])
-        expected = json.loads(
-            '{"name": "' + _("This field is required.") + '", '
-            '"email": "' + _("\'{value}\' is not a \'{type}\'").format(
-                value='noemail', type='email'
-            ) + '"}'
-        )
+        expected = {
+            'name': 'This field is required.',
+            'email': '\'noemail\' is not a \'email\''
+        }
         assert actual == expected
 
     def test_validate_multiple_contacts(self):
@@ -58,10 +56,9 @@ class ValidateContactTest(TestCase):
         with pytest.raises(ValidationError) as exc:
             validate_contact(value)
 
+        print(exc.value.error_list)
         assert len(exc.value.error_list) == 2
         assert exc.value.error_list[0].messages[0] == (
             '{"name": "' + _("This field is required.") + '"}')
         assert exc.value.error_list[1].messages[0] == (
-            '{"email": "' + _("\'{value}\' is not a \'{type}\'").format(
-                value='noemail', type='email'
-            ) + '"}')
+            '{"email": "\'noemail\' is not a \'email\'"}')

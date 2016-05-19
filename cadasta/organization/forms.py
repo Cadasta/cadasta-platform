@@ -1,5 +1,3 @@
-import json
-
 from django import forms
 from django.contrib.postgres import forms as pg_forms
 from django.contrib.gis import forms as gisforms
@@ -14,7 +12,7 @@ from accounts.models import User
 from questionnaires.models import Questionnaire
 from .models import Organization, Project, OrganizationRole, ProjectRole
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
-from .fields import ProjectRoleField, PublicPrivateField
+from .fields import ProjectRoleField, PublicPrivateField, ContactsField
 
 FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
 
@@ -30,9 +28,55 @@ def create_update_or_delete_project_role(project, user, role):
                                    project_id=project).delete()
 
 
+class ContactsForm(forms.Form):
+    name = forms.CharField()
+    email = forms.EmailField(required=False)
+    tel = forms.CharField(required=False)
+    remove = forms.BooleanField(required=False, widget=forms.HiddenInput())
+
+    def as_table(self):
+        html = self._html_output(
+            normal_row='<td>%(errors)s%(field)s%(help_text)s</td>',
+            error_row='<td colspan="3">%s</td></tr><tr>',
+            row_ender='</td>',
+            help_text_html='<br /><span class="helptext">%s</span>',
+            errors_on_separate_row=False)
+
+        closeBtn = ('<td><a data-prefix="' + self.prefix + '" '
+                    'class="close remove-contact" href="#">'
+                    '<span aria-hidden="true">&times;</span></a></td>')
+
+        return '<tr>' + html + closeBtn + '</tr>'
+
+    def full_clean(self):
+        if self.data.get(self.prefix + '-remove') != 'on':
+            super().full_clean()
+        else:
+            self.cleaned_data = {'remove': True}
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if (not self.errors and
+                not cleaned_data['email'] and not cleaned_data['tel']):
+            raise forms.ValidationError(_("Please provide either email or "
+                                          "phone number"))
+        return cleaned_data
+
+    def clean_string(self, value):
+        if not value:
+            return None
+        return value
+
+    def clean_email(self):
+        return self.clean_string(self.cleaned_data['email'])
+
+    def clean_tel(self):
+        return self.clean_string(self.cleaned_data['tel'])
+
+
 class OrganizationForm(forms.ModelForm):
     urls = pg_forms.SimpleArrayField(forms.URLField(), required=False)
-    contacts = forms.CharField(required=False)
+    contacts = ContactsField(form=ContactsForm, required=False)
     access = PublicPrivateField()
 
     class Meta:
@@ -51,12 +95,6 @@ class OrganizationForm(forms.ModelForm):
 
     def clean_urls(self):
         return self.to_list(self.data.get('urls'))
-
-    def clean_contacts(self):
-        contacts = self.data.get('contacts')
-        if contacts:
-            return json.loads(contacts)
-        return contacts
 
     def save(self, *args, **kwargs):
         instance = super(OrganizationForm, self).save(commit=False)
@@ -157,6 +195,7 @@ class ProjectAddDetails(forms.Form):
     access = PublicPrivateField(initial='public')
     url = forms.URLField(required=False)
     questionaire = forms.CharField(required=False, widget=S3FileUploadWidget)
+    contacts = ContactsField(form=ContactsForm, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -170,10 +209,12 @@ class ProjectEditDetails(forms.ModelForm):
     urls = pg_forms.SimpleArrayField(forms.URLField(), required=False)
     questionnaire = forms.CharField(required=False, widget=S3FileUploadWidget)
     access = PublicPrivateField()
+    contacts = ContactsField(form=ContactsForm, required=False)
 
     class Meta:
         model = Project
-        fields = ['name', 'description', 'access', 'urls', 'questionnaire']
+        fields = ['name', 'description', 'access', 'urls', 'questionnaire',
+                  'contacts']
 
     def save(self, *args, **kwargs):
         new_form = self.data.get('questionnaire')
