@@ -58,6 +58,31 @@ class ProjectRoleWidgetTest(TestCase):
 
 
 class PublicPrivateToggleTest(TestCase):
+    def test_render_none(self):
+        widget = PublicPrivateToggle()
+        html = widget.render('field-name', None)
+
+        expected = (
+            '<div class="public-private-widget">'
+            '  <label for"field-name">Project visibility</label>'
+            '  <div>'
+            '    Public<br>'
+            '    <span class="glyphicon glyphicon-eye-open"></span>'
+            '  </div>'
+            '  <div>'
+            '    <input name="field-name"  type="checkbox"'
+            '           data-toggle="toggle" data-onstyle="danger"'
+            '           data-offstyle="success" data-on=" " data-off=" ">'
+            '  </div>'
+            '  <div>'
+            '    Private<br>'
+            '    <span class="glyphicon glyphicon-eye-close"></span>'
+            '  </div>'
+            '</div>'
+        )
+
+        assert expected == html
+
     def test_render_public(self):
         widget = PublicPrivateToggle()
         html = widget.render('field-name', 'public')
@@ -86,6 +111,31 @@ class PublicPrivateToggleTest(TestCase):
     def test_render_private(self):
         widget = PublicPrivateToggle()
         html = widget.render('field-name', 'private')
+
+        expected = (
+            '<div class="public-private-widget">'
+            '  <label for"field-name">Project visibility</label>'
+            '  <div>'
+            '    Public<br>'
+            '    <span class="glyphicon glyphicon-eye-open"></span>'
+            '  </div>'
+            '  <div>'
+            '    <input name="field-name" checked type="checkbox"'
+            '           data-toggle="toggle" data-onstyle="danger"'
+            '           data-offstyle="success" data-on=" " data-off=" ">'
+            '  </div>'
+            '  <div>'
+            '    Private<br>'
+            '    <span class="glyphicon glyphicon-eye-close"></span>'
+            '  </div>'
+            '</div>'
+        )
+
+        assert expected == html
+
+    def test_render_on(self):
+        widget = PublicPrivateToggle()
+        html = widget.render('field-name', 'on')
 
         expected = (
             '<div class="public-private-widget">'

@@ -350,6 +350,7 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
         logo = orgs.first().logo if orgs.first() is not None else ''
         context['init_org_logo'] = logo
         context['init_org_hidden'] = 'org-logo-hidden' if logo is None else ''
+        context['display_org'] = self.kwargs.get('organization')
         form = context['wizard']['form']
         if isinstance(form, forms.ProjectAddExtents):
             context['wizard_step_classes'] = {

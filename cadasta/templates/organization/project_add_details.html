@@ -41,7 +41,7 @@
   </div>
 </div>
 
-<div class="row{% if wizard.form.organization.value %} hidden{% endif %}">
+<div class="row{% if display_org %} hidden{% endif %}">
   <div class="col-md-7">
     <div class="form-group">
       {{ wizard.form.organization.errors }}

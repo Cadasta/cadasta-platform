@@ -72,7 +72,7 @@ class PublicPrivateToggle(Widget):
             name=name,
             public=_("Public"),
             private=_("Private"),
-            checked=('checked' if value != 'public' else '')
+            checked=('checked' if value in ['private', 'on'] else '')
         )
 
 
