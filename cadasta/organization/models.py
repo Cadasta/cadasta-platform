@@ -38,7 +38,8 @@ class Organization(SlugModel, RandomIDModel):
     description = models.TextField(null=True, blank=True)
     archived = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
-    contacts = JSONField(validators=[validate_contact], default={})
+    contacts = JSONField(validators=[validate_contact], default=[],
+                         null=True, blank=True)
     users = models.ManyToManyField('accounts.User',
                                    through='OrganizationRole',
                                    related_name='organizations')
@@ -151,7 +152,8 @@ class Project(SlugModel, RandomIDModel):
     # logo = models.ImageField(blank=True, upload_to='/image/logo')
     archived = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
-    contacts = JSONField(validators=[validate_contact], default={})
+    contacts = JSONField(validators=[validate_contact], default=[],
+                         null=True, blank=True)
     users = models.ManyToManyField('accounts.User', through='ProjectRole')
     last_updated = models.DateTimeField(auto_now=True)
     extent = gismodels.PolygonField(null=True)
