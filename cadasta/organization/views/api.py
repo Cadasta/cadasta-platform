@@ -1,7 +1,5 @@
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework import filters, status
-
+from rest_framework import generics, filters, status
 from tutelary.mixins import APIPermissionRequiredMixin
 
 from accounts.models import User

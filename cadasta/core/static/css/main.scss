@@ -12,6 +12,7 @@
 @import "bootstrap-sass/assets/stylesheets/bootstrap/tables";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/glyphicons";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/dropdowns";
+@import "bootstrap-sass/assets/stylesheets/bootstrap/navs";
 @import "wizard";
 @import "reg";
 @import "geolocate";
@@ -467,6 +468,20 @@ img.org-logo, img#org-logo {
 .avatar-lg {
   width: 120px;
   height: 120px;
+}
+
+.thumb-60 {
+  width: 60px;
+  height: 60px;
+  float: left;
+  margin-right: 10px;
+}
+
+.thumb-128 {
+  width: 128px;
+  height: 128px;
+  float: left;
+  margin-right: 10px;
 }
 
 /* =Buttons

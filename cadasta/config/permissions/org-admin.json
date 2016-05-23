@@ -13,8 +13,14 @@
 
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*", "questionaire.*", "spatial.*"],
+      "action": ["project.*", "project.*.*", "questionaire.*", "spatial.*", "resource.*"],
       "object": ["project/$organization/*"]
+    },
+
+    {
+      "effect": "allow",
+      "action": ["resource.*"],
+      "object": ["resource/$organization/*/*"]
     }
   ]
 }
