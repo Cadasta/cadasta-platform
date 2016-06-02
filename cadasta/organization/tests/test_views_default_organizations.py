@@ -11,9 +11,9 @@ from tutelary.models import Policy, assign_user_policies
 
 from accounts.tests.factories import UserFactory
 from ..views import default
-from ..models import Organization, OrganizationRole
+from ..models import Organization, OrganizationRole, Project
 from .. import forms
-from .factories import OrganizationFactory, clause
+from .factories import OrganizationFactory, ProjectFactory, clause
 
 
 class OrganizationListTest(TestCase):
@@ -137,6 +137,9 @@ class OrganizationDashboardTest(TestCase):
         setattr(self.request, 'method', 'GET')
 
         self.org = OrganizationFactory.create()
+        self.projs = ProjectFactory.create_batch(2, organization=self.org)
+        self.private_proj = ProjectFactory.create(
+            organization=self.org, access='private')
 
         clauses = {
             'clause': [
@@ -155,17 +158,29 @@ class OrganizationDashboardTest(TestCase):
         self.user = UserFactory.create()
         setattr(self.request, 'user', self.user)
 
-    def _get(self, slug, status=None):
+    def _get(self, slug, status=None, user=None, make_org_member=None,):
+        if user is None:
+            user = self.user
+        if make_org_member is not None:
+            OrganizationRole.objects.create(organization=self.org, user=user)
+        setattr(self.request, 'user', user)
         response = self.view(self.request, slug=slug)
         if status is not None:
             assert response.status_code == status
         return response
 
-    def _check_ok(self, response):
+    def _check_ok(self, response, org=None, member=False):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
-        context['object'] = self.org
+        context['object'] = org or self.org
+        if member:
+            context['projects'] = Project.objects.filter(
+                organization__slug=self.org.slug)
+        elif org is None:
+            context['projects'] = Project.objects.filter(
+                organization__slug=self.org.slug, access='public')
+
         expected = render_to_string(
             'organization/organization_dashboard.html',
             context
@@ -181,6 +196,17 @@ class OrganizationDashboardTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self._get(self.org.slug, status=200)
         self._check_ok(response)
+
+    def test_get_with_org_membership(self):
+        response = self._get(
+            self.org.slug, status=200, make_org_member=self.org)
+        self._check_ok(response, member=True)
+
+    def test_get_with_new_org(self):
+        new_org = OrganizationFactory.create()
+        assign_user_policies(self.user, self.policy)
+        response = self._get(new_org.slug, status=200)
+        self._check_ok(response, org=new_org)
 
 
 class OrganizationEditTest(TestCase):

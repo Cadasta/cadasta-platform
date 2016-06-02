@@ -97,6 +97,12 @@ class Organization(SlugModel, RandomIDModel):
     def __repr__(self):
         return str(self)
 
+    def public_projects(self):
+        return self.projects.filter(access='public')
+
+    def all_projects(self):
+        return self.projects.all()
+
 
 class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)

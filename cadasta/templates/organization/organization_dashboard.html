@@ -85,7 +85,7 @@
       <div class="col-md-8 col-text">
         <h2 class="page-title">{% trans "Overview" %}</h2>
         <div class="project-list">
-          {% if object.projects.all  %}
+          {% if projects  %}
           <table class="table table-hover datatable" data-paging-type="simple">
             <thead>
               <tr>
@@ -95,7 +95,7 @@
               </tr>
             </thead>
             <tbody>
-              {% for prj in object.projects.all %}
+              {% for prj in projects %}
               <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.slug %}';">
                 <td>{{ prj.name }}</td>
                 <td>{{ prj.country }}</td>
