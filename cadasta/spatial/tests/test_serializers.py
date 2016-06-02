@@ -102,7 +102,7 @@ class SpatialUnitSerializerTest(TestCase):
         project = ProjectFactory.create(name='Original Project')
         su = SpatialUnitFactory.create(name='Test Spatial Unit',
                                        project=project)
-        new_project = ProjectFactory.create(name='New Project')
+        ProjectFactory.create(name='New Project')
         spatial_data = {
             'properties': {
                 'project': 'something'
