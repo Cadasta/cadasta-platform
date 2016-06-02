@@ -19,7 +19,7 @@
     },
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*"],
+      "action": ["project.*", "project.*.*", "spatial.*"],
       "object": ["project/*/*"]
     },
 

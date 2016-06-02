@@ -7,7 +7,7 @@
     // organization.
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*", "questionaire.*"],
+      "action": ["project.*", "project.*.*", "questionaire.*", "spatial.*"],
       "object": ["project/$organization/$project"]
     },
     {

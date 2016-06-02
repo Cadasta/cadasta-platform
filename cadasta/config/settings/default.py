@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'geography',
     'accounts',
     'organization',
+    'spatial',
     'questionnaires',
     'buckets',
 
