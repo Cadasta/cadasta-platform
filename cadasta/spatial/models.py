@@ -14,15 +14,11 @@ from tutelary.decorators import permissioned_model
 
 @permissioned_model
 class SpatialUnit(RandomIDModel):
-    """
-    A single spatial unit: has a type, an optional geometry, a
-    type-dependent set of attributes, and a set of relationships
-    to other spatial units.
+    """A single spatial unit: has a type, an optional geometry, a
+    type-dependent set of attributes, and a set of relationships to
+    other spatial units.
 
     """
-    project = models.ForeignKey(Project, on_delete=models.CASCADE,
-                                related_name='spatial_units')
-    name = models.CharField(max_length=200)
 
     class Meta:
         ordering = ('name',)
@@ -53,7 +49,11 @@ class SpatialUnit(RandomIDModel):
               'permissions_object': 'project'}),
         )
 
-    # all spatial units are associated with a single project.
+    # All spatial units are associated with a single project.
+    project = models.ForeignKey(Project, on_delete=models.CASCADE,
+                                related_name='spatial_units')
+
+    name = models.CharField(max_length=200)
 
     # Spatial unit geometry is optional: some spatial units may only
     # have a textual description of their location.
@@ -81,10 +81,8 @@ class SpatialUnit(RandomIDModel):
 
 
 class SpatialUnitRelationshipManager(models.Manager):
-    """
-    Check conditions based on spatial unit type before
-    creating object. If conditions aren't met,
-    exceptions are raised.
+    """Check conditions based on spatial unit type before creating
+    object. If conditions aren't met, exceptions are raised.
 
     """
     def create(self, *args, **kwargs):
@@ -93,28 +91,27 @@ class SpatialUnitRelationshipManager(models.Manager):
 
             if (kwargs['type'] == 'C' and
                kwargs['su1'].geometry.geom_type == 'Polygon'):
-                    result = SpatialUnit.objects.filter(
-                        id=kwargs['su1'].id).filter(
-                        geometry__contains=kwargs['su2'].geometry)
+                result = SpatialUnit.objects.filter(
+                    id=kwargs['su1'].id
+                ).filter(
+                    geometry__contains=kwargs['su2'].geometry
+                )
 
-                    if len(result) != 0:
-                        return super().create(**kwargs)
-                    else:
-                        raise SpatialUnitRelationshipError(
-                            """
-                            That selected location is not
-                            geographically contained
-                            within the parent location
-                            """)
+                if len(result) != 0:
+                    return super().create(**kwargs)
+                else:
+                    raise SpatialUnitRelationshipError(
+                        """That selected location is not geographically
+                        contained within the parent location""")
 
         return super().create(**kwargs)
 
 
 class SpatialUnitRelationship(RandomIDModel):
-    """
-    A relationship between spatial units: encodes simple logical terms
-    like ``su1 is-contained-in su2`` or ``su1 is-split-of su2``.
-    May have additional requirements.
+    """A relationship between spatial units: encodes simple logical terms
+    like ``su1 is-contained-in su2`` or ``su1 is-split-of su2``.  May
+    have additional requirements.
+
     """
 
     # Possible spatial unit relationships types: TYPE_CHOICES is the
@@ -128,14 +125,10 @@ class SpatialUnitRelationship(RandomIDModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
 
     # Spatial units are in the relationships.
-    su1 = models.ForeignKey(
-        SpatialUnit,
-        on_delete=models.CASCADE,
-        related_name='spatial_unit_one')
-    su2 = models.ForeignKey(
-        SpatialUnit,
-        on_delete=models.CASCADE,
-        related_name='spatial_unit_two')
+    su1 = models.ForeignKey(SpatialUnit, on_delete=models.CASCADE,
+                            related_name='spatial_unit_one')
+    su2 = models.ForeignKey(SpatialUnit, on_delete=models.CASCADE,
+                            related_name='spatial_unit_two')
 
     # Spatial unit relationship type: used to manage range of allowed
     # attributes

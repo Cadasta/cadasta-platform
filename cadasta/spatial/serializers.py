@@ -10,8 +10,9 @@ from organization.models import Project
 
 class ProjectSpatialUnitSerializer(DetailSerializer, FieldSelectorSerializer,
                                    serializers.ModelSerializer):
-    organization = OrganizationSerializer(read_only=True,
-                                          fields=('id', 'name', 'slug'))
+    organization = OrganizationSerializer(
+        read_only=True, fields=('id', 'name', 'slug')
+    )
 
     class Meta:
         model = Project
@@ -37,7 +38,5 @@ class SpatialUnitSerializer(DetailSerializer,
 
     def create(self, validated_data):
         project = self.context['project']
-        return SpatialUnit.objects.create(
-            project_id=project.id,
-            **validated_data
-        )
+        return SpatialUnit.objects.create(project_id=project.id,
+                                          **validated_data)
