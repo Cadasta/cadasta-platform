@@ -31,6 +31,10 @@ api_v1 = [
                 namespace='questionnaires')),
     url(r'^users/',
         include('organization.urls.api.users', namespace='user')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project_id>[-\w]+)/parties/',
+        include('party.urls.api.parties',
+                namespace='party')),
 ]
 
 api = [
