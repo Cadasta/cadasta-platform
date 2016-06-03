@@ -1,0 +1,20 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block extra_script %}
+  {{ form.media }}
+  {% include "resources/scripts.html" %}
+{% endblock %}
+
+{% block project_main %}
+<div class="col-md-11 col-md-offset-1 main col-text">
+  <div class="row">
+    <div class="col-md-12 page-title">
+      <h2>{% trans "Resources: Edit" %}</h2>
+    </div>
+  </div>
+  <div class="row">
+    {% include "resources/form.html" %}
+  </div>
+</div>
+{% endblock %}

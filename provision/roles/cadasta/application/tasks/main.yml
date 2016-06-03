@@ -15,6 +15,7 @@
       - unzip
       - libxslt1-dev
       - libxml2-dev
+      - libjpeg-dev
 
 - name: dev locale
   become: yes

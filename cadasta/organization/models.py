@@ -12,6 +12,7 @@ from tutelary.models import Policy
 
 from core.models import RandomIDModel, SlugModel
 from geography.models import WorldBorder
+from resources.mixins import ResourceModelMixin
 from .validators import validate_contact
 from .choices import ROLE_CHOICES, ACCESS_CHOICES
 from . import messages
@@ -143,7 +144,7 @@ def remove_project_membership(sender, instance, **kwargs):
 
 
 @permissioned_model
-class Project(SlugModel, RandomIDModel):
+class Project(ResourceModelMixin, SlugModel, RandomIDModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50, unique=True, null=True)
     organization = models.ForeignKey(Organization, related_name='projects')

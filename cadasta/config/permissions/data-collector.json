@@ -5,8 +5,13 @@
     // specified project within a specified organization.
     {
       "effect": "allow",
-      "action": ["project.resources.*"],
+      "action": ["resource.*"],
       "object": ["project/$organization/$project"]
+    },
+    {
+      "effect": "allow",
+      "action": ["resource.*"],
+      "object": ["resource/$organization/$project/*"]
     }
   ]
 }

@@ -1,0 +1,7 @@
+  <script type="text/javascript">
+    $(function() {
+      $('.file-input').change(function(event) {
+        $('input[name="original_file"]').val(event.target.files[0].name);
+      });
+    });
+  </script>

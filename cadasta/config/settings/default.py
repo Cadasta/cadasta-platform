@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'organization',
     'spatial',
     'questionnaires',
+    'resources',
     'buckets',
     'party',
 

@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url
+from django.conf import settings
+from django.conf.urls.static import static
 
 api_v1 = [
     url(r'^account/', include('accounts.urls.api', namespace='accounts')),
@@ -29,6 +31,10 @@ api_v1 = [
         '(?P<project_id>[-\w]+)/',
         include('questionnaires.urls.api',
                 namespace='questionnaires')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project>[-\w]+)/',
+        include('resources.urls.api',
+                namespace='resources')),
     url(r'^users/',
         include('organization.urls.api.users', namespace='user')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
@@ -61,6 +67,9 @@ urlpatterns = [
     url(r'^users/',
         include('organization.urls.default.users',
                 namespace='user')),
+    url(r'^',
+        include('resources.urls.default',
+                namespace='resources')),
 
     url(r'^api/',
         include(api,
@@ -70,4 +79,4 @@ urlpatterns = [
         include('django.conf.urls.i18n')),
 
     url(r'', include('buckets.test.urls')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

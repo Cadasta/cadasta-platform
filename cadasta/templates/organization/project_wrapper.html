@@ -2,7 +2,7 @@
 
 {% load i18n %}
 
-{% block title %} | {{ project.name }}{% endblock %}
+{% block title %} | {{ object.name }}{% endblock %}
 
 {% block content %}
 
@@ -52,7 +52,7 @@
           </button>
           <ul class="dropdown-menu">
             <li><a href="#">Add new location</a></li>
-            <li><a href="#">Add new ressource</a></li>
+            <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">Add new ressource</a></li>
             <li role="separator" class="divider"></li>
             <li><a class="edit" href="#">{% trans "Import field data" %}</a></li>
           </ul>
@@ -77,7 +77,9 @@
         {% trans "Records" %}
       </li>
       <li>
-        {% trans "Resources" %}
+        <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
+          {% trans "Resources" %}
+        </a>
       </li>
       <li>
         {% trans "Reports" %}

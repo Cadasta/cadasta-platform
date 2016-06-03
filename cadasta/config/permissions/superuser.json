@@ -19,10 +19,14 @@
     },
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*", "spatial.*"],
+      "action": ["project.*", "project.*.*", "spatial.*", "resource.*"],
       "object": ["project/*/*"]
     },
-
+    {
+      "effect": "allow",
+      "action": ["resource.*"],
+      "object": ["resource/*/*/*"]
+    },
     {
       "effect": "allow",
       "action": ["user.*"]

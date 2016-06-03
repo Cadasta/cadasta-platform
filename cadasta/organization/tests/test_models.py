@@ -162,18 +162,18 @@ class ProjectRoleTest(TestCase):
 
     def test_assign_new_collector(self):
         self._add_role('DC')
-        self._has('project.resources.add', True)
+        self._has('resource.add', True)
 
     def test_add_collector_role(self):
-        self._has('project.resources.add', False)
+        self._has('resource.add', False)
         self._add_role('DC')
-        self._has('project.resources.add', True)
+        self._has('resource.add', True)
 
     def test_keep_collector_role(self):
-        self._change_role('project.resources.add', 'DC', True, 'DC', True)
+        self._change_role('resource.add', 'DC', True, 'DC', True)
 
     def test_keep_non_collector_role(self):
-        self._change_role('project.resources.add', 'PU', False, 'PU', False)
+        self._change_role('resource.add', 'PU', False, 'PU', False)
 
     def test_remove_collector_role(self):
-        self._change_role('project.resources.add', 'DC', True, 'PU', False)
+        self._change_role('resource.add', 'DC', True, 'PU', False)

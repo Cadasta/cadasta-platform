@@ -10,6 +10,7 @@ from django.contrib import messages
 import formtools.wizard.views as wizard
 
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
+from core.views.mixins import ArchiveMixin
 from accounts.models import User
 from questionnaires.models import Questionnaire
 from questionnaires.exceptions import InvalidXLSForm
@@ -70,7 +71,7 @@ class OrganizationEdit(LoginPermissionRequiredMixin,
 
 
 class OrgArchiveView(LoginPermissionRequiredMixin,
-                     mixins.ArchiveMixin,
+                     ArchiveMixin,
                      generic.DetailView):
     model = Organization
 
@@ -84,17 +85,13 @@ class OrgArchiveView(LoginPermissionRequiredMixin,
 class OrganizationArchive(OrgArchiveView):
     permission_required = 'org.archive'
     permission_denied_message = error_messages.ORG_ARCHIVE
-
-    def get(self, request, *args, **kwargs):
-        return self.archive(True)
+    do_archive = True
 
 
 class OrganizationUnarchive(OrgArchiveView):
     permission_required = 'org.unarchive'
     permission_denied_message = error_messages.ORG_UNARCHIVE
-
-    def get(self, request, *args, **kwargs):
-        return self.archive(False)
+    do_archive = False
 
 
 class OrganizationMembers(LoginPermissionRequiredMixin, generic.DetailView):
@@ -489,17 +486,13 @@ class ProjectEditPermissions(ProjectEdit, generic.UpdateView):
     permission_denied_message = error_messages.PROJ_EDIT
 
 
-class ProjectArchive(ProjectEdit, mixins.ArchiveMixin, generic.DetailView):
+class ProjectArchive(ProjectEdit, ArchiveMixin, generic.DetailView):
     permission_required = 'project.archive'
     permission_denied_message = error_messages.PROJ_ARCHIVE
-
-    def get(self, request, *args, **kwargs):
-        return self.archive(True)
+    do_archive = True
 
 
-class ProjectUnarchive(ProjectEdit, mixins.ArchiveMixin, generic.DetailView):
+class ProjectUnarchive(ProjectEdit, ArchiveMixin, generic.DetailView):
     permission_required = 'project.unarchive'
     permission_denied_message = error_messages.PROJ_UNARCHIVE
-
-    def get(self, request, *args, **kwargs):
-        return self.archive(False)
+    do_archive = False

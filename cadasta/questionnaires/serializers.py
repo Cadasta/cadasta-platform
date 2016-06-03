@@ -1,14 +1,7 @@
 from rest_framework import serializers
+from buckets.serializers import S3Field
 
 from . import models
-
-
-class S3Field(serializers.Field):
-    def to_internal_value(self, value):
-        return value
-
-    def to_representation(self, value):
-        return value.url
 
 
 class QuestionOptionSerializer(serializers.ModelSerializer):
