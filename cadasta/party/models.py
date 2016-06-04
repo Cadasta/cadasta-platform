@@ -1,15 +1,16 @@
 """Party models."""
 
-from django.conf import settings
-from django.db import models
-from django.utils.translation import ugettext as _
-from django.contrib.postgres.fields import JSONField
+from datetime import date
 
 from core.models import RandomIDModel
-
-from tutelary.decorators import permissioned_model
+from django.conf import settings
+from django.contrib.gis.db import models
+from django.contrib.postgres.fields import JSONField
+from django.utils.translation import ugettext as _
 from organization.models import Project
 from organization.validators import validate_contact
+from spatial.models import SpatialUnit
+from tutelary.decorators import permissioned_model
 
 from . import messages
 
@@ -33,9 +34,9 @@ class Party(RandomIDModel):
     INDIVIDUAL = 'IN'
     CORPORATION = 'CO'
     GROUP = 'GR'
-    TYPE_CHOICES = ((INDIVIDUAL, 'Individual'),
-                    (CORPORATION, 'Corporation'),
-                    (GROUP, 'Group'))
+    TYPE_CHOICES = ((INDIVIDUAL, _('Individual')),
+                    (CORPORATION, _('Corporation')),
+                    (GROUP, _('Group')))
 
     # All parties are associated with a single project.
     project = models.ForeignKey(
@@ -65,10 +66,10 @@ class Party(RandomIDModel):
     )
 
     # Tenure relationships.
-    # tenure_relationships = models.ManyToManyField(
-    #     'SpatialUnit', through='TenureRelationship',
-    #     related_name='tenure_relationships_set'
-    # )
+    tenure_relationships = models.ManyToManyField(
+        SpatialUnit, through='TenureRelationship',
+        related_name='tenure_relationships'
+    )
 
     class Meta:
         ordering = ('name',)
@@ -136,3 +137,55 @@ class PartyRelationship(RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONField(default={})
+
+
+class TenureRelationship(RandomIDModel):
+    """TenureRelationship model.
+
+    Governs relationships between Party and SpatialUnit.
+    """
+
+    CONTRACTUAL_SHARE_CROP = 'CS'
+    CUSTOMARY_ARRANGEMENT = 'CA'
+    GIFT = 'GF'
+    HOMESTEAD = 'HS'
+    INFORMAL_OCCUPANT = 'IO'
+    INHERITANCE = 'IN'
+    LEASEHOLD = 'LH'
+    PURCHASED_FREEHOLD = 'PF'
+    RENTAL = 'RN'
+    OTHER = 'OT'
+
+    ACQUIRED_CHOICES = ((CONTRACTUAL_SHARE_CROP, _('Contractual/Share Crop')),
+                        (CUSTOMARY_ARRANGEMENT, _('Customary Arrangement')),
+                        (GIFT, _('Gift')),
+                        (HOMESTEAD, _('Homestead')),
+                        (INFORMAL_OCCUPANT, _('Informal Occupant')),
+                        (INHERITANCE, _('Inheritance')),
+                        (LEASEHOLD, _('Leasehold')),
+                        (PURCHASED_FREEHOLD, _('Purchased Freehold')),
+                        (RENTAL, _('Rental')),
+                        (OTHER, _('Other')))
+
+    tenure_type = models.ForeignKey(
+        'TenureRelationshipType',
+        related_name='tenure_type', null=False, blank=False
+    )
+    party = models.ForeignKey(Party, related_name='party',
+                              on_delete=models.CASCADE)
+    spatial_unit = models.ForeignKey(
+        SpatialUnit, related_name='spatial_unit', on_delete=models.CASCADE)
+    acquired_how = models.CharField(
+        max_length=2,
+        choices=ACQUIRED_CHOICES, null=True, blank=True
+    )
+    acquired_date = models.DateField(default=date.today)
+    attributes = JSONField(default={})
+    geom = models.GeometryField(null=True, blank=True)
+
+
+class TenureRelationshipType(models.Model):
+    """Defines allowable tenure types."""
+
+    id = models.CharField(max_length=2, primary_key=True)
+    label = models.CharField(max_length=200)
