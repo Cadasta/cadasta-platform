@@ -33,10 +33,12 @@ class UserListTest(TestCase):
         self.messages = FallbackStorage(self.request)
         setattr(self.request, '_messages', self.messages)
 
-        self.users = UserFactory.create_batch(3)
-        self.org1 = OrganizationFactory.create(add_users=[self.users[0]])
+        self.u1 = UserFactory.create()
+        self.u2 = UserFactory.create()
+        self.u3 = UserFactory.create()
+        self.org1 = OrganizationFactory.create(name='A', add_users=[self.u1])
         self.org2 = OrganizationFactory.create(
-            add_users=[self.users[0], self.users[1]]
+            name='B', add_users=[self.u1, self.u2]
         )
 
         self.policy = Policy.objects.create(
@@ -44,7 +46,6 @@ class UserListTest(TestCase):
         )
 
         self.user = UserFactory.create()
-        self.users.append(self.user)
         setattr(self.request, 'user', self.user)
 
     def test_get_with_user(self):
@@ -52,12 +53,17 @@ class UserListTest(TestCase):
         response = self.view(self.request).render()
         content = response.content.decode('utf-8')
 
-        dummy = default.UserList()
-        dummy.object_list = self.users
-        dummy.get_context_data()
+        self.u1.org_names = 'A, B'
+        self.u2.org_names = 'B'
+        self.u3.org_names = '&mdash;'
+        self.user.org_names = '&mdash;'
+
+        users = [self.u1, self.u2, self.u3, self.user]
+
         expected = render_to_string(
             'organization/user_list.html',
-            {'object_list': self.users, 'user': self.request.user},
+            {'object_list': users,
+             'user': self.request.user},
             request=self.request)
 
         assert response.status_code == 200
