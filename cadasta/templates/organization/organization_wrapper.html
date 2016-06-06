@@ -1,0 +1,82 @@
+{% extends "core/base.html" %}
+
+{% load i18n %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block title %} | {% block page_title %}{% endblock %}{{ organization.name }} {% endblock %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="inner-header">
+      <a class="index-link" href="{% url 'organization:list' %}">
+        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+      </a>
+      <div class="org-logo">
+        {% if organization.logo %}
+        <img src="{{ organization.logo }}" alt="{{ organization.name }}" class="org-logo" />
+        {% else %}
+        <h2>{{ organization.name }}</h2>
+        {% endif %}
+      </div>
+      <div class="top-btn pull-right">
+        <!-- More options menu -->
+        <div class="dropdown pull-right btn-more">
+          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+            <span class="icon kabob-icon"></span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="dLabel">
+            <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
+            <li role="separator" class="divider"></li>
+            <li>
+              {% if organization.archived %}
+              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
+              {% else %}
+              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+        <!-- Split add button -->
+        <div class="dropdown pull-right btn-add">
+          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
+            {% trans "Add" %}
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="{% url 'organization:project-add' organization.slug %}">{% trans "Add new project" %}</a></li>
+            <li><a href="#">{% trans "Add new member" %}</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Sidebar -->
+  <div class="col-md-1 sidebar">
+    <ul class="nav nav-sidebar">
+      <li class="active">
+        {% trans "Overview" %}
+      </li>
+      <li>
+        {% trans "Projects" %}
+      </li>
+      <li>
+        {% trans "Members" %}
+      </li>
+      <li>
+        {% trans "Reports" %}
+      </li>
+      <li>
+        {% trans "Activity" %}
+      </li>
+    </ul>
+  </div>
+  <!-- /.sidebar -->
+  {% block organization_main %}{% endblock %}
+  {% endblock %}

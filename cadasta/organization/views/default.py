@@ -131,7 +131,7 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['object'] = self.get_organization()
+        context['organization'] = self.get_organization()
         return context
 
     def get_form_kwargs(self, *args, **kwargs):

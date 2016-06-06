@@ -1,83 +1,8 @@
-{% extends "core/base.html" %}
+{% extends "organization/organization_wrapper.html" %}
 
 {% load i18n %}
-{% load widget_tweaks %}
-{% load staticfiles %}
 
-{% block title %} | {{ object.name }}{% endblock %}
-
-{% block content %}
-
-<div class="row">
-  <div class="col-md-12">
-    <div class="inner-header">
-      <a class="index-link" href="{% url 'organization:list' %}">
-        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-      </a>
-      <div class="org-logo">
-        {% if org.logo %}
-        <img src="{{ object.logo }}" alt="{{ object.name }}" class="org-logo" />
-        {% else %}
-        <h2>{{ object.name }}</h2>
-        {% endif %}
-      </div>
-      <div class="top-btn pull-right">
-        <!-- More options menu -->
-        <div class="dropdown pull-right btn-more">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-            <span class="icon kabob-icon"></span>
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a class="edit" href="{% url 'organization:edit' object.slug %}">{% trans "Edit organization" %}</a></li>
-            <li role="separator" class="divider"></li>
-            <li>
-              {% if object.archived %}
-              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
-              {% else %}
-              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-        <!-- Split add button -->
-        <div class="dropdown pull-right btn-add">
-          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span>
-            {% trans "Add" %}
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="{% url 'organization:project-add' object.slug %}">{% trans "Add new project" %}</a></li>
-            <li><a href="#">{% trans "Add new member" %}</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <!-- Sidebar -->
-  <div class="col-md-1 sidebar">
-    <ul class="nav nav-sidebar">
-      <li class="active">
-        {% trans "Overview" %}
-      </li>
-      <li>
-        {% trans "Projects" %}
-      </li>
-      <li>
-        {% trans "Members" %}
-      </li>
-      <li>
-        {% trans "Reports" %}
-      </li>
-      <li>
-        {% trans "Activity" %}
-      </li>
-    </ul>
-  </div>
-  <!-- /.sidebar -->
+{% block organization_main %}
   <!-- Main content -->
   <div class="col-md-11 col-md-offset-1 main">
     <div class="row">
@@ -96,7 +21,7 @@
             </thead>
             <tbody>
               {% for prj in projects %}
-              <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=object.slug project=prj.slug %}';">
+              <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
                 <td>{{ prj.name }}</td>
                 <td>{{ prj.country }}</td>
                 <td>{{ prj.last_updated }}</td>
@@ -112,7 +37,7 @@
             {% trans "What would you like to do next?" %}
           </p>
           <p>
-            <a href="{% url 'organization:project-add' object.slug %}" class="btn btn-primary" role="button">
+            <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary" role="button">
               {% trans "Add new project" %}
             </a>
             <a href="#" class="btn btn-primary" role="button">
@@ -127,17 +52,17 @@
       <!-- Right column detail  -->
       <div class="col-md-4 col-detail org-detail">
         <section class="desc">
-          <p>{{ object.description }}<p>
+          <p>{{ organization.description }}<p>
         </section>
         <section class="members">
           <h4>{% trans "Members" %}</h4>
-          {% for user in object.users.all %}
+          {% for user in organization.users.all %}
           <p>
             <b>{{ user.get_full_name }}</b><br />{% trans "Username" %}: {{ user.username }}
           </p>
           {% endfor %}
           <div class="btn-view">
-            <a href="{% url 'organization:members' object.slug %}" class="btn btn-primary" role="button">
+            <a href="{% url 'organization:members' organization.slug %}" class="btn btn-primary" role="button">
               {% trans "View all" %}
             </a>
           </div>
@@ -165,7 +90,7 @@
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:archive' object.slug %}"  class="btn btn-primary archive-final" role="button">
+        <a href="{% url 'organization:archive' organization.slug %}"  class="btn btn-primary archive-final" role="button">
           {% trans "Archive" %}
         </a>
       </div>
@@ -191,7 +116,7 @@
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:unarchive' object.slug %}"  class="btn btn-primary unarchive-final" role="button">
+        <a href="{% url 'organization:unarchive' organization.slug %}"  class="btn btn-primary unarchive-final" role="button">
           {% trans "Unarchive" %}
         </a>
       </div>

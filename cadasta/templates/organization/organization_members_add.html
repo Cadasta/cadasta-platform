@@ -2,7 +2,7 @@
 
 {% load widget_tweaks %}
 
-{% block title %} | Add member | {{ object.name }}{% endblock %}
+{% block page_title %}Add member | {% endblock %}
 
 {% block modals %}
 
@@ -11,9 +11,9 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST"
-              action="{% url 'organization:members_add' object.slug %}">
+              action="{% url 'organization:members_add' organization.slug %}">
           <div class="modal-header">
-            <a class="close" href="{% url 'organization:members' object.slug %}"><span aria-hidden="true">&times;</span></a>
+            <a class="close" href="{% url 'organization:members' organization.slug %}"><span aria-hidden="true">&times;</span></a>
             <h3 class="modal-title">Add member</h3>
           </div>
           <div class="modal-body">
@@ -29,7 +29,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <a class="btn btn-link" href="{% url 'organization:members' object.slug %}">Cancel</a>
+            <a class="btn btn-link" href="{% url 'organization:members' organization.slug %}">Cancel</a>
             <button type="submit" class="btn btn-primary text-uppercase">Continue</button>
           </div>
         </form>
