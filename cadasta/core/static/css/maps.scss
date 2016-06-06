@@ -1,0 +1,71 @@
+/* =Leaflet popups
+-------------------------------------------------------------- */
+
+.leaflet-container {
+  font-family: $font-family-sans-serif !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 4px !important;
+  padding-bottom: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+}
+
+.leaflet-popup-content {
+  .text-wrap { // org and project
+    margin: 0 18px 0 10px;
+    h2 {
+      margin-top: 10px;
+      font-size: 18px;
+      span {
+        font-size: 11px;
+        color: $gray-medium;
+        display: block;
+        text-transform: uppercase; 
+        padding-bottom: 2px;
+      }
+    }
+  }
+  .btn-wrap { // button
+  background: $body-bg;
+  border-top: 1px solid $gray-light;
+  padding: 4px 4px 5px;
+  }
+}
+
+.leaflet-popup-tip { // pointer
+  background: $body-bg !important;
+}
+
+/* =Geolocate
+-------------------------------------------------------------- */
+
+.leaflet-control-geolocate {
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  text-align: center;
+}
+
+.leaflet-control-geolocate:hover {
+  background-color: #f4f4f4;
+}
+
+.leaflet-control-geolocate span {
+  display: inline-block;
+  width: 25px;
+  height: 25px;
+  line-height: 25px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+/* =Map controls
+-------------------------------------------------------------- */
+
+.leaflet-top, .leaflet-bottom {
+  z-index: 200;
+}

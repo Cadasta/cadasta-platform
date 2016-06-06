@@ -2,22 +2,33 @@
 
 //== Colors
 
-$gray-dark:              #595a5c;  // Cadasta gray
-$gray-light:             #f1f2f3;  // Cadasta light gray
-$brand-primary:          #2e51a3;  // Cadasta blue
-$brand-gold:             #edaa00;  // Cadasta gold
+$gray-dark:                    #595a5c;  // Cadasta gray
+$gray-medium:                  lighten($gray-dark, 30%); // Cadasta medium gray
+$gray-light:                   lighten($gray-dark, 50%); // Cadasta light gray
+$brand-primary:                #2e51a3;  // Cadasta blue
+$brand-lightblue:              lighten($brand-primary, 30%);  // Cadasta light blue
+$brand-darkblue:               #0e305e; // #183C8F  // Cadasta dark blue
+$brand-sidebar-blue:           darken($brand-primary, 20%);  // Cadasta sidebar blue
+$brand-gold:                   #edaa00;  // Cadasta gold
 
 //== Scaffolding
 
-$body-bg:               #eee;
+$body-bg:                      #f2f4f7;
 
 //== Typography
 
-$font-family-sans-serif: 'roboto', Helvetica, Arial, sans-serif;
+$font-family-sans-serif:       'roboto', Helvetica, Arial, sans-serif;
+
+//== Header
+
+$header-height:                70px;
+$navbar-height:                63px;
+$header-height-home:           100px;
+$navbar-height-home:           93px;
 
 //== Buttons
 
-$btn-primary-color:              #fff;
+$btn-primary-color:             #fff !important;
 $btn-primary-bg:                 #00b288;  // Cadasta green
 $btn-primary-border:            darken($btn-primary-bg, 5%);
 
@@ -40,6 +51,11 @@ $modal-backdrop-bg:              rgba(0, 0, 0, 0.6);
 //== Tables
 
 $table-cell-padding:            12px 24px !default;
+$table-bg-accent:               #f9f9f9 !default; // Bg for table-striped
+$table-bg-accent:               #lighten($table-bg-accent, 25%); // Bg for table-striped
+$table-bg-hover:                #f2f4f7 !default; // Bg for table-hover
+$table-bg-active:               $table-bg-hover !default;
+$table-border-color:            #e7e8ea; // Bg for table borders
 
 // End Override
 
