@@ -7,6 +7,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
+    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/img/favicon.png" type="image/x-icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,7 +22,7 @@
     {% endif %}
     {% block extra_head %}{% endblock %}
   </head>
-  <body id="{% block top-nav %}page{% endblock %}">
+  <body id="{% block top-nav %}{% endblock %}">
     <div id="cadasta">
       <!-- Site header -->
       <header class="header" role="banner">
@@ -82,25 +84,27 @@
         </div>
       </header>
       <!-- /.header -->
-      
-      <div class="container">
-        {% if messages %}
-        <div id="messages">
-          {% for message in messages %}
-          <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}"
-               role="alert">
-            <button type="button" class="close" data-dismiss="alert"
-                    aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            {{message}}
+      {% block page-header %}{% endblock %}
+      <!-- Page content -->
+      <div id="page-content">
+        {% block sub-nav %}{% endblock %}
+        <main class="container" role="main">
+          {% if messages %}
+          <div id="messages">
+            {% for message in messages %}
+            <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              {{message}}
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
-        {% endif %}
-
-        {% block content %}{% endblock %}
+          {% endif %}
+          {% block content %}{% endblock %}
+        </main>
       </div>
+      <!-- /.page-content -->
 
       <!-- Site footer -->
       <footer class="footer" role="contentinfo">

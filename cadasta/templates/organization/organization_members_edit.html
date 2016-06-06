@@ -5,72 +5,86 @@
 
 {% block page_title %}Members |{% endblock %}
 
-{% block organization_main %}
-  <!-- Main content -->
-  <div class="col-md-11 col-md-offset-1 main col-text">
-    <form method="POST" action="" class="org-member-edit">
-    {% csrf_token %}
+{% block left-nav %}members{% endblock %}
 
-    <div class="row">
-      <div class="col-md-12 page-title">
-        <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
-      </div>
-      <div class="col-md-3">
-        <!-- Member panel -->
-        <div class="panel panel-default well">
-          <div class="panel-body member-info">
-            <div class="member-pic">
-              <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+{% block content %}
+
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <form method="POST" action="" class="org-member-edit">
+      {% csrf_token %}
+  
+        <div class="page-title">
+          <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <!-- Member panel -->
+            <div class="panel panel-default">
+              <div class="panel-body member-info">
+                <div class="member-pic">
+                  <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+                </div>
+                <div class="member-detail">
+                  <h4>{{ object.username }}</h4>
+                  {{ object.get_full_name }}<br>
+                  {{ object.email }}<br>
+                  Last login: {{ object.last_login }}<br>
+                </div>
+                <div class="member-role form-group">
+                  {{ form.org_role.errors }}
+                  <label for="{{ form.org_role.id_for_label }}">Role</label>
+                  {% render_field form.org_role class+="form-control" %}
+                </div>
+                <div class="btn-full">
+                  <button type="button" class="btn btn-default" name="remove" data-toggle="modal" data-target="#remove_confirm">
+                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove member</button>
+                </div>
+              </div>
             </div>
-            <div class="member-detail">
-              <h4>{{ object.username }}</h4>
-              {{ object.get_full_name }}<br>
-              {{ object.email }}<br>
-              Last login: {{ object.last_login }}<br>
-            </div>
-            <div class="member-role form-group">
-              {{ form.org_role.errors }}
-              <label for="{{ form.org_role.id_for_label }}">Role</label>
-              {% render_field form.org_role class+="form-control" %}
-            </div>
-            <div class="btn-view">
-              <button type="button" class="btn btn-default" name="remove" data-toggle="modal" data-target="#remove_confirm">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove member</button>
+            <!-- /member panel -->
+          </div>
+          <div class="col-md-9">
+            <div class="panel panel-default">
+              <div class="panel-heading"><h3>Member Permissions</h3></div>
+              <div class="panel-body">
+                <!-- Members index -->
+                <table class="table table-hover datatable" id="projects-permissions">
+                  <thead>
+                    <tr>
+                      <th>Project</th>
+                      <th>Permissions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for field in form %}
+                    {% if field.name != 'org_role' %}
+                    <tr>
+                      <td><label for="{{ field.id_for_label }}">{{field.label}}</label></td>
+                      <td>{% render_field field class+="form-control" %}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                  </tbody>
+                </table>
+                <div class="btn-full">
+                  <button type="submit" class="btn btn-primary btn-lg" name="submit">Save</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <!-- /member panel -->
-      </div>
-
-      <div class="col-md-9">
-        <table class="table table-hover datatable" id="projects-permissions">
-          <thead>
-            <tr>
-              <th>Project</th>
-              <th>Permissions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for field in form %}
-            {% if field.name != 'org_role' %}
-            <tr>
-              <td><label for="{{ field.id_for_label }}">{{field.label}}</label></td>
-              <td>{% render_field field class+="form-control" %}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
-        <div class="btn-full">
-          <button type="submit" class="btn btn-primary btn-lg" name="submit">Save</button>
-        </div>
-      </div>
+      </form>
     </div>
-
-    </form>
+    <!-- /.main-text -->
   </div>
-  <!-- /.main -->
 </div>
+
+{% endblock %}
+
+{% block modals %}
 
 <div class="modal fade" id="remove_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">

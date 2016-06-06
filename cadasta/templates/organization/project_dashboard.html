@@ -23,52 +23,41 @@
 </script>
 {% endblock %}
 
-{% block project_main %}
+{% block left-nav %}overview{% endblock %}
 
-  <!-- Main content -->
-  <div class="col-md-11 col-md-offset-1 main main-map">
-    <div class="row">
-      <!-- Left column map  -->
-      <div class="col-md-7 col-map">
-        {% leaflet_map "project-map" callback="project_map_init" %}
-      </div>
-      <!-- /.col-map -->
-      <!-- Right column detail  -->
-      <div class="col-md-5 col-detail">
-        <section class="desc">
-          <h2 class="page-title">Project Overview</h2>
-          <p>{{ object.description }}</p>
-        </section>
+{% block content %}
+
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Start overview map  -->
+    <div class="col-md-8 map">
+      {% leaflet_map "project-map" callback="project_map_init" %}
+    </div>
+    <!-- / end overview map -->
+    <!-- Overview detail  -->
+    <div class="col-md-4 detail">
+      <section>
+        <h2>Project Overview</h2>
+        <p>{{ object.description }}</p>
         {% if has_content %}
-        <section class="stats">
           {% trans "Some statistics here..." %}
-        </section>
         {% else %}
-        <!-- Starter text -->
-        <section class="text">
-          <p class="larger">{% trans "You have successfully created your project." %}</p>
-          <p class="larger">{% trans "What would you like to do next?" %}</p>
-
-          <div class="btn-view">
+          <div class="divider"></div>
+          <!-- Starter text -->
+          <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3> 
+          <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
+          <div class="btn-full">
             <button class="btn btn-primary btn-lg">
-              {% trans "Add a parcel" %}
-            </button>
-            <button class="btn btn-primary btn-lg">
-              {% trans "Upload data" %}
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+              {% trans "Add a location" %}
             </button>
           </div>
-          <br/>
-          <p>{% trans "Not sure what to do next?  View our Getting Started demo." %}</p>
-          <iframe width="420" height="315"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  frameborder="0" allowfullscreen>
-          </iframe>
-        </section>
+          <p>Need to help getting started? <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.</p>
         {% endif %}
-      </div>
-      <!-- /.col-detail -->
+      </section>
     </div>
+    <!-- / overview detail -->
   </div>
-  <!-- /.main -->
+</div>
 
 {% endblock %}

@@ -2,98 +2,112 @@
 
 {% load i18n %}
 
+{% block top-nav %}project-single{% endblock %}
+
 {% block title %} | {{ object.name }}{% endblock %}
 
-{% block content %}
+{% block page-header %}
 
-<!-- Project inner header -->
-<div class="row">
-  <div class="col-md-12">
-    <div class="inner-header">
-      <a class="index-link" href="{% url 'project:list' %}">
-        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-      </a>
-      <div class="org-logo">
-        {% if object.organization.logo %}
-        <img src="{{ object.organization.logo }}" alt="{{ object.organization.name }}" class="org-logo" />
-        {% else %}
-        <h2>{{ object.organization.name }}</h2>
-        {% endif %}
+<!-- Single project header -->
+<div class="header page-header">
+  <div class="page-title">
+    <a class="index-link" href="{% url 'project:list' %}">
+      <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+    </a>
+    <h1>
+      <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">
+        {{ object.organization.name }}
+      </a> 
+      {{ object.name }}
+    </h1>
+    <div class="top-btn pull-right">
+      <!-- More options menu -->
+      <div class="dropdown pull-right btn-more">
+        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+          <span class="more-menu glyphicon glyphicon-option-vertical"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project location" %}</a></li>
+          <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
+          <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
+          <li role="separator" class="divider"></li>
+          <li>
+            {% if object.archived %}
+            <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive project" %}</a>
+            {% else %}
+            <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive project" %}</a>
+            {% endif %}
+          </li>
+        </ul>
       </div>
-      <h2>{{ object.name }}</h2>
-      <div class="top-btn pull-right">
-        <!-- More options menu -->
-        <div class="dropdown pull-right btn-more">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-            <span class="icon kabob-icon"></span>
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project geometry" %}</a></li>
-            <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
-            <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit project member permissions" %}</a></li>
-            <li role="separator" class="divider"></li>
-            <li>
-              {% if object.archived %}
-              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive project" %}</a>
-              {% else %}
-              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive project" %}</a>
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-        <!-- Split add button -->
-        <div class="btn-group pull-right btn-add">
-          <button type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
-          </button>
-          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Add</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#">Add new location</a></li>
-            <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">Add new ressource</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a class="edit" href="#">{% trans "Import field data" %}</a></li>
-          </ul>
-        </div>
+      <!-- Split add button -->
+      <div class="btn-group pull-right btn-add">
+        <button type="button" class="btn btn-primary">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
+        </button>
+        <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">Toggle Add</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="#">{% trans "Add relationship" %}</a></li>
+          <li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add resource" %}</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
+        </ul>
       </div>
     </div>
   </div>
 </div>
-<!-- /.inner-header -->
+<!-- / single project header -->
 
-<div class="row">
-  <!-- Sidebar -->
-  <div class="col-md-1 sidebar">
-    <ul class="nav nav-sidebar">
-      <li>
-        {% trans "Overview" %}
-      </li>
-      <li>
-        {% trans "Map" %}
-      </li>
-      <li>
-        {% trans "Records" %}
-      </li>
-      <li>
-        <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
-          {% trans "Resources" %}
-        </a>
-      </li>
-      <li>
-        {% trans "Reports" %}
-      </li>
-      <li>
-        {% trans "Activity" %}
-      </li>
-    </ul>
-  </div>
-  <!-- /.sidebar -->
+{% endblock %}
 
-  {% block project_main %}{% endblock %}
+{% block sub-nav %}
 
+<!-- Sidebar -->
+<div id="sidebar" class="{% block left-nav %}{% endblock %} col-md-1">
+  <ul class="nav nav-sidebar">
+    <li class="overview">
+      <a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">
+        <span class="icon"></span>
+        <span class="title">{% trans "Overview" %}</span>
+      </a>
+    </li>
+    <li class="map">
+      <a href="#">
+        <span class="icon map"></span>
+        <span class="title">{% trans "Map" %}</span>
+      </a>
+    </li>
+    <li class="resources">
+      <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
+        <span class="icon resources"></span>
+        <span class="title">{% trans "Resources" %}</span>
+      </a>
+    </li>
+    <li class="reports">
+      <a href="#">
+         <span class="icon reports"></span>
+         <span class="title">{% trans "Reports" %}</span>
+      </a>
+    </li>
+    <li class="activity">
+      <a href="#">
+        <span class="icon activity"></span>
+        <span class="title">{% trans "Activity" %}</span>
+      </a>
+    </li>
+  </ul>
 </div>
+<!-- /.sidebar -->
+
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block modals %}
 
 <div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">

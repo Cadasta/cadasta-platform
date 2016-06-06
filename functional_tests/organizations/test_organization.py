@@ -72,9 +72,10 @@ class OrganizationTest(FunctionalTest):
         fields["description"].send_keys("A technology company.")
         page.click_on_submit_button()
 
-        name = page.get_organization_title()
+        name = self.page_title().text
         info = page.get_org_description_and_members()
-        assert "Stark Enterprise" in name
+        print(name)
+        assert "Stark Enterprise".upper() in name
         assert "A technology company." in info
 
     def test_archiving_organization(self):
@@ -136,7 +137,8 @@ class OrganizationTest(FunctionalTest):
         page.go_to_organization_page()
 
         title = page.click_on_project()
-        assert title == "Organization #0 Test Project"
+        print("Organization #0\nTest Project")
+        assert title == "Organization #0\nTest Project".upper()
 
     def test_new_organization_view(self):
         """An organization without projects has a different view."""
@@ -147,7 +149,7 @@ class OrganizationTest(FunctionalTest):
         page.go_to_organization_page(new=True)
 
         welcome = page.get_welcome_message()
-        assert "You're ready to go".upper() in welcome
+        assert "You're ready to go" in welcome
 
         title = page.click_add_new_project_button()
         assert title == "PROJECTS: Add new"
