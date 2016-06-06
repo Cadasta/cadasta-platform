@@ -42,7 +42,11 @@
             {% endif %}
           </div>
         </td>
-        <td>{{ org.projects.count }}</td>
+        {% if user.is_authenticated and org in user.organizations.all %}
+          <td>{{ org.all_projects.count }}</td>
+        {% else %}
+          <td>{{ org.public_projects.count }}</td>
+        {% endif %}
       </tr>
       {% endfor %}
     </table>

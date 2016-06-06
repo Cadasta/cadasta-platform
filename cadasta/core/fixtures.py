@@ -128,7 +128,7 @@ class FixturesData:
             This is a test project.  This is a test project.  This is a test
             project.  This is a test project.  This is a test project.  This
             is a test project.  This is a test project.""",
-            organization=orgs[0],
+            organization=orgs[1],
             country='KE',
             extent=('SRID=4326;'
                     'POLYGON ((-5.1031494140625000 8.1299292850467957, '
@@ -144,7 +144,7 @@ class FixturesData:
             This is a test project.  This is a test project.  This is a test
             project.  This is a test project.  This is a test project.  This
             is a test project.  This is a test project.""",
-            organization=orgs[0],
+            organization=orgs[1],
             country='PH',
             extent=('SRID=4326;'
                     'POLYGON ((-63.6328125000000000 44.7233201889582475, '
@@ -161,7 +161,7 @@ class FixturesData:
             project. This is another test project.  This is a test project.
             This is another test project.  This is another test project.
             This is another test project.""",
-            organization=orgs[1],
+            organization=orgs[0],
             country='ID',
             extent=('SRID=4326;'
                     'POLYGON ((-57.0520019531250000 -1.0793428942462329, '
@@ -179,7 +179,7 @@ class FixturesData:
             project. This is another test project.  This is a test project.
             This is another test project.  This is another test project.
             This is another test project.""",
-            organization=orgs[1],
+            organization=orgs[0],
             country='MM'
         ))
         projs.append(ProjectFactory.create(
@@ -190,7 +190,7 @@ class FixturesData:
             project. This is another test project.  This is a test project.
             This is another test project.  This is another test project.
             This is another test project.""",
-            organization=orgs[1],
+            organization=orgs[0],
             country='MM',
             extent=GEOSGeometry(
                 '{"type": "Polygon",'
@@ -212,7 +212,7 @@ class FixturesData:
             project. This is another test project.  This is a test project.
             This is another test project.  This is another test project.
             This is another test project.""",
-            organization=orgs[1],
+            organization=orgs[0],
             country='MM',
             extent=GEOSGeometry(
                 '{"type": "Polygon",'
@@ -233,7 +233,7 @@ class FixturesData:
             project. This is another test project.  This is a test project.
             This is another test project.  This is another test project.
             This is another test project.""",
-            organization=orgs[0],
+            organization=orgs[1],
             extent=GEOSGeometry(
                 '{"type": "Polygon",'
                 '"coordinates": [['
@@ -251,6 +251,48 @@ class FixturesData:
                 '[-245.3981566429138, -3.331934566552203],'
                 '[-245.39695501327512, -3.328635665488632]]]}')
         ))
+
+        projs.append(ProjectFactory.create(
+            name='Private Cadasta Test Project',
+            slug='private-cadasta',
+            description=""""This is a private test project.  This is pivate test
+            project. This is pivate test project.  This is pivate test
+            project. This is pivate test project.  This is a test project.
+            This is another test project.  This is another test project.
+            This is another test project.""",
+            organization=orgs[0],
+            extent=GEOSGeometry(
+                '{"type": "Polygon",'
+                '"coordinates": [['
+                '[-21.81009292602539, 64.07722793795327],'
+                '[-21.81009292602539, 64.09425757251603],'
+                '[-21.76013946533203, 64.09425757251603],'
+                '[-21.76013946533203, 64.07722793795327],'
+                '[-21.81009292602539, 64.07722793795327]]'
+                ']}'),
+            access='private'
+        ))
+
+        projs.append(ProjectFactory.create(
+            name='Private H4H Test Project',
+            slug='private-h4h',
+            description=""""This is a private test project.  This is pivate test
+            project. This is pivate test project.  This is pivate test
+            project. This is pivate test project.  This is a test project.
+            This is another test project.  This is another test project.
+            This is another test project.""",
+            organization=orgs[1],
+            extent=GEOSGeometry(
+                '{"type": "Polygon",'
+                '"coordinates": [['
+                '[-166.18331909179688, 59.891003681240576],'
+                '[-166.18331909179688, 60.06346983332297],'
+                '[-165.596923828125, 60.06346983332297],'
+                '[-165.596923828125, 59.891003681240576],'
+                '[-166.18331909179688, 59.891003681240576]]]}'),
+            access='private'
+        ))
+
         print('\nSuccessfully added organizations {}'.
               format(Project.objects.all()))
 

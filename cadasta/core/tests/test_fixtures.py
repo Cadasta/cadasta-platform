@@ -21,7 +21,7 @@ class FixturesTest(TestCase):
         assert User.objects.count() == 20
         assert Policy.objects.count() == 7
         assert Organization.objects.count() == 2
-        assert Project.objects.count() == 7
+        assert Project.objects.count() == 9
         assert SpatialUnit.objects.count() == 7
         assert SpatialUnitRelationship.objects.count() == 2
 

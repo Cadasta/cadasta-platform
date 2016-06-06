@@ -54,6 +54,25 @@ class OrganizationDashboard(PermissionRequiredMixin, generic.DetailView):
     template_name = 'organization/organization_dashboard.html'
     permission_required = 'org.view'
 
+    def get_context_data(self, member=False, **kwargs):
+        context = super(OrganizationDashboard, self).get_context_data(**kwargs)
+        if member:
+            projects = self.object.all_projects()
+        else:
+            projects = self.object.public_projects()
+        context['projects'] = projects
+        return context
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        if hasattr(self.request.user, 'organizations'):
+            orgs = self.request.user.organizations.all()
+            for org in orgs:
+                if org.slug == self.kwargs['slug']:
+                    context = self.get_context_data(member=True)
+        return super(generic.DetailView, self).render_to_response(context)
+
 
 class OrganizationEdit(LoginPermissionRequiredMixin,
                        generic.UpdateView):
