@@ -20,9 +20,10 @@
     {% endif %}
     {% block extra_head %}{% endblock %}
   </head>
-  <body>
+  <body id="{% block top-nav %}page{% endblock %}">
     <div id="cadasta">
-      <header>
+      <!-- Site header -->
+      <header class="header" role="banner">
         <div class="container">
           <div id="logo" class="pull-left">
             <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>
@@ -38,7 +39,7 @@
               </button>
               <ul class="dropdown-menu">
                 <li>
-                  <a href="{% url 'account:profile' %}">{% trans "My Profile" %}</a>
+                  <a href="{% url 'account:profile' %}">{% trans "Edit Profile" %}</a>
                 </li>
                 <li role="separator" class="divider"></li>
                 <li>
@@ -48,25 +49,30 @@
             </div>
             {% else %}
             <!-- New user menu -->
+            <div class="divider pull-left"></div>
             <div class="btn-group" role="group">
               <a href="{% url 'account_login' %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a> 
               <a href="{% url 'account_signup' %}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
             </div>
             {% endif %}
           </div>
+          <!-- Info -->
+          <a href="#" class="btn btn-info pull-right" aria-label="Info">
+            <span class="glyphicon glyphicon-info-sign"></span>
+          </a>
           <nav class="nav" role="navigation">
             <ul class="list-inline">
-              <li>
+              <li class="projects">
                 <a href="{% url 'project:list' %}">
                   {% trans "Projects" %}
                 </a>
-              </li>
-              <li>
+              </li><!--
+              --><li class="organizations">
                 <a href="{% url 'organization:list' %}">
                   {% trans "Organizations" %}
                 </a>
-              </li>
-              <li>
+              </li><!--
+              --><li class="users">
                 <a href="{% url 'user:list' %}">
                   {% trans "Users" %}
                 </a>
@@ -75,7 +81,8 @@
           </nav>
         </div>
       </header>
-
+      <!-- /.header -->
+      
       <div class="container">
         {% if messages %}
         <div id="messages">
@@ -95,7 +102,8 @@
         {% block content %}{% endblock %}
       </div>
 
-      <footer class="footer">
+      <!-- Site footer -->
+      <footer class="footer" role="contentinfo">
         <div class="container">
           <p class="pull-left">
             {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
@@ -148,6 +156,8 @@
           </div>
         </div>
       </footer>
+      <!-- /.footer -->
+
     </div>
     {% block modals %} {% endblock %}
 
