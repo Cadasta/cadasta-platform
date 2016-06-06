@@ -24,12 +24,12 @@
 
 <form class="account-register form-narrow" id="signup_form" method="POST"
       action="{% url 'account_signup' %}">
-  <h1>{% trans "Sign up for a free account" %}</h1>
+  <h1>{% trans "Register for a free account" %}</h1>
 
   {% csrf_token %}
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
-    <label for="id_username">Choose username</label>
+    <label for="id_username">Choose your username</label>
     <label class="pull-right control-label">
       {% for error in form.username.errors %}
       {{ error|escape }}
@@ -90,5 +90,7 @@
     {% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
   </p>
 </form>
+
+<div class="tinted-bg"></div>
 
 {% endblock %}
