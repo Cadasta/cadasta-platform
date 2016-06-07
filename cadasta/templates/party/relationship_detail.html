@@ -1,0 +1,36 @@
+{% extends "spatial/location_wrapper.html" %}
+{% load i18n %}
+
+{% block form_script %}
+  {{ form.media }}
+  {% include "resources/scripts.html" %}
+{% endblock %}
+
+{% block location_panel %}
+
+<h2>{% trans "Relationship" %}</h2>
+
+<a href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}">Edit</a> | 
+<a href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}">Delete</a>
+
+<table class="table table-hover">
+  <tr>
+    <td>{% trans "Type" %}</td>
+    <td>{{ relationship.tenure_type.label }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Party" %}</td>
+    <td><a href="{% url 'parties:detail' object.organization.slug object.slug relationship.party.id %}">{{ relationship.party.name }}</a></td>
+  </tr>
+</table>
+
+<h3>{% trans "resources" %}</h3>
+
+{% include 'resources/table.html' with object_list=relationship.resources %}
+
+<div class="btn-group btn-group-justified">
+  <a class="btn btn-primary" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">{% trans "Add from library" %}</a>
+  <a class="btn btn-primary" href="{% url 'parties:relationship_resource_new' object.organization.slug object.slug relationship.id %}">{% trans "Upload new resource" %}</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "spatial/location_wrapper.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block modals %}
+<div class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="POST">
+          <div class="modal-header">
+            <a class="close" href="{% url 'locations:detail' object.organization.slug object.slug location.id %}#resources">
+              <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title">{% trans "Add resource from library" %}</h3>
+          </div>
+
+          <div class="modal-body">
+            {% include 'resources/table_add_lib.html' %}
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn btn-link cancel"
+               href="{% url 'locations:detail' object.organization.slug object.slug location.id %}#resources">
+              {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+              {% trans "Save" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

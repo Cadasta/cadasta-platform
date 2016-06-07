@@ -10,13 +10,14 @@ from simple_history.models import HistoricalRecords
 from . import messages
 from .choices import TYPE_CHOICES
 from .exceptions import SpatialRelationshipError
+from resources.mixins import ResourceModelMixin
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
 
 
 @fix_model_for_attributes
 @permissioned_model
-class SpatialUnit(RandomIDModel):
+class SpatialUnit(ResourceModelMixin, RandomIDModel):
     """A single spatial unit: has a type, an optional geometry, a
     type-dependent set of attributes, and a set of relationships to
     other spatial units.
@@ -78,6 +79,9 @@ class SpatialUnit(RandomIDModel):
             ('spatial.delete',
              {'description': _("Delete an existing spatial unit"),
               'error_message': messages.SPATIAL_DELETE}),
+            ('spatial.resources.add',
+             {'description': _("Add resources to this spatial unit"),
+              'error_message': messages.SPATIAL_ADD_RESOURCE})
         )
 
     def __str__(self):

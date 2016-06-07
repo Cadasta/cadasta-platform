@@ -1,0 +1,37 @@
+{% extends "party/relationship_detail.html" %}
+{% load i18n %}
+
+{% block modals %}
+
+<div class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="POST">
+          <div class="modal-header">
+            <a class="close" href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}">
+              <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title">{% trans "Upload new resource" %}</h3>
+          </div>
+
+          <div class="modal-body">
+            {% include 'resources/form.html' %}
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn btn-link cancel"
+               href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}">
+              {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+              {% trans "Submit" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

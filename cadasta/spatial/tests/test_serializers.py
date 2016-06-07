@@ -2,7 +2,7 @@ import pytest
 from django.test import TestCase
 from rest_framework.serializers import ValidationError
 
-from spatial.serializers import SpatialUnitSerializer
+from spatial import serializers
 from spatial.tests.factories import SpatialUnitFactory
 from spatial.models import SpatialUnit
 from organization.tests.factories import ProjectFactory
@@ -11,7 +11,7 @@ from organization.tests.factories import ProjectFactory
 class SpatialUnitSerializerTest(TestCase):
     def test_geojson_serialization(self):
         spatial_data = SpatialUnitFactory.create()
-        serializer = SpatialUnitSerializer(spatial_data)
+        serializer = serializers.SpatialUnitSerializer(spatial_data)
         assert serializer.data['type'] == 'Feature'
         assert 'geometry' in serializer.data
         assert 'properties' in serializer.data
@@ -24,7 +24,7 @@ class SpatialUnitSerializerTest(TestCase):
                 'project': project
             }
         }
-        serializer = SpatialUnitSerializer(
+        serializer = serializers.SpatialUnitSerializer(
             data=spatial_data,
             context={'project': project}
         )
@@ -37,7 +37,7 @@ class SpatialUnitSerializerTest(TestCase):
     def test_project_detail_not_serialized(self):
         project = ProjectFactory.create()
         spatial_data = SpatialUnitFactory.create(project=project)
-        serializer = SpatialUnitSerializer(spatial_data)
+        serializer = serializers.SpatialUnitSerializer(spatial_data)
         assert 'description' not in serializer.data['properties']['project']
 
     def test_create_without_name(self):
@@ -49,7 +49,7 @@ class SpatialUnitSerializerTest(TestCase):
             }
         }
 
-        serializer = SpatialUnitSerializer(
+        serializer = serializers.SpatialUnitSerializer(
             data=spatial_data,
             context={'project': project}
         )
@@ -66,7 +66,7 @@ class SpatialUnitSerializerTest(TestCase):
                 'project': project
             }
         }
-        serializer = SpatialUnitSerializer(
+        serializer = serializers.SpatialUnitSerializer(
             su,
             data=spatial_data,
             partial=True,
@@ -88,7 +88,7 @@ class SpatialUnitSerializerTest(TestCase):
                 'name': ''
             }
         }
-        serializer = SpatialUnitSerializer(
+        serializer = serializers.SpatialUnitSerializer(
             su,
             data=spatial_data,
             partial=True,
@@ -108,7 +108,7 @@ class SpatialUnitSerializerTest(TestCase):
                 'project': 'something'
             }
         }
-        serializer = SpatialUnitSerializer(
+        serializer = serializers.SpatialUnitSerializer(
             su,
             data=spatial_data,
             partial=True,
@@ -119,3 +119,31 @@ class SpatialUnitSerializerTest(TestCase):
         serializer.save()
         data = serializer.data['properties']
         assert data['project']['name'] != 'New Project'
+
+
+class SpatialUnitGeoJsonSerializerTest(TestCase):
+    def test_serialize(self):
+        location = SpatialUnitFactory.build(id='abc123')
+        serializer = serializers.SpatialUnitGeoJsonSerializer(location)
+
+        assert 'type' in serializer.data['properties']
+        assert 'url' in serializer.data['properties']
+        assert 'geometry' in serializer.data
+
+    def test_get_url(self):
+        location = SpatialUnitFactory.build(id='abc123')
+        serializer = serializers.SpatialUnitGeoJsonSerializer(location)
+
+        expected_url = ('/organizations/{o}/projects/{p}/records/'
+                        'locations/{l}/'.format(
+                            o=location.project.organization.slug,
+                            p=location.project.slug,
+                            l=location.id
+                        ))
+
+        assert serializer.get_url(location) == expected_url
+
+    def test_get_type(self):
+        location = SpatialUnitFactory.build(type='CB')
+        serializer = serializers.SpatialUnitGeoJsonSerializer(location)
+        assert serializer.get_type(location) == 'Community boundary'

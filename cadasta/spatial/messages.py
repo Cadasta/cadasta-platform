@@ -11,6 +11,8 @@ SPATIAL_UPDATE = _(
     "You don't have permission to update this spatial unit.")
 SPATIAL_DELETE = _(
     "You don't have permission to remove this spatial unit.")
+SPATIAL_ADD_RESOURCE = _("You don't have permission to add resources to this "
+                         "spatial unit")
 
 SPATIAL_REL_LIST = _(
     "You don't have permission to view spatial relationships of this project.")

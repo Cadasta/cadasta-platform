@@ -1,0 +1,21 @@
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% csrf_token %}
+<table class="table table-hover datatable" data-paging-type="simple">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{% trans "Resource" %}</th>
+      <th>{% trans "Type" %}</th>
+      <th>{% trans "Entities associated" %}</th>
+      <th>{% trans "Contributor" %}</th>
+      <th>{% trans "Last updated" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for field in form %}
+    {% render_field field class+="form-control" %}
+  {% endfor %}
+  </tbody>
+</table>

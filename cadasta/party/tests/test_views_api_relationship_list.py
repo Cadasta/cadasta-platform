@@ -63,7 +63,7 @@ class SpatialUnitsRelationshipListAPITest(RelationshipListTestCase):
         request = APIRequestFactory().get(url)
         force_authenticate(request, user=self.user)
         response = self.view(
-            request, organization=org.slug, project_slug=prj.slug,
+            request, organization=org.slug, project=prj.slug,
             spatial_id=self.su1.id).render()
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status_code.HTTP_200_OK
@@ -81,7 +81,7 @@ class SpatialUnitsRelationshipListAPITest(RelationshipListTestCase):
         request = APIRequestFactory().get(url)
         force_authenticate(request, user=self.user)
         response = self.view(
-            request, organization=org.slug, project_slug=prj.slug,
+            request, organization=org.slug, project=prj.slug,
             party_id=self.party1.id).render()
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status_code.HTTP_200_OK
@@ -99,7 +99,7 @@ class SpatialUnitsRelationshipListAPITest(RelationshipListTestCase):
         request = APIRequestFactory().get(url)
         force_authenticate(request, user=self.user)
         response = self.view(
-            request, organization=org.slug, project_slug=prj.slug,
+            request, organization=org.slug, project=prj.slug,
             party_id=self.party1.id).render()
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status_code.HTTP_400_BAD_REQUEST

@@ -614,6 +614,7 @@ header {
     padding-bottom: 14px;
     text-shadow: none;
   }
+
   h3 {
     font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
@@ -643,6 +644,10 @@ header {
       height: 100%;
       min-height: 100%;
     }
+  }
+  #id_geometry_map {
+    height: 100%;
+    min-height: 100%;
   }
   .main-text {
     padding: 30px 40px 50px 50px;
@@ -849,6 +854,50 @@ div.dataTables_wrapper div.dataTables_info /* showing number total */ {
   table {
     overflow-x: auto;
   }
+}
+
+/* =Organizations
+-------------------------------------------------------------- */
+
+div.org-logo {
+  float: left;
+  padding: 10px;
+}
+
+.org-text {
+  margin-left: 160px;
+}
+
+.member-pic {
+  padding-bottom: 12px;
+  img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+   }
+}
+
+.member-detail {
+  min-height: 100px;
+  display: inline-block;
+  padding: 0 0 20px 0;
+  h5 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+}
+
+.member-role {
+  padding: 30px 0;
+  border-top: solid 1px $table-border-color;
+  border-bottom: solid 1px $table-border-color;
+  clear: both;
+  margin: 30px 0;
+}
+
+#projects-permissions .form-control {
+  min-width: 70%;
 }
 
 /* =Dashboard map

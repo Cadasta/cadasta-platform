@@ -47,10 +47,9 @@
           <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3> 
           <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
           <div class="btn-full">
-            <button class="btn btn-primary btn-lg">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
-              {% trans "Add a location" %}
-            </button>
+            <a class="btn btn-primary btn-lg" href="{% url 'locations:add' object.organization.slug object.slug %}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
+            </a>
           </div>
         {% endif %}
       </section>
