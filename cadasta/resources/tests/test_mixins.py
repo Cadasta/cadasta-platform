@@ -1,7 +1,7 @@
 from django.db.models import Model
-from django.test import TestCase
 from ..mixins import ResourceModelMixin
 from .factories import ResourceFactory
+from core.tests.base_test_case import UserTestCase
 
 
 class ResourceModel(ResourceModelMixin, Model):
@@ -9,7 +9,7 @@ class ResourceModel(ResourceModelMixin, Model):
         app_label = 'core'
 
 
-class ResourceModelMixinTest(TestCase):
+class ResourceModelMixinTest(UserTestCase):
     def test_resources_property(self):
         resource_model_1 = ResourceModel()
         resource_model_1.save()

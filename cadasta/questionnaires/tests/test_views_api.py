@@ -1,6 +1,5 @@
 import os
 import json
-from django.test import TestCase
 from django.conf import settings
 
 from buckets.test.utils import ensure_dirs
@@ -8,6 +7,7 @@ from buckets.test.storage import FakeS3Storage
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Policy
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from ..views import api
@@ -17,8 +17,9 @@ from .factories import QuestionnaireFactory
 path = os.path.dirname(settings.BASE_DIR)
 
 
-class QuestionnaireDetailTest(TestCase):
+class QuestionnaireDetailTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clause = {
             'clause': [
                 {

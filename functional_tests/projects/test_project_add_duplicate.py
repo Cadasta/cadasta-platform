@@ -3,12 +3,14 @@ from pages.Project import ProjectPage
 from pages.ProjectAdd import ProjectAddPage
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
+from core.tests.factories import PolicyFactory
 
 
 class ProjectAddDuplicateTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
 
         # Define 1 OA
         self.test_data = {

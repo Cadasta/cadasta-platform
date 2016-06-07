@@ -2,11 +2,13 @@ from base import FunctionalTest
 from pages.Registration import RegistrationPage
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
+from core.tests.factories import PolicyFactory
 
 
 class RegistrationTest(FunctionalTest):
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         self.test_data = {
             'users': [{
                 'username': 'default1',

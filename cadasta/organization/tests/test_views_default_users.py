@@ -1,5 +1,5 @@
 import json
-from django.test import TestCase
+
 from django.http import HttpRequest, Http404
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
@@ -9,6 +9,7 @@ import pytest
 
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory
 from ..views import default
@@ -23,8 +24,9 @@ USER_CLAUSES = {
 }
 
 
-class UserListTest(TestCase):
+class UserListTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.UserList.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -80,8 +82,9 @@ class UserListTest(TestCase):
         assert '/account/login/' in response['location']
 
 
-class UserActivationTest(TestCase):
+class UserActivationTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'POST')
 

@@ -2,12 +2,14 @@ from base import FunctionalTest
 from pages.Users import UsersPage
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
+from core.tests.factories import PolicyFactory
 
 
 class PageAccessTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         self.test_data = {
             'user1': {
                 'username': 'default1',

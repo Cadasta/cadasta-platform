@@ -1,13 +1,13 @@
-from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from ..models import User
 from ..forms import RegisterForm, ProfileForm
+from core.tests.base_test_case import UserTestCase
 
 from .factories import UserFactory
 
 
-class RegisterFormTest(TestCase):
+class RegisterFormTest(UserTestCase):
     def test_valid_data(self):
         data = {
             'username': 'imagine71',
@@ -56,7 +56,7 @@ class RegisterFormTest(TestCase):
         assert User.objects.count() == 1
 
 
-class ProfileFormTest(TestCase):
+class ProfileFormTest(UserTestCase):
     def test_update_user(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk')

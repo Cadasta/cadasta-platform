@@ -7,12 +7,14 @@ from pages.ProjectAdd import ProjectAddPage
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
+from core.tests.factories import PolicyFactory
 
 
 class ProjectAddTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
 
         # Load world boundary data
         geography.load.run(verbose=False)

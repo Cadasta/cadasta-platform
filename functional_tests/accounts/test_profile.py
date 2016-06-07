@@ -1,11 +1,13 @@
 from base import FunctionalTest
 from pages.Profile import ProfilePage
 from pages.Login import LoginPage
+from core.tests.factories import PolicyFactory
 
 
 class ProfileTest(FunctionalTest):
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         self.test_data = {
             'users': [{
                 'username': 'default1',

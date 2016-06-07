@@ -29,10 +29,6 @@ class OrganizationListPage(Page):
         return self.test.table_body(
             "DataTables_Table_0", "//tr{}//td".format(row) + xpath)
 
-    def get_empty_table(self):
-        return self.get_table_data(
-            "[contains(@class, 'dataTables_empty')]", "[1]").text
-
     def get_organization_title_in_table(self, row="[1]"):
         return self.get_table_data("//h4", row).text
 

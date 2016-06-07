@@ -1,8 +1,8 @@
 import os
 
-from django.test import TestCase
 from django.conf import settings
 
+from core.tests.base_test_case import UserTestCase
 from .factories import ResourceFactory
 from ..models import ContentObject, Resource, create_thumbnails
 
@@ -11,7 +11,7 @@ from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
 
 
-class ResourceTest(TestCase):
+class ResourceTest(UserTestCase):
     def test_file_name_property(self):
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_name == 'filename.txt'

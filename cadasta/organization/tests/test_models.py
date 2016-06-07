@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from tutelary.models import Policy
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from geography import load as load_countries
 from .factories import OrganizationFactory, ProjectFactory
@@ -16,17 +17,19 @@ class OrganizationTest(TestCase):
         org = OrganizationFactory.create(name='Org')
         assert str(org) == '<Organization: Org>'
 
+    def test_repr(self):
+        org = OrganizationFactory.create(name='Org')
+        assert repr(org) == '<Organization: Org>'
+
     def test_has_random_id(self):
         org = OrganizationFactory.create()
         assert type(org.id) is not int
 
 
-class OrganizationRoleTest(TestCase):
+class OrganizationRoleTest(UserTestCase):
     def setUp(self):
-        self.oa_policy = Policy.objects.create(
-            name='org-admin',
-            body=open(PERMISSIONS_DIR + 'org-admin.json').read()
-        )
+        super().setUp()
+        self.oa_policy = Policy.objects.get(name='org-admin')
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create(add_users=[self.user])
         self.no_user_org = OrganizationFactory.create()
@@ -79,6 +82,10 @@ class ProjectTest(TestCase):
         project = ProjectFactory.create(name='Project')
         assert str(project) == '<Project: Project>'
 
+    def test_repr(self):
+        project = ProjectFactory.create(name='Project')
+        assert repr(project) == '<Project: Project>'
+
     def test_has_random_id(self):
         project = ProjectFactory.create()
         assert type(project.id) is not int
@@ -116,8 +123,9 @@ class ProjectTest(TestCase):
         assert not project.public()
 
 
-class ProjectRoleTest(TestCase):
+class ProjectRoleTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.user = UserFactory.create()
 

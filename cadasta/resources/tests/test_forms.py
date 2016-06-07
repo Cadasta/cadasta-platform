@@ -1,9 +1,9 @@
 import os
-from django.test import TestCase
 from django.conf import settings
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
 from ..forms import ResourceForm, AddResourceFromLibraryForm
@@ -12,8 +12,9 @@ from .factories import ResourceFactory
 path = os.path.dirname(settings.BASE_DIR)
 
 
-class ResourceFormTest(TestCase):
+class ResourceFormTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         ensure_dirs()
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb')
@@ -53,7 +54,7 @@ class ResourceFormTest(TestCase):
         assert self.project.resources.first().contributor == user
 
 
-class AddResourceFromLibraryFormTest(TestCase):
+class AddResourceFromLibraryFormTest(UserTestCase):
     def test_init(self):
         prj = ProjectFactory.create()
         prj_res = ResourceFactory.create(project=prj, content_object=prj)

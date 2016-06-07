@@ -1,6 +1,5 @@
 import json
 
-from django.test import TestCase
 from django.utils.translation import gettext as _
 from django.http import QueryDict
 from django.contrib.auth.models import AnonymousUser
@@ -8,14 +7,16 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, clause
 from ..models import Organization, OrganizationRole
 from ..views import api
 
 
-class OrganizationListAPITest(TestCase):
+class OrganizationListAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clauses = {
             'clause': [
                 clause('allow', ['org.list']),
@@ -120,8 +121,9 @@ class OrganizationListAPITest(TestCase):
         assert(names == sorted(names, reverse=True))
 
 
-class OrganizationCreateAPITest(TestCase):
+class OrganizationCreateAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clauses = {
             'clause': [
                 clause('allow', ['org.*']),
@@ -181,8 +183,9 @@ class OrganizationCreateAPITest(TestCase):
         assert content['detail'] == PermissionDenied.default_detail
 
 
-class OrganizationDetailAPITest(TestCase):
+class OrganizationDetailAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.OrganizationDetail.as_view()
 
         clauses = {
@@ -299,8 +302,9 @@ class OrganizationDetailAPITest(TestCase):
         assert org.archived
 
 
-class OrganizationUsersAPITest(TestCase):
+class OrganizationUsersAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.OrganizationUsers.as_view()
 
         clauses = {
@@ -388,8 +392,9 @@ class OrganizationUsersAPITest(TestCase):
         assert content['detail'] == _("Organization not found.")
 
 
-class OrganizationUsersDetailAPITest(TestCase):
+class OrganizationUsersDetailAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.OrganizationUsersDetail.as_view()
         clauses = {
             'clause': [

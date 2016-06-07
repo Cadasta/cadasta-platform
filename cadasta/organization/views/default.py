@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from django.contrib import messages
 
 import formtools.wizard.views as wizard
+from tutelary.models import Role
 
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from core.views.mixins import ArchiveMixin
@@ -21,11 +22,20 @@ from .. import forms
 from .. import messages as error_messages
 
 
+def check_if_superuser(self):
+    superuser = Role.objects.filter(name='superuser')
+    if len(superuser) > 0:
+        if hasattr(self.request.user, 'assigned_policies'):
+            return superuser[0] in self.request.user.assigned_policies()
+    return False
+
+
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
     model = Organization
     template_name = 'organization/organization_list.html'
     permission_required = 'org.list'
     permission_filter_queryset = ('org.view',)
+    # print(PermissionSet.objects.get(anonymous_user=True))
 
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
@@ -54,23 +64,19 @@ class OrganizationDashboard(PermissionRequiredMixin, generic.DetailView):
     template_name = 'organization/organization_dashboard.html'
     permission_required = 'org.view'
 
-    def get_context_data(self, member=False, **kwargs):
-        context = super(OrganizationDashboard, self).get_context_data(**kwargs)
-        if member:
-            projects = self.object.all_projects()
-        else:
-            projects = self.object.public_projects()
-        context['projects'] = projects
-        return context
-
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data()
-        if hasattr(self.request.user, 'organizations'):
-            orgs = self.request.user.organizations.all()
-            for org in orgs:
-                if org.slug == self.kwargs['slug']:
-                    context = self.get_context_data(member=True)
+        if check_if_superuser(self):
+            projects = self.object.all_projects()
+        else:
+            projects = self.object.public_projects()
+            if hasattr(self.request.user, 'organizations'):
+                orgs = self.request.user.organizations.all()
+                for org in orgs:
+                    if org.slug == self.kwargs['slug']:
+                        projects = self.object.all_projects()
+        context['projects'] = projects
         return super(generic.DetailView, self).render_to_response(context)
 
 
@@ -267,6 +273,23 @@ class ProjectList(PermissionRequiredMixin, mixins.ProjectQuerySetMixin,
         context = super(ProjectList, self).get_context_data(**kwargs)
         context['add_allowed'] = Organization.objects.count() > 0
         return context
+
+    def get(self, request, *args, **kwargs):
+        if (hasattr(self.request.user, 'assigned_policies') and
+           check_if_superuser(self)):
+                projects = Project.objects.all()
+        else:
+            projects = []
+            projects.extend(Project.objects.filter(access='public'))
+            if hasattr(self.request.user, 'organizations'):
+                user_orgs = self.request.user.organizations.all()
+                for org in Organization.objects.all():
+                    if org in user_orgs:
+                        projects.extend(org.projects.filter(access='private'))
+        self.object_list = sorted(
+            projects, key=lambda p: p.organization.slug + ':' + p.slug)
+        context = self.get_context_data()
+        return super(generic.ListView, self).render_to_response(context)
 
 
 def assign_project_extent_context(context, project):

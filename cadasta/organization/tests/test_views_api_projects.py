@@ -1,7 +1,5 @@
 import json
 
-from django.test import TestCase
-from django.conf import settings
 from django.utils.translation import gettext as _
 from django.http import QueryDict
 from django.contrib.auth.models import AnonymousUser
@@ -9,15 +7,17 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
-from core.tests.factories import PolicyFactory, RoleFactory
+from core.tests.factories import RoleFactory
 from .factories import OrganizationFactory, ProjectFactory, clause
 from ..models import Project, ProjectRole, OrganizationRole
 from ..views import api
 
 
-class ProjectUsersAPITest(TestCase):
+class ProjectUsersAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.ProjectUsers.as_view()
 
         clause = {
@@ -122,8 +122,9 @@ class ProjectUsersAPITest(TestCase):
                 in content['username'])
 
 
-class ProjectUsersDetailAPITest(TestCase):
+class ProjectUsersDetailAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.ProjectUsersDetail.as_view()
 
         clause = {
@@ -261,8 +262,9 @@ class ProjectUsersDetailAPITest(TestCase):
                      auth=AnonymousUser(), status=403, count=1)
 
 
-class OrganizationProjectListAPITest(TestCase):
+class OrganizationProjectListAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clause = {
             'clause': [
                 {
@@ -360,8 +362,9 @@ class OrganizationProjectListAPITest(TestCase):
         assert names == sorted(names, reverse=True)
 
 
-class ProjectListAPITest(TestCase):
+class ProjectListAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clause = {
             'clause': [
                 {
@@ -378,8 +381,7 @@ class ProjectListAPITest(TestCase):
         assign_user_policies(self.user, policy)
 
         self.super_user = UserFactory.create()
-        PolicyFactory.set_directory(settings.BASE_DIR + '/permissions/')
-        su_pol = PolicyFactory.create(name='superuser', file='superuser.json')
+        su_pol = Policy.objects.get(name='superuser')
         su_role = RoleFactory.create(name='superuser', policies=[su_pol])
         self.super_user.assign_policies(su_role)
 
@@ -551,8 +553,9 @@ class ProjectListAPITest(TestCase):
         self._check_visible(users, orgs, prjs, users[7], [0, 1, 2, 3, 4, 5])
 
 
-class ProjectCreateAPITest(TestCase):
+class ProjectCreateAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clauses = {
             'clause': [
                 clause('allow', ['org.*']),
@@ -600,8 +603,9 @@ class ProjectCreateAPITest(TestCase):
         assert content['name'][0] == _('This field is required.')
 
 
-class ProjectDetailAPITest(TestCase):
+class ProjectDetailAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.ProjectDetail.as_view()
 
         clauses = {

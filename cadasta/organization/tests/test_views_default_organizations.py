@@ -1,5 +1,5 @@
 import json
-from django.test import TestCase
+
 from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
@@ -9,6 +9,8 @@ from django.contrib.messages.api import get_messages
 
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
+from core.tests.factories import RoleFactory
 from accounts.tests.factories import UserFactory
 from ..views import default
 from ..models import Organization, OrganizationRole, Project
@@ -16,12 +18,12 @@ from .. import forms
 from .factories import OrganizationFactory, ProjectFactory, clause
 
 
-class OrganizationListTest(TestCase):
+class OrganizationListTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationList.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
-        setattr(self.request, 'user', AnonymousUser())
 
         self.orgs = OrganizationFactory.create_batch(2)
         OrganizationFactory.create(slug='unauthorized')
@@ -36,25 +38,58 @@ class OrganizationListTest(TestCase):
         self.policy = Policy.objects.create(
             name='allow',
             body=json.dumps(clauses))
+        self.user = UserFactory.create()
+        assigned_policies = self.user.assigned_policies()
+        assigned_policies.append(self.policy)
+        self.user.assign_policies(*assigned_policies)
 
-    def test_get_with_user(self):
-        user = UserFactory.create()
-        assign_user_policies(user, self.policy)
+    def _get(self, orgs, user=None, status=None,
+             make_org_member=None):
+        if user is None:
+            user = self.user
         setattr(self.request, 'user', user)
-        response = self.view(self.request).render()
-        content = response.content.decode('utf-8')
+        response = self.view(self.request)
+        if status is not None:
+            assert response.status_code == status
+        content = response.render().content.decode('utf-8')
 
         expected = render_to_string(
             'organization/organization_list.html',
-            {'object_list': self.orgs, 'user': self.request.user},
+            {'object_list':
+             sorted(orgs,
+                    key=lambda p: p.slug),
+             'user': self.request.user},
             request=self.request)
 
-        assert response.status_code == 200
+        if expected != content:
+            with open('expected.txt', 'w') as fp:
+                print(expected, file=fp)
+            with open('content.txt', 'w') as fp:
+                print(content, file=fp)
         assert expected == content
 
+    def test_get_with_user(self):
+        self._get(self.orgs, status=200)
 
-class OrganizationAddTest(TestCase):
+    def test_get_without_user(self):
+        # I'm not sure why I'm having to explicitely call this
+        # when using AnonymousUser()
+        assign_user_policies(None, Policy.objects.get(name='default'))
+        self._get(Organization.objects.all(), user=AnonymousUser(), status=200)
+
+    def test_get_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_pol = Policy.objects.get(name='superuser')
+        self.superuser_role = RoleFactory.create(
+            name='superuser', policies=[superuser_pol]
+        )
+        superuser.assign_policies(self.superuser_role)
+        self._get(Organization.objects.all(), user=superuser, status=200)
+
+
+class OrganizationAddTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationAdd.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -130,8 +165,9 @@ class OrganizationAddTest(TestCase):
         assert '/account/login/' in response['location']
 
 
-class OrganizationDashboardTest(TestCase):
+class OrganizationDashboardTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationDashboard.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -173,13 +209,14 @@ class OrganizationDashboardTest(TestCase):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
-        context['organization'] = org or self.org
+        org = org or self.org
+        context['organization'] = org
         if member:
             context['projects'] = Project.objects.filter(
-                organization__slug=self.org.slug)
-        elif org is None:
+                organization__slug=org.slug)
+        else:
             context['projects'] = Project.objects.filter(
-                organization__slug=self.org.slug, access='public')
+                organization__slug=org.slug, access='public')
 
         expected = render_to_string(
             'organization/organization_dashboard.html',
@@ -188,29 +225,41 @@ class OrganizationDashboardTest(TestCase):
 
         assert expected == content
 
-    def test_get_with_authorized_user(self):
+    def test_get_org_with_authorized_user(self):
         assign_user_policies(self.user, self.policy)
         response = self._get(self.org.slug, status=200)
         self._check_ok(response)
 
-    def test_get_with_unauthorized_user(self):
-        response = self._get(self.org.slug, status=200)
+    def test_get_org_with_unauthorized_user(self):
+        assign_user_policies(None, Policy.objects.get(name='default'))
+        response = self._get(self.org.slug, user=AnonymousUser(), status=200)
         self._check_ok(response)
 
-    def test_get_with_org_membership(self):
+    def test_get_org_with_org_membership(self):
         response = self._get(
             self.org.slug, status=200, make_org_member=self.org)
         self._check_ok(response, member=True)
 
-    def test_get_with_new_org(self):
+    def test_get_org_with_new_org(self):
         new_org = OrganizationFactory.create()
         assign_user_policies(self.user, self.policy)
         response = self._get(new_org.slug, status=200)
         self._check_ok(response, org=new_org)
 
+    def test_get_org_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_pol = Policy.objects.get(name='superuser')
+        self.superuser_role = RoleFactory.create(
+            name='superuser', policies=[superuser_pol]
+        )
+        superuser.assign_policies(self.superuser_role)
+        response = self._get(self.org.slug, user=superuser, status=200)
+        self._check_ok(response, member=True)
 
-class OrganizationEditTest(TestCase):
+
+class OrganizationEditTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationEdit.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -332,8 +381,9 @@ class OrganizationEditTest(TestCase):
         assert self.org.description != 'Some description'
 
 
-class OrganizationArchiveTest(TestCase):
+class OrganizationArchiveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationArchive.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -388,8 +438,9 @@ class OrganizationArchiveTest(TestCase):
         assert self.org.archived is False
 
 
-class OrganizationUnarchiveTest(TestCase):
+class OrganizationUnarchiveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationUnarchive.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -444,8 +495,9 @@ class OrganizationUnarchiveTest(TestCase):
         assert self.org.archived is True
 
 
-class OrganizationMembersTest(TestCase):
+class OrganizationMembersTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationMembers.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -485,7 +537,6 @@ class OrganizationMembersTest(TestCase):
         )
 
         assert response.status_code == 200
-        print(expected)
         assert expected == content
 
         response = self.view(self.request, slug=self.org.slug)
@@ -507,8 +558,9 @@ class OrganizationMembersTest(TestCase):
         assert '/account/login/' in response['location']
 
 
-class OrganizationMembersAddTest(TestCase):
+class OrganizationMembersAddTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationMembersAdd.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -609,8 +661,9 @@ class OrganizationMembersAddTest(TestCase):
             organization=self.org, user=user_to_add).exists() is False
 
 
-class OrganizationMembersEditTest(TestCase):
+class OrganizationMembersEditTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationMembersEdit.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -743,8 +796,9 @@ class OrganizationMembersEditTest(TestCase):
         assert 'X is not one of the available choices' in errors[0]
 
 
-class OrganizationMembersRemoveTest(TestCase):
+class OrganizationMembersRemoveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.OrganizationMembersRemove.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')

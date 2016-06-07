@@ -1,16 +1,15 @@
-import os.path
 from faker import Factory
 from django.contrib.gis.geos import GEOSGeometry
-from django.conf import settings
 from datetime import datetime, timezone
 
 from accounts.models import User
 from organization.models import Organization, Project, OrganizationRole
-from tutelary.models import Policy, Role, PolicyInstance, RolePolicyAssign
+from tutelary.models import (Policy, Role, PolicyInstance, RolePolicyAssign,
+                             assign_user_policies)
 
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
-from core.tests.factories import PolicyFactory, RoleFactory
+from core.tests.factories import RoleFactory
 from spatial.tests.factories import (
     SpatialUnitFactory, SpatialUnitRelationshipFactory)
 
@@ -49,24 +48,17 @@ class FixturesData:
                     is_active=(n < 8),
                     full_name=fake.name(),
                 ))
-        print('Successfully added test users.')
+        print('\nSuccessfully added test users.')
         return users
 
     def add_test_users_and_roles(self):
         users = FixturesData.add_test_users(self)
         orgs = Organization.objects.all()
 
-        PolicyFactory.set_directory(
-            os.path.join(settings.BASE_DIR, 'permissions')
-        )
-
         pols = {}
         for pol in ['default', 'superuser', 'org-admin', 'org-member',
                     'project-manager', 'data-collector', 'project-user']:
-            try:
-                pols[pol] = Policy.objects.get(name=pol)
-            except Policy.DoesNotExist:
-                pols[pol] = PolicyFactory.create(name=pol, file=pol + '.json')
+            pols[pol] = Policy.objects.get(name=pol)
 
         roles = {}
         roles['superuser'] = RoleFactory.create(
@@ -75,6 +67,7 @@ class FixturesData:
         )
         users[0].assign_policies(roles['superuser'])
         users[1].assign_policies(roles['superuser'])
+        assign_user_policies(None, pols['default'])
 
         for i in [0, 1, 3, 4, 7, 10]:
             admin = i == 3 or i == 4
@@ -114,8 +107,9 @@ class FixturesData:
             contacts=[{'email': 'info@cadasta.org'}]
         ))
 
-        print('\nSuccessfully added organizations {}'.
-              format(Organization.objects.all()))
+        print('\nSuccessfully added organizations:')
+        for org in Organization.objects.all():
+            print(org.name)
 
     def add_test_projects(self):
         projs = []
@@ -293,8 +287,9 @@ class FixturesData:
             access='private'
         ))
 
-        print('\nSuccessfully added organizations {}'.
-              format(Project.objects.all()))
+        print('\nSuccessfully added projects:')
+        for proj in Project.objects.all():
+            print(proj.name)
 
     def add_test_spatial_units(self):
         project = Project.objects.get(
