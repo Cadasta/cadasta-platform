@@ -38,7 +38,7 @@ class SlugModel:
 
         orig = self.slug
 
-        if self.__original_slug != self.slug:
+        if not self.id or self.__original_slug != self.slug:
             for x in itertools.count(1):
                 if not type(self).objects.filter(slug=self.slug).exists():
                     break

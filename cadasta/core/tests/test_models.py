@@ -28,6 +28,7 @@ class RandomIDModelTest(TestCase):
 
 
 class MySlugModel(SlugModel, Model):
+    name = CharField(max_length=50)
     slug = SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -81,6 +82,19 @@ class SlugModelTest(TestCase):
 
         instance1.refresh_from_db()
         instance2.refresh_from_db()
+        assert instance1.slug != instance2.slug
+        assert instance2.slug == 'test-name-1'
+
+    def test_create_with_duplicate_slug(self):
+        instance1 = MySlugModel()
+        instance1.name = 'Test Name'
+        instance1.save()
+
+        instance2 = MySlugModel(
+            name='Some Name',
+            slug=instance1.slug,
+        )
+        instance2.save()
         assert instance1.slug != instance2.slug
         assert instance2.slug == 'test-name-1'
 
