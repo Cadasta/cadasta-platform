@@ -1,88 +1,16 @@
-{% extends "core/base.html" %}
+{% extends "organization/organization_wrapper.html" %}
 
 {% load i18n %}
-{% load widget_tweaks %}
-{% load staticfiles %}
+{% block page_title %}Members | {% endblock %}
 
-{% block title %} | Members | {{ object.name }}{% endblock %}
-
-{% block content %}
-
-<div class="row">
-  <div class="col-md-12">
-    <div class="inner-header">
-      <a class="index-link" href="{% url 'organization:list' %}">
-        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-      </a>
-      <div class="org-logo">
-        <span class="category">{% trans "Organization" %}</span>
-        <img src="{{ object.logo }}" alt="{{ object.name }}" class="org-logo" />
-      </div>
-      <div class="top-btn pull-right">
-        <!-- More options menu -->
-        <div class="dropdown pull-right btn-more">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-            <span class="icon kabob-icon"></span>
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a class="edit" href="{% url 'organization:edit' object.slug %}">{% trans "Edit organization" %}</a></li>
-            <li role="separator" class="divider"></li>
-            <li>
-              {% if object.archived %}
-              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
-              {% else %}
-              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-        <!-- Split add button -->
-        <div class="btn-group pull-right btn-add">
-          <button type="button" class="btn btn-primary">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add project" %}
-          </button>
-          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span class="caret"></span>
-            <span class="sr-only">Toggle Add</span>
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="#">Add new member</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row">
-  <!-- Sidebar -->
-  <div class="col-md-1 sidebar">
-    <ul class="nav nav-sidebar">
-      <li>
-        {% trans "Overview" %}
-      </li>
-      <li>
-        {% trans "Projects" %}
-      </li>
-      <li class="active">
-        {% trans "Members" %}
-      </li>
-      <li>
-        {% trans "Reports" %}
-      </li>
-      <li>
-        {% trans "Activity" %}
-      </li>
-    </ul>
-  </div>
-  <!-- /.sidebar -->
+{% block organization_main %}
   <!-- Main content -->
   <div class="col-md-11 col-md-offset-1 main col-text">
     <div class="row">
       <div class="col-md-12 page-title">
         <h2>{% trans "Members" %}</h2>
         <div class="top-btn pull-right">
-          <a class="btn btn-primary" href="{% url 'organization:members_add' object.slug %}">
+          <a class="btn btn-primary" href="{% url 'organization:members_add' organization.slug %}">
             <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
           </a>
         </div>
@@ -98,8 +26,8 @@
         </tr>
       </thead>
       <tbody>
-      {% for user in object.users.all %}
-        <tr onclick="window.document.location='{% url 'organization:members_edit' slug=object.slug username=user.username %}';">
+      {% for user in organization.users.all %}
+        <tr onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
           <td>{{ user.get_full_name }}</td>
           <td>{{ user.username }}</td>
           <td>{{ user.email }}</td>

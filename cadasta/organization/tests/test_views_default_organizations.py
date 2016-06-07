@@ -173,7 +173,7 @@ class OrganizationDashboardTest(TestCase):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
-        context['object'] = org or self.org
+        context['organization'] = org or self.org
         if member:
             context['projects'] = Project.objects.filter(
                 organization__slug=self.org.slug)
@@ -242,7 +242,7 @@ class OrganizationEditTest(TestCase):
 
         context = RequestContext(self.request)
         context['form'] = forms.OrganizationForm(instance=self.org)
-        context['object'] = self.org
+        context['organization'] = self.org
 
         expected = render_to_string(
             'organization/organization_edit.html',
@@ -477,7 +477,7 @@ class OrganizationMembersTest(TestCase):
         content = response.content.decode('utf-8')
 
         context = RequestContext(self.request)
-        context['object'] = self.org
+        context['organization'] = self.org
 
         expected = render_to_string(
             'organization/organization_members.html',
@@ -485,6 +485,7 @@ class OrganizationMembersTest(TestCase):
         )
 
         assert response.status_code == 200
+        print(expected)
         assert expected == content
 
         response = self.view(self.request, slug=self.org.slug)
@@ -538,7 +539,7 @@ class OrganizationMembersAddTest(TestCase):
         content = response.content.decode('utf-8')
 
         context = RequestContext(self.request)
-        context['object'] = self.org
+        context['organization'] = self.org
         context['form'] = forms.AddOrganizationMemberForm()
 
         expected = render_to_string(
