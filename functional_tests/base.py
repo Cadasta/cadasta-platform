@@ -6,7 +6,7 @@ import re
 import os
 import os.path
 import shutil
-import base64
+import random
 
 from urllib.parse import urlparse
 from selenium import webdriver
@@ -28,6 +28,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     DEFAULT_WAIT = 5
     BY_ALERT = (By.CLASS_NAME, 'alert')
+    BY_FIELD_ERROR = (By.CLASS_NAME, 'has-error')
     superuser_role = None
 
     @classmethod
@@ -120,21 +121,17 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def click_through(self, button, wait, screenshot=None):
         """Click a button or link and wait for something to appear."""
-        try:
-            button.click()
-        except ElementNotVisibleException:
-            self.browser.execute_script(
-                "return arguments[0].scrollIntoView();", button)
-            button.click()
+        self.browser.execute_script(
+            "return arguments[0].scrollIntoView();", button)
+        button.click()
         if screenshot is not None:
-            self.screenshot(screenshot)
+            self.get_screenshot(screenshot)
         try:
             WebDriverWait(self.browser, 10).until(
                 EC.presence_of_element_located(wait)
             )
-        except TimeoutException as exc:
-            with open('exception.png', 'wb') as f:
-                f.write(base64.b64decode(exc.screen))
+        except TimeoutException:
+            self.get_screenshot('exception')
             raise
 
     def click_through_close(self, button, wait, screenshot=None):
@@ -147,14 +144,13 @@ class FunctionalTest(StaticLiveServerTestCase):
             button.click()
 
         if screenshot is not None:
-            self.screenshot(screenshot)
+            self.get_screenshot(screenshot)
         try:
             WebDriverWait(self.browser, 10).until_not(
                 EC.presence_of_element_located(wait)
             )
-        except TimeoutException as exc:
-            with open('exception.png', 'wb') as f:
-                f.write(base64.b64decode(exc.screen))
+        except TimeoutException:
+            self.get_screenshot('exception')
             raise
 
     def wait_for_alert(self):
@@ -197,6 +193,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         """Check whether a form field has an error marker: this will be a
         ``has_error`` class on the field's immediate parent."""
         cls = field.find_element_by_xpath('..').get_attribute('class')
+        print('cls =', cls)
         assert re.search(r'\bhas-error\b', cls)
 
     def assert_field_has_no_error(self, field):
@@ -256,7 +253,7 @@ class FunctionalTest(StaticLiveServerTestCase):
             if check_input:
                 check_input()
 
-    def screenshot(self, title=None):
+    def get_screenshot(self, title=None):
         if title is not None:
             f, _ = unique_file(self.screenshot_dir, title, 1)
         else:
@@ -265,8 +262,17 @@ class FunctionalTest(StaticLiveServerTestCase):
                                                    self.screenshot_index)
         self.browser.save_screenshot(f)
 
+    def dump_dom_source(self, filename='dom.html'):
+        js = "return document.documentElement.outerHTML"
+        f = open(filename, 'w')
+        f.write(self.browser.execute_script(js))
+        f.close()
+
     def xpath(self, tag, contents):
         return "//{}[normalize-space(.)='{}']".format(tag, contents)
+
+    def get_rand_bool(self):
+        return random.randint(0, 1) == 1
 
     def create_superuser(
         self,
@@ -365,17 +371,39 @@ class FunctionalTest(StaticLiveServerTestCase):
 
         # Load orgs
         if 'orgs' in data:
+            org_objs = []  # For anchoring projects to orgs later
             for org in data['orgs']:
                 kwargs = org.copy()
-                if '_members' in org:
-                    del kwargs['_members']
+                for key in ('_members', '_admins'):
+                    if key in org:
+                        del kwargs[key]
                 org_obj = OrganizationFactory.create(**kwargs)
+                org_objs.append(org_obj)
                 if '_members' in org:
+                    admin_idxs = []
+                    if '_admins' in org:
+                        admin_idxs = org['_admins']
                     for member_idx in org['_members']:
                         OrganizationRole.objects.create(
                             organization=org_obj,
                             user=user_objs[member_idx],
+                            admin=member_idx in admin_idxs,
                         )
+
+        # Load projects
+        if 'projects' in data:
+            for project in data['projects']:
+                assert '_org' in project
+                kwargs = project.copy()
+                kwargs['organization'] = org_objs[kwargs['_org']]
+                del kwargs['_org']
+                if '_managers' in project:
+                    org_idx = project['_org']
+                    org_member_idxs = data['orgs'][org_idx]['_members']
+                    for idx in project['_managers']:
+                        assert idx in org_member_idxs
+                    del kwargs['_managers']
+                ProjectFactory.create(**kwargs)
 
 
 def unique_file(dir, base, startidx):
