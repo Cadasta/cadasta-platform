@@ -1,12 +1,11 @@
 """Factories for Party model creation."""
 
 import factory
-
 from core.tests.factories import ExtendedFactory
 from organization.tests.factories import ProjectFactory
+from party.models import (Party, PartyRelationship, TenureRelationship,
+                          TenureRelationshipType)
 from spatial.tests.factories import SpatialUnitFactory
-from party.models import (Party, PartyRelationship,
-                          TenureRelationship, TenureRelationshipType)
 
 
 class PartyFactory(ExtendedFactory):
@@ -38,6 +37,7 @@ class TenureRelationshipFactory(ExtendedFactory):
     class Meta:
         model = TenureRelationship
 
+    project = factory.SubFactory(ProjectFactory)
     party = factory.SubFactory(PartyFactory)
     spatial_unit = factory.SubFactory(SpatialUnitFactory)
     acquired_how = 'HS'

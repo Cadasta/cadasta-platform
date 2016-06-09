@@ -3,6 +3,7 @@
 from datetime import date
 
 from django.test import TestCase
+from organization.tests.factories import ProjectFactory
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
@@ -42,7 +43,7 @@ class PartyTest(TestCase):
         assert party.attributes['description'] == 'Mad Hatters Tea Party'
 
 
-class PartRelationshipTest(TestCase):
+class PartyRelationshipTest(TestCase):
 
     def test_relationships_creation(self):
         relationship = PartyRelationshipFactory(
@@ -76,8 +77,11 @@ class PartRelationshipTest(TestCase):
 class TenureRelationshipTest(TestCase):
 
     def setUp(self):
-        self.party = PartyFactory.create(name='TestParty')
-        self.spatial_unit = SpatialUnitFactory.create(name='TestSpatialUnit')
+        self.project = ProjectFactory.create(name='TestProject')
+        self.party = PartyFactory.create(
+            name='TestParty', project=self.project)
+        self.spatial_unit = SpatialUnitFactory.create(
+            name='TestSpatialUnit', project=self.project)
 
     def test_tenure_relationship_creation(self):
         tenure_relationship = TenureRelationshipFactory.create(
@@ -111,6 +115,14 @@ class TenureRelationshipTest(TestCase):
         except ValueError:
             # expected
             pass
+
+    def test_tenure_relationship_project_set(self):
+        tenure_relationship = TenureRelationshipFactory.create(
+            party=self.party,
+            spatial_unit=self.spatial_unit, project=self.project
+        )
+        assert tenure_relationship.project is not None
+        assert tenure_relationship.project.id == self.project.id
 
 
 class TenureRelationshipTypeTest(TestCase):

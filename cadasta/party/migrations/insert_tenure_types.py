@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 id=tr_type[0], label=tr_type[1])
 
     dependencies = [
-        ('party', '0002_tenure_relationships'),
+        ('party', '0001_initial'),
     ]
 
     operations = [

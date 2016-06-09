@@ -171,6 +171,9 @@ class TenureRelationship(RandomIDModel):
         'TenureRelationshipType',
         related_name='tenure_type', null=False, blank=False
     )
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
     party = models.ForeignKey(Party, related_name='party',
                               on_delete=models.CASCADE)
     spatial_unit = models.ForeignKey(
