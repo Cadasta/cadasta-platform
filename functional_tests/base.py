@@ -61,6 +61,14 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self.browser.find_element_by_xpath(
             "//div[contains(@class, 'container')]" + field)
 
+    def page_header(self, field):
+        return self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'page-header')]" + field)
+
+    def page_content(self, field):
+        return self.browser.find_element_by_xpath(
+            "//div[@id='page-content']" + field)
+
     def form(self, f):
         """Find a form of a given class."""
         return self.browser.find_element_by_xpath(
@@ -107,7 +115,7 @@ class FunctionalTest(StaticLiveServerTestCase):
          "//h1[contains(@class, '{}')]".format(f))
 
     def page_title(self):
-        return self.container("//div[contains(@class, 'page-title')]//h2")
+        return self.page_header("//div[contains(@class, 'page-title')]//h1")
 
     def wait_for(self, function_with_assertion, timeout=DEFAULT_WAIT):
         """Wait for an assertion to become true."""
@@ -226,6 +234,9 @@ class FunctionalTest(StaticLiveServerTestCase):
                              click_on_button,
                              fill_inputbox=None,
                              check_input=None):
+        """
+        Check to make sure that the close and cancel buttons work on modals.
+        """
         close_buttons = ['btn-link', 'close']
         for close in close_buttons:
             if fill_inputbox:
@@ -332,7 +343,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def create_test_projects(self, orgs):
         projs = []
         projs.append(ProjectFactory.create(
-            name='Organization #0 Test Project',
+            name='Test Project',
             slug='test-project',
             description="""This is a test project.  This is a test project.
             This is a test project.  This is a test project.  This is a test

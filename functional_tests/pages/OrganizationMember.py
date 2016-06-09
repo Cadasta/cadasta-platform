@@ -26,7 +26,7 @@ class OrganizationMemberPage(Page):
         return self.test.table_body('DataTables_Table_0', "//tr" + xpath)
 
     def get_member_title(self):
-        return self.test.page_title().text
+        return self.test.page_content("//h2").text
 
     def go_to_testuser_member_page(self):
         testuser_page = self.get_table_row(

@@ -23,33 +23,30 @@ class ProjectPage(Page):
         self.browser.get(self.url)
         return self
 
-    def get_org_logo(self):
-        try:
-            url = self.BY_CSS('.org-logo img').get_attribute('src')
-        except NoSuchElementException:
-            url = ''
-        return url
+    # def get_org_logo(self):
+    #     try:
+    #         url = self.BY_CSS('.org-logo img').get_attribute('src')
+    #     except NoSuchElementException:
+    #         url = ''
+    #     return url
 
     def get_org_name(self):
-        try:
-            name = self.BY_CSS('.org-logo img').get_attribute('alt')
-        except NoSuchElementException:
-            name = self.BY_CSS('.org-logo h2').text
-        return name
+        return self.BY_CSS('.org-name').text
 
     def get_project_name(self):
-        h2_elems = self.BYS_CSS('.inner-header h2')
-        assert len(h2_elems) > 0
-        return h2_elems[len(h2_elems) - 1].text
+        project_name = self.test.page_title().text
+        project_name = project_name.replace(self.get_org_name(), '')
+        project_name = project_name.replace('\n', '')
+        return project_name
 
     def get_project_description(self):
-        return self.BY_CSS('.desc p').text
+        return self.BY_CSS('.detail p').text
 
     def check_page_contents(self, target_project):
         """This checks that the page displays the correct project data
         based on the supplied test data for a project."""
 
         assert self.get_org_name() == target_project['_org_name']
-        assert self.get_org_logo() == target_project['_org_logo']
-        assert self.get_project_name() == target_project['name']
+        # assert self.get_org_logo() == target_project['_org_logo']
+        assert self.get_project_name() == target_project['name'].upper()
         assert self.get_project_description() == target_project['description']

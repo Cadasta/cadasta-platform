@@ -2,13 +2,28 @@
 
 {% load i18n %}
 
+{% block top-nav %}users{% endblock %}
+
 {% block title %} | {% trans "Users" %}{% endblock %}
+
+{% block page-header %}
+
+<!-- Page header -->
+<div class="header page-header">
+  <div class="container">
+    <div class="page-title">
+      <h1>{% trans "Users" %}</h1>
+    </div>
+  </div>
+</div>
+<!-- /.page-header -->
+
+{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Users" %}</h1>
-
-<table class="table table-striped datatable" data-paging-type="simple">
+<!-- Organization index table -->
+<table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
       <th class="col-md-2">
@@ -27,7 +42,7 @@
     </tr>
   </thead>
   {% for user in object_list %}
-  <tr>
+  <tr class="{{ user.is_active|yesno:_("disabled,active") }}">
     <td>{{ user.username }}</td>
     <td>{{ user.email }}</td>
     <td>{{ user.org_names|safe }}</td>
@@ -36,7 +51,7 @@
       <form method="POST"
             action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary btn-sm">
+        <button type="submit" class="btn btn-sm {{ user.is_active|yesno:_("btn-primary,btn-default") }}">
           {{ user.is_active|yesno:_("Deactivate,Activate") }}
         </button>
       </form>
@@ -44,4 +59,5 @@
   </tr>
   {% endfor %}
 </table>
+
 {% endblock %}

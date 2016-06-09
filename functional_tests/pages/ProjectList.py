@@ -41,14 +41,14 @@ class ProjectListPage(Page):
 
             cells = row.find_elements_by_tag_name('td')
             actual_org_slug = onclick_items[2]
-            img = cells[0].find_element_by_tag_name('img')
+            img = cells[1].find_element_by_tag_name('img')
             actual_org_logo = img.get_attribute('src')
             actual_org_name = img.get_attribute('alt')
             actual_project_name = (
-                cells[1].find_element_by_tag_name('h4').text
+                cells[0].find_element_by_tag_name('h4').text
             )
             actual_project_description = (
-                cells[1].find_element_by_tag_name('p').text
+                cells[0].find_element_by_tag_name('p').text
             )
             actual_country = cells[2].text
 

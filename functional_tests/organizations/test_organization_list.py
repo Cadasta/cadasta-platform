@@ -90,8 +90,8 @@ class OrganizationListTest(FunctionalTest):
         fields['urls'].clear()
 
         page.click_submit_button()
-        organization_name = OrganizationPage(self).get_organization_title()
-        assert organization_name == 'Organization #2'
+        organization_name = self.page_title().text
+        assert organization_name == 'Organization #2'.upper()
         self.logout()
 
         LoginPage(self).login('wyldstyle', 'password')

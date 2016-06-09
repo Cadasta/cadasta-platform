@@ -22,14 +22,20 @@ class OrganizationPage(Page):
         assert title.text == "Organizations".upper()
         return title
 
-    def click_through(self, button, wait):
-        return self.test.click_through(button, wait)
+    def click_through(self, button, wait, screenshot=None):
+        return self.test.click_through(button, wait, screenshot)
 
     def click_through_close(self, button, wait):
         return self.test.click_through_close(button, wait)
 
     def get_container(self, xpath):
         return self.test.container(xpath)
+
+    def get_page_header(self, xpath):
+        return self.test.page_header(xpath)
+
+    def get_page_content(self, xpath):
+        return self.test.page_content(xpath)
 
     def get_table_row(self, xpath=""):
         return self.test.table_body('DataTables_Table_0', "//tr" + xpath)
@@ -39,28 +45,19 @@ class OrganizationPage(Page):
         org_page = self.get_table_row(row)
         self.click_through(org_page, self.BY_ORG_LOGO)
 
-    def get_organization_title(self):
-        organization = self.browser.find_element_by_xpath(
-            "//div[contains(@class, 'org-logo')]")
-        try:
-            return organization.find_element_by_xpath(
-                "//img[@class='org-logo']").get_attribute('alt')
-        except NoSuchElementException:
-            return organization.find_element_by_xpath("//h2").text
-
     def get_org_description_and_members(self):
-        return self.get_container(
-            "//div[contains(@class, 'org-detail')]").text
+        return self.get_page_content(
+            "//div[contains(@class, 'detail')]").text
 
     def click_on_more_button(self):
-        more = self.browser.find_element_by_xpath(
+        more = self.get_page_header(
                 "//div[contains(@class, 'btn-more')]")
         self.click_through(
             more, (By.CSS_SELECTOR, "div.dropdown.pull-right.btn-more.open"))
 
     def click_on_edit_button(self, success=True):
         self.click_on_more_button()
-        edit = self.get_container("//a[@class='edit']")
+        edit = self.get_page_header("//a[@class='edit']")
         if success:
             self.test.click_through(edit, self.BY_MODAL_BACKDROP)
         else:
@@ -112,7 +109,7 @@ class OrganizationPage(Page):
         )
 
     def get_archive_container(self):
-        return self.get_container("//a[@class='archive']")
+        return self.get_page_header("//a[@class='archive']")
 
     def get_archive_button(self):
         self.click_on_more_button()
@@ -139,36 +136,32 @@ class OrganizationPage(Page):
             self.click_through_close(cancel, self.BY_MODAL_BACKDROP)
 
     def get_view_all_button(self):
-        return self.browser.find_element_by_xpath(
-            "//div[contains(@class, 'btn-view')]")
+        return self.get_page_content(
+            "//div[contains(@class, 'detail')]//a")
 
     def click_on_view_all_button(self, successful=True):
         view_all = self.get_view_all_button()
 
         if not successful:
-            self.click_through(view_all, (By.CLASS_NAME, 'project-list'))
+            self.click_through(view_all, (By.CLASS_NAME, 'panel-default'))
         else:
-            self.click_through(view_all, (By.CLASS_NAME, 'page-title'))
-            view_all = self.test.page_title().text
+            self.test.click_through_close(view_all, (By.CLASS_NAME, 'detail'))
+            view_all = self.get_page_content("//h2").text
             return view_all
 
     def click_on_project(self):
         project = self.get_table_row("[1]")
-        self.click_through(project, (By.CLASS_NAME, "main-map"))
-        project_title = self.get_container(
-            "//div[contains(@class, 'inner-header')]/h2")
+        self.click_through(project, (By.CLASS_NAME, "leaflet-container"))
+        project_title = self.test.page_title()
         return project_title.text
 
     def get_welcome_message(self):
-        return self.get_container(
-            "//div[contains(@class, 'project-list')]").text
+        return self.get_page_content(
+            "//div[contains(@class, 'panel-body')]").text
 
     def click_add_new_project_button(self):
-        add_btn = self.browser.find_element_by_xpath(
-            "//button[contains(@class, 'btn-rt')]")
-        add_btn.click()
-
-        new_proj = self.browser.find_element_by_link_text('Add new project')
+        new_proj = self.get_page_content(
+            "//a[contains(@href, '/projects/new/')]")
         self.click_through(new_proj, (By.CLASS_NAME, 'new-project-page'))
         title = self.test.h1("new-project-page").text
         return title
