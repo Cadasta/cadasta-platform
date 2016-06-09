@@ -1,15 +1,15 @@
-from django.db import models
-from django.contrib.postgres.fields import JSONField
-from django.utils.translation import ugettext as _
-from django.contrib.gis.db.models import GeometryField
-
 from core.models import RandomIDModel
+from django.contrib.gis.db.models import GeometryField
+from django.contrib.postgres.fields import JSONField
+from django.db import models
+from django.utils.translation import ugettext as _
 from organization.models import Project
-from .exceptions import SpatialUnitRelationshipError
-from .choices import TYPE_CHOICES
-from . import messages
-
+from party import managers
 from tutelary.decorators import permissioned_model
+
+from . import messages
+from .choices import TYPE_CHOICES
+from .exceptions import SpatialUnitRelationshipError
 
 
 @permissioned_model
@@ -80,30 +80,37 @@ class SpatialUnit(RandomIDModel):
         return "<SpatialUnit: {name}>".format(name=self.name)
 
 
-class SpatialUnitRelationshipManager(models.Manager):
+class SpatialUnitRelationshipManager(managers.BaseRelationshipManager):
     """Check conditions based on spatial unit type before creating
     object. If conditions aren't met, exceptions are raised.
 
     """
+
     def create(self, *args, **kwargs):
-        if (kwargs['su1'].geometry is not None and
-           kwargs['su2'].geometry is not None):
+        su1 = kwargs['su1']
+        su2 = kwargs['su2']
+        project = kwargs['project']
+        if (su1.geometry is not None and
+                su2.geometry is not None):
 
             if (kwargs['type'] == 'C' and
-               kwargs['su1'].geometry.geom_type == 'Polygon'):
+                    su1.geometry.geom_type == 'Polygon'):
                 result = SpatialUnit.objects.filter(
-                    id=kwargs['su1'].id
+                    id=su1.id
                 ).filter(
-                    geometry__contains=kwargs['su2'].geometry
+                    geometry__contains=su2.geometry
                 )
 
                 if len(result) != 0:
+                    self.check_project_constraints(
+                        project=project, left=su1, right=su2)
                     return super().create(**kwargs)
                 else:
                     raise SpatialUnitRelationshipError(
                         """That selected location is not geographically
                         contained within the parent location""")
-
+        self.check_project_constraints(
+            project=project, left=su1, right=su2)
         return super().create(**kwargs)
 
 

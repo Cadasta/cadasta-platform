@@ -12,7 +12,7 @@ from organization.validators import validate_contact
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
 
-from . import messages
+from . import managers, messages
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -121,7 +121,8 @@ class PartyRelationship(RandomIDModel):
                     ('M', 'is-member-of'))
 
     # All party relationships are associated with a single project.
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name='party_relationships')
 
     # Parties to the relationship.
     party1 = models.ForeignKey(Party,
@@ -137,6 +138,8 @@ class PartyRelationship(RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONField(default={})
+
+    objects = managers.PartyRelationshipManager()
 
 
 class TenureRelationship(RandomIDModel):
@@ -172,12 +175,12 @@ class TenureRelationship(RandomIDModel):
         related_name='tenure_type', null=False, blank=False
     )
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name='tenure_relationships')
 
-    party = models.ForeignKey(Party, related_name='party',
-                              on_delete=models.CASCADE)
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
     spatial_unit = models.ForeignKey(
-        SpatialUnit, related_name='spatial_unit', on_delete=models.CASCADE)
+        SpatialUnit, on_delete=models.CASCADE)
     acquired_how = models.CharField(
         max_length=2,
         choices=ACQUIRED_CHOICES, null=True, blank=True
@@ -185,6 +188,8 @@ class TenureRelationship(RandomIDModel):
     acquired_date = models.DateField(default=date.today)
     attributes = JSONField(default={})
     geom = models.GeometryField(null=True, blank=True)
+
+    objects = managers.TenureRelationshipManager()
 
 
 class TenureRelationshipType(models.Model):

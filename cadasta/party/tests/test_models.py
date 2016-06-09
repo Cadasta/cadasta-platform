@@ -2,12 +2,15 @@
 
 from datetime import date
 
+import pytest
+
 from django.test import TestCase
 from organization.tests.factories import ProjectFactory
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
-from spatial.tests.factories import SpatialUnitFactory
+
+from .. import exceptions
 
 
 class PartyTest(TestCase):
@@ -47,17 +50,19 @@ class PartyRelationshipTest(TestCase):
 
     def test_relationships_creation(self):
         relationship = PartyRelationshipFactory(
-            party1__name='Mad Hatter',
-            party2__name='Mad Hatters Tea Party')
+            party1__name='Mad Hatter', party2__name='Mad Hatters Tea Party')
         party2_name = str(relationship.party1.relationships.all()[0])
         assert party2_name == '<Party: Mad Hatters Tea Party>'
 
-    def test_reverse_relationship(self):
+    def test_party_reverse_relationship(self):
         relationship = PartyRelationshipFactory(
-            party1__name='Mad Hatter',
-            party2__name='Mad Hatters Tea Party')
+            party1__name='Mad Hatter', party2__name='Mad Hatters Tea Party')
         party1_name = str(relationship.party2.relationships_set.all()[0])
         assert party1_name == '<Party: Mad Hatter>'
+
+    def test_project_reverse_relationship(self):
+        relationship = PartyRelationshipFactory()
+        assert len(relationship.project.party_relationships.all()) == 1
 
     def test_relationship_type(self):
         relationship = PartyRelationshipFactory(type='M')
@@ -73,30 +78,37 @@ class PartyRelationshipTest(TestCase):
         assert relationship.attributes[
             'description'] == 'Mad Hatter attends Tea Party'
 
+    def test_project_relationship_invalid(self):
+        with pytest.raises(exceptions.ProjectRelationshipError):
+            project = ProjectFactory()
+            PartyRelationshipFactory.create(party1__project=project)
+
+    def test_left_and_right_project_ids(self):
+        with pytest.raises(exceptions.ProjectRelationshipError):
+            project1 = ProjectFactory()
+            project2 = ProjectFactory()
+            PartyRelationshipFactory.create(
+                party1__project=project1,
+                party2__project=project2
+            )
+
 
 class TenureRelationshipTest(TestCase):
 
-    def setUp(self):
-        self.project = ProjectFactory.create(name='TestProject')
-        self.party = PartyFactory.create(
-            name='TestParty', project=self.project)
-        self.spatial_unit = SpatialUnitFactory.create(
-            name='TestSpatialUnit', project=self.project)
-
     def test_tenure_relationship_creation(self):
-        tenure_relationship = TenureRelationshipFactory.create(
-            party=self.party, spatial_unit=self.spatial_unit)
+        tenure_relationship = TenureRelationshipFactory.create()
         assert tenure_relationship.tenure_type is not None
         d1 = date.today().isoformat()
         d2 = tenure_relationship.acquired_date.isoformat()
         assert d1 == d2
         assert tenure_relationship.acquired_how == 'HS'
-        assert self.party.id == tenure_relationship.party.id
-        assert self.spatial_unit.id == tenure_relationship.spatial_unit.id
+
+    def test_project_reverse_tenure_relationships(self):
+        relationship = TenureRelationshipFactory.create()
+        assert len(relationship.project.tenure_relationships.all()) == 1
 
     def test_set_attributes(self):
-        tenure_relationship = TenureRelationshipFactory.create(
-            party=self.party, spatial_unit=self.spatial_unit)
+        tenure_relationship = TenureRelationshipFactory.create()
         attributes = {
             'description':
             'Additional attribute data'
@@ -107,25 +119,27 @@ class TenureRelationshipTest(TestCase):
             'description'] == tenure_relationship.attributes['description']
 
     def test_tenure_relationship_type_not_set(self):
-        try:
-            TenureRelationshipFactory.create(
-                party=self.party,
-                spatial_unit=self.spatial_unit, tenure_type=None
-            )
-        except ValueError:
-            # expected
-            pass
+        with pytest.raises(ValueError):
+            TenureRelationshipFactory.create(tenure_type=None)
 
-    def test_tenure_relationship_project_set(self):
-        tenure_relationship = TenureRelationshipFactory.create(
-            party=self.party,
-            spatial_unit=self.spatial_unit, project=self.project
-        )
-        assert tenure_relationship.project is not None
-        assert tenure_relationship.project.id == self.project.id
+    def test_project_relationship_invalid(self):
+        with pytest.raises(exceptions.ProjectRelationshipError):
+            project = ProjectFactory()
+            TenureRelationshipFactory.create(
+                party__project=project,
+                spatial_unit__project=project
+            )
+
+    def test_left_and_right_project_ids(self):
+        with pytest.raises(exceptions.ProjectRelationshipError):
+            project = ProjectFactory()
+            TenureRelationshipFactory.create(
+                party__project=project
+            )
 
 
 class TenureRelationshipTypeTest(TestCase):
+    """Test TenureRelationshipType."""
 
     def test_tenure_relationship_types(self):
         tenure_types = TenureRelationshipType.objects.all()
@@ -137,28 +151,18 @@ class TenureRelationshipTypeTest(TestCase):
 class PartyTenureRelationshipsTest(TestCase):
     """Test TenureRelationships on Party."""
 
-    def setUp(self):
-        self.party = PartyFactory.create(name='TestParty')
-        self.spatial_unit = SpatialUnitFactory.create(name='TestSpatialUnit')
-
     def test_party_tenure_relationships(self):
-        TenureRelationshipFactory.create(
-            party=self.party, spatial_unit=self.spatial_unit
-        )
-        su = self.party.tenure_relationships.all()[0]
-        assert su.id == self.spatial_unit.id
+        relationship = TenureRelationshipFactory.create()
+        queryset = relationship.party.tenure_relationships.all()
+        assert len(queryset) == 1
+        assert queryset[0] is not None
 
 
 class SpatialUnitTenureRelationshipsTest(TestCase):
     """Test TenureRelationships on SpatialUnit."""
 
-    def setUp(self):
-        self.party = PartyFactory.create(name='TestParty')
-        self.spatial_unit = SpatialUnitFactory.create(name='TestSpatialUnit')
-
     def test_spatial_unit_tenure_relationships(self):
-        TenureRelationshipFactory.create(
-            party=self.party, spatial_unit=self.spatial_unit
-        )
-        party = self.spatial_unit.tenure_relationships.all()[0]
-        assert party.id == self.party.id
+        relationship = TenureRelationshipFactory.create()
+        queryset = relationship.spatial_unit.tenure_relationships.all()
+        assert len(queryset) == 1
+        assert queryset[0] is not None

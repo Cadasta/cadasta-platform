@@ -1,11 +1,11 @@
 import factory
-
 from core.tests.factories import ExtendedFactory
-from spatial.models import SpatialUnit, SpatialUnitRelationship
 from organization.tests.factories import ProjectFactory
+from spatial.models import SpatialUnit, SpatialUnitRelationship
 
 
 class SpatialUnitFactory(ExtendedFactory):
+
     class Meta:
         model = SpatialUnit
 
@@ -14,10 +14,13 @@ class SpatialUnitFactory(ExtendedFactory):
 
 
 class SpatialUnitRelationshipFactory(ExtendedFactory):
+
     class Meta:
         model = SpatialUnitRelationship
 
     project = factory.SubFactory(ProjectFactory)
-    su1 = factory.SubFactory(SpatialUnitFactory, project=project)
-    su2 = factory.SubFactory(SpatialUnitFactory, project=project)
+    su1 = factory.SubFactory(
+        SpatialUnitFactory, project=factory.SelfAttribute('..project'))
+    su2 = factory.SubFactory(
+        SpatialUnitFactory, project=factory.SelfAttribute('..project'))
     type = 'C'
