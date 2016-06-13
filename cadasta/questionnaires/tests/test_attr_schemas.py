@@ -12,7 +12,7 @@ from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
 from spatial.tests.factories import (SpatialUnitFactory,
-                                     SpatialUnitRelationshipFactory)
+                                     SpatialRelationshipFactory)
 
 from .. import models
 # from ..exceptions import InvalidXLSForm
@@ -113,13 +113,13 @@ class CreateAttributeSchemaTest(TestCase):
                 }
             )
 
-    def test_spatialunit_relationship_schema(self):
+    def test_spatial_relationship_schema(self):
         project = ProjectFactory.create(name='TestFactory')
         content_type = ContentType.objects.get(
-            app_label='spatial', model='spatialunitrelationship')
+            app_label='spatial', model='spatialrelationship')
         create_attrs_schema(
             project=project, dict=location_relationship_xform_group, errors=[])
-        sur = SpatialUnitRelationshipFactory.create(
+        sur = SpatialRelationshipFactory.create(
             project=project, attributes={
                 'notes': 'Some additional textual info'}
         )
@@ -129,13 +129,13 @@ class CreateAttributeSchemaTest(TestCase):
         assert schema.selectors == [project.organization.pk, project.pk]
         assert 'notes' in sur.attributes.attributes
 
-    def test_spatialunit_relationship_invalid_attribute(self):
+    def test_spatial_relationship_invalid_attribute(self):
         project = ProjectFactory.create(name='TestFactory')
         create_attrs_schema(
             project=project, dict=location_relationship_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
-            SpatialUnitRelationshipFactory.create(
+            SpatialRelationshipFactory.create(
                 project=project,
                 attributes={
                     'invalid_attribute': 'yes',

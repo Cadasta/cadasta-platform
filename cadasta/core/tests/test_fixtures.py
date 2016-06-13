@@ -5,7 +5,7 @@ from ..fixtures import FixturesData
 from tutelary.models import Policy
 from accounts.models import User
 from organization.models import Organization, Project
-from spatial.models import SpatialUnit, SpatialUnitRelationship
+from spatial.models import SpatialUnit, SpatialRelationship
 
 
 class FixturesTest(TestCase):
@@ -25,7 +25,7 @@ class FixturesTest(TestCase):
         assert Organization.objects.count() == 2
         assert Project.objects.count() == 9
         assert SpatialUnit.objects.count() == 7
-        assert SpatialUnitRelationship.objects.count() == 2
+        assert SpatialRelationship.objects.count() == 2
 
         data.delete_test_users()
         data.delete_test_organizations()
@@ -35,4 +35,4 @@ class FixturesTest(TestCase):
         assert Organization.objects.count() == 0
         assert Project.objects.count() == 0
         assert SpatialUnit.objects.count() == 0
-        assert SpatialUnitRelationship.objects.count() == 0
+        assert SpatialRelationship.objects.count() == 0
