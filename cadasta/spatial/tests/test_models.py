@@ -1,11 +1,14 @@
-from django.test import TestCase
 import pytest
 
-from spatial.tests.factories import (
-    SpatialUnitFactory, SpatialUnitRelationshipFactory)
+from django.test import TestCase
+from organization.tests.factories import ProjectFactory
+from party import exceptions
+from spatial.tests.factories import (SpatialUnitFactory,
+                                     SpatialUnitRelationshipFactory)
 
 
 class SpatialUnitTest(TestCase):
+
     def test_str(self):
         spatial_unit = SpatialUnitFactory.create(name='Disneyland')
         assert str(spatial_unit) == '<SpatialUnit: Disneyland>'
@@ -52,9 +55,16 @@ class SpatialUnitTest(TestCase):
 
 
 class SpatialUnitRelationshipTest(TestCase):
+
+    def setUp(self):
+        self.project = ProjectFactory(name='TestProject')
+
     def test_relationships_creation(self):
         relationship = SpatialUnitRelationshipFactory(
+            project=self.project,
+            su1__project=self.project,
             su1__name='Disneyworld',
+            su2__project=self.project,
             su2__name='Disneyland')
         su2_name = str(relationship.su1.relationships.all()[0])
 
@@ -221,3 +231,18 @@ class SpatialUnitRelationshipTest(TestCase):
                           '-109.0461 40.2617))',
             type='C')
         assert relationship is not None
+
+    def test_project_relationship_invalid(self):
+        with pytest.raises(exceptions.ProjectRelationshipError):
+            project = ProjectFactory()
+            SpatialUnitRelationshipFactory(
+                su1__project=project,
+                su2__project=project
+            )
+
+    def test_left_and_right_project_ids(self):
+        with pytest.raises(exceptions.ProjectRelationshipError):
+            project = ProjectFactory()
+            SpatialUnitRelationshipFactory(
+                su1__project=project
+            )

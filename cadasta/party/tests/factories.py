@@ -26,8 +26,10 @@ class PartyRelationshipFactory(ExtendedFactory):
         model = PartyRelationship
 
     project = factory.SubFactory(ProjectFactory)
-    party1 = factory.SubFactory(PartyFactory, project=project)
-    party2 = factory.SubFactory(PartyFactory, project=project)
+    party1 = factory.SubFactory(
+        PartyFactory, project=factory.SelfAttribute('..project'))
+    party2 = factory.SubFactory(
+        PartyFactory, project=factory.SelfAttribute('..project'))
     type = 'M'
 
 
@@ -38,7 +40,9 @@ class TenureRelationshipFactory(ExtendedFactory):
         model = TenureRelationship
 
     project = factory.SubFactory(ProjectFactory)
-    party = factory.SubFactory(PartyFactory)
-    spatial_unit = factory.SubFactory(SpatialUnitFactory)
+    party = factory.SubFactory(
+        PartyFactory, project=factory.SelfAttribute('..project'))
+    spatial_unit = factory.SubFactory(
+        SpatialUnitFactory, project=factory.SelfAttribute('..project'))
     acquired_how = 'HS'
     tenure_type = factory.Iterator(TenureRelationshipType.objects.all())
