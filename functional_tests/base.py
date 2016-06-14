@@ -36,9 +36,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         super(FunctionalTest, cls).setUpClass()
 
         # IMPORTANT: Make sure the window size is big enough to see
-        # everything (e.g. links in the nav bar).  Otherwise tests
-        # will fail mysteriously because PhantomJS will clip the
-        # viewport.
+        # everything (e.g. links in the nav bar).  
         cls.browser = webdriver.Firefox()
         cls.browser.set_window_size(1024, 768)
 
