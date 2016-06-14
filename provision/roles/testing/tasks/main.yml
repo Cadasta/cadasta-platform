@@ -1,11 +1,28 @@
-- name: Install Firefox, Xvfb and Squid
+- name: Install Xvfb and Squid
   become: yes
   become_user: root
   apt: pkg={{ item }} state=installed update_cache=yes
   with_items:
-      - firefox
       - xvfb
       - squid3
+
+- name: Download Firefox 46 install bundle
+  become: yes
+  become_user: root
+  get_url: url=https://ftp.mozilla.org/pub/firefox/releases/46.0.1/linux-x86_64/en-US/firefox-46.0.1.tar.bz2
+           dest=/opt
+
+- name: Unpack Firefox 46 install bundle
+  become: yes
+  become_user: root
+  unarchive: creates=/opt/firefox/firefox
+             src=/opt/firefox-46.0.1.tar.bz2 dest=/opt copy=no
+
+- name: Add path to Firefox 46
+  become: yes
+  become_user: "{{ app_user }}"
+  lineinfile: dest=/home/vagrant/.bashrc
+              line="export PATH=/opt/firefox:$PATH"
 
 - name: Install Python Selenium driver
   become: yes
