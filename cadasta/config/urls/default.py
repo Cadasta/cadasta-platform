@@ -87,6 +87,7 @@ urlpatterns = [
     url(r'^api/',
         include(api,
                 namespace='api')),
+    url(r'^collect/', include('xforms.urls.api')),
 
     url(r'^i18n/',
         include('django.conf.urls.i18n')),

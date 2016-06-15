@@ -1,15 +1,18 @@
 import itertools
 import re
+import hashlib
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+
 from django.db import models, transaction
 from django.db.models import Max
 from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.xls2json import parse_file_to_json
+from pyxform.builder import create_survey_element_from_dict
 
-from .exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidXLSForm
 
 ATTRIBUTE_GROUPS = {
     'location_attributes': {
@@ -151,6 +154,19 @@ class QuestionnaireManager(models.Manager):
             instance.title = json.get('title')
             instance.id_string = json.get('id_string')
             instance.version = version
+            instance.md5_hash = self.get_hash(
+                instance.id_string, instance.version)
+            # ignoring pyxform errors to provide more verbose errors later.
+            try:
+                survey = create_survey_element_from_dict(json)
+                xml_form = survey.xml().toprettyxml()
+                content = str.encode(xml_form)
+                url = instance.xml_form.storage.save(
+                    '{}.xml'.format(instance.name), content)
+
+                instance.xml_form = url
+            except:
+                pass
             instance.save()
 
             project.current_questionnaire = instance.id
@@ -169,6 +185,10 @@ class QuestionnaireManager(models.Manager):
                 raise InvalidXLSForm(errors)
 
             return instance
+
+    def get_hash(self, id_string, version):
+        string = str(id_string) + str(version)
+        return hashlib.md5(string.encode()).hexdigest()
 
 
 class QuestionGroupManager(models.Manager):

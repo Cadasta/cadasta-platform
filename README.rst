@@ -15,6 +15,15 @@ Install:
 
 Clone the `repository <https://github.com/cadasta/cadasta-platform>`_.
 
+AWS Deployment::
+
+  vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+  vagrant plugin install vagrant-aws
+  ...
+
+  vagrant up --provider=aws ...
+
+
 Provision the VM::
 
   vagrant up --provision

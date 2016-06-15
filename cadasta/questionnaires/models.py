@@ -15,12 +15,13 @@ class Questionnaire(RandomIDModel):
     title = models.CharField(max_length=500)
     id_string = models.CharField(max_length=50)
     xls_form = S3FileField(upload_to='xls-forms')
+    xml_form = S3FileField(upload_to='xml-forms', default=False)
     project = models.ForeignKey('organization.Project',
                                 related_name='questionnaires')
     version = models.IntegerField(default=1)
+    md5_hash = models.CharField(max_length=50, default=False)
 
     objects = managers.QuestionnaireManager()
-
     history = HistoricalRecords()
 
     class TutelaryMeta:
