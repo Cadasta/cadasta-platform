@@ -4,6 +4,8 @@
 {% load i18n %}
 {% load leaflet_tags %}
 
+{% block left-nav %}overview{% endblock %}
+
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
 <style type="text/css">
@@ -27,29 +29,40 @@
 </script>
 {% endblock %}
 
-{% block project_main %}
+{% block content %}
 
-<!-- Main content -->
-  <form class="col-md-11 col-md-offset-1 main main-map" method="POST" action="{% url 'organization:project-edit-geometry' project.organization.slug project.slug %}">
-    {% csrf_token %}
-    <div class="row">
-      <!-- Left column map  -->
-      <div class="col-md-7 col-map">
-        {{ form.extent }}
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Edit project extent" %}</h2>
       </div>
-      <!-- /.col-map -->
-      <!-- Right column detail  -->
-      <div class="col-md-5 col-detail">
-        <h2 class="page-title">{% trans "Edit project geometry" %}</h2>
-        <p>{% trans "Use the map tools to modify your project geometry. Once complete, select the continue button." %}</p>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form method="POST" action="{% url 'organization:project-edit-geometry' project.organization.slug project.slug %}">
+            {% csrf_token %}
+            <div class="row">
+              <!-- Left column map  -->
+              <div class="col-md-7 col-map">
+                {{ form.extent }}
+              </div>
+              <!-- /.col-map -->
+              <!-- Right column detail  -->
+              <div class="col-md-5 col-detail">
+                <h2 class="page-title">{% trans "Edit project geometry" %}</h2>
+                <p>{% trans "Use the map tools to modify your project geometry. Once complete, select the continue button." %}</p>
 
-        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-        <a class="btn btn-link" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
+                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                <a class="btn btn-link" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
+              </div>
+              <!-- /.col-detail -->
+            </div>
+          </form>
+        </div>
       </div>
-      <!-- /.col-detail -->
     </div>
-  </form>
-  <!-- /.main -->
+  </div>
 </div>
 
 {% endblock %}

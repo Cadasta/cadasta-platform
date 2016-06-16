@@ -8,25 +8,41 @@
   {{ form.media }}
 {% endblock %}
 
-{% block project_main %}
+{% block left-nav %}overview{% endblock %}
 
-<form class="col-md-11 col-md-offset-1 main" method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
-  {% csrf_token %}
-  <table class="table table-striped datatable" data-paging-type="simple">
-    <thead>
-      <tr>
-        <th class="col-md-2">{% trans "Member" %}</th>
-        <th class="col-md-3">{% trans "Email address" %}</th>
-        <th class="col-md-4">{% trans "Permissions" %}</th>
-      </tr>
-    </thead>
-    {% for field in form %}
-      {% render_field field class+="form-control" %}
-    {% endfor %}
-  </table>
+{% block content %}
 
-  <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-  <a class="btn btn-default" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
-</form>
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Edit project permissions" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
+            {% csrf_token %}
+            <table class="table table-striped datatable" data-paging-type="simple">
+              <thead>
+                <tr>
+                  <th class="col-md-2">{% trans "Member" %}</th>
+                  <th class="col-md-3">{% trans "Email address" %}</th>
+                  <th class="col-md-4">{% trans "Permissions" %}</th>
+                </tr>
+              </thead>
+              {% for field in form %}
+                {% render_field field class+="form-control" %}
+              {% endfor %}
+            </table>
+
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            <a class="btn btn-default" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
+          </form>    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
