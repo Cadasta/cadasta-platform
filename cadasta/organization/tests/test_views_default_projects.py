@@ -1,7 +1,7 @@
 import os
+import os.path
 import json
 from django.conf import settings
-from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest, Http404
 from django.contrib.auth.models import AnonymousUser
@@ -15,6 +15,8 @@ from tutelary.models import Policy, assign_user_policies
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
+from core.tests.base_test_case import UserTestCase
+from core.tests.factories import RoleFactory
 from accounts.tests.factories import UserFactory
 from organization.models import OrganizationRole, Project, ProjectRole
 from questionnaires.tests.factories import QuestionnaireFactory
@@ -24,8 +26,9 @@ from .. import forms
 from .factories import OrganizationFactory, ProjectFactory, clause
 
 
-class ProjectListTest(TestCase):
+class ProjectListTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectList.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -110,10 +113,11 @@ class ProjectListTest(TestCase):
         assert expected == content
 
     def test_get_with_valid_user(self):
-        self._get(status=200, projs=self.projs)
+        self._get(status=200, projs=self.projs+self.unauth_projs)
 
     def test_get_with_unauthenticated_user(self):
-        self._get(status=200, user=AnonymousUser(), projs=[])
+        self._get(status=200, user=AnonymousUser(),
+                  projs=self.projs + self.unauth_projs)
 
     def test_get_with_unauthorized_user(self):
         # Slight weirdness here: an unauthorized user can see *more*
@@ -125,17 +129,29 @@ class ProjectListTest(TestCase):
 
     def test_get_with_org_membership(self):
         self._get(status=200, make_org_member=[self.ok_org1],
-                  projs=self.projs + [self.priv_proj1, self.priv_proj2])
+                  projs=(self.projs + self.unauth_projs +
+                         [self.priv_proj1, self.priv_proj2]))
 
     def test_get_with_org_memberships(self):
         self._get(status=200, make_org_member=[self.ok_org1, self.ok_org2],
-                  projs=self.projs + [
+                  projs=self.projs + self.unauth_projs + [
                       self.priv_proj1, self.priv_proj2, self.priv_proj3
                   ])
 
+    def test_get_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_pol = Policy.objects.get(name='superuser')
+        self.superuser_role = RoleFactory.create(
+            name='superuser', policies=[superuser_pol]
+        )
+        superuser.assign_policies(self.superuser_role)
+        self._get(status=200, user=superuser,
+                  projs=Project.objects.all())
 
-class ProjectDashboardTest(TestCase):
+
+class ProjectDashboardTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectDashboard.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -245,6 +261,16 @@ class ProjectDashboardTest(TestCase):
                              status=200)
         self._check_render(response, self.project1)
 
+    def test_get_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_pol = Policy.objects.get(name='superuser')
+        self.superuser_role = RoleFactory.create(
+            name='superuser', policies=[superuser_pol]
+        )
+        superuser.assign_policies(self.superuser_role)
+        response = self._get(self.project1, user=superuser, status=200)
+        self._check_render(response, self.project1,)
+
     def test_get_non_existent_project(self):
         setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
@@ -287,9 +313,22 @@ class ProjectDashboardTest(TestCase):
         )
         self._check_fail()
 
+    def test_get_private_project_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_pol = Policy.objects.get(name='superuser')
+        self.superuser_role = RoleFactory.create(
+            name='superuser', policies=[superuser_pol]
+        )
+        superuser.assign_policies(self.superuser_role)
+        response, prj = self._get_private(
+            user=superuser, status=200
+        )
+        self._check_render(response, prj)
 
-class ProjectAddTest(TestCase):
+
+class ProjectAddTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectAddWizard.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -498,7 +537,7 @@ class ProjectAddTest(TestCase):
         assert Questionnaire.objects.filter(project=proj).exists() is False
 
 
-class ProjectEditGeometryTest(TestCase):
+class ProjectEditGeometryTest(UserTestCase):
     post_data = {
         'extent': '{"coordinates": [[[12.37, 51.36], '
                   '[12.35, 51.34], [12.36, 51.33], [12.4, 51.33], '
@@ -506,6 +545,7 @@ class ProjectEditGeometryTest(TestCase):
     }
 
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectEditGeometry.as_view()
         self.request = HttpRequest()
 
@@ -602,7 +642,7 @@ class ProjectEditGeometryTest(TestCase):
         assert self.project.extent is None
 
 
-class ProjectEditDetailsTest(TestCase):
+class ProjectEditDetailsTest(UserTestCase):
     post_data = {
         'name': 'New Name',
         'description': 'New Description',
@@ -617,6 +657,7 @@ class ProjectEditDetailsTest(TestCase):
     }
 
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectEditDetails.as_view()
         self.request = HttpRequest()
 
@@ -773,8 +814,9 @@ class ProjectEditDetailsTest(TestCase):
         assert self.project.description != self.post_data['description']
 
 
-class ProjectEditPermissionsTest(TestCase):
+class ProjectEditPermissionsTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectEditPermissions.as_view()
         self.request = HttpRequest()
 
@@ -885,8 +927,9 @@ class ProjectEditPermissionsTest(TestCase):
         assert self.project_role.role == 'DC'
 
 
-class ProjectArchiveTest(TestCase):
+class ProjectArchiveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectArchive.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -944,8 +987,9 @@ class ProjectArchiveTest(TestCase):
         assert self.prj.archived is False
 
 
-class ProjectUnarchiveTest(TestCase):
+class ProjectUnarchiveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = default.ProjectUnarchive.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')

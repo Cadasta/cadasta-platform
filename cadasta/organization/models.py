@@ -22,13 +22,7 @@ PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 
 def get_policy_instance(policy_name, variables):
-    try:
-        policy = Policy.objects.get(name=policy_name)
-    except Policy.DoesNotExist:
-        policy = Policy.objects.create(
-            name=policy_name,
-            body=open(PERMISSIONS_DIR + policy_name + '.json').read()
-        )
+    policy = Policy.objects.get(name=policy_name)
     return (policy, variables)
 
 

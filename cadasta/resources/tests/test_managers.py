@@ -1,8 +1,8 @@
 import os
-from django.test import TestCase
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 
@@ -18,7 +18,7 @@ file = open(path + '/resources/tests/files/image.jpg', 'rb')
 file_name = storage.save('image.jpg', file)
 
 
-class ResourceModelTest(TestCase):
+class ResourceModelTest(UserTestCase):
     def test_project_resource(self):
         project = ProjectFactory.create()
         user = UserFactory.create()

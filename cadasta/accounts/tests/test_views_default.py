@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
@@ -7,12 +6,14 @@ from django.contrib import messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 
 from accounts.tests.factories import UserFactory
+from core.tests.base_test_case import UserTestCase
 from ..views.default import AccountProfile
 from ..forms import ProfileForm
 
 
-class ProfileTest(TestCase):
+class ProfileTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = AccountProfile.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')

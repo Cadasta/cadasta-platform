@@ -8,6 +8,7 @@ import django.contrib.auth.base_user as auth_base
 from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
 
+
 from .manager import UserManager
 
 
@@ -66,13 +67,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 
 @receiver(models.signals.post_save, sender=User)
 def assign_default_policy(sender, instance, **kwargs):
-    try:
-        policy = Policy.objects.get(name='default')
-    except Policy.DoesNotExist:
-        policy = Policy.objects.create(
-            name='default',
-            body=open(PERMISSIONS_DIR + 'default.json').read()
-        )
+    policy = Policy.objects.get(name='default')
     assigned_policies = instance.assigned_policies()
     if policy not in assigned_policies:
         assigned_policies.insert(0, policy)

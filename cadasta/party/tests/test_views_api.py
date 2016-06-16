@@ -2,7 +2,6 @@
 
 import json
 
-from django.test import TestCase
 from django.http import QueryDict
 # from django.utils.translation import gettext as _
 
@@ -11,6 +10,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from accounts.tests.factories import UserFactory
 from ..tests.factories import PartyFactory
@@ -18,9 +18,10 @@ from ..tests.factories import PartyFactory
 from ..views import api
 
 
-class PartyListAPITest(TestCase):
+class PartyListAPITest(UserTestCase):
 
     def setUp(self):
+        super().setUp()
         self.view = api.PartyList.as_view()
         clauses = {
             'clause': [
@@ -136,9 +137,9 @@ class PartyListAPITest(TestCase):
         assert content['detail'] == "Project not found."
 
 
-class PartyCreateAPITest(TestCase):
-
+class PartyCreateAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.PartyList.as_view()
         clauses = {
             'clause': [
@@ -198,9 +199,9 @@ class PartyCreateAPITest(TestCase):
                    count=3)
 
 
-class PartyDetailAPITest(TestCase):
-
+class PartyDetailAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.PartyDetail.as_view()
         clauses = {
             'clause': [

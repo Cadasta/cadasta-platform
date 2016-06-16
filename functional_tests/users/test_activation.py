@@ -2,12 +2,14 @@ from base import FunctionalTest
 from pages.Users import UsersPage
 from pages.Login import LoginPage
 from pages.AccountInactive import AccountInactivePage
+from core.tests.factories import PolicyFactory
 
 
 class ActivationTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         self.test_data = {
             'inactive_user': {
                 'username': 'default1',

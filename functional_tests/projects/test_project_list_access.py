@@ -3,12 +3,14 @@ import random
 from base import FunctionalTest
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
+from core.tests.factories import PolicyFactory
 
 
 class ProjectListAccessTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
 
         # Define 1 superuser and 9 other users
         users = []

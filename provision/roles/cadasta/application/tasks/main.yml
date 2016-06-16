@@ -91,6 +91,14 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
+- name: Load policy data
+  become: yes
+  become_user: "{{ app_user }}"
+  django_manage: command=loadpolicies
+                 app_path="{{ application_path }}cadasta"
+                 virtualenv="{{ virtualenv_path }}"
+                 settings="{{ django_settings }}"
+
 - name: Install Bootstrap for SASS processing
   become: yes
   become_user: "{{ app_user }}"

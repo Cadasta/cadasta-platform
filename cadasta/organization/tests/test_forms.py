@@ -1,7 +1,6 @@
 import os
 from pytest import raises
 
-from django.test import TestCase
 from django.conf import settings
 
 from buckets.test.utils import ensure_dirs
@@ -11,14 +10,17 @@ from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
-from core.tests.factories import PolicyFactory, RoleFactory
+from core.tests.base_test_case import UserTestCase
+from core.tests.factories import RoleFactory
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
+from tutelary.models import Policy
 
 
-class OrganzationTest(TestCase):
+class OrganzationTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.data = {
             'name': 'Org',
             'description': 'Org description',
@@ -126,7 +128,7 @@ class OrganzationTest(TestCase):
         assert org.contacts == []
 
 
-class AddOrganizationMemberFormTest(TestCase):
+class AddOrganizationMemberFormTest(UserTestCase):
     def _save(self, identifier=None, identifier_field=None, ok=True):
         org = OrganizationFactory.create()
         user = UserFactory.create()
@@ -155,7 +157,7 @@ class AddOrganizationMemberFormTest(TestCase):
         self._save(identifier='some-user', ok=False)
 
 
-class EditOrganizationMemberFormTest(TestCase):
+class EditOrganizationMemberFormTest(UserTestCase):
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
         user = UserFactory.create()
@@ -205,7 +207,7 @@ class EditOrganizationMemberFormTest(TestCase):
                 is False)
 
 
-class ProjectEditDetailsTest(TestCase):
+class ProjectEditDetailsTest(UserTestCase):
     def _get_form(self, form_name):
         path = os.path.dirname(settings.BASE_DIR)
         ensure_dirs()
@@ -316,8 +318,9 @@ class ProjectEditDetailsTest(TestCase):
         assert not project.current_questionnaire
 
 
-class UpdateProjectRolesTest(TestCase):
+class UpdateProjectRolesTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.user = UserFactory.create()
 
@@ -359,17 +362,16 @@ class UpdateProjectRolesTest(TestCase):
         assert ProjectRole.objects.count() == 0
 
 
-class ProjectEditPermissionsTest(TestCase):
+class ProjectEditPermissionsTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
 
         self.super_user = UserFactory.create()
         OrganizationRole.objects.create(user=self.super_user,
                                         organization=self.project.organization,
                                         admin=False)
-
-        PolicyFactory.set_directory(settings.BASE_DIR + '/permissions/')
-        su_pol = PolicyFactory.create(name='superuser', file='superuser.json')
+        su_pol = Policy.objects.get(name='superuser')
         su_role = RoleFactory.create(
             name='superuser',
             policies=[su_pol]
@@ -427,7 +429,7 @@ class ProjectEditPermissionsTest(TestCase):
         assert role_2.role == 'DC'
 
 
-class ContactsFormTest(TestCase):
+class ContactsFormTest(UserTestCase):
     def test_as_table(self):
         form = forms.ContactsForm(prefix='c')
         html = form.as_table()

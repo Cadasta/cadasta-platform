@@ -1,11 +1,11 @@
 from datetime import datetime
 
-from django.test import TestCase
 from django.core import mail
 
 from rest_framework.test import APIRequestFactory, force_authenticate
 from djoser.utils import encode_uid
 
+from core.tests.base_test_case import UserTestCase
 from ..models import User
 from ..views.api import (
     AccountUser, AccountRegister, AccountLogin, AccountVerify
@@ -15,7 +15,7 @@ from ..token import cadastaTokenGenerator
 from .factories import UserFactory
 
 
-class AccountUserTest(TestCase):
+class AccountUserTest(UserTestCase):
     def _put(self, user, data, versioned=True, status=None, mails=None):
         if versioned:
             url = '/v1/account/'
@@ -69,7 +69,7 @@ class AccountUserTest(TestCase):
         assert user.username == 'john'
 
 
-class AccountSignupTest(TestCase):
+class AccountSignupTest(UserTestCase):
     def _post(self, data, status=None, count=None):
         url = '/v1/account/register/'
         request = APIRequestFactory().post(url, data)
@@ -99,8 +99,9 @@ class AccountSignupTest(TestCase):
         self._post(data, status=400, count=0)
 
 
-class AccountLoginTest(TestCase):
+class AccountLoginTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.user = UserFactory.create(username='imagine71',
                                        email='john@beatles.uk',
                                        password='iloveyoko79')
@@ -141,7 +142,7 @@ class AccountLoginTest(TestCase):
         assert len(mail.outbox) == 1
 
 
-class AccountVerifyTest(TestCase):
+class AccountVerifyTest(UserTestCase):
     def test_activate_account(self):
         user = UserFactory.create()
 

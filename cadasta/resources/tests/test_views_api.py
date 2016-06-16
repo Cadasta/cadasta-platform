@@ -1,11 +1,11 @@
 import os
 import json
-from django.test import TestCase
 from django.http import QueryDict
 from django.conf import settings
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Policy
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from .factories import ResourceFactory
@@ -36,8 +36,9 @@ clauses = {
 }
 
 
-class ProjectResourcesTest(TestCase):
+class ProjectResourcesTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.resources = ResourceFactory.create_batch(
             2, content_object=self.project)
@@ -226,8 +227,9 @@ class ProjectResourcesTest(TestCase):
         assert(names == sorted(names, reverse=True))
 
 
-class ProjectResourcesDetailTest(TestCase):
+class ProjectResourcesDetailTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project)
         self.view = api.ProjectResourcesDetail.as_view()

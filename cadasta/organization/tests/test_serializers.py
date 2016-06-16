@@ -8,13 +8,14 @@ from django.core.urlresolvers import reverse
 from rest_framework.serializers import ValidationError
 from rest_framework.test import APIRequestFactory
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from .. import serializers
 from ..models import OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
 
-class OrganizationSerializerTest(TestCase):
+class OrganizationSerializerTest(UserTestCase):
     def test_slug_field_is_set(self):
         request = APIRequestFactory().post('/')
         user = UserFactory.create()
@@ -119,7 +120,7 @@ class ProjectGeometrySerializerTest(TestCase):
                     'project': project.slug})
 
 
-class OrganizationUserSerializerTest(TestCase):
+class OrganizationUserSerializerTest(UserTestCase):
     def test_to_represenation(self):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
@@ -234,7 +235,7 @@ class OrganizationUserSerializerTest(TestCase):
         assert role.admin is True
 
 
-class ProjectUserSerializerTest(TestCase):
+class ProjectUserSerializerTest(UserTestCase):
     def test_to_represenation(self):
         user = UserFactory.create()
         project = ProjectFactory.create(add_users=[user])
@@ -328,7 +329,7 @@ class ProjectUserSerializerTest(TestCase):
         assert role.role == data['role']
 
 
-class UserAdminSerializerTest(TestCase):
+class UserAdminSerializerTest(UserTestCase):
     def test_user_fields_are_set(self):
         user = UserFactory.create(last_login=datetime.now())
         serializer = serializers.UserAdminSerializer(user)

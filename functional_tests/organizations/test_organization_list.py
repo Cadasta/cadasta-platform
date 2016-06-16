@@ -3,25 +3,31 @@ from pages.OrganizationList import OrganizationListPage
 from pages.Organization import OrganizationPage
 from pages.Login import LoginPage
 
+from tutelary.models import assign_user_policies, Policy
 from accounts.tests.factories import UserFactory
+from organization.tests.factories import OrganizationFactory
+from organization.models import OrganizationRole
+from core.tests.factories import PolicyFactory
 
 
 class OrganizationListTest(FunctionalTest):
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         self.add_all_test_data()
-        UserFactory.create(
+        user = UserFactory.create(
             username='wyldstyle',
             password='password')
 
     def test_organizations_view_without_permission(self):
-        """ Unregistered users cannot see organizations."""
-
+        """ Unregistered users can see organizations."""
+        # again, not sure why you have to call this explicitly
+        assign_user_policies(None, Policy.objects.get(name='default'))
         page = OrganizationListPage(self)
         page.go_to()
 
-        empty_table = page.get_empty_table()
-        assert empty_table == 'No data available in table'
+        organization_title = page.get_organization_title_in_table()
+        assert organization_title == 'Organization #0'
 
     def test_organizations_view_with_permission(self):
         """A registered user can view organizations"""
