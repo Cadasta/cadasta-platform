@@ -18,4 +18,5 @@ def run(verbose=True):
             name=pol,
             body=open(PERMISSIONS_DIR + pol + '.json').read()
         )
-        print('Created: ' + pols[pol].name)
+
+    models.assign_user_policies(None, pols['default'])

@@ -14,7 +14,7 @@ djangorestframework-gis==0.10.1
 jsonschema==2.5.1
 rfc3987==1.3.5
 drfdocs==0.0.9
-django-tutelary==0.1.12
+django-tutelary==0.1.13
 django-audit-log==0.7.0
 simplejson==3.8.1
 django-widget-tweaks==1.4.1

@@ -4,8 +4,7 @@ from datetime import datetime, timezone
 
 from accounts.models import User
 from organization.models import Organization, Project, OrganizationRole
-from tutelary.models import (Policy, Role, PolicyInstance, RolePolicyAssign,
-                             assign_user_policies)
+from tutelary.models import Policy, Role, PolicyInstance, RolePolicyAssign
 
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
@@ -67,7 +66,6 @@ class FixturesData:
         )
         users[0].assign_policies(roles['superuser'])
         users[1].assign_policies(roles['superuser'])
-        assign_user_policies(None, pols['default'])
 
         for i in [0, 1, 3, 4, 7, 10]:
             admin = i == 3 or i == 4

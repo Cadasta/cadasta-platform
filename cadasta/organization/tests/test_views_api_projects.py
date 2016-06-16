@@ -312,11 +312,15 @@ class OrganizationProjectListAPITest(UserTestCase):
 
     def test_full_list_with_unauthorized_user(self):
         """
-        It should 403 "You do not have permission to perform this action."
+        It should return all projects.
         """
-        OrganizationFactory.create(slug='habitat')
-        content = self._get('habitat', user=AnonymousUser(), status=403)
-        assert content['detail'] == PermissionDenied.default_detail
+        organization = OrganizationFactory.create(slug='habitat')
+        ProjectFactory.create_batch(2, organization=organization)
+        ProjectFactory.create_batch(2)
+        content = self._get('habitat', user=AnonymousUser(),
+                            status=200, length=2)
+        assert all([proj.get('organization').get('id') == organization.id
+                    for proj in content])
 
     def test_filter_active(self):
         """
@@ -694,7 +698,7 @@ class ProjectDetailAPITest(UserTestCase):
         self._test_get_public_project(self.user, 200, check_ok=True)
 
     def test_get_public_project_with_unauthorized_user(self):
-        self._test_get_public_project(AnonymousUser(), 403, check_error=True)
+        self._test_get_public_project(AnonymousUser(), 200, check_ok=True)
 
     def test_get_public_project_that_does_not_exist(self):
         self._test_get_public_project(self.user, 404, non_existent=True)

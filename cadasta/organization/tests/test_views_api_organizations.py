@@ -77,10 +77,11 @@ class OrganizationListAPITest(UserTestCase):
 
     def test_full_list_with_unauthorized_user(self):
         """
-        It should return an empty organization list.
+        It should return all organizations.
         """
         OrganizationFactory.create_batch(2)
-        self._get(user=AnonymousUser(), status=200, length=0)
+        content = self._get(user=AnonymousUser(), status=200, length=2)
+        assert 'users' not in content[0]
 
     def test_filter_active(self):
         """
@@ -244,8 +245,9 @@ class OrganizationDetailAPITest(UserTestCase):
 
     def test_get_organization_with_unauthorized_user(self):
         org = OrganizationFactory.create(slug='org')
-        content = self._get(org.slug, user=AnonymousUser(), status=403)
-        assert content['detail'] == PermissionDenied.default_detail
+        content = self._get(org.slug, user=AnonymousUser(), status=200)
+        assert content['id'] == org.id
+        assert 'users' in content
 
     def test_get_organization_that_does_not_exist(self):
         content = self._get('some-org', status=404)

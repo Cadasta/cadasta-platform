@@ -35,7 +35,6 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     template_name = 'organization/organization_list.html'
     permission_required = 'org.list'
     permission_filter_queryset = ('org.view',)
-    # print(PermissionSet.objects.get(anonymous_user=True))
 
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):

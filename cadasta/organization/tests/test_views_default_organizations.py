@@ -55,9 +55,7 @@ class OrganizationListTest(UserTestCase):
 
         expected = render_to_string(
             'organization/organization_list.html',
-            {'object_list':
-             sorted(orgs,
-                    key=lambda p: p.slug),
+            {'object_list': sorted(orgs, key=lambda p: p.slug),
              'user': self.request.user},
             request=self.request)
 
@@ -72,9 +70,6 @@ class OrganizationListTest(UserTestCase):
         self._get(self.orgs, status=200)
 
     def test_get_without_user(self):
-        # I'm not sure why I'm having to explicitely call this
-        # when using AnonymousUser()
-        assign_user_policies(None, Policy.objects.get(name='default'))
         self._get(Organization.objects.all(), user=AnonymousUser(), status=200)
 
     def test_get_with_superuser(self):
@@ -231,7 +226,6 @@ class OrganizationDashboardTest(UserTestCase):
         self._check_ok(response)
 
     def test_get_org_with_unauthorized_user(self):
-        assign_user_policies(None, Policy.objects.get(name='default'))
         response = self._get(self.org.slug, user=AnonymousUser(), status=200)
         self._check_ok(response)
 
