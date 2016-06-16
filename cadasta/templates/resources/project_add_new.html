@@ -1,25 +1,31 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
+{% block left-nav %}resources{% endblock %}
+
 {% block extra_script %}
   {{ form.media }}
   {% include "resources/scripts.html" %}
 {% endblock %}
 
-{% block project_main %}
-<div class="col-md-11 col-md-offset-1 main col-text">
+{% block content %}
+<div class="col-md-11 col-md-offset-1 content-single">
   <div class="row">
-    <div class="col-md-12 page-title">
-      <h2>{% trans "Resources: Add new" %}</h2>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation"><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}" role="tab">{% trans "From library" %}</a></li>
-        <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
-      </ul>
-      {% include "resources/form.html" %}
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Resources: Add new" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- Resources index -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}" role="tab">{% trans "From library" %}</a></li>
+            <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
+          </ul>
+          {% include "resources/form.html" %}
+        </div>
+      </div>
     </div>
   </div>
 </div>

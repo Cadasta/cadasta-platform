@@ -8,54 +8,67 @@
   {{ form.media }}
 {% endblock %}
 
-{% block project_main %}
+{% block left-nav %}overview{% endblock %}
 
-<!-- Main content -->
-  <form class="col-md-11 col-md-offset-1 main" method="POST" action="{% url 'organization:project-edit-details' project.organization.slug project.slug %}">
-    {% csrf_token %}
-    <div class="row">
-      <div class="col-md-9">
-        {{ form.non_field_errors }}
+{% block content %}
 
-        <div class="row">
-          <div class="col-sm-8">
-            <div class="form-group">
-              {{ form.name.errors }}
-              <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-              {% render_field form.name class+="form-control input-lg" %}
-            </div>    
-          </div>
-          <div class="col-sm-4">
-            {{ form.access }}
-          </div>
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Edit project details" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form method="POST" action="{% url 'organization:project-edit-details' project.organization.slug project.slug %}">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-9">
+                {{ form.non_field_errors }}
+
+                <div class="row">
+                  <div class="col-sm-8">
+                    <div class="form-group">
+                      {{ form.name.errors }}
+                      <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
+                      {% render_field form.name class+="form-control input-lg" %}
+                    </div>    
+                  </div>
+                  <div class="col-sm-4">
+                    {{ form.access }}
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  {{ form.description.errors }}
+                  <label for="{{ form.description.id_for_label }}">{% trans "Description" %}</label>
+                  {% render_field form.description class+="form-control input-lg" %}
+                </div>
+
+                <div class="form-group">
+                  {{ form.urls.errors }}
+                  <label for="{{ form.urls.id_for_label }}">{% trans "Url" %}</label>
+                  {% render_field form.urls class+="form-control input-lg" %}
+                </div>
+
+                <div class="form-group">
+                  {{ form.questionnaire.errors }}
+                  <label for="{{ form.questionnaire.id_for_label }}">{% trans "Upload questionnaire" %}</label>
+                  {{ form.questionnaire }}
+                </div>
+
+                {% render_field form.contacts class+="form-control input-lg" %}
+
+                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+                <a href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
+              </div>
+            </div>
+          </form>    
         </div>
-
-        <div class="form-group">
-          {{ form.description.errors }}
-          <label for="{{ form.description.id_for_label }}">{% trans "Description" %}</label>
-          {% render_field form.description class+="form-control input-lg" %}
-        </div>
-
-        <div class="form-group">
-          {{ form.urls.errors }}
-          <label for="{{ form.urls.id_for_label }}">{% trans "Url" %}</label>
-          {% render_field form.urls class+="form-control input-lg" %}
-        </div>
-
-        <div class="form-group">
-          {{ form.questionnaire.errors }}
-          <label for="{{ form.questionnaire.id_for_label }}">{% trans "Upload questionnaire" %}</label>
-          {{ form.questionnaire }}
-        </div>
-
-        {% render_field form.contacts class+="form-control input-lg" %}
-
-        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-        <a href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
       </div>
     </div>
-  </form>
-  <!-- /.main -->
+  </div>
 </div>
 
 {% endblock %}

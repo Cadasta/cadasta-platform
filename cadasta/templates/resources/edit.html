@@ -1,20 +1,28 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
+{% block left-nav %}resources{% endblock %}
+
 {% block extra_script %}
   {{ form.media }}
   {% include "resources/scripts.html" %}
 {% endblock %}
 
-{% block project_main %}
-<div class="col-md-11 col-md-offset-1 main col-text">
+{% block content %}
+
+<div class="col-md-11 col-md-offset-1 content-single">
   <div class="row">
-    <div class="col-md-12 page-title">
-      <h2>{% trans "Resources: Edit" %}</h2>
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Resources: Edit" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          {% include "resources/form.html" %}
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="row">
-    {% include "resources/form.html" %}
   </div>
 </div>
 {% endblock %}
