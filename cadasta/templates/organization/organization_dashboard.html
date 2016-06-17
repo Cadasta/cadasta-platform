@@ -8,77 +8,79 @@
 
 <div class="col-md-11 col-md-offset-1 content-single">
   <div class="row">
-    <!-- Main text  -->
-    <div class="col-md-8 main-text">
-      <h2>{% trans "Organization Overview" %}</h2>
-      <div class="panel panel-default">
-        <div class="panel-heading"><h3>Projects</h3></div>
-        <div class="panel-body">
-          {% if projects  %}
-          <table class="table table-hover datatable" data-paging-type="simple">
-            <thead>
-              <tr>
-                <th class="col-md-6">{% trans "Project" %}</th>
-                <th class="col-md-2">{% trans "Country" %}</th>
-                <th class="col-md-2">{% trans "Last updated" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for prj in projects %}
-              <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
-                <td>{{ prj.name }}</td>
-                <td>{{ prj.country }}</td>
-                <td>{{ prj.last_updated }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% else %}
-          <!-- Starter text -->
-          <h3 style="text-transform: none;">{% trans "You're ready to go" %}</h3>
-          <p>
-            {% trans "You have successfully created your organization. What would you like to do next?" %}
-          </p>
-          <p>Need to help getting started? <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.</p>
-          <div class="btn-full">
-            <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary btn-lg" role="button">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a new project" %}
-            </a>
-            <a href="#" class="btn btn-primary btn-lg" role="button">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add new members" %}
-            </a>
+    <div class="row-height">
+      <!-- Main text  -->
+      <div class="col-md-8 main-text col-height">
+        <h2>{% trans "Organization Overview" %}</h2>
+        <div class="panel panel-default">
+          <div class="panel-heading"><h3>Projects</h3></div>
+          <div class="panel-body">
+            {% if projects  %}
+            <table class="table table-hover datatable" data-paging-type="simple">
+              <thead>
+                <tr>
+                  <th class="col-md-6">{% trans "Project" %}</th>
+                  <th class="col-md-2">{% trans "Country" %}</th>
+                  <th class="col-md-2">{% trans "Last updated" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for prj in projects %}
+                <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
+                  <td>{{ prj.name }}</td>
+                  <td>{{ prj.country }}</td>
+                  <td>{{ prj.last_updated }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <!-- Starter text -->
+            <h3 style="text-transform: none;">{% trans "You're ready to go" %}</h3>
+            <p>
+              {% trans "You have successfully created your organization. What would you like to do next?" %}
+            </p>
+            <p>Need to help getting started? <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.</p>
+            <div class="btn-full">
+              <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary btn-lg" role="button">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a new project" %}
+              </a>
+              <a href="#" class="btn btn-primary btn-lg" role="button">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add new members" %}
+              </a>
+            </div>
+            {% endif %}
           </div>
-          {% endif %}
         </div>
       </div>
+      <!-- /.main-text -->
+      <!-- Right detail  -->
+      <div class="col-md-4 detail col-height">
+        <section>
+          <div class="org-logo">
+            <img src="{{ organization.logo }}" alt="{{ organization.name }}" />
+          </div>
+          <p>{{ organization.description }}<p>
+          <div class="divider"></div>
+          <!-- Starter text -->
+          <h3>{% trans "Members" %}</h3>
+          <ul class="list-unstyled list-divider">
+          {% for user in organization.users.all %}
+            <li>
+              <strong>{{ user.get_full_name }}</strong><br />{% trans "Username" %}: {{ user.username }}
+            </li>
+          {% endfor %}
+          </ul>
+          <div class="btn-full">
+            <a href="{% url 'organization:members' organization.slug %}" class="btn btn-primary" role="button">
+              {% trans "View all" %}
+            </a>
+          </div>
+        </section>
+      </div>
+      <!-- /.detail -->
     </div>
-    <!-- /.main-text -->
-    <!-- Right detail  -->
-    <div class="col-md-4 detail">
-      <section>
-        <div class="org-logo">
-          <img src="{{ organization.logo }}" alt="{{ organization.name }}" />
-        </div>
-        <p>{{ organization.description }}<p>
-        <div class="divider"></div>
-        <!-- Starter text -->
-        <h3>{% trans "Members" %}</h3>
-        <ul class="list-unstyled list-divider">
-        {% for user in organization.users.all %}
-          <li>
-            <strong>{{ user.get_full_name }}</strong><br />{% trans "Username" %}: {{ user.username }}
-          </li>
-        {% endfor %}
-        </ul>
-        <div class="btn-full">
-          <a href="{% url 'organization:members' organization.slug %}" class="btn btn-primary" role="button">
-            {% trans "View all" %}
-          </a>
-        </div>
-      </section>
-    </div>
-    <!-- /.detail -->
-  </div>
+  <div>
 </div>
 <!-- /.main -->
 

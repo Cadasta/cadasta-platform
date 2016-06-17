@@ -15,6 +15,8 @@
 @import "bootstrap-sass/assets/stylesheets/bootstrap/navs";
 @import "wizard";
 @import "reg";
+@import "subnav";
+@import "orgs";
 @import "maps";
 @import "widgets";
 
@@ -63,7 +65,7 @@ body, #cadasta {
 }
 
 h1, h2 {
-  font-family: 'Roboto Condensed', Georgia, Arial, sans-serif;
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 h3, h4, h5 {
@@ -438,65 +440,6 @@ header {
   }
 }
 
-/* =Icons active in subnav
--------------------------------------------------------------- */
-
-#sidebar {
-  li.overview {
-    .icon { 
-      background-image: url('/static/img/icon-overview.png');
-    }
-  }
-  li.map {
-    .icon { 
-      background-image: url('/static/img/icon-map.png');
-    }
-  }
-  li.resources {
-    .icon { 
-      background-image: url('/static/img/icon-resources.png');
-    }
-  }
-  li.reports {
-    .icon { 
-      background-image: url('/static/img/icon-reports.png');
-    }
-  }
-  li.activity {
-    .icon { 
-      background-image: url('/static/img/icon-activity.png');
-    }
-  }
-  li.projects {
-    .icon { 
-      background-image: url('/static/img/icon-projects.png');
-    }
-  }
-  li.members {
-    .icon { 
-      background-image: url('/static/img/icon-members.png');
-    }
-  }
-}
-
-#sidebar.overview li.overview,
-#sidebar.map li.map,
-#sidebar.resources li.resources,
-#sidebar.reports li.reports,
-#sidebar.activity li.activity, 
-#sidebar.projects li.projects,
-#sidebar.members li.members { // show active icon
-  a {
-    border-left: 7px solid $brand-gold;
-  }
-  .icon { // show active icon
-    background-position: -96px 0;
-  }
-  .title {
-    color: #fff;
-  }
-}
-
 /* =Main content to right of sidebar
 -------------------------------------------------------------- */
 
@@ -530,7 +473,7 @@ header {
     text-shadow: none;
   }
   h3 {
-    font-family: 'Roboto Condensed', Georgia, Arial, sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
     opacity: 0.8;
     font-weight: 300;
@@ -560,18 +503,28 @@ header {
     }
   }
   .main-text {
-    padding: 30px 40px 30px 50px;;
+    padding: 30px 40px 50px 50px;
     .panel { // content box in main panel 
       border: 1px solid $table-border-color;
       .panel-heading {
         background: transparent;
         h3 {
           margin: 4px auto;
-          padding: 0;
-          text-transform: uppercase;
-          opacity: 0.7;
-          font-weight: 300;
-          letter-spacing: 0;
+        }
+      }
+      .panel-body {
+        h3 {
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: solid 1px $gray-light;
+        }
+      }
+      .panel-buttons { // buttons at bottom of panels containing forms
+        background: transparent;
+        padding: 20px 15px;
+        .btn {
+          min-width: 120px;
+          margin-right: 20px;
         }
       }
     }
@@ -607,10 +560,24 @@ header {
   }
 }
 
+/* =Forms
+-------------------------------------------------------------- */
+
+textarea.form-control {
+  max-height: 80px;
+}
+
+.file-input { // browse for file
+  margin: 14px 0;
+  height: 34px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
 /* =Table views
 -------------------------------------------------------------- */
 
-.table.dataTable {
+.table {
   background: #fff;
   border-top: 1px solid $table-border-color;
   border-bottom: 3px solid $table-border-color;
@@ -662,50 +629,6 @@ div.dataTables_wrapper div.dataTables_filter label /* search label */,
 div.dataTables_wrapper div.dataTables_info /* showing number total */ {
   opacity: 0.8;
   font-size: 12px;
-}
-
-/* =Organizations
--------------------------------------------------------------- */
-
-div.org-logo {
-  float: left;
-  padding: 10px;
-}
-
-.org-text {
-  margin-left: 160px;
-}
-
-.member-pic {
-  padding-bottom: 12px;
-  img {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-   }
-}
-
-.member-detail {
-  min-height: 100px;
-  display: inline-block;
-  padding: 0 0 20px 0;
-  h5 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 4px 0;
-  }
-}
-
-.member-role {
-  padding: 30px 0;
-  border-top: solid 1px $table-border-color;
-  border-bottom: solid 1px $table-border-color;
-  clear: both;
-  margin: 30px 0;
-}
-
-#projects-permissions .form-control {
-  min-width: 70%;
 }
 
 /* =Dashboard map
@@ -843,3 +766,8 @@ div#id_extents_location_map {
 label[for="id_extents-location"] {
   display: none;
 }
+
+
+
+
+

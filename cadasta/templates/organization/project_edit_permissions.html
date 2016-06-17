@@ -16,13 +16,11 @@
   <div class="row">
     <!-- Main text  -->
     <div class="col-md-12 main-text">
-      <div class="page-title">
-        <h2>{% trans "Edit project permissions" %}</h2>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
-            {% csrf_token %}
+      <h2>{% trans "Edit project permissions" %}</h2>
+      <form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
+        {% csrf_token %}
+        <div class="panel panel-default">
+          <div class="panel-body">
             <table class="table table-striped datatable" data-paging-type="simple">
               <thead>
                 <tr>
@@ -35,12 +33,14 @@
                 {% render_field field class+="form-control" %}
               {% endfor %}
             </table>
+          </div>
 
+          <div class="panel-footer panel-buttons">
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
             <a class="btn btn-default" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
-          </form>    
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>
