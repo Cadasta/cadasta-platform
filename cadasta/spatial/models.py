@@ -6,6 +6,7 @@ from django.utils.translation import ugettext as _
 from organization.models import Project
 from party import managers
 from tutelary.decorators import permissioned_model
+from simple_history.models import HistoricalRecords
 
 from . import messages
 from .choices import TYPE_CHOICES
@@ -76,6 +77,8 @@ class SpatialUnit(RandomIDModel):
         related_name='relationships_set',
     )
 
+    history = HistoricalRecords()
+
     def __str__(self):
         return "<SpatialUnit: {name}>".format(name=self.name)
 
@@ -144,3 +147,5 @@ class SpatialUnitRelationship(RandomIDModel):
     # JSON attributes field with management of allowed members.
     attributes = JSONField(default={})
     objects = SpatialUnitRelationshipManager()
+
+    history = HistoricalRecords()

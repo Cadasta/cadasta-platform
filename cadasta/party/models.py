@@ -11,6 +11,7 @@ from organization.models import Project
 from organization.validators import validate_contact
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
+from simple_history.models import HistoricalRecords
 
 from . import managers, messages
 
@@ -70,6 +71,8 @@ class Party(RandomIDModel):
         SpatialUnit, through='TenureRelationship',
         related_name='tenure_relationships'
     )
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ('name',)
@@ -141,6 +144,8 @@ class PartyRelationship(RandomIDModel):
 
     objects = managers.PartyRelationshipManager()
 
+    history = HistoricalRecords()
+
 
 class TenureRelationship(RandomIDModel):
     """TenureRelationship model.
@@ -191,9 +196,13 @@ class TenureRelationship(RandomIDModel):
 
     objects = managers.TenureRelationshipManager()
 
+    history = HistoricalRecords()
+
 
 class TenureRelationshipType(models.Model):
     """Defines allowable tenure types."""
 
     id = models.CharField(max_length=2, primary_key=True)
     label = models.CharField(max_length=200)
+
+    history = HistoricalRecords()

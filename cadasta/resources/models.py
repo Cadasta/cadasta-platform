@@ -8,6 +8,7 @@ from django.dispatch import receiver
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.postgres.fields import JSONField
+from simple_history.models import HistoricalRecords
 
 from tutelary.decorators import permissioned_model
 from buckets.fields import S3FileField
@@ -35,6 +36,8 @@ class Resource(RandomIDModel):
     project = models.ForeignKey('organization.Project')
 
     objects = ResourceManager()
+
+    history = HistoricalRecords()
 
     class TutelaryMeta:
         perm_type = 'resource'
@@ -135,3 +138,5 @@ class ContentObject(RandomIDModel):
                                  null=True,
                                  blank=True)
     content_object = GenericForeignKey('content_type', 'object_id')
+
+    history = HistoricalRecords()
