@@ -4,15 +4,8 @@
 {% load i18n %}
 {% load leaflet_tags %}
 
-{% block left-nav %}overview{% endblock %}
-
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
-<style type="text/css">
-  #id_extent_map {
-    height: 100%;
-  }  
-</style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
 {% endblock %}
 
@@ -29,40 +22,36 @@
 </script>
 {% endblock %}
 
+{% block left-nav %}overview{% endblock %}
+
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
-  <div class="row">
-    <!-- Main text  -->
-    <div class="col-md-12 main-text">
-      <div class="page-title">
-        <h2>{% trans "Edit project extent" %}</h2>
+<form method="POST" action="{% url 'organization:project-edit-geometry' project.organization.slug project.slug %}">
+{% csrf_token %}
+  <div class="col-md-11 col-md-offset-1 content-single">
+    <div class="row">
+      <!-- Location map  -->
+      <div class="col-md-8 map">
+        {{ form.extent }}
       </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <form method="POST" action="{% url 'organization:project-edit-geometry' project.organization.slug project.slug %}">
-            {% csrf_token %}
-            <div class="row">
-              <!-- Left column map  -->
-              <div class="col-md-7 col-map">
-                {{ form.extent }}
-              </div>
-              <!-- /.col-map -->
-              <!-- Right column detail  -->
-              <div class="col-md-5 col-detail">
-                <h2 class="page-title">{% trans "Edit project geometry" %}</h2>
-                <p>{% trans "Use the map tools to modify your project geometry. Once complete, select the continue button." %}</p>
-
-                <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-                <a class="btn btn-link" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
-              </div>
-              <!-- /.col-detail -->
-            </div>
-          </form>
+      <!-- / location map -->
+      <!-- Overview detail  -->
+      <div class="col-md-4 detail detail-edit">
+        <h2>{% trans "Edit project location" %}</h2>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <p>{% trans "Use the map tools to modify your project location boundaries. Once complete, select the save button below." %}</p>
+            <p>{% trans "Need help?" %} <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.</p>
+          </div>
+          <div class="panel-footer panel-buttons">
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            <a href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
+          </div>
         </div>
       </div>
+      <!-- / overview detail -->
     </div>
   </div>
-</div>
+</form>
 
 {% endblock %}

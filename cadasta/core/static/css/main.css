@@ -1661,7 +1661,7 @@ input[type="search"] {
     line-height: 46px; } }
 
 .form-group {
-  margin-bottom: 15px; }
+  margin-bottom: 30px; }
 
 .radio,
 .checkbox {
@@ -3551,6 +3551,153 @@ table th[class*="col-"] {
   .form-narrow .checkbox.pull-left {
     margin-top: 0; }
 
+/* =Icons active in subnav
+-------------------------------------------------------------- */
+#sidebar li.overview .icon {
+  background-image: url("/static/img/icon-overview.png"); }
+
+#sidebar li.map .icon {
+  background-image: url("/static/img/icon-map.png"); }
+
+#sidebar li.resources .icon {
+  background-image: url("/static/img/icon-resources.png"); }
+
+#sidebar li.reports .icon {
+  background-image: url("/static/img/icon-reports.png"); }
+
+#sidebar li.activity .icon {
+  background-image: url("/static/img/icon-activity.png"); }
+
+#sidebar li.projects .icon {
+  background-image: url("/static/img/icon-projects.png"); }
+
+#sidebar li.members .icon {
+  background-image: url("/static/img/icon-members.png"); }
+
+#sidebar.overview li.overview a,
+#sidebar.map li.map a,
+#sidebar.resources li.resources a,
+#sidebar.reports li.reports a,
+#sidebar.activity li.activity a,
+#sidebar.projects li.projects a,
+#sidebar.members li.members a {
+  border-left: 7px solid #edaa00; }
+
+#sidebar.overview li.overview .icon,
+#sidebar.map li.map .icon,
+#sidebar.resources li.resources .icon,
+#sidebar.reports li.reports .icon,
+#sidebar.activity li.activity .icon,
+#sidebar.projects li.projects .icon,
+#sidebar.members li.members .icon {
+  background-position: -96px 0; }
+
+#sidebar.overview li.overview .title,
+#sidebar.map li.map .title,
+#sidebar.resources li.resources .title,
+#sidebar.reports li.reports .title,
+#sidebar.activity li.activity .title,
+#sidebar.projects li.projects .title,
+#sidebar.members li.members .title {
+  color: #fff; }
+
+/* =Organizations
+-------------------------------------------------------------- */
+div.org-logo {
+  float: left;
+  padding: 10px; }
+
+.org-text {
+  margin-left: 160px; }
+
+/* =Single member permissions
+-------------------------------------------------------------- */
+.member-info .member-pic {
+  padding-bottom: 12px; }
+  .member-info .member-pic img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto; }
+
+.member-info .member-detail {
+  min-height: 100px;
+  display: inline-block;
+  padding: 0 0 20px 0; }
+  .member-info .member-detail h5 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0; }
+
+.member-info .member-role {
+  padding: 30px 0;
+  border-top: solid 1px #e7e8ea;
+  border-bottom: solid 1px #e7e8ea;
+  clear: both;
+  margin: 30px 0; }
+
+.member-info .btn-full {
+  padding: 20px 0; }
+
+#projects-permissions .form-control {
+  min-width: 70%; }
+
+/* =Columns of same height for organization overview
+-------------------------------------------------------------- */
+.row-height {
+  display: table;
+  table-layout: fixed;
+  height: 100%;
+  width: 100%; }
+
+.col-height {
+  display: table-cell;
+  float: none;
+  height: 100%; }
+
+@media (min-width: 480px) {
+  .row-xs-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%; }
+  .col-xs-height {
+    display: table-cell;
+    float: none;
+    height: 100%; } }
+
+@media (min-width: 768px) {
+  .row-sm-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%; }
+  .col-sm-height {
+    display: table-cell;
+    float: none;
+    height: 100%; } }
+
+@media (min-width: 992px) {
+  .row-md-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%; }
+  .col-md-height {
+    display: table-cell;
+    float: none;
+    height: 100%; } }
+
+@media (min-width: 1200px) {
+  .row-lg-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%; }
+  .col-lg-height {
+    display: table-cell;
+    float: none;
+    height: 100%; } }
+
 /* =Leaflet popups
 -------------------------------------------------------------- */
 .leaflet-container {
@@ -3608,13 +3755,15 @@ table th[class*="col-"] {
   z-index: 200; }
 
 .public-private-widget > label {
-  display: block; }
+  display: none; }
 
 .public-private-widget > div {
   width: 60px;
   float: left;
   text-align: center;
-  margin-right: 15px; }
+  margin-right: 15px;
+  position: relative;
+  top: 22px; }
 
 .public-private-widget > div:nth-child(2) {
   width: 40px;
@@ -3660,7 +3809,7 @@ body, #cadasta {
   padding-bottom: 40px; }
 
 h1, h2 {
-  font-family: 'Roboto Condensed', Georgia, Arial, sans-serif; }
+  font-family: 'Roboto Condensed', sans-serif; }
 
 h3, h4, h5 {
   letter-spacing: -0.3px; }
@@ -4398,56 +4547,6 @@ header {
         font-weight: 500;
         text-transform: uppercase; }
 
-/* =Icons active in subnav
--------------------------------------------------------------- */
-#sidebar li.overview .icon {
-  background-image: url("/static/img/icon-overview.png"); }
-
-#sidebar li.map .icon {
-  background-image: url("/static/img/icon-map.png"); }
-
-#sidebar li.resources .icon {
-  background-image: url("/static/img/icon-resources.png"); }
-
-#sidebar li.reports .icon {
-  background-image: url("/static/img/icon-reports.png"); }
-
-#sidebar li.activity .icon {
-  background-image: url("/static/img/icon-activity.png"); }
-
-#sidebar li.projects .icon {
-  background-image: url("/static/img/icon-projects.png"); }
-
-#sidebar li.members .icon {
-  background-image: url("/static/img/icon-members.png"); }
-
-#sidebar.overview li.overview a,
-#sidebar.map li.map a,
-#sidebar.resources li.resources a,
-#sidebar.reports li.reports a,
-#sidebar.activity li.activity a,
-#sidebar.projects li.projects a,
-#sidebar.members li.members a {
-  border-left: 7px solid #edaa00; }
-
-#sidebar.overview li.overview .icon,
-#sidebar.map li.map .icon,
-#sidebar.resources li.resources .icon,
-#sidebar.reports li.reports .icon,
-#sidebar.activity li.activity .icon,
-#sidebar.projects li.projects .icon,
-#sidebar.members li.members .icon {
-  background-position: -96px 0; }
-
-#sidebar.overview li.overview .title,
-#sidebar.map li.map .title,
-#sidebar.resources li.resources .title,
-#sidebar.reports li.reports .title,
-#sidebar.activity li.activity .title,
-#sidebar.projects li.projects .title,
-#sidebar.members li.members .title {
-  color: #fff; }
-
 /* =Main content to right of sidebar
 -------------------------------------------------------------- */
 #project-single #page-content main,
@@ -4477,7 +4576,7 @@ header {
     padding-bottom: 14px;
     text-shadow: none; }
   .content-single h3 {
-    font-family: 'Roboto Condensed', Georgia, Arial, sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
     opacity: 0.8;
     font-weight: 300;
@@ -4496,22 +4595,11 @@ header {
     height: 100%;
     min-height: 100%;
     padding-right: 0; }
-    .content-single .map #project-map {
+    .content-single .map #project-map, .content-single .map #id_extent_map {
       height: 100%;
       min-height: 100%; }
   .content-single .main-text {
-    padding: 30px 40px 30px 50px; }
-    .content-single .main-text .panel {
-      border: 1px solid #e7e8ea; }
-      .content-single .main-text .panel .panel-heading {
-        background: transparent; }
-        .content-single .main-text .panel .panel-heading h3 {
-          margin: 4px auto;
-          padding: 0;
-          text-transform: uppercase;
-          opacity: 0.7;
-          font-weight: 300;
-          letter-spacing: 0; }
+    padding: 30px 40px 50px 50px; }
   .content-single .detail {
     height: 100%;
     min-height: 100%;
@@ -4536,17 +4624,46 @@ header {
       .content-single .detail ul.list-divider li:last-child {
         border-bottom: 0;
         padding-bottom: 6px; }
+  .content-single .detail-edit {
+    background: none; }
+  .content-single .panel {
+    border: 1px solid #e7e8ea; }
+    .content-single .panel .panel-heading {
+      background: transparent; }
+      .content-single .panel .panel-heading h3 {
+        margin: 4px auto; }
+    .content-single .panel .panel-body h3 {
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: solid 1px #d9dadb; }
+    .content-single .panel .panel-buttons {
+      background: transparent;
+      padding: 20px 15px; }
+      .content-single .panel .panel-buttons .btn {
+        min-width: 120px;
+        margin-right: 20px; }
+
+/* =Forms
+-------------------------------------------------------------- */
+textarea.form-control {
+  max-height: 80px; }
+
+.file-input {
+  margin: 14px 0;
+  height: 34px;
+  padding: 0 12px;
+  cursor: pointer; }
 
 /* =Table views
 -------------------------------------------------------------- */
-.table.dataTable {
+.table {
   background: #fff;
   border-top: 1px solid #e7e8ea;
   border-bottom: 3px solid #e7e8ea; }
-  .table.dataTable h4 {
+  .table h4 {
     font-weight: bold;
     margin-top: 0; }
-  .table.dataTable > thead > tr > th {
+  .table > thead > tr > th {
     border-bottom: 2px solid #e7e8ea;
     font-weight: 500;
     text-transform: uppercase;
@@ -4554,11 +4671,11 @@ header {
     opacity: 0.7;
     padding: 4px 24px;
     background: #f2f4f7; }
-  .table.dataTable > tbody > tr.linked > td:hover {
+  .table > tbody > tr.linked > td:hover {
     cursor: pointer; }
-  .table.dataTable .btn-sm {
+  .table .btn-sm {
     min-width: 90px; }
-  .table.dataTable div.org-logo {
+  .table div.org-logo {
     padding: 4px 0; }
 
 table.dataTable thead .sorting::after {
@@ -4582,41 +4699,6 @@ div.dataTables_wrapper div.dataTables_filter label,
 div.dataTables_wrapper div.dataTables_info {
   opacity: 0.8;
   font-size: 12px; }
-
-/* =Organizations
--------------------------------------------------------------- */
-div.org-logo {
-  float: left;
-  padding: 10px; }
-
-.org-text {
-  margin-left: 160px; }
-
-.member-pic {
-  padding-bottom: 12px; }
-  .member-pic img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto; }
-
-.member-detail {
-  min-height: 100px;
-  display: inline-block;
-  padding: 0 0 20px 0; }
-  .member-detail h5 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 4px 0; }
-
-.member-role {
-  padding: 30px 0;
-  border-top: solid 1px #e7e8ea;
-  border-bottom: solid 1px #e7e8ea;
-  clear: both;
-  margin: 30px 0; }
-
-#projects-permissions .form-control {
-  min-width: 70%; }
 
 /* =Dashboard map
 -------------------------------------------------------------- */
