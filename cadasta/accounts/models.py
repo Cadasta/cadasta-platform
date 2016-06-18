@@ -8,7 +8,7 @@ import django.contrib.auth.base_user as auth_base
 from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
 
-
+from simple_history.models import HistoricalRecords
 from .manager import UserManager
 
 
@@ -37,6 +37,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     verify_email_by = models.DateTimeField(default=now_plus_48_hours)
 
     objects = UserManager()
+
+    history = HistoricalRecords()
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'full_name']

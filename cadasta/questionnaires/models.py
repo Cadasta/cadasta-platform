@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext as _
 
 from tutelary.decorators import permissioned_model
+from simple_history.models import HistoricalRecords
 from buckets.fields import S3FileField
 
 from core.models import RandomIDModel
@@ -19,6 +20,8 @@ class Questionnaire(RandomIDModel):
     version = models.IntegerField(default=1)
 
     objects = managers.QuestionnaireManager()
+
+    history = HistoricalRecords()
 
     class TutelaryMeta:
         perm_type = 'questionnaire'
@@ -46,6 +49,8 @@ class QuestionGroup(RandomIDModel):
                                       related_name='question_groups')
 
     objects = managers.QuestionGroupManager()
+
+    history = HistoricalRecords()
 
 
 class Question(RandomIDModel):
@@ -89,6 +94,8 @@ class Question(RandomIDModel):
 
     objects = managers.QuestionManager()
 
+    history = HistoricalRecords()
+
     @property
     def has_options(self):
         return self.type in ['S1', 'SM']
@@ -98,3 +105,5 @@ class QuestionOption(RandomIDModel):
     name = models.CharField(max_length=100)
     label = models.CharField(max_length=200)
     question = models.ForeignKey(Question, related_name='options')
+
+    history = HistoricalRecords()
