@@ -34,7 +34,7 @@
             {% if user.is_authenticated %}
             <!-- User menu -->
             <div class="btn-group divider" role="group">
-              <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown" 
+              <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
                 <img src="/static/img/avatar.jpg" class="avatar thumbnail">
                 {{ user.full_name }} <span class="caret"></span>
@@ -53,7 +53,7 @@
             <!-- New user menu -->
             <div class="divider pull-left"></div>
             <div class="btn-group" role="group">
-              <a href="{% url 'account_login' %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a> 
+              <a href="{% url 'account_login' %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a>
               <a href="{% url 'account_signup' %}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
             </div>
             {% endif %}
@@ -170,10 +170,12 @@
     <script type="text/javascript"
             src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js">
     </script>
+    <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}">
+    </script>
     {% block extra_script %}{% endblock %}
     <script>
      $(document).ready(function () {
-       $('.datatable').DataTable();
+       $('.datatable').DataTable({ conditionalPaging: true });
        $('.dropdown-toggle').dropdown();
        $('#language').change(function() { this.form.submit(); });
      });
