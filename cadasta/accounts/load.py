@@ -19,4 +19,9 @@ def run(verbose=True):
             body=open(PERMISSIONS_DIR + pol + '.json').read()
         )
 
+    models.Role.objects.create(
+        name='superuser',
+        policies=[pols['default'], pols['superuser']]
+    )
+
     models.assign_user_policies(None, pols['default'])

@@ -262,10 +262,7 @@ class ProjectEditDetails(forms.ModelForm):
 class PermissionsForm:
     def check_admin(self, user):
         if not hasattr(self, 'su_role'):
-            try:
-                self.su_role = Role.objects.get(name='superuser')
-            except Role.DoesNotExist:
-                self.su_role = None
+            self.su_role = Role.objects.get(name='superuser')
 
         if not hasattr(self, 'admins'):
             self.admins = [

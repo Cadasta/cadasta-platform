@@ -6,7 +6,6 @@ from core.tests.factories import PolicyFactory
 
 
 class PageAccessTest(FunctionalTest):
-
     def setUp(self):
         super().setUp()
         PolicyFactory.load_policies()
@@ -61,3 +60,39 @@ class PageAccessTest(FunctionalTest):
         )
         UsersPage(self).go_to()
         assert UsersPage(self).is_on_page()
+
+    def test_user_list_link_nonloggedin_user(self):
+        """A non-logged-in superuser should NOT see the "Users" link in the
+        navbar.
+
+        """
+        DashboardPage(self).go_to()
+        self.get_screenshot('dash')
+        ulink = DashboardPage(self).has_nav_link('Users')
+        print(ulink)
+        plink = DashboardPage(self).has_nav_link('Projects')
+        print(plink)
+        assert not DashboardPage(self).has_nav_link('Users')
+
+    def test_user_list_link_nonsuperuser(self):
+        """A logged-in non-superuser should NOT see the "Users" link in the
+        navbar.
+
+        """
+        LoginPage(self).login(
+            self.test_data['user1']['username'],
+            self.test_data['user1']['password'],
+        )
+        DashboardPage(self).go_to()
+        assert not DashboardPage(self).has_nav_link('Users')
+
+    def test_user_list_link_superuser(self):
+        """A logged-in superuser should see the "Users" link in the navbar.
+
+        """
+        LoginPage(self).login(
+            self.test_data['superuser']['username'],
+            self.test_data['superuser']['password'],
+        )
+        DashboardPage(self).go_to()
+        assert DashboardPage(self).has_nav_link('Users')

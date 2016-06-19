@@ -7,10 +7,9 @@ from django.template import RequestContext
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.messages.api import get_messages
 
-from tutelary.models import Policy, assign_user_policies
+from tutelary.models import Policy, Role, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
-from core.tests.factories import RoleFactory
 from accounts.tests.factories import UserFactory
 from ..views import default
 from ..models import Organization, OrganizationRole, Project
@@ -44,7 +43,7 @@ class OrganizationListTest(UserTestCase):
         self.user.assign_policies(*assigned_policies)
 
     def _get(self, orgs, user=None, status=None,
-             make_org_member=None):
+             make_org_member=None, is_superuser=False):
         if user is None:
             user = self.user
         setattr(self.request, 'user', user)
@@ -56,7 +55,8 @@ class OrganizationListTest(UserTestCase):
         expected = render_to_string(
             'organization/organization_list.html',
             {'object_list': sorted(orgs, key=lambda p: p.slug),
-             'user': self.request.user},
+             'user': self.request.user,
+             'is_superuser': is_superuser},
             request=self.request)
 
         if expected != content:
@@ -74,12 +74,11 @@ class OrganizationListTest(UserTestCase):
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
-        self._get(Organization.objects.all(), user=superuser, status=200)
+        self._get(Organization.objects.all(),
+                  user=superuser, is_superuser=True,
+                  status=200)
 
 
 class OrganizationAddTest(UserTestCase):
@@ -200,7 +199,7 @@ class OrganizationDashboardTest(UserTestCase):
             assert response.status_code == status
         return response
 
-    def _check_ok(self, response, org=None, member=False):
+    def _check_ok(self, response, org=None, member=False, is_superuser=False):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
@@ -212,6 +211,7 @@ class OrganizationDashboardTest(UserTestCase):
         else:
             context['projects'] = Project.objects.filter(
                 organization__slug=org.slug, access='public')
+        context['is_superuser'] = is_superuser
 
         expected = render_to_string(
             'organization/organization_dashboard.html',
@@ -242,13 +242,10 @@ class OrganizationDashboardTest(UserTestCase):
 
     def test_get_org_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
         response = self._get(self.org.slug, user=superuser, status=200)
-        self._check_ok(response, member=True)
+        self._check_ok(response, member=True, is_superuser=True)
 
 
 class OrganizationEditTest(UserTestCase):
