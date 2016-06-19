@@ -7,17 +7,20 @@ from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import ugettext as _
+from jsonattrs.decorators import fix_model_for_attributes
+from jsonattrs.fields import JSONAttributeField
 from organization.models import Project
 from organization.validators import validate_contact
+from simple_history.models import HistoricalRecords
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
-from simple_history.models import HistoricalRecords
 
 from . import managers, messages
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 
+@fix_model_for_attributes
 @permissioned_model
 class Party(RandomIDModel):
     """
@@ -55,7 +58,7 @@ class Party(RandomIDModel):
     contacts = JSONField(validators=[validate_contact], default={})
 
     # JSON attributes field with management of allowed members.
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
 
     # Party-party relationships: includes things like family
     # relationships and group memberships.
@@ -106,6 +109,7 @@ class Party(RandomIDModel):
         return str(self)
 
 
+@fix_model_for_attributes
 class PartyRelationship(RandomIDModel):
     """
     PartyRelationship model.
@@ -140,13 +144,14 @@ class PartyRelationship(RandomIDModel):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
     # JSON attributes field with management of allowed members.
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
 
     objects = managers.PartyRelationshipManager()
 
     history = HistoricalRecords()
 
 
+@fix_model_for_attributes
 class TenureRelationship(RandomIDModel):
     """TenureRelationship model.
 
@@ -191,7 +196,7 @@ class TenureRelationship(RandomIDModel):
         choices=ACQUIRED_CHOICES, null=True, blank=True
     )
     acquired_date = models.DateField(default=date.today)
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
     geom = models.GeometryField(null=True, blank=True)
 
     objects = managers.TenureRelationshipManager()

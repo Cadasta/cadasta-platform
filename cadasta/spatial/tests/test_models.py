@@ -1,6 +1,8 @@
 import pytest
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from jsonattrs.models import Attribute, AttributeType, Schema
 from organization.tests.factories import ProjectFactory
 from party import exceptions
 from spatial.tests.factories import (SpatialUnitFactory,
@@ -47,6 +49,15 @@ class SpatialUnitTest(TestCase):
         assert spatial_unit.get_type_display() == 'Right-of-way'
 
     def test_adding_attributes(self):
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        sch = Schema.objects.create(content_type=content_type, selectors=())
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='description', long_name='Description',
+            required=False, index=1, attr_type=attr_type
+        )
         space = SpatialUnitFactory.create(
             attributes={
                 'description': 'The happiest place on earth'
@@ -77,6 +88,15 @@ class SpatialUnitRelationshipTest(TestCase):
         assert relationship.get_type_display() == 'is-split-of'
 
     def test_adding_attributes(self):
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunitrelationship')
+        sch = Schema.objects.create(content_type=content_type, selectors=())
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='test', long_name='Test',
+            required=False, index=1, attr_type=attr_type
+        )
         relationship = SpatialUnitRelationshipFactory(
             su1__name='Disneyworld',
             su2__name='Disneyland',
