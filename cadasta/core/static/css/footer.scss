@@ -1,0 +1,80 @@
+/* =Footer
+-------------------------------------------------------------- */
+
+footer {
+  position: fixed;
+  display: table-row;
+  bottom: 0;
+  width: 100%;
+  height: 30px;
+  background-color: $body-bg;
+  border-top: solid 1px $table-border-color;
+  font-size: 11px;
+  white-space: nowrap;
+  padding-top: 4px;
+  z-index: 1000;
+  overflow: hidden;
+  .copy {
+    float: left;
+  }
+  .list-inline {
+    display: inline-block;
+  }
+  form.language {
+    display: inline-block;
+    padding-left: 24px;
+    float: right;
+  }
+  .footer-links {
+    float: right;
+  }
+  .list-inline > li {
+    padding-left: 24px;
+    text-align: right;
+  }
+}
+
+@media (max-width: $screen-sm-max) {
+  footer {
+    position: relative;
+    top: 0;
+    display: block;
+    overflow: visible;
+    height: auto;
+    .footer-links {
+      float: left;
+      clear: both;
+    }
+    .list-inline > li {
+      padding-left: 5px;
+      float: left;
+    }
+  }
+  #dashboard footer, #registration footer {
+    position: absolute;
+    bottom: 0;
+    top: auto;
+    height: 30px;
+  }
+}
+
+@media (max-width: 400px) {
+  footer {
+    form.language {
+      display: block;
+      padding-left: 0;
+      padding-bottom: 8px;
+      select {
+        font-size: 9px;
+      }
+    }
+    .copy {
+      font-size: 9px;
+    }
+  }
+  #dashboard footer, #registration footer {
+    .footer-links {
+      display: none;
+    }
+  }
+}

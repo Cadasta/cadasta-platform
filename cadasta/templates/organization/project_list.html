@@ -33,10 +33,10 @@
 <table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
-      <th class="col-md-6">{% trans "Project" %}</th>
-      <th class="col-md-2">{% trans "Organization" %}</th>
-      <th class="col-md-2">{% trans "Country" %}</th>
-      <th class="col-md-2">{% trans "Last updated" %}</th>
+      <th class="col-md-8">{% trans "Project" %}</th>
+      <th class="col-md-1 hidden-xs">{% trans "Organization" %}</th>
+      <th class="col-md-1 hidden-xs hidden-sm">{% trans "Country" %}</th>
+      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
     </tr>
   </thead>
   {% for proj in object_list %}
@@ -44,15 +44,16 @@
     <td>
       <h4>{{ proj.name }}</h4>
       <p>{{ proj.description }}</p>
+      <p class="visible-xs-block">Organization: {{ proj.organization.name }}</p>
     </td>
-    <td>
+    <td class="hidden-xs">
       <div class="org-logo">
         <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
         <img src="{{ proj.organization.logo }}" class="org-logo" alt="{{ proj.organization.name }}"/>
       </div>
     </td>
-    <td>{{ proj.country.name }}</td>
-    <td>{{ proj.last_updated|default_if_none:"&mdash;" }}</td>
+    <td class="hidden-xs hidden-sm">{{ proj.country.name }}</td>
+    <td class="hidden-xs hidden-sm">{{ proj.last_updated|default_if_none:"&mdash;" }}</td>
   </tr>
   {% endfor %}
 </table>

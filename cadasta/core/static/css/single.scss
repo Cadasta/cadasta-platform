@@ -1,0 +1,194 @@
+/* =For styles only found in single project or organization pages
+-------------------------------------------------------------- */
+
+/* =Sidebar for single project or organization navigation
+-------------------------------------------------------------- */
+
+#sidebar {
+  position: absolute;
+  width: 100px;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 990;
+  padding: 0;
+  overflow: hidden;
+  background-color: $brand-darkblue;
+  color: $brand-lightblue;
+  text-align: center;
+  -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
+  box-shadow: 0 0 6px rgba(0,0,0,.3);
+  .nav-sidebar {
+    width: 100%;
+    position: relative;
+    > li {
+      position: relative;
+      cursor: pointer;
+      display: block;
+      text-align: center;
+      border-bottom: solid 1px $brand-darkerblue;
+      a {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        color: $brand-lightblue;
+        border-left: 7px solid $brand-darkerblue;
+        &:focus, &:hover {
+          @include button-variant(#fff, darken($btn-blue-bg, 2%), $brand-gold);
+          transition: all 0.3s ease 0s;
+          .icon { // show active icon
+            background-position: -48px 0;
+          }
+        }
+      }
+      .icon {
+        margin: 0 auto;
+        height: 48px;
+        width: 48px;
+        position: relative;
+        background-position: 0 0;
+        display: block;
+      }
+      .title {
+        display: block;
+        position: relative; 
+        margin: 0;
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+#sidebar {
+  li.overview {
+    .icon { 
+      background-image: url('/static/img/icon-overview.png');
+    }
+  }
+  li.map {
+    .icon { 
+      background-image: url('/static/img/icon-map.png');
+    }
+  }
+  li.resources {
+    .icon { 
+      background-image: url('/static/img/icon-resources.png');
+    }
+  }
+  li.reports {
+    .icon { 
+      background-image: url('/static/img/icon-reports.png');
+    }
+  }
+  li.activity {
+    .icon { 
+      background-image: url('/static/img/icon-activity.png');
+    }
+  }
+  li.projects {
+    .icon { 
+      background-image: url('/static/img/icon-projects.png');
+    }
+  }
+  li.members {
+    .icon { 
+      background-image: url('/static/img/icon-members.png');
+    }
+  }
+}
+
+#sidebar.overview li.overview,
+#sidebar.map li.map,
+#sidebar.resources li.resources,
+#sidebar.reports li.reports,
+#sidebar.activity li.activity, 
+#sidebar.projects li.projects,
+#sidebar.members li.members { // show active icon
+  a {
+    border-left: 7px solid $brand-gold;
+  }
+  .icon { // show active icon
+    background-position: -96px 0;
+  }
+  .title {
+    color: #fff;
+  }
+}
+
+@media (max-width: $screen-sm-max) {
+  #sidebar {
+    position: relative;
+    width: 100%;
+    background-color: $brand-darkblue;
+    height: 70px;
+    overflow: hidden;
+    .nav-sidebar {
+      position: relative;
+      border-top: 3px solid $brand-darkerblue;
+      > li {
+        display: inline-block;
+        border-left: 0;
+        width: 20%;
+        border-right: solid 1px $brand-darkerblue;
+        border-bottom: 0;
+        margin-top: -3px;
+        &:last-child {
+          border-right: 0;
+        }
+        a {
+          width: 100%;
+          height: 100%;
+          position: relative;
+          color: $brand-lightblue;
+          border-left: 0;
+          border-top: 3px solid $brand-darkerblue;
+          padding: 10px;
+          &:focus, &:hover {
+            .icon { // show active icon
+              background-position: -56px -60px;
+            }
+          }
+        }
+        .icon {
+          height: 32px;
+          width: 32px;
+          background-position: -8px -60px;
+        }
+      }
+    }
+  }
+  #sidebar.overview li.overview,
+  #sidebar.map li.map,
+  #sidebar.resources li.resources,
+  #sidebar.reports li.reports,
+  #sidebar.activity li.activity, 
+  #sidebar.projects li.projects,
+  #sidebar.members li.members { // show active icon
+    a {
+      border-top: 3px solid $brand-gold;
+      border-left: 0;
+    }
+    .icon { // show active icon
+      background-position: -108px -60px;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  #sidebar {
+    height: 60px;
+    .nav-sidebar > li {
+      width: 19%;
+      float: left;
+      a {
+        padding: 12px 0;
+        .title {
+          display: none;
+        }
+      }
+    }
+  }
+}
+

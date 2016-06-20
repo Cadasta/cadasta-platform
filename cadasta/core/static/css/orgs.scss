@@ -48,6 +48,15 @@ div.org-logo {
   min-width: 70%;
 }
 
+@media (max-width: $screen-sm-max) {
+  .member-info {
+    .member-pic {
+      margin-right: 20px;
+      float: left;
+    }
+  }
+}
+
 /* =Columns of same height for organization overview
 -------------------------------------------------------------- */
 
@@ -64,7 +73,13 @@ div.org-logo {
   height: 100%;
 }
 
-@media (min-width: 480px) {
+@media (max-width: $screen-sm-max) {
+  .col-height { 
+    display: block;
+  }
+}
+
+@media (min-width: $screen-xs-min) {
   .row-xs-height {
     display: table;
     table-layout: fixed;
@@ -78,7 +93,7 @@ div.org-logo {
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: $screen-sm-min) {
   .row-sm-height {
     display: table;
     table-layout: fixed;
@@ -92,7 +107,7 @@ div.org-logo {
   }
 }
 
-@media (min-width: 992px) {
+@media (min-width: $screen-md-min) {
   .row-md-height {
     display: table;
     table-layout: fixed;
@@ -106,7 +121,7 @@ div.org-logo {
   }
 }
 
-@media (min-width: 1200px) {
+@media (min-width: $screen-lg-min) {
   .row-lg-height {
     display: table;
     table-layout: fixed;

@@ -1,4 +1,4 @@
-/* =Registration area & narrow form
+/* =Registration area & profile pages
 -------------------------------------------------------------- */
 
 .tinted-bg { // photo for login and register forms
@@ -38,3 +38,18 @@
     margin-top: 0;
   }
 }
+
+@media (max-width: $screen-md-max) {
+  .form-narrow { 
+    margin-top: 15px;
+    padding: 10px 15px;
+  }
+  .form-group {
+    margin-bottom: 10px;
+  }
+  .form-narrow .btn-block {
+    margin-bottom: 8px;
+  }
+}
+
+
