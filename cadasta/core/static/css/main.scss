@@ -497,37 +497,13 @@ header {
     height: 100%;
     min-height: 100%;
     padding-right: 0;
-    #project-map {
+    #project-map, #id_extent_map {
       height: 100%;
       min-height: 100%;
     }
   }
   .main-text {
     padding: 30px 40px 50px 50px;
-    .panel { // content box in main panel 
-      border: 1px solid $table-border-color;
-      .panel-heading {
-        background: transparent;
-        h3 {
-          margin: 4px auto;
-        }
-      }
-      .panel-body {
-        h3 {
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: solid 1px $gray-light;
-        }
-      }
-      .panel-buttons { // buttons at bottom of panels containing forms
-        background: transparent;
-        padding: 20px 15px;
-        .btn {
-          min-width: 120px;
-          margin-right: 20px;
-        }
-      }
-    }
   }
   .detail { // right panel detail
     height: 100%;
@@ -555,8 +531,38 @@ header {
       &:last-child {
         border-bottom: 0;
         padding-bottom: 6px;
-    }
+      }
     } 
+  }
+  .detail-edit { // edit on right
+    background: none;
+  }
+  .panel { // content box in main panel 
+    border: 1px solid $table-border-color;
+    .panel-heading {
+      background: transparent;
+      h3 {
+        margin: 4px auto;
+      }
+    }
+    .panel-body {
+      h3 {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: solid 1px $gray-light;
+      }
+    }
+    .panel-buttons { // buttons at bottom of panels containing forms
+      background: transparent;
+      padding: 20px 15px;
+      .btn {
+        min-width: 120px;
+        margin-right: 20px;
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
   }
 }
 
@@ -584,6 +590,7 @@ textarea.form-control {
   h4 {
     font-weight: bold;
     margin-top: 0;
+    color: $gray-darker;
   }
   > thead > tr > th {
     border-bottom: 2px solid $table-border-color;
@@ -766,8 +773,3 @@ div#id_extents_location_map {
 label[for="id_extents-location"] {
   display: none;
 }
-
-
-
-
-

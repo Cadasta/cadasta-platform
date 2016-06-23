@@ -5,6 +5,7 @@
 $gray-dark:                    #595a5c;  // Cadasta gray
 $gray-medium:                  lighten($gray-dark, 30%); // Cadasta medium gray
 $gray-light:                   lighten($gray-dark, 50%); // Cadasta light gray
+$gray-darker:                  darken(#595a5c, 14%);  // Cadasta darker gray
 $brand-primary:                #2e51a3;  // Cadasta blue
 $brand-lightblue:              lighten($brand-primary, 36%);  // Cadasta light blue
 $brand-darkblue:               #0e305e;  // Cadasta dark blue
@@ -59,7 +60,7 @@ $modal-backdrop-bg:              rgba(0, 0, 0, 0.6);
 $table-cell-padding:            12px 24px !default;
 $table-bg-accent:               #f9f9f9 !default; // Bg for table-striped
 $table-bg-accent:               #lighten($table-bg-accent, 25%); // Bg for table-striped
-$table-bg-hover:                #f2f4f7 !default; // Bg for table-hover
+$table-bg-hover:                #f9fafe !default; // Bg for table-hover
 $table-bg-active:               $table-bg-hover !default;
 $table-border-color:            #e7e8ea; // Bg for table borders
 

@@ -12,20 +12,20 @@
 
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
-  <div class="row">
-    <!-- Main text  -->
-    <div class="col-md-12 main-text">
-      <h2>{% trans "Edit project permissions" %}</h2>
-      <form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
-        {% csrf_token %}
+<form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
+{% csrf_token %}
+  <div class="col-md-11 col-md-offset-1 content-single">
+    <div class="row">
+      <!-- Main text  -->
+      <div class="col-md-12 main-text">
+        <h2>{% trans "Edit member permissions" %}</h2>
         <div class="panel panel-default">
           <div class="panel-body">
             <table class="table table-striped datatable" data-paging-type="simple">
               <thead>
                 <tr>
-                  <th class="col-md-2">{% trans "Member" %}</th>
-                  <th class="col-md-3">{% trans "Email address" %}</th>
+                  <th class="col-md-4">{% trans "Member" %}</th>
+                  <th class="col-md-4">{% trans "Email address" %}</th>
                   <th class="col-md-4">{% trans "Permissions" %}</th>
                 </tr>
               </thead>
@@ -34,15 +34,14 @@
               {% endfor %}
             </table>
           </div>
-
           <div class="panel-footer panel-buttons">
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
             <a class="btn btn-default" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   </div>
-</div>
+</form>
 
 {% endblock %}
