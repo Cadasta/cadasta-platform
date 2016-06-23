@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
     <div class="col-md-12 main-text">
@@ -25,9 +25,9 @@
               <tr>
                 <th>{% trans "Resource" %}</th>
                 <th>{% trans "Type" %}</th>
-                <th>{% trans "Entities associated" %}</th>
-                <th>{% trans "Contributor" %}</th>
-                <th>{% trans "Last updated" %}</th>
+                <th class="hidden-xs hidden-sm">{% trans "Entities associated" %}</th>
+                <th class="hidden-xs hidden-sm">{% trans "Contributor" %}</th>
+                <th class="hidden-xs hidden-sm">{% trans "Last updated" %}</th>
               </tr>
             </thead>
             <tbody>
@@ -38,9 +38,9 @@
                   <strong>{{ resource.name }}</strong><br>{{ resource.file_name }}
                 </td>
                 <td>{{ resource.file_type }}</td>
-                <td>{{ resource.num_entities }}</td>
-                <td>{{ resource.contributor.full_name }}<br>{{ resource.contributor.username }}</td>
-                <td>{{ resource.last_updated }}</td>
+                <td class="hidden-xs hidden-sm">{{ resource.num_entities }}</td>
+                <td class="hidden-xs hidden-sm">{{ resource.contributor.full_name }}<br>{{ resource.contributor.username }}</td>
+                <td class="hidden-xs hidden-sm">{{ resource.last_updated }}</td>
               </tr>
             {% endfor %}
             </tbody>

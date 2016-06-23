@@ -11,7 +11,7 @@
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link" href="{% url 'project:list' %}">
+    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'project:list' %}">
       <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
     </a>
     <h1>
@@ -21,6 +21,7 @@
       {{ object.name }}
     </h1>
     <div class="top-btn pull-right">
+
       <!-- More options menu -->
       <div class="dropdown pull-right btn-more">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
@@ -40,8 +41,9 @@
           </li>
         </ul>
       </div>
+
       <!-- Split add button -->
-      <div class="btn-group pull-right btn-add">
+      <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         <button type="button" class="btn btn-primary">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
         </button>
@@ -57,6 +59,21 @@
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
         </ul>
       </div>
+      <!-- Single add button for smaller screens-->
+      <div class="dropdown pull-right visible-xs-inline">
+        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
+          <span class="glyphicon glyphicon-plus"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li><a href="#">{% trans "Add location" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>
+          <li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add resource" %}</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
+        </ul>
+      </div>
+
     </div>
   </div>
 </div>
@@ -67,33 +84,33 @@
 {% block sub-nav %}
 
 <!-- Sidebar -->
-<div id="sidebar" class="{% block left-nav %}{% endblock %} col-md-1">
+<div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
     <li class="overview">
       <a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li>
-    <li class="map">
+    </li><!--
+    --><li class="map">
       <a href="#">
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
       </a>
-    </li>
-    <li class="resources">
+    </li><!--
+    --><li class="resources">
       <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
         <span class="icon resources"></span>
         <span class="title">{% trans "Resources" %}</span>
       </a>
-    </li>
-    <li class="reports">
+    </li><!--
+    --><li class="reports">
       <a href="#">
          <span class="icon reports"></span>
          <span class="title">{% trans "Reports" %}</span>
       </a>
-    </li>
-    <li class="activity">
+    </li><!--
+    --><li class="activity">
       <a href="#">
         <span class="icon activity"></span>
         <span class="title">{% trans "Activity" %}</span>
