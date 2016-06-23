@@ -9,16 +9,13 @@
 
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
     <div class="col-md-12 main-text">
+      <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
       <form method="POST" action="" class="org-member-edit">
       {% csrf_token %}
-  
-        <div class="page-title">
-          <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
-        </div>
         <div class="row">
           <div class="col-md-3">
             <!-- Member panel -->
