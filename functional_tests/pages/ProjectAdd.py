@@ -92,8 +92,6 @@ class ProjectAddPage(Page):
         zoom_in = self.BY_CLASS('leaflet-control-zoom-in')
         zoom_in.click()  # Zoom 1
         time.sleep(0.5)  # Give zoom animation time to settle
-        zoom_in.click()  # Zoom 2
-        time.sleep(0.5)  # Give zoom animation time to settle
 
         if country == 'AU':
             self.draw_rectangle(840, 210, 20, 20)
