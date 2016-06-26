@@ -5555,4 +5555,33 @@ img.org-logo, img#org-logo {
   position: relative;
   z-index: 999; }
 
+/* =Modals
+-------------------------------------------------------------- */
+.modal .modal-dialog {
+  overflow-y: initial !important; }
+
+.modal h3.modal-title {
+  font-family: 'Roboto Condensed', sans-serif;
+  text-transform: uppercase; }
+
+.modal .modal-body {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto; }
+
+.modal .modal-footer {
+  border-top: 0;
+  background: #f2f4f7;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px; }
+  .modal .modal-footer .btn {
+    min-width: 100px;
+    margin: 10px auto 10px; }
+
+.modal button#add-contact {
+  background: transparent;
+  color: #2e51a3 !important;
+  border: 0;
+  float: left !important;
+  padding: 0; }
+
 /*# sourceMappingURL=../../../../../static/css/main.css.map */
