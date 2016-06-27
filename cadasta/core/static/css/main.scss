@@ -977,3 +977,35 @@ img.org-logo, img#org-logo {
   position: relative;
   z-index: 999;
 }
+
+/* =Modals
+-------------------------------------------------------------- */
+
+.modal {
+  .modal-dialog {
+    overflow-y: initial !important
+  }
+  h3.modal-title {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+  }
+  .modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+  .modal-footer {
+    background: $body-bg;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    .btn {
+      min-width: 100px;
+    }
+  }
+  button#add-contact {
+    background: transparent;
+    color: $link-color !important;
+    border: 0;
+    float: left !important;
+    padding: 0;
+  }
+}
