@@ -154,7 +154,7 @@ class OrganizationTest(FunctionalTest):
         assert "You're ready to go" in welcome
 
         title = page.click_add_new_project_button()
-        assert title == "PROJECTS: Add new"
+        assert title == "ADD NEW PROJECT"
 
     def test_navigate_back_to_organization_list(self):
         """A user can click on the index-link

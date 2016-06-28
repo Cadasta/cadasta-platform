@@ -89,13 +89,14 @@
   z-index: 200;
 }
 
-/* =Leftovers
+/* =Labels
 -------------------------------------------------------------- */
 
 div#id_extents_location_map {
   height: 500px;
 }
 
+label[for="id_extents-extent"],
 label[for="id_extents-location"] {
   display: none;
 }

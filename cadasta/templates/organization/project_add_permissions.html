@@ -3,40 +3,57 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% block step_title %}{% trans "Assign project permissions" %}{% endblock %}
+{% block step_content_1 %}
 
-{% block step_description %}
-{% blocktrans %}
-Not able to find a member?  Organization administrators must first
-invite users to join your organization before permissions can be assigned.
-{% endblocktrans %}
+    <div class="row">
+      <!-- Main text  -->
+      <div class="col-md-12 main-text">
+
 {% endblock %}
 
-{% block step_content %}
+{% block step_title %}{% trans "Assign permissions to members" %}{% endblock %}
 
-{{ wizard.management_form }}
-{% if wizard.form.forms %}
-{{ wizard.form.management_form }}
-{% for form in wizard.form.forms %}
-{{ form }}
-{% endfor %}
-{% else %}
+{% block step_instructions %}
+    <p>
+      {% blocktrans %}
+      Not able to find a member?  Organization administrators must first
+      invite users to join your organization before permissions can be assigned.
+      {% endblocktrans %}
+    </p>
+{% endblock %}
 
-<table class="table table-striped datatable" data-paging-type="simple">
-  <thead>
-    <tr>
-      <th class="col-md-2">{% trans "Member" %}</th>
-      <th class="col-md-3">{% trans "Email address" %}</th>
-      <th class="col-md-4">{% trans "Permissions" %}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for field in form %}
-      {% render_field field class+="form-control" %}
-    {% endfor %}
-  </tbody>>
-</table>
+{% block step_content_2 %}
 
-{% endif %}
+          {{ wizard.management_form }}
+          {% if wizard.form.forms %}
+            {{ wizard.form.management_form }}
+            {% for form in wizard.form.forms %}
+              {{ form }}
+            {% endfor %}
+          {% else %}
+
+            <table class="table table-striped datatable" data-paging-type="simple">
+              <thead>
+                <tr>
+                  <th class="col-md-4">{% trans "Member" %}</th>
+                  <th class="col-md-4">{% trans "Email address" %}</th>
+                  <th class="col-md-4">{% trans "Permissions" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for field in form %}
+                  {% render_field field class+="form-control" %}
+                {% endfor %}
+              </tbody>
+            </table>
+
+          {% endif %}
+
+{% endblock %}
+
+{% block step_content_3 %}
+
+      </div>
+    </div>
 
 {% endblock %}
