@@ -3,9 +3,6 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-{% block step_title %}{% trans "Add project details" %}{% endblock %}
-
-
 {% block extra_script %}
 {{ form.media }}
 <script>
@@ -25,84 +22,111 @@
 </script>
 {% endblock %}
 
-{% block step_content %}
+{% block step_content_1 %}
 
-{{ wizard.management_form }}
-{% if wizard.form.forms %}
-{{ wizard.form.management_form }}
-{% for form in wizard.form.forms %}
-{{ form }}
-{% endfor %}
-{% else %}
+    <div class="row">
+      <!-- Main text  -->
+      <div class="col-md-12 main-text">
 
-<div class="row">
-  <div class="col-md-9">
-    {{ wizard.form.non_field_errors }}
-  </div>
-</div>
+{% endblock %}
 
-<div class="row{% if display_org %} hidden{% endif %}">
-  <div class="col-md-7">
-    <div class="form-group">
-      {{ wizard.form.organization.errors }}
-      <label for="{{ wizard.form.organization.id_for_label }}">
-        {% trans "Select organization" %}
-      </label>
-      {% render_field wizard.form.organization class+="form-control input-lg" %}
+{% block step_title %}{% trans "1. General Information" %}{% endblock %}
+
+{% block step_content_2 %}
+
+          {{ wizard.management_form }}
+          {% if wizard.form.forms %}
+            {{ wizard.form.management_form }}
+            {% for form in wizard.form.forms %}
+              {{ form }}
+            {% endfor %}
+          {% else %}
+
+            <div class="row">
+              <div class="col-md-9">
+                {{ wizard.form.non_field_errors }}
+              </div>
+            </div>
+
+            <div class="row{% if display_org %} hidden{% endif %}">
+              <div class="col-md-9">
+                <div class="row">
+                  <div class="col-md-8">
+                    <div class="form-group">
+                      {{ wizard.form.organization.errors }}
+                      <label for="{{ wizard.form.organization.id_for_label }}">{% trans "Select organization" %}</label>
+                      {% render_field wizard.form.organization class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div id="org-wrapper">
+                      <img class="org-logo {{ init_org_hidden }}" id="org-logo" src="{{ init_org_logo }}" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-9">
+                <div class="row">
+                  <div class="col-md-8">
+                    <div class="form-group">
+                      {{ wizard.form.name.errors }}
+                      <label for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
+                      {% render_field wizard.form.name class+="form-control" %}
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    {{ wizard.form.access.errors }}
+                    {{ wizard.form.access }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-9">
+                <div class="form-group">
+                  {{ wizard.form.description.errors }}
+                  <label for="{{ wizard.form.description.id_for_label }}">{% trans "Project description" %}</label>
+                  {% render_field wizard.form.description class+="form-control" %}
+                </div>
+
+                <div class="form-group">
+                  {{ wizard.form.url.errors }}
+                  <label for="{{ wizard.form.url.id_for_label }}">{% trans "Project URL" %}</label>
+                  {% render_field wizard.form.url class+="form-control" %}
+                </div>
+              </div>
+            </div>
+
+            <h3>2. Questionnaire</h3>
+            <div class="row">
+              <div class="col-md-9">
+                <div class="form-group">
+                  {{ wizard.form.questionaire.errors }}
+                  <label for="{{ wizard.form.questionaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
+                  {% render_field wizard.form.questionaire class+="form-control" %}
+                  <p class="help-block">Accepted file type: xls</p>
+                </div>
+              </div>
+            </div>
+
+            <h3>3. Contacts</h3>
+            <div class="row">
+              <div class="col-md-9">
+                {% render_field wizard.form.contacts class+="form-control" %}
+              </div>
+            </div>
+
+          {% endif %}
+
+{% endblock %}
+
+{% block step_content_3 %}
+
+      </div>
     </div>
-  </div>
-  <div class="col-md-2">
-    <img class="org-logo {{ init_org_hidden }}" id="org-logo"
-         src="{{ init_org_logo }}" />
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-6">
-    <div class="form-group">
-      {{ wizard.form.name.errors }}
-      <label for="{{ wizard.form.name.id_for_label }}">
-        {% trans "Project name" %}
-      </label>
-      {% render_field wizard.form.name class+="form-control input-lg" %}
-    </div>
-  </div>
-  <div class="col-md-3">
-  {{ wizard.form.access.errors }}
-    {{ wizard.form.access }}
-  </div>
-</div>
-
-<div class="row">
-  <div class="col-md-9">
-    <div class="form-group">
-      {{ wizard.form.description.errors }}
-      <label for="{{ wizard.form.description.id_for_label }}">
-        {% trans "Description" %}
-      </label>
-      {% render_field wizard.form.description class+="form-control input-lg" %}
-    </div>
-
-    <div class="form-group">
-      {{ wizard.form.url.errors }}
-      <label for="{{ wizard.form.url.id_for_label }}">
-        {% trans "Project URL" %}
-      </label>
-      {% render_field wizard.form.url class+="form-control input-lg" %}
-    </div>
-
-    <div class="form-group">
-      {{ wizard.form.questionaire.errors }}
-      <label for="{{ wizard.form.questionaire.id_for_label }}">
-        {% trans "Upload questionaire" %}
-      </label>
-      {% render_field wizard.form.questionaire class+="form-control input-lg" %}
-    </div>
-
-    {% render_field wizard.form.contacts class+="form-control input-lg" %}
-  </div>
-</div>
-
-{% endif %}
 
 {% endblock %}

@@ -3590,105 +3590,129 @@ table th[class*="col-"] {
   .hidden-print {
     display: none !important; } }
 
+/* =Wizard css
+-------------------------------------------------------------- */
 .wizard {
-  margin-top: 15px;
-  border: 1px solid #d4d4d4;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065); }
+  display: inline-block;
+  float: right;
+  width: 336px; }
+  .wizard > ul {
+    position: relative;
+    display: table;
+    width: 100%;
+    margin: 0 0 20px 0;
+    list-style: none;
+    padding: 0; }
+    .wizard > ul > li {
+      display: table-cell;
+      width: 1%;
+      text-align: center; }
+      .wizard > ul > li a, .wizard > ul > li a:hover {
+        position: relative;
+        display: block;
+        opacity: 1;
+        color: #666;
+        -moz-opacity: 1;
+        text-decoration: none; }
+        .wizard > ul > li a:before, .wizard > ul > li a:hover:before {
+          position: absolute;
+          z-index: 4;
+          top: 20px;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          content: '';
+          background: #ccc; }
+    .wizard > ul > li:first-child a:before {
+      left: 50%; }
+    .wizard > ul > li:last-child a:before {
+      right: 50%;
+      left: auto;
+      width: 50%; }
 
-.wizard:before,
-.wizard:after {
-  display: table;
-  line-height: 0;
-  content: ""; }
-
-.wizard:after {
-  clear: both; }
-
-.wizard ul {
-  padding: 0;
-  margin: 0;
-  list-style: none outside none; }
-
-.wizard ul li {
-  position: relative;
-  float: left;
-  height: 42px;
-  padding: 0 10px 0 25px;
-  margin: 0;
-  font-size: 135%;
+.wizard > ul > li a .wizard-step {
+  font-size: 16px;
   line-height: 42px;
-  color: #999999;
-  cursor: default;
-  background: #ededed; }
-
-.wizard ul li .chevron {
-  position: absolute;
-  top: 0;
-  right: -14px;
+  position: relative;
+  z-index: 5;
   display: block;
-  border: 19px solid transparent;
-  border-right: 0;
-  border-left: 14px solid #d4d4d4; }
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 5px;
+  cursor: pointer;
+  text-align: center;
+  color: #fafafa;
+  border-radius: 100px;
+  background: #ccc; }
 
-.wizard ul li .chevron:before {
-  position: absolute;
-  top: -19px;
-  right: 1px;
+.wizard > ul > li.enabled a .wizard-step {
+  background: #2e51a3; }
+
+.wizard > ul > li a .wizard-description {
+  font-size: 13px;
+  font-weight: bold;
+  opacity: .60;
+  -moz-opacity: .60;
+  font-family: 'Roboto Condensed', sans-serif;
+  text-transform: uppercase;
+  opacity: 0.8;
+  font-weight: 500;
+  letter-spacing: 0; }
+
+.wizard > ul > li a .wizard-description small {
+  font-size: 12px;
+  text-transform: none;
+  font-weight: normal;
   display: block;
-  border: 19px solid transparent;
-  border-right: 0;
-  border-left: 14px solid #ededed;
-  content: ""; }
+  padding: 3px 0 0;
+  opacity: .70;
+  -moz-opacity: .70;
+  font-weight: 300;
+  display: none; }
 
-.wizard ul li.enabled {
-  color: #000; }
+.wizard > ul > li a .wizard-description:hover,
+.wizard > ul > li.enabled a .wizard-description {
+  opacity: 1;
+  -moz-opacity: 1;
+  text-decoration: none; }
 
-.wizard ul li.complete {
-  color: #468847;
-  background: #f3f4f5; }
+.wizard > ul > li a.disabled .wizard-step {
+  background: #ccc; }
 
-.wizard ul li.complete .chevron:before {
-  border-left: 14px solid #f3f4f5; }
+.msgBox {
+  display: none; }
 
-.wizard ul li.active {
-  color: #3a87ad;
-  background: #f1f6fc; }
+.loader {
+  display: none; }
 
-.wizard ul li.active .chevron:before {
-  border-left: 14px solid #f1f6fc; }
+.actionBar {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px 0 0;
+  border-top: #ddd solid 1px; }
 
-.wizard ul li:nth-child(1) {
-  z-index: 10;
-  padding-left: 10px;
-  border-radius: 4px 0 0 4px; }
+.actionBar a.btn {
+  float: right;
+  margin-left: 10px; }
 
-.wizard ul li:nth-child(2) {
-  z-index: 9; }
+#project-wizard .content-single .detail {
+  background: transparent; }
 
-.wizard ul li:nth-child(3) {
-  z-index: 8; }
+#project-wizard h1 {
+  color: #0e305e;
+  text-shadow: none;
+  margin: 34px auto 14px;
+  font-size: 30px; }
 
-.wizard ul li:nth-child(4) {
-  z-index: 7; }
+#project-wizard .col-md-4.detail .wizard {
+  display: block;
+  float: none; }
 
-.wizard ul li:nth-child(5) {
-  z-index: 6; }
+#project-wizard .col-md-4.detail h1 {
+  width: 100%; }
 
-.wizard ul li:nth-child(6) {
-  z-index: 5; }
-
-.wizard ul li:nth-child(7) {
-  z-index: 4; }
-
-.wizard ul li:nth-child(8) {
-  z-index: 3; }
-
-.wizard ul li:nth-child(9) {
-  z-index: 2; }
-
-.wizard ul li:nth-child(10) {
-  z-index: 1; }
+#project-wizard div#org-wrapper {
+  margin-top: 16px; }
 
 .public-private-widget > label {
   display: none; }
@@ -4192,11 +4216,12 @@ div.org-logo {
 .leaflet-top, .leaflet-bottom {
   z-index: 200; }
 
-/* =Leftovers
+/* =Labels
 -------------------------------------------------------------- */
 div#id_extents_location_map {
   height: 500px; }
 
+label[for="id_extents-extent"],
 label[for="id_extents-location"] {
   display: none; }
 
@@ -4589,12 +4614,14 @@ header {
 -------------------------------------------------------------- */
 #projects .nav li.projects,
 #project-single .nav li.projects,
+#project-wizard .nav li.projects,
 #organizations .nav li.organizations,
 #organization-single .nav li.organizations,
 #users .nav li.users {
   border-top: solid 7px #edaa00; }
   #projects .nav li.projects a,
   #project-single .nav li.projects a,
+  #project-wizard .nav li.projects a,
   #organizations .nav li.organizations a,
   #organization-single .nav li.organizations a,
   #users .nav li.users a {
@@ -4602,18 +4629,21 @@ header {
 
 #projects .nav .dropdown-menu > li.projects,
 #project-single .nav .dropdown-menu > li.projects,
+#project-wizard .nav .dropdown-menu > li.projects,
 #organizations .nav .dropdown-menu > li.organizations,
 #organization-single .dropdown-menu > .nav li.organizations,
 #users .nav .dropdown-menu > li.users {
   border-top: none; }
   #projects .nav .dropdown-menu > li.projects > a,
   #project-single .nav .dropdown-menu > li.projects > a,
+  #project-wizard .nav .dropdown-menu > li.projects > a,
   #organizations .nav .dropdown-menu > li.organizations > a,
   #organization-single .dropdown-menu > .nav li.organizations > a,
   #users .nav .dropdown-menu > li.users > a {
     background: #edaa00; }
 
 #project-single .header,
+#project-wizard .header,
 #organization-single .header {
   position: absolute; }
 
@@ -4952,6 +4982,8 @@ header {
     margin-top: 0; }
   .page-header .btn-add {
     margin-right: 14px; }
+  .page-header .page-title h1, .page-header .page-title h2 {
+    width: 60%; }
 
 .page-title {
   padding-top: 2px;
@@ -5166,7 +5198,10 @@ header {
   #organization-single .page-header {
     overflow: visible;
     padding-bottom: 4px;
-    border-bottom: solid 1px #0b2548; }
+    border-bottom: solid 1px #0b2548;
+    margin-top: 0;
+    height: auto;
+    min-height: 104px; }
     #project-single .page-header .more-menu,
     #organization-single .page-header .more-menu {
       width: 36px; }
@@ -5199,6 +5234,7 @@ header {
 #dashboard #page-content,
 #registration #page-content,
 #project-single #page-content,
+#project-wizard #page-content,
 #organization-single #page-content {
   width: 100%;
   max-width: 100%;
@@ -5214,6 +5250,7 @@ header {
   overflow-y: auto; }
 
 #dashboard #page-content,
+#project-wizard #page-content,
 #registration #page-content {
   top: 70px; }
 
@@ -5231,6 +5268,7 @@ header {
     margin-top: -220px;
     padding-top: 14px; }
   #project-single #page-content,
+  #project-wizard #page-content,
   #organization-single #page-content {
     position: relative;
     top: 0; } }
@@ -5291,7 +5329,7 @@ header {
     height: 100%;
     min-height: 100%;
     padding-right: 0; }
-    .content-single .map #project-map, .content-single .map #id_extent_map {
+    .content-single .map #project-map, .content-single .map #id_extent_map, .content-single .map #id_extents_extent_map {
       height: 100%;
       min-height: 100%; }
   .content-single .main-text {
@@ -5306,7 +5344,10 @@ header {
     overflow-x: hidden;
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); }
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    z-index: 300; }
+    .content-single .detail .btn {
+      min-width: 120px; }
     .content-single .detail .org-logo {
       margin: 10px auto 20px;
       float: none;
@@ -5325,7 +5366,8 @@ header {
   .content-single .detail-edit {
     background: none; }
   .content-single .panel {
-    border: 1px solid #e7e8ea; }
+    border: 1px solid #e7e8ea;
+    clear: both; }
     .content-single .panel .panel-heading {
       background: transparent; }
       .content-single .panel .panel-heading h3 {
@@ -5350,7 +5392,7 @@ header {
       height: 300px;
       min-height: 300px; }
     .content-single .main-text {
-      padding: 20px 20px 50px 20px; }
+      padding: 20px 30px 50px 40px; }
     .content-single .detail {
       padding-top: 20px; } }
 
@@ -5512,19 +5554,12 @@ img.org-logo, img#org-logo {
   .top-btn .btn-rt {
     min-width: 20px; }
 
-@media (max-width: 991px) {
-  #project-single .page-header,
-  #organization-single .page-header {
-    margin-top: 0;
-    height: auto;
-    min-height: 104px; }
-    #project-single .page-header .top-btn,
-    #organization-single .page-header .top-btn {
-      padding: 8px 14px;
-      margin-top: 0; }
-      #project-single .page-header .top-btn .btn,
-      #organization-single .page-header .top-btn .btn {
-        min-width: auto; } }
+button#add-contact {
+  background: transparent;
+  border: 0;
+  float: left !important;
+  color: #2e51a3 !important;
+  padding: 0; }
 
 .btn-full {
   background: #eeeeee;
@@ -5536,8 +5571,20 @@ img.org-logo, img#org-logo {
     margin: 10px;
     padding: 10px 24px; }
 
+.btn-link {
+  min-width: 60px; }
+
 .btn-primary:hover {
   background-color: #009975; }
+
+@media (max-width: 991px) {
+  #project-single .page-header .top-btn,
+  #organization-single .page-header .top-btn {
+    padding: 8px 14px;
+    margin-top: 0; }
+    #project-single .page-header .top-btn .btn,
+    #organization-single .page-header .top-btn .btn {
+      min-width: auto; } }
 
 @media (max-width: 1199px) {
   .btn-full .btn {

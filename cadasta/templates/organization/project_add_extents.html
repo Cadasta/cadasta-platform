@@ -23,27 +23,42 @@
 </script>
 {% endblock %}
 
-{% block step_title %}{% trans "Create project geometry" %}{% endblock %}
+{% block step_content_1 %}
 
-{% block step_description %}
-{% blocktrans %}
-Find your location and use the drawing tools to draw your project
-geometry.  Once complete, select the "Continue" button.
-{% endblocktrans %}
+<!-- Start extent map  -->
+<div class="col-md-8 map">
+  <div id="project-map" class="project-extent-map">
+    {{ wizard.management_form }}
+    {% if wizard.form.forms %}
+      {{ wizard.form.management_form }}
+      {% for form in wizard.form.forms %}
+        {{ form }}
+      {% endfor %}
+    {% else %}
+      {{ wizard.form }}
+    {% endif %}
+  </div>
+</div>
+<!-- / end extent map -->
+
+<!-- wizard detail  -->
+<div class="col-md-4 detail">
+
 {% endblock %}
 
-{% block step_content %}
+{% block step_title %}{% trans "Create project geometry" %}{% endblock %}
 
-<div class="project-extent-map">
-  {{ wizard.management_form }}
-  {% if wizard.form.forms %}
-  {{ wizard.form.management_form }}
-  {% for form in wizard.form.forms %}
-  {{ form }}
-  {% endfor %}
-  {% else %}
-  {{ wizard.form }}
-  {% endif %}
+{% block step_instructions %}
+    <p>
+      {% blocktrans %}
+      Use the map tools to outline your project location boundaries. Once complete, select the "Save and continue" button below.
+      {% endblocktrans %}
+    </p>
+{% endblock %}
+
+{% block step_content_3 %}
+
 </div>
+<!-- / wizard detail -->
 
 {% endblock %}

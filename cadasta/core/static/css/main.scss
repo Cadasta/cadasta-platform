@@ -223,6 +223,7 @@ header {
 
 #projects .nav li.projects,
 #project-single .nav li.projects,
+#project-wizard .nav li.projects,
 #organizations .nav li.organizations,
 #organization-single .nav li.organizations,
 #users .nav li.users {
@@ -234,6 +235,7 @@ header {
 
 #projects .nav .dropdown-menu > li.projects,
 #project-single .nav .dropdown-menu > li.projects,
+#project-wizard .nav .dropdown-menu > li.projects,
 #organizations .nav .dropdown-menu > li.organizations,
 #organization-single .dropdown-menu > .nav li.organizations,
 #users .nav .dropdown-menu > li.users {
@@ -244,6 +246,7 @@ header {
 }
 
 #project-single .header,
+#project-wizard .header,
 #organization-single .header { 
   position: absolute;
 }
@@ -360,6 +363,9 @@ header {
   .btn-add {
     margin-right: 14px;
   }
+  .page-title h1, .page-title h2 {
+    width: 60%;
+  }
 }
 
 .page-title { // page title
@@ -474,6 +480,9 @@ header {
     overflow: visible;
     padding-bottom: 4px;
     border-bottom: solid 1px $brand-darkerblue;
+    margin-top: 0;
+    height: auto;
+    min-height: 104px;
     .more-menu {
       width: 36px;
     }
@@ -516,6 +525,7 @@ header {
 #dashboard #page-content,
 #registration #page-content,
 #project-single #page-content,
+#project-wizard #page-content,
 #organization-single #page-content { // for single project and org pages with left subnav
   width: 100%;
   max-width: 100%;
@@ -532,7 +542,8 @@ header {
 }
 
 #dashboard #page-content,
-#registration #page-content {
+#project-wizard #page-content,
+#registration #page-content { // full height page with only site header
   top: $header-height;
 }
 
@@ -554,6 +565,7 @@ header {
   }
 
   #project-single #page-content,
+  #project-wizard #page-content,
   #organization-single #page-content {
     position: relative;
     top: 0;
@@ -627,7 +639,7 @@ header {
     height: 100%;
     min-height: 100%;
     padding-right: 0;
-    #project-map, #id_extent_map {
+    #project-map, #id_extent_map, #id_extents_extent_map {
       height: 100%;
       min-height: 100%;
     }
@@ -646,6 +658,10 @@ header {
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
+    z-index: 300;
+    .btn {
+      min-width: 120px;
+    }
     .org-logo { // large org logo
       margin: 10px auto 20px;
       float: none;
@@ -672,6 +688,7 @@ header {
   }
   .panel { // content box in main panel 
     border: 1px solid $table-border-color;
+    clear: both;
     .panel-heading {
       background: transparent;
       h3 {
@@ -707,7 +724,7 @@ header {
       min-height: 300px;
     }
     .main-text {
-      padding: 20px 20px 50px 20px;
+      padding: 20px 30px 50px 40px;
     }
     .detail {
       padding-top: 20px;
@@ -922,20 +939,12 @@ img.org-logo, img#org-logo {
   }
 }
 
-@media (max-width: $screen-sm-max) {
-  #project-single .page-header, 
-  #organization-single .page-header {
-    margin-top: 0;
-    height: auto;
-    min-height: 104px;
-    .top-btn {
-      padding: 8px 14px;
-      margin-top: 0;
-      .btn {
-        min-width: auto;
-      }
-    }
-  }
+button#add-contact { // below contacts table
+  background: transparent;
+  border: 0;
+  float: left !important;
+  color: $link-color !important;
+  padding: 0;
 }
 
 .btn-full {
@@ -950,9 +959,26 @@ img.org-logo, img#org-logo {
   }
 }
 
+.btn-link {
+  min-width: 60px;
+}
+
 .btn-primary { // for green buttons on dark background
   &:hover {
     background-color: darken($btn-primary-bg, 5%);
+  }
+}
+
+@media (max-width: $screen-sm-max) {
+  #project-single .page-header, 
+  #organization-single .page-header {
+    .top-btn {
+      padding: 8px 14px;
+      margin-top: 0;
+      .btn {
+        min-width: auto;
+      }
+    }
   }
 }
 
