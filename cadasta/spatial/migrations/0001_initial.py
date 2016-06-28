@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='HistoricalSpatialUnitRelationship',
+            name='HistoricalSpatialRelationship',
             fields=[
                 ('id', models.CharField(db_index=True, max_length=24)),
                 ('type', models.CharField(choices=[('C', 'is-contained-in'), ('S', 'is-split-of'), ('M', 'is-merge-of')], max_length=1)),
@@ -72,12 +72,12 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
-            name='SpatialUnitRelationship',
+            name='SpatialRelationship',
             fields=[
                 ('id', models.CharField(max_length=24, primary_key=True, serialize=False)),
                 ('type', models.CharField(choices=[('C', 'is-contained-in'), ('S', 'is-split-of'), ('M', 'is-merge-of')], max_length=1)),
                 ('attributes', jsonattrs.fields.JSONAttributeField(default=jsonattrs.fields.JSONAttributes)),
-                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='organization.Project')),
+                ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='spatial_relationships', to='organization.Project')),
                 ('su1', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='spatial_unit_one', to='spatial.SpatialUnit')),
                 ('su2', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='spatial_unit_two', to='spatial.SpatialUnit')),
             ],
@@ -88,15 +88,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='spatialunit',
             name='relationships',
-            field=models.ManyToManyField(related_name='relationships_set', through='spatial.SpatialUnitRelationship', to='spatial.SpatialUnit'),
+            field=models.ManyToManyField(related_name='relationships_set', through='spatial.SpatialRelationship', to='spatial.SpatialUnit'),
         ),
         migrations.AddField(
-            model_name='historicalspatialunitrelationship',
+            model_name='historicalspatialrelationship',
             name='su1',
             field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='spatial.SpatialUnit'),
         ),
         migrations.AddField(
-            model_name='historicalspatialunitrelationship',
+            model_name='historicalspatialrelationship',
             name='su2',
             field=models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='spatial.SpatialUnit'),
         ),

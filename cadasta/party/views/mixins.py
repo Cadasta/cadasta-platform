@@ -12,19 +12,42 @@ class PartyMixin:
             slug=self.kwargs['project_slug']
         )
 
-
-class PartyQuerySetMixin(PartyMixin):
-
     def get_perms_objects(self):
         return [self.get_project()]
 
+
+class PartyQuerySetMixin(PartyMixin):
+
     def get_queryset(self):
         self.proj = self.get_project()
-        print(self.proj.parties.all())
         return self.proj.parties.all()
 
     def get_serializer_context(self, *args, **kwargs):
         context = super(PartyQuerySetMixin, self).get_serializer_context(
             *args, **kwargs)
+        context['project'] = self.get_project()
+        return context
+
+
+class PartyRelationshipQuerySetMixin(PartyMixin):
+
+    def get_queryset(self):
+        self.proj = self.get_project()
+        return self.proj.party_relationships.all()
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super().get_serializer_context(*args, **kwargs)
+        context['project'] = self.get_project()
+        return context
+
+
+class TenureRelationshipQuerySetMixin(PartyMixin):
+
+    def get_queryset(self):
+        self.proj = self.get_project()
+        return self.proj.tenure_relationships.all()
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super().get_serializer_context(*args, **kwargs)
         context['project'] = self.get_project()
         return context

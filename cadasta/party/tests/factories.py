@@ -1,6 +1,7 @@
 """Factories for Party model creation."""
 
 import factory
+
 from core.tests.factories import ExtendedFactory
 from organization.tests.factories import ProjectFactory
 from party.models import (Party, PartyRelationship, TenureRelationship,

@@ -9,7 +9,7 @@ from simple_history.models import HistoricalRecords
 
 from . import messages
 from .choices import TYPE_CHOICES
-from .exceptions import SpatialUnitRelationshipError
+from .exceptions import SpatialRelationshipError
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
 
@@ -23,48 +23,21 @@ class SpatialUnit(RandomIDModel):
 
     """
 
-    class Meta:
-        ordering = ('name',)
-
-    class TutelaryMeta:
-        perm_type = 'spatial'
-        path_fields = ('project', 'id')
-        actions = (
-            ('spatial.list',
-             {'description': _("List existing spatial units in a project"),
-              'error_message': messages.SPATIAL_LIST,
-              'permissions_object': 'project'}),
-            ('spatial.add',
-             {'description': _("Add a spatial units in a project"),
-              'error_message': messages.SPATIAL_ADD,
-              'permissions_object': 'project'}),
-            ('spatial.view',
-             {'description': _("View existing spatial unit in project"),
-              'error_message': messages.SPATIAL_VIEW,
-              'permissions_object': 'project'}),
-            ('spatial.update',
-             {'description': _("Updated an existing spatial unit in project"),
-              'error_message': messages.SPATIAL_EDIT,
-              'permissions_object': 'project'}),
-            ('spatial.delete',
-             {'description': _("Delete spatial unit from a project"),
-              'error_message': messages.SPATIAL_REMOVE,
-              'permissions_object': 'project'}),
-        )
-
     # All spatial units are associated with a single project.
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name='spatial_units')
 
+    # All spatial units have a name used to provide
+    # a human-readable label for it.
     name = models.CharField(max_length=200)
-
-    # Spatial unit geometry is optional: some spatial units may only
-    # have a textual description of their location.
-    geometry = GeometryField(null=True)
 
     # Spatial unit type: used to manage range of allowed attributes.
     type = models.CharField(max_length=2,
                             choices=TYPE_CHOICES, default='PA')
+
+    # Spatial unit geometry is optional: some spatial units may only
+    # have a textual description of their location.
+    geometry = GeometryField(null=True)
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
@@ -73,7 +46,7 @@ class SpatialUnit(RandomIDModel):
     # containment and split/merge relationships.
     relationships = models.ManyToManyField(
         'self',
-        through='SpatialUnitRelationship',
+        through='SpatialRelationship',
         through_fields=('su1', 'su2'),
         symmetrical=False,
         related_name='relationships_set',
@@ -81,11 +54,37 @@ class SpatialUnit(RandomIDModel):
 
     history = HistoricalRecords()
 
+    class Meta:
+        ordering = ('name',)
+
+    class TutelaryMeta:
+        perm_type = 'spatial'
+        path_fields = ('project', 'id')
+        actions = (
+            ('spatial.list',
+             {'description': _("List existing spatial units of a project"),
+              'error_message': messages.SPATIAL_LIST,
+              'permissions_object': 'project'}),
+            ('spatial.create',
+             {'description': _("Add a spatial unit to a project"),
+              'error_message': messages.SPATIAL_CREATE,
+              'permissions_object': 'project'}),
+            ('spatial.view',
+             {'description': _("View an existing spatial unit"),
+              'error_message': messages.SPATIAL_VIEW}),
+            ('spatial.update',
+             {'description': _("Update an existing spatial unit"),
+              'error_message': messages.SPATIAL_UPDATE}),
+            ('spatial.delete',
+             {'description': _("Delete an existing spatial unit"),
+              'error_message': messages.SPATIAL_DELETE}),
+        )
+
     def __str__(self):
-        return "<SpatialUnit: {name}>".format(name=self.name)
+        return "<SpatialUnit: {}>".format(self.name)
 
 
-class SpatialUnitRelationshipManager(managers.BaseRelationshipManager):
+class SpatialRelationshipManager(managers.BaseRelationshipManager):
     """Check conditions based on spatial unit type before creating
     object. If conditions aren't met, exceptions are raised.
 
@@ -111,7 +110,7 @@ class SpatialUnitRelationshipManager(managers.BaseRelationshipManager):
                         project=project, left=su1, right=su2)
                     return super().create(**kwargs)
                 else:
-                    raise SpatialUnitRelationshipError(
+                    raise SpatialRelationshipError(
                         """That selected location is not geographically
                         contained within the parent location""")
         self.check_project_constraints(
@@ -120,7 +119,7 @@ class SpatialUnitRelationshipManager(managers.BaseRelationshipManager):
 
 
 @fix_model_for_attributes
-class SpatialUnitRelationship(RandomIDModel):
+class SpatialRelationship(RandomIDModel):
     """A relationship between spatial units: encodes simple logical terms
     like ``su1 is-contained-in su2`` or ``su1 is-split-of su2``.  May
     have additional requirements.
@@ -135,7 +134,8 @@ class SpatialUnitRelationship(RandomIDModel):
                     ('M', 'is-merge-of'))
 
     # All spatial unit relationships are associated with a single project.
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE,
+                                related_name='spatial_relationships')
 
     # Spatial units are in the relationships.
     su1 = models.ForeignKey(SpatialUnit, on_delete=models.CASCADE,
@@ -149,6 +149,35 @@ class SpatialUnitRelationship(RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
-    objects = SpatialUnitRelationshipManager()
+    objects = SpatialRelationshipManager()
 
     history = HistoricalRecords()
+
+    class TutelaryMeta:
+        perm_type = 'spatial_rel'
+        path_fields = ('project', 'id')
+        actions = (
+            ('spatial_rel.list',
+             {'description': _("List existing spatial relationships"
+                               " of a project"),
+              'error_message': messages.SPATIAL_REL_LIST,
+              'permissions_object': 'project'}),
+            ('spatial_rel.create',
+             {'description': _("Add a spatial relationship to a project"),
+              'error_message': messages.SPATIAL_REL_CREATE,
+              'permissions_object': 'project'}),
+            ('spatial_rel.view',
+             {'description': _("View an existing spatial relationship"),
+              'error_message': messages.SPATIAL_REL_VIEW}),
+            ('spatial_rel.update',
+             {'description': _("Update an existing spatial relationship"),
+              'error_message': messages.SPATIAL_REL_UPDATE}),
+            ('spatial_rel.delete',
+             {'description': _("Delete an existing spatial relationship"),
+              'error_message': messages.SPATIAL_REL_DELETE}),
+        )
+
+    def __str__(self):
+        return "<SpatialRelationship: <{su1}> {type} <{su2}>>".format(
+            su1=self.su1.name, su2=self.su2.name,
+            type=dict(self.TYPE_CHOICES).get(self.type))

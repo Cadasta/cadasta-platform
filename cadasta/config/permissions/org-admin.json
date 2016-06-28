@@ -10,13 +10,37 @@
       "action": ["org.*", "org.*.*", "project.*", "project.*.*"],
       "object": ["organization/$organization"]
     },
-
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*", "questionaire.*", "spatial.*", "resource.*"],
+      "action": ["project.*", "project.*.*", "questionaire.*", "resource.*",
+                 "spatial.*", "spatial_rel.*", "party.*", "party_rel.*", "tenure_rel.*"],
       "object": ["project/$organization/*"]
     },
-
+    {
+      "effect": "allow",
+      "action": ["spatial.*"],
+      "object": ["spatial/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["spatial_rel.*"],
+      "object": ["spatial_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party.*"],
+      "object": ["party/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party_rel.*"],
+      "object": ["party_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["tenure_rel.*"],
+      "object": ["tenure_rel/$organization/*/*"]
+    },
     {
       "effect": "allow",
       "action": ["resource.*"],
