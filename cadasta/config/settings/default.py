@@ -15,7 +15,6 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -67,6 +66,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'sass_processor',
     'simple_history',
+    'jsonattrs',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -209,3 +209,12 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'sass_processor.finders.CssFinder',
 )
+
+JSONATTRS_SCHEMA_SELECTORS = {
+    'spatial.spatialunit': ('project.organization.pk', 'project.pk',),
+    'spatial.spatialunitrelationship': (
+        'project.organization.pk', 'project.pk',),
+    'party.party': ('project.organization.pk', 'project.pk',),
+    'party.partyrelationship': ('project.organization.pk', 'project.pk',),
+    'party.tenurerelationship': ('project.organization.pk', 'project.pk',)
+}

@@ -4,7 +4,9 @@ from datetime import date
 
 import pytest
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from jsonattrs.models import Attribute, AttributeType, Schema
 from organization.tests.factories import ProjectFactory
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
@@ -39,6 +41,15 @@ class PartyTest(TestCase):
         assert party.get_type_display() == 'Group'
 
     def test_adding_attributes(self):
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        sch = Schema.objects.create(content_type=content_type, selectors=())
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='description', long_name='Description',
+            required=False, index=1, attr_type=attr_type
+        )
         party = PartyFactory.create(
             attributes={
                 'description': 'Mad Hatters Tea Party'
@@ -70,6 +81,15 @@ class PartyRelationshipTest(TestCase):
         assert relationship.get_type_display() == 'is-member-of'
 
     def test_set_attributes(self):
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='party', model='partyrelationship')
+        sch = Schema.objects.create(content_type=content_type, selectors=())
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='description', long_name='Description',
+            required=False, index=1, attr_type=attr_type
+        )
         relationship = PartyRelationshipFactory.create(
             attributes={
                 'description':

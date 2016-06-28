@@ -1,6 +1,5 @@
 from core.models import RandomIDModel
 from django.contrib.gis.db.models import GeometryField
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import ugettext as _
 from organization.models import Project
@@ -11,8 +10,11 @@ from simple_history.models import HistoricalRecords
 from . import messages
 from .choices import TYPE_CHOICES
 from .exceptions import SpatialUnitRelationshipError
+from jsonattrs.fields import JSONAttributeField
+from jsonattrs.decorators import fix_model_for_attributes
 
 
+@fix_model_for_attributes
 @permissioned_model
 class SpatialUnit(RandomIDModel):
     """A single spatial unit: has a type, an optional geometry, a
@@ -65,7 +67,7 @@ class SpatialUnit(RandomIDModel):
                             choices=TYPE_CHOICES, default='PA')
 
     # JSON attributes field with management of allowed members.
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
 
     # Spatial unit-spatial unit relationships: includes spatial
     # containment and split/merge relationships.
@@ -117,6 +119,7 @@ class SpatialUnitRelationshipManager(managers.BaseRelationshipManager):
         return super().create(**kwargs)
 
 
+@fix_model_for_attributes
 class SpatialUnitRelationship(RandomIDModel):
     """A relationship between spatial units: encodes simple logical terms
     like ``su1 is-contained-in su2`` or ``su1 is-split-of su2``.  May
@@ -145,7 +148,7 @@ class SpatialUnitRelationship(RandomIDModel):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
     # JSON attributes field with management of allowed members.
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
     objects = SpatialUnitRelationshipManager()
 
     history = HistoricalRecords()
