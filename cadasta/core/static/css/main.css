@@ -5242,7 +5242,8 @@ header {
   position: relative;
   left: 0;
   margin-left: 100px;
-  min-height: 100%; }
+  min-height: 100%;
+  overflow: hidden; }
 
 @media (max-width: 991px) {
   #project-single #page-content main,
@@ -5569,13 +5570,11 @@ img.org-logo, img#org-logo {
   overflow-y: auto; }
 
 .modal .modal-footer {
-  border-top: 0;
   background: #f2f4f7;
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px; }
   .modal .modal-footer .btn {
-    min-width: 100px;
-    margin: 10px auto 10px; }
+    min-width: 100px; }
 
 .modal button#add-contact {
   background: transparent;
@@ -5583,5 +5582,20 @@ img.org-logo, img#org-logo {
   border: 0;
   float: left !important;
   padding: 0; }
+
+/* =Chrome fix for fonts
+-------------------------------------------------------------- */
+@media all and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  body {
+    -webkit-animation-delay: 0.1s;
+    -webkit-animation-name: fontfix;
+    -webkit-animation-duration: 0.1s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: linear; }
+  @-webkit-keyframes fontfix {
+    from {
+      opacity: 1; }
+    to {
+      opacity: 1; } } }
 
 /*# sourceMappingURL=../../../../../static/css/main.css.map */
