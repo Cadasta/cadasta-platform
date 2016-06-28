@@ -10,7 +10,7 @@ from jsonattrs.models import Attribute, Schema, AttributeType
 from organization.models import Organization, OrganizationRole, Project
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from spatial.tests.factories import (SpatialUnitFactory,
-                                     SpatialUnitRelationshipFactory)
+                                     SpatialRelationshipFactory)
 from tutelary.models import Policy, PolicyInstance, Role, RolePolicyAssign
 
 
@@ -334,7 +334,7 @@ class FixturesData:
             type='AP',
             attributes={"testing": "attributes"})
 
-        SpatialUnitRelationshipFactory(
+        SpatialRelationshipFactory(
             su1=su1, su2=su2, type='C', project=project)
 
         su3 = SpatialUnitFactory(
@@ -361,7 +361,7 @@ class FixturesData:
             type='PA',
             attributes={"testing": "attributes"})
 
-        SpatialUnitRelationshipFactory(
+        SpatialRelationshipFactory(
             su1=su3, su2=su4, type='C', project=project)
 
         SpatialUnitFactory(

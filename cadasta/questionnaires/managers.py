@@ -21,7 +21,7 @@ ATTRIBUTE_GROUPS = {
     },
     'location_relationship_attributes': {
         'app_label': 'spatial',
-        'model': 'spatialunitrelationship'
+        'model': 'spatialrelationship'
     },
     'party_relationship_attributes': {
         'app_label': 'party',

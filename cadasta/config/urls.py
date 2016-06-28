@@ -41,6 +41,10 @@ api_v1 = [
         '(?P<project_id>[-\w]+)/parties/',
         include('party.urls.api.parties',
                 namespace='party')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project_id>[-\w]+)/relationships/',
+        include('party.urls.api.relationships',
+                namespace='relationship')),
 ]
 
 api = [

@@ -5,8 +5,19 @@
     // within an organization.
     {
       "effect": "allow",
-      "action": ["project.view_private", "spatial.view", "spatial.list"],
-      "object": ["project/$organization/*", "project/$organization/*/*"]
+      "action": ["project.view_private",
+                 "spatial.list", "spatial.view",
+                 "spatial_rel.list", "spatial_rel.view",
+                 "party.list", "party.view",
+                 "party_rel.list", "party_rel.view",
+                 "tenure_rel.list", "tenure_rel.view"],
+      "object": ["project/$organization/*",
+                 "project/$organization/*/*",
+                 "spatial/$organization/*/*",
+                 "spatial_rel/$organization/*/*",
+                 "party/$organization/*/*",
+                 "party_rel/$organization/*/*",
+                 "tenure_rel/$organization/*/*"]
     }
   ]
 }

@@ -59,6 +59,18 @@ class PartyTest(TestCase):
 
 class PartyRelationshipTest(TestCase):
 
+    def test_str(self):
+        project = ProjectFactory(name='TestProject')
+        relationship = PartyRelationshipFactory(
+            project=project,
+            party1__project=project,
+            party1__name='Simba',
+            party2__project=project,
+            party2__name='Mufasa',
+            type='C')
+        assert str(relationship) == (
+            "<PartyRelationship: <Simba> is-child-of <Mufasa>>")
+
     def test_relationships_creation(self):
         relationship = PartyRelationshipFactory(
             party1__name='Mad Hatter', party2__name='Mad Hatters Tea Party')
@@ -114,6 +126,19 @@ class PartyRelationshipTest(TestCase):
 
 
 class TenureRelationshipTest(TestCase):
+
+    def test_str(self):
+        project = ProjectFactory(name='TestProject')
+        tenure_type = TenureRelationshipType(id='LS', label="Leasehold")
+        relationship = TenureRelationshipFactory(
+            project=project,
+            party__project=project,
+            party__name='Family',
+            spatial_unit__project=project,
+            spatial_unit__name='Parcel',
+            tenure_type=tenure_type)
+        assert str(relationship) == (
+            "<TenureRelationship: <Family> Leasehold <Parcel>>")
 
     def test_tenure_relationship_creation(self):
         tenure_relationship = TenureRelationshipFactory.create()
