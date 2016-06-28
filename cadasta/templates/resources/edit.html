@@ -17,11 +17,18 @@
       <div class="page-title">
         <h2>{% trans "Resources: Edit" %}</h2>
       </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-          {% include "resources/form.html" %}
+      <form method="POST">
+      {% csrf_token %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            {% include "resources/form.html" %}
+          </div>
+          <div class="panel-footer panel-buttons">
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>

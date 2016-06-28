@@ -3942,6 +3942,27 @@ div.org-logo {
     float: none;
     height: 100%; } }
 
+/* =Resources
+-------------------------------------------------------------- */
+div.resource-60 {
+  float: left;
+  padding: 0 10px; }
+
+div.resource-text {
+  margin-left: 90px; }
+
+.resource-modal h4 {
+  font-weight: 500;
+  margin-top: 0;
+  color: #363638; }
+
+.resource-modal ul.resource-actions > li {
+  padding: 4px 12px;
+  margin: 12px 0; }
+  .resource-modal ul.resource-actions > li:first-child {
+    padding-left: 0;
+    border-right: 1px solid #e7e8ea; }
+
 /* =For styles only found in single project or organization pages
 -------------------------------------------------------------- */
 /* =Sidebar for single project or organization navigation
@@ -5373,9 +5394,11 @@ header {
       .content-single .panel .panel-heading h3 {
         margin: 4px auto; }
     .content-single .panel .panel-body h3 {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       padding-bottom: 10px;
       border-bottom: solid 1px #d9dadb; }
+    .content-single .panel .panel-body .nav-tabs {
+      margin-bottom: 30px; }
     .content-single .panel .panel-buttons {
       background: transparent;
       padding: 20px 15px; }
@@ -5538,7 +5561,7 @@ img.org-logo, img#org-logo {
   width: 128px;
   height: 128px;
   float: left;
-  margin-right: 10px; }
+  margin-right: 20px; }
 
 @media (max-width: 767px) {
   .avatar {

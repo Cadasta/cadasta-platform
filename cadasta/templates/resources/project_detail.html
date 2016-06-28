@@ -11,19 +11,23 @@
           <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
           <h3 class="modal-title">{% trans "Resource detail" %}</h3>
         </div>
-        <div class="modal-body">
+        <div class="modal-body resource-modal">
           <img src="{{ resource.thumbnail }}" class="thumb-128">
           <h4>{{ resource.name }}</h4>
           <p>{{ resource.description }}<br><strong>{{ resource.file_name }}</strong></p>
-          <p>{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
-          <p>
-            <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}">Edit</a> | 
-            {% if resource.archived %}
-            <a href="#unarchive_resource_confirm" data-toggle="modal">Yes, unarchive this resource</a>
-            {% else %}
-            <a href="#archive_resource_confirm" data-toggle="modal">Yes, archive this resource</a>
-            {% endif %}
-          </p>
+          <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+          <ul class="list-inline resource-actions">
+            <li>
+              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}">Edit</a>
+            </li>
+            <li>
+              {% if resource.archived %}
+              <a href="#unarchive_resource_confirm" data-toggle="modal">Unarchive</a>
+              {% else %}
+              <a href="#archive_resource_confirm" data-toggle="modal">Archive</a>
+              {% endif %}
+            </li>
+          </ul>
         </div>
       </div>
     </div>
