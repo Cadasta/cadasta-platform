@@ -569,6 +569,7 @@ header {
   left: 0;
   margin-left: 100px;
   min-height: 100%;
+  overflow: hidden;
 }
 
 @media (max-width: $screen-sm-max) {
@@ -1008,4 +1009,23 @@ img.org-logo, img#org-logo {
     float: left !important;
     padding: 0;
   }
+}
+
+/* =Chrome fix for fonts
+-------------------------------------------------------------- */
+
+@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { 
+  body {
+    -webkit-animation-delay: 0.1s;
+    -webkit-animation-name: fontfix;
+    -webkit-animation-duration: 0.1s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: linear;
+  }
+
+  @-webkit-keyframes fontfix {
+    from { opacity: 1; }
+    to   { opacity: 1; }
+  }
+
 }
