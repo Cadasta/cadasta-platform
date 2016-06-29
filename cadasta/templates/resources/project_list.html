@@ -20,31 +20,7 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <!-- Resources index -->
-          <table class="table table-hover datatable" data-paging-type="simple">
-            <thead>
-              <tr>
-                <th>{% trans "Resource" %}</th>
-                <th>{% trans "Type" %}</th>
-                <th class="hidden-xs hidden-sm">{% trans "Entities associated" %}</th>
-                <th class="hidden-xs hidden-sm">{% trans "Contributor" %}</th>
-                <th class="hidden-xs hidden-sm">{% trans "Last updated" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-            {% for resource in object_list %}
-              <tr onclick="window.document.location='{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}';">
-                <td>
-                  <img src="{{ resource.thumbnail }}" class="thumb-60">
-                  <strong>{{ resource.name }}</strong><br>{{ resource.file_name }}
-                </td>
-                <td>{{ resource.file_type }}</td>
-                <td class="hidden-xs hidden-sm">{{ resource.num_entities }}</td>
-                <td class="hidden-xs hidden-sm">{{ resource.contributor.full_name }}<br>{{ resource.contributor.username }}</td>
-                <td class="hidden-xs hidden-sm">{{ resource.last_updated }}</td>
-              </tr>
-            {% endfor %}
-            </tbody>
-          </table>
+          {% include 'resources/table.html' %}
         </div>
       </div>
     </div>

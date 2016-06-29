@@ -1,7 +1,6 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-<form method="POST" class="col-md-7">
   {% csrf_token %}
 
   <div class="form-group">
@@ -22,7 +21,4 @@
     {% render_field form.file class+="form-control input-lg" %}
   </div>
 
-  <input type="hidden" name="original_file">
-
-  <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-</form>
+  <input type="hidden" name="original_file" value="{{ form.original_file.value }}">

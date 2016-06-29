@@ -42,19 +42,19 @@
         </ul>
       </div>
 
-      <!-- Split add button -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
-        <button type="button" class="btn btn-primary">
+        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
-        </button>
+        </a>
+        <!-- <button type="button" class="btn btn-primary">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
+        </button> -->
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="caret"></span>
           <span class="sr-only">Toggle Add</span>
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#">{% trans "Add relationship" %}</a></li>
-          <li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add resource" %}</a></li>
+          <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           <li role="separator" class="divider"></li>
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
         </ul>
@@ -65,20 +65,16 @@
           <span class="glyphicon glyphicon-plus"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
-          <li><a href="#">{% trans "Add location" %}</a></li>
-          <li><a href="#">{% trans "Add relationship" %}</a></li>
-          <li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add resource" %}</a></li>
+          <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
+          <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           <li role="separator" class="divider"></li>
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
         </ul>
       </div>
-
     </div>
   </div>
 </div>
 <!-- / single project header -->
-
 {% endblock %}
 
 {% block sub-nav %}
@@ -91,9 +87,9 @@
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li><!--
-    --><li class="map">
-      <a href="#">
+    </li>
+    <li class="map">
+      <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
       </a>
@@ -125,6 +121,7 @@
 {% block content %}{% endblock %}
 
 {% block modals %}
+{% block form_modal %}{% endblock %}
 
 <div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">

@@ -19,7 +19,11 @@
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
-          {% include "resources/form.html" %}
+          <form method="POST">
+          {{ form.errors }}
+            {% include "resources/form.html" %}
+            <button type="submit" class="btn btn-primary">Save</button>  
+          </form>
         </div>
       </div>
     </div>

@@ -19,7 +19,6 @@ from ..views import api
 
 
 class PartyListAPITest(UserTestCase):
-
     def setUp(self):
         super().setUp()
         self.view = api.PartyList.as_view()
@@ -62,7 +61,7 @@ class PartyListAPITest(UserTestCase):
             setattr(request, 'GET', QueryDict(query))
         force_authenticate(request, user=user)
         response = self.view(request, organization=org,
-                             project_slug=prj).render()
+                             project=prj).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -177,7 +176,7 @@ class PartyCreateAPITest(UserTestCase):
         )
         force_authenticate(request, user=user)
         response = self.view(request, organization=org,
-                             project_slug=prj).render()
+                             project=prj).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -217,6 +216,10 @@ class PartyDetailAPITest(UserTestCase):
                     'effect': 'allow',
                     'object': ['project/*/*'],
                     'action': ['project.*', 'project.*.*', 'party.*']
+                }, {
+                    'effect': 'allow',
+                    'object': ['party/*/*/*'],
+                    'action': ['party.*']
                 }
             ]
         }
@@ -237,7 +240,7 @@ class PartyDetailAPITest(UserTestCase):
         request = APIRequestFactory().get(url)
         force_authenticate(request, user=user)
         response = self.view(request, organization=org,
-                             project_slug=prj.slug, party_id=party_id).render()
+                             project=prj.slug, party=party_id).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -250,7 +253,7 @@ class PartyDetailAPITest(UserTestCase):
         request = APIRequestFactory().patch(url, data)
         force_authenticate(request, user=user)
         response = self.view(request, organization=org,
-                             project_slug=prj, party_id=party_id).render()
+                             project=prj, party=party_id).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -262,8 +265,9 @@ class PartyDetailAPITest(UserTestCase):
         url = self.url.format(org=org, prj=prj, id=party_id)
         request = APIRequestFactory().delete(url)
         force_authenticate(request, user=user)
-        response = self.view(request, organization=org, project_slug=prj,
-                             party_id=party_id).render()
+        response = self.view(request, organization=org, project=prj,
+                             party=party_id).render()
+
         if status is not None:
             assert response.status_code == status
 

@@ -7,11 +7,14 @@ from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import ugettext as _
+
 from jsonattrs.decorators import fix_model_for_attributes
 from jsonattrs.fields import JSONAttributeField
 from organization.models import Project
 from organization.validators import validate_contact
 from simple_history.models import HistoricalRecords
+
+from resources.mixins import ResourceModelMixin
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
 
@@ -22,7 +25,7 @@ PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 @fix_model_for_attributes
 @permissioned_model
-class Party(RandomIDModel):
+class Party(ResourceModelMixin, RandomIDModel):
     """
     Party model.
 
@@ -103,6 +106,9 @@ class Party(RandomIDModel):
             ('party.delete',
              {'description': _("Delete an existing party"),
               'error_message': messages.PARTY_DELETE}),
+            ('party.resources.add',
+             {'description': _("Add resources to the party"),
+              'error_message': messages.PARTY_RESOURCES_ADD})
         )
 
     def __str__(self):
@@ -181,7 +187,8 @@ class PartyRelationship(RandomIDModel):
 
 
 @fix_model_for_attributes
-class TenureRelationship(RandomIDModel):
+@permissioned_model
+class TenureRelationship(ResourceModelMixin, RandomIDModel):
     """TenureRelationship model.
 
     Governs relationships between Party and SpatialUnit.
@@ -237,6 +244,8 @@ class TenureRelationship(RandomIDModel):
     # Extra unnecessary field (will go into attributes)
     geom = models.GeometryField(null=True, blank=True)
 
+    history = HistoricalRecords()
+
     class TutelaryMeta:
         perm_type = 'tenure_rel'
         path_fields = ('project', 'id')
@@ -259,14 +268,15 @@ class TenureRelationship(RandomIDModel):
             ('tenure_rel.delete',
              {'description': _("Delete an existing tenure relationship"),
               'error_message': messages.TENURE_REL_DELETE}),
+            ('tenure_rel.resources.add',
+             {'description': _("Add a resource to a tenure relationship"),
+              'error_message': messages.TENURE_REL_RESOURCES_ADD}),
         )
 
     def __str__(self):
         return "<TenureRelationship: <{party}> {type} <{su}>>".format(
             party=self.party.name, su=self.spatial_unit.name,
             type=self.tenure_type.label)
-
-    history = HistoricalRecords()
 
 
 class TenureRelationshipType(models.Model):

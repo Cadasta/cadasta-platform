@@ -1,0 +1,59 @@
+{% extends "spatial/location_wrapper.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+
+{% block location_panel %}
+<h2>Location</h2>
+<a href="{% url 'locations:edit' object.organization.slug object.slug location.id %}">Edit</a>
+<a href="{% url 'locations:delete' object.organization.slug object.slug location.id %}">Delete</a>
+
+<ul class="nav nav-tabs" role="tablist">
+  <li role="presentation" class="active"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">{% trans "Overview" %}</a></li>
+  <li role="presentation"><a href="#relationships" aria-controls="relationships" role="tab" data-toggle="tab">{% trans "Relationships" %}</a></li>
+  <li role="presentation"><a  href="#resources" aria-controls="resources" role="tab" data-toggle="tab">{% trans "Resources" %}</a></li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane active" id="overview">
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <td><strong>Type</strong></td>
+          <td>{{ location.get_type_display }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="relationships">
+    <table class="table table-hover datatable" data-paging-type="simple">
+      <thead>
+        <tr>
+          <th>{% trans "Relationship type" %}</th>
+          <th>{% trans "Party" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rel in relationships %}
+        <tr onclick="window.document.location='{% url 'parties:relationship_detail' object.organization.slug object.slug rel.id %}';">
+          <td>{{ rel.tenure_type.label }}</td>
+          <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary btn-block">
+      {% trans "Add new relationship" %}
+    </a>
+  </div>
+
+  <div role="tabpanel" class="tab-pane" id="resources">
+    {% include 'resources/table.html' with object_list=location.resources %}
+    <div class="btn-group btn-group-justified">
+      <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">{% trans "Add from library" %}</a>
+      <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">{% trans "Upload new resource" %}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

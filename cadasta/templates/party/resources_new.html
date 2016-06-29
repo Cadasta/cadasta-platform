@@ -1,0 +1,42 @@
+{% extends "party/party_detail.html" %}
+{% load i18n %}
+
+{% block extra_script %}
+  {{ form.media }}
+  {% include "resources/scripts.html" %}
+{% endblock %}
+
+{% block modals %}
+
+<div class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="POST">
+          <div class="modal-header">
+            <a class="close" href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">
+              <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title">{% trans "Add new resource" %}</h3>
+          </div>
+
+          <div class="modal-body">
+              {% include "resources/form.html" %}  
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn btn-link cancel"
+               href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">
+              {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+              {% trans "Save" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

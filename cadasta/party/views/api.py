@@ -13,6 +13,7 @@ from spatial.models import SpatialRelationship
 from party import serializers
 from spatial.serializers import SpatialRelationshipReadSerializer
 from . import mixins
+from organization.views.mixins import ProjectMixin
 
 
 class PartyList(APIPermissionRequiredMixin,
@@ -31,6 +32,9 @@ class PartyList(APIPermissionRequiredMixin,
     }
     # permission_filter_queryset = ('project.',)
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
 
 class PartyDetail(APIPermissionRequiredMixin,
                   mixins.PartyQuerySetMixin,
@@ -38,7 +42,7 @@ class PartyDetail(APIPermissionRequiredMixin,
 
     serializer_class = serializers.PartySerializer
     filter_fields = ('archived',)
-    lookup_url_kwarg = 'party_id'
+    lookup_url_kwarg = 'party'
     lookup_field = 'id'
     permission_required = {
         'GET': 'party.view',
@@ -48,7 +52,7 @@ class PartyDetail(APIPermissionRequiredMixin,
 
 
 class RelationshipList(APIPermissionRequiredMixin,
-                       mixins.PartyMixin,
+                       ProjectMixin,
                        APIView):
 
     permission_required = (
@@ -112,6 +116,9 @@ class RelationshipList(APIPermissionRequiredMixin,
             serialized_tenure_rels
         )
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
 
 class PartyRelationshipCreate(APIPermissionRequiredMixin,
                               mixins.PartyRelationshipQuerySetMixin,
@@ -119,6 +126,9 @@ class PartyRelationshipCreate(APIPermissionRequiredMixin,
 
     permission_required = 'party_rel.create'
     serializer_class = serializers.PartyRelationshipWriteSerializer
+
+    def get_perms_objects(self):
+        return [self.get_project()]
 
 
 class PartyRelationshipDetail(APIPermissionRequiredMixin,
@@ -143,6 +153,9 @@ class PartyRelationshipDetail(APIPermissionRequiredMixin,
         self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
 
 class TenureRelationshipCreate(APIPermissionRequiredMixin,
                                mixins.TenureRelationshipQuerySetMixin,
@@ -163,6 +176,9 @@ class TenureRelationshipDetail(APIPermissionRequiredMixin,
         'PATCH': 'tenure_rel.update',
         'DELETE': 'tenure_rel.delete'
     }
+
+    def get_perms_objects(self):
+        return [self.get_project()]
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':

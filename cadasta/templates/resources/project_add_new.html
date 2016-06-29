@@ -11,6 +11,7 @@
 {% block content %}
 <div class="col-md-12 content-single">
   <div class="row">
+<<<<<<< HEAD
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <div class="page-title">
@@ -23,7 +24,10 @@
             <li role="presentation"><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}" role="tab">{% trans "From library" %}</a></li>
             <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
           </ul>
-          {% include "resources/form.html" %}
+          <form method="POST">
+            {% include "resources/form.html" %}  
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+          </form>
         </div>
       </div>
     </div>

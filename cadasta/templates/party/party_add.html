@@ -1,0 +1,28 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Add party" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <form method="POST">
+
+            {% include "party/party_form.html" %}
+
+            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+              {% trans "Save" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
