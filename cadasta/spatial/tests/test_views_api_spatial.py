@@ -1,12 +1,12 @@
 import json
 
-from django.test import TestCase
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import (ProjectFactory, OrganizationFactory,
                                           clause)
@@ -16,8 +16,9 @@ from ..models import SpatialUnit
 from ..views import api
 
 
-class SpatialUnitListTestCase(TestCase):
+class SpatialUnitListTestCase(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.SpatialUnitList.as_view()
 
         clauses = {
@@ -292,8 +293,9 @@ class SpatialUnitCreateAPITest(SpatialUnitListTestCase):
         assert content['detail'] == "Project not found."
 
 
-class SpatialUnitDetailTestCase(TestCase):
+class SpatialUnitDetailTestCase(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = api.SpatialUnitDetail.as_view()
 
         clauses = {

@@ -1,5 +1,5 @@
 .public-private-widget > label {
-    display: block;
+    display: none;
 }
 
 .public-private-widget {
@@ -8,6 +8,8 @@
         float: left;
         text-align: center;
         margin-right: 15px;
+        position: relative;
+        top: 22px;
     }
     & > div:nth-child(2) {
         width: 40px;

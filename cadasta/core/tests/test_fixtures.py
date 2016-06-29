@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from core.tests.factories import PolicyFactory
 from ..fixtures import FixturesData
 from tutelary.models import Policy
 from accounts.models import User
@@ -14,6 +15,7 @@ class FixturesTest(TestCase):
         data.delete_test_organizations()
         data.delete_test_projects()
         data.add_test_organizations()
+        PolicyFactory.load_policies()
         data.add_test_users_and_roles()
         data.add_test_projects()
         data.add_test_spatial_units()

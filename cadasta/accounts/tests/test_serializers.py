@@ -1,10 +1,10 @@
 import pytest
 from datetime import datetime
-from django.test import TestCase
 from django.utils.translation import gettext as _
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
 
+from core.tests.base_test_case import UserTestCase
 from ..serializers import (
     RegistrationSerializer, UserSerializer, AccountLoginSerializer
 )
@@ -22,7 +22,7 @@ BASIC_TEST_DATA = {
 }
 
 
-class RegistrationSerializerTest(TestCase):
+class RegistrationSerializerTest(UserTestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = RegistrationSerializer(user)
@@ -74,7 +74,7 @@ class RegistrationSerializerTest(TestCase):
                 in serializer._errors['email'])
 
 
-class UserSerializerTest(TestCase):
+class UserSerializerTest(UserTestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = UserSerializer(user)
@@ -126,7 +126,7 @@ class UserSerializerTest(TestCase):
         assert serializer2.errors['last_login'] == ['Cannot update last_login']
 
 
-class AccountLoginSerializerTest(TestCase):
+class AccountLoginSerializerTest(UserTestCase):
     def test_unverified_account(self):
         """Serializer should raise EmailNotVerifiedError exeception when the
            user has not verified their email address within 48 hours"""

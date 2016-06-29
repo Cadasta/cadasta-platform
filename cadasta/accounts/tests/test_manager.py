@@ -1,12 +1,11 @@
-from django.test import TestCase
-
 from pytest import raises
 
 from ..models import User
 from .factories import UserFactory
+from core.tests.base_test_case import UserTestCase
 
 
-class UserManagerTest(TestCase):
+class UserManagerTest(UserTestCase):
     def test_get_from_usernamel(self):
         user = UserFactory.create()
         found = User.objects.get_from_username_or_email(

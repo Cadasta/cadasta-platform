@@ -5,12 +5,14 @@ from django.utils import formats
 from base import FunctionalTest
 from pages.Users import UsersPage
 from pages.Login import LoginPage
+from core.tests.factories import PolicyFactory
 
 
 class PageListTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
 
         # Define 1 superuser and 9 other users
         users = []

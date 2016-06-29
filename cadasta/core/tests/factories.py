@@ -2,6 +2,7 @@ import os.path
 import factory
 
 from tutelary.models import Policy, Role
+from accounts import load
 
 
 class ExtendedFactory(factory.django.DjangoModelFactory):
@@ -26,6 +27,9 @@ class PolicyFactory(factory.django.DjangoModelFactory):
         body_file = os.path.join(cls.directory, kwargs.pop('file', None))
         kwargs['body'] = open(body_file).read()
         return kwargs
+
+    def load_policies():
+        load.run()
 
 
 class RoleFactory(factory.django.DjangoModelFactory):

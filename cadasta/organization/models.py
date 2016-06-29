@@ -5,7 +5,7 @@ from django.contrib.postgres.fields import JSONField, ArrayField
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 import django.contrib.gis.db.models as gismodels
-
+from simple_history.models import HistoricalRecords
 
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
@@ -22,13 +22,7 @@ PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 
 def get_policy_instance(policy_name, variables):
-    try:
-        policy = Policy.objects.get(name=policy_name)
-    except Policy.DoesNotExist:
-        policy = Policy.objects.create(
-            name=policy_name,
-            body=open(PERMISSIONS_DIR + policy_name + '.json').read()
-        )
+    policy = Policy.objects.get(name=policy_name)
     return (policy, variables)
 
 
@@ -51,6 +45,8 @@ class Organization(SlugModel, RandomIDModel):
     access = models.CharField(
         default="public", choices=ACCESS_CHOICES, max_length=8
     )
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ('name',)
@@ -108,6 +104,8 @@ class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)
     user = models.ForeignKey('accounts.User')
     admin = models.BooleanField(default=False)
+
+    history = HistoricalRecords()
 
 
 def reassign_user_policies(instance, adding):
@@ -170,6 +168,8 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
     current_questionnaire = models.CharField(
       max_length=24, null=True, blank=True
     )
+
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ('organization', 'name')
@@ -240,6 +240,8 @@ class ProjectRole(RandomIDModel):
     role = models.CharField(max_length=2,
                             choices=ROLE_CHOICES,
                             default='PU')
+
+    history = HistoricalRecords()
 
     class Meta:
         unique_together = ('project', 'user')

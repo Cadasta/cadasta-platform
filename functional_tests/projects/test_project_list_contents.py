@@ -2,12 +2,14 @@ from base import FunctionalTest
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
 from common_test_data.common_test_data_1 import get_test_data
+from core.tests.factories import PolicyFactory
 
 
 class ProjectListContentsTest(FunctionalTest):
 
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         self.test_data = get_test_data()
         self.load_test_data(self.test_data)
 
@@ -85,10 +87,10 @@ class ProjectListContentsTest(FunctionalTest):
             self.logout()
 
     # FAILS: issue #188
-    # def test_nonloggedin_user(self):
-    #     """Verify that a non-logged-in user can only see
-    #     public projects and that project details are correct."""
-    #     self.check_project_list('nonloggedin', [])
+    def test_nonloggedin_user(self):
+        """Verify that a non-logged-in user can only see
+        public projects and that project details are correct."""
+        self.check_project_list('nonloggedin', [])
 
     def test_unaffiliated_user(self):
         """Verify that a user who is not a member of any org can

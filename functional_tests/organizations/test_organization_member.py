@@ -7,11 +7,13 @@ from pages.Login import LoginPage
 
 from accounts.tests.factories import UserFactory
 from organization.models import OrganizationRole
+from core.tests.factories import PolicyFactory
 
 
 class OrganizationMemberTest(FunctionalTest):
     def setUp(self):
         super().setUp()
+        PolicyFactory.load_policies()
         orgs = self.add_all_test_data()
         OrganizationRole.objects.create(
                 organization=orgs[0],

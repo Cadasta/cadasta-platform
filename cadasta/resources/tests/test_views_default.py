@@ -1,7 +1,6 @@
 import json
 import os
 import pytest
-from django.test import TestCase
 from django.http import HttpRequest, Http404
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
@@ -14,6 +13,7 @@ from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 from ..views import default
@@ -37,8 +37,9 @@ clauses = {
 }
 
 
-class ProjectResourcesTest(TestCase):
+class ProjectResourcesTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.resources = ResourceFactory.create_batch(
             2, content_object=self.project, project=self.project)
@@ -108,8 +109,9 @@ class ProjectResourcesTest(TestCase):
                       organization='some-org', project='some-project')
 
 
-class ProjectResourcesAddTest(TestCase):
+class ProjectResourcesAddTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.assigned = ResourceFactory.create(project=self.project,
                                                content_object=self.project)
@@ -223,8 +225,9 @@ class ProjectResourcesAddTest(TestCase):
         assert self.project.resources.first() == self.assigned
 
 
-class ProjectResourcesNewTest(TestCase):
+class ProjectResourcesNewTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
 
         self.view = default.ProjectResourcesNew.as_view()
@@ -340,8 +343,9 @@ class ProjectResourcesNewTest(TestCase):
         assert self.project.resources.count() == 0
 
 
-class ProjectResourcesDetailTest(TestCase):
+class ProjectResourcesDetailTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,
                                                project=self.project)
@@ -412,8 +416,9 @@ class ProjectResourcesDetailTest(TestCase):
         assert '/account/login/' in response['location']
 
 
-class ProjectResourcesEditTest(TestCase):
+class ProjectResourcesEditTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,
                                                project=self.project)
@@ -541,8 +546,9 @@ class ProjectResourcesEditTest(TestCase):
         assert self.project.resources.first().name != self.data['name']
 
 
-class ResourceArchiveTest(TestCase):
+class ResourceArchiveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.user = UserFactory.create()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,
@@ -625,8 +631,9 @@ class ResourceArchiveTest(TestCase):
         assert self.resource.archived is False
 
 
-class ResourceUnArchiveTest(TestCase):
+class ResourceUnArchiveTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.user = UserFactory.create()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,

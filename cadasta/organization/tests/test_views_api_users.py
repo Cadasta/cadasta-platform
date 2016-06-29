@@ -9,20 +9,22 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
+from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, clause
 from ..views import api
 
 
-class UserListAPITest(TestCase):
+class UserListAPITest(UserTestCase):
     def setUp(self):
+        super().setUp()
         clauses = {
             'clause': [
                 clause('allow', ['user.list'])
             ]
         }
         policy = Policy.objects.create(
-            name='default',
+            name='test-default',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)

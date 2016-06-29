@@ -1,9 +1,9 @@
 import os
 import pytest
-from django.test import TestCase
 from django.conf import settings
 from rest_framework.serializers import ValidationError
 
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 
@@ -20,7 +20,7 @@ file = open(path + '/resources/tests/files/image.jpg', 'rb')
 file_name = storage.save('image.jpg', file)
 
 
-class ResourceSerializerTest(TestCase):
+class ResourceSerializerTest(UserTestCase):
     def test_serialize_fields(self):
         resource = ResourceFactory.create()
         serializer = ResourceSerializer(resource)

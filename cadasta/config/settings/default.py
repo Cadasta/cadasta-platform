@@ -66,6 +66,7 @@ INSTALLED_APPS = (
     'allauth.account',
     'allauth.socialaccount',
     'sass_processor',
+    'simple_history',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -80,6 +81,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware'
 )
 
 REST_FRAMEWORK = {

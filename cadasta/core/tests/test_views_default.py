@@ -1,12 +1,14 @@
 import json
 
-from django.test import TestCase
 from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 from django.template import RequestContext
 from django.template.loader import render_to_string
 
+from core.tests.base_test_case import UserTestCase
+from tutelary.models import Policy
 from accounts.tests.factories import UserFactory
+from core.tests.factories import RoleFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
@@ -14,8 +16,9 @@ from organization.serializers import ProjectGeometrySerializer
 from ..views.default import IndexPage, Dashboard
 
 
-class IndexPageTest(TestCase):
+class IndexPageTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = IndexPage.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -30,11 +33,13 @@ class IndexPageTest(TestCase):
 
     def test_page_is_rendered_when_user_is_not_signed_in(self):
         response = self.view(self.request)
-        assert response.status_code == 200
+        assert response.status_code == 302
+        assert '/dashboard/' in response['location']
 
 
-class DashboardTest(TestCase):
+class DashboardTest(UserTestCase):
     def setUp(self):
+        super().setUp()
         self.view = Dashboard.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -53,15 +58,22 @@ class DashboardTest(TestCase):
 
         setattr(self.request, 'user', AnonymousUser())
 
-    def _test_projects_rendered(self, response, member=False):
+    def _test_projects_rendered(self, response, member=False, superuser=False):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
         projects = []
-        if member:
+        if superuser:
+            projects = Project.objects.filter(extent__isnull=False)
+        else:
+            if member:
+                projects.extend(Project.objects.filter(
+                    organization__slug=self.org.slug,
+                    access='private',
+                    extent__isnull=False))
             projects.extend(Project.objects.filter(
-                organization__slug=self.org.slug, access='private'))
-        projects.extend(Project.objects.filter(access='public'))
+                            access='public',
+                            extent__isnull=False))
         context['geojson'] = json.dumps(
             ProjectGeometrySerializer(projects, many=True).data
         )
@@ -72,10 +84,9 @@ class DashboardTest(TestCase):
 
         assert expected == content
 
-    def test_redirects_when_user_is_not_signed_in(self):
+    def test_page_is_rendered_when_user_is_not_signed_in(self):
         response = self.view(self.request)
-        assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert response.status_code == 200
 
     def test_page_is_rendered_when_user_is_signed_in(self):
         user = UserFactory.create()
@@ -97,3 +108,15 @@ class DashboardTest(TestCase):
         response = self.view(self.request)
         assert response.status_code == 200
         self._test_projects_rendered(response)
+
+    def test_get_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_pol = Policy.objects.get(name='superuser')
+        self.superuser_role = RoleFactory.create(
+            name='superuser', policies=[superuser_pol]
+        )
+        superuser.assign_policies(self.superuser_role)
+        setattr(self.request, 'user', superuser)
+        response = self.view(self.request).render()
+        assert response.status_code == 200
+        self._test_projects_rendered(response, superuser=True)

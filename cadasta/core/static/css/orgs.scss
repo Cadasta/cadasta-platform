@@ -1,0 +1,121 @@
+/* =Organizations
+-------------------------------------------------------------- */
+
+div.org-logo {
+  float: left;
+  padding: 10px;
+}
+
+.org-text {
+  margin-left: 160px;
+}
+
+/* =Single member permissions
+-------------------------------------------------------------- */
+
+.member-info {
+  .member-pic {
+    padding-bottom: 12px;
+    img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+     }
+  }
+  .member-detail {
+    min-height: 100px;
+    display: inline-block;
+    padding: 0 0 20px 0;
+    h5 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+  }
+  .member-role {
+    padding: 30px 0;
+    border-top: solid 1px $table-border-color;
+    border-bottom: solid 1px $table-border-color;
+    clear: both;
+    margin: 30px 0;
+  }
+  .btn-full {
+    padding: 20px 0;
+  }
+}
+
+#projects-permissions .form-control {
+  min-width: 70%;
+}
+
+/* =Columns of same height for organization overview
+-------------------------------------------------------------- */
+
+.row-height {
+  display: table;
+  table-layout: fixed;
+  height: 100%;
+  width: 100%;
+}
+
+.col-height {
+  display: table-cell;
+  float: none;
+  height: 100%;
+}
+
+@media (min-width: 480px) {
+  .row-xs-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%;
+  }
+  .col-xs-height {
+    display: table-cell;
+    float: none;
+    height: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .row-sm-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%;
+  }
+  .col-sm-height {
+    display: table-cell;
+    float: none;
+    height: 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .row-md-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%;
+  }
+  .col-md-height {
+    display: table-cell;
+    float: none;
+    height: 100%;
+  }
+}
+
+@media (min-width: 1200px) {
+  .row-lg-height {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+    width: 100%;
+  }
+  .col-lg-height {
+    display: table-cell;
+    float: none;
+    height: 100%;
+  }
+}

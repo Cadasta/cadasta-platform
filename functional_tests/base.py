@@ -10,6 +10,7 @@ import random
 
 from urllib.parse import urlparse
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.common.exceptions import (
     NoSuchElementException, WebDriverException, TimeoutException,
     ElementNotVisibleException
@@ -18,6 +19,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+from tutelary.models import Policy
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory, RoleFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
@@ -36,9 +38,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         super(FunctionalTest, cls).setUpClass()
 
         # IMPORTANT: Make sure the window size is big enough to see
-        # everything (e.g. links in the nav bar).  Otherwise tests
-        # will fail mysteriously because PhantomJS will clip the
-        # viewport.
+        # everything (e.g. links in the nav bar).  
         cls.browser = webdriver.Firefox()
         cls.browser.set_window_size(1024, 768)
 
@@ -305,12 +305,7 @@ class FunctionalTest(StaticLiveServerTestCase):
 
         # Create superuser policy and role if not yet created
         if not self.superuser_role:
-            PolicyFactory.set_directory(
-                os.path.join(settings.BASE_DIR, 'permissions')
-            )
-            superuser_pol = PolicyFactory.create(
-                name='superuser', file='superuser.json'
-            )
+            superuser_pol = Policy.objects.get(name='superuser')
             self.superuser_role = RoleFactory.create(
                 name='superuser', policies=[superuser_pol]
             )
