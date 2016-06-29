@@ -129,23 +129,27 @@ class OrganzationTest(UserTestCase):
 
 
 class AddOrganizationMemberFormTest(UserTestCase):
+    def setUp(self):
+        super().setUp()
+        self.org = OrganizationFactory.create()
+        self.user = UserFactory.create()
+
     def _save(self, identifier=None, identifier_field=None, ok=True):
-        org = OrganizationFactory.create()
-        user = UserFactory.create()
         if identifier_field is not None:
-            identifier = getattr(user, identifier_field)
+            identifier = getattr(self.user, identifier_field)
         data = {'identifier': identifier}
-        form = forms.AddOrganizationMemberForm(data, organization=org)
+        form = forms.AddOrganizationMemberForm(data, organization=self.org)
+        num_roles_before = OrganizationRole.objects.count()
         if ok:
             form.save()
             assert form.is_valid() is True
             assert OrganizationRole.objects.filter(
-                organization=org, user=user).count() == 1
+                organization=self.org, user=self.user).count() == 1
         else:
             with raises(ValueError):
                 form.save()
             assert form.is_valid() is False
-            assert OrganizationRole.objects.count() == 0
+            assert OrganizationRole.objects.count() == num_roles_before
 
     def test_add_with_username(self):
         self._save(identifier_field='username')
@@ -155,6 +159,11 @@ class AddOrganizationMemberFormTest(UserTestCase):
 
     def test_add_non_existing_user(self):
         self._save(identifier='some-user', ok=False)
+
+    def test_add_already_member_user(self):
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user)
+        self._save(identifier_field='username', ok=False)
 
 
 class EditOrganizationMemberFormTest(UserTestCase):
