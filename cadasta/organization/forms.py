@@ -127,9 +127,9 @@ class AddOrganizationMemberForm(forms.Form):
                 identifier=identifier)
         except (User.DoesNotExist, User.MultipleObjectsReturned) as e:
             raise forms.ValidationError(e)
-        num_roles = OrganizationRole.objects.filter(
-            user=self.user, organization=self.organization).count()
-        if num_roles != 0:
+        user_exists = OrganizationRole.objects.filter(
+            user=self.user, organization=self.organization).exists()
+        if user_exists:
             raise forms.ValidationError(
                 _("User is already a member of the organization."),
                 code='member_already')
