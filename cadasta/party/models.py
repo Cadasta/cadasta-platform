@@ -1,7 +1,5 @@
 """Party models."""
 
-from datetime import date
-
 from core.models import RandomIDModel
 from django.conf import settings
 from django.contrib.gis.db import models
@@ -235,14 +233,6 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
     objects = managers.TenureRelationshipManager()
-
-    # Additional properties
-    acquired_how = models.CharField(
-        max_length=2, choices=ACQUIRED_CHOICES, null=True, blank=True)
-    acquired_date = models.DateField(default=date.today)
-
-    # Extra unnecessary field (will go into attributes)
-    geom = models.GeometryField(null=True, blank=True)
 
     history = HistoricalRecords()
 

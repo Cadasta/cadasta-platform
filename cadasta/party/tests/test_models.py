@@ -1,7 +1,5 @@
 """TestCases for Party models."""
 
-from datetime import date
-
 import pytest
 
 from django.contrib.contenttypes.models import ContentType
@@ -143,10 +141,6 @@ class TenureRelationshipTest(TestCase):
     def test_tenure_relationship_creation(self):
         tenure_relationship = TenureRelationshipFactory.create()
         assert tenure_relationship.tenure_type is not None
-        d1 = date.today().isoformat()
-        d2 = tenure_relationship.acquired_date.isoformat()
-        assert d1 == d2
-        assert tenure_relationship.acquired_how == 'HS'
 
     def test_project_reverse_tenure_relationships(self):
         relationship = TenureRelationshipFactory.create()
