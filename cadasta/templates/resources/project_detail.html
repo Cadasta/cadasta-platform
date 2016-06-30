@@ -3,16 +3,15 @@
 
 {% block content %}
 
-<<<<<<< HEAD
-<div class="modal-backdrop">
-  <div class="modal show" data-backdrop="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
-          <h3 class="modal-title">{% trans "Resource detail" %}</h3>
-        </div>
-        <div class="modal-body resource-modal">
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Resource detail" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
           <img src="{{ resource.thumbnail }}" class="thumb-128">
           <h4>{{ resource.name }}</h4>
           <p>{{ resource.description }}<br><strong>{{ resource.file_name }}</strong></p>
@@ -29,34 +28,12 @@
               {% endif %}
             </li>
           </ul>
-=======
-<div class="col-md-12 content-single">
-  <div class="row">
-    <!-- Main text  -->
-    <div class="col-md-12 main-text">
-      <div class="page-title">
-        <h2>{% trans "Resource detail" %}</h2>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <img src="{{ resource.thumbnail }}" class="thumb-128">
-          <h4>{{ resource.name }}</h4>
-          <p>{{ resource.description }}<br><strong>{{ resource.file_name }}</strong></p>
-          <p>{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
-          <p>
-            <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}">Edit</a> | 
-            {% if resource.archived %}
-            <a href="#unarchive_resource_confirm" data-toggle="modal">Yes, unarchive this resource</a>
-            {% else %}
-            <a href="#archive_resource_confirm" data-toggle="modal">Yes, archive this resource</a>
-            {% endif %}
-          </p>
->>>>>>> master
         </div>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}
 
 {% block modals %}
