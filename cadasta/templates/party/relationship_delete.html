@@ -1,0 +1,29 @@
+{% extends "party/relationship_detail.html" %}
+{% load i18n %}
+
+{% block modals %}
+
+<form method="POST" class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></a>
+          <h4 class="modal-title">{% trans "Delete this relationship" %}</h4>
+        </div>
+        <div class="modal-body">
+          <p>{% trans "Are you sure you want to delete this relationship?" %}</p>
+        </div>
+        <div class="modal-footer">
+          <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}"  class="btn btn-link cancel">
+            {% trans "Cancel" %}
+          </a>
+          {% csrf_token %}
+          <button type="submit" value="Confirm" class="btn btn-primary archive-final">{% trans "Delete" %}</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+</form>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block left-nav %}map{% endblock %}
+
+{% load leaflet_tags %}
+{% load staticfiles %}
+
+{% block extra_script %}
+{% leaflet_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="{% static 'js/map_utils.js' %}"></script>
+<script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
+<script>
+  function locations_map_init(map, options) {
+    var data = {{ geojson|safe }};
+
+    add_map_controls(map);
+
+    var geoJson = L.geoJson(null, {
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("<div class=\"text-wrap\">" +
+                       "<h2><span>Location</span>" +
+                       feature.properties.type + "</h2></div>" +
+                       "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
+                       "</div>");
+      }
+    });
+
+    L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+    geoJson.addData(data);
+
+    var markerGroup = L.markerClusterGroup.layerSupport()
+    markerGroup.addTo(map);
+    markerGroup.checkIn(geoJson);
+    geoJson.addTo(map);
+    map.fitBounds(geoJson.getBounds());
+  }
+</script>
+{% endblock %}
+
+{% block extra_head %}
+{% leaflet_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+<style type="text/css">
+  #project-map {
+    height: 600px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Start overview map  -->
+    <div class="col-sm-12 map">
+      {% leaflet_map "project-map" callback="locations_map_init" %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

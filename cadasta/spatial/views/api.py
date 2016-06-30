@@ -23,9 +23,8 @@ class SpatialUnitList(APIPermissionRequiredMixin,
         'POST': 'spatial.create',
     }
 
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            project__slug=self.kwargs['project_slug'])
+    def get_perms_objects(self):
+        return [self.get_project()]
 
 
 class SpatialUnitDetail(APIPermissionRequiredMixin,
@@ -40,6 +39,11 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
         'PATCH': 'spatial.update',
         'DELETE': 'spatial.delete'
     }
+
+    def get_perms_objects(self):
+        # Talk to Brian about this. This should be the Spatial Unit not the
+        # project
+        return [self.get_project()]
 
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()

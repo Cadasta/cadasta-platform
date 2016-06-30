@@ -5353,6 +5353,9 @@ header {
     .content-single .map #project-map, .content-single .map #id_extent_map, .content-single .map #id_extents_extent_map {
       height: 100%;
       min-height: 100%; }
+  .content-single #id_geometry_map {
+    height: 100%;
+    min-height: 100%; }
   .content-single .main-text {
     padding: 30px 40px 50px 50px; }
   .content-single .detail {
@@ -5507,6 +5510,41 @@ div.dataTables_wrapper div.dataTables_info {
 @media (max-width: 991px) {
   table {
     overflow-x: auto; } }
+
+/* =Organizations
+-------------------------------------------------------------- */
+div.org-logo {
+  float: left;
+  padding: 10px; }
+
+.org-text {
+  margin-left: 160px; }
+
+.member-pic {
+  padding-bottom: 12px; }
+  .member-pic img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto; }
+
+.member-detail {
+  min-height: 100px;
+  display: inline-block;
+  padding: 0 0 20px 0; }
+  .member-detail h5 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0; }
+
+.member-role {
+  padding: 30px 0;
+  border-top: solid 1px #e7e8ea;
+  border-bottom: solid 1px #e7e8ea;
+  clear: both;
+  margin: 30px 0; }
+
+#projects-permissions .form-control {
+  min-width: 70%; }
 
 /* =Dashboard map
 -------------------------------------------------------------- */

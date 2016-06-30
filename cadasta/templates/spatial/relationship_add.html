@@ -1,0 +1,68 @@
+{% extends "spatial/location_detail.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block form_script %}
+  {{ form.media }}
+{% endblock %}
+
+{% block form_modal %}
+<div class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="POST">
+          <div class="modal-header">
+            <a class="close" href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
+              <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title">{% trans "Add new relationship" %}</h3>
+          </div>
+
+          <div class="modal-body">
+            {% csrf_token %}
+
+            {{form.errors}}
+
+            {% render_field form.id class+="form-control input-lg" %}
+
+            {% render_field form.new_entity class+="form-control input-lg" %}
+
+            <div id="new-item" {% if not form.new_entity.value %}class="hidden"{% endif %}>
+              <div class="form-group">
+                {{ form.name.errors }}
+                <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
+                {% render_field form.name class+="form-control input-lg" %}
+              </div>
+
+              <div class="form-group">
+                {{ form.party_type.errors }}
+                <label for="{{ form.party_type.id_for_label }}">{% trans "Party Type" %}</label>
+                {% render_field form.party_type class+="form-control input-lg" %}
+              </div>
+            </div>
+
+            <div class="form-group">
+              {{ form.tenure_type.errors }}
+              <label for="{{ form.tenure_type.id_for_label }}">{% trans "Tenure Type" %}</label>
+              {% render_field form.tenure_type class+="form-control input-lg" %}
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn btn-link cancel"
+               href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
+              {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+              {% trans "Save" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

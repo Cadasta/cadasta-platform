@@ -31,6 +31,21 @@
     },
     {
       "effect": "allow",
+      "action": ["spatial.*", "spatial.*.*"],
+      "object": ["spatial/*/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party.*", "party.*.*"],
+      "object": ["party/*/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["tenure_rel.*", "tenure_rel.*.*"],
+      "object": ["tenure_rel/*/*/*"]
+    },
+    {
+      "effect": "allow",
       "action": ["user.*"]
     },
     {

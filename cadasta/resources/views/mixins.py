@@ -52,6 +52,10 @@ class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):
     def get_success_url(self):
         project = self.get_project()
 
+        next_url = self.request.GET.get('next', None)
+        if next_url:
+            return next_url + '#resources'
+
         return reverse(
             'resources:project_list',
             kwargs={
@@ -64,7 +68,10 @@ class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):
 class ResourceObjectMixin(ProjectResourceMixin):
     def get_object(self):
         try:
-            return self.get_queryset().get(id=self.kwargs['resource'])
+            return Resource.objects.get(
+                project__slug=self.kwargs['project'],
+                id=self.kwargs['resource']
+            )
         except Resource.DoesNotExist as e:
             raise Http404(e)
 

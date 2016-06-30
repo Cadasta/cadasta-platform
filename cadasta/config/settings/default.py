@@ -168,7 +168,12 @@ LEAFLET_CONFIG = {
                'pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW1'
                '1a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
                {'attribution': 'DigitalGlobe'})],
-    'RESET_VIEW': False
+    'RESET_VIEW': False,
+    'PLUGINS': {
+        'draw': {
+            'js': '/static/leaflet/draw/leaflet.draw.js'
+        }
+    }
 }
 
 # Internationalization

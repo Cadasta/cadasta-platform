@@ -1,0 +1,21 @@
+{% extends "spatial/location_wrapper.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block location_panel %}
+
+<h2>{% trans "Edit Relationship" %}</h2>
+
+<form method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    {{ form.tenure_type.errors }}
+    <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>
+    {% render_field form.tenure_type class+="form-control input-lg" %}
+  </div>  
+  <button type="submit" class="btn btn-primary">Submit</button>
+  <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}" class="btn btn-link">Cancel</a>
+</form>
+
+
+{% endblock %}

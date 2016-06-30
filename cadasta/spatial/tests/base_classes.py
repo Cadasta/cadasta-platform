@@ -74,7 +74,7 @@ class RecordListBaseTestCase(RecordBaseTestCase):
         request = APIRequestFactory().get(url)
         force_authenticate(request, user=user)
         response = self.view(
-            request, organization=org_slug, project_slug=prj_slug).render()
+            request, organization=org_slug, project=prj_slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -172,7 +172,7 @@ class RecordCreateBaseTestCase(RecordBaseTestCase):
         request = APIRequestFactory().post(url, data=data, format='json')
         force_authenticate(request, user=user)
         response = self.view(
-            request, organization=org_slug, project_slug=prj_slug).render()
+            request, organization=org_slug, project=prj_slug).render()
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status
         assert self.record_model.objects.count() == (
@@ -273,7 +273,7 @@ class RecordDetailBaseTestCase(RecordBaseTestCase):
         force_authenticate(request, user=user)
         kwargs = {self.record_id_url_var_name: record_id}
         response = self.view(
-            request, organization=org_slug, project_slug=prj_slug, **kwargs
+            request, organization=org_slug, project=prj_slug, **kwargs
         ).render()
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status
@@ -285,7 +285,7 @@ class RecordDetailBaseTestCase(RecordBaseTestCase):
         force_authenticate(request, user=user)
         kwargs = {self.record_id_url_var_name: record.id}
         response = self.view(
-            request, organization=org_slug, project_slug=prj_slug, **kwargs
+            request, organization=org_slug, project=prj_slug, **kwargs
         ).render()
         content = json.loads(response.content.decode('utf-8'))
         assert response.status_code == status
@@ -298,7 +298,7 @@ class RecordDetailBaseTestCase(RecordBaseTestCase):
         force_authenticate(request, user=user)
         kwargs = {self.record_id_url_var_name: record_id}
         response = self.view(
-            request, organization=org_slug, project_slug=prj_slug, **kwargs
+            request, organization=org_slug, project=prj_slug, **kwargs
         ).render()
         assert response.status_code == status
         if response.content:

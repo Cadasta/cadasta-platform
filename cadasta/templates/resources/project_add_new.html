@@ -11,11 +11,13 @@
 {% block content %}
 <div class="col-md-12 content-single">
   <div class="row">
+<<<<<<< HEAD
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <div class="page-title">
         <h2>{% trans "Resources: Add new" %}</h2>
       </div>
+<<<<<<< HEAD
       <form method="POST">
       {% csrf_token %}
         <div class="panel panel-default">
@@ -35,6 +37,19 @@
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
             <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
           </div>
+=======
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <!-- Resources index -->
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}" role="tab">{% trans "From library" %}</a></li>
+            <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
+          </ul>
+          <form method="POST">
+            {% include "resources/form.html" %}  
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+          </form>
+>>>>>>> master
         </div>
       </form>
     </div>

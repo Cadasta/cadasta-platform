@@ -45,6 +45,22 @@
       "effect": "allow",
       "action": ["resource.*"],
       "object": ["resource/$organization/*/*"]
+    },
+
+    {
+      "effect": "allow",
+      "action": ["spatial.*"],
+      "object": ["spatial/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party.*"],
+      "object": ["party/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["tenure_rel.*", "tenure_rel.*.*"],
+      "object": ["tenure_rel/$organization/*/*"]
     }
   ]
 }
