@@ -115,7 +115,7 @@ class QuestionnaireManagerTest(TestCase):
 
         project = ProjectFactory.create()
 
-        models.Questionnaire.objects.create_from_form(
+        m1 = models.Questionnaire.objects.create_from_form(
             xls_form=form,
             project=project
         )
@@ -129,6 +129,10 @@ class QuestionnaireManagerTest(TestCase):
         assert model.name == 'xls-form'
         assert model.title == 'Question types'
         assert model.version == 2
+
+        assert m1.id != model.id
+        assert m1.version == 1
+        assert project.current_questionnaire == model.id
 
     def test_create_from_invald_form(self):
         ensure_dirs()

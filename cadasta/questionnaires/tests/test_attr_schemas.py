@@ -2,6 +2,7 @@ import os
 
 import pytest
 
+from buckets.test.mocks import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -11,8 +12,8 @@ from jsonattrs.models import Attribute, Schema
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
-from spatial.tests.factories import (SpatialUnitFactory,
-                                     SpatialRelationshipFactory)
+from spatial.tests.factories import (SpatialRelationshipFactory,
+                                     SpatialUnitFactory)
 
 from .. import models
 # from ..exceptions import InvalidXLSForm
@@ -21,6 +22,7 @@ from .attr_schemas import (location_relationship_xform_group,
                            location_xform_group,
                            party_relationship_xform_group, party_xform_group,
                            tenure_relationship_xform_group)
+from .factories import QuestionnaireFactory
 
 path = os.path.dirname(settings.BASE_DIR)
 
@@ -28,6 +30,7 @@ path = os.path.dirname(settings.BASE_DIR)
 class CreateAttributeSchemaTest(TestCase):
 
     def test_create_attribute_schemas(self):
+        ensure_dirs()
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
@@ -42,7 +45,8 @@ class CreateAttributeSchemaTest(TestCase):
         assert 8 == Attribute.objects.all().count()
 
     def test_party_attribute_schema(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
@@ -57,7 +61,8 @@ class CreateAttributeSchemaTest(TestCase):
         assert 1 == Schema.objects.all().count()
         schema = Schema.objects.get(content_type=content_type)
         assert schema is not None
-        assert schema.selectors == [project.organization.pk, project.pk]
+        assert schema.selectors == [
+            project.organization.pk, project.pk, project.current_questionnaire]
         assert 'homeowner' in party.attributes.attributes
         assert 'dob' in party.attributes.attributes
         assert 'gender' in party.attributes.attributes
@@ -66,7 +71,8 @@ class CreateAttributeSchemaTest(TestCase):
         assert party.attributes['dob'] == '1980-01-01'
 
     def test_party_invalid_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=party_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
@@ -80,7 +86,8 @@ class CreateAttributeSchemaTest(TestCase):
             )
 
     def test_spatial_unit_attribute_schema(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         create_attrs_schema(
@@ -94,14 +101,16 @@ class CreateAttributeSchemaTest(TestCase):
         assert 1 == Schema.objects.all().count()
         schema = Schema.objects.get(content_type=content_type)
         assert schema is not None
-        assert schema.selectors == [project.organization.pk, project.pk]
+        assert schema.selectors == [
+            project.organization.pk, project.pk, project.current_questionnaire]
         assert 'quality' in spatial_unit.attributes.attributes
         assert 'polygon_high' == spatial_unit.attributes['quality']
         # notes field is omitted in xform
         assert 'notes' not in spatial_unit.attributes.attributes
 
     def test_spatial_unit_invalid_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=location_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
@@ -114,7 +123,8 @@ class CreateAttributeSchemaTest(TestCase):
             )
 
     def test_spatial_relationship_schema(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialrelationship')
         create_attrs_schema(
@@ -126,11 +136,13 @@ class CreateAttributeSchemaTest(TestCase):
         assert 1 == Schema.objects.all().count()
         schema = Schema.objects.get(content_type=content_type)
         assert schema is not None
-        assert schema.selectors == [project.organization.pk, project.pk]
+        assert schema.selectors == [
+            project.organization.pk, project.pk, project.current_questionnaire]
         assert 'notes' in sur.attributes.attributes
 
     def test_spatial_relationship_invalid_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=location_relationship_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
@@ -143,7 +155,8 @@ class CreateAttributeSchemaTest(TestCase):
             )
 
     def test_party_relationship_schema(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='party', model='partyrelationship')
         create_attrs_schema(
@@ -155,11 +168,13 @@ class CreateAttributeSchemaTest(TestCase):
         assert 1 == Schema.objects.all().count()
         schema = Schema.objects.get(content_type=content_type)
         assert schema is not None
-        assert schema.selectors == [project.organization.pk, project.pk]
+        assert schema.selectors == [
+            project.organization.pk, project.pk, project.current_questionnaire]
         assert 'notes' in pr.attributes.attributes
 
     def test_party_relationship_invalid_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=party_relationship_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
@@ -172,7 +187,8 @@ class CreateAttributeSchemaTest(TestCase):
             )
 
     def test_tenure_relationship_schema(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
@@ -184,11 +200,13 @@ class CreateAttributeSchemaTest(TestCase):
         assert 1 == Schema.objects.all().count()
         schema = Schema.objects.get(content_type=content_type)
         assert schema is not None
-        assert schema.selectors == [project.organization.pk, project.pk]
+        assert schema.selectors == [
+            project.organization.pk, project.pk, project.current_questionnaire]
         assert 'notes' in tr.attributes.attributes
 
     def test_tenure_relationship_invalid_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=tenure_relationship_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
@@ -201,7 +219,8 @@ class CreateAttributeSchemaTest(TestCase):
             )
 
     def test_omit_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=location_xform_group, errors=[])
         with pytest.raises(KeyError):
@@ -213,7 +232,8 @@ class CreateAttributeSchemaTest(TestCase):
             )
 
     def test_required_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
@@ -234,7 +254,8 @@ class CreateAttributeSchemaTest(TestCase):
         assert attr.required
 
     def test_invalid_choice_attribute(self):
-        project = ProjectFactory.create(name='TestFactory')
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
         create_attrs_schema(
             project=project, dict=party_xform_group, errors=[])
         assert 1 == Schema.objects.all().count()
@@ -246,3 +267,40 @@ class CreateAttributeSchemaTest(TestCase):
                     'dob': '1980-01-01'
                 }
             )
+
+    def test_update_questionnaire_attribute_schema(self):
+        ensure_dirs()
+
+        storage = FakeS3Storage()
+        file = open(
+            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+        form = storage.save('xls-form.xlsx', file)
+        project = ProjectFactory.create(name='TestProject')
+        q1 = models.Questionnaire.objects.create_from_form(
+            xls_form=form,
+            project=project
+        )
+
+        q2 = models.Questionnaire.objects.create_from_form(
+            xls_form=form,
+            project=project
+        )
+
+        assert 10 == Schema.objects.all().count()
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        assert q1.id != q2.id
+
+        s1 = Schema.objects.get(
+            content_type=content_type, selectors=(
+                project.organization.pk, project.pk, q1.id)
+        )
+        assert s1 is not None
+        s2 = Schema.objects.get(
+            content_type=content_type, selectors=(
+                project.organization.pk, project.pk,
+                project.current_questionnaire)
+        )
+        assert s2 is not None
+        assert s1 != s2

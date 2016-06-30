@@ -216,9 +216,24 @@ STATICFILES_FINDERS = (
 )
 
 JSONATTRS_SCHEMA_SELECTORS = {
-    'spatial.spatialunit': ('project.organization.pk', 'project.pk',),
-    'spatial.spatialrelationship': ('project.organization.pk', 'project.pk',),
-    'party.party': ('project.organization.pk', 'project.pk',),
-    'party.partyrelationship': ('project.organization.pk', 'project.pk',),
-    'party.tenurerelationship': ('project.organization.pk', 'project.pk',)
+    'spatial.spatialunit': (
+        'project.organization.pk',
+        'project.pk', 'project.current_questionnaire'
+    ),
+    'spatial.spatialrelationship': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    ),
+    'party.party': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    ),
+    'party.partyrelationship': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    ),
+    'party.tenurerelationship': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    )
 }
