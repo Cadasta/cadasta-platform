@@ -45,5 +45,4 @@ class TenureRelationshipFactory(ExtendedFactory):
         PartyFactory, project=factory.SelfAttribute('..project'))
     spatial_unit = factory.SubFactory(
         SpatialUnitFactory, project=factory.SelfAttribute('..project'))
-    acquired_how = 'HS'
     tenure_type = factory.Iterator(TenureRelationshipType.objects.all())

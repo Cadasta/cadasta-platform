@@ -75,7 +75,7 @@ class TenureRelationshipReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = TenureRelationship
         fields = ('rel_class', 'id', 'party', 'spatial_unit', 'tenure_type',
-                  'acquired_how', 'acquired_date', 'attributes')
+                  'attributes')
         read_only_fields = ('id',)
 
     def get_rel_class(self, obj):
@@ -86,8 +86,7 @@ class TenureRelationshipWriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TenureRelationship
-        fields = ('id', 'party', 'spatial_unit', 'tenure_type',
-                  'acquired_how', 'acquired_date', 'attributes')
+        fields = ('id', 'party', 'spatial_unit', 'tenure_type', 'attributes')
         read_only_fields = ('id',)
 
     def validate(self, data):
