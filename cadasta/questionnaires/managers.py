@@ -71,9 +71,10 @@ def create_attrs_schema(project=None, dict=None, errors=[]):
     fields = []
     proj = project.pk
     org = project.organization.pk
+    quest = project.current_questionnaire
 
     schema_obj = Schema.objects.create(content_type=content_type,
-                                       selectors=(org, proj,))
+                                       selectors=(org, proj, quest))
 
     for c in dict.get('children'):
         field = {}
