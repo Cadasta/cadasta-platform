@@ -64,10 +64,7 @@ class Migration(migrations.Migration):
             name='HistoricalTenureRelationship',
             fields=[
                 ('id', models.CharField(db_index=True, max_length=24)),
-                ('acquired_how', models.CharField(blank=True, choices=[('CS', 'Contractual/Share Crop'), ('CA', 'Customary Arrangement'), ('GF', 'Gift'), ('HS', 'Homestead'), ('IO', 'Informal Occupant'), ('IN', 'Inheritance'), ('LH', 'Leasehold'), ('PF', 'Purchased Freehold'), ('RN', 'Rental'), ('OT', 'Other')], max_length=2, null=True)),
-                ('acquired_date', models.DateField(default=datetime.date.today)),
                 ('attributes', jsonattrs.fields.JSONAttributeField(default=jsonattrs.fields.JSONAttributes)),
-                ('geom', django.contrib.gis.db.models.fields.GeometryField(blank=True, null=True, srid=4326)),
                 ('history_id', models.AutoField(primary_key=True, serialize=False)),
                 ('history_date', models.DateTimeField()),
                 ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
@@ -127,10 +124,7 @@ class Migration(migrations.Migration):
             name='TenureRelationship',
             fields=[
                 ('id', models.CharField(max_length=24, primary_key=True, serialize=False)),
-                ('acquired_how', models.CharField(blank=True, choices=[('CS', 'Contractual/Share Crop'), ('CA', 'Customary Arrangement'), ('GF', 'Gift'), ('HS', 'Homestead'), ('IO', 'Informal Occupant'), ('IN', 'Inheritance'), ('LH', 'Leasehold'), ('PF', 'Purchased Freehold'), ('RN', 'Rental'), ('OT', 'Other')], max_length=2, null=True)),
-                ('acquired_date', models.DateField(default=datetime.date.today)),
                 ('attributes', jsonattrs.fields.JSONAttributeField(default=jsonattrs.fields.JSONAttributes)),
-                ('geom', django.contrib.gis.db.models.fields.GeometryField(blank=True, null=True, srid=4326)),
                 ('party', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='party.Party')),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tenure_relationships', to='organization.Project')),
                 ('spatial_unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='spatial.SpatialUnit')),
