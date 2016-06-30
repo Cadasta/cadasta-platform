@@ -1,16 +1,15 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% csrf_token %}
 <table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
-      <th></th>
-      <th>{% trans "Resource" %}</th>
-      <th>{% trans "Type" %}</th>
-      <th>{% trans "Entities associated" %}</th>
-      <th>{% trans "Contributor" %}</th>
-      <th>{% trans "Last updated" %}</th>
+      <th class="col-md-1"></th>
+      <th class="col-md-4">{% trans "Resource" %}</th>
+      <th class="col-md-1">{% trans "Type" %}</th>
+      <th class="col-md-2">{% trans "Entities associated" %}</th>
+      <th class="col-md-2">{% trans "Contributor" %}</th>
+      <th class="col-md-2">{% trans "Last updated" %}</th>
     </tr>
   </thead>
   <tbody>

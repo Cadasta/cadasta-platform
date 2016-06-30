@@ -3951,15 +3951,15 @@ div.resource-60 {
 div.resource-text {
   margin-left: 90px; }
 
-.resource-modal h4 {
+.panel-body h4 {
   font-weight: 500;
   margin-top: 0;
   color: #363638; }
 
-.resource-modal ul.resource-actions > li {
+ul.resource-actions > li {
   padding: 4px 12px;
   margin: 12px 0; }
-  .resource-modal ul.resource-actions > li:first-child {
+  ul.resource-actions > li:first-child {
     padding-left: 0;
     border-right: 1px solid #e7e8ea; }
 
@@ -4249,9 +4249,16 @@ label[for="id_extents-location"] {
 /* =Fonts
 -------------------------------------------------------------- */
 @font-face {
-  font-family: 'roboto';
+  font-family: 'Roboto';
   src: url("/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot");
   src: url("/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot?#iefix") format("embedded-opentype"), url("/static/fonts/roboto_regular_macroman/roboto-regular-webfont.woff") format("woff"), url("/static/fonts/roboto_regular_macroman/roboto-regular-webfont.ttf") format("truetype"), url("/static/fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto") format("svg");
+  font-weight: 300;
+  font-style: normal; }
+
+@font-face {
+  font-family: 'Roboto Condensed';
+  src: url("/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot");
+  src: url("/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot?#iefix") format("embedded-opentype"), url("/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.woff") format("woff"), url("/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.ttf") format("truetype"), url("/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.svg#roboto") format("svg");
   font-weight: 300;
   font-style: normal; }
 
