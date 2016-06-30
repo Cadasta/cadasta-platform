@@ -13,6 +13,7 @@
   z-index: 990;
   padding: 0;
   overflow: hidden;
+  overflow-y: auto;
   background-color: $brand-darkblue;
   color: $brand-lightblue;
   text-align: center;
@@ -78,16 +79,19 @@
     }
   }
   li.reports {
+    display: none; //beta
     .icon { 
       background-image: url('/static/img/icon-reports.png');
     }
   }
   li.activity {
+    display: none; // beta
     .icon { 
       background-image: url('/static/img/icon-activity.png');
     }
   }
   li.projects {
+    display: none; // beta 
     .icon { 
       background-image: url('/static/img/icon-projects.png');
     }
