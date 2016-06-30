@@ -19,6 +19,7 @@
 @import "reg";
 @import "footer";
 @import "orgs";
+@import "resources";
 @import "single";
 @import "maps";
 
@@ -26,12 +27,23 @@
 -------------------------------------------------------------- */
 
 @font-face {
-  font-family: 'roboto';
+  font-family: 'Roboto';
   src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot');
   src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto Condensed';
+  src: url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot');
+  src: url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.woff') format('woff'),
+       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.ttf') format('truetype'),
+       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.svg#roboto') format('svg');
   font-weight: 300;
   font-style: normal;
 }
@@ -702,9 +714,12 @@ header {
     }
     .panel-body {
       h3 {
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         padding-bottom: 10px;
         border-bottom: solid 1px $gray-light;
+      }
+      .nav-tabs {
+        margin-bottom: 30px;
       }
     }
     .panel-buttons { // buttons at bottom of panels containing forms
@@ -965,7 +980,7 @@ img.org-logo, img#org-logo {
   width: 128px;
   height: 128px;
   float: left;
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 @media (max-width: $screen-xs-max) {

@@ -13,25 +13,28 @@
       <div class="page-title">
         <h2>{% trans "Resources: Add new" %}</h2>
       </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <!-- Resources index -->
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="" role="tab">{% trans "From library" %}</a></li>
-            <li role="presentation"><a href="{% url 'resources:project_add_new' object.organization.slug object.slug %}" role="tab">{% trans "Upload new" %}</a></li>
-          </ul>
+      <form method="POST">
+      {% csrf_token %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <!-- Resources index -->
+            <ul class="nav nav-tabs" role="tablist">
+              <li role="presentation" class="active"><a href="" role="tab">{% trans "From library" %}</a></li>
+              <li role="presentation"><a href="{% url 'resources:project_add_new' object.organization.slug object.slug %}" role="tab">{% trans "Upload new" %}</a></li>
+            </ul>
 
-          <form class="col-md-12" method="POST">
-            {% csrf_token %}
+            <h3>{% trans "Select files from library" %}</h3>
+            <p>{% trans "Resources in the library are able to be connected to locations, relationships, parties, and the project.  To add a connection, select the checkbox in the left column and select the 'Save' button.  If you would like to upload a new resource, select the 'Upload new' tab." %}<br /><br /></p>
+
             <table class="table table-hover datatable" data-paging-type="simple">
               <thead>
                 <tr>
-                  <th></th>
-                  <th>{% trans "Resource" %}</th>
-                  <th>{% trans "Type" %}</th>
-                  <th>{% trans "Entities associated" %}</th>
-                  <th>{% trans "Contributor" %}</th>
-                  <th>{% trans "Last updated" %}</th>
+                  <th class="col-md-1"></th>
+                  <th class="col-md-4">{% trans "Resource" %}</th>
+                  <th class="col-md-1">{% trans "Type" %}</th>
+                  <th class="col-md-2">{% trans "Entities associated" %}</th>
+                  <th class="col-md-2">{% trans "Contributor" %}</th>
+                  <th class="col-md-2">{% trans "Last updated" %}</th>
                 </tr>
               </thead>
               <tbody>
@@ -40,10 +43,13 @@
               {% endfor %}
               </tbody>
             </table>
+          </div>
+          <div class="panel-footer panel-buttons">
             <button type="submit" class="btn btn-primary">Save</button>
-          </form>
+            <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 
