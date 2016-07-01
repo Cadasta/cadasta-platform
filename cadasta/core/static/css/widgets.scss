@@ -1,22 +1,30 @@
-.public-private-widget > label {
+.public-private-widget {
+  min-height: 70px;
+  > label {
     display: none;
+  }
+  & > div {
+    width: 60px;
+    float: left;
+    text-align: center;
+    margin-right: 15px;
+    position: relative;
+    top: 22px;
+  }
+  & > div:nth-child(2) {
+    width: 40px;
+    text-align: right;
+  }
+  & > div:last-child {
+    width: 40px;
+    text-align: left;
+  }
 }
 
-.public-private-widget {
+@media (max-width: $screen-xs-max) {
+  .public-private-widget {
     & > div {
-        width: 60px;
-        float: left;
-        text-align: center;
-        margin-right: 15px;
-        position: relative;
-        top: 22px;
+        top: 0;
     }
-    & > div:nth-child(2) {
-        width: 40px;
-        text-align: right;
-    }
-    & > div:last-child {
-        width: 40px;
-        text-align: left;
-    }
+  }
 }

@@ -3712,26 +3712,30 @@ table th[class*="col-"] {
   width: 100%; }
 
 #project-wizard div#org-wrapper {
-  margin-top: 16px; }
+  margin-top: 16px;
+  margin-bottom: 24px; }
 
-.public-private-widget > label {
-  display: none; }
+.public-private-widget {
+  min-height: 70px; }
+  .public-private-widget > label {
+    display: none; }
+  .public-private-widget > div {
+    width: 60px;
+    float: left;
+    text-align: center;
+    margin-right: 15px;
+    position: relative;
+    top: 22px; }
+  .public-private-widget > div:nth-child(2) {
+    width: 40px;
+    text-align: right; }
+  .public-private-widget > div:last-child {
+    width: 40px;
+    text-align: left; }
 
-.public-private-widget > div {
-  width: 60px;
-  float: left;
-  text-align: center;
-  margin-right: 15px;
-  position: relative;
-  top: 22px; }
-
-.public-private-widget > div:nth-child(2) {
-  width: 40px;
-  text-align: right; }
-
-.public-private-widget > div:last-child {
-  width: 40px;
-  text-align: left; }
+@media (max-width: 767px) {
+  .public-private-widget > div {
+    top: 0; } }
 
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
@@ -4068,20 +4072,14 @@ ul.resource-actions > li {
 #sidebar li.resources .icon {
   background-image: url("/static/img/icon-resources.png"); }
 
-#sidebar li.reports {
-  display: none; }
-  #sidebar li.reports .icon {
-    background-image: url("/static/img/icon-reports.png"); }
+#sidebar li.reports .icon {
+  background-image: url("/static/img/icon-reports.png"); }
 
-#sidebar li.activity {
-  display: none; }
-  #sidebar li.activity .icon {
-    background-image: url("/static/img/icon-activity.png"); }
+#sidebar li.activity .icon {
+  background-image: url("/static/img/icon-activity.png"); }
 
-#sidebar li.projects {
-  display: none; }
-  #sidebar li.projects .icon {
-    background-image: url("/static/img/icon-projects.png"); }
+#sidebar li.projects .icon {
+  background-image: url("/static/img/icon-projects.png"); }
 
 #sidebar li.members .icon {
   background-image: url("/static/img/icon-members.png"); }
@@ -4168,8 +4166,10 @@ ul.resource-actions > li {
   #sidebar {
     height: 60px; }
     #sidebar .nav-sidebar > li {
-      width: 19%;
-      float: left; }
+      width: 25%;
+      /* beta 
+      float: left; 
+      width: 19%; */ }
       #sidebar .nav-sidebar > li a {
         padding: 12px 0; }
         #sidebar .nav-sidebar > li a .title {
@@ -5217,14 +5217,6 @@ header {
   #project-single .page-header .btn-add,
   #organization-single .page-header .btn-add {
     margin-right: 14px; }
-  #project-single .page-header .more-menu,
-  #organization-single .page-header .more-menu {
-    float: left;
-    font-size: 24px;
-    margin: 2px 0 0 10px;
-    width: 48px;
-    height: 48px;
-    display: block; }
 
 #organization-single .page-header {
   padding-top: 35px; }
@@ -5353,7 +5345,7 @@ header {
     opacity: 0.8;
     font-weight: 300;
     letter-spacing: 0; }
-  .content-single .divider {
+  .content-single .divider-thick {
     border-top: solid 7px #e7e8ea;
     margin: 24px auto; }
   .content-single .btn-block {
@@ -5389,6 +5381,8 @@ header {
     z-index: 300; }
     .content-single .detail .btn {
       min-width: 120px; }
+    .content-single .detail .more-menu {
+      width: auto !important; }
     .content-single .detail .org-logo {
       margin: 10px auto 20px;
       float: none;
@@ -5417,8 +5411,6 @@ header {
       margin-bottom: 10px;
       padding-bottom: 10px;
       border-bottom: solid 1px #d9dadb; }
-    .content-single .panel .panel-body .nav-tabs {
-      margin-bottom: 30px; }
     .content-single .panel .panel-buttons {
       background: transparent;
       padding: 20px 15px; }
@@ -5428,6 +5420,8 @@ header {
         margin-bottom: 10px; }
         .content-single .panel .panel-buttons .btn:last-child {
           margin-right: 0; }
+  .content-single .nav-tabs {
+    margin-bottom: 20px; }
 
 @media (max-width: 991px) {
   .content-single {
@@ -5524,6 +5518,9 @@ div.dataTables_wrapper div.dataTables_filter label,
 div.dataTables_wrapper div.dataTables_info {
   opacity: 0.8;
   font-size: 12px; }
+
+.tab-content div.dataTables_wrapper div.dataTables_filter input {
+  max-width: 100px; }
 
 @media (max-width: 991px) {
   table {
@@ -5655,6 +5652,14 @@ button#add-contact {
 
 .btn-primary:hover {
   background-color: #009975; }
+
+.more-menu {
+  float: left;
+  font-size: 24px;
+  margin: 2px 0 0 10px;
+  width: 48px;
+  height: 48px;
+  display: block; }
 
 @media (max-width: 991px) {
   #project-single .page-header .top-btn,

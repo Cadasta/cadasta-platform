@@ -51,8 +51,8 @@
           <span class="sr-only">Toggle Add</span>
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add relationship" %}</a></li>
+          <!--<li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>-->
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           <!--<li role="separator" class="divider"></li>
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
@@ -65,8 +65,8 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
-          <li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add relationship" %}</a></li>
+          <!--<li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>-->
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           <!--<li role="separator" class="divider"></li>
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
@@ -101,13 +101,13 @@
         <span class="title">{% trans "Resources" %}</span>
       </a>
     </li><!--
-    --><li class="reports">
+    --><li class="reports hidden">
       <a href="#">
          <span class="icon reports"></span>
          <span class="title">{% trans "Reports" %}</span>
       </a>
     </li><!--
-    --><li class="activity">
+    --><li class="activity hidden">
       <a href="#">
         <span class="icon activity"></span>
         <span class="title">{% trans "Activity" %}</span>

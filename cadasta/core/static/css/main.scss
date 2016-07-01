@@ -472,14 +472,6 @@ header {
   .btn-add {
     margin-right: 14px;
   }
-  .more-menu {
-    float: left;
-    font-size: 24px;
-    margin: 2px 0 0 10px;
-    width: 48px;
-    height: 48px;
-    display: block;
-  }
 }
 
 #organization-single .page-header { 
@@ -637,7 +629,7 @@ header {
     font-weight: 300;
     letter-spacing: 0;
   }
-  .divider {
+  .divider-thick {
     border-top: solid 7px $table-border-color;
     margin: 24px auto;
   }
@@ -682,6 +674,9 @@ header {
     .btn {
       min-width: 120px;
     }
+    .more-menu {
+      width: auto !important;
+    }
     .org-logo { // large org logo
       margin: 10px auto 20px;
       float: none;
@@ -721,9 +716,6 @@ header {
         padding-bottom: 10px;
         border-bottom: solid 1px $gray-light;
       }
-      .nav-tabs {
-        margin-bottom: 30px;
-      }
     }
     .panel-buttons { // buttons at bottom of panels containing forms
       background: transparent;
@@ -737,6 +729,9 @@ header {
         }
       }
     }
+  }
+  .nav-tabs {
+    margin-bottom: 20px;
   }
 }
 
@@ -867,6 +862,10 @@ div.dataTables_wrapper div.dataTables_filter label /* search label */,
 div.dataTables_wrapper div.dataTables_info /* showing number total */ {
   opacity: 0.8;
   font-size: 12px;
+}
+
+.tab-content div.dataTables_wrapper div.dataTables_filter input {
+  max-width: 100px;
 }
 
 @media (max-width: $screen-sm-max) {
@@ -1035,6 +1034,15 @@ button#add-contact { // below contacts table
   &:hover {
     background-color: darken($btn-primary-bg, 5%);
   }
+}
+
+.more-menu {
+  float: left;
+  font-size: 24px;
+  margin: 2px 0 0 10px;
+  width: 48px;
+  height: 48px;
+  display: block;
 }
 
 @media (max-width: $screen-sm-max) {

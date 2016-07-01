@@ -67,12 +67,12 @@
 <div class="col-sm-12 content-single">
   <div class="row">
     <!-- Start overview map  -->
-    <div class="col-md-6 map">
+    <div class="col-md-8 map">
       {% leaflet_map "project-map" callback="locations_map_init" %}
     </div>
     <!-- / end overview map -->
     <!-- Overview detail  -->
-    <div class="col-md-6 detail">
+    <div class="col-md-4 detail">
       <section>
         {% block location_panel %}{% endblock %}
       </section>
