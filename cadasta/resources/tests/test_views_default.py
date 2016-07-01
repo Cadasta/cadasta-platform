@@ -271,7 +271,7 @@ class ProjectResourcesNewTest(UserTestCase):
     def _post(self, user=None, status=None, expected_redirect=None):
         ensure_dirs()
         storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb')
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
 
         self.data = {
@@ -469,7 +469,7 @@ class ProjectResourcesEditTest(UserTestCase):
 
         ensure_dirs()
         storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb')
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
         self.data = {
             'name': 'Some name',

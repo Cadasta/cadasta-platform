@@ -17,7 +17,7 @@ class ResourceFormTest(UserTestCase):
         super().setUp()
         ensure_dirs()
         storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb')
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
 
         self.data = {

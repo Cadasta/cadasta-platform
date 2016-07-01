@@ -17,7 +17,7 @@ class ValidateFileTypeTest(TestCase):
         ensure_dirs()
         storage = FakeS3Storage()
         field = S3FileField(storage=storage)
-        file = open(path + '/resources/tests/files/image.jpg', 'rb')
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file = storage.save('image.jpg', file)
         s3_file = S3File(file, field=field)
 
@@ -30,7 +30,7 @@ class ValidateFileTypeTest(TestCase):
         ensure_dirs()
         storage = FakeS3Storage()
         field = S3FileField(storage=storage)
-        file = open(path + '/resources/tests/files/text.txt', 'rb')
+        file = open(path + '/resources/tests/files/text.txt', 'rb').read()
         file = storage.save('text.txt', file)
         s3_file = S3File(file, field=field)
 

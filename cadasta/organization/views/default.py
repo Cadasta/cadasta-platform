@@ -1,4 +1,5 @@
-from django.http import Http404
+import os
+from django.http import Http404, HttpResponse
 from django.db import transaction
 import django.views.generic as generic
 from django.shortcuts import redirect, get_object_or_404
@@ -542,3 +543,33 @@ class ProjectUnarchive(ProjectEdit, ArchiveMixin, generic.DetailView):
     permission_required = 'project.unarchive'
     permission_denied_message = error_messages.PROJ_UNARCHIVE
     do_archive = False
+
+
+class ProjectDataDownload(mixins.ProjectMixin,
+                          LoginPermissionRequiredMixin,
+                          generic.edit.FormMixin,
+                          generic.DetailView):
+    template_name = 'organization/project_download.html'
+    permission_required = 'project.download'
+    permission_denied_message = error_messages.PROJ_DOWNLOAD
+    form_class = forms.DownloadForm
+
+    def get_object(self):
+        return self.get_project()
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+        kwargs['project'] = self.object
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            path, mime_type = form.get_file()
+            filename, ext = os.path.splitext(path)
+            response = HttpResponse(open(path, 'rb'), content_type=mime_type)
+            response['Content-Disposition'] = ('attachment; filename=' +
+                                               self.object.slug + ext)
+            return response

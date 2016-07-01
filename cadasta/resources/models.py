@@ -123,7 +123,7 @@ def create_thumbnails(sender, instance, created, **kwargs):
             thumb = thumbnail.make(file, size)
             thumb.save(write_path)
             instance.file.storage.save(name + '-128x128.' + ext,
-                                       open(write_path, 'rb'))
+                                       open(write_path, 'rb').read())
 
 
 class ContentObject(RandomIDModel):
