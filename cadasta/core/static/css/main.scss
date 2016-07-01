@@ -276,6 +276,7 @@ header {
   }
   .dropdown-menu {
     min-width: 224px;
+    min-width: 160px; // beta
   }
   .caret {
     margin-left: 14px;
@@ -285,6 +286,7 @@ header {
   .btn-user { // user profile links
     border-radius: 0;
     min-width: 224px;
+    min-width: 160px; // beta
     height: $header-height;
     border: none;
     font-size: 13px;
@@ -302,6 +304,7 @@ header {
       margin-bottom: 0;
       margin-right: 14px;
       background-color: transparent;
+      display: none; // beta
     }
   }
   .open .btn-user { // menu is open
@@ -728,6 +731,7 @@ header {
       .btn {
         min-width: 120px;
         margin-right: 20px;
+        margin-bottom: 10px;
         &:last-child {
           margin-right: 0;
         }

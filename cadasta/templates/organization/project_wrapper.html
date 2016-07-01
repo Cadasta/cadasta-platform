@@ -46,17 +46,16 @@
         <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
         </a>
-        <!-- <button type="button" class="btn btn-primary">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
-        </button> -->
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="caret"></span>
           <span class="sr-only">Toggle Add</span>
         </button>
         <ul class="dropdown-menu">
+          <li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
-          <li role="separator" class="divider"></li>
-          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
+          <!--<li role="separator" class="divider"></li>
+          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
         </ul>
       </div>
       <!-- Single add button for smaller screens-->
@@ -66,9 +65,11 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
+          <li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
-          <li role="separator" class="divider"></li>
-          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
+          <!--<li role="separator" class="divider"></li>
+          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
         </ul>
       </div>
     </div>
