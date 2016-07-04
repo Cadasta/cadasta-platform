@@ -1,17 +1,16 @@
+from rest_framework import generics, filters, status
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework import filters, status
-
 from tutelary.mixins import APIPermissionRequiredMixin
 
-from spatial.serializers import SpatialUnitSerializer
-from .mixins import SpatialQuerySetMixin
+from spatial import serializers
+from . import mixins
 
 
 class SpatialUnitList(APIPermissionRequiredMixin,
-                      SpatialQuerySetMixin,
+                      mixins.SpatialQuerySetMixin,
                       generics.ListCreateAPIView):
-    serializer_class = SpatialUnitSerializer
+
+    serializer_class = serializers.SpatialUnitSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
@@ -21,18 +20,18 @@ class SpatialUnitList(APIPermissionRequiredMixin,
 
     permission_required = {
         'GET': 'spatial.list',
-        'POST': 'spatial.add',
+        'POST': 'spatial.create',
     }
 
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            project__slug=self.kwargs['project_slug'])
+    def get_perms_objects(self):
+        return [self.get_project()]
 
 
 class SpatialUnitDetail(APIPermissionRequiredMixin,
-                        SpatialQuerySetMixin,
+                        mixins.SpatialQuerySetMixin,
                         generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = SpatialUnitSerializer
+
+    serializer_class = serializers.SpatialUnitSerializer
     lookup_url_kwarg = 'spatial_id'
     lookup_field = 'id'
     permission_required = {
@@ -41,12 +40,42 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
         'DELETE': 'spatial.delete'
     }
 
-    def get_queryset(self):
-        return super().get_queryset().filter(id=self.kwargs['spatial_id'])
+    def get_perms_objects(self):
+        # Talk to Brian about this. This should be the Spatial Unit not the
+        # project
+        return [self.get_project()]
 
     def destroy(self, request, *args, **kwargs):
-        su = self.get_object()
-        role = self.proj.spatial_units.get(id=su.id)
-        role.delete()
+        self.get_object().delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class SpatialRelationshipCreate(APIPermissionRequiredMixin,
+                                mixins.SpatialRelationshipQuerySetMixin,
+                                generics.CreateAPIView):
+
+    permission_required = 'spatial_rel.create'
+    serializer_class = serializers.SpatialRelationshipWriteSerializer
+
+
+class SpatialRelationshipDetail(APIPermissionRequiredMixin,
+                                mixins.SpatialRelationshipQuerySetMixin,
+                                generics.RetrieveUpdateDestroyAPIView):
+
+    lookup_url_kwarg = 'spatial_rel_id'
+    lookup_field = 'id'
+    permission_required = {
+        'GET': 'spatial_rel.view',
+        'PATCH': 'spatial_rel.update',
+        'DELETE': 'spatial_rel.delete'
+    }
+
+    def get_serializer_class(self):
+        if self.request.method == 'PATCH':
+            return serializers.SpatialRelationshipWriteSerializer
+        else:
+            return serializers.SpatialRelationshipReadSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

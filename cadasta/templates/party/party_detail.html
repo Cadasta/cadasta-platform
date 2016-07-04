@@ -1,0 +1,44 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="col-sm-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Party" %}</h2>
+        <a href="{% url 'parties:edit' object.organization.slug object.slug party.id %}">Edit</a>
+        <a href="{% url 'parties:delete' object.organization.slug object.slug party.id %}">Delete</a>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table table-striped">
+            <tbody>
+              <tr>
+                <td><strong>Name</strong></td>
+                <td>{{ party.name }}</td>
+              </tr>
+              <tr>
+                <td><strong>Type</strong></td>
+                <td>{{ party.get_type_display }}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>{% trans "Resources" %}</h3>
+
+          {% include 'resources/table.html' with object_list=party.resources %}
+
+          <div class="btn-group btn-group-justified">
+            <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">{% trans "Add from library" %}</a>
+            <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">{% trans "Upload new resource" %}</a>
+          </div>    
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

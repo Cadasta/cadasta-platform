@@ -13,23 +13,37 @@
 @import "bootstrap-sass/assets/stylesheets/bootstrap/glyphicons";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/dropdowns";
 @import "bootstrap-sass/assets/stylesheets/bootstrap/navs";
+@import "bootstrap-sass/assets/stylesheets/bootstrap/responsive-utilities";
 @import "wizard";
-@import "reg";
-@import "subnav";
-@import "orgs";
-@import "maps";
 @import "widgets";
+@import "reg";
+@import "footer";
+@import "orgs";
+@import "resources";
+@import "single";
+@import "maps";
 
 /* =Fonts
 -------------------------------------------------------------- */
 
 @font-face {
-  font-family: 'roboto';
+  font-family: 'Roboto';
   src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot');
   src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
        url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Roboto Condensed';
+  src: url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot');
+  src: url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.woff') format('woff'),
+       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.ttf') format('truetype'),
+       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.svg#roboto') format('svg');
   font-weight: 300;
   font-style: normal;
 }
@@ -62,6 +76,12 @@ body, #cadasta {
 #cadasta {
   display: table;
   padding-bottom: 40px;
+}
+
+@media (max-width: $screen-sm-max) {
+  #cadasta {
+    padding-bottom: 0;
+  }
 }
 
 h1, h2 {
@@ -103,12 +123,12 @@ header {
     font-size: 22px;
     margin: 0 auto;
     padding: 0;
+    img {
+      height: 18px;
+      width: 124px;
+    }
   }
-  #logo img {
-    height: 18px;
-    width: 124px;
-  }
-  nav {
+  .nav {
     display: inline-block;
     float: right;
     height: $navbar-height;
@@ -148,7 +168,8 @@ header {
     font-size: 13px;
     @include button-variant($gray-lighter, transparent, $btn-blue-bg);
     border-left: solid 1px $btn-blue-border;
-    &:hover {
+    &:hover,
+    &:focus {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
       transition: all 0.3s ease 0s;
     }
@@ -156,6 +177,32 @@ header {
       font-size: 18px;
       width: 48px;
       height: 32px;
+    }
+  }
+  .btn-hamburger { // mobile hamburger menu
+    > a {
+      display: block;
+      min-width: $header-height;
+      height: $header-height;
+      border: none;
+      text-align: center;
+      padding-top: 24px;
+      @include button-variant($gray-lighter, transparent, $btn-blue-bg);
+      &:hover, 
+      &:focus {
+        @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+        transition: all 0.3s ease 0s;
+        text-decoration: none;
+         .glyphicon-menu-hamburger {
+           color: #fff;
+        }
+      }
+      .glyphicon-menu-hamburger {
+        font-size: 24px;
+      }
+    }
+    &.open > a { // menu is open
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
     }
   }
 }
@@ -166,11 +213,29 @@ header {
   right: 0;
 }
 
+@media (max-width: $screen-sm-max) {
+  .header {
+    position: relative !important;
+    top: 0 !important;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  header #logo img {
+    height: 13px;
+    width: 90px;
+  }
+  header .btn-hamburger > a {
+    min-width: 50px;
+  }
+}
+
 /* =Top navigation status
 -------------------------------------------------------------- */
 
 #projects .nav li.projects,
 #project-single .nav li.projects,
+#project-wizard .nav li.projects,
 #organizations .nav li.organizations,
 #organization-single .nav li.organizations,
 #users .nav li.users {
@@ -180,7 +245,20 @@ header {
   }
 }
 
+#projects .nav .dropdown-menu > li.projects,
+#project-single .nav .dropdown-menu > li.projects,
+#project-wizard .nav .dropdown-menu > li.projects,
+#organizations .nav .dropdown-menu > li.organizations,
+#organization-single .dropdown-menu > .nav li.organizations,
+#users .nav .dropdown-menu > li.users {
+  border-top: none;
+  > a {
+    background: $brand-gold;
+  }
+}
+
 #project-single .header,
+#project-wizard .header,
 #organization-single .header { 
   position: absolute;
 }
@@ -198,6 +276,7 @@ header {
   }
   .dropdown-menu {
     min-width: 224px;
+    min-width: 160px; // beta
   }
   .caret {
     margin-left: 14px;
@@ -207,11 +286,13 @@ header {
   .btn-user { // user profile links
     border-radius: 0;
     min-width: 224px;
+    min-width: 160px; // beta
     height: $header-height;
     border: none;
     font-size: 13px;
     @include button-variant($gray-lighter, transparent, $btn-blue-bg);
-    &:focus, &:hover {
+    &:hover,
+    &:focus {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
       transition: all 0.3s ease 0s;
        .caret {
@@ -223,7 +304,11 @@ header {
       margin-bottom: 0;
       margin-right: 14px;
       background-color: transparent;
+      display: none; // beta
     }
+  }
+  .open .btn-user { // menu is open
+    @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
   }
   .btn-reg { // login and register links
     margin-top: 22px;
@@ -233,6 +318,42 @@ header {
     &:hover {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), #fff);
       transition: all 0.3s ease 0s;
+    }
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .reg-links {
+    div.divider {
+      min-width: 12px;
+    }
+    .dropdown-menu {
+      min-width: auto;
+    }
+    .caret {
+      margin-left: 4px;
+    }
+    .btn-user { // user profile links
+      min-width: 90px;
+      .thumbnail {
+        margin-right: 4px;
+      }
+    }
+    .btn-reg { // login and register links
+      min-width: auto;
+      margin-top: 24px;
+      margin-left: 0;
+      font-size: 12px;
+      padding: 4px 8px;
+      @include button-variant($gray-lighter, lighten($btn-blue-bg, 5%), transparent);
+      border-radius: 0 !important;
+      margin-left: 0 !important;
+      &:first-child {
+        margin-right: 8px;
+      }
+      &:hover {
+        @include button-variant(#fff, darken($btn-blue-bg, 5%), transparent);
+      }
     }
   }
 }
@@ -257,6 +378,9 @@ header {
   .btn-add {
     margin-right: 14px;
   }
+  .page-title h1, .page-title h2 {
+    width: 60%;
+  }
 }
 
 .page-title { // page title
@@ -269,6 +393,7 @@ header {
     position: relative;
     margin-top: 0;
     text-shadow: 1px 1px 3px rgba(0,0,0,.2);
+    width: 60%;
     .org-name {
       font-size: 14px;
       display: block;
@@ -281,7 +406,22 @@ header {
   }
 }
 
-/* =Page header for single project or organization
+@media (max-width: $screen-sm-max) {
+  .page-header {
+    padding-top: 24px;
+  }
+  .page-title h1, .page-title h2, h1, h2 {
+    font-size: 2em;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .page-title h1, .page-title h2, h1, h2 {
+    font-size: 1.8em;
+  }
+}
+
+/* =Page header single project or organizations
 -------------------------------------------------------------- */
 
 #project-single .page-header, 
@@ -304,7 +444,7 @@ header {
   }
   .index-link {
     padding: 4px 10px;
-    margin-right: 24px;
+    margin-right: 10px;
     border: 1px solid $brand-lightblue;
     border-radius: 8px;
     border-top-left-radius: 0;
@@ -323,6 +463,9 @@ header {
     padding-top: 14px;
     padding-bottom: 8px;
   }
+  h1, h2 {
+    margin-left: 14px;
+  }
   .top-btn {
     margin-top: 18px;
   }
@@ -333,8 +476,8 @@ header {
     float: left;
     font-size: 24px;
     margin: 2px 0 0 10px;
-    width: $icon-width;
-    height: $icon-height;
+    width: 48px;
+    height: 48px;
     display: block;
   }
 }
@@ -346,11 +489,40 @@ header {
   }
 }
 
+@media (max-width: $screen-sm-max) {
+  #project-single .page-header, 
+  #organization-single .page-header { 
+    overflow: visible;
+    padding-bottom: 4px;
+    border-bottom: solid 1px $brand-darkerblue;
+    margin-top: 0;
+    height: auto;
+    min-height: 104px;
+    .more-menu {
+      width: 36px;
+    }
+  }
+  #organization-single .page-header { 
+    padding-top: 18px; 
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  #project-single .page-header, 
+  #organization-single .page-header {
+    .more-menu {
+      width: 24px;
+    }
+  }
+}
+
 /* =Page Content
 -------------------------------------------------------------- */
 
 #page-content { // for page content
   z-index: 800;
+  position: relative;
+  padding-bottom: 20px;
 }
 
 #projects #page-content,
@@ -358,7 +530,6 @@ header {
 #users #page-content { // index pages without subnav that overlap page-header
   max-width: 1220px;
   margin: -190px auto 10px;
-  padding-bottom: 20px;
   padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -366,7 +537,10 @@ header {
   border-radius: 4px;
 }
 
+#dashboard #page-content,
+#registration #page-content,
 #project-single #page-content,
+#project-wizard #page-content,
 #organization-single #page-content { // for single project and org pages with left subnav
   width: 100%;
   max-width: 100%;
@@ -382,61 +556,34 @@ header {
   overflow-y: auto;
 }
 
-/* =Sidebar for single project or organization navigation
--------------------------------------------------------------- */
+#dashboard #page-content,
+#project-wizard #page-content,
+#registration #page-content { // full height page with only site header
+  top: $header-height;
+}
 
-#sidebar {
-  position: relative;
-  height: 100%;
-  z-index: 990;
-  display: block;
-  padding: 0;
-  overflow: hidden;
-  background-color: $brand-darkblue;
-  color: $brand-lightblue;
-  text-align: center;
-  -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
-  box-shadow: 0 0 6px rgba(0,0,0,.3);
-  .nav-sidebar {
-    width: 100%;
+@media (max-width: $screen-md-max) {
+  #projects #page-content,
+  #organizations #page-content,
+  #users #page-content {
+    border-radius: 0;
+  }
+}
+
+@media (max-width: $screen-sm-max) {
+  #projects #page-content,
+  #organizations #page-content,
+  #users #page-content {
+    border-radius: 0;
+    margin-top: -220px;
+    padding-top: 14px;
+  }
+
+  #project-single #page-content,
+  #project-wizard #page-content,
+  #organization-single #page-content {
     position: relative;
-    > li {
-      position: relative;
-      cursor: pointer;
-      display: block;
-      text-align: center;
-      border-bottom: solid 1px $brand-darkerblue;
-      a {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        color: $brand-lightblue;
-        border-left: 7px solid $brand-darkerblue;
-        &:focus, &:hover {
-          @include button-variant(#fff, darken($btn-blue-bg, 2%), $brand-gold);
-          transition: all 0.3s ease 0s;
-          .icon { // show active icon
-            background-position: -48px 0;
-          }
-        }
-      }
-      .icon {
-        margin: 0 auto;
-        height: 48px;
-        width: 48px;
-        position: relative;
-        background-position: 0 0;
-        display: block;
-      }
-      .title {
-        display: block;
-        position: relative; 
-        margin: 0;
-        font-size: 11px;
-        font-weight: 500;
-        text-transform: uppercase;
-      }
-    }
+    top: 0;
   }
 }
 
@@ -445,8 +592,18 @@ header {
 
 #project-single #page-content main,
 #organization-single #page-content main { 
-  width: 100%;
-  max-width: 100%;
+  position: relative;
+  left: 0;
+  margin-left: 100px;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: $screen-sm-max) {
+  #project-single #page-content main,
+  #organization-single #page-content main { 
+    margin-left: 0;
+  }
 }
 
 .content-single {
@@ -472,6 +629,7 @@ header {
     padding-bottom: 14px;
     text-shadow: none;
   }
+
   h3 {
     font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
@@ -497,10 +655,14 @@ header {
     height: 100%;
     min-height: 100%;
     padding-right: 0;
-    #project-map, #id_extent_map {
+    #project-map, #id_extent_map, #id_extents_extent_map {
       height: 100%;
       min-height: 100%;
     }
+  }
+  #id_geometry_map {
+    height: 100%;
+    min-height: 100%;
   }
   .main-text {
     padding: 30px 40px 50px 50px;
@@ -516,8 +678,12 @@ header {
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
+    z-index: 300;
+    .btn {
+      min-width: 120px;
+    }
     .org-logo { // large org logo
-      margin: 0 auto 20px;
+      margin: 10px auto 20px;
       float: none;
       padding-left: 0;
       img { 
@@ -534,11 +700,15 @@ header {
       }
     } 
   }
+  .row-height .detail { // columns fixed to match heights like org overview 
+    padding-top: 0;
+  }
   .detail-edit { // edit on right
     background: none;
   }
   .panel { // content box in main panel 
     border: 1px solid $table-border-color;
+    clear: both;
     .panel-heading {
       background: transparent;
       h3 {
@@ -547,9 +717,12 @@ header {
     }
     .panel-body {
       h3 {
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         padding-bottom: 10px;
         border-bottom: solid 1px $gray-light;
+      }
+      .nav-tabs {
+        margin-bottom: 30px;
       }
     }
     .panel-buttons { // buttons at bottom of panels containing forms
@@ -558,6 +731,7 @@ header {
       .btn {
         min-width: 120px;
         margin-right: 20px;
+        margin-bottom: 10px;
         &:last-child {
           margin-right: 0;
         }
@@ -565,6 +739,23 @@ header {
     }
   }
 }
+
+@media (max-width: $screen-sm-max) {
+  .content-single {
+    position: relative;
+    .map {
+      height: 300px;
+      min-height: 300px;
+    }
+    .main-text {
+      padding: 20px 30px 50px 40px;
+    }
+    .detail {
+      padding-top: 20px;
+    }
+  }
+}
+
 
 /* =Forms
 -------------------------------------------------------------- */
@@ -578,6 +769,46 @@ textarea.form-control {
   height: 34px;
   padding: 0 12px;
   cursor: pointer;
+}
+
+/* =Table for sort and filter
+-------------------------------------------------------------- */
+
+@media (max-width: $screen-sm-max) {
+  .dataTables_wrapper .col-sm-6 {
+    width: 50% !important; // fix for col-xs-6
+    float: left !important;
+  }
+  
+  div.dataTables_wrapper div.dataTables_length {
+    text-align: left !important;
+  }
+  
+  div.dataTables_wrapper div.dataTables_filter {
+    text-align: right !important;
+  }
+}
+
+@media (max-width: 500px) {
+  div.dataTables_wrapper div.dataTables_filter input {
+    max-width: 80px;
+  }
+}
+
+@media (max-width: 400px) {
+  #project-single div.dataTables_wrapper div.dataTables_filter input, 
+  #organization-single div.dataTables_wrapper div.dataTables_filter input {
+    max-width: inherit;
+  }
+  #project-single .dataTables_wrapper .col-sm-6, 
+  #organization-single .dataTables_wrapper .col-sm-6 {
+    width: 100% !important; // fix for col-xs-6
+    float: left !important;
+  }
+  #project-single div.dataTables_wrapper div.dataTables_filter,
+  #organization-single div.dataTables_wrapper div.dataTables_filter {
+    text-align: left !important;
+  }
 }
 
 /* =Table views
@@ -638,6 +869,56 @@ div.dataTables_wrapper div.dataTables_info /* showing number total */ {
   font-size: 12px;
 }
 
+@media (max-width: $screen-sm-max) {
+  table {
+    overflow-x: auto;
+  }
+}
+
+/* =Organizations
+-------------------------------------------------------------- */
+
+div.org-logo {
+  float: left;
+  padding: 10px;
+}
+
+.org-text {
+  margin-left: 160px;
+}
+
+.member-pic {
+  padding-bottom: 12px;
+  img {
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+   }
+}
+
+.member-detail {
+  min-height: 100px;
+  display: inline-block;
+  padding: 0 0 20px 0;
+  h5 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+}
+
+.member-role {
+  padding: 30px 0;
+  border-top: solid 1px $table-border-color;
+  border-bottom: solid 1px $table-border-color;
+  clear: both;
+  margin: 30px 0;
+}
+
+#projects-permissions .form-control {
+  min-width: 70%;
+}
+
 /* =Dashboard map
 -------------------------------------------------------------- */
 
@@ -645,8 +926,15 @@ div.dataTables_wrapper div.dataTables_info /* showing number total */ {
   position: absolute;
   left: 0;
   right: 0;
-  top: $header-height;
+  top: 0;
   bottom: 30px;
+  z-index: 900;
+  padding: 0;
+  overflow: hidden;
+  height: 100%;
+  height: -webkit-calc(100% - 30px);
+  height: -moz-calc(100% - 30px);
+  height: calc(100% - 30px);
 }
 
 /* =Img sizing
@@ -655,6 +943,19 @@ div.dataTables_wrapper div.dataTables_info /* showing number total */ {
 img.org-logo, img#org-logo {
   max-width: 120px;
   max-height: 50px;
+}
+
+@media (max-width: $screen-xs-max) {
+  img.org-logo, img#org-logo {
+    max-width: 80px;
+    max-height: 30px;
+  }
+  #organizations .table div.org-logo {
+    display: none;
+  }
+  #organizations .table div.org-text {
+    margin-left: 0;
+  }
 }
 
 .avatar {
@@ -683,7 +984,14 @@ img.org-logo, img#org-logo {
   width: 128px;
   height: 128px;
   float: left;
-  margin-right: 10px;
+  margin-right: 20px;
+}
+
+@media (max-width: $screen-xs-max) {
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 /* =Buttons
@@ -699,6 +1007,14 @@ img.org-logo, img#org-logo {
   }
 }
 
+button#add-contact { // below contacts table
+  background: transparent;
+  border: 0;
+  float: left !important;
+  color: $link-color !important;
+  padding: 0;
+}
+
 .btn-full {
   background: $gray-lighter;
   text-align: center;
@@ -706,14 +1022,38 @@ img.org-logo, img#org-logo {
   margin: 20px 0;
   .btn {
     min-width: 200px;
-    margin: 0 10px;
+    margin: 10px;
     padding: 10px 24px;
   }
+}
+
+.btn-link {
+  min-width: 60px;
 }
 
 .btn-primary { // for green buttons on dark background
   &:hover {
     background-color: darken($btn-primary-bg, 5%);
+  }
+}
+
+@media (max-width: $screen-sm-max) {
+  #project-single .page-header, 
+  #organization-single .page-header {
+    .top-btn {
+      padding: 8px 14px;
+      margin-top: 0;
+      .btn {
+        min-width: auto;
+      }
+    }
+  }
+}
+
+@media (max-width: $screen-md-max) {
+  .btn-full .btn {
+    min-width: 100px;
+    padding: 10px;
   }
 }
 
@@ -733,43 +1073,53 @@ img.org-logo, img#org-logo {
   z-index: 999;
 }
 
-/* =Footer
+/* =Modals
 -------------------------------------------------------------- */
 
-footer {
-  position: fixed;
-  display: table-row;
-  bottom: 0;
-  width: 100%;
-  height: 30px;
-  background-color: $body-bg;
-  border-top: solid 1px $table-border-color;
-  font-size: 11px;
-  white-space: nowrap;
-  padding-top: 4px;
-  z-index: 1000;
-  overflow: hidden;
-  .list-inline {
-    display: inline-block;
+.modal {
+  .modal-dialog {
+    overflow-y: initial !important
   }
-  form {
-    display: inline-block;
-    padding-left: 24px;
-    color: rgb(21, 51, 103);
+  h3.modal-title {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
   }
-  .list-inline > li {
-    padding-left: 24px;
-    text-align: right;
+  .modal-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+  .modal-footer {
+    background: $body-bg;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    .btn {
+      min-width: 100px;
+    }
+  }
+  button#add-contact {
+    background: transparent;
+    color: $link-color !important;
+    border: 0;
+    float: left !important;
+    padding: 0;
   }
 }
 
-/* =CLEAN UP BELOW
+/* =Chrome fix for fonts
 -------------------------------------------------------------- */
 
-div#id_extents_location_map {
-  height: 500px;
-}
+@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { 
+  body {
+    -webkit-animation-delay: 0.1s;
+    -webkit-animation-name: fontfix;
+    -webkit-animation-duration: 0.1s;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-timing-function: linear;
+  }
 
-label[for="id_extents-location"] {
-  display: none;
+  @-webkit-keyframes fontfix {
+    from { opacity: 1; }
+    to   { opacity: 1; }
+  }
+
 }

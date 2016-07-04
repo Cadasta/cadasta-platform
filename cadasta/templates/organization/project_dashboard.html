@@ -27,7 +27,7 @@
 
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
     <!-- Start overview map  -->
     <div class="col-md-8 map">
@@ -47,12 +47,10 @@
           <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3> 
           <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
           <div class="btn-full">
-            <button class="btn btn-primary btn-lg">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
-              {% trans "Add a location" %}
-            </button>
+            <a class="btn btn-primary btn-lg" href="{% url 'locations:add' object.organization.slug object.slug %}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
+            </a>
           </div>
-          <p>Need to help getting started? <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.</p>
         {% endif %}
       </section>
     </div>

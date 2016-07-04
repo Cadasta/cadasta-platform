@@ -1,0 +1,20 @@
+{% load i18n %}
+{% load widget_tweaks %}
+
+<table class="table table-hover datatable" data-paging-type="simple">
+  <thead>
+    <tr>
+      <th class="col-md-1"></th>
+      <th class="col-md-4">{% trans "Resource" %}</th>
+      <th class="col-md-1">{% trans "Type" %}</th>
+      <th class="col-md-2">{% trans "Entities associated" %}</th>
+      <th class="col-md-2">{% trans "Contributor" %}</th>
+      <th class="col-md-2">{% trans "Last updated" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for field in form %}
+    {% render_field field class+="form-control" %}
+  {% endfor %}
+  </tbody>
+</table>

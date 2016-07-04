@@ -38,9 +38,13 @@ api_v1 = [
     url(r'^users/',
         include('organization.urls.api.users', namespace='user')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
-        '(?P<project_id>[-\w]+)/parties/',
+        '(?P<project>[-\w]+)/parties/',
         include('party.urls.api.parties',
                 namespace='party')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project>[-\w]+)/relationships/',
+        include('party.urls.api.relationships',
+                namespace='relationship')),
 ]
 
 api = [
@@ -67,6 +71,12 @@ urlpatterns = [
     url(r'^users/',
         include('organization.urls.default.users',
                 namespace='user')),
+    url(r'^',
+        include('party.urls.default',
+                namespace='parties')),
+    url(r'^',
+        include('spatial.urls.default',
+                namespace='locations')),
     url(r'^',
         include('resources.urls.default',
                 namespace='resources')),

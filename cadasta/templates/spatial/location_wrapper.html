@@ -1,0 +1,83 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block left-nav %}map{% endblock %}
+
+{% load leaflet_tags %}
+{% load staticfiles %}
+
+{% block extra_head %}
+{% leaflet_css %}
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+{% endblock %}
+
+{% block extra_script %}
+{% leaflet_js %}
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
+<!-- Detail extra script-->
+<script>
+  function locations_map_init(map, options) {
+    var locations_data = {{ geojson|safe }};
+    var geoJson = L.geoJson(null);
+
+    L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+    geoJson.addData(locations_data);
+
+    var markerGroup = L.markerClusterGroup.layerSupport()
+    markerGroup.addTo(map);
+    markerGroup.checkIn(geoJson);
+    geoJson.addTo(map);
+
+    var data = {{ location.geometry.geojson|safe }};
+    var location = L.geoJson(data, {
+      style: {color: '#edaa00', fillColor: '#edaa00'},
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("<div class=\"text-wrap\">" +
+                       "<h2><span>Location</span>{{ location.get_type_display }}</h2></div>" +
+                       "<div class=\"btn-wrap\"><a href='{% url 'locations:detail' object.organization.slug object.slug location.id %}' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
+                       "</div>");
+      }
+    });
+    location.addTo(map);
+    map.fitBounds(location.getBounds());
+    map.setZoom(map.getZoom() - 2);
+  }
+
+  $(document).ready(function() {
+    if(location.hash) {
+        $('a[href=' + location.hash + ']').tab('show');
+    }
+    $(document.body).on("click", "a[data-toggle]", function(event) {
+        location.hash = this.getAttribute("href");
+    });
+  });
+  $(window).on('popstate', function() {
+      var anchor = location.hash || $("a[data-toggle=tab]").first().attr("href");
+      $('a[href=' + anchor + ']').tab('show');
+  });
+</script>
+{% block form_script %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+
+<div class="col-sm-12 content-single">
+  <div class="row">
+    <!-- Start overview map  -->
+    <div class="col-md-6 map">
+      {% leaflet_map "project-map" callback="locations_map_init" %}
+    </div>
+    <!-- / end overview map -->
+    <!-- Overview detail  -->
+    <div class="col-md-6 detail">
+      <section>
+        {% block location_panel %}{% endblock %}
+      </section>
+    </div>
+    <!-- / overview detail -->
+  </div>
+</div>
+{% endblock %}

@@ -13,13 +13,14 @@
 <!-- Single organization header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link" href="{% url 'organization:list' %}">
+    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:list' %}">
       <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
     </a>
     <h1>
       {{ organization.name }}
     </h1>
     <div class="top-btn pull-right">
+
       <!-- More options menu -->
       <div class="dropdown pull-right btn-more">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
@@ -37,8 +38,9 @@
           </li>
         </ul>
       </div>
+
       <!-- Split add button -->
-      <div class="btn-group pull-right btn-add">
+      <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add project" %}
         </a>
@@ -47,9 +49,24 @@
           <span class="sr-only">Toggle Add</span>
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#">{% trans "Add org member" %}</a></li>
+          <li><a href="{% url 'organization:members_add' organization.slug %}">{% trans "Add org member" %}</a></li>
         </ul>
       </div>
+      <!-- Single add button for smaller screens-->
+      <div class="dropdown pull-right visible-xs-inline">
+        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
+          <span class="glyphicon glyphicon-plus"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li>
+            <a href="{% url 'organization:project-add' organization.slug %}">
+              {% trans "Add project" %}
+            </a>
+          </li>
+          <li><a href="{% url 'organization:members_add' organization.slug %}">{% trans "Add org member" %}</a></li>
+        </ul>
+      </div>
+
     </div>
   </div>
 </div>
@@ -60,33 +77,33 @@
 {% block sub-nav %}
 
 <!-- Sidebar -->
-<div id="sidebar" class="{% block left-nav %}{% endblock %} col-md-1">
+<div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
     <li class="overview">
       <a href="{% url 'organization:dashboard' organization.slug %}">
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li>
-    <li class="projects">
+    </li><!--
+    --><li class="projects">
       <a href="#">
         <span class="icon projects"></span>
         <span class="title">{% trans "Projects" %}</span>
       </a>
-    </li>
-    <li class="members">
+    </li><!--
+    --><li class="members">
       <a href="{% url 'organization:members' organization.slug %}">
         <span class="icon members"></span>
         <span class="title">{% trans "Members" %}</span>
       </a>
-    </li>
-    <li class="reports">
+    </li><!--
+    --><li class="reports">
       <a href="#">
          <span class="icon reports"></span>
          <span class="title">{% trans "Reports" %}</span>
       </a>
-    </li>
-    <li class="activity">
+    </li><!--
+    --><li class="activity">
       <a href="#">
         <span class="icon activity"></span>
         <span class="title">{% trans "Activity" %}</span>

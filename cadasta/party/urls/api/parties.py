@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from ...views import api
+from party.views import api
 
 urlpatterns = [
     url(
@@ -8,7 +8,11 @@ urlpatterns = [
         api.PartyList.as_view(),
         name='list'),
     url(
-        r'^(?P<id>[-\w]+)/$',
+        r'^(?P<party>[-\w]+)/relationships/$',
+        api.RelationshipList.as_view(),
+        name='rel_list'),
+    url(
+        r'^(?P<party>[-\w]+)/$',
         api.PartyDetail.as_view(),
         name='detail'),
 ]

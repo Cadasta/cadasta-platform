@@ -1,19 +1,21 @@
-from faker import Factory
-from django.contrib.gis.geos import GEOSGeometry
 from datetime import datetime, timezone
 
 from accounts.models import User
-from organization.models import Organization, Project, OrganizationRole
-from tutelary.models import Policy, Role, PolicyInstance, RolePolicyAssign
-
 from accounts.tests.factories import UserFactory
-from organization.tests.factories import OrganizationFactory, ProjectFactory
 from core.tests.factories import RoleFactory
-from spatial.tests.factories import (
-    SpatialUnitFactory, SpatialUnitRelationshipFactory)
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.geos import GEOSGeometry
+from faker import Factory
+from jsonattrs.models import Attribute, Schema, AttributeType
+from organization.models import Organization, OrganizationRole, Project
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+from spatial.tests.factories import (SpatialUnitFactory,
+                                     SpatialRelationshipFactory)
+from tutelary.models import Policy, PolicyInstance, Role, RolePolicyAssign
 
 
 class FixturesData:
+
     def add_test_users(self):
         users = []
         # the first two named users will have superuser access
@@ -307,6 +309,16 @@ class FixturesData:
             project=project,
             type='BU')
 
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        sch = Schema.objects.create(content_type=content_type, selectors=())
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='testing', long_name='Testing',
+            required=False, index=1, attr_type=attr_type
+        )
+
         su2 = SpatialUnitFactory(
             name='Apartment Unit (Test)',
             geometry=GEOSGeometry('{"type": "Polygon",'
@@ -322,7 +334,7 @@ class FixturesData:
             type='AP',
             attributes={"testing": "attributes"})
 
-        SpatialUnitRelationshipFactory(
+        SpatialRelationshipFactory(
             su1=su1, su2=su2, type='C', project=project)
 
         su3 = SpatialUnitFactory(
@@ -349,7 +361,7 @@ class FixturesData:
             type='PA',
             attributes={"testing": "attributes"})
 
-        SpatialUnitRelationshipFactory(
+        SpatialRelationshipFactory(
             su1=su3, su2=su4, type='C', project=project)
 
         SpatialUnitFactory(

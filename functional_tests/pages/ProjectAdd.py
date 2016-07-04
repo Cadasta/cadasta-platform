@@ -45,14 +45,14 @@ class ProjectAddPage(Page):
         steps = self.BYS_CSS('.wizard .steps li')
         assert len(steps) == 3
         steps_class = list(map(get_class, steps))
-        title = self.BY_TAG('h2').text
+        title = self.BY_TAG('h3').text
 
         if (
             'active' in steps_class[0] and
             'enabled' in steps_class[0] and
             steps_class[1] == '' and
             steps_class[2] == '' and
-            title == "Create project geometry"
+            title == "Create project geometry".upper()
         ):
             return self.SUBPAGE_TYPES[0]
         elif (
@@ -61,7 +61,7 @@ class ProjectAddPage(Page):
             'active' in steps_class[1] and
             'enabled' in steps_class[1] and
             steps_class[2] == '' and
-            title == "Add project details"
+            title == "1. GENERAL INFORMATION".upper()
         ):
             return self.SUBPAGE_TYPES[1]
         elif (
@@ -71,7 +71,7 @@ class ProjectAddPage(Page):
             'enabled' in steps_class[1] and
             'active' in steps_class[2] and
             'enabled' in steps_class[2] and
-            title == "Assign project permissions"
+            title == "Assign permissions to members".upper()
         ):
             return self.SUBPAGE_TYPES[2]
         else:
@@ -85,24 +85,22 @@ class ProjectAddPage(Page):
     # Geometry subpage methods
 
     def get_available_countries(self):
-        return ('AU', 'BR', 'CN', 'US')
+        return ('AU', 'BR', 'CN', 'US',)
 
     def set_geometry(self, country):
 
         zoom_in = self.BY_CLASS('leaflet-control-zoom-in')
-        zoom_in.click()  # Zoom 1
-        time.sleep(0.5)  # Give zoom animation time to settle
-        zoom_in.click()  # Zoom 2
+        # zoom_in.click()  # Zoom 1
         time.sleep(0.5)  # Give zoom animation time to settle
 
         if country == 'AU':
-            self.draw_rectangle(840, 210, 20, 20)
+            self.draw_rectangle(500, 310, 20, 20)
         if country == 'BR':
-            self.draw_rectangle(310, 170, 20, 20)
+            self.draw_rectangle(250, 300, 20, 20)
         if country == 'CN':
-            self.draw_rectangle(750, 30, 20, 20)
+            self.draw_rectangle(450, 220, 20, 20)
         if country == 'US':
-            self.draw_rectangle(170, 20, 20, 20)
+            self.draw_rectangle(170, 220, 20, 20)
 
     def search_for_place(self, placename):
         """Searches for the specified place name using the
@@ -157,9 +155,7 @@ class ProjectAddPage(Page):
     def submit_geometry(self):
         assert self.is_on_subpage('geometry')
         submit = self.BY_CLASS('btn-primary')
-        next_header = "Add project details"
-        xpath = "//h2[text()='{}' and not(*[2])]".format(next_header)
-        add_details_wait = (By.XPATH, xpath)
+        add_details_wait = (By.ID, 'id_details-organization')
         self.test.click_through(submit, add_details_wait)
         assert self.is_on_subpage('details')
 
@@ -263,7 +259,8 @@ class ProjectAddPage(Page):
 
     def click_submit_details(self):
         submit_button = self.BY_XPATH(
-            "//input[contains(@class, 'btn-primary') and @value='Continue']"
+            "//input[contains(@class, 'btn-primary')" +
+            " and @value='Save and continue']"
         )
         submit_button.click()
 
@@ -276,7 +273,8 @@ class ProjectAddPage(Page):
         assert re.fullmatch('\s*', self.get_name()) is not None
 
         submit_button = self.BY_XPATH(
-            "//input[contains(@class, 'btn-primary') and @value='Continue']"
+            "//input[contains(@class, 'btn-primary')" +
+            " and @value='Save and continue']"
         )
         error_wait = (By.CLASS_NAME, 'errorlist')
         self.test.click_through(submit_button, error_wait)
@@ -297,10 +295,11 @@ class ProjectAddPage(Page):
     def submit_details(self):
         assert self.is_on_subpage('details')
         submit_button = self.BY_XPATH(
-            "//input[contains(@class, 'btn-primary') and @value='Continue']"
+            "//input[contains(@class, 'btn-primary')" +
+            " and @value='Save and continue']"
         )
-        next_header = "Assign project permissions"
-        xpath = "//h2[text()='{}' and not(*[2])]".format(next_header)
+        next_header = "Assign permissions to members"
+        xpath = "//h3[text()='{}']".format(next_header)
         set_perms_wait = (By.XPATH, xpath)
         self.test.click_through(submit_button, set_perms_wait)
         assert self.is_on_subpage('permissions')

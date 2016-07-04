@@ -4,6 +4,8 @@
 {% load i18n %}
 {% load account socialaccount %}
 
+{% block top-nav %}registration{% endblock %}
+
 {% block title %} | {% trans "Sign In" %}{% endblock %}
 
 {% block content %}
@@ -55,7 +57,7 @@
     </a>
   </div>
 
-  <div class="checkbox">
+  <div class="checkbox pull-left">
     <label>
       <input id="id_remember" label="Remember me"
              name="remember" type="checkbox" />

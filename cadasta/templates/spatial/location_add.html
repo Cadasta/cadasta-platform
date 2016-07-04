@@ -1,0 +1,56 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block left-nav %}map{% endblock %}
+
+{% load staticfiles %}
+{% load leaflet_tags %}
+
+{% block extra_head %}
+{% leaflet_css plugins="draw,forms" %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+{% endblock %}
+
+{% block extra_script %}
+{% leaflet_js plugins="draw,forms" %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
+<script src="{% static 'js/map_utils.js' %}"></script>
+<script>
+ $(document).ready(function () {
+   $(window).on('map:init', function(e) {
+      var map = e.originalEvent.detail.map;
+      add_map_controls(map);
+
+      var data = {{ geojson|safe }};
+
+      var geoJson = L.geoJson(null, {
+        onEachFeature: function(feature, layer) {
+          layer.bindPopup("<div class=\"text-wrap\">" +
+                         "<h2><span>Location</span>" +
+                         feature.properties.type + "</h2></div>" +
+                         "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
+                         "</div>");
+        }
+      });
+
+      L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+      geoJson.addData(data);
+
+      var markerGroup = L.markerClusterGroup.layerSupport()
+      markerGroup.addTo(map);
+      markerGroup.checkIn(geoJson);
+      geoJson.addTo(map);
+      map.fitBounds(geoJson.getBounds());
+   });
+ });
+</script>
+{% endblock %}
+
+{% block content %}
+  {% include "spatial/location_form.html" with title="Add location" %}
+{% endblock %}

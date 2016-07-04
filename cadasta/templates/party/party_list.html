@@ -1,0 +1,34 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Parties" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <table class="table table-hover datatable" data-paging-type="simple">
+            <thead>
+              <tr>
+                <th class="col-md-9">{% trans "Name" %}</th>
+                <th class="col-md-3">{% trans "Type" %}</th>
+              </tr>
+            </thead>
+            {% for party in object_list %}
+            <tr onclick="window.document.location='{% url 'parties:detail' object.organization.slug object.slug party.id %}';">
+              <td>{{ party.name }}</td>
+              <td>{{ party.get_type_display }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

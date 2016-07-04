@@ -16,7 +16,7 @@
 <script>
  $(document).ready(function () {
    $(window).on('map:init', function(e) {
-     add_map_controls(e.originalEvent.detail.map);
+      add_map_controls(e.originalEvent.detail.map);
    });
  });
 </script>
@@ -28,7 +28,7 @@
 
 <form method="POST" action="{% url 'organization:project-edit-geometry' project.organization.slug project.slug %}">
 {% csrf_token %}
-  <div class="col-md-11 col-md-offset-1 content-single">
+  <div class="col-md-12 content-single">
     <div class="row">
       <!-- Location map  -->
       <div class="col-md-8 map">
@@ -41,7 +41,6 @@
         <div class="panel panel-default">
           <div class="panel-body">
             <p>{% blocktrans %}Use the map tools to modify your project location boundaries. Once complete, select the save button below.{% endblocktrans %}</p>
-            <p>{% blocktrans %}<strong>Need help?</strong> <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.{% endblocktrans %}</p>
           </div>
           <div class="panel-footer panel-buttons">
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>

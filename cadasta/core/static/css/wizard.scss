@@ -1,121 +1,137 @@
+/* =Wizard css
+-------------------------------------------------------------- */
+
 .wizard {
-  margin-top: 15px;
-  border: 1px solid #d4d4d4;
-  border-radius: 4px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  display: inline-block;
+  float: right;
+  width: 336px;
+  > ul {
+    position: relative;
+    display: table;
+    width: 100%;
+    margin: 0 0 20px 0;
+    list-style: none;
+    padding: 0;
+    > li {
+      display: table-cell;
+      width: 1%;
+      text-align: center;
+      a, a:hover {
+        position: relative;
+        display: block;
+        opacity: 1;
+        color: #666;
+        -moz-opacity: 1;
+        text-decoration: none;
+        &:before {
+          position: absolute;
+          z-index: 4;
+          top: 20px;
+          left: 0;
+          width: 100%;
+          height: 4px;
+          content: '';
+          background: #ccc;
+        }
+      }
+    }
+    > li:first-child a:before {
+      left: 50%;
+    }
+    > li:last-child a:before {
+      right: 50%;
+      left: auto;
+      width: 50%;
+    }
+  }
 }
 
-.wizard:before,
-.wizard:after {
-  display: table;
-  line-height: 0;
-  content: "";
-}
-
-.wizard:after {
-  clear: both;
-}
-
-.wizard ul {
-  padding: 0;
-  margin: 0;
-  list-style: none outside none;
-}
-
-.wizard ul li {
-  position: relative;
-  float: left;
-  height: 42px;
-  padding: 0 10px 0 25px;
-  margin: 0;
-  font-size: 135%;
+.wizard > ul > li a .wizard-step {
+  font-size: 16px;
   line-height: 42px;
-  color: #999999;
-  cursor: default;
-  background: #ededed;
-}
-
-.wizard ul li .chevron {
-  position: absolute;
-  top: 0;
-  right: -14px;
-  display: block;
-  border: 19px solid transparent;
-  border-right: 0;
-  border-left: 14px solid #d4d4d4;
-}
-
-.wizard ul li .chevron:before {
-  position: absolute;
-  top: -19px;
-  right: 1px;
-  display: block;
-  border: 19px solid transparent;
-  border-right: 0;
-  border-left: 14px solid #ededed;
-  content: "";
-}
-
-.wizard ul li.enabled {
-  color: #000;
-}
-
-.wizard ul li.complete {
-  color: #468847;
-  background: #f3f4f5;
-}
-
-.wizard ul li.complete .chevron:before {
-  border-left: 14px solid #f3f4f5;
-}
-
-.wizard ul li.active {
-  color: #3a87ad;
-  background: #f1f6fc;
-}
-
-.wizard ul li.active .chevron:before {
-  border-left: 14px solid #f1f6fc;
-}
-
-.wizard ul li:nth-child(1) {
-  z-index: 10;
-  padding-left: 10px;
-  border-radius: 4px 0 0 4px;
-}
-
-.wizard ul li:nth-child(2) {
-  z-index: 9;
-}
-
-.wizard ul li:nth-child(3) {
-  z-index: 8;
-}
-
-.wizard ul li:nth-child(4) {
-  z-index: 7;
-}
-
-.wizard ul li:nth-child(5) {
-  z-index: 6;
-}
-
-.wizard ul li:nth-child(6) {
+  position: relative;
   z-index: 5;
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 5px;
+  cursor: pointer;
+  text-align: center;
+  color: #fafafa;
+  border-radius: 100px;
+  background: #ccc;
+}
+.wizard > ul > li.enabled a .wizard-step {
+  background: $brand-primary;
+}
+.wizard > ul > li a .wizard-description {
+  font-size: 13px;
+  font-weight: bold;
+  opacity: .60;
+  -moz-opacity: .60;
+  font-family: 'Roboto Condensed', sans-serif;
+  text-transform: uppercase;
+  opacity: 0.8;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+.wizard > ul > li a .wizard-description small {
+  font-size: 12px;
+  text-transform: none;
+  font-weight: normal;
+  display: block;
+  padding: 3px 0 0;
+  opacity: .70;
+  -moz-opacity: .70;
+  font-weight: 300;
+  display: none;
+}
+.wizard > ul > li a .wizard-description:hover,
+.wizard > ul > li.enabled a .wizard-description {
+  opacity: 1;
+  -moz-opacity: 1;
+  text-decoration: none;
+}
+.wizard > ul > li a.disabled .wizard-step {
+  background: #ccc;
+}
+.msgBox {
+  display: none;
+}
+.loader {
+  display: none;
+}
+.actionBar {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px 0 0;
+  border-top: #ddd solid 1px;
+}
+.actionBar a.btn {
+  float: right;
+  margin-left: 10px;
 }
 
-.wizard ul li:nth-child(7) {
-  z-index: 4;
-}
-
-.wizard ul li:nth-child(8) {
-  z-index: 3;
-}
-
-.wizard ul li:nth-child(9) {
-  z-index: 2;
-}
-
-.wizard ul li:nth-child(10) {
-  z-index: 1;
+#project-wizard {
+  .content-single .detail {
+    background: transparent;
+  }
+  h1 { 
+    color: $brand-darkblue;
+    text-shadow: none;
+    margin: 34px auto 14px;
+    font-size: 30px;
+  }
+  .col-md-4.detail {
+    .wizard {
+      display: block;
+      float: none;
+    }
+    h1 {
+      width: 100%;
+    }
+  }
+  div#org-wrapper {
+    margin-top: 16px;
+  }
 }

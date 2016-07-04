@@ -11,7 +11,7 @@
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link" href="{% url 'project:list' %}">
+    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'project:list' %}">
       <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
     </a>
     <h1>
@@ -21,6 +21,7 @@
       {{ object.name }}
     </h1>
     <div class="top-btn pull-right">
+
       <!-- More options menu -->
       <div class="dropdown pull-right btn-more">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
@@ -40,34 +41,47 @@
           </li>
         </ul>
       </div>
-      <!-- Split add button -->
-      <div class="btn-group pull-right btn-add">
-        <button type="button" class="btn btn-primary">
+
+      <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
+        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
-        </button>
+        </a>
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="caret"></span>
           <span class="sr-only">Toggle Add</span>
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#">{% trans "Add relationship" %}</a></li>
           <li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add resource" %}</a></li>
-          <li role="separator" class="divider"></li>
-          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>
+          <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
+          <!--<li role="separator" class="divider"></li>
+          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
+        </ul>
+      </div>
+      <!-- Single add button for smaller screens-->
+      <div class="dropdown pull-right visible-xs-inline">
+        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
+          <span class="glyphicon glyphicon-plus"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
+          <li><a href="#">{% trans "Add party" %}</a></li>
+          <li><a href="#">{% trans "Add relationship" %}</a></li>
+          <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
+          <!--<li role="separator" class="divider"></li>
+          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
         </ul>
       </div>
     </div>
   </div>
 </div>
 <!-- / single project header -->
-
 {% endblock %}
 
 {% block sub-nav %}
 
 <!-- Sidebar -->
-<div id="sidebar" class="{% block left-nav %}{% endblock %} col-md-1">
+<div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
     <li class="overview">
       <a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">
@@ -76,24 +90,24 @@
       </a>
     </li>
     <li class="map">
-      <a href="#">
+      <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
       </a>
-    </li>
-    <li class="resources">
+    </li><!--
+    --><li class="resources">
       <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
         <span class="icon resources"></span>
         <span class="title">{% trans "Resources" %}</span>
       </a>
-    </li>
-    <li class="reports">
+    </li><!--
+    --><li class="reports">
       <a href="#">
          <span class="icon reports"></span>
          <span class="title">{% trans "Reports" %}</span>
       </a>
-    </li>
-    <li class="activity">
+    </li><!--
+    --><li class="activity">
       <a href="#">
         <span class="icon activity"></span>
         <span class="title">{% trans "Activity" %}</span>
@@ -108,6 +122,7 @@
 {% block content %}{% endblock %}
 
 {% block modals %}
+{% block form_modal %}{% endblock %}
 
 <div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">
@@ -116,7 +131,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">{% trans "Archive project" %}</h4>
+        <h3 class="modal-title">{% trans "Archive project" %}</h3>
       </div>
       <div class="modal-body">
         <p>{% trans "Are you sure you want to archive this project?" %}</p>
@@ -126,7 +141,7 @@
           {% trans "Cancel" %}
         </button>
         <a href="{% url 'organization:project-archive' object.organization.slug object.slug %}"  class="btn btn-primary archive-final" role="button">
-          {% trans "Archive" %}
+          {% trans "Yes, archive this project" %}
         </a>
       </div>
     </div><!-- /.modal-content -->
@@ -140,7 +155,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">{% trans "Unarchive project" %}</h4>
+        <h3 class="modal-title">{% trans "Unarchive project" %}</h3>
       </div>
       <div class="modal-body">
         <p>
@@ -152,7 +167,7 @@
           {% trans "Cancel" %}
         </button>
         <a href="{% url 'organization:project-unarchive' object.organization.slug object.slug %}"  class="btn btn-primary unarchive-final" role="button">
-          {% trans "Unarchive" %}
+          {% trans "Yes, unarchive this project" %}
         </a>
       </div>
     </div><!-- /.modal-content -->

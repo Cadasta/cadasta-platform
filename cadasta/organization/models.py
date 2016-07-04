@@ -234,6 +234,36 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
         return self.access == 'public'
 
 
+def reassign_project_extent(instance):
+    if instance.extent:
+        points = [list(x) for x in list(instance.extent.boundary.coords)]
+        extent_visible = True
+        for point in points:
+            if point[0] < -180 or point[0] > 180:
+                extent_visible = False
+                break
+        if extent_visible:
+            return
+        extent = '(('
+        for i, point in enumerate(points):
+            while point[0] < -180:
+                point[0] += 360
+            while point[0] > 180:
+                point[0] -= 360
+            extent += ' '.join([str(point[0]), str(point[1])])
+            if i != len(points) - 1:
+                extent += ','
+        polygon = str(instance.extent).split(' ')[0]
+        new_extent = ('{} {}))'.format(polygon, extent))
+        instance.extent = new_extent
+
+
+@receiver(models.signals.pre_save, sender=Project)
+def check_extent(sender, instance, **kwargs):
+    if instance.extent:
+        reassign_project_extent(instance)
+
+
 class ProjectRole(RandomIDModel):
     project = models.ForeignKey(Project)
     user = models.ForeignKey('accounts.User')

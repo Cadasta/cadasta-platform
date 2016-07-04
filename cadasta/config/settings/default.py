@@ -15,7 +15,6 @@ import os
 
 from django.utils.translation import ugettext_lazy as _
 
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -67,6 +66,7 @@ INSTALLED_APPS = (
     'allauth.socialaccount',
     'sass_processor',
     'simple_history',
+    'jsonattrs',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -168,7 +168,12 @@ LEAFLET_CONFIG = {
                'pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW1'
                '1a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
                {'attribution': 'DigitalGlobe'})],
-    'RESET_VIEW': False
+    'RESET_VIEW': False,
+    'PLUGINS': {
+        'draw': {
+            'js': '/static/leaflet/draw/leaflet.draw.js'
+        }
+    }
 }
 
 # Internationalization
@@ -209,3 +214,26 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'sass_processor.finders.CssFinder',
 )
+
+JSONATTRS_SCHEMA_SELECTORS = {
+    'spatial.spatialunit': (
+        'project.organization.pk',
+        'project.pk', 'project.current_questionnaire'
+    ),
+    'spatial.spatialrelationship': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    ),
+    'party.party': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    ),
+    'party.partyrelationship': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    ),
+    'party.tenurerelationship': (
+        'project.organization.pk', 'project.pk',
+        'project.current_questionnaire'
+    )
+}

@@ -1,0 +1,37 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="col-md-11 col-md-offset-1 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Party resources" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">{% trans "Overview" %}</a></li>
+            <li role="presentation"><a href="{% url 'parties:relationship_list' object.organization.slug object.slug party.id %}">{% trans "Relationships" %}</a></li>
+            <li role="presentation" class="active"><a href="{% url 'parties:resource_list' object.organization.slug object.slug party.id %}">{% trans "Resources" %}</a></li>
+
+            <li role="presentation" class="pull-right">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> Add new resource</a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">{% trans "Add from library" %}</a></li>
+                <li><a href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">{% trans "Upload new resource" %}</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          {% include 'resources/table.html' %}
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

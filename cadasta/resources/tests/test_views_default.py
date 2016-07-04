@@ -396,7 +396,9 @@ class ProjectResourcesDetailTest(UserTestCase):
         setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
             self.view(self.request,
-                      organization='some-org', project='some-project')
+                      organization='some-org',
+                      project='some-project',
+                      resource=self.resource.id)
 
     def test_get_non_existent_resource(self):
         setattr(self.request, 'user', self.user)
@@ -461,7 +463,7 @@ class ProjectResourcesEditTest(UserTestCase):
             assert expected == content
         return response
 
-    def _post(self, user=None, status=None, expected_redirect=None):
+    def _post(self, user=None, status=None, expected_redirect=None, get=None):
         if user is None:
             user = self.user
 
@@ -478,6 +480,8 @@ class ProjectResourcesEditTest(UserTestCase):
 
         setattr(self.request, 'method', 'POST')
         setattr(self.request, 'POST', self.data)
+        if get:
+            setattr(self.request, 'GET', get)
         setattr(self.request, 'user', user)
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
@@ -501,7 +505,9 @@ class ProjectResourcesEditTest(UserTestCase):
         setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
             self.view(self.request,
-                      organization='some-org', project='some-project')
+                      organization='some-org',
+                      project='some-project',
+                      resource=self.resource.id)
 
     def test_get_non_existent_resource(self):
         setattr(self.request, 'user', self.user)
@@ -529,6 +535,13 @@ class ProjectResourcesEditTest(UserTestCase):
             }
         )
         self._post(status=302, expected_redirect=redirect_url)
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first().name == self.data['name']
+
+    def test_update_with_custom_redirect(self):
+        self._post(status=302,
+                   expected_redirect='http://example.com/#resources',
+                   get={'next': 'http://example.com/'})
         assert self.project.resources.count() == 1
         assert self.project.resources.first().name == self.data['name']
 

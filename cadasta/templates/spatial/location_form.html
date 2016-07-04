@@ -1,0 +1,35 @@
+{% load i18n %}
+{% load leaflet_tags %}
+{% load widget_tweaks %}
+
+<form method="POST" class="col-sm-12 content-single">
+  {% csrf_token %}
+  <div class="row">
+    <!-- Start overview map  -->
+    <div class="col-md-6 map">
+      {{ form.geometry }}
+    </div>
+    <!-- / end overview map -->
+    <!-- Overview detail  -->
+    <div class="col-md-6 detail">
+      <section>
+        <h2>{{ title }}</h2>
+
+        <div class="form-group">
+          {{ form.type.errors }}
+          <label for="{{ form.type.id_for_label }}">{% trans "What type of location is this?" %}</label>
+          {% render_field form.type class+="form-control input-lg" %}
+        </div>
+
+        <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+          {% trans "Save" %}
+        </button>
+        <a class="btn btn-link cancel"
+          href="{{ request.META.HTTP_REFERER }}">
+          {% trans "Cancel" %}
+        </a>
+      </section>
+    </div>
+    <!-- / overview detail -->
+  </div>
+</form>

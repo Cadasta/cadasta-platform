@@ -33,7 +33,7 @@
   <thead>
     <tr>
       <th class="col-md-10">{% trans "Organization" %}</th>
-      <th class="col-md-2">{% trans "Projects" %}</th>
+      <th class="col-md-2 hidden-xs">{% trans "Projects" %}</th>
     </tr>
   </thead>
   {% for org in object_list %}
@@ -52,7 +52,7 @@
         {% endif %}
       </div>
     </td>
-    <td>{{ org.projects.count }}</td>
+    <td class=" hidden-xs">{{ org.projects.count }}</td>
   </tr>
   {% endfor %}
 </table>

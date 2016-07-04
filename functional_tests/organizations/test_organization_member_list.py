@@ -61,6 +61,13 @@ class OrganizationMemberListTest(FunctionalTest):
 
         input_box = page.click_on_input()
         input_box.clear()
+        input_box.send_keys("admin_user")
+        error_list = page.click_submit_button(success=False)
+        error_message = 'User is already a member of the organization.'
+        assert error_list == error_message
+
+        input_box = page.click_on_input()
+        input_box.clear()
         input_box.send_keys("hansolo")
         member = page.click_submit_button()
         assert member == "MEMBER: Han Solo"

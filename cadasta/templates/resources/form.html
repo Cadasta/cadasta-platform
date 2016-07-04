@@ -1,28 +1,25 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-<form method="POST" class="col-md-7">
-  {% csrf_token %}
-
-  <div class="form-group">
-    {{ form.name.errors }}
-    <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-    {% render_field form.name class+="form-control input-lg" %}
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      {{ form.file.errors }}
+      <h4><label for="{{ form.file.id_for_label }}">{% trans "Select the file to upload" %}</label></h4>
+      {% render_field form.file class+="form-control" %}
+      <p class="help-block">Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png</p>
+    </div>
+    <hr class="divider">
+    <div class="form-group">
+      {{ form.name.errors }}
+      <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
+      {% render_field form.name class+="form-control" %}
+    </div>
+    <div class="form-group">
+      {{ form.description.errors }}
+      <label for="{{ form.description.id_for_label }}">{% trans "Description" %}</label>
+      {% render_field form.description class+="form-control" %}
+    </div>
+    <input type="hidden" name="original_file" value="{{ form.original_file.value }}">
   </div>
-
-  <div class="form-group">
-    {{ form.description.errors }}
-    <label for="{{ form.description.id_for_label }}">{% trans "Description" %}</label>
-    {% render_field form.description class+="form-control input-lg" %}
-  </div>
-
-  <div class="form-group">
-    {{ form.file.errors }}
-    <label for="{{ form.file.id_for_label }}">{% trans "Upload File" %}</label>
-    {% render_field form.file class+="form-control input-lg" %}
-  </div>
-
-  <input type="hidden" name="original_file">
-
-  <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-</form>
+</div>

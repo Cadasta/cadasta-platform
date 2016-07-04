@@ -6,11 +6,11 @@
 
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
     <div class="row-height">
       <!-- Main text  -->
-      <div class="col-md-8 main-text col-height">
+      <div class="col-md-8 main-text col-height hidden-xs hidden-sm">
         <h2>{% trans "Organization Overview" %}</h2>
         <div class="panel panel-default">
           <div class="panel-heading"><h3>Projects</h3></div>
@@ -40,7 +40,6 @@
             <p>
               {% trans "You have successfully created your organization. What would you like to do next?" %}
             </p>
-            <p>Need to help getting started? <a href="#">Learn more in this video</a> or <a href="#">visit our help center</a>.</p>
             <div class="btn-full">
               <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary btn-lg" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a new project" %}
@@ -95,7 +94,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">{% trans "Archive organization" %}</h4>
+        <h3 class="modal-title">{% trans "Archive organization" %}</h3>
       </div>
       <div class="modal-body">
         <p>{% trans "Are you sure you want to archive this organization?" %}</p>
@@ -105,7 +104,7 @@
           {% trans "Cancel" %}
         </button>
         <a href="{% url 'organization:archive' organization.slug %}"  class="btn btn-primary archive-final" role="button">
-          {% trans "Archive" %}
+          {% trans "Yes, archive this organization" %}
         </a>
       </div>
     </div><!-- /.modal-content -->
@@ -119,7 +118,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-        <h4 class="modal-title">{% trans "Unarchive organization" %}</h4>
+        <h3 class="modal-title">{% trans "Unarchive organization" %}</h3>
       </div>
       <div class="modal-body">
         <p>
@@ -131,7 +130,7 @@
           {% trans "Cancel" %}
         </button>
         <a href="{% url 'organization:unarchive' organization.slug %}"  class="btn btn-primary unarchive-final" role="button">
-          {% trans "Unarchive" %}
+          {% trans "Yes, unarchive this organization" %}
         </a>
       </div>
     </div><!-- /.modal-content -->

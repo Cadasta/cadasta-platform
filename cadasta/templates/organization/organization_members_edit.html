@@ -9,16 +9,13 @@
 
 {% block content %}
 
-<div class="col-md-11 col-md-offset-1 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
     <div class="col-md-12 main-text">
+      <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
       <form method="POST" action="" class="org-member-edit">
       {% csrf_token %}
-  
-        <div class="page-title">
-          <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
-        </div>
         <div class="row">
           <div class="col-md-3">
             <!-- Member panel -->
@@ -91,7 +88,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" name="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Confirm Removal of Member</h4>
+        <h3 class="modal-title">Remove Member</h3>
       </div>
       <div class="modal-body">
         <p>Removing this member will remove the member's project permissions for this organization.</p>
@@ -99,7 +96,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-link" name="cancel" data-dismiss="modal">Cancel</button>
-        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-primary confirm">Confirm removal</a>
+        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-primary confirm">Yes, remove this member</a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

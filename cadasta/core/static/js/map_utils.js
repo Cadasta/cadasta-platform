@@ -34,4 +34,5 @@ function add_map_controls(map) {
   });
 
   map.addControl(new Geolocate());
+  return map
 }

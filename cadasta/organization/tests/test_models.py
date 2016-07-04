@@ -114,6 +114,19 @@ class ProjectTest(TestCase):
         )
         assert project.country == ''
 
+    def test_reassign_extent(self):
+        project = ProjectFactory.create(
+            extent='SRID=4326;POLYGON(('
+            '211.36667 47.25000, '
+            '211.41667 47.25000, '
+            '211.41667 47.28333, '
+            '211.36667 47.28333, '
+            '211.36667 47.25000))'
+        )
+        assert project.extent.boundary.coords == (
+            (-148.63333, 47.25), (-148.58333, 47.25), (-148.58333, 47.28333),
+            (-148.63333, 47.28333), (-148.63333, 47.25))
+
     def test_defaults_to_public(self):
         project = ProjectFactory.create()
         assert project.public()

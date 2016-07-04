@@ -1,25 +1,29 @@
 """Party models."""
 
-from datetime import date
-
 from core.models import RandomIDModel
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import ugettext as _
+
+from jsonattrs.decorators import fix_model_for_attributes
+from jsonattrs.fields import JSONAttributeField
 from organization.models import Project
 from organization.validators import validate_contact
+from simple_history.models import HistoricalRecords
+
+from resources.mixins import ResourceModelMixin
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
-from simple_history.models import HistoricalRecords
 
 from . import managers, messages
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 
+@fix_model_for_attributes
 @permissioned_model
-class Party(RandomIDModel):
+class Party(ResourceModelMixin, RandomIDModel):
     """
     Party model.
 
@@ -49,18 +53,19 @@ class Party(RandomIDModel):
     name = models.CharField(max_length=200)
 
     # Party type: used to manage range of allowed attributes.
-    type = models.CharField(max_length=2,
-                            choices=TYPE_CHOICES, default=INDIVIDUAL)
+    type = models.CharField(
+        max_length=2, choices=TYPE_CHOICES, default=INDIVIDUAL)
 
     contacts = JSONField(validators=[validate_contact], default={})
 
     # JSON attributes field with management of allowed members.
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
 
     # Party-party relationships: includes things like family
     # relationships and group memberships.
     relationships = models.ManyToManyField(
-        'self', through='PartyRelationship',
+        'self',
+        through='PartyRelationship',
         through_fields=('party1', 'party2'),
         symmetrical=False,
         related_name='relationships_set'
@@ -68,7 +73,8 @@ class Party(RandomIDModel):
 
     # Tenure relationships.
     tenure_relationships = models.ManyToManyField(
-        SpatialUnit, through='TenureRelationship',
+        SpatialUnit,
+        through='TenureRelationship',
         related_name='tenure_relationships'
     )
 
@@ -78,34 +84,39 @@ class Party(RandomIDModel):
         ordering = ('name',)
 
     class TutelaryMeta:
-        perm_type = 'project'
-        path_fields = ('id',)
+        perm_type = 'party'
+        path_fields = ('project', 'id')
         actions = (
-            ('project.party.list',
-             {'description': _("List existing parties"), }),
-            ('project.party.create',
-             {'description': _("Create parties"), }),
-            ('project.party.view',
-             {'description': _("View existing parties"),
+            ('party.list',
+             {'description': _("List existing parties of a project"),
+              'error_message': messages.PARTY_LIST,
+              'permissions_object': 'project'}),
+            ('party.create',
+             {'description': _("Add a party to a project"),
+              'error_message': messages.PARTY_CREATE,
+              'permissions_object': 'project'}),
+            ('party.view',
+             {'description': _("View an existing party"),
               'error_message': messages.PARTY_VIEW}),
-            ('project.party.update',
+            ('party.update',
              {'description': _("Update an existing party"),
-              'error_message': messages.PARTY_EDIT}),
-            # ('party.archive',
-            #  {'description': _("Archive an existing party"),
-            #   'error_message': messages.PARTY_ARCHIVE}),
-            # ('party.unarchive',
-            #  {'description': _("Unarchive an existing party"),
-            #   'error_message': messages.PARTY_UNARCHIVE}),
+              'error_message': messages.PARTY_UPDATE}),
+            ('party.delete',
+             {'description': _("Delete an existing party"),
+              'error_message': messages.PARTY_DELETE}),
+            ('party.resources.add',
+             {'description': _("Add resources to the party"),
+              'error_message': messages.PARTY_RESOURCES_ADD})
         )
 
     def __str__(self):
-        return "<Party: {name}>".format(name=self.name)
+        return "<Party: {}>".format(self.name)
 
     def __repr__(self):
         return str(self)
 
 
+@fix_model_for_attributes
 class PartyRelationship(RandomIDModel):
     """
     PartyRelationship model.
@@ -123,31 +134,59 @@ class PartyRelationship(RandomIDModel):
                     ('C', 'is-child-of'),
                     ('M', 'is-member-of'))
 
-    # All party relationships are associated with a single project.
+    # All party relationships are associated with a single project
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name='party_relationships')
 
     # Parties to the relationship.
-    party1 = models.ForeignKey(Party,
-                               on_delete=models.CASCADE,
-                               related_name='party1'
-                               )
-    party2 = models.ForeignKey(Party,
-                               on_delete=models.CASCADE,
+    party1 = models.ForeignKey(Party, on_delete=models.CASCADE,
+                               related_name='party1')
+    party2 = models.ForeignKey(Party, on_delete=models.CASCADE,
                                related_name='party2')
 
     # Party relationship type: used to manage range of allowed attributes.
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
     # JSON attributes field with management of allowed members.
-    attributes = JSONField(default={})
+    attributes = JSONAttributeField(default={})
 
     objects = managers.PartyRelationshipManager()
 
     history = HistoricalRecords()
 
+    class TutelaryMeta:
+        perm_type = 'party_rel'
+        path_fields = ('project', 'id')
+        actions = (
+            ('party_rel.list',
+             {'description': _("List existing party relationships"
+                               " of a project"),
+              'error_message': messages.PARTY_REL_LIST,
+              'permissions_object': 'project'}),
+            ('party_rel.create',
+             {'description': _("Add a party relationship to a project"),
+              'error_message': messages.PARTY_REL_CREATE,
+              'permissions_object': 'project'}),
+            ('party_rel.view',
+             {'description': _("View an existing party relationship"),
+              'error_message': messages.PARTY_REL_VIEW}),
+            ('party_rel.update',
+             {'description': _("Update an existing party relationship"),
+              'error_message': messages.PARTY_REL_UPDATE}),
+            ('party_rel.delete',
+             {'description': _("Delete an existing party relationship"),
+              'error_message': messages.PARTY_REL_DELETE}),
+        )
 
-class TenureRelationship(RandomIDModel):
+    def __str__(self):
+        return "<PartyRelationship: <{party1}> {type} <{party2}>>".format(
+            party1=self.party1.name, party2=self.party2.name,
+            type=dict(self.TYPE_CHOICES).get(self.type))
+
+
+@fix_model_for_attributes
+@permissioned_model
+class TenureRelationship(ResourceModelMixin, RandomIDModel):
     """TenureRelationship model.
 
     Governs relationships between Party and SpatialUnit.
@@ -175,28 +214,59 @@ class TenureRelationship(RandomIDModel):
                         (RENTAL, _('Rental')),
                         (OTHER, _('Other')))
 
+    # All tenure relationships are associated with a single project
+    project = models.ForeignKey(
+        Project, on_delete=models.CASCADE, related_name='tenure_relationships')
+
+    # Party to the relationship
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
+
+    # Spatial unit in the relationship
+    spatial_unit = models.ForeignKey(SpatialUnit, on_delete=models.CASCADE)
+
+    # Tenure relationships type: used to manage range of allowed attributes
     tenure_type = models.ForeignKey(
         'TenureRelationshipType',
         related_name='tenure_type', null=False, blank=False
     )
 
-    project = models.ForeignKey(
-        Project, on_delete=models.CASCADE, related_name='tenure_relationships')
-
-    party = models.ForeignKey(Party, on_delete=models.CASCADE)
-    spatial_unit = models.ForeignKey(
-        SpatialUnit, on_delete=models.CASCADE)
-    acquired_how = models.CharField(
-        max_length=2,
-        choices=ACQUIRED_CHOICES, null=True, blank=True
-    )
-    acquired_date = models.DateField(default=date.today)
-    attributes = JSONField(default={})
-    geom = models.GeometryField(null=True, blank=True)
-
+    # JSON attributes field with management of allowed members.
+    attributes = JSONAttributeField(default={})
     objects = managers.TenureRelationshipManager()
 
     history = HistoricalRecords()
+
+    class TutelaryMeta:
+        perm_type = 'tenure_rel'
+        path_fields = ('project', 'id')
+        actions = (
+            ('tenure_rel.list',
+             {'description': _("List existing tenure relationships"
+                               " of a project"),
+              'error_message': messages.TENURE_REL_LIST,
+              'permissions_object': 'project'}),
+            ('tenure_rel.create',
+             {'description': _("Add a tenure relationship to a project"),
+              'error_message': messages.TENURE_REL_CREATE,
+              'permissions_object': 'project'}),
+            ('tenure_rel.view',
+             {'description': _("View an existing tenure relationship"),
+              'error_message': messages.TENURE_REL_VIEW}),
+            ('tenure_rel.update',
+             {'description': _("Update an existing tenure relationship"),
+              'error_message': messages.TENURE_REL_UPDATE}),
+            ('tenure_rel.delete',
+             {'description': _("Delete an existing tenure relationship"),
+              'error_message': messages.TENURE_REL_DELETE}),
+            ('tenure_rel.resources.add',
+             {'description': _("Add a resource to a tenure relationship"),
+              'error_message': messages.TENURE_REL_RESOURCES_ADD}),
+        )
+
+    def __str__(self):
+        return "<TenureRelationship: <{party}> {type} <{su}>>".format(
+            party=self.party.name, su=self.spatial_unit.name,
+            type=self.tenure_type.label)
 
 
 class TenureRelationshipType(models.Model):
