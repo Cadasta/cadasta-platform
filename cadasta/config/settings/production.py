@@ -21,7 +21,7 @@ DJOSER.update({  # NOQA
 })
 
 # Adding localhost here for uWSGI debugging!
-ALLOWED_HOSTS = [os.environ['API_HOST'], 'localhost']
+ALLOWED_HOSTS = [os.environ['API_HOST'], os.environ['DOMAIN'], 'localhost']
 
 ADMINS = [('Cadasta platform admins', 'platform-admin@cadasta.org')]
 EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
