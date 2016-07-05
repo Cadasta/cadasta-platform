@@ -6,14 +6,14 @@
     <tr>
       <th class="col-md-4">{% trans "Resource" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Type" %}</th>
-      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Entities associated" %}</th>
+      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Connections" %}</th>
       <th class="col-md-2">{% trans "Contributor" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
     </tr>
   </thead>
   <tbody>
   {% for resource in object_list %}
-    <tr onclick="window.document.location='{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}';">
+    <tr class="linked" onclick="window.document.location='{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}';">
       <td>
         <div class="resource-60">
           <img src="{{ resource.thumbnail }}" class="thumb-60">

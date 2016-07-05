@@ -19,7 +19,7 @@
               </tr>
             </thead>
             {% for party in object_list %}
-            <tr onclick="window.document.location='{% url 'parties:detail' object.organization.slug object.slug party.id %}';">
+            <tr class="linked" onclick="window.document.location='{% url 'parties:detail' object.organization.slug object.slug party.id %}';">
               <td>{{ party.name }}</td>
               <td>{{ party.get_type_display }}</td>
             </tr>

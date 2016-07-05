@@ -33,7 +33,7 @@
         </thead>
         <tbody>
         {% for user in organization.users.all %}
-          <tr onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
+          <tr class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
             <td>{{ user.get_full_name }}
               <div class="hidden-sm hidden-md hidden-lg">
                 {{ user.username }}<br />

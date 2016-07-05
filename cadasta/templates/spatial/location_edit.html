@@ -4,6 +4,8 @@
 {% load widget_tweaks %}
 {% load staticfiles %}
 
+{% block page_title %}Edit location | {% endblock %}
+
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
