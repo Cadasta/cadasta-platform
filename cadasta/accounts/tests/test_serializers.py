@@ -1,3 +1,4 @@
+import random
 import pytest
 from datetime import datetime
 from django.utils.translation import gettext as _
@@ -73,6 +74,21 @@ class RegistrationSerializerTest(UserTestCase):
         assert (_("Another user is already registered with this email address")
                 in serializer._errors['email'])
 
+    def test_create_with_restricted_username(self):
+        invalid_usernames = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'username': random.choice(invalid_usernames),
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79',
+            'password_repeat': 'iloveyoko79',
+            'full_name': 'John Lennon',
+        }
+
+        serializer = RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert (_("Username cannot be “add” or “new”.")
+                in serializer._errors['username'])
+
 
 class UserSerializerTest(UserTestCase):
     def test_field_serialization(self):
@@ -102,8 +118,7 @@ class UserSerializerTest(UserTestCase):
     def test_update_username_fails(self):
         serializer = UserSerializer(data=BASIC_TEST_DATA)
         assert serializer.is_valid()
-        serializer.save()
-        user = User.objects.first()
+        user = serializer.save()
         other_user = UserFactory.create()
         update_data = {'username': 'bad-update'}
         request = APIRequestFactory().patch('/user/imagine71', update_data)
@@ -124,6 +139,25 @@ class UserSerializerTest(UserTestCase):
         serializer2 = UserSerializer(user, data=update_data1)
         assert not serializer2.is_valid()
         assert serializer2.errors['last_login'] == ['Cannot update last_login']
+
+    def test_update_with_restricted_username(self):
+        serializer = UserSerializer(data=BASIC_TEST_DATA)
+        assert serializer.is_valid()
+        user = serializer.save()
+        invalid_usernames = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'username': random.choice(invalid_usernames),
+            'email': 'john@beatles.uk',
+            'full_name': 'John Lennon',
+        }
+        request = APIRequestFactory().patch('/user/imagine71', data)
+        force_authenticate(request, user=user)
+        serializer2 = UserSerializer(
+            user, data=data, context={'request': Request(request)}
+        )
+        assert not serializer2.is_valid()
+        assert serializer2.errors['username'] == [
+            _("Username cannot be “add” or “new”.")]
 
 
 class AccountLoginSerializerTest(UserTestCase):

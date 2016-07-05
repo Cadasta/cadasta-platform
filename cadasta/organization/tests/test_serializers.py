@@ -1,3 +1,4 @@
+import random
 import pytest
 from datetime import datetime
 from django.utils.text import slugify
@@ -48,6 +49,23 @@ class OrganizationSerializerTest(UserTestCase):
 
         serializer = serializers.OrganizationSerializer(org, detail=True)
         assert 'users' in serializer.data
+
+    def test_restricted_organization_name(self):
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {'name': random.choice(invalid_names)}
+        serializer = serializers.OrganizationSerializer(
+            data=data,
+            context={'request': request}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': ["Organization name cannot be “Add” or “New”."]
+        }
 
 
 class ProjectSerializerTest(TestCase):
@@ -106,6 +124,24 @@ class ProjectSerializerTest(TestCase):
 
         project_instance = serializer.instance
         assert project_instance.access == 'private'
+
+    def test_restricted_project_name(self):
+        org = OrganizationFactory.create()
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'name': random.choice(invalid_names),
+            'organization': org,
+            'access': 'private'
+        }
+        serializer = serializers.ProjectSerializer(
+            data=data,
+            context={'organization': org}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': ["Project name cannot be “Add” or “New”."]
+        }
 
 
 class ProjectGeometrySerializerTest(TestCase):

@@ -178,6 +178,9 @@ LEAFLET_CONFIG = {
     }
 }
 
+# Invalid names for Cadasta organizations, projects, and usernames
+CADASTA_INVALID_ENTITY_NAMES = ['add', 'new']
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 

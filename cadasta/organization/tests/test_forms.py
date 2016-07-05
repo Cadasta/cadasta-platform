@@ -1,4 +1,5 @@
 import os
+import random
 from pytest import raises
 
 from django.conf import settings
@@ -18,7 +19,7 @@ from accounts.tests.factories import UserFactory
 from tutelary.models import Policy
 
 
-class OrganzationTest(UserTestCase):
+class OrganizationTest(UserTestCase):
     def setUp(self):
         super().setUp()
         self.data = {
@@ -76,6 +77,23 @@ class OrganzationTest(UserTestCase):
             'tel': '555-5555',
             'email': 'ringo@beatles.uk'
         }]
+
+    def test_add_organization_with_restricted_name(self):
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'name': random.choice(invalid_names),
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+        form = forms.OrganizationForm(data, user=UserFactory.create())
+        assert not form.is_valid()
+        assert form.errors == {
+            'name': ["Organization name cannot be “Add” or “New”."]
+        }
+        assert not Organization.objects.exists()
 
     def test_update_organization(self):
         org = OrganizationFactory.create(slug='some-org')
@@ -214,6 +232,26 @@ class EditOrganizationMemberFormTest(UserTestCase):
                 is False)
         assert (ProjectRole.objects.filter(user=user, project=prj_4).exists()
                 is False)
+
+
+class ProjectAddDetailsTest(UserTestCase):
+    def test_add_new_project_with_restricted_name(self):
+        org = OrganizationFactory.create()
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'organization': org.slug,
+            'name': random.choice(invalid_names),
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+        form = forms.ProjectAddDetails(data=data)
+        assert not form.is_valid()
+        assert form.errors == {
+            'name': ["Project name cannot be “Add” or “New”."]
+        }
 
 
 class ProjectEditDetailsTest(UserTestCase):

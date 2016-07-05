@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
+from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 from django.template.loader import get_template
 from django.template import Context
@@ -26,6 +27,14 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
         read_only_fields = ('id', 'slug',)
         detail_only_fields = ('users',)
 
+    def validate_name(self, value):
+        is_create = not self.instance
+        invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
+        if is_create and slugify(value) in invalid_names:
+            raise serializers.ValidationError(
+                _("Organization name cannot be “Add” or “New”."))
+        return value
+
     def create(self, *args, **kwargs):
         org = super(OrganizationSerializer, self).create(*args, **kwargs)
 
@@ -42,6 +51,14 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
     organization = OrganizationSerializer(read_only=True)
     country = CountryField(required=False)
+
+    def validate_name(self, value):
+        is_create = not self.instance
+        invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
+        if is_create and slugify(value) in invalid_names:
+            raise serializers.ValidationError(
+                _("Project name cannot be “Add” or “New”."))
+        return value
 
     class Meta:
         model = Project
