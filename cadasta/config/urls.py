@@ -27,6 +27,9 @@ api_v1 = [
     url(r'^projects/',
         include('organization.urls.api.projects',
                 namespace='project')),
+    url(r'^users/',
+        include('organization.urls.api.users',
+                namespace='user')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
         '(?P<project_id>[-\w]+)/',
         include('questionnaires.urls.api',
@@ -35,8 +38,10 @@ api_v1 = [
         '(?P<project>[-\w]+)/',
         include('resources.urls.api',
                 namespace='resources')),
-    url(r'^users/',
-        include('organization.urls.api.users', namespace='user')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project>[-\w]+)/spatial/',
+        include('spatial.urls.api.spatial',
+                namespace='spatial')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
         '(?P<project>[-\w]+)/parties/',
         include('party.urls.api.parties',

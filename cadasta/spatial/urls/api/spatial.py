@@ -9,11 +9,11 @@ urlpatterns = [
         api.SpatialUnitList.as_view(),
         name='list'),
     url(
-        r'^(?P<spatial_id>[-\w]+)/relationships/$',
-        RelationshipList.as_view(),
-        name='rel_list'),
-    url(
         r'^(?P<spatial_id>[-\w]+)/$',
         api.SpatialUnitDetail.as_view(),
         name='detail'),
+    url(
+        r'^(?P<spatial_id>[-\w]+)/relationships/$',
+        RelationshipList.as_view(),
+        name='rel_list'),
 ]

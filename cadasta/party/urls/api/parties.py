@@ -8,11 +8,11 @@ urlpatterns = [
         api.PartyList.as_view(),
         name='list'),
     url(
-        r'^(?P<party>[-\w]+)/relationships/$',
-        api.RelationshipList.as_view(),
-        name='rel_list'),
-    url(
         r'^(?P<party>[-\w]+)/$',
         api.PartyDetail.as_view(),
         name='detail'),
+    url(
+        r'^(?P<party>[-\w]+)/relationships/$',
+        api.RelationshipList.as_view(),
+        name='rel_list'),
 ]
