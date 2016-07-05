@@ -1,4 +1,5 @@
 import itertools
+import re
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -42,9 +43,16 @@ def create_children(children, errors=[], project=None, kwargs={}):
 
                 # parse attribute group
                 attribute_group = c.get('name')
-                if attribute_group in ATTRIBUTE_GROUPS:
-                    create_attrs_schema(
-                        project=project, dict=c, errors=errors)
+                for attr_group in ATTRIBUTE_GROUPS.keys():
+                    if attribute_group.startswith(attr_group):
+                        app_label = ATTRIBUTE_GROUPS[attr_group]['app_label']
+                        model = ATTRIBUTE_GROUPS[attr_group]['model']
+                        content_type = ContentType.objects.get(
+                            app_label=app_label, model=model)
+                        create_attrs_schema(
+                            project=project, dict=c,
+                            content_type=content_type, errors=errors
+                        )
             else:
                 model_name = 'Question'
 
@@ -62,19 +70,24 @@ def create_options(options, question, errors=[]):
                         " '{field_name}'".format(field_name=question.name)))
 
 
-def create_attrs_schema(project=None, dict=None, errors=[]):
-    name = dict.get('name')
-    app_label = ATTRIBUTE_GROUPS[name]['app_label']
-    model = ATTRIBUTE_GROUPS[name]['model']
-    content_type = ContentType.objects.get(
-        app_label=app_label, model=model)
+def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
     fields = []
-    proj = project.pk
-    org = project.organization.pk
-    quest = project.current_questionnaire
+    selectors = (project.organization.pk, project.pk,
+                 project.current_questionnaire)
+
+    # check if the attribute group has a relevant bind statement,
+    # eg ${party_type}='IN'
+    # this enables conditional attribute schema creation
+    bind = dict.get('bind', None)
+    if bind:
+        relevant = bind.get('relevant', None)
+        if relevant:
+            clauses = relevant.split('=')
+            selector = re.sub("'", '', clauses[1])
+            selectors += (selector,)
 
     schema_obj = Schema.objects.create(content_type=content_type,
-                                       selectors=(org, proj, quest))
+                                       selectors=selectors)
 
     for c in dict.get('children'):
         field = {}
@@ -83,7 +96,7 @@ def create_attrs_schema(project=None, dict=None, errors=[]):
         # HACK: pyxform strips underscores from xform field names
         field['attr_type'] = c.get('type').replace(' ', '_')
         if c.get('default'):
-            field['default'] = c.get('default')
+            field['default'] = c.get('default', '')
         if c.get('omit'):
             field['omit'] = c.get('omit')
         bind = c.get('bind')
