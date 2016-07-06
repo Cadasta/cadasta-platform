@@ -1,3 +1,5 @@
+import random
+
 from django.utils.translation import gettext as _
 
 from ..models import User
@@ -55,6 +57,22 @@ class RegisterFormTest(UserTestCase):
                 in form.errors.get('email'))
         assert User.objects.count() == 1
 
+    def test_signup_with_restricted_username(self):
+        invalid_usernames = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'username': random.choice(invalid_usernames),
+            'email': 'john@beatles.uk',
+            'password1': 'iloveyoko79',
+            'password2': 'iloveyoko68',
+            'full_name': 'John Lennon',
+        }
+        form = RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert (_("Username cannot be “add” or “new”.")
+                in form.errors.get('username'))
+        assert User.objects.count() == 0
+
 
 class ProfileFormTest(UserTestCase):
     def test_update_user(self):
@@ -90,6 +108,18 @@ class ProfileFormTest(UserTestCase):
         data = {
             'username': 'imagine71',
             'email': 'existing@example.com',
+            'full_name': 'John Lennon',
+        }
+        form = ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+
+    def test_update_user_with_restricted_username(self):
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
+        invalid_usernames = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'username': random.choice(invalid_usernames),
+            'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
         }
         form = ProfileForm(data, instance=user)

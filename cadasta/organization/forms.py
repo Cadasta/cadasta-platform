@@ -1,6 +1,8 @@
 from django import forms
+from django.conf import settings
 from django.contrib.postgres import forms as pg_forms
 from django.contrib.gis import forms as gisforms
+from django.utils.text import slugify
 from django.utils.translation import ugettext as _
 from django.db import transaction
 
@@ -96,13 +98,22 @@ class OrganizationForm(forms.ModelForm):
     def clean_urls(self):
         return self.to_list(self.data.get('urls'))
 
+    def clean_name(self):
+        is_create = not self.instance.id
+        name = self.cleaned_data['name']
+        invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
+        if is_create and slugify(name) in invalid_names:
+            raise forms.ValidationError(
+                _("Organization name cannot be “Add” or “New”."))
+        return name
+
     def save(self, *args, **kwargs):
         instance = super(OrganizationForm, self).save(commit=False)
-        create = not instance.id
+        is_create = not instance.id
 
         instance.save()
 
-        if create:
+        if is_create:
             OrganizationRole.objects.create(
                 organization=instance,
                 user=self.user,
@@ -207,6 +218,13 @@ class ProjectAddDetails(forms.Form):
         self.fields['organization'].choices = [
             (o.slug, o.name) for o in Organization.objects.order_by('name')
         ]
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if slugify(name) in settings.CADASTA_INVALID_ENTITY_NAMES:
+            raise forms.ValidationError(
+                _("Project name cannot be “Add” or “New”."))
+        return name
 
 
 class ProjectEditDetails(forms.ModelForm):
