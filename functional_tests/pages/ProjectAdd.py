@@ -52,7 +52,7 @@ class ProjectAddPage(Page):
             'enabled' in steps_class[0] and
             steps_class[1] == '' and
             steps_class[2] == '' and
-            title == "Create project geometry".upper()
+            title == "Draw project on map".upper()
         ):
             return self.SUBPAGE_TYPES[0]
         elif (
@@ -282,15 +282,10 @@ class ProjectAddPage(Page):
 
         # Assert that the error message is for the project name field
         assert self.BY_XPATH(
-            "//div[" +
-            "    @class='form-group' and " +
-            "    ./input[@id='id_details-name'] and " +
-            "    ./ul[" +
-            "        @class='errorlist' and " +
-            "        ./li[text()='This field is required.']" +
-            "    ]" +
-            "]"
-        )
+            "//div[@class='form-group has-error']/" +
+            "input[@id='id_details-name']/../" +
+            "label[contains(@class, 'control-label')]/" +
+            "ul[@class='errorlist']").text == 'This field is required.'
 
     def submit_details(self):
         assert self.is_on_subpage('details')

@@ -5631,10 +5631,6 @@ img.org-logo, img#org-logo {
     min-width: 20px; }
 
 button#add-contact {
-  background: transparent;
-  border: 0;
-  float: left !important;
-  color: #2e51a3 !important;
   padding: 0; }
 
 .btn-full {
@@ -5687,6 +5683,15 @@ button#add-contact {
   position: relative;
   z-index: 999; }
 
+.alert-error {
+  background-color: #f2dede;
+  border-color: #ebccd1;
+  color: #a94442; }
+  .alert-error hr {
+    border-top-color: #e4b9c0; }
+  .alert-error .alert-link {
+    color: #843534; }
+
 /* =Modals
 -------------------------------------------------------------- */
 .modal .modal-dialog {
@@ -5698,12 +5703,16 @@ button#add-contact {
 
 .modal .modal-body {
   max-height: calc(100vh - 200px);
-  overflow-y: auto; }
+  overflow-y: auto;
+  padding-left: 30px;
+  padding-right: 30px; }
 
 .modal .modal-footer {
   background: #f2f4f7;
   border-bottom-left-radius: 6px;
-  border-bottom-right-radius: 6px; }
+  border-bottom-right-radius: 6px;
+  padding-left: 30px;
+  padding-right: 30px; }
   .modal .modal-footer .btn {
     min-width: 100px; }
 
@@ -5714,19 +5723,19 @@ button#add-contact {
   float: left !important;
   padding: 0; }
 
-/* =Chrome fix for fonts
+/* =Error messaging for forms
 -------------------------------------------------------------- */
-@media all and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
-  body {
-    -webkit-animation-delay: 0.1s;
-    -webkit-animation-name: fontfix;
-    -webkit-animation-duration: 0.1s;
-    -webkit-animation-iteration-count: 1;
-    -webkit-animation-timing-function: linear; }
-  @-webkit-keyframes fontfix {
-    from {
-      opacity: 1; }
-    to {
-      opacity: 1; } } }
+.form-group.has-error {
+  background-color: #fcf8e3;
+  padding: 10px; }
+
+ul.errorlist {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none !important; }
+  ul.errorlist li {
+    background-color: #fcf8e3;
+    color: #a94442;
+    padding: 2px 8px; }
 
 /*# sourceMappingURL=../../../../../static/css/main.css.map */

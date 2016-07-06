@@ -94,7 +94,7 @@ class ContactsWidget(Widget):
         '    <tr>'
         '      <td colspan="4">'
         '        <button data-prefix="{prefix}" type="button" '
-        '                class="btn btn-primary pull-right" '
+        '                class="btn btn-link" '
         '                id="add-contact">{add_contact}</button>'
         '      </td>'
         '    </tr>'

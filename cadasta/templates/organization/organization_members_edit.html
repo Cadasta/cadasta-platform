@@ -14,7 +14,7 @@
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
-      <form method="POST" action="" class="org-member-edit">
+      <form method="POST" action="" class="org-member-edit" novalidate>
       {% csrf_token %}
         <div class="row">
           <div class="col-md-3">
@@ -30,9 +30,9 @@
                   {{ object.email }}<br>
                   Last login: {{ object.last_login }}<br>
                 </div>
-                <div class="member-role form-group">
-                  {{ form.org_role.errors }}
+                <div class="member-role form-group{% if form.org_role.errors %} has-error{% endif %}">
                   <label for="{{ form.org_role.id_for_label }}">Role</label>
+                  <label class="pull-right control-label">{{ form.org_role.errors }}</label>
                   {% render_field form.org_role class+="form-control" %}
                 </div>
                 <div class="btn-full">
