@@ -117,6 +117,7 @@ class Party(ResourceModelMixin, RandomIDModel):
 
 
 @fix_model_for_attributes
+@permissioned_model
 class PartyRelationship(RandomIDModel):
     """
     PartyRelationship model.
@@ -182,6 +183,9 @@ class PartyRelationship(RandomIDModel):
         return "<PartyRelationship: <{party1}> {type} <{party2}>>".format(
             party1=self.party1.name, party2=self.party2.name,
             type=dict(self.TYPE_CHOICES).get(self.type))
+
+    def __repr__(self):
+        return str(self)
 
 
 @fix_model_for_attributes
@@ -267,6 +271,9 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
         return "<TenureRelationship: <{party}> {type} <{su}>>".format(
             party=self.party.name, su=self.spatial_unit.name,
             type=self.tenure_type.label)
+
+    def __repr__(self):
+        return str(self)
 
 
 class TenureRelationshipType(models.Model):

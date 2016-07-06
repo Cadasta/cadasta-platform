@@ -40,11 +40,6 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
         'DELETE': 'spatial.delete'
     }
 
-    def get_perms_objects(self):
-        # Talk to Brian about this. This should be the Spatial Unit not the
-        # project
-        return [self.get_project()]
-
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

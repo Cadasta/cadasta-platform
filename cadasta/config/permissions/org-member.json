@@ -6,18 +6,40 @@
     {
       "effect": "allow",
       "action": ["project.view_private",
-                 "spatial.list", "spatial.view",
-                 "spatial_rel.list", "spatial_rel.view",
-                 "party.list", "party.view",
-                 "party_rel.list", "party_rel.view",
-                 "tenure_rel.list", "tenure_rel.view"],
-      "object": ["project/$organization/*",
-                 "project/$organization/*/*",
-                 "spatial/$organization/*/*",
-                 "spatial_rel/$organization/*/*",
-                 "party/$organization/*/*",
-                 "party_rel/$organization/*/*",
-                 "tenure_rel/$organization/*/*"]
+                 "spatial.list", "spatial_rel.list",
+                 "party.list", "party_rel.list",
+                 "tenure_rel.list", "resource.list"],
+      "object": ["project/$organization/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["spatial.view"],
+      "object": ["spatial/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["spatial_rel.view"],
+      "object": ["spatial_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party.view"],
+      "object": ["party/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party_rel.view"],
+      "object": ["party_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["tenure_rel.view"],
+      "object": ["tenure_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["resource.view"],
+      "object": ["resource/$organization/*/*"]
     }
   ]
 }

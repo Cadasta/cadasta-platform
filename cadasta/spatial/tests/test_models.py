@@ -14,6 +14,7 @@ class SpatialUnitTest(TestCase):
     def test_str(self):
         spatial_unit = SpatialUnitFactory.create(name='Disneyland')
         assert str(spatial_unit) == '<SpatialUnit: Disneyland>'
+        assert repr(spatial_unit) == '<SpatialUnit: Disneyland>'
 
     def test_has_random_id(self):
         spatial_unit = SpatialUnitFactory.create()
@@ -79,6 +80,10 @@ class SpatialRelationshipTest(TestCase):
             su2__name='California',
             type='C')
         assert str(relationship) == (
+            "<SpatialRelationship: "
+            "<Los Angeles> is-contained-in <California>>"
+        )
+        assert repr(relationship) == (
             "<SpatialRelationship: "
             "<Los Angeles> is-contained-in <California>>"
         )

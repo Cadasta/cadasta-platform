@@ -102,10 +102,6 @@ class PartyRelationshipObjectMixin(ProjectMixin):
 
         return context
 
-    def get_queryset(self):
-        self.proj = self.get_project()
-        return self.proj.tenure_relationships.all()
-
     def get_object(self):
         try:
             return TenureRelationship.objects.get(
@@ -119,8 +115,10 @@ class PartyRelationshipObjectMixin(ProjectMixin):
 
 class PartyRelationshipResourceMixin(ResourceViewMixin,
                                      PartyRelationshipObjectMixin):
-    def get_content_object(self):
-        return self.get_object()
+    # UNUSED until party relationship list view is used
+    #
+    # def get_content_object(self):
+    #     return self.get_object()
 
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = {
