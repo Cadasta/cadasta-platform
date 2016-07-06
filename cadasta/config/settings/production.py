@@ -31,6 +31,7 @@ EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 SERVER_EMAIL = 'platform-errors@cadasta.org'
 DEFAULT_FROM_EMAIL = 'platform@cadasta.org'
+ROOT_URLCONF = 'config.urls.production'
 
 # Debug logging...
 LOGGING = {

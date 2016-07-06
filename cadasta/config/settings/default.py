@@ -94,7 +94,6 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.views.api.exception_handler'
 }
 
-ROOT_URLCONF = 'config.urls'
 SITE_NAME = 'Cadasta'
 
 BASE_TEMPLATE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'templates')
