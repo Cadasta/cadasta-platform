@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
+{% block page_title %}Location detail | {% endblock %}
 
 {% block location_panel %}
 
@@ -50,7 +51,7 @@
       </thead>
       <tbody>
         {% for rel in relationships %}
-        <tr onclick="window.document.location='{% url 'parties:relationship_detail' object.organization.slug object.slug rel.id %}';">
+        <tr class="linked" onclick="window.document.location='{% url 'parties:relationship_detail' object.organization.slug object.slug rel.id %}';">
           <td>{{ rel.tenure_type.label }}</td>
           <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
         </tr>
