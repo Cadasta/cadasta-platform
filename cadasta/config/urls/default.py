@@ -14,8 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url
-from django.conf import settings
-from django.conf.urls.static import static
 
 api_v1 = [
     url(r'^account/', include('accounts.urls.api', namespace='accounts')),
@@ -92,6 +90,4 @@ urlpatterns = [
 
     url(r'^i18n/',
         include('django.conf.urls.i18n')),
-
-    url(r'', include('buckets.test.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
