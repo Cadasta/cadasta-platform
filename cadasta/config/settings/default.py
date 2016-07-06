@@ -231,7 +231,8 @@ JSONATTRS_SCHEMA_SELECTORS = {
     ),
     'party.party': (
         'project.organization.pk', 'project.pk',
-        'project.current_questionnaire'
+        'project.current_questionnaire',
+        'type'
     ),
     'party.partyrelationship': (
         'project.organization.pk', 'project.pk',
