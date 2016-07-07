@@ -169,6 +169,16 @@ class ProjectUrlsTest(TestCase):
         assert resolved.kwargs['organization'] == 'org-slug'
         assert resolved.kwargs['project'] == 'prj'
 
+    def test_project_download(self):
+        url = reverse('organization:project-download',
+                      kwargs={'organization': 'org-slug', 'project': 'prj'})
+        assert (url == '/organizations/org-slug/projects/prj/download/')
+
+        resolved = resolve('/organizations/org-slug/projects/prj/download/')
+        assert resolved.func.__name__ == default.ProjectDataDownload.__name__
+        assert resolved.kwargs['organization'] == 'org-slug'
+        assert resolved.kwargs['project'] == 'prj'
+
 
 class OrganizationMembersUrlsTest(TestCase):
     def test_member_list(self):

@@ -211,6 +211,9 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
             ('project.users.remove',
              {'description': _("Remove user from a project"),
               'error_message': messages.PROJ_USERS_REMOVE}),
+            ('project.download',
+             {'description': _("Download data from a project"),
+              'error_message': messages.PROJ_DOWNLOAD}),
         )
 
     def __str__(self):

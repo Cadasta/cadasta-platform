@@ -24,7 +24,7 @@ class QuestionnaireSerializerTest(TestCase):
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
-        )
+        ).read()
         form = storage.save('{}.xlsx'.format(form_name), file)
         return form
 

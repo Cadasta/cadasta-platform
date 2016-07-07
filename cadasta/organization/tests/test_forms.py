@@ -1,11 +1,13 @@
 import os
 import random
 from pytest import raises
+from zipfile import ZipFile
 
 from django.conf import settings
 
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
+from tutelary.models import Policy
 
 from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
@@ -16,7 +18,7 @@ from core.tests.factories import RoleFactory
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
-from tutelary.models import Policy
+from resources.tests.factories import ResourceFactory
 
 
 class OrganizationTest(UserTestCase):
@@ -263,7 +265,7 @@ class ProjectEditDetailsTest(UserTestCase):
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
-        )
+        ).read()
         form = storage.save('{}.xlsx'.format(form_name), file)
         return form
 
@@ -586,3 +588,54 @@ class ContactsFormTest(UserTestCase):
         assert form.is_valid() is False
         assert ("Please provide either email or phone number" in
                 form.errors['__all__'])
+
+
+class DownloadFormTest(UserTestCase):
+    def test_init(self):
+        user = UserFactory.build()
+        project = ProjectFactory.build()
+        form = forms.DownloadForm(project, user)
+        assert form.project == project
+        assert form.user == user
+
+    def test_get_xls_download(self):
+        ensure_dirs()
+        data = {'type': 'xls'}
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+        form = forms.DownloadForm(project, user, data=data)
+        assert form.is_valid() is True
+        path, mime = form.get_file()
+        assert '{}-{}'.format(project.id, user.id) in path
+        assert (mime == 'application/vnd.openxmlformats-officedocument.'
+                        'spreadsheetml.sheet')
+
+    def test_get_resources_download(self):
+        ensure_dirs()
+        data = {'type': 'res'}
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+        form = forms.DownloadForm(project, user, data=data)
+        assert form.is_valid() is True
+        path, mime = form.get_file()
+        assert '{}-{}'.format(project.id, user.id) in path
+        assert mime == 'application/zip'
+
+    def test_get_all_download(self):
+        ensure_dirs()
+        data = {'type': 'all'}
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+        res = ResourceFactory.create(project=project)
+
+        form = forms.DownloadForm(project, user, data=data)
+        assert form.is_valid() is True
+        path, mime = form.get_file()
+        assert '{}-{}'.format(project.id, user.id) in path
+        assert mime == 'application/zip'
+
+        with ZipFile(path, 'r') as testzip:
+            assert len(testzip.namelist()) == 3
+            assert res.original_file in testzip.namelist()
+            assert 'resources.xlsx' in testzip.namelist()
+            assert 'data.xlsx' in testzip.namelist()

@@ -33,7 +33,8 @@ class CreateAttributeSchemaTest(TestCase):
         ensure_dirs()
         storage = FakeS3Storage()
         file = open(
-            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
+        ).read()
         form = storage.save('xls-form-attrs.xlsx', file)
         project = ProjectFactory.create()
         models.Questionnaire.objects.create_from_form(
@@ -300,7 +301,8 @@ class CreateAttributeSchemaTest(TestCase):
 
         storage = FakeS3Storage()
         file = open(
-            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
+        ).read()
         form = storage.save('xls-form.xlsx', file)
         project = ProjectFactory.create(name='TestProject')
         q1 = models.Questionnaire.objects.create_from_form(
@@ -339,7 +341,8 @@ class ConditionalAttributeSchemaTest(TestCase):
         ensure_dirs()
         storage = FakeS3Storage()
         file = open(
-            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
+        ).read()
         form = storage.save('xls-form-attrs.xlsx', file)
         self.content_type = ContentType.objects.get(
             app_label='party', model='party')
