@@ -2,33 +2,35 @@
 {% load leaflet_tags %}
 {% load widget_tweaks %}
 
-<form method="POST" class="col-sm-12 content-single">
+<form method="POST" id="location-wizard" class="col-sm-12 content-single">
   {% csrf_token %}
   <div class="row">
     <!-- Start overview map  -->
-    <div class="col-md-6 map">
+    <div class="col-md-8 map">
       {{ form.geometry }}
     </div>
     <!-- / end overview map -->
     <!-- Overview detail  -->
-    <div class="col-md-6 detail">
-      <section>
+    <div class="col-md-4 detail detail-edit">
         <h2>{{ title }}</h2>
+        <div class="panel panel-default">
+          <div class="panel-body">
 
-        <div class="form-group">
-          {{ form.type.errors }}
-          <label for="{{ form.type.id_for_label }}">{% trans "What type of location is this?" %}</label>
-          {% render_field form.type class+="form-control input-lg" %}
+          <h3>Draw location on map</h3>
+          <p>
+            {% blocktrans %}Use the map tools to mark your new location. Next select the location type below.  Once complete, select the save button.<br /><br />{% endblocktrans %}
+          </p>
+          <div class="form-group">
+            {{ form.type.errors }}
+            <label for="{{ form.type.id_for_label }}">{% trans "What type of location is this?" %}</label>
+            {% render_field form.type class+="form-control" %}
+          </div>
+       </div>
+        <div class="panel-footer panel-buttons">
+          <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}"/>
+          <a class="btn btn-default" href="{{ request.META.HTTP_REFERER }}">{% trans "Cancel" %}</a>
         </div>
-
-        <button type="submit" class="btn btn-primary text-uppercase" name="submit">
-          {% trans "Save" %}
-        </button>
-        <a class="btn btn-link cancel"
-          href="{{ request.META.HTTP_REFERER }}">
-          {% trans "Cancel" %}
-        </a>
-      </section>
+      </div>
     </div>
     <!-- / overview detail -->
   </div>

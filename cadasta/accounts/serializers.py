@@ -1,5 +1,5 @@
+from django.conf import settings
 from django.utils import timezone
-
 from django.utils.translation import ugettext as _
 
 from rest_framework.serializers import EmailField, ValidationError
@@ -33,6 +33,12 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
             'email': {'required': True, 'unique': True}
         }
 
+    def validate_username(self, username):
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+            raise ValidationError(
+                _("Username cannot be “add” or “new”."))
+        return username
+
 
 class UserSerializer(djoser_serializers.UserSerializer):
     email = EmailField(
@@ -64,6 +70,9 @@ class UserSerializer(djoser_serializers.UserSerializer):
                username != instance.username and
                self.context['request'].user != instance):
                 raise ValidationError('Cannot update username')
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+            raise ValidationError(
+                _("Username cannot be “add” or “new”."))
         return username
 
     def validate_last_login(self, last_login):

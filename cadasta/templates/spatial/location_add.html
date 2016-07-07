@@ -6,6 +6,8 @@
 {% load staticfiles %}
 {% load leaflet_tags %}
 
+{% block page_title %}Add new location | {% endblock %}
+
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
@@ -52,5 +54,5 @@
 {% endblock %}
 
 {% block content %}
-  {% include "spatial/location_form.html" with title="Add location" %}
+  {% include "spatial/location_form.html" with title="Add new location" %}
 {% endblock %}

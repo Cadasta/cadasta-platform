@@ -4,6 +4,8 @@
 {% load leaflet_tags %}
 {% load i18n %}
 
+{% block page_title %}| Draw map{% endblock %}
+
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
@@ -51,7 +53,7 @@
 {% block step_instructions %}
     <p>
       {% blocktrans %}
-      Use the map tools to outline your project location boundaries. Once complete, select the "Save and continue" button below.
+      Use the map tools to outline your project location boundaries. Once complete, select the save button below.
       {% endblocktrans %}
     </p>
 {% endblock %}

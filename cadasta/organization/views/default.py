@@ -316,9 +316,14 @@ class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectDashboard, self).get_context_data(**kwargs)
-        # TODO: Used for deciding whether to show statistics or
-        # "getting started".  Needs to be set up properly later on.
-        context['has_content'] = False
+        num_locations = self.object.spatial_units.count()
+        num_parties = self.object.parties.count()
+        num_resources = self.object.resource_set.count()
+        context['has_content'] = (
+            num_locations > 0 or num_parties > 0 or num_resources > 0)
+        context['num_locations'] = num_locations
+        context['num_parties'] = num_parties
+        context['num_resources'] = num_resources
         if self.object.extent is None:
             context['extent'] = False
         else:

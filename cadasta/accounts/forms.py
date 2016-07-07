@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from .models import User
@@ -14,11 +15,17 @@ class RegisterForm(forms.ModelForm):
         fields = ['username', 'email', 'password1', 'password2',
                   'full_name']
 
+    def clean_username(self):
+        username = self.data.get('username')
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+            raise forms.ValidationError(
+                _("Username cannot be “add” or “new”."))
+        return username
+
     def clean_password1(self):
         password = self.data.get('password1')
         if password != self.data.get('password2'):
             raise forms.ValidationError(_("Passwords do not match"))
-
         return password
 
     def clean_email(self):
@@ -26,7 +33,6 @@ class RegisterForm(forms.ModelForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError(
                 _("Another user with this email already exists"))
-
         return email
 
     def save(self, *args, **kwargs):
@@ -47,7 +53,9 @@ class ProfileForm(forms.ModelForm):
                 User.objects.filter(username=username).exists()):
             raise forms.ValidationError(
                 _("Another user with this username already exists"))
-
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+            raise forms.ValidationError(
+                _("Username cannot be “add” or “new”."))
         return username
 
     def clean_email(self):
@@ -56,5 +64,4 @@ class ProfileForm(forms.ModelForm):
                 User.objects.filter(email=email).exists()):
             raise forms.ValidationError(
                 _("Another user with this email already exists"))
-
         return email

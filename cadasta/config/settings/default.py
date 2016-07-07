@@ -94,7 +94,6 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.views.api.exception_handler'
 }
 
-ROOT_URLCONF = 'config.urls'
 SITE_NAME = 'Cadasta'
 
 BASE_TEMPLATE_DIR = os.path.join(os.path.dirname(BASE_DIR), 'templates')
@@ -161,13 +160,15 @@ LEAFLET_CONFIG = {
                 'Map data &copy; <a href="http://openstreetmap.org">'
                 'OpenStreetMap</a> contributors, '
                 '<a href="http://creativecommons.org/licenses/by-sa/2.0/">'
-                'CC-BY-SA</a>'}),
+                'CC-BY-SA</a>',
+                'maxZoom': 19}),
               ('DigitalGlobe Satellite',
                'https://{s}.tiles.mapbox.com/v4/digitalglobe.nal0g75k'
                '/{z}/{x}/{y}.png?access_token='
                'pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW1'
                '1a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
-               {'attribution': 'DigitalGlobe'})],
+               {'attribution': 'DigitalGlobe',
+                'maxZoom': 22})],
     'RESET_VIEW': False,
     'PLUGINS': {
         'draw': {
@@ -175,6 +176,9 @@ LEAFLET_CONFIG = {
         }
     }
 }
+
+# Invalid names for Cadasta organizations, projects, and usernames
+CADASTA_INVALID_ENTITY_NAMES = ['add', 'new']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -226,7 +230,8 @@ JSONATTRS_SCHEMA_SELECTORS = {
     ),
     'party.party': (
         'project.organization.pk', 'project.pk',
-        'project.current_questionnaire'
+        'project.current_questionnaire',
+        'type'
     ),
     'party.partyrelationship': (
         'project.organization.pk', 'project.pk',

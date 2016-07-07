@@ -36,4 +36,4 @@ class ValidateFileTypeTest(TestCase):
 
         with pytest.raises(ValidationError) as e:
             validate_file_type(s3_file)
-        assert e.value.message == "Files of type text/plain are not accpeted."
+        assert e.value.message == "Files of type text/plain are not accepted."

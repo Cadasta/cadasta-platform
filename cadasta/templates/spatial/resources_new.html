@@ -2,11 +2,12 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
+{% block page_title %}Upload new resource | {% endblock %}
+
 {% block form_script %}
   {{ form.media }}
   {% include "resources/scripts.html" %}
 {% endblock %}
-
 
 {% block modals %}
 

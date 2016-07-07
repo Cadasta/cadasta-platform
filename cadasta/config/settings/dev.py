@@ -54,6 +54,7 @@ EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 DEFAULT_FROM_EMAIL = 'testing@example.com'
 
+ROOT_URLCONF = 'config.urls.dev'
 DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 MEDIA_URL = '/media/'

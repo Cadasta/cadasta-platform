@@ -14,8 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url
-from django.conf import settings
-from django.conf.urls.static import static
 
 api_v1 = [
     url(r'^account/', include('accounts.urls.api', namespace='accounts')),
@@ -27,6 +25,9 @@ api_v1 = [
     url(r'^projects/',
         include('organization.urls.api.projects',
                 namespace='project')),
+    url(r'^users/',
+        include('organization.urls.api.users',
+                namespace='user')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
         '(?P<project_id>[-\w]+)/',
         include('questionnaires.urls.api',
@@ -35,8 +36,10 @@ api_v1 = [
         '(?P<project>[-\w]+)/',
         include('resources.urls.api',
                 namespace='resources')),
-    url(r'^users/',
-        include('organization.urls.api.users', namespace='user')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project>[-\w]+)/spatial/',
+        include('spatial.urls.api.spatial',
+                namespace='spatial')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
         '(?P<project>[-\w]+)/parties/',
         include('party.urls.api.parties',
@@ -87,6 +90,4 @@ urlpatterns = [
 
     url(r'^i18n/',
         include('django.conf.urls.i18n')),
-
-    url(r'', include('buckets.test.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]

@@ -3,6 +3,8 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
+{% block page_title %}| Add details{% endblock %}
+
 {% block extra_script %}
 {{ form.media }}
 <script>
@@ -51,7 +53,7 @@
             <div class="row{% if display_org %} hidden{% endif %}">
               <div class="col-md-9">
                 <div class="row">
-                  <div class="col-md-8">
+                  <div class="col-sm-8">
                     <div class="form-group">
                       {{ wizard.form.organization.errors }}
                       <label for="{{ wizard.form.organization.id_for_label }}">{% trans "Select organization" %}</label>
@@ -70,14 +72,14 @@
             <div class="row">
               <div class="col-md-9">
                 <div class="row">
-                  <div class="col-md-8">
+                  <div class="col-sm-8">
                     <div class="form-group">
                       {{ wizard.form.name.errors }}
                       <label for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
                       {% render_field wizard.form.name class+="form-control" %}
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-sm-4">
                     {{ wizard.form.access.errors }}
                     {{ wizard.form.access }}
                   </div>

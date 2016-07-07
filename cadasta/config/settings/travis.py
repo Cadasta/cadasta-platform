@@ -19,6 +19,7 @@ DJOSER.update({  # NOQA
     'SEND_ACTIVATION_EMAIL': False,
 })
 
+ROOT_URLCONF = 'config.urls.dev'
 DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 MEDIA_URL = '/media/'

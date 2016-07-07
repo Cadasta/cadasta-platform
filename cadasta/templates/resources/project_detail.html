@@ -1,6 +1,8 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
+{% block page_title %}Resource detail | {% endblock %}
+
 {% block content %}
 
 <div class="col-md-12 content-single">
@@ -18,7 +20,7 @@
           <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
           <ul class="list-inline resource-actions">
             <li>
-              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}">Edit</a>
+              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}">Edit</a>
             </li>
             <li>
               {% if resource.archived %}
@@ -28,6 +30,8 @@
               {% endif %}
             </li>
           </ul>
+
+          <a href="{{ resource.file.url }}" class="btn btn-primary" download>Dowload</a>
         </div>
       </div>
     </div>

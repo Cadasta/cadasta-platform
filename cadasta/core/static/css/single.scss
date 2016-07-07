@@ -79,19 +79,16 @@
     }
   }
   li.reports {
-    display: none; //beta
     .icon { 
       background-image: url('/static/img/icon-reports.png');
     }
   }
   li.activity {
-    display: none; // beta
     .icon { 
       background-image: url('/static/img/icon-activity.png');
     }
   }
   li.projects {
-    display: none; // beta 
     .icon { 
       background-image: url('/static/img/icon-projects.png');
     }
@@ -184,8 +181,10 @@
   #sidebar {
     height: 60px;
     .nav-sidebar > li {
-      width: 19%;
-      float: left;
+      width: 25%;
+      /* beta 
+      float: left; 
+      width: 19%; */
       a {
         padding: 12px 0;
         .title {

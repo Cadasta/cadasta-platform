@@ -2,6 +2,7 @@
 
 {% load i18n %}
 
+{% block page_title %}Overview | {% endblock %}
 {% block left-nav %}overview{% endblock %}
 
 {% block content %}
@@ -26,7 +27,7 @@
               </thead>
               <tbody>
                 {% for prj in projects %}
-                <tr onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
+                <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
                   <td>{{ prj.name }}</td>
                   <td>{{ prj.country }}</td>
                   <td>{{ prj.last_updated }}</td>
@@ -60,7 +61,7 @@
             <img src="{{ organization.logo }}" alt="{{ organization.name }}" />
           </div>
           <p>{{ organization.description }}<p>
-          <div class="divider"></div>
+          <div class="divider-thick"></div>
           <!-- Starter text -->
           <h3>{% trans "Members" %}</h3>
           <ul class="list-unstyled list-divider">
