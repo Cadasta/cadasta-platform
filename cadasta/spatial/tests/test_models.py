@@ -34,6 +34,19 @@ class SpatialUnitTest(TestCase):
             '11.36667 47.25000))')
         assert spatial_unit.geometry is not None
 
+    def test_reassign_extent(self):
+        spatial_unit = SpatialUnitFactory.create(
+            geometry='SRID=4326;POLYGON(('
+            '211.36667 47.25000, '
+            '211.41667 47.25000, '
+            '211.41667 47.28333, '
+            '211.36667 47.28333, '
+            '211.36667 47.25000))'
+        )
+        assert spatial_unit.geometry.boundary.coords == (
+            (-148.63333, 47.25), (-148.58333, 47.25), (-148.58333, 47.28333),
+            (-148.63333, 47.28333), (-148.63333, 47.25))
+
     def test_defaults_no_geometry(self):
         spatial_unit = SpatialUnitFactory.create()
         assert spatial_unit.geometry is None
