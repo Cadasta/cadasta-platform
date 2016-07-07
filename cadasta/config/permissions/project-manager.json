@@ -7,13 +7,20 @@
     // organization.
     {
       "effect": "allow",
-      "action": ["project.*", "project.*.*", "questionaire.*", "spatial.*",
-                 "resource.*", "party.*", "tenure_rel.*"],
+      "action": ["project.*", "project.users.*", "questionaire.*",
+                 "resource.*", "spatial.*", "spatial_rel.*",
+                 "party.*", "party_rel.*", "tenure_rel.*"],
       "object": ["project/$organization/$project"]
     },
     {
+      "effect": "deny",
+      "action": ["project.archive", "project.unarchive", "questionaire.add"],
+      "object": ["project/$organization/$project"]
+    },
+
+    {
       "effect": "allow",
-      "action": ["spatial.*"],
+      "action": ["spatial.*", "spatial.resources.*"],
       "object": ["spatial/$organization/$project/*"]
     },
     {
@@ -23,7 +30,7 @@
     },
     {
       "effect": "allow",
-      "action": ["party.*"],
+      "action": ["party.*", "party.resources.*"],
       "object": ["party/$organization/$project/*"]
     },
     {
@@ -33,33 +40,13 @@
     },
     {
       "effect": "allow",
-      "action": ["tenure_rel.*"],
+      "action": ["tenure_rel.*", "tenure_rel.resources.*"],
       "object": ["tenure_rel/$organization/$project/*"]
     },
     {
       "effect": "allow",
       "action": ["resource.*"],
       "object": ["resource/$organization/$project/*"]
-    },
-    {
-      "effect": "deny",
-      "action": ["project.archive", "project.unarchive", "questionaire.add"],
-      "object": ["project/$organization/$project"]
-    },
-    {
-      "effect": "allow",
-      "action": ["spatial.*", "spatial.*.*"],
-      "object": ["spatial/$organization/$project/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["party.*", "party.*.*"],
-      "object": ["party/$organization/$project/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["tenure_rel.*", "tenure_rel.*.*"],
-      "object": ["tenure_rel/$organization/$project/*"]
     }
   ]
 }

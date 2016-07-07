@@ -127,9 +127,6 @@ class PartyRelationshipCreate(APIPermissionRequiredMixin,
     permission_required = 'party_rel.create'
     serializer_class = serializers.PartyRelationshipWriteSerializer
 
-    def get_perms_objects(self):
-        return [self.get_project()]
-
 
 class PartyRelationshipDetail(APIPermissionRequiredMixin,
                               mixins.PartyRelationshipQuerySetMixin,
@@ -153,9 +150,6 @@ class PartyRelationshipDetail(APIPermissionRequiredMixin,
         self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def get_perms_objects(self):
-        return [self.get_project()]
-
 
 class TenureRelationshipCreate(APIPermissionRequiredMixin,
                                mixins.TenureRelationshipQuerySetMixin,
@@ -176,9 +170,6 @@ class TenureRelationshipDetail(APIPermissionRequiredMixin,
         'PATCH': 'tenure_rel.update',
         'DELETE': 'tenure_rel.delete'
     }
-
-    def get_perms_objects(self):
-        return [self.get_project()]
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':

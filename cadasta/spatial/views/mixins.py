@@ -44,10 +44,6 @@ class SpatialQuerySetMixin(ProjectMixin):
 
 
 class SpatialRelationshipQuerySetMixin(ProjectMixin):
-
-    def get_perms_objects(self):
-        return [self.get_project()]
-
     def get_queryset(self):
         self.proj = self.get_project()
         return self.proj.spatial_relationships.all()
