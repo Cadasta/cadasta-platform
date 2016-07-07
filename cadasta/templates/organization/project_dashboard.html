@@ -40,19 +40,36 @@
       <section>
         <h2>Project Overview</h2>
         <p>{{ object.description }}</p>
+        <div class="divider-thick"></div>
         {% if has_content %}
-          {% trans "Some statistics here..." %}
+          <h3 style="text-transform: capitalize;">{% trans "Summary" %}</h3>
+          <p>
+          {% blocktrans count counter=num_locations %}
+          This project currently has {{ counter }} location,
+          {% plural %}
+          This project currently has {{ counter }} locations,
+          {% endblocktrans %}
+          {% blocktrans count counter=num_parties %}
+          {{ counter }} party, and
+          {% plural %}
+          {{ counter }} parties, and
+          {% endblocktrans %}
+          {% blocktrans count counter=num_resources %}
+          {{ counter }} resource.
+          {% plural %}
+          {{ counter }} resources.
+          {% endblocktrans %}
+          </p>
         {% else %}
-          <div class="divider-thick"></div>
           <!-- Starter text -->
           <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3> 
           <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
-          <div class="btn-full">
-            <a class="btn btn-primary btn-lg" href="{% url 'locations:add' object.organization.slug object.slug %}">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
-            </a>
-          </div>
         {% endif %}
+        <div class="btn-full">
+          <a class="btn btn-primary btn-lg" href="{% url 'locations:add' object.organization.slug object.slug %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
+          </a>
+        </div>
       </section>
     </div>
     <!-- / overview detail -->
