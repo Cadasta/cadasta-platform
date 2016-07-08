@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
-from django.utils.text import slugify
+from core.util import slugify
 from django.utils.translation import ugettext as _
 from django.template.loader import get_template
 from django.template import Context

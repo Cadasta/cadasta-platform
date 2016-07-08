@@ -28,7 +28,7 @@ class RandomIDModelTest(TestCase):
 
 
 class MySlugModel(SlugModel, Model):
-    name = CharField(max_length=50)
+    name = CharField(max_length=100)
     slug = SlugField(max_length=50, unique=True)
 
     class Meta:
@@ -109,3 +109,29 @@ class SlugModelTest(TestCase):
         instance.refresh_from_db()
         assert instance.name == 'Other Name'
         assert instance.slug == 'test-name'
+
+    def test_create_with_long_name(self):
+        instance = MySlugModel()
+        instance.name = ('Very Long Name For The Purposes of '
+                         'Testing That Slug Truncation Functions Correctly')
+        instance.save()
+
+        assert len(instance.slug) == 50
+
+    def test_duplicate_slug_long_name(self):
+        instance1 = MySlugModel()
+        instance1.name = ('Very Long Name For The Purposes of '
+                          'Testing That Slug Truncation Functions Correctly')
+        instance1.save()
+
+        instance2 = MySlugModel()
+        instance2.name = ('Very Long Name For The Purposes of '
+                          'Testing That Slug Truncation Functions Correctly')
+        instance2.save()
+
+        instance1.refresh_from_db()
+        instance2.refresh_from_db()
+        assert instance1.slug != instance2.slug
+        assert instance2.slug[-2:] == '-1'
+        print(instance1.slug)
+        print(instance2.slug)

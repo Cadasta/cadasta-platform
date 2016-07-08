@@ -1,7 +1,7 @@
 import random
 import pytest
 from datetime import datetime
-from django.utils.text import slugify
+from core.util import slugify
 from django.test import TestCase
 from django.utils.translation import gettext as _
 from django.core import mail

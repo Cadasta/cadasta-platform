@@ -4,7 +4,7 @@ from django.db import transaction
 import django.views.generic as generic
 from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse
-from django.utils.text import slugify
+from core.util import slugify
 from django.utils.translation import gettext as _
 from django.contrib import messages
 
