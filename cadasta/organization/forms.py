@@ -1,3 +1,5 @@
+import time
+from zipfile import ZipFile
 from django import forms
 from django.conf import settings
 from django.contrib.postgres import forms as pg_forms
@@ -15,6 +17,8 @@ from questionnaires.models import Questionnaire
 from .models import Organization, Project, OrganizationRole, ProjectRole
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
 from .fields import ProjectRoleField, PublicPrivateField, ContactsField
+from .download.xls import XLSExporter
+from .download.resources import ResourceExporter
 
 FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
 
@@ -321,3 +325,37 @@ class ProjectEditPermissions(PermissionsForm, forms.Form):
                 create_update_or_delete_project_role(
                     self.project.id, f.user, role)
         return self.project
+
+
+class DownloadForm(forms.Form):
+    CHOICES = (('all', 'All data'), ('xls', 'XLS'), ('res', 'Resources'))
+    type = forms.ChoiceField(choices=CHOICES, initial='xls')
+
+    def __init__(self, project, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = project
+        self.user = user
+
+    def get_file(self):
+        t = round(time.time() * 1000)
+
+        file_name = '{}-{}-{}'.format(self.project.id, self.user.id, t)
+        type = self.cleaned_data['type']
+
+        if type == 'xls':
+            e = XLSExporter(self.project)
+            path, mime = e.make_download(file_name + '-xls')
+        elif type == 'res':
+            e = ResourceExporter(self.project)
+            path, mime = e.make_download(file_name + '-res')
+        elif type == 'all':
+            res_exporter = ResourceExporter(self.project)
+            xls_exporter = XLSExporter(self.project)
+            path, mime = res_exporter.make_download(file_name + '-res')
+            data_path, _ = xls_exporter.make_download(file_name + '-xls')
+
+            with ZipFile(path, 'a') as myzip:
+                myzip.write(data_path, arcname='data.xlsx')
+                myzip.close()
+
+        return path, mime

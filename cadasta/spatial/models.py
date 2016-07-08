@@ -87,6 +87,9 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     def __str__(self):
         return "<SpatialUnit: {}>".format(self.name)
 
+    def __repr__(self):
+        return str(self)
+
 
 class SpatialRelationshipManager(managers.BaseRelationshipManager):
     """Check conditions based on spatial unit type before creating
@@ -123,6 +126,7 @@ class SpatialRelationshipManager(managers.BaseRelationshipManager):
 
 
 @fix_model_for_attributes
+@permissioned_model
 class SpatialRelationship(RandomIDModel):
     """A relationship between spatial units: encodes simple logical terms
     like ``su1 is-contained-in su2`` or ``su1 is-split-of su2``.  May
@@ -185,3 +189,6 @@ class SpatialRelationship(RandomIDModel):
         return "<SpatialRelationship: <{su1}> {type} <{su2}>>".format(
             su1=self.su1.name, su2=self.su2.name,
             type=dict(self.TYPE_CHOICES).get(self.type))
+
+    def __repr__(self):
+        return str(self)

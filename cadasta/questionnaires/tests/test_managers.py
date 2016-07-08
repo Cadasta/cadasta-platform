@@ -94,7 +94,8 @@ class QuestionnaireManagerTest(TestCase):
         ensure_dirs()
 
         storage = FakeS3Storage()
-        file = open(path + '/questionnaires/tests/files/xls-form.xlsx', 'rb')
+        file = open(
+            path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
         form = storage.save('xls-form.xlsx', file)
 
         model = models.Questionnaire.objects.create_from_form(
@@ -110,7 +111,8 @@ class QuestionnaireManagerTest(TestCase):
         ensure_dirs()
 
         storage = FakeS3Storage()
-        file = open(path + '/questionnaires/tests/files/xls-form.xlsx', 'rb')
+        file = open(
+            path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
         form = storage.save('xls-form.xlsx', file)
 
         project = ProjectFactory.create()
@@ -139,7 +141,7 @@ class QuestionnaireManagerTest(TestCase):
 
         storage = FakeS3Storage()
         file = open(path + '/questionnaires/tests/files/'
-                           'xls-form-invalid.xlsx', 'rb')
+                           'xls-form-invalid.xlsx', 'rb').read()
         form = storage.save('xls-form-invalid.xlsx', file)
 
         with pytest.raises(InvalidXLSForm) as e:

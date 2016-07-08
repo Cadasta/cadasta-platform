@@ -18,9 +18,6 @@ class PartyTest(TestCase):
     def test_str(self):
         party = PartyFactory.create(name='TeaParty')
         assert str(party) == '<Party: TeaParty>'
-
-    def test_repr(self):
-        party = PartyFactory.create(name='TeaParty')
         assert repr(party) == '<Party: TeaParty>'
 
     def test_has_random_id(self):
@@ -67,6 +64,8 @@ class PartyRelationshipTest(TestCase):
             party2__name='Mufasa',
             type='C')
         assert str(relationship) == (
+            "<PartyRelationship: <Simba> is-child-of <Mufasa>>")
+        assert repr(relationship) == (
             "<PartyRelationship: <Simba> is-child-of <Mufasa>>")
 
     def test_relationships_creation(self):
@@ -136,6 +135,8 @@ class TenureRelationshipTest(TestCase):
             spatial_unit__name='Parcel',
             tenure_type=tenure_type)
         assert str(relationship) == (
+            "<TenureRelationship: <Family> Leasehold <Parcel>>")
+        assert repr(relationship) == (
             "<TenureRelationship: <Family> Leasehold <Parcel>>")
 
     def test_tenure_relationship_creation(self):

@@ -14,7 +14,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 ensure_dirs()
 storage = FakeS3Storage()
-file = open(path + '/resources/tests/files/image.jpg', 'rb')
+file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
 file_name = storage.save('image.jpg', file)
 
 

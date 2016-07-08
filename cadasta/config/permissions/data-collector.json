@@ -1,11 +1,9 @@
 {
   "clause": [
-    // In addition to the permissions provided by the default
-    // policy, data collectors are allowed to manage resources for a
-    // specified project within a specified organization.
     {
       "effect": "allow",
-      "action": ["resource.*"],
+      "action": ["resource.*", "spatial.*", "spatial_rel.*",
+                 "party.*", "party_rel.*", "tenure_rel.*"],
       "object": ["project/$organization/$project"]
     },
     {
@@ -16,17 +14,27 @@
 
     {
       "effect": "allow",
-      "action": ["spatial.*"],
+      "action": ["spatial.*", "spatial.resources.*"],
       "object": ["spatial/$organization/$project/*"]
     },
     {
       "effect": "allow",
-      "action": ["party.*"],
+      "action": ["spatial_rel.*"],
+      "object": ["spatial_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party.*", "party.resources.*"],
       "object": ["party/$organization/$project/*"]
     },
     {
       "effect": "allow",
-      "action": ["tenure_rel.*", "tenure_rel.*.*"],
+      "action": ["party_rel.*"],
+      "object": ["party_rel/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["tenure_rel.*", "tenure_rel.resources.*"],
       "object": ["tenure_rel/$organization/$project/*"]
     }
   ]

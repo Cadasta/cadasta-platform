@@ -425,7 +425,7 @@ class ProjectAddTest(UserTestCase):
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb')
+            'rb').read()
         form = storage.save(form_name + '.xlsx', file)
         return form
 
@@ -765,7 +765,7 @@ class ProjectEditDetailsTest(UserTestCase):
         file = open(
             path + '/questionnaires/tests/files/xls-form-invalid.xlsx',
             'rb'
-        )
+        ).read()
         questionnaire = storage.save('xls-form-invalid.xlsx', file)
         self.post_data['questionnaire'] = questionnaire
 
@@ -1045,3 +1045,92 @@ class ProjectUnarchiveTest(UserTestCase):
         assert response.status_code == 302
         assert '/account/login/' in response['location']
         assert self.prj.archived is True
+
+
+class ProjectDataDownloadTest(UserTestCase):
+    def setUp(self):
+        super().setUp()
+        self.view = default.ProjectDataDownload.as_view()
+        self.request = HttpRequest()
+
+        self.project = ProjectFactory.create()
+
+        self.post_data = {'type': 'xls', 'include_resources': False}
+
+        clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*']),
+                clause('allow', ['project.download'], ['project/*/*']),
+            ]
+        }
+        self.policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+
+    def req(self, method='GET', user=AnonymousUser(), status=None):
+        setattr(self.request, 'user', user)
+        setattr(self.request, 'method', method)
+
+        if method == 'POST':
+            setattr(self.request, 'POST', self.post_data)
+
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
+        response = self.view(self.request,
+                             organization=self.project.organization.slug,
+                             project=self.project.slug)
+        if status:
+            assert response.status_code == status
+
+        return response
+
+    def test_get_with_authorized_user(self):
+        user = UserFactory.create()
+        user.assign_policies(self.policy)
+
+        response = self.req(user=user, status=200)
+        content = response.render().content.decode('utf-8')
+
+        expected = render_to_string(
+            'organization/project_download.html',
+            {'project': self.project,
+             'object': self.project,
+             'form': forms.DownloadForm(project=self.project,
+                                        user=user)},
+            request=self.request)
+
+        assert expected == content
+
+    def test_get_with_unauthorized_user(self):
+        user = UserFactory.create()
+        self.req(user=user, status=302)
+        assert ("You don't have permission to download data from this project"
+                in [str(m) for m in get_messages(self.request)])
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.req(status=302)
+        assert '/account/login/' in response['location']
+
+    def test_post_with_authorized_user(self):
+        ensure_dirs()
+        user = UserFactory.create()
+        user.assign_policies(self.policy)
+        response = self.req(user=user, method='POST', status=200)
+        assert (response._headers['content-disposition'][1] ==
+                'attachment; filename={}.xlsx'.format(self.project.slug))
+        assert (response._headers['content-type'][1] ==
+                'application/vnd.openxmlformats-officedocument.'
+                'spreadsheetml.sheet')
+
+    def test_post_with_unauthorized_user(self):
+        user = UserFactory.create()
+        self.req(user=user, method='POST', status=302)
+        assert ("You don't have permission to download data from this project"
+                in [str(m) for m in get_messages(self.request)])
+
+    def test_post_with_unauthenticated_user(self):
+        response = self.req(method='POST', status=302)
+        assert '/account/login/' in response['location']

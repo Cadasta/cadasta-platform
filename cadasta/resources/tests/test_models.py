@@ -45,7 +45,7 @@ class ResourceTest(UserTestCase):
     def test_register_file_version(self):
         ensure_dirs()
         storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb')
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('thumb_new.jpg', file)
         resource = ResourceFactory.create()
 
@@ -58,7 +58,7 @@ class ResourceTest(UserTestCase):
     def test_create_thumbnail(self):
         ensure_dirs()
         storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb')
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('thumb_test.jpg', file)
         resource = ResourceFactory.build(file=file_name)
 
