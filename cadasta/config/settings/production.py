@@ -6,6 +6,8 @@ DEBUG = False
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
+DEFAULT_FILE_STORAGE = 'buckets.storage.S3Storage'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -21,7 +23,7 @@ DJOSER.update({  # NOQA
 })
 
 # Adding localhost here for uWSGI debugging!
-ALLOWED_HOSTS = [os.environ['API_HOST'], 'localhost']
+ALLOWED_HOSTS = [os.environ['API_HOST'], os.environ['DOMAIN'], 'localhost']
 
 ADMINS = [('Cadasta platform admins', 'platform-admin@cadasta.org')]
 EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
@@ -32,6 +34,9 @@ EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 SERVER_EMAIL = 'platform-errors@cadasta.org'
 DEFAULT_FROM_EMAIL = 'platform@cadasta.org'
 ROOT_URLCONF = 'config.urls.production'
+
+STATIC_URL = '/static/'
+STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/static/'
 
 # Debug logging...
 LOGGING = {
