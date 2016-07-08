@@ -30,7 +30,7 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
     def validate_name(self, value):
         is_create = not self.instance
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
-        if is_create and slugify(value) in invalid_names:
+        if is_create and slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
         return value
@@ -55,7 +55,7 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     def validate_name(self, value):
         is_create = not self.instance
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
-        if is_create and slugify(value) in invalid_names:
+        if is_create and slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Project name cannot be “Add” or “New”."))
         return value

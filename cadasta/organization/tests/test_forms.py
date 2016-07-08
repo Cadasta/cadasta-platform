@@ -46,7 +46,6 @@ class OrganizationTest(UserTestCase):
     def test_add_organization(self):
         self._save(self.data)
         org = Organization.objects.first()
-
         assert org.slug == 'org'
         assert OrganizationRole.objects.filter(organization=org).count() == 1
 
@@ -69,16 +68,22 @@ class OrganizationTest(UserTestCase):
         assert org.urls == ['http://example.com']
 
     def test_add_organization_with_contact(self):
-        self.data['contacts-0-name'] = 'Ringo Starr'
+        self.data['contacts-0-name'] = "Ringo Starr"
         self.data['contacts-0-email'] = 'ringo@beatles.uk'
         self.data['contacts-0-tel'] = '555-5555'
         self._save(self.data)
         org = Organization.objects.first()
         assert org.contacts == [{
-            'name': 'Ringo Starr',
+            'name': "Ringo Starr",
             'tel': '555-5555',
             'email': 'ringo@beatles.uk'
         }]
+
+    def test_add_organization_with_unicode_slug(self):
+        self.data['name'] = "東京プロジェクト 2016"
+        self._save(self.data)
+        org = Organization.objects.first()
+        assert org.slug == '東京プロジェクト-2016'
 
     def test_add_organization_with_restricted_name(self):
         invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')

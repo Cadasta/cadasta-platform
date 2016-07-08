@@ -452,7 +452,8 @@ class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
 
         with transaction.atomic():
             project = Project.objects.create(
-                name=name, organization=org, slug=slugify(name),
+                name=name, organization=org,
+                slug=slugify(name, allow_unicode=True),
                 description=description, urls=[url], extent=extent,
                 access=access
             )
