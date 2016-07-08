@@ -11,6 +11,11 @@ server {
 
     client_max_body_size 75M;
 
+    # alias favicon.* to static
+    location ~ ^/favicon.(\w*)$ {
+        alias   {{ application_path }}cadasta/static/favicon.png;
+    }
+
     location /static/ {
         alias   {{ application_path }}cadasta/static/;
     }
@@ -43,6 +48,11 @@ server {
     charset     utf-8;
 
     client_max_body_size 75M;
+
+    # alias favicon.* to static
+    location ~ ^/favicon.(\w*)$ {
+        alias   {{ application_path }}cadasta/static/favicon.png;
+    }
 
     location /static/ {
         alias   {{ application_path }}cadasta/static/;
