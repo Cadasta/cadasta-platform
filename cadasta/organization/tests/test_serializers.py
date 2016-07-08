@@ -22,7 +22,7 @@ class OrganizationSerializerTest(UserTestCase):
         user = UserFactory.create()
         setattr(request, 'user', user)
 
-        org_data = {'name': 'Test Organization'}
+        org_data = {'name': "Test Organization"}
 
         serializer = serializers.OrganizationSerializer(
             data=org_data,
@@ -32,7 +32,27 @@ class OrganizationSerializerTest(UserTestCase):
         serializer.save()
 
         org_instance = serializer.instance
-        assert org_instance.slug == slugify(org_data['name'])
+        assert org_instance.slug == slugify(
+            org_data['name'], allow_unicode=True)
+        assert OrganizationRole.objects.filter(
+            organization=org_instance).count() == 1
+
+    def test_unicode_slug_field_is_set(self):
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        org_data = {'name': "東京プロジェクト"}
+
+        serializer = serializers.OrganizationSerializer(
+            data=org_data,
+            context={'request': request}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        org_instance = serializer.instance
+        assert org_instance.slug == '東京プロジェクト'
         assert OrganizationRole.objects.filter(
             organization=org_instance).count() == 1
 
@@ -72,7 +92,7 @@ class ProjectSerializerTest(TestCase):
     def test_project_is_set(self):
         organization = OrganizationFactory.create()
         project_data = {
-            'name': 'Project',
+            'name': "Project",
             'organization': organization
         }
         serializer = serializers.ProjectSerializer(
@@ -88,7 +108,7 @@ class ProjectSerializerTest(TestCase):
     def test_project_public_visibility(self):
         organization = OrganizationFactory.create()
         project_data = {
-            'name': 'Project',
+            'name': "Project",
             'organization': organization,
             'access': 'public'
         }
@@ -108,7 +128,7 @@ class ProjectSerializerTest(TestCase):
     def test_project_private_visibility(self):
         organization = OrganizationFactory.create()
         project_data = {
-            'name': 'Project',
+            'name': "Project",
             'organization': organization,
             'access': 'private'
         }
@@ -142,6 +162,23 @@ class ProjectSerializerTest(TestCase):
         assert serializer.errors == {
             'name': ["Project name cannot be “Add” or “New”."]
         }
+
+    def test_unicode_slug(self):
+        org = OrganizationFactory.create()
+        data = {
+            'name': "東京プロジェクト 2016",
+            'organization': org,
+            'access': 'private'
+        }
+        serializer = serializers.ProjectSerializer(
+            data=data,
+            context={'organization': org}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        project_instance = serializer.instance
+        assert project_instance.slug == '東京プロジェクト-2016'
 
 
 class ProjectGeometrySerializerTest(TestCase):

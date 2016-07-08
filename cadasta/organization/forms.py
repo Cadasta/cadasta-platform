@@ -106,7 +106,7 @@ class OrganizationForm(forms.ModelForm):
         is_create = not self.instance.id
         name = self.cleaned_data['name']
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
-        if is_create and slugify(name) in invalid_names:
+        if is_create and slugify(name, allow_unicode=True) in invalid_names:
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
         return name
@@ -225,7 +225,8 @@ class ProjectAddDetails(forms.Form):
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if slugify(name) in settings.CADASTA_INVALID_ENTITY_NAMES:
+        invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
+        if slugify(name, allow_unicode=True) in invalid_names:
             raise forms.ValidationError(
                 _("Project name cannot be “Add” or “New”."))
         return name
