@@ -13,6 +13,7 @@ from ..exceptions import InvalidXLSForm
 from . import factories
 
 path = os.path.dirname(settings.BASE_DIR)
+ensure_dirs(add='s3/uploads/xls-forms')
 
 
 class CreateChildrenTest(TestCase):
@@ -96,7 +97,7 @@ class QuestionnaireManagerTest(TestCase):
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
-        form = storage.save('xls-form.xlsx', file)
+        form = storage.save('xls-forms/xls-form.xlsx', file)
 
         model = models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -113,7 +114,7 @@ class QuestionnaireManagerTest(TestCase):
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
-        form = storage.save('xls-form.xlsx', file)
+        form = storage.save('xls-forms/xls-form.xlsx', file)
 
         project = ProjectFactory.create()
 

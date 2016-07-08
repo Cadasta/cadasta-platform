@@ -13,14 +13,17 @@ path = os.path.dirname(settings.BASE_DIR)
 
 class ResourceTest(UserTestCase):
     def test_file_name_property(self):
+        ensure_dirs(add='s3/uploads/resources')
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_name == 'filename.txt'
 
     def test_file_type_property(self):
+        ensure_dirs(add='s3/uploads/resources')
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_type == 'txt'
 
     def test_thumbnail(self):
+        ensure_dirs(add='s3/uploads/resources')
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.jpg',
             mime_type='image/jpg'
@@ -43,10 +46,10 @@ class ResourceTest(UserTestCase):
         assert resource.num_entities == 2
 
     def test_register_file_version(self):
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('thumb_new.jpg', file)
+        file_name = storage.save('resources/thumb_new.jpg', file)
         resource = ResourceFactory.create()
 
         resource.file = file_name
@@ -56,12 +59,12 @@ class ResourceTest(UserTestCase):
         assert len(resource.file_versions) == 1
 
     def test_create_thumbnail(self):
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('thumb_test.jpg', file)
+        file_name = storage.save('resources/thumb_test.jpg', file)
         resource = ResourceFactory.build(file=file_name)
 
         create_thumbnails(Resource, resource, True)
         assert os.path.isfile(os.path.join(settings.MEDIA_ROOT,
-                              's3/uploads/thumb_test-128x128.jpg'))
+                              's3/uploads/resources/thumb_test-128x128.jpg'))

@@ -530,7 +530,7 @@ class LocationResourceNewTest(TestCase):
 
     def get_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)

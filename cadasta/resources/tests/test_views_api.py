@@ -15,10 +15,10 @@ from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
 
-ensure_dirs()
+ensure_dirs(add='s3/uploads/resources')
 storage = FakeS3Storage()
 file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-file_name = storage.save('image.jpg', file)
+file_name = storage.save('resources/image.jpg', file)
 
 clauses = {
     'clause': [
@@ -170,7 +170,7 @@ class ProjectResourcesTest(UserTestCase):
         assert 'name' in response
 
     def test_search_for_file(self):
-        not_found = storage.save('bild.jpg', file)
+        not_found = storage.save('resources/bild.jpg', file)
         project = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
             {'content_object': project, 'file': file_name},

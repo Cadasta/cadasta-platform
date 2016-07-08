@@ -4,10 +4,11 @@
 <div class="row">
   <div class="col-md-6">
     {% csrf_token %}
+
     <div class="form-group">
-      {{ form.file.errors }}
       <h4><label for="{{ form.file.id_for_label }}">{% trans "Select the file to upload" %}</label></h4>
-      {% render_field form.file class+="form-control" %}
+      {{ form.file.errors }}
+      {{ form.file }}
       <p class="help-block">Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png</p>
     </div>
     <hr class="divider">

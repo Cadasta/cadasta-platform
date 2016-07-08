@@ -15,7 +15,7 @@ path = os.path.dirname(settings.BASE_DIR)
 class ResourceFormTest(UserTestCase):
     def setUp(self):
         super().setUp()
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
@@ -56,6 +56,7 @@ class ResourceFormTest(UserTestCase):
 
 class AddResourceFromLibraryFormTest(UserTestCase):
     def test_init(self):
+        ensure_dirs(add='s3/uploads/resources')
         prj = ProjectFactory.create()
         prj_res = ResourceFactory.create(project=prj, content_object=prj)
         res = ResourceFactory.create(project=prj)
@@ -67,6 +68,7 @@ class AddResourceFromLibraryFormTest(UserTestCase):
         assert form.fields[res.id].initial is False
 
     def test_save(self):
+        ensure_dirs(add='s3/uploads/resources')
         prj = ProjectFactory.create()
         prj_res = ResourceFactory.create(project=prj, content_object=prj)
         res = ResourceFactory.create(project=prj)

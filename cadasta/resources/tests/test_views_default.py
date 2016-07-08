@@ -20,6 +20,8 @@ from ..views import default
 from ..forms import ResourceForm, AddResourceFromLibraryForm
 from .factories import ResourceFactory
 
+ensure_dirs(add='s3/uploads/resources')
+
 path = os.path.dirname(settings.BASE_DIR)
 clauses = {
     'clause': [
@@ -269,7 +271,6 @@ class ProjectResourcesNewTest(UserTestCase):
         return response
 
     def _post(self, user=None, status=None, expected_redirect=None):
-        ensure_dirs()
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
@@ -467,7 +468,6 @@ class ProjectResourcesEditTest(UserTestCase):
         if user is None:
             user = self.user
 
-        ensure_dirs()
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
