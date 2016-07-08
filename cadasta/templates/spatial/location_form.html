@@ -25,6 +25,8 @@
             <label for="{{ form.type.id_for_label }}">{% trans "What type of location is this?" %}</label>
             {% render_field form.type class+="form-control" %}
           </div>
+
+          {{ form.geometry.errors }}
        </div>
         <div class="panel-footer panel-buttons">
           <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}"/>
