@@ -393,6 +393,7 @@ class PartyResourcesAddTest(TestCase):
     success_url_name = 'parties:detail'
 
     def set_up_models(self):
+        ensure_dirs(add='s3/uploads/resources')
         self.project = ProjectFactory.create()
         self.party = PartyFactory.create(project=self.project)
         self.assigned = ResourceFactory.create(project=self.project,
@@ -508,7 +509,7 @@ class PartyResourcesNewTest(TestCase):
 
     def get_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)
@@ -796,6 +797,7 @@ class PartyRelationshipResourceAddTest(TestCase):
     success_url_name = 'parties:relationship_detail'
 
     def set_up_models(self):
+        ensure_dirs(add='s3/uploads/resources')
         self.project = ProjectFactory.create()
         self.relationship = TenureRelationshipFactory.create(
             project=self.project)
@@ -919,7 +921,7 @@ class PartyRelationshipResourceNewTest(TestCase):
 
     def get_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('image.jpg', file)

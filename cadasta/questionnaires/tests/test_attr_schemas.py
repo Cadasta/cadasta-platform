@@ -25,17 +25,16 @@ from .attr_schemas import (location_relationship_xform_group,
 from .factories import QuestionnaireFactory
 
 path = os.path.dirname(settings.BASE_DIR)
+ensure_dirs(add='s3/uploads/xls-forms')
 
 
 class CreateAttributeSchemaTest(TestCase):
-
     def test_create_attribute_schemas(self):
-        ensure_dirs()
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
         ).read()
-        form = storage.save('xls-form-attrs.xlsx', file)
+        form = storage.save('xls-forms/xls-form-attrs.xlsx', file)
         project = ProjectFactory.create()
         models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -303,7 +302,7 @@ class CreateAttributeSchemaTest(TestCase):
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
         ).read()
-        form = storage.save('xls-form.xlsx', file)
+        form = storage.save('xls-forms/xls-form.xlsx', file)
         project = ProjectFactory.create(name='TestProject')
         q1 = models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -343,7 +342,7 @@ class ConditionalAttributeSchemaTest(TestCase):
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
         ).read()
-        form = storage.save('xls-form-attrs.xlsx', file)
+        form = storage.save('xls-forms/xls-form-attrs.xlsx', file)
         self.content_type = ContentType.objects.get(
             app_label='party', model='party')
         self.project = ProjectFactory.create(name='TestProject')

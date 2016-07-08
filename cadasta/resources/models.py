@@ -122,6 +122,8 @@ def create_thumbnails(sender, instance, created, **kwargs):
 
             thumb = thumbnail.make(file, size)
             thumb.save(write_path)
+            if instance.file.field.upload_to:
+                name = instance.file.field.upload_to + '/' + name
             instance.file.storage.save(name + '-128x128.' + ext,
                                        open(write_path, 'rb').read())
 

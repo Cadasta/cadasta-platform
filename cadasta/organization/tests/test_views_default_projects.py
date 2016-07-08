@@ -419,14 +419,14 @@ class ProjectAddTest(UserTestCase):
         assert 'organization' not in form_initial
 
     def _get_xls_form(self, form_name):
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/xls-forms')
 
         path = os.path.dirname(settings.BASE_DIR)
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb').read()
-        form = storage.save(form_name + '.xlsx', file)
+        form = storage.save('xls-forms/' + form_name + '.xlsx', file)
         return form
 
     EXTENTS_POST_DATA = {
@@ -766,7 +766,7 @@ class ProjectEditDetailsTest(UserTestCase):
             path + '/questionnaires/tests/files/xls-form-invalid.xlsx',
             'rb'
         ).read()
-        questionnaire = storage.save('xls-form-invalid.xlsx', file)
+        questionnaire = storage.save('xls-forms/xls-form-invalid.xlsx', file)
         self.post_data['questionnaire'] = questionnaire
 
         user = UserFactory.create()

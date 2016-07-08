@@ -5,7 +5,7 @@ from zipfile import ZipFile
 
 from django.conf import settings
 
-from buckets.test.utils import ensure_dirs
+from buckets.test import utils as bucket_uitls
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy
 
@@ -264,14 +264,14 @@ class ProjectAddDetailsTest(UserTestCase):
 class ProjectEditDetailsTest(UserTestCase):
     def _get_form(self, form_name):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs()
+        bucket_uitls.ensure_dirs(add='s3/uploads/xls-forms')
 
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
         ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
+        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def test_add_new_questionnaire(self):
@@ -604,7 +604,7 @@ class DownloadFormTest(UserTestCase):
         assert form.user == user
 
     def test_get_xls_download(self):
-        ensure_dirs()
+        bucket_uitls.ensure_dirs()
         data = {'type': 'xls'}
         user = UserFactory.create()
         project = ProjectFactory.create()
@@ -616,7 +616,7 @@ class DownloadFormTest(UserTestCase):
                         'spreadsheetml.sheet')
 
     def test_get_resources_download(self):
-        ensure_dirs()
+        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         data = {'type': 'res'}
         user = UserFactory.create()
         project = ProjectFactory.create()
@@ -627,7 +627,7 @@ class DownloadFormTest(UserTestCase):
         assert mime == 'application/zip'
 
     def test_get_all_download(self):
-        ensure_dirs()
+        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         data = {'type': 'all'}
         user = UserFactory.create()
         project = ProjectFactory.create()

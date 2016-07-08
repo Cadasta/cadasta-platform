@@ -14,6 +14,7 @@ from ..models import Questionnaire
 from ..exceptions import InvalidXLSForm
 
 path = os.path.dirname(settings.BASE_DIR)
+ensure_dirs(add='s3/uploads/xls-forms')
 
 
 class QuestionnaireSerializerTest(TestCase):
@@ -25,7 +26,7 @@ class QuestionnaireSerializerTest(TestCase):
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
         ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
+        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def test_deserialize(self):

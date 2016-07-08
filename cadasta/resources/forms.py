@@ -6,7 +6,7 @@ from .fields import ResourceField
 
 
 class ResourceForm(forms.ModelForm):
-    file = forms.CharField(widget=S3FileUploadWidget)
+    file = forms.CharField(widget=S3FileUploadWidget(upload_to='resources'))
 
     class Meta:
         model = Resource
