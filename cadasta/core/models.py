@@ -1,4 +1,5 @@
 import itertools
+import math
 from core.util import slugify
 from django.db import models
 
@@ -45,11 +46,8 @@ class SlugModel:
             for x in itertools.count(1):
                 if not type(self).objects.filter(slug=self.slug).exists():
                     break
-                if x == 1 or x % 10 == 0:
-                    max_length -= 1
-                    if x == 1:
-                        max_length -= 1
-                    orig = self.slug[:max_length]
+                slug_length = max_length - int(math.log10(x)) - 2
+                orig = self.slug[:slug_length]
                 self.slug = '{}-{}'.format(orig, x)
 
         self.__original_slug = self.slug
