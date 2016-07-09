@@ -74,12 +74,14 @@
                 <a href="{% url 'organization:list' %}">
                   {% trans "Organizations" %}
                 </a>
-              </li><!--
-              --><li class="users">
+              </li>
+              {% if is_superuser %}
+              <li class="users">
                 <a href="{% url 'user:list' %}">
                   {% trans "Users" %}
                 </a>
               </li>
+              {% endif %}
             </ul>
             <!-- Hamburger -->
             <div class="dropdown pull-right btn-group btn-hamburger visible-xs-inline visible-sm-inline">

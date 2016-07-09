@@ -44,6 +44,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     REQUIRED_FIELDS = ['email', 'full_name']
 
     class Meta:
+        ordering = ('username',)
         verbose_name = _('user')
         verbose_name_plural = _('users')
 

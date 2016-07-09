@@ -6,9 +6,8 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 
 from core.tests.base_test_case import UserTestCase
-from tutelary.models import Policy
+from tutelary.models import Role
 from accounts.tests.factories import UserFactory
-from core.tests.factories import RoleFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
@@ -77,6 +76,7 @@ class DashboardTest(UserTestCase):
         context['geojson'] = json.dumps(
             ProjectGeometrySerializer(projects, many=True).data
         )
+        context['is_superuser'] = superuser
         expected = render_to_string(
             'core/dashboard.html',
             context
@@ -111,10 +111,7 @@ class DashboardTest(UserTestCase):
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
         setattr(self.request, 'user', superuser)
         response = self.view(self.request).render()

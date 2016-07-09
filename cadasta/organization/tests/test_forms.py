@@ -7,14 +7,13 @@ from django.conf import settings
 
 from buckets.test import utils as bucket_uitls
 from buckets.test.storage import FakeS3Storage
-from tutelary.models import Policy
+from tutelary.models import Role
 
 from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
 from core.tests.base_test_case import UserTestCase
-from core.tests.factories import RoleFactory
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
@@ -425,11 +424,7 @@ class ProjectEditPermissionsTest(UserTestCase):
         OrganizationRole.objects.create(user=self.super_user,
                                         organization=self.project.organization,
                                         admin=False)
-        su_pol = Policy.objects.get(name='superuser')
-        su_role = RoleFactory.create(
-            name='superuser',
-            policies=[su_pol]
-        )
+        su_role = Role.objects.get(name='superuser')
         self.super_user.assign_policies(su_role)
 
         self.org_admin = UserFactory.create()

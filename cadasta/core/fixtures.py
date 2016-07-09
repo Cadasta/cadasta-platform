@@ -2,15 +2,15 @@ from datetime import datetime, timezone
 
 from accounts.models import User
 from accounts.tests.factories import UserFactory
-from core.tests.factories import RoleFactory
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import GEOSGeometry
 from faker import Factory
 from jsonattrs.models import Attribute, Schema, AttributeType
 from organization.models import Organization, OrganizationRole, Project
 from organization.tests.factories import OrganizationFactory, ProjectFactory
-from spatial.tests.factories import (SpatialUnitFactory,
-                                     SpatialRelationshipFactory)
+from spatial.tests.factories import (
+    SpatialUnitFactory, SpatialRelationshipFactory
+)
 from tutelary.models import Policy, PolicyInstance, Role, RolePolicyAssign
 
 
@@ -62,10 +62,7 @@ class FixturesData:
             pols[pol] = Policy.objects.get(name=pol)
 
         roles = {}
-        roles['superuser'] = RoleFactory.create(
-            name='superuser',
-            policies=[pols['default'], pols['superuser']]
-        )
+        roles['superuser'] = Role.objects.get(name='superuser')
         users[0].assign_policies(roles['superuser'])
         users[1].assign_policies(roles['superuser'])
 

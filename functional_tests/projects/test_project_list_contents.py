@@ -4,6 +4,8 @@ from pages.Login import LoginPage
 from common_test_data.common_test_data_1 import get_test_data
 from core.tests.factories import PolicyFactory
 
+# from accounts.models import User
+
 
 class ProjectListContentsTest(FunctionalTest):
 
@@ -83,6 +85,8 @@ class ProjectListContentsTest(FunctionalTest):
 
             # Log in as the selected user, check the list, log out
             LoginPage(self).login(user['username'], user['password'])
+            # u = User.objects.get(username=user['username'])
+            # print(user['username'], '=>', u.assigned_policies())
             self.check_project_list(user_type, parent_org_idxs)
             self.logout()
 
