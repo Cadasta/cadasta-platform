@@ -1,7 +1,7 @@
 import json
 
 from django.shortcuts import redirect
-from django.views.generic import TemplateView
+from core.views.generic import TemplateView
 from organization.models import Project, Organization
 from tutelary.models import Role
 

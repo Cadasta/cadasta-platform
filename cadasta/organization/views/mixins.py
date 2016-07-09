@@ -68,10 +68,7 @@ class ProjectRoles(ProjectMixin):
 class ProjectQuerySetMixin:
     def get_queryset(self):
         if not hasattr(self, 'su_role'):
-            try:
-                self.su_role = Role.objects.get(name='superuser')
-            except Role.DoesNotExist:
-                self.su_role = None
+            self.su_role = Role.objects.get(name='superuser')
 
         if (not isinstance(self.request.user, AnonymousUser) and
             any([isinstance(pol, Role) and pol == self.su_role

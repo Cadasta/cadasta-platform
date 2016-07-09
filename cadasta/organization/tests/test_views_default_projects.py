@@ -11,7 +11,7 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.messages.api import get_messages
 import pytest
 
-from tutelary.models import Policy, assign_user_policies
+from tutelary.models import Policy, Role, assign_user_policies
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
@@ -82,7 +82,7 @@ class ProjectListTest(UserTestCase):
         self.user.assign_policies(*assigned_policies)
 
     def _get(self, user=None, status=None, projs=None,
-             make_org_member=None):
+             make_org_member=None, is_superuser=False):
         if user is None:
             user = self.user
         if projs is None:
@@ -102,7 +102,8 @@ class ProjectListTest(UserTestCase):
              sorted(projs,
                     key=lambda p: p.organization.slug + ':' + p.slug),
              'add_allowed': True,
-             'user': self.request.user},
+             'user': self.request.user,
+             'is_superuser': is_superuser},
             request=self.request)
 
         if expected != content:
@@ -140,12 +141,9 @@ class ProjectListTest(UserTestCase):
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
-        self._get(status=200, user=superuser,
+        self._get(status=200, user=superuser, is_superuser=True,
                   projs=Project.objects.all())
 
 

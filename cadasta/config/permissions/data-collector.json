@@ -20,7 +20,7 @@
     {
       "effect": "allow",
       "action": ["spatial_rel.*"],
-      "object": ["spatial_rel/$organization/*/*"]
+      "object": ["spatial_rel/$organization/$project/*"]
     },
     {
       "effect": "allow",
