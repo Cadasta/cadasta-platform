@@ -12,7 +12,17 @@
     {{ form.tenure_type.errors }}
     <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>
     {% render_field form.tenure_type class+="form-control input-lg" %}
-  </div>  
+  </div>
+
+  {% for field in form %}
+    {% if "attributes" in field.name %}
+    <div class="form-group">
+      {{ field.errors }}
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {% render_field field class+="form-control input-lg" %}
+    </div>
+    {% endif %}
+  {% endfor %}
   <button type="submit" class="btn btn-primary">Submit</button>
   <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}" class="btn btn-link">Cancel</a>
 </form>

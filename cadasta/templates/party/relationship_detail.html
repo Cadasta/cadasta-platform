@@ -15,13 +15,19 @@
 
 <table class="table table-hover">
   <tr>
-    <td>{% trans "Type" %}</td>
-    <td>{{ relationship.tenure_type.label }}</td>
+    <td><strong>{% trans "Type" %}</strong></td>
+    <td>{{ relationship.tenure_type.label }}</strong></td>
   </tr>
   <tr>
-    <td>{% trans "Party" %}</td>
+    <td><strong>{% trans "Party" %}</td>
     <td><a href="{% url 'parties:detail' object.organization.slug object.slug relationship.party.id %}">{{ relationship.party.name }}</a></td>
   </tr>
+  {% for attr in attributes %}
+  <tr>
+    <td><strong>{{ attr.0 }}</strong></td>
+    <td>{{ attr.1 }}</td>
+  </tr>
+  {% endfor %}
 </table>
 
 <h3>{% trans "resources" %}</h3>

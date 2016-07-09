@@ -4,10 +4,12 @@ import pytest
 from django.http import Http404
 from django.conf import settings
 from django.contrib.messages.api import get_messages
+from django.contrib.contenttypes.models import ContentType
 
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
+from jsonattrs.models import Attribute, AttributeType, Schema
 
 from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
@@ -108,7 +110,7 @@ class PartiesAddTest(TestCase):
     def get_template_context(self):
         return {
             'object': self.project,
-            'form': forms.PartyForm()
+            'form': forms.PartyForm(schema_selectors=())
         }
 
     def get_url_kwargs(self):
@@ -173,12 +175,28 @@ class PartyDetailTest(TestCase):
     def set_up_models(self):
         self.project = ProjectFactory.create()
         self.party = PartyFactory.create(project=self.project)
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        self.party = PartyFactory.create(project=self.project,
+                                         attributes={'fname': 'test'})
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
 
     def get_template_context(self):
-        return {'object': self.project, 'party': self.party}
+        return {'object': self.project,
+                'party': self.party,
+                'attributes': (('Test field', 'test', ), )}
 
     def get_url_kwargs(self):
         return {
@@ -220,12 +238,27 @@ class PartiesEditTest(TestCase):
     success_url_name = 'parties:detail'
     post_data = {
         'name': 'Party',
-        'type': 'GR'
+        'type': 'GR',
+        'attributes::fname': 'New text'
     }
 
     def set_up_models(self):
         self.project = ProjectFactory.create()
         self.party = PartyFactory.create(project=self.project)
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        self.party = PartyFactory.create(project=self.project,
+                                         attributes={'fname': 'test'})
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -283,6 +316,7 @@ class PartiesEditTest(TestCase):
         self.party.refresh_from_db()
         assert self.party.name == self.post_data['name']
         assert self.party.type == self.post_data['type']
+        assert self.party.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
@@ -576,8 +610,20 @@ class PartyRelationshipDetailTest(TestCase):
 
     def set_up_models(self):
         self.project = ProjectFactory.create()
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
         self.relationship = TenureRelationshipFactory.create(
-            project=self.project)
+            project=self.project, attributes={'fname': 'test'})
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -586,7 +632,8 @@ class PartyRelationshipDetailTest(TestCase):
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'geojson': '{"type": "FeatureCollection", "features": []}',
+                'attributes': (('Test field', 'test', ), )}
 
     def get_url_kwargs(self):
         return {
@@ -626,12 +673,24 @@ class PartyRelationshipEditTest(TestCase):
     view = default.PartyRelationshipEdit
     template = 'party/relationship_edit.html'
     success_url_name = 'parties:relationship_detail'
-    post_data = {'tenure_type': 'LH'}
+    post_data = {'tenure_type': 'LH', 'attributes::fname': 'New text'}
 
     def set_up_models(self):
         self.project = ProjectFactory.create()
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
         self.relationship = TenureRelationshipFactory.create(
-            project=self.project)
+            project=self.project, attributes={'fname': 'test'})
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -687,6 +746,7 @@ class PartyRelationshipEditTest(TestCase):
 
         self.relationship.refresh_from_db()
         assert self.relationship.tenure_type_id == 'LH'
+        assert self.relationship.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)

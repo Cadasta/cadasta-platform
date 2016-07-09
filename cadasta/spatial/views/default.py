@@ -1,4 +1,5 @@
 import json
+from jsonattrs.mixins import JsonAttrsMixin
 from django.views import generic
 from django.core.urlresolvers import reverse
 
@@ -33,13 +34,33 @@ class LocationsAdd(LoginPermissionRequiredMixin,
     def get_perms_objects(self):
         return [self.get_project()]
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        prj = self.get_project()
+
+        kwargs['schema_selectors'] = (
+            {'name': 'organization',
+             'value': prj.organization,
+             'selector': prj.organization.id},
+            {'name': 'project',
+             'value': prj,
+             'selector': prj.id},
+            {'name': 'questionaire',
+             'value': prj.current_questionnaire,
+             'selector': prj.current_questionnaire}
+        )
+
+        return kwargs
+
 
 class LocationDetail(LoginPermissionRequiredMixin,
+                     JsonAttrsMixin,
                      mixins.SpatialUnitObjectMixin,
                      generic.DetailView):
     template_name = 'spatial/location_detail.html'
     permission_required = 'spatial.view'
     permission_denied_message = error_messages.SPATIAL_VIEW
+    attributes_field = 'attributes'
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -124,6 +145,24 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
         )
 
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        prj = self.get_project()
+
+        kwargs['schema_selectors'] = (
+            {'name': 'organization',
+             'value': prj.organization,
+             'selector': prj.organization.id},
+            {'name': 'project',
+             'value': prj,
+             'selector': prj.id},
+            {'name': 'questionaire',
+             'value': prj.current_questionnaire,
+             'selector': prj.current_questionnaire}
+        )
+
+        return kwargs
 
     def get_success_url(self):
         return (reverse('locations:detail', kwargs=self.kwargs) +
