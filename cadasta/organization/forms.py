@@ -4,7 +4,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.postgres import forms as pg_forms
 from django.contrib.gis import forms as gisforms
-from django.utils.text import slugify
+from core.util import slugify
 from django.utils.translation import ugettext as _
 from django.db import transaction
 
