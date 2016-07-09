@@ -1007,10 +1007,6 @@ img.org-logo, img#org-logo {
 }
 
 button#add-contact { // below contacts table
-  background: transparent;
-  border: 0;
-  float: left !important;
-  color: $link-color !important;
   padding: 0;
 }
 
@@ -1081,6 +1077,10 @@ button#add-contact { // below contacts table
   z-index: 999;
 }
 
+.alert-error { // same as alert-danger
+  @include alert-variant($alert-danger-bg, $alert-danger-border, $alert-danger-text);
+}
+
 /* =Modals
 -------------------------------------------------------------- */
 
@@ -1095,11 +1095,15 @@ button#add-contact { // below contacts table
   .modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+    padding-left: 30px;
+    padding-right: 30px;
   }
   .modal-footer {
     background: $body-bg;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
+    padding-left: 30px;
+    padding-right: 30px;
     .btn {
       min-width: 100px;
     }
@@ -1113,21 +1117,21 @@ button#add-contact { // below contacts table
   }
 }
 
-/* =Chrome fix for fonts
+/* =Error messaging for forms
 -------------------------------------------------------------- */
 
-@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { 
-  body {
-    -webkit-animation-delay: 0.1s;
-    -webkit-animation-name: fontfix;
-    -webkit-animation-duration: 0.1s;
-    -webkit-animation-iteration-count: 1;
-    -webkit-animation-timing-function: linear;
+.form-group.has-error {
+  background-color: $alert-warning-bg;
+  padding: 10px;
+}
+  
+ul.errorlist {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none !important;
+  li {
+    background-color: $alert-warning-bg;
+    color: $alert-danger-text;
+    padding: 2px 8px;
   }
-
-  @-webkit-keyframes fontfix {
-    from { opacity: 1; }
-    to   { opacity: 1; }
-  }
-
 }

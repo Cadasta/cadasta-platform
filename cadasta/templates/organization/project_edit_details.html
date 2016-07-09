@@ -13,7 +13,7 @@
 
 {% block content %}
 
-<form method="POST" action="{% url 'organization:project-edit-details' project.organization.slug project.slug %}">
+<form method="POST" action="{% url 'organization:project-edit-details' project.organization.slug project.slug %}" novalidate>
 {% csrf_token %}
   <div class="col-md-12 content-single">
     <div class="row">
@@ -32,9 +32,9 @@
               <div class="col-md-9">
                 <div class="row">
                   <div class="col-md-8">
-                    <div class="form-group">
-                      {{ form.name.errors }}
+                    <div class="form-group{% if form.name.errors %} has-error{% endif %}">
                       <label for="{{ form.name.id_for_label }}">{% trans "Project name" %}</label>
+                      <label class="pull-right control-label">{{ form.name.errors }}</label>
                       {% render_field form.name class+="form-control" %}
                     </div>
                   </div>
@@ -42,16 +42,16 @@
                     {{ form.access }}
                   </div>
                 </div>
-                <div class="form-group">
-                  {{ form.description.errors }}
+                <div class="form-group{% if form.description.errors %} has-error{% endif %}">
                   <label for="{{ form.description.id_for_label }}">{% trans "Project description" %}</label>
+                  <label class="pull-right control-label">{{ form.description.errors }}</label>
                   {% render_field form.description class+="form-control" %}
                 </div>
   
-                <div class="form-group">
-                  {{ form.urls.errors }}
+                <div class="form-group{% if form.urls.errors %} has-error{% endif %}">
                   <label for="{{ form.urls.id_for_label }}">{% trans "Project URL" %}</label>
-                  {% render_field form.urls class+="form-control" %}
+                  <label class="pull-right control-label">{{ form.urls.errors }}</label>
+                  {% render_field form.urls class+="form-control" placeholder="http://" %}
                 </div>
               </div>
             </div>
@@ -59,9 +59,9 @@
             <h3>{% trans "2. Questionnaire" %}</h3>
             <div class="row">
               <div class="col-md-9">
-                <div class="form-group">
-                  {{ form.questionnaire.errors }}
+                <div class="form-group{% if form.questionnaire.errors %} has-error{% endif %}">
                   <label for="{{ form.questionnaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
+                  <label class="pull-right control-label">{{ form.questionnaire.errors }}</label>
                   {{ form.questionnaire }}
                   <p class="help-block">Accepted file type: xls</p>
                 </div>

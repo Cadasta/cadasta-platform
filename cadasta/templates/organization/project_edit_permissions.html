@@ -14,7 +14,7 @@
 
 {% block content %}
 
-<form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}">
+<form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}" novalidate>
 {% csrf_token %}
   <div class="col-md-12 content-single">
     <div class="row">

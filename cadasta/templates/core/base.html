@@ -128,7 +128,7 @@
           <p class="copy">
             {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
           </p>
-          <form action="{% url 'set_language' %}" method="post" class="language">
+          <form action="{% url 'set_language' %}" method="post" class="language" novalidate>
           {% csrf_token %}
             <select id="language" name="language">
               {% get_current_language as LANGUAGE_CODE %}

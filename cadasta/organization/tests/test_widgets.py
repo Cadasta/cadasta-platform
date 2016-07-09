@@ -208,7 +208,7 @@ class ContactsWidgetTest(TestCase):
                 '    <tr>'
                 '      <td colspan="4">'
                 '        <button data-prefix="contacts" type="button" '
-                '                class="btn btn-primary pull-right" '
+                '                class="btn btn-link" '
                 '                id="add-contact">Add contact</button>'
                 '      </td>'
                 '    </tr>'
