@@ -192,6 +192,9 @@
        $('.dropdown-toggle').dropdown();
        $('#language').change(function() { this.form.submit(); });
      });
+      window.setTimeout(function() {
+        $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+      }, 5000);
     </script>
   </body>
 </html>
