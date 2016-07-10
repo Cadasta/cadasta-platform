@@ -1066,6 +1066,8 @@ button#add-contact { // below contacts table
 
 .alert {
   text-align: center;
+  max-width: 50%;
+  margin: 0 auto;
 }
 
 .translation-wrapper {
@@ -1075,10 +1077,18 @@ button#add-contact { // below contacts table
 #messages { // success messages on top of map
   position: relative;
   z-index: 999;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .alert-error { // same as alert-danger
   @include alert-variant($alert-danger-bg, $alert-danger-border, $alert-danger-text);
+}
+
+@media (max-width: $screen-sm-max) {
+  .alert {
+    max-width: none;
+  }
 }
 
 /* =Modals

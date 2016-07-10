@@ -5674,14 +5674,18 @@ button#add-contact {
 /* =Alerts
 -------------------------------------------------------------- */
 .alert {
-  text-align: center; }
+  text-align: center;
+  max-width: 50%;
+  margin: 0 auto; }
 
 .translation-wrapper {
   background-color: fuchsia; }
 
 #messages {
   position: relative;
-  z-index: 999; }
+  z-index: 999;
+  margin-top: 10px;
+  margin-bottom: 10px; }
 
 .alert-error {
   background-color: #f2dede;
@@ -5691,6 +5695,10 @@ button#add-contact {
     border-top-color: #e4b9c0; }
   .alert-error .alert-link {
     color: #843534; }
+
+@media (max-width: 991px) {
+  .alert {
+    max-width: none; } }
 
 /* =Modals
 -------------------------------------------------------------- */
