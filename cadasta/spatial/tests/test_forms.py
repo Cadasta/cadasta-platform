@@ -117,6 +117,7 @@ class TenureRelationshipFormTest(TestCase):
         )
 
         form = forms.TenureRelationshipForm(
+            data={'new_item': 'on'},
             project=project,
             spatial_unit=spatial_unit,
             schema_selectors=(

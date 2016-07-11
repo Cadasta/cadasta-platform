@@ -38,17 +38,19 @@ class LocationsAdd(LoginPermissionRequiredMixin,
         kwargs = super().get_form_kwargs()
         prj = self.get_project()
 
-        kwargs['schema_selectors'] = (
-            {'name': 'organization',
-             'value': prj.organization,
-             'selector': prj.organization.id},
-            {'name': 'project',
-             'value': prj,
-             'selector': prj.id},
-            {'name': 'questionaire',
-             'value': prj.current_questionnaire,
-             'selector': prj.current_questionnaire}
-        )
+        kwargs['schema_selectors'] = ()
+        if prj.current_questionnaire:
+            kwargs['schema_selectors'] = (
+                {'name': 'organization',
+                 'value': prj.organization,
+                 'selector': prj.organization.id},
+                {'name': 'project',
+                 'value': prj,
+                 'selector': prj.id},
+                {'name': 'questionaire',
+                 'value': prj.current_questionnaire,
+                 'selector': prj.current_questionnaire}
+            )
 
         return kwargs
 
@@ -150,17 +152,19 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
         kwargs = super().get_form_kwargs()
         prj = self.get_project()
 
-        kwargs['schema_selectors'] = (
-            {'name': 'organization',
-             'value': prj.organization,
-             'selector': prj.organization.id},
-            {'name': 'project',
-             'value': prj,
-             'selector': prj.id},
-            {'name': 'questionaire',
-             'value': prj.current_questionnaire,
-             'selector': prj.current_questionnaire}
-        )
+        kwargs['schema_selectors'] = ()
+        if prj.current_questionnaire:
+            kwargs['schema_selectors'] = (
+                {'name': 'organization',
+                 'value': prj.organization,
+                 'selector': prj.organization.id},
+                {'name': 'project',
+                 'value': prj,
+                 'selector': prj.id},
+                {'name': 'questionaire',
+                 'value': prj.current_questionnaire,
+                 'selector': prj.current_questionnaire}
+            )
 
         return kwargs
 
