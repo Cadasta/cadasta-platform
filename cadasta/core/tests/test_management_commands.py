@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.contrib.sites.models import Site
 
 from core.tests.factories import PolicyFactory
 from ..fixtures import FixturesData
@@ -6,6 +7,7 @@ from tutelary.models import Policy
 from accounts.models import User
 from organization.models import Organization, Project
 from spatial.models import SpatialUnit, SpatialRelationship
+from core.management.commands import loadsite
 
 
 class FixturesTest(TestCase):
@@ -36,3 +38,14 @@ class FixturesTest(TestCase):
         assert Project.objects.count() == 0
         assert SpatialUnit.objects.count() == 0
         assert SpatialRelationship.objects.count() == 0
+
+
+class LoadSiteTest(TestCase):
+    def test_default_site_replacement(self):
+        assert Site.objects.filter(name='example.com').exists()
+        loadsite.Command().handle()
+        assert len(Site.objects.all()) == 1
+        assert Site.objects.filter(name='Cadasta').exists()
+        response = loadsite.Command().handle()
+        assert len(Site.objects.all()) == 1
+        assert response == "Cadasta.org object already exists."
