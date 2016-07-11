@@ -237,8 +237,8 @@ class ProjectDashboardTest(UserTestCase):
         context = RequestContext(self.request)
         context['object'] = project
         context['project'] = project
-        if assign_context:
-            default.assign_project_extent_context(context, project)
+        context['geojson'] = '{"type": "FeatureCollection", "features": []}'
+
         expected = render_to_string(
             'organization/project_dashboard.html',
             context, request=self.request

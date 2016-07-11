@@ -1,4 +1,5 @@
 import os
+import json
 from django.http import Http404, HttpResponse
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404
@@ -16,6 +17,7 @@ from core.views.mixins import ArchiveMixin
 from accounts.models import User
 from questionnaires.models import Questionnaire
 from questionnaires.exceptions import InvalidXLSForm
+from spatial.serializers import SpatialUnitGeoJsonSerializer
 
 from ..models import Organization, Project, OrganizationRole, ProjectRole
 from . import mixins
@@ -285,17 +287,6 @@ class ProjectList(PermissionRequiredMixin,
         return super(generic.ListView, self).render_to_response(context)
 
 
-def assign_project_extent_context(context, project):
-    ext = project.extent.extent
-    context['extent'] = True
-    context['wlon'] = ext[0]
-    context['slat'] = ext[1]
-    context['elon'] = ext[2]
-    context['nlat'] = ext[3]
-    context['boundary'] = list(map(lambda t: [t[1], t[0]],
-                                   project.extent.coords[0]))
-
-
 class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
     def get_actions(view, request):
         if view.get_object().public():
@@ -318,10 +309,11 @@ class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
-        if self.object.extent is None:
-            context['extent'] = False
-        else:
-            assign_project_extent_context(context, self.object)
+        context['geojson'] = json.dumps(
+            SpatialUnitGeoJsonSerializer(
+                self.object.spatial_units.all(), many=True).data
+        )
+
         return context
 
     def get_object(self, queryset=None):
