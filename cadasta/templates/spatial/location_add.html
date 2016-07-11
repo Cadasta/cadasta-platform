@@ -28,6 +28,7 @@
       var map = e.originalEvent.detail.map;
       add_map_controls(map);
 
+      // Add locations, if any
       var data = {{ geojson|safe }};
 
       var geoJson = L.geoJson(null, {
@@ -42,12 +43,32 @@
 
       L.Deflate(map, {minSize: 20, layerGroup: geoJson});
       geoJson.addData(data);
-
       var markerGroup = L.markerClusterGroup.layerSupport()
       markerGroup.addTo(map);
       markerGroup.checkIn(geoJson);
       geoJson.addTo(map);
-      map.fitBounds(geoJson.getBounds());
+
+      {% if extent %}
+      // Add project extent
+      var extent = {{ extent_geojson|safe }};
+      var extentGeoJson = L.geoJson(extent, {
+        style: {
+          "color": "#ff0000",
+          "weight": 2,
+          "opacity": 0.4,
+          "fill": true,
+          "fillColor": "#ff0000",
+          "fillOpacity": 0.2,
+        },
+        clickable: false,
+      }).addTo(map);
+
+      map.fitBounds(extentGeoJson.getBounds());
+      {% else %}
+      // TODO: It seems Leaflet has a bug with L.geoJson()
+      // not returning the correct bounds (see #377 for details)
+      map.fitBounds(L.geoJson(data).getBounds());
+      {% endif %}
    });
  });
 </script>

@@ -37,7 +37,9 @@
     markerGroup.addTo(map);
     markerGroup.checkIn(geoJson);
     geoJson.addTo(map);
-    map.fitBounds(geoJson.getBounds());
+    // TODO: It seems Leaflet has a bug with L.geoJson()
+    // not returning the correct bounds (see #377 for details)
+    map.fitBounds(L.geoJson(data).getBounds());
   }
 </script>
 {% endblock %}

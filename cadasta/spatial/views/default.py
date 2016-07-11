@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 
 from core.mixins import LoginPermissionRequiredMixin
 
+from organization.serializers import ProjectGeometrySerializer
 from resources.forms import AddResourceFromLibraryForm
 from party.models import TenureRelationship
 from party.messages import TENURE_REL_CREATE
@@ -53,6 +54,15 @@ class LocationsAdd(LoginPermissionRequiredMixin,
             )
 
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(LocationsAdd, self).get_context_data(**kwargs)
+        project = self.get_project()
+        context['extent'] = project.extent is not None
+        context['extent_geojson'] = json.dumps(
+            ProjectGeometrySerializer(project).data
+        )
+        return context
 
 
 class LocationDetail(LoginPermissionRequiredMixin,
