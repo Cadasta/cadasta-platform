@@ -9,7 +9,7 @@ class ProjectRoleWidget(Select):
         '    <p>{full_name}</p>'
         '    <p>{username}</p>'
         '  </td>'
-        '  <td>{email}</td>'
+        '  <td class="hidden-xs hidden-sm">{email}</td>'
         '  <td>'
         '    {select}'
         '  </td>'
