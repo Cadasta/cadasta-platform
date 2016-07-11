@@ -7,9 +7,9 @@ from buckets.test.storage import FakeS3Storage
 from buckets.test.mocks import ensure_dirs
 
 from organization.tests.factories import ProjectFactory
+from questionnaires.exceptions import InvalidXLSForm
 from .. import models
 from ..managers import create_children, create_options
-from ..exceptions import InvalidXLSForm
 from . import factories
 
 path = os.path.dirname(settings.BASE_DIR)
