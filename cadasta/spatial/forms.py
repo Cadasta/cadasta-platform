@@ -78,7 +78,8 @@ class TenureRelationshipForm(forms.Form):
             raise forms.ValidationError(_("This field is required."))
         return name
 
-    def create_model_fields(self, model, field_prefix, selectors):
+    def create_model_fields(self, model, field_prefix, selectors,
+                            new_item=False):
         content_type = ContentType.objects.get_for_model(model)
         schemas = Schema.objects.lookup(
             content_type=content_type, selectors=selectors
@@ -87,7 +88,12 @@ class TenureRelationshipForm(forms.Form):
         for name, attr in attrs.items():
             fieldname = field_prefix + '::' + name
             atype = attr.attr_type
-            args = {'label': attr.long_name}
+            initial = self.data.get(fieldname, '')
+            args = {
+                'label': attr.long_name,
+                'required': False,
+                'initial': initial
+            }
             field = form_field_from_name(atype.form_field)
             if atype.form_field == 'CharField':
                 args['max_length'] = 32
@@ -98,16 +104,18 @@ class TenureRelationshipForm(forms.Form):
                 args['required'] = False
                 if len(attr.default) > 0:
                     args['initial'] = (attr.default != 'False')
-            elif attr.required:
-                args['required'] = True
-                if len(attr.default) > 0:
+            else:
+                if attr.required and new_item:
+                    args['required'] = True
+                if len(attr.default) > 0 and len(initial) == 0:
                     args['initial'] = attr.default
             self.fields[fieldname] = field(**args)
 
     def add_attribute_fields(self, schema_selectors):
         selectors = [s['selector'] for s in schema_selectors]
 
-        self.create_model_fields(Party, 'party', selectors)
+        new_item = self.data.get('new_item') == 'on'
+        self.create_model_fields(Party, 'party', selectors, new_item=new_item)
         self.create_model_fields(TenureRelationship, 'relationship', selectors)
 
     def process_attributes(self, key):
