@@ -12,9 +12,9 @@
     <!-- / end overview map -->
     <!-- Overview detail  -->
     <div class="col-md-4 detail detail-edit">
-        <h2>{{ title }}</h2>
-        <div class="panel panel-default">
-          <div class="panel-body">
+      <h2>{{ title }}</h2>
+      <div class="panel panel-default">
+        <div class="panel-body">
 
           <h3>Draw location on map</h3>
           <p>
@@ -25,9 +25,17 @@
             <label for="{{ form.type.id_for_label }}">{% trans "What type of location is this?" %}</label>
             {% render_field form.type class+="form-control" %}
           </div>
-
+          {% for field in form %}
+            {% if "attributes" in field.name %}
+            <div class="form-group">
+              {{ field.errors }}
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% render_field field class+="form-control input-lg" %}
+            </div>
+            {% endif %}
+          {% endfor %}
           {{ form.geometry.errors }}
-       </div>
+         </div>
         <div class="panel-footer panel-buttons">
           <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}"/>
           <a class="btn btn-default" href="{{ request.META.HTTP_REFERER }}">{% trans "Cancel" %}</a>

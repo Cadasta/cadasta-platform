@@ -5,10 +5,12 @@ from django.http import Http404
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.contrib.messages.api import get_messages
+from django.contrib.contenttypes.models import ContentType
 
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
+from jsonattrs.models import Attribute, AttributeType, Schema
 
 from organization.tests.factories import ProjectFactory
 from core.tests.util import TestCase
@@ -110,11 +112,24 @@ class LocationAddTest(TestCase):
                     '905819532],[-0.1411914825439453,51.55181915488898],[-'
                     '0.1411271095275879,51.55254631651022],[-0.14181375503'
                     '54004,51.55240622205599]]]}',
-        'type': 'CB'
+        'type': 'CB',
+        'attributes::fname': 'Test text'
     }
 
     def set_up_models(self):
-        self.project = ProjectFactory.create()
+        self.project = ProjectFactory.create(current_questionnaire='a1')
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, 'a1'))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -122,7 +137,19 @@ class LocationAddTest(TestCase):
     def get_template_context(self):
         return {
             'object': self.project,
-            'form': forms.LocationForm(),
+            'form': forms.LocationForm(
+                schema_selectors=(
+                    {'name': 'organization',
+                     'value': self.project.organization,
+                     'selector': self.project.organization.id},
+                    {'name': 'project',
+                     'value': self.project,
+                     'selector': self.project.id},
+                    {'name': 'questionnaire',
+                     'value': self.project.current_questionnaire,
+                     'selector': self.project.current_questionnaire}
+                )
+            ),
             'geojson': '{"type": "FeatureCollection", "features": []}'
         }
 
@@ -165,6 +192,7 @@ class LocationAddTest(TestCase):
         response = self.request(method='POST', user=self.authorized_user)
         assert SpatialUnit.objects.count() == 1
         self.location_created = SpatialUnit.objects.first()
+        assert self.location_created.attributes.get('fname') == 'Test text'
         assert response.status_code == 302
         assert response['location'] == self.expected_success_url
 
@@ -189,7 +217,20 @@ class LocationDetailTest(TestCase):
 
     def set_up_models(self):
         self.project = ProjectFactory.create()
-        self.location = SpatialUnitFactory.create(project=self.project)
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        self.location = SpatialUnitFactory.create(
+            project=self.project, attributes={'fname': 'test'})
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -198,7 +239,8 @@ class LocationDetailTest(TestCase):
         return {
             'object': self.project,
             'location': self.location,
-            'geojson': '{"type": "FeatureCollection", "features": []}'
+            'geojson': '{"type": "FeatureCollection", "features": []}',
+            'attributes': (('Test field', 'test', ), )
         }
 
     def get_url_kwargs(self):
@@ -245,12 +287,26 @@ class LocationEditTest(TestCase):
                     '905819532],[-0.1411914825439453,51.55181915488898],[-'
                     '0.1411271095275879,51.55254631651022],[-0.14181375503'
                     '54004,51.55240622205599]]]}',
-        'type': 'NP'
+        'type': 'NP',
+        'attributes::fname': 'New text'
     }
 
     def set_up_models(self):
         self.project = ProjectFactory.create()
-        self.location = SpatialUnitFactory.create(project=self.project)
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        self.location = SpatialUnitFactory.create(
+            project=self.project, attributes={'fname': 'test'})
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -308,6 +364,7 @@ class LocationEditTest(TestCase):
 
         self.location.refresh_from_db()
         assert self.location.type == self.post_data['type']
+        assert self.location.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
@@ -600,8 +657,33 @@ class TenureRelationshipAddTest(TestCase):
         assign_policies(self.authorized_user)
 
     def set_up_models(self):
-        self.project = ProjectFactory.create()
+        self.project = ProjectFactory.create(current_questionnaire='a1')
         self.spatial_unit = SpatialUnitFactory(project=self.project)
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, 'a1'))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='r_name', long_name='Relationship field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(self.project.organization.id, self.project.id, 'a1'))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='p_name', long_name='Party field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
 
     def get_url_kwargs(self):
         return {
@@ -619,7 +701,9 @@ class TenureRelationshipAddTest(TestCase):
             'id': '',
             'name': 'The Beatles',
             'party_type': 'GR',
-            'tenure_type': 'CU'
+            'tenure_type': 'CU',
+            'party::p_name': 'Party Name',
+            'relationship::r_name': 'Rel Name'
         }
 
     def get_template_context(self):
@@ -627,7 +711,18 @@ class TenureRelationshipAddTest(TestCase):
                 'location': self.spatial_unit,
                 'form': forms.TenureRelationshipForm(
                     project=self.project,
-                    spatial_unit=self.spatial_unit),
+                    spatial_unit=self.spatial_unit,
+                    schema_selectors=(
+                        {'name': 'organization',
+                         'value': self.project.organization,
+                         'selector': self.project.organization.id},
+                        {'name': 'project',
+                         'value': self.project,
+                         'selector': self.project.id},
+                        {'name': 'questionnaire',
+                         'value': self.project.current_questionnaire,
+                         'selector': self.project.current_questionnaire}
+                    )),
                 'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
                     [self.spatial_unit], many=True).data)
                 }
@@ -666,7 +761,11 @@ class TenureRelationshipAddTest(TestCase):
                 self.expected_success_url + '#relationships')
 
         assert TenureRelationship.objects.count() == 1
+        rel = TenureRelationship.objects.first()
+        assert rel.attributes.get('r_name') == 'Rel Name'
         assert Party.objects.count() == 1
+        party = Party.objects.first()
+        assert party.attributes.get('p_name') == 'Party Name'
 
     def test_post_with_authorized_invalid_data(self):
         response, content = self.request(method='POST',
@@ -679,7 +778,18 @@ class TenureRelationshipAddTest(TestCase):
         context['form'] = forms.TenureRelationshipForm(
             project=self.project,
             spatial_unit=self.spatial_unit,
-            data=data)
+            data=data,
+            schema_selectors=(
+                {'name': 'organization',
+                 'value': self.project.organization,
+                 'selector': self.project.organization.id},
+                {'name': 'project',
+                 'value': self.project,
+                 'selector': self.project.id},
+                {'name': 'questionnaire',
+                 'value': self.project.current_questionnaire,
+                 'selector': self.project.current_questionnaire}
+            ))
         expected = render_to_string(
             self.template, context, request=self.request)
         assert content == expected

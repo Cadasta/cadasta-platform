@@ -24,8 +24,6 @@
           <div class="modal-body">
             {% csrf_token %}
 
-            {{form.errors}}
-
             {% render_field form.id class+="form-control input-lg" %}
 
             {% render_field form.new_entity class+="form-control input-lg" %}
@@ -42,6 +40,16 @@
                 <label for="{{ form.party_type.id_for_label }}">{% trans "Party Type" %}</label>
                 {% render_field form.party_type class+="form-control input-lg" %}
               </div>
+
+              {% for field in form %}
+                {% if "party::" in field.name %}
+                <div class="form-group">
+                  {{ field.errors }}
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {% render_field field class+="form-control input-lg" %}
+                </div>
+                {% endif %}
+              {% endfor %}
             </div>
 
             <div class="form-group">
@@ -49,6 +57,16 @@
               <label for="{{ form.tenure_type.id_for_label }}">{% trans "Tenure Type" %}</label>
               {% render_field form.tenure_type class+="form-control input-lg" %}
             </div>
+
+            {% for field in form %}
+              {% if "relationship::" in field.name %}
+              <div class="form-group">
+                {{ field.errors }}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {% render_field field class+="form-control input-lg" %}
+              </div>
+              {% endif %}
+            {% endfor %}
           </div>
 
           <div class="modal-footer">

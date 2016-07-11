@@ -24,6 +24,12 @@
                 <td><strong>Type</strong></td>
                 <td>{{ party.get_type_display }}</td>
               </tr>
+              {% for attr in attributes %}
+              <tr>
+                <td><strong>{{ attr.0 }}</strong></td>
+                <td>{{ attr.1 }}</td>
+              </tr>
+              {% endfor %}
             </tbody>
           </table>
 

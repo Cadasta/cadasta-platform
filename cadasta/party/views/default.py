@@ -1,5 +1,6 @@
 from django.views import generic
 from django.core.urlresolvers import reverse
+from jsonattrs.mixins import JsonAttrsMixin
 from core.mixins import LoginPermissionRequiredMixin
 
 from resources.forms import AddResourceFromLibraryForm
@@ -28,13 +29,20 @@ class PartiesAdd(LoginPermissionRequiredMixin,
     def get_perms_objects(self):
         return [self.get_project()]
 
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super().get_form_kwargs(*args, **kwargs)
+        kwargs['schema_selectors'] = ()
+        return kwargs
+
 
 class PartiesDetail(LoginPermissionRequiredMixin,
+                    JsonAttrsMixin,
                     mixins.PartyObjectMixin,
                     generic.DetailView):
     template_name = 'party/party_detail.html'
     permission_required = 'party.view'
     permission_denied_message = error_messages.PARTY_VIEW
+    attributes_field = 'attributes'
 
 
 class PartiesEdit(LoginPermissionRequiredMixin,
@@ -85,11 +93,13 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
 
 
 class PartyRelationshipDetail(LoginPermissionRequiredMixin,
+                              JsonAttrsMixin,
                               mixins.PartyRelationshipObjectMixin,
                               generic.DetailView):
     template_name = 'party/relationship_detail.html'
     permission_required = 'tenure_rel.view'
     permission_denied_message = error_messages.TENURE_REL_VIEW
+    attributes_field = 'attributes'
 
 
 class PartyRelationshipEdit(LoginPermissionRequiredMixin,

@@ -13,3 +13,13 @@
   <label for="{{ form.type.id_for_label }}">{% trans "Type" %}</label>
   {% render_field form.type class+="form-control input-lg" %}
 </div>
+
+{% for field in form %}
+  {% if "attributes" in field.name %}
+  <div class="form-group">
+    {{ field.errors }}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% render_field field class="form-control input-lg" %}
+  </div>
+  {% endif %}
+{% endfor %}
