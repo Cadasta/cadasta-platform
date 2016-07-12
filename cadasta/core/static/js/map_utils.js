@@ -38,25 +38,29 @@ function add_map_controls(map) {
 }
 
 function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
+  var projectBounds;
+
   if (projectExtent) {
     var boundary = L.geoJson(
       projectExtent,
       {
         style: {
-            "stroke": true, 
-            "color": "#0e305e",
-            "weight": 5,
-            "dashArray": "5, 20",
-            "opacity": 1,
-            "fill": false
+            stroke: true, 
+            color: "#0e305e",
+            weight: 2,
+            dashArray: "5, 5",
+            opacity: 1,
+            fill: false
         }
       }
     );
     boundary.addTo(map);
-    if (fitBounds === 'project') {map.fitBounds(boundary.getBounds());}
+    projectBounds = boundary.getBounds();
+    if (fitBounds === 'project') {map.fitBounds(projectBounds);}
   }
 
   var geoJson = L.geoJson(null, {
+    style: { weight: 2 },
     onEachFeature: function(feature, layer) {
       layer.bindPopup("<div class=\"text-wrap\">" +
                       "<h2><span>Location</span>" +
@@ -68,7 +72,14 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
 
   L.Deflate(map, {minSize: 20, layerGroup: geoJson});
   geoJson.addData(spatialUnits);
-  if (fitBounds === 'locations') {map.fitBounds(L.geoJson(spatialUnits).getBounds());}
+
+  if (fitBounds === 'locations') {
+    if (spatialUnits.features.length) {
+      map.fitBounds(L.geoJson(spatialUnits).getBounds());
+    } else if (projectBounds) {
+      map.fitBounds(projectBounds);
+    }
+  }
 
   var markerGroup = L.markerClusterGroup.layerSupport()
   markerGroup.addTo(map);
