@@ -1,9 +1,9 @@
 import pytest
-from django.test import TestCase
 from django.forms import ValidationError, CharField, ChoiceField, BooleanField
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
 
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import PartyFactory
 from party.models import TenureRelationship, Party
@@ -13,7 +13,7 @@ from .. import forms
 from ..widgets import SelectPartyWidget
 
 
-class LocationFormTest(TestCase):
+class LocationFormTest(UserTestCase):
     def test_create_location(self):
         data = {
             'geometry': '{"type": "Polygon","coordinates": [[[-0.1418137550354'
@@ -75,7 +75,7 @@ class LocationFormTest(TestCase):
         assert unit.attributes.get('fname') == 'test'
 
 
-class TenureRelationshipFormTest(TestCase):
+class TenureRelationshipFormTest(UserTestCase):
     def test_init(self):
         project = ProjectFactory.create()
         spatial_unit = SpatialUnitFactory.create(project=project)

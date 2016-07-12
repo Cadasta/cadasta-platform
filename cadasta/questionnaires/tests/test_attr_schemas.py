@@ -7,8 +7,8 @@ from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
@@ -28,7 +28,7 @@ path = os.path.dirname(settings.BASE_DIR)
 ensure_dirs(add='s3/uploads/xls-forms')
 
 
-class CreateAttributeSchemaTest(TestCase):
+class CreateAttributeSchemaTest(UserTestCase):
     def test_create_attribute_schemas(self):
         storage = FakeS3Storage()
         file = open(
@@ -334,9 +334,10 @@ class CreateAttributeSchemaTest(TestCase):
         assert s1 != s2
 
 
-class ConditionalAttributeSchemaTest(TestCase):
+class ConditionalAttributeSchemaTest(UserTestCase):
 
     def setUp(self):
+        super().setUp()
         ensure_dirs()
         storage = FakeS3Storage()
         file = open(

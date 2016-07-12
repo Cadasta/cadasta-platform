@@ -11,6 +11,3 @@ class Command(BaseCommand):
             site.name = 'Cadasta'
             site.domain = 'platform.cadasta.org'
             site.save()
-            return "Successfully loaded Cadasta.org object"
-        else:
-            return "Cadasta.org object already exists."

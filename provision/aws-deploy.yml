@@ -19,3 +19,4 @@
     - cadasta/install
     - cadasta/application
     - webserver/production
+    - data
