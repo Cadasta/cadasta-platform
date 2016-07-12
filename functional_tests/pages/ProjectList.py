@@ -1,3 +1,5 @@
+from selenium.common.exceptions import NoSuchElementException
+
 from .base import Page
 from django_countries import countries
 
@@ -41,9 +43,14 @@ class ProjectListPage(Page):
 
             cells = row.find_elements_by_tag_name('td')
             actual_org_slug = onclick_items[2]
-            img = cells[1].find_element_by_tag_name('img')
-            actual_org_logo = img.get_attribute('src')
-            actual_org_name = img.get_attribute('alt')
+            try:
+                img = cells[1].find_element_by_tag_name('img')
+                actual_org_logo = img.get_attribute('src')
+                actual_org_name = img.get_attribute('alt')
+            except NoSuchElementException:
+                actual_org_logo = None
+                alt = cells[1].find_elements_by_class_name('org-name-alt')
+                actual_org_name = alt[0].text
             actual_project_name = (
                 cells[0].find_element_by_tag_name('h4').text
             )
@@ -64,7 +71,7 @@ class ProjectListPage(Page):
             expected_org_logo = (
                 target_project['_org_logo']
                 if target_project['_org_logo']
-                else self.url + 'None'
+                else None
             )
             assert actual_org_logo == expected_org_logo
             assert actual_project_name == target_project['name']

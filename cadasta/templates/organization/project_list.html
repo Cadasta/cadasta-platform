@@ -47,10 +47,14 @@
       <p class="visible-xs-block">Organization: {{ proj.organization.name }}</p>
     </td>
     <td class="hidden-xs">
-      <div class="org-logo">
-        <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
-        <img src="{{ proj.organization.logo }}" class="org-logo" alt="{{ proj.organization.name }}"/>
-      </div>
+      {% if proj.organization.logo %}
+        <div class="org-logo">
+          <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
+          <img src="{{ proj.organization.logo }}" class="org-logo" alt="{{ proj.organization.name }}"/>
+        </div>
+      {% else %}
+        <p class="org-name-alt">{{ proj.organization.name }}</p>
+      {% endif %}
     </td>
     <td class="hidden-xs hidden-sm">{{ proj.country.name }}</td>
     <td class="hidden-xs hidden-sm">{{ proj.last_updated|default_if_none:"&mdash;" }}</td>

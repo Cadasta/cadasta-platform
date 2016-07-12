@@ -1,4 +1,5 @@
 from .base import Page
+from .Organization import OrganizationPage
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import ElementNotVisibleException
 
@@ -80,7 +81,8 @@ class OrganizationListPage(Page):
     def click_submit_button(self):
         fields = self.get_fields()
         self.click_through(
-            fields['add'], (By.CLASS_NAME, 'org-logo'))
+            fields['add'], OrganizationPage.BY_ORG_OVERVIEW
+        )
 
     def click_close_button(self, button):
         cancel = self.test.link(button)
