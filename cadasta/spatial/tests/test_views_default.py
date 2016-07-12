@@ -485,7 +485,8 @@ class LocationResourceAddTest(TestCase):
                                           project_id=self.project.id)
         return {'object': self.project,
                 'location': self.location,
-                'form': form}
+                'form': form,
+                'geojson': '{"type": "FeatureCollection", "features": []}'}
 
     def get_url_kwargs(self):
         return {
