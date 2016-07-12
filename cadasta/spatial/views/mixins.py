@@ -80,6 +80,17 @@ class SpatialUnitObjectMixin(SpatialQuerySetMixin):
 
 
 class SpatialUnitResourceMixin(ResourceViewMixin, SpatialUnitObjectMixin):
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        locs = context['object'].spatial_units.exclude(
+            id=context['location'].id)
+        context['geojson'] = json.dumps(
+            SpatialUnitGeoJsonSerializer(locs, many=True).data
+        )
+
+        return context
+
     def get_content_object(self):
         return self.get_object()
 
