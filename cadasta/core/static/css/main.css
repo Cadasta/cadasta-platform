@@ -4175,6 +4175,31 @@ ul.resource-actions > li {
         #sidebar .nav-sidebar > li a .title {
           display: none; } }
 
+/* =Map location details in right column
+-------------------------------------------------------------- */
+.content-single .detail h2 {
+  margin-top: 10px; }
+  .content-single .detail h2 span {
+    font-size: 11px;
+    color: #a6a7a8;
+    display: block;
+    text-transform: uppercase;
+    padding-bottom: 2px; }
+
+.content-single .detail .btn-group {
+  margin-bottom: 20px; }
+
+.content-single .detail .btn-full .btn {
+  padding: 10px 12px; }
+
+#project-map h2 {
+  padding-bottom: 0; }
+
+#project-map .btn-wrap {
+  padding: 4px 4px 5px; }
+  #project-map .btn-wrap .btn-block {
+    margin: 0 auto; }
+
 /* =Leaflet popups
 -------------------------------------------------------------- */
 .leaflet-container {
@@ -5376,7 +5401,7 @@ header {
     position: relative;
     background: #fff;
     margin: 0 auto;
-    padding: 30px;
+    padding: 24px;
     overflow-x: hidden;
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
@@ -5384,7 +5409,7 @@ header {
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     z-index: 300; }
     .content-single .detail .btn {
-      min-width: 120px; }
+      min-width: 110px; }
     .content-single .detail .more-menu {
       width: auto !important; }
     .content-single .detail .org-logo {
@@ -5419,13 +5444,19 @@ header {
       background: transparent;
       padding: 20px 15px; }
       .content-single .panel .panel-buttons .btn {
-        min-width: 120px;
+        min-width: 110px;
         margin-right: 20px;
         margin-bottom: 10px; }
         .content-single .panel .panel-buttons .btn:last-child {
           margin-right: 0; }
   .content-single .nav-tabs {
     margin-bottom: 20px; }
+  .content-single .detail .nav-tabs li > a {
+    font-size: 13px;
+    padding: 10px; }
+  .content-single .detail .nav-tabs li.active > a, .content-single .detail .nav-tabs li.active > a:hover, .content-single .detail .nav-tabs li.active > a:focus {
+    border-color: #e7e8ea;
+    border-bottom-color: transparent; }
 
 @media (max-width: 991px) {
   .content-single {
@@ -5525,6 +5556,15 @@ div.dataTables_wrapper div.dataTables_info {
 
 .tab-content div.dataTables_wrapper div.dataTables_filter input {
   max-width: 100px; }
+
+table.table-location {
+  border-top: none;
+  border-bottom: none; }
+  table.table-location tr:first-child td {
+    border-top: none; }
+  table.table-location label {
+    text-transform: uppercase;
+    font-size: 12px; }
 
 @media (max-width: 991px) {
   table {
@@ -5752,5 +5792,14 @@ ul.errorlist {
     background-color: #fcf8e3;
     color: #a94442;
     padding: 2px 8px; }
+
+/* =Map location details
+-------------------------------------------------------------- */
+.content-single .detail h2 span {
+  font-size: 14px;
+  color: #a6a7a8;
+  display: block;
+  text-transform: uppercase;
+  padding-bottom: 2px; }
 
 /*# sourceMappingURL=../../../../../static/css/main.css.map */

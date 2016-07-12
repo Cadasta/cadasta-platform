@@ -195,3 +195,36 @@
   }
 }
 
+/* =Map location details in right column
+-------------------------------------------------------------- */
+
+.content-single .detail {
+  h2 {
+    margin-top: 10px;
+    span {
+      font-size: 11px;
+      color: $gray-medium;
+      display: block;
+      text-transform: uppercase; 
+      padding-bottom: 2px;
+    }
+  }
+  .btn-group {
+    margin-bottom: 20px;
+  }
+  .btn-full .btn {
+    padding: 10px 12px;
+  }
+}
+
+#project-map {
+  h2 {
+  padding-bottom: 0;
+  }
+  .btn-wrap { // button
+    padding: 4px 4px 5px;
+    .btn-block {
+      margin: 0 auto;
+    }
+  }
+}
