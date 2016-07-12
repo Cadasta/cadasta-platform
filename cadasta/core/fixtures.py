@@ -11,7 +11,8 @@ from organization.tests.factories import OrganizationFactory, ProjectFactory
 from spatial.tests.factories import (
     SpatialUnitFactory, SpatialRelationshipFactory
 )
-from tutelary.models import Policy, PolicyInstance, Role, RolePolicyAssign
+from spatial.models import SpatialUnit
+from tutelary.models import Policy, Role
 
 
 class FixturesData:
@@ -391,15 +392,19 @@ class FixturesData:
             project=Project.objects.get(name='Kibera Test Project'),
             type='MI')
 
+    def delete_test_spatial_units(self):
+        sus = SpatialUnit.objects.filter(name__contains='Test')
+        for su in sus:
+            su.delete()
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit'
+        )
+        Schema.objects.filter(content_type=content_type, selectors=()).delete()
+
     def delete_test_organizations(self):
         orgs = Organization.objects.filter(name__contains='Test')
         for org in orgs:
             org.delete()
-
-        PolicyInstance.objects.all().delete()
-        RolePolicyAssign.objects.all().delete()
-        Policy.objects.all().delete()
-        Role.objects.all().delete()
 
     def delete_test_users(self):
         users = User.objects.filter(username__startswith='testuser')

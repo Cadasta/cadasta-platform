@@ -3,7 +3,6 @@ import os
 from openpyxl import load_workbook, Workbook
 from zipfile import ZipFile
 from buckets.test import utils as bucket_uitls
-from django.test import TestCase
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
@@ -21,7 +20,7 @@ from ..download.xls import XLSExporter
 from ..download.resources import ResourceExporter
 
 
-class XLSTest(TestCase):
+class XLSTest(UserTestCase):
     def test_init(self):
         project = ProjectFactory.build()
         exporter = XLSExporter(project)

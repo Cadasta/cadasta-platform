@@ -1,15 +1,15 @@
 import pytest
 
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party import exceptions
 from spatial.tests.factories import (SpatialUnitFactory,
                                      SpatialRelationshipFactory)
 
 
-class SpatialUnitTest(TestCase):
+class SpatialUnitTest(UserTestCase):
 
     def test_str(self):
         spatial_unit = SpatialUnitFactory.create(name='Disneyland')
@@ -79,9 +79,10 @@ class SpatialUnitTest(TestCase):
         assert space.attributes['description'] == 'The happiest place on earth'
 
 
-class SpatialRelationshipTest(TestCase):
+class SpatialRelationshipTest(UserTestCase):
 
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory(name='TestProject')
 
     def test_str(self):
