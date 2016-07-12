@@ -98,7 +98,7 @@ class CreateAttributeSchemaTest(UserTestCase):
             project=project, dict=location_xform_group,
             content_type=content_type, errors=[])
         spatial_unit = SpatialUnitFactory.create(
-            name='Test', project=project,
+            project=project,
             attributes={
                 'quality': 'polygon_high'
             }
@@ -124,7 +124,7 @@ class CreateAttributeSchemaTest(UserTestCase):
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             SpatialUnitFactory.create(
-                name='TestLocation', project=project,
+                project=project,
                 attributes={
                     'invalid_attribute': 'yes',
                 }

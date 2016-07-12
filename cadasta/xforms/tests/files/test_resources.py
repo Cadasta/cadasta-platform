@@ -54,17 +54,13 @@ FORM = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Bilbo Baggins</party_name>
-        <location_name>Middle Earth</location_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0;</location_geometry>
         <location_type>MI</location_type>
         <location_photo>test_image.png</location_photo>
         <party_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Middle Earth</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>
@@ -94,17 +90,13 @@ FORM_2_RESOURCES = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Bilbo Baggins</party_name>
-        <location_name>Middle Earth</location_name>
         <location_geometry />
         <location_type>MI</location_type>
         <location_photo>test_image.png</location_photo>
         <party_photo>this-is-fine.png</party_photo>
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Middle Earth</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>
@@ -134,17 +126,13 @@ INVALID_FORM = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name></party_name>
-        <location_name>Null Island</location_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0;</location_geometry>
         <location_type>MI</location_type>
         <location_photo>test_image.png</location_photo>
         <party_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Null Island</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>
@@ -174,7 +162,6 @@ POLY_FORM = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Peggy Carter</party_name>
-        <location_name>Polygon</location_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0;
         41.6890612 -73.9925067 0.0 0.0;41.6890612 -72.9925067 0.0 0.0;
         40.6890612 -72.9925067 0.0 0.0;40.6890612 -73.9925067 0.0 0.0;
@@ -184,10 +171,7 @@ POLY_FORM = '''<?xml version=\'1.0\' ?>
         <party_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Polygon</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>
@@ -217,7 +201,6 @@ LINE_FORM = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Buckey Barnes</party_name>
-        <location_name>Line</location_name>
         <location_geometry>45.56342779158167 -122.67650283873081 0.0 0.0;
         45.56176327330353 -122.67669159919024 0.0 0.0;
         45.56151562182025 -122.67490658909082 0.0 0.0;
@@ -229,10 +212,7 @@ LINE_FORM = '''<?xml version=\'1.0\' ?>
         <party_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Line</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>
@@ -262,7 +242,6 @@ MISSING_SEMI_FORM = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Stever Rogers</party_name>
-        <location_name>Missing Semi</location_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0
         </location_geometry>
         <location_type>MI</location_type>
@@ -270,10 +249,7 @@ MISSING_SEMI_FORM = '''<?xml version=\'1.0\' ?>
         <party_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Missing Semi</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>
@@ -303,7 +279,6 @@ BAD_QUESTIONNAIRE = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Scrooge McDuck</party_name>
-        <location_name>Bank</location_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0;
         41.6890612 -73.9925067 0.0 0.0;41.6890612 -72.9925067 0.0 0.0;
         40.6890612 -72.9925067 0.0 0.0;40.6890612 -73.9925067 0.0 0.0;
@@ -313,10 +288,7 @@ BAD_QUESTIONNAIRE = '''<?xml version=\'1.0\' ?>
         <party_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
-            <quality>none</quality>
-            <acquired_how>LH</acquired_how>
-            <acquired_when>2016-07-07</acquired_when>
-            <notes>Locaiton attribute notes.</notes>
+            <name>Bank</name>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>

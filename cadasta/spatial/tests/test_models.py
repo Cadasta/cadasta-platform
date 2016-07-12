@@ -12,9 +12,9 @@ from spatial.tests.factories import (SpatialUnitFactory,
 class SpatialUnitTest(UserTestCase):
 
     def test_str(self):
-        spatial_unit = SpatialUnitFactory.create(name='Disneyland')
-        assert str(spatial_unit) == '<SpatialUnit: Disneyland>'
-        assert repr(spatial_unit) == '<SpatialUnit: Disneyland>'
+        spatial_unit = SpatialUnitFactory.create(type='PA')
+        assert str(spatial_unit) == '<SpatialUnit: Parcel>'
+        assert repr(spatial_unit) == '<SpatialUnit: Parcel>'
 
     def test_has_random_id(self):
         spatial_unit = SpatialUnitFactory.create()
@@ -89,28 +89,28 @@ class SpatialRelationshipTest(UserTestCase):
         relationship = SpatialRelationshipFactory(
             project=self.project,
             su1__project=self.project,
-            su1__name='Los Angeles',
+            su1__type='PA',
             su2__project=self.project,
-            su2__name='California',
+            su2__type='CB',
             type='C')
         assert str(relationship) == (
             "<SpatialRelationship: "
-            "<Los Angeles> is-contained-in <California>>"
+            "<Parcel> is-contained-in <Community boundary>>"
         )
         assert repr(relationship) == (
             "<SpatialRelationship: "
-            "<Los Angeles> is-contained-in <California>>"
+            "<Parcel> is-contained-in <Community boundary>>"
         )
 
     def test_relationships_creation(self):
         relationship = SpatialRelationshipFactory(
             project=self.project,
             su1__project=self.project,
-            su1__name='Disneyworld',
+            su1__type='PA',
             su2__project=self.project,
-            su2__name='Disneyland')
-        su2_name = str(relationship.su1.relationships.all()[0])
-        assert su2_name == '<SpatialUnit: Disneyland>'
+            su2__type='CB')
+        su2_type = str(relationship.su1.relationships.all()[0])
+        assert su2_type == '<SpatialUnit: Community boundary>'
 
     def test_relationship_type(self):
         relationship = SpatialRelationshipFactory(type='S')
@@ -129,16 +129,16 @@ class SpatialRelationshipTest(UserTestCase):
             required=False, index=1, attr_type=attr_type
         )
         relationship = SpatialRelationshipFactory(
-            su1__name='Disneyworld',
-            su2__name='Disneyland',
+            su1__type='BU',
+            su2__type='AP',
             attributes={'test': 'Partner amusement parks.'})
 
         assert relationship.attributes['test'] == 'Partner amusement parks.'
 
     def test_traversing_contained_spatial_unit(self):
         relationship = SpatialRelationshipFactory(
-            su1__name='Building',
-            su2__name='Apartment',
+            su1__type='BU',
+            su2__type='AP',
             type='C')
         su1_contains = str(relationship.su1.relationships.all()[0])
         su2_is_contained_in = str(relationship.su2.relationships_set.all()[0])
@@ -149,31 +149,31 @@ class SpatialRelationshipTest(UserTestCase):
 
     def test_traversing_split_spatial_unit(self):
         relationship = SpatialRelationshipFactory(
-            su1__name='Parent Property',
-            su2__name='Inheritance',
+            su1__type='BU',
+            su2__type='AP',
             type='S')
         su1_split_into = str(relationship.su1.relationships.all()[0])
         su2_split_from = str(relationship.su2.relationships_set.all()[0])
 
         assert relationship.get_type_display() == 'is-split-of'
-        assert su1_split_into == '<SpatialUnit: Inheritance>'
-        assert su2_split_from == '<SpatialUnit: Parent Property>'
+        assert su1_split_into == '<SpatialUnit: Apartment>'
+        assert su2_split_from == '<SpatialUnit: Building>'
 
     def test_traversing_merged_spatial_unit(self):
         relationship = SpatialRelationshipFactory(
-            su1__name='Married Property',
-            su2__name='Individual Property',
+            su1__type='BU',
+            su2__type='AP',
             type='M')
         su1_merged_from = str(relationship.su1.relationships.all()[0])
         su2_merged_into = str(relationship.su2.relationships_set.all()[0])
 
         assert relationship.get_type_display() == 'is-merge-of'
-        assert su1_merged_from == '<SpatialUnit: Individual Property>'
-        assert su2_merged_into == '<SpatialUnit: Married Property>'
+        assert su1_merged_from == '<SpatialUnit: Apartment>'
+        assert su2_merged_into == '<SpatialUnit: Building>'
 
     def test_spatial_unit_contains_anothers_geometry(self):
         relationship = SpatialRelationshipFactory(
-            su1__name='Building',
+            su1__type='BU',
             su1__geometry='SRID=4326;POLYGON(('
                           '-91.9947 34.7994, '
                           '-91.9950 34.7846, '
@@ -182,7 +182,7 @@ class SpatialRelationshipTest(UserTestCase):
                           '-91.9174 34.7627, '
                           '-91.9153 34.8032, '
                           '-91.9947 34.7994))',
-            su2__name='Apartment',
+            su2__type='AP',
             su2__geometry='SRID=4326;POLYGON(('
                           '-91.9320 34.7918, '
                           '-91.9335 34.7846, '
@@ -195,7 +195,7 @@ class SpatialRelationshipTest(UserTestCase):
     def test_relationship_fails_if_contained_unit_expands_outside_parent(self):
         with pytest.raises(Exception):
             SpatialRelationshipFactory(
-                su1__name='Building',
+                su1__type='BU',
                 su2__geometry='SRID=4326;POLYGON(('
                               '-91.9947 34.7994, '
                               '-91.9950 34.7846, '
@@ -204,7 +204,7 @@ class SpatialRelationshipTest(UserTestCase):
                               '-91.9174 34.7627, '
                               '-91.9153 34.8032, '
                               '-91.9947 34.7994))',
-                su2__name='Apartment',
+                su2__type='AP',
                 su1__geometry='SRID=4326;POLYGON(('
                               '-91.9320 34.7918, '
                               '-91.9335 34.7846, '
@@ -216,14 +216,14 @@ class SpatialRelationshipTest(UserTestCase):
     def test_spatial_unit_does_not_contain_anothers_geometry(self):
         with pytest.raises(Exception):
             SpatialRelationshipFactory(
-                su1__name='Building',
+                su1__type='BU',
                 su1__geometry='SRID=4326;POLYGON(('
                               '-91.9960 34.7850, '
                               '-91.9960 34.8016, '
                               '-91.9785 34.8016, '
                               '-91.9785 34.7850, '
                               '-91.9960 34.7850))',
-                su2__name='Apartment',
+                su2__type='AP',
                 su2__geometry='SRID=4326;POLYGON(('
                               '11.36667 47.25000, '
                               '11.41667 47.25000, '
@@ -234,7 +234,7 @@ class SpatialRelationshipTest(UserTestCase):
 
     def test_spatial_unit_contains_a_point(self):
         relationship = SpatialRelationshipFactory(
-            su1__name='Building',
+            su1__type='BU',
             su1__geometry='SRID=4326;POLYGON(('
                           '-109.0461 40.2617, '
                           '-108.6039 40.2459,'
@@ -243,7 +243,7 @@ class SpatialRelationshipTest(UserTestCase):
                           '-108.8841 40.7836, '
                           '-109.0434 40.8657, '
                           '-109.0461 40.2617))',
-            su2__name='Apartment',
+            su2__type='AP',
             su2__geometry='SRID=4326;POINT('
                           '-108.7536 40.5054)',
             type='C')
@@ -252,7 +252,7 @@ class SpatialRelationshipTest(UserTestCase):
     def test_spatial_unit_does_not_contain_point(self):
         with pytest.raises(Exception):
             SpatialRelationshipFactory(
-                su1__name='Building',
+                su1__type='BU',
                 su1__geometry='SRID=4326;POLYGON(('
                               '-109.0461 40.2617, '
                               '-108.6039 40.2459,'
@@ -261,17 +261,17 @@ class SpatialRelationshipTest(UserTestCase):
                               '-108.8841 40.7836, '
                               '-109.0434 40.8657, '
                               '-109.0461 40.2617))',
-                su2__name='Apartment',
+                su2__type='AP',
                 su2__geometry='SRID=4326;POINT('
                               '-108.0972 40.9508)',
                 type='C')
 
     def test_spatial_unit_point_contains_relationship_still_created(self):
         relationship = SpatialRelationshipFactory(
-            su1__name='Building',
+            su1__type='BU',
             su1__geometry='SRID=4326;POINT('
                           '-108.7536 40.5054)',
-            su2__name='Apartment',
+            su2__type='AP',
             su2__geometry='SRID=4326;POLYGON(('
                           '-109.0461 40.2617, '
                           '-108.6039 40.2459,'

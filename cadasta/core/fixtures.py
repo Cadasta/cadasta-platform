@@ -11,7 +11,7 @@ from organization.tests.factories import OrganizationFactory, ProjectFactory
 from spatial.tests.factories import (
     SpatialUnitFactory, SpatialRelationshipFactory
 )
-from spatial.models import SpatialUnit
+
 from tutelary.models import Policy, Role
 
 
@@ -293,8 +293,19 @@ class FixturesData:
         project = Project.objects.get(
             name__contains='Pekapuran Laut Test Project')
 
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        sch = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.pk, project.pk))
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='name', long_name='Name',
+            required=False, index=1, attr_type=attr_type
+        )
+
         su1 = SpatialUnitFactory(
-            name='Building Unit (Test)',
             geometry=GEOSGeometry('{"type": "Polygon",'
                                   '"coordinates": [['
                                   '[-245.3920519351959, -3.3337982265513184],'
@@ -305,20 +316,10 @@ class FixturesData:
                                   '}'
                                   ),
             project=project,
-            type='BU')
-
-        # add attribute schema
-        content_type = ContentType.objects.get(
-            app_label='spatial', model='spatialunit')
-        sch = Schema.objects.create(content_type=content_type, selectors=())
-        attr_type = AttributeType.objects.get(name="text")
-        Attribute.objects.create(
-            schema=sch, name='testing', long_name='Testing',
-            required=False, index=1, attr_type=attr_type
-        )
+            type='BU',
+            attributes={'name': 'Building Unit (Test)'})
 
         su2 = SpatialUnitFactory(
-            name='Apartment Unit (Test)',
             geometry=GEOSGeometry('{"type": "Polygon",'
                                   '"coordinates": [['
                                   '[-245.39200901985168,  -3.333808937230755],'
@@ -330,13 +331,12 @@ class FixturesData:
                                   ),
             project=project,
             type='AP',
-            attributes={"testing": "attributes"})
+            attributes={"name": "Apartment Unit (Test)"})
 
         SpatialRelationshipFactory(
             su1=su1, su2=su2, type='C', project=project)
 
         su3 = SpatialUnitFactory(
-            name='Parcel (Test)',
             geometry=GEOSGeometry('{"type": "Polygon",'
                                   '"coordinates": [['
                                   '[-245.39088249206543,  -3.333262692430284],'
@@ -347,23 +347,23 @@ class FixturesData:
                                   ']}'
                                   ),
             project=project,
-            type='PA')
+            type='PA',
+            attributes={
+                'name': 'Parcel (Test)',
+            })
 
         su4 = SpatialUnitFactory(
-            name='Point Inside Parcel (Test)',
             geometry=GEOSGeometry('{"type": "Point",'
                                   '"coordinates": ['
                                   '-245.39034605026242, -3.333294824485769]}'
                                   ),
             project=project,
-            type='PA',
-            attributes={"testing": "attributes"})
+            type='PA')
 
         SpatialRelationshipFactory(
             su1=su3, su2=su4, type='C', project=project)
 
         SpatialUnitFactory(
-            name='Line (Test)',
             geometry=GEOSGeometry('{"type": "LineString",'
                                   '"coordinates": ['
                                   '[-245.3934037685394, -3.334258785662196],'
@@ -374,32 +374,23 @@ class FixturesData:
             type='RW')
 
         SpatialUnitFactory(
-            name='Uncontained Point (Test)',
             geometry=GEOSGeometry('{"type": "Point",'
                                   '"coordinates": ['
                                   '-245.39366126060483, -3.334130257559935]}'
                                   ),
             project=project,
-            type='MI')
+            type='MI',
+            attributes={"name": 'Uncontained Point (Test)'})
 
         SpatialUnitFactory(
-            name='Kibera Test Spatial Unit (Test)',
             geometry=GEOSGeometry('{"type": "Point",'
                                   '"coordinates": ['
                                   '-4.9383544921875,'
                                   '7.833452408875349'
                                   ']}'),
             project=Project.objects.get(name='Kibera Test Project'),
-            type='MI')
-
-    def delete_test_spatial_units(self):
-        sus = SpatialUnit.objects.filter(name__contains='Test')
-        for su in sus:
-            su.delete()
-        content_type = ContentType.objects.get(
-            app_label='spatial', model='spatialunit'
-        )
-        Schema.objects.filter(content_type=content_type, selectors=()).delete()
+            type='MI',
+            attributes={})
 
     def delete_test_organizations(self):
         orgs = Organization.objects.filter(name__contains='Test')

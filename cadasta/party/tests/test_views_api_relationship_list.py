@@ -25,9 +25,9 @@ class RelationshipListTestCase(RecordBaseTestCase):
         org = OrganizationFactory.create(slug='namati')
         prj = ProjectFactory.create(
             slug='test-project', organization=org, access=access)
-        su1 = SpatialUnitFactory.create(project=prj, name='Parcel')
-        su2 = SpatialUnitFactory.create(project=prj, name='House')
-        su3 = SpatialUnitFactory.create(project=prj, name='Village')
+        su1 = SpatialUnitFactory.create(project=prj)
+        su2 = SpatialUnitFactory.create(project=prj)
+        su3 = SpatialUnitFactory.create(project=prj)
         self.su1 = su1
         self.su2 = su2
         self.su3 = su3

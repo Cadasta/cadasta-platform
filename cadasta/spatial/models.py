@@ -31,10 +31,6 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name='spatial_units')
 
-    # All spatial units have a name used to provide
-    # a human-readable label for it.
-    name = models.CharField(max_length=200)
-
     # Spatial unit type: used to manage range of allowed attributes.
     type = models.CharField(max_length=2,
                             choices=TYPE_CHOICES, default='PA')
@@ -59,7 +55,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('type',)
 
     class TutelaryMeta:
         perm_type = 'spatial'
@@ -88,7 +84,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         )
 
     def __str__(self):
-        return "<SpatialUnit: {}>".format(self.name)
+        return "<SpatialUnit: {}>".format(self.get_type_display())
 
     def __repr__(self):
         return str(self)
@@ -223,7 +219,7 @@ class SpatialRelationship(RandomIDModel):
 
     def __str__(self):
         return "<SpatialRelationship: <{su1}> {type} <{su2}>>".format(
-            su1=self.su1.name, su2=self.su2.name,
+            su1=self.su1.get_type_display(), su2=self.su2.get_type_display(),
             type=dict(self.TYPE_CHOICES).get(self.type))
 
     def __repr__(self):

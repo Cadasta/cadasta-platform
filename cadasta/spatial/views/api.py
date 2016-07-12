@@ -15,8 +15,6 @@ class SpatialUnitList(APIPermissionRequiredMixin,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('type',)
-    search_fields = ('name',)
-    ordering_fields = ('name',)
 
     permission_required = {
         'GET': 'spatial.list',

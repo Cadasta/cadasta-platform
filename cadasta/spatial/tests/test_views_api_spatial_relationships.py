@@ -31,9 +31,9 @@ class SpatialRelationshipCreateTestCase(RecordCreateBaseTestCase):
         org = OrganizationFactory.create(slug='namati')
         prj = ProjectFactory.create(
             slug='test-project', organization=org, access=access)
-        su1 = SpatialUnitFactory.create(project=prj, name="House")
-        su2 = SpatialUnitFactory.create(project=prj, name="Parcel")
-        su3 = SpatialUnitFactory.create(project=prj, name="Bungalow")
+        su1 = SpatialUnitFactory.create(project=prj, type='AP')
+        su2 = SpatialUnitFactory.create(project=prj, type='BU')
+        su3 = SpatialUnitFactory.create(project=prj, type='CB')
         SpatialRelationshipFactory.create(project=prj, su1=su1, su2=su2)
         SpatialRelationshipFactory.create(project=prj, su1=su2, su2=su3)
         SpatialRelationshipFactory.create(project=prj, su1=su1, su2=su3)
@@ -55,6 +55,10 @@ class SpatialRelationshipCreateAPITest(SpatialRelationshipCreateTestCase,
             'type': 'C'
         }
 
+    def check_for_unchanged(self, content):
+        assert content['su1']['properties']['type'] == "AP"
+        assert content['su2']['properties']['type'] == "BU"
+
     # Additional tests
 
     def test_create_invalid_record_with_dupe_su(self):
@@ -73,7 +77,7 @@ class SpatialRelationshipCreateAPITest(SpatialRelationshipCreateTestCase,
     def test_create_invalid_record_with_different_project(self):
         org, prj = self._test_objs()
         other_prj = ProjectFactory.create(slug='other', organization=org)
-        other_su = SpatialUnitFactory.create(project=other_prj, name="Other")
+        other_su = SpatialUnitFactory.create(project=other_prj)
         invalid_data = {
             'su1': self.su1.id,
             'su2': other_su.id,
@@ -105,9 +109,9 @@ class SpatialRelationshipDetailTestCase(RecordDetailBaseTestCase):
         org = OrganizationFactory.create(slug='namati')
         prj = ProjectFactory.create(
             slug='test-project', organization=org, access=access)
-        su1 = SpatialUnitFactory.create(project=prj, name="House")
-        su2 = SpatialUnitFactory.create(project=prj, name="Parcel")
-        su3 = SpatialUnitFactory.create(project=prj, name="Bungalow")
+        su1 = SpatialUnitFactory.create(project=prj, type='AP')
+        su2 = SpatialUnitFactory.create(project=prj, type='BU')
+        su3 = SpatialUnitFactory.create(project=prj)
         rel = SpatialRelationshipFactory.create(
             project=prj, su1=su1, su2=su2)
         self.su1 = su1
@@ -137,8 +141,8 @@ class SpatialRelationshipUpdateAPITest(SpatialRelationshipDetailTestCase,
         assert content['su2'] == self.su3.id
 
     def check_for_unchanged(self, content):
-        assert content['su1']['properties']['name'] == "House"
-        assert content['su2']['properties']['name'] == "Parcel"
+        assert content['su1']['properties']['type'] == "AP"
+        assert content['su2']['properties']['type'] == "BU"
 
     # Additional tests
 
@@ -156,7 +160,7 @@ class SpatialRelationshipUpdateAPITest(SpatialRelationshipDetailTestCase,
 
         other_org = OrganizationFactory.create(slug='other')
         other_prj = ProjectFactory.create(slug='other', organization=other_org)
-        other_su = SpatialUnitFactory.create(project=other_prj, name="Other")
+        other_su = SpatialUnitFactory.create(project=other_prj)
 
         def get_invalid_data():
             return {'su2': other_su.id}

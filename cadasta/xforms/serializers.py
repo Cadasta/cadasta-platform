@@ -52,7 +52,7 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
                 'instanceID': survey['meta']['instanceID'],
                 'project': create_models['project'],
                 'location_photo': survey['location_photo'],
-                'location_name': create_models['location'].id,
+                'location': create_models['location'].id,
                 'party_photo': survey['party_photo'],
-                'party_name': create_models['party'].id
+                'party': create_models['party'].id
             }

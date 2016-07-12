@@ -269,7 +269,7 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
 
     def __str__(self):
         return "<TenureRelationship: <{party}> {type} <{su}>>".format(
-            party=self.party.name, su=self.spatial_unit.name,
+            party=self.party.name, su=self.spatial_unit.get_type_display(),
             type=self.tenure_type.label)
 
     def __repr__(self):

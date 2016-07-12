@@ -31,7 +31,7 @@ class SpatialUnitSerializer(DetailSerializer, FieldSelectorSerializer,
         context_key = 'project'
         geo_field = 'geometry'
         id_field = False
-        fields = ('id', 'name',
+        fields = ('id',
                   'geometry', 'type', 'attributes',
                   'relationships', 'project',)
         read_only_fields = ('id', 'project',)
@@ -66,8 +66,8 @@ class SpatialUnitGeoJsonSerializer(geo_serializers.GeoFeatureModelSerializer):
 
 class SpatialRelationshipReadSerializer(serializers.ModelSerializer):
 
-    su1 = SpatialUnitSerializer(fields=('id', 'name', 'geometry', 'type'))
-    su2 = SpatialUnitSerializer(fields=('id', 'name', 'geometry', 'type'))
+    su1 = SpatialUnitSerializer(fields=('id', 'geometry', 'type'))
+    su2 = SpatialUnitSerializer(fields=('id', 'geometry', 'type'))
     rel_class = serializers.SerializerMethodField()
 
     class Meta:
