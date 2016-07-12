@@ -36,3 +36,42 @@ function add_map_controls(map) {
   map.addControl(new Geolocate());
   return map
 }
+
+function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
+  if (projectExtent) {
+    var boundary = L.geoJson(
+      projectExtent,
+      {
+        style: {
+            "stroke": true, 
+            "color": "#0e305e",
+            "weight": 5,
+            "dashArray": "5, 20",
+            "opacity": 1,
+            "fill": false
+        }
+      }
+    );
+    boundary.addTo(map);
+    if (fitBounds === 'project') {map.fitBounds(boundary.getBounds());}
+  }
+
+  var geoJson = L.geoJson(null, {
+    onEachFeature: function(feature, layer) {
+      layer.bindPopup("<div class=\"text-wrap\">" +
+                      "<h2><span>Location</span>" +
+                      feature.properties.type + "</h2></div>" +
+                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + trans['open'] + "</a>"  +
+                      "</div>");
+    }
+  });
+
+  L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+  geoJson.addData(spatialUnits);
+  if (fitBounds === 'locations') {map.fitBounds(L.geoJson(spatialUnits).getBounds());}
+
+  var markerGroup = L.markerClusterGroup.layerSupport()
+  markerGroup.addTo(map);
+  markerGroup.checkIn(geoJson);
+  geoJson.addTo(map);  
+}

@@ -16,30 +16,20 @@
 <script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
 <script>
   function locations_map_init(map, options) {
-    var data = {{ geojson|safe }};
-
-    add_map_controls(map);
-
-    var geoJson = L.geoJson(null, {
-      onEachFeature: function(feature, layer) {
-        layer.bindPopup("<div class=\"text-wrap\">" +
-                       "<h2><span>Location</span>" +
-                       feature.properties.type + "</h2></div>" +
-                       "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
-                       "</div>");
-      }
-    });
-
-    L.Deflate(map, {minSize: 20, layerGroup: geoJson});
-    geoJson.addData(data);
-
-    var markerGroup = L.markerClusterGroup.layerSupport()
-    markerGroup.addTo(map);
-    markerGroup.checkIn(geoJson);
-    geoJson.addTo(map);
     // TODO: It seems Leaflet has a bug with L.geoJson()
     // not returning the correct bounds (see #377 for details)
-    map.fitBounds(L.geoJson(data).getBounds());
+    var trans = {
+      open: "{% trans 'Open Location' %}"
+    };
+
+    {% if object.extent %}
+    var projectExtent = {{ object.extent.geojson|safe }};
+    {% else %}
+    var projectExtent = null;
+    {% endif %}
+    var spatialUnits = {{ geojson|safe }};
+
+    renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
   }
 </script>
 {% endblock %}
