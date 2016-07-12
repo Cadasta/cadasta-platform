@@ -668,7 +668,7 @@ header {
     position: relative;
     background: #fff;
     margin: 0 auto;
-    padding: 30px;
+    padding: 24px;
     overflow-x: hidden;
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -676,7 +676,7 @@ header {
     box-shadow: 0 0 6px rgba(0,0,0,.3);
     z-index: 300;
     .btn {
-      min-width: 120px;
+      min-width: 110px;
     }
     .more-menu {
       width: auto !important;
@@ -725,7 +725,7 @@ header {
       background: transparent;
       padding: 20px 15px;
       .btn {
-        min-width: 120px;
+        min-width: 110px;
         margin-right: 20px;
         margin-bottom: 10px;
         &:last-child {
@@ -736,6 +736,16 @@ header {
   }
   .nav-tabs {
     margin-bottom: 20px;
+  }
+  .detail .nav-tabs {
+    li > a {
+      font-size: 13px;
+      padding: 10px;
+    }
+    li.active > a, li.active > a:hover, li.active > a:focus {
+      border-color: $table-border-color;
+      border-bottom-color: transparent;
+    }
   }
 }
 
@@ -870,6 +880,18 @@ div.dataTables_wrapper div.dataTables_info /* showing number total */ {
 
 .tab-content div.dataTables_wrapper div.dataTables_filter input {
   max-width: 100px;
+}
+
+table.table-location { // location details in map area
+  border-top: none;
+  border-bottom: none;
+  tr:first-child td {
+    border-top: none;
+  }
+  label {
+    text-transform: uppercase;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: $screen-sm-max) {
@@ -1152,3 +1174,14 @@ ul.errorlist {
     padding: 2px 8px;
   }
 }
+
+/* =Map location details
+-------------------------------------------------------------- */
+
+.content-single .detail h2 span {
+  font-size: 14px;
+  color: #a6a7a8;
+  display: block;
+  text-transform: uppercase;
+  padding-bottom: 2px;
+ } 

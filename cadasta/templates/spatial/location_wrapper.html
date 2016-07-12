@@ -22,7 +22,7 @@
 <script>
   function locations_map_init(map, options) {
     var trans = {
-      open: "{% trans 'Open Location' %}"
+      open: "{% trans 'Open location' %}"
     };
 
     {% if object.extent %}
@@ -40,7 +40,7 @@
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                        "<h2><span>Location</span>{{ location.get_type_display }}</h2></div>" +
-                       "<div class=\"btn-wrap\"><a href='{% url 'locations:detail' object.organization.slug object.slug location.id %}' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
+                       "<div class=\"btn-wrap\"><a href='{% url 'locations:detail' object.organization.slug object.slug location.id %}' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open location' %}</a>"  +
                        "</div>");
       }
     });

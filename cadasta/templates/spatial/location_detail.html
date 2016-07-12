@@ -7,7 +7,7 @@
 {% block location_panel %}
 
 <div class="page-title">
-  <h2>Location</h2>
+  <h2><span>Location </span>{{ location.get_type_display }}</h2>
   <div class="top-btn pull-right">
     <!-- More options menu -->
     <div class="dropdown pull-right btn-more">
@@ -30,51 +30,84 @@
 </ul>
 
 <div class="tab-content">
+  <!-- Overview tab -->
   <div role="tabpanel" class="tab-pane active" id="overview">
-    <table class="table table-striped">
+    <table class="table table-location">
       <tbody>
         <tr>
-          <td><strong>Type</strong></td>
-          <td>{{ location.get_type_display }}</td>
+          <td class="col-md-4"><label>Type</label></td>
+          <td class="col-md-8">{{ location.get_type_display }}</td>
         </tr>
         {% for attr in attributes %}
         <tr>
-          <td><strong>{{ attr.0 }}</strong></td>
+          <td><label>{{ attr.0 }}</label></td>
           <td>{{ attr.1 }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <!-- /overview tab -->
 
+  <!-- Relationship tab -->
   <div role="tabpanel" class="tab-pane" id="relationships">
-    <table class="table table-hover datatable" data-paging-type="simple">
-      <thead>
-        <tr>
-          <th>{% trans "Relationship type" %}</th>
-          <th>{% trans "Party" %}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for rel in relationships %}
-        <tr class="linked" onclick="window.document.location='{% url 'parties:relationship_detail' object.organization.slug object.slug rel.id %}';">
-          <td>{{ rel.tenure_type.label }}</td>
-          <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary btn-block">
-      {% trans "Add new relationship" %}
-    </a>
+    {% if has_relationships %}
+      <div class="pull-right">
+        <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary btn-small">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+        {% trans "Add relationship" %}
+        </a>
+      </div>
+      <table class="table table-hover datatable" data-paging-type="simple">
+        <thead>
+          <tr>
+            <th>{% trans "Relationship type" %}</th>
+            <th>{% trans "Party" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rel in relationships %}
+          <tr class="linked" onclick="window.document.location='{% url 'parties:relationship_detail' object.organization.slug object.slug rel.id %}';">
+            <td>{{ rel.tenure_type.label }}</td>
+            <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <div>
+        <p>{% trans "This location does not have any relationships and is not connected to any parties. To add your first relationship, select the button below." %}</p>
+        <div class="btn-full">
+          <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+          {% trans "Add relationship" %}
+          </a>
+        </div>
+      </div>
+    {% endif %}
   </div>
+  <!-- /relationship tab -->
 
+  <!-- Resources tab -->
   <div role="tabpanel" class="tab-pane" id="resources">
-    {% include 'resources/table_sm.html' with object_list=location.resources %}
-    <div class="btn-group btn-group-justified">
-      <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">{% trans "Add from library" %}</a>
-      <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">{% trans "Upload new resource" %}</a>
-    </div>
+    {% if has_resources %}
+      <div class="btn-group btn-group-justified">
+        <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">{% trans "Add from library" %}</a>
+        <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">{% trans "Upload new resource" %}</a>
+      </div>
+      {% include 'resources/table_sm.html' with object_list=location.resources %}
+    {% else %}
+      <div>
+        <p>{% trans "This location does not have any connected resources. To add a resource, selection from the options below." %}</p>
+        <div class="btn-full btn-group btn-group-justified">
+          <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">{% trans "Add from library" %}</a>
+          <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">{% trans "Upload new resource" %}</a>
+        </div>
+      </div>
+    {% endif %}
   </div>
+  <!-- /resources tab -->
+
 </div>
+
 {% endblock %}
