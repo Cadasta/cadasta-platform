@@ -29,7 +29,7 @@
     {% endif %}
     var spatialUnits = {{ geojson|safe }};
 
-    renderFeatures(map, projectExtent, spatialUnits, trans, 'project');
+    renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
   }
 </script>
 {% endblock %}

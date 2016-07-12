@@ -36,7 +36,7 @@
 
     var data = {{ location.geometry.geojson|safe }};
     var location = L.geoJson(data, {
-      style: {color: '#edaa00', fillColor: '#edaa00'},
+      style: {color: '#edaa00', fillColor: '#edaa00', weight: 3},
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                        "<h2><span>Location</span>{{ location.get_type_display }}</h2></div>" +
@@ -46,7 +46,6 @@
     });
     location.addTo(map);
     map.fitBounds(location.getBounds());
-    map.setZoom(map.getZoom() - 2);
   }
 
   $(document).ready(function() {
