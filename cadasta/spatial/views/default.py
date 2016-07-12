@@ -1,6 +1,7 @@
 import json
 from jsonattrs.mixins import JsonAttrsMixin
-from django.views import generic
+import django.views.generic as base_generic
+from core.views import generic
 from django.core.urlresolvers import reverse
 
 from core.mixins import LoginPermissionRequiredMixin
@@ -95,7 +96,7 @@ class LocationDelete(LoginPermissionRequiredMixin,
 
 class LocationResourceAdd(LoginPermissionRequiredMixin,
                           mixins.SpatialUnitResourceMixin,
-                          generic.edit.FormMixin,
+                          base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'spatial/resources_add.html'
     form_class = AddResourceFromLibraryForm
