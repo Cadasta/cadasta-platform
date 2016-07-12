@@ -40,29 +40,13 @@ class SpatialUnitSerializerTest(TestCase):
         serializer = serializers.SpatialUnitSerializer(spatial_data)
         assert 'description' not in serializer.data['properties']['project']
 
-    def test_create_without_name(self):
-        project = ProjectFactory.create()
-        spatial_data = {
-            'properties': {
-                'name': '',
-                'project': project
-            }
-        }
-
-        serializer = serializers.SpatialUnitSerializer(
-            data=spatial_data,
-            context={'project': project}
-        )
-        with pytest.raises(ValidationError):
-            serializer.is_valid(raise_exception=True)
-
     def test_update_spatial_unit(self):
         project = ProjectFactory.create()
-        su = SpatialUnitFactory.create(name='Test Spatial Unit',
+        su = SpatialUnitFactory.create(type='BU',
                                        project=project)
         spatial_data = {
             'properties': {
-                'name': 'Updated Spatial Unit',
+                'type': 'AP',
                 'project': project
             }
         }
@@ -77,15 +61,15 @@ class SpatialUnitSerializerTest(TestCase):
         serializer.save()
 
         su_update = SpatialUnit.objects.get(id=su.id)
-        assert su_update.name == 'Updated Spatial Unit'
+        assert su_update.type == 'AP'
 
     def test_update_spatial_unit_fails(self):
         project = ProjectFactory.create()
-        su = SpatialUnitFactory.create(name='Test Spatial Unit',
+        su = SpatialUnitFactory.create(type='BU',
                                        project=project)
         spatial_data = {
             'properties': {
-                'name': ''
+                'type': ''
             }
         }
         serializer = serializers.SpatialUnitSerializer(
@@ -100,8 +84,7 @@ class SpatialUnitSerializerTest(TestCase):
 
     def test_update_spatial_unit_project_fails(self):
         project = ProjectFactory.create(name='Original Project')
-        su = SpatialUnitFactory.create(name='Test Spatial Unit',
-                                       project=project)
+        su = SpatialUnitFactory.create(project=project)
         ProjectFactory.create(name='New Project')
         spatial_data = {
             'properties': {

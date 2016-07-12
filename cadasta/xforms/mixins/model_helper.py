@@ -36,7 +36,6 @@ class ModelHelper():
     def add_data_to_spatial_unit(self, data, project):
         location = SpatialUnit.objects.create(
             project=project,
-            name=data['location_name'],
             type=data['location_type'],
             geometry=self._format_geometry(data['location_geometry']),
             attributes=data['location_attributes']
@@ -57,7 +56,7 @@ class ModelHelper():
         Storage = get_storage_class()
         storage = Storage()
         url = storage.save('resources/' + data.name, data.file.read())
-        # if not Resource.objects.filter(name=data.name).exists():
+
         Resource.objects.create(
             name=data.name,
             file=url,
@@ -119,10 +118,10 @@ class ModelHelper():
             if i != 'xml_submission_file':
                 if i == survey['location_photo']:
                     content_object = SpatialUnit.objects.get(
-                                    id=survey['location_name'])
+                                    id=survey['location'])
                 elif i == survey['party_photo']:
                     content_object = Party.objects.get(
-                                    id=survey['party_name'])
+                                    id=survey['party'])
 
                 self.add_data_to_resource(data=data[i],
                                           user=user,

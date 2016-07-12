@@ -132,7 +132,7 @@ class TenureRelationshipTest(UserTestCase):
             party__project=project,
             party__name='Family',
             spatial_unit__project=project,
-            spatial_unit__name='Parcel',
+            spatial_unit__type='PA',
             tenure_type=tenure_type)
         assert str(relationship) == (
             "<TenureRelationship: <Family> Leasehold <Parcel>>")

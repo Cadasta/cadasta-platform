@@ -15,7 +15,6 @@ from party.models import load_tenure_relationship_types
 class FixturesTest(TestCase):
     def test_fixture_setup(self):
         data = FixturesData()
-        data.delete_test_spatial_units()
         data.delete_test_users()
         data.delete_test_organizations()
         data.delete_test_projects()
@@ -34,7 +33,6 @@ class FixturesTest(TestCase):
         assert SpatialUnit.objects.count() == 7
         assert SpatialRelationship.objects.count() == 2
 
-        data.delete_test_spatial_units()
         data.delete_test_users()
         data.delete_test_organizations()
         data.delete_test_projects()

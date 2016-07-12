@@ -227,10 +227,11 @@ class XFormSubmissionTest(UserTestCase):
                    image=images['test_image'],
                    status=201)
         assert Party.objects.filter(name='Bilbo Baggins').exists()
-        assert SpatialUnit.objects.filter(name='Middle Earth').exists()
+        assert SpatialUnit.objects.filter(
+            attributes={'name': 'Middle Earth'}).exists()
 
         party = Party.objects.get(name='Bilbo Baggins')
-        location = SpatialUnit.objects.get(name='Middle Earth')
+        location = SpatialUnit.objects.get(attributes={'name': 'Middle Earth'})
 
         assert location in party.tenure_relationships.all()
         assert Resource.objects.filter(name__contains='test_image').exists()
@@ -243,10 +244,11 @@ class XFormSubmissionTest(UserTestCase):
                    image=images,
                    status=201)
         assert Party.objects.filter(name='Bilbo Baggins').exists()
-        assert SpatialUnit.objects.filter(name='Middle Earth').exists()
+        assert SpatialUnit.objects.filter(
+            attributes={'name': 'Middle Earth'}).exists()
 
         party = Party.objects.get(name='Bilbo Baggins')
-        location = SpatialUnit.objects.get(name='Middle Earth')
+        location = SpatialUnit.objects.get(attributes={'name': 'Middle Earth'})
 
         assert location in party.tenure_relationships.all()
         assert Resource.objects.filter(name__contains='test_image').exists()
@@ -259,15 +261,16 @@ class XFormSubmissionTest(UserTestCase):
     def test_invalid_resource_upload(self):
         # testing submitting with a missing xml_submission_file
         self._post(form=images['test_image'], status=400, valid=False)
-        assert not SpatialUnit.objects.filter(name='Null Island').exists()
+        assert not SpatialUnit.objects.filter(
+            attributes={'name': 'Null Island'}).exists()
 
     def test_geometry_upload(self):
         self._post(form='line_form', status=201)
         self._post(form='poly_form', status=201)
         self._post(form='missing_semi_form', status=201)
-        polygon = SpatialUnit.objects.get(name='Polygon')
-        line = SpatialUnit.objects.get(name='Line')
-        point = SpatialUnit.objects.get(name='Missing Semi')
+        polygon = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
+        line = SpatialUnit.objects.get(attributes={'name': 'Line'})
+        point = SpatialUnit.objects.get(attributes={'name': 'Missing Semi'})
 
         assert polygon.geometry.geom_type == 'Polygon'
         assert line.geometry.geom_type == 'LineString'

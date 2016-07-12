@@ -66,91 +66,10 @@ location_xform_group = {
     "label": "Location Attributes",
     "children": [
         {
-            "default": "none",
-            "choices": [
-                {
-                    "name": "none",
-                    "label": "No data"
-                },
-                {
-                    "name": "text",
-                    "label": "Textual"
-                },
-                {
-                    "name": "point",
-                    "label": "Point data"
-                },
-                {
-                    "name": "polygon_low",
-                    "label": "Low quality polygon"
-                },
-                {
-                    "name": "polygon_high",
-                    "label": "High quality polygon"
-                }
-            ],
-            "hint": "Quality of parcel geometry",
-            "name": "quality",
-            "type": "select one",
-            "label": "Spatial Unit Quality"
-        },
-        {
-            "label": "Acquired when",
-            "name": "acquired_when",
-            "type": "date"
-        },
-        {
-            "label": "Acquired how",
-            "name": "acquired_how",
-            "type": "select one",
-            "choices": [
-                {
-                    "name": "CS",
-                    "label": "Contractual Share Crop"
-                },
-                {
-                    "name": "CA",
-                    "label": "Customary Arrangement"
-                },
-                {
-                    "name": "GF",
-                    "label": "Gift"
-                },
-                {
-                    "name": "HS",
-                    "label": "Homestead"
-                },
-                {
-                    "name": "IO",
-                    "label": "Informal Occupant"
-                },
-                {
-                    "name": "IN",
-                    "label": "Inheritance"
-                },
-                {
-                    "name": "LH",
-                    "label": "Leasehold"
-                },
-                {
-                    "name": "PF",
-                    "label": "Purchased Freehold"
-                },
-                {
-                    "name": "RN",
-                    "label": "Rental"
-                },
-                {
-                    "name": "OT",
-                    "label": "Other"
-                }
-            ],
-        },
-        {
-            "label": "Notes",
-            "name": "notes",
+            "label": "Name",
+            "name": "name",
             "type": "text",
-            "hint": "Additional Notes"
+            "hint": "Name of the location"
         }
     ]
 }

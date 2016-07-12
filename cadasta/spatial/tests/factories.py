@@ -9,7 +9,6 @@ class SpatialUnitFactory(ExtendedFactory):
     class Meta:
         model = SpatialUnit
 
-    name = factory.Sequence(lambda n: "Location #{}".format(n))
     project = factory.SubFactory(ProjectFactory)
 
 
