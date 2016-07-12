@@ -4321,6 +4321,8 @@ header {
   position: relative;
   height: 70px;
   background-color: #2e51a3;
+  -webkit-box-shadow: 0 1px 4px rgba(31, 54, 79, 0.2);
+  -moz-box-shadow: 0 1px 4px rgba(31, 54, 79, 0.2);
   box-shadow: 0 1px 4px rgba(31, 54, 79, 0.2); }
   header.header {
     top: 0; }
@@ -5258,6 +5260,7 @@ header {
   padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
   border-radius: 4px; }
 
@@ -5377,6 +5380,7 @@ header {
     overflow-x: hidden;
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     z-index: 300; }
     .content-single .detail .btn {
@@ -5676,7 +5680,10 @@ button#add-contact {
 .alert {
   text-align: center;
   max-width: 50%;
-  margin: 0 auto; }
+  margin: 0 auto;
+  -webkit-box-shadow: 10px 10px 6px -8px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 10px 10px 6px -8px rgba(0, 0, 0, 0.5);
+  box-shadow: 10px 10px 6px -8px rgba(0, 0, 0, 0.5); }
 
 .translation-wrapper {
   background-color: fuchsia; }

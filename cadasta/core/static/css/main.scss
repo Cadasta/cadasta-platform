@@ -113,6 +113,8 @@ header {
   position: relative;
   height: $header-height;
   background-color: $brand-primary;
+  -webkit-box-shadow: 0 1px 4px rgba(31,54,79,.2);
+  -moz-box-shadow: 0 1px 4px rgba(31,54,79,.2);
   box-shadow: 0 1px 4px rgba(31,54,79,.2);
   &.header {
     top: 0;
@@ -525,6 +527,7 @@ header {
   padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
+  -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
   box-shadow: 0 0 6px rgba(0,0,0,.3);
   border-radius: 4px;
 }
@@ -669,6 +672,7 @@ header {
     overflow-x: hidden;
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
+    -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
     z-index: 300;
     .btn {
@@ -1068,6 +1072,9 @@ button#add-contact { // below contacts table
   text-align: center;
   max-width: 50%;
   margin: 0 auto;
+  -webkit-box-shadow:: 10px 10px 6px -8px rgba(0,0,0,.5);
+  -moz-box-shadow:  10px 10px 6px -8px rgba(0,0,0,.5);
+  box-shadow:  10px 10px 6px -8px rgba(0,0,0,.5);
 }
 
 .translation-wrapper {
