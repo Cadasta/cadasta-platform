@@ -1,3 +1,4 @@
+import os
 import itertools
 import re
 import hashlib
@@ -11,6 +12,7 @@ from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.xls2json import parse_file_to_json
 from pyxform.builder import create_survey_element_from_dict
+from pyxform.errors import PyXFormError
 
 from questionnaires.exceptions import InvalidXLSForm
 
@@ -161,11 +163,13 @@ class QuestionnaireManager(models.Manager):
                 survey = create_survey_element_from_dict(json)
                 xml_form = survey.xml().toprettyxml()
                 content = str.encode(xml_form)
+                name = os.path.join(instance.xml_form.field.upload_to,
+                                    os.path.basename(instance.name))
                 url = instance.xml_form.storage.save(
-                    '{}.xml'.format(instance.name), content)
+                    '{}.xml'.format(name), content)
 
                 instance.xml_form = url
-            except:
+            except PyXFormError:
                 pass
             instance.save()
 

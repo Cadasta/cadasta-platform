@@ -264,6 +264,7 @@ class ProjectEditDetailsTest(UserTestCase):
     def _get_form(self, form_name):
         path = os.path.dirname(settings.BASE_DIR)
         bucket_uitls.ensure_dirs(add='s3/uploads/xls-forms')
+        bucket_uitls.ensure_dirs(add='s3/uploads/xml-forms')
 
         storage = FakeS3Storage()
         file = open(

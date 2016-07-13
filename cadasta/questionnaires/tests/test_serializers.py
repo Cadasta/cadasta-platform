@@ -15,6 +15,7 @@ from ..models import Questionnaire
 
 path = os.path.dirname(settings.BASE_DIR)
 ensure_dirs(add='s3/uploads/xls-forms')
+ensure_dirs(add='s3/uploads/xml-forms')
 
 
 class QuestionnaireSerializerTest(TestCase):
