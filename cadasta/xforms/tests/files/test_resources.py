@@ -292,10 +292,6 @@ GEOSHAPE_FORM = '''<?xml version=\'1.0\' ?>
         <location_attributes>
             <name>Geoshape</name>
         </location_attributes>
-        <party_attributes_default />
-        <party_attributes_individual />
-        <party_relationship_attributes />
-        <tenure_relationship_attributes />
         <meta>
             <instanceID>uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad</instanceID>
         </meta>
