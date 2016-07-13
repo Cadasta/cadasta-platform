@@ -413,6 +413,7 @@ class ProjectAddTest(UserTestCase):
 
     def _get_xls_form(self, form_name):
         ensure_dirs(add='s3/uploads/xls-forms')
+        ensure_dirs(add='s3/uploads/xml-forms')
 
         path = os.path.dirname(settings.BASE_DIR)
         storage = FakeS3Storage()

@@ -29,7 +29,7 @@ class XFormListSerializerTest(UserTestCase):
 
     def _test_serialize(self, https=False):
         form = self._get_form('xls-form')
-        self.url = '/v1/collect/'
+        self.url = '/collect/'
         user = UserFactory.create()
         request = APIRequestFactory().get(self.url)
         force_authenticate(request, user=user)
