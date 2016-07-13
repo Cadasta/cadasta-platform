@@ -3,8 +3,8 @@
 import pytest
 
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
@@ -13,7 +13,7 @@ from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
 from .. import exceptions
 
 
-class PartyTest(TestCase):
+class PartyTest(UserTestCase):
 
     def test_str(self):
         party = PartyFactory.create(name='TeaParty')
@@ -52,7 +52,7 @@ class PartyTest(TestCase):
         assert party.attributes['description'] == 'Mad Hatters Tea Party'
 
 
-class PartyRelationshipTest(TestCase):
+class PartyRelationshipTest(UserTestCase):
 
     def test_str(self):
         project = ProjectFactory(name='TestProject')
@@ -122,7 +122,7 @@ class PartyRelationshipTest(TestCase):
             )
 
 
-class TenureRelationshipTest(TestCase):
+class TenureRelationshipTest(UserTestCase):
 
     def test_str(self):
         project = ProjectFactory(name='TestProject')
@@ -132,7 +132,7 @@ class TenureRelationshipTest(TestCase):
             party__project=project,
             party__name='Family',
             spatial_unit__project=project,
-            spatial_unit__name='Parcel',
+            spatial_unit__type='PA',
             tenure_type=tenure_type)
         assert str(relationship) == (
             "<TenureRelationship: <Family> Leasehold <Parcel>>")
@@ -178,7 +178,7 @@ class TenureRelationshipTest(TestCase):
             )
 
 
-class TenureRelationshipTypeTest(TestCase):
+class TenureRelationshipTypeTest(UserTestCase):
     """Test TenureRelationshipType."""
 
     def test_tenure_relationship_types(self):
@@ -188,7 +188,7 @@ class TenureRelationshipTypeTest(TestCase):
         assert freehold.label == 'Freehold'
 
 
-class PartyTenureRelationshipsTest(TestCase):
+class PartyTenureRelationshipsTest(UserTestCase):
     """Test TenureRelationships on Party."""
 
     def test_party_tenure_relationships(self):
@@ -198,7 +198,7 @@ class PartyTenureRelationshipsTest(TestCase):
         assert queryset[0] is not None
 
 
-class SpatialUnitTenureRelationshipsTest(TestCase):
+class SpatialUnitTenureRelationshipsTest(UserTestCase):
     """Test TenureRelationships on SpatialUnit."""
 
     def test_spatial_unit_tenure_relationships(self):

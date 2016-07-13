@@ -54,16 +54,18 @@
               <div class="col-md-9">
                 <div class="row">
                   <div class="col-sm-8">
-                    <div class="form-group">
-                      {{ wizard.form.organization.errors }}
+                    <div class="form-group{% if wizard.form.organization.errors %} has-error{% endif %}">
                       <label for="{{ wizard.form.organization.id_for_label }}">{% trans "Select organization" %}</label>
+                      <label class="pull-right control-label">{{ wizard.form.organization.errors }}</label>
                       {% render_field wizard.form.organization class+="form-control" %}
                     </div>
                   </div>
                   <div class="col-sm-4">
+                    {% if init_org_logo %}
                     <div id="org-wrapper">
                       <img class="org-logo {{ init_org_hidden }}" id="org-logo" src="{{ init_org_logo }}" />
                     </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>
@@ -73,9 +75,9 @@
               <div class="col-md-9">
                 <div class="row">
                   <div class="col-sm-8">
-                    <div class="form-group">
-                      {{ wizard.form.name.errors }}
+                    <div class="form-group{% if wizard.form.name.errors %} has-error{% endif %}">
                       <label for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
+                      <label class="pull-right control-label">{{ wizard.form.name.errors }}</label>
                       {% render_field wizard.form.name class+="form-control" %}
                     </div>
                   </div>
@@ -86,19 +88,19 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="row">
               <div class="col-md-9">
-                <div class="form-group">
-                  {{ wizard.form.description.errors }}
+                <div class="form-group{% if wizard.form.description.errors %} has-error{% endif %}">
                   <label for="{{ wizard.form.description.id_for_label }}">{% trans "Project description" %}</label>
+                  <label class="pull-right control-label">{{ wizard.form.description.errors }}</label>
                   {% render_field wizard.form.description class+="form-control" %}
                 </div>
 
-                <div class="form-group">
-                  {{ wizard.form.url.errors }}
+                <div class="form-group{% if wizard.form.url.errors %} has-error{% endif %}">
                   <label for="{{ wizard.form.url.id_for_label }}">{% trans "Project URL" %}</label>
-                  {% render_field wizard.form.url class+="form-control" %}
+                  <label class="pull-right control-label">{{ wizard.form.url.errors }}</label>
+                  {% render_field wizard.form.url class+="form-control" placeholder="http://" %}
                 </div>
               </div>
             </div>
@@ -106,9 +108,9 @@
             <h3>2. Questionnaire</h3>
             <div class="row">
               <div class="col-md-9">
-                <div class="form-group">
-                  {{ wizard.form.questionaire.errors }}
+                <div class="form-group{% if wizard.form.questionaire.errors %} has-error{% endif %}">
                   <label for="{{ wizard.form.questionaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
+                  <label class="pull-right control-label">{{ wizard.form.questionaire.errors }}</label>
                   {% render_field wizard.form.questionaire class+="form-control" %}
                   <p class="help-block">Accepted file type: xls</p>
                 </div>

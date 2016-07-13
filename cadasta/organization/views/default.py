@@ -1,34 +1,28 @@
 import os
+import json
 from django.http import Http404, HttpResponse
 from django.db import transaction
-import django.views.generic as generic
 from django.shortcuts import redirect, get_object_or_404
+import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
-from django.utils.text import slugify
+from core.util import slugify
 from django.utils.translation import gettext as _
 from django.contrib import messages
 
 import formtools.wizard.views as wizard
-from tutelary.models import Role
 
+import core.views.generic as generic
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from core.views.mixins import ArchiveMixin
 from accounts.models import User
 from questionnaires.models import Questionnaire
 from questionnaires.exceptions import InvalidXLSForm
+from spatial.serializers import SpatialUnitGeoJsonSerializer
 
 from ..models import Organization, Project, OrganizationRole, ProjectRole
 from . import mixins
 from .. import forms
 from .. import messages as error_messages
-
-
-def check_if_superuser(self):
-    superuser = Role.objects.filter(name='superuser')
-    if len(superuser) > 0:
-        if hasattr(self.request.user, 'assigned_policies'):
-            return superuser[0] in self.request.user.assigned_policies()
-    return False
 
 
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
@@ -59,7 +53,8 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
         return kwargs
 
 
-class OrganizationDashboard(PermissionRequiredMixin, generic.DetailView):
+class OrganizationDashboard(PermissionRequiredMixin,
+                            generic.DetailView):
     model = Organization
     template_name = 'organization/organization_dashboard.html'
     permission_required = 'org.view'
@@ -67,7 +62,7 @@ class OrganizationDashboard(PermissionRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data()
-        if check_if_superuser(self):
+        if self.is_superuser:
             projects = self.object.all_projects()
         else:
             projects = self.object.public_projects()
@@ -158,7 +153,7 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
-                              generic.edit.FormMixin,
+                              base_generic.edit.FormMixin,
                               generic.DetailView):
     slug_field = 'username'
     slug_url_kwarg = 'username'
@@ -245,7 +240,7 @@ class UserList(LoginPermissionRequiredMixin, generic.ListView):
         return context
 
 
-class UserActivation(LoginPermissionRequiredMixin, generic.View):
+class UserActivation(LoginPermissionRequiredMixin, base_generic.View):
     permission_required = 'user.update'
     permission_denied_message = error_messages.USERS_UPDATE
     new_state = None
@@ -260,8 +255,8 @@ class UserActivation(LoginPermissionRequiredMixin, generic.View):
         return redirect('user:list')
 
 
-class ProjectList(PermissionRequiredMixin, mixins.ProjectQuerySetMixin,
-                  generic.ListView):
+class ProjectList(PermissionRequiredMixin,
+                  mixins.ProjectQuerySetMixin, generic.ListView):
     model = Project
     template_name = 'organization/project_list.html'
     permission_required = 'project.list'
@@ -276,7 +271,7 @@ class ProjectList(PermissionRequiredMixin, mixins.ProjectQuerySetMixin,
 
     def get(self, request, *args, **kwargs):
         if (hasattr(self.request.user, 'assigned_policies') and
-           check_if_superuser(self)):
+           self.is_superuser):
                 projects = Project.objects.all()
         else:
             projects = []
@@ -290,17 +285,6 @@ class ProjectList(PermissionRequiredMixin, mixins.ProjectQuerySetMixin,
             projects, key=lambda p: p.organization.slug + ':' + p.slug)
         context = self.get_context_data()
         return super(generic.ListView, self).render_to_response(context)
-
-
-def assign_project_extent_context(context, project):
-    ext = project.extent.extent
-    context['extent'] = True
-    context['wlon'] = ext[0]
-    context['slat'] = ext[1]
-    context['elon'] = ext[2]
-    context['nlat'] = ext[3]
-    context['boundary'] = list(map(lambda t: [t[1], t[0]],
-                                   project.extent.coords[0]))
 
 
 class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
@@ -325,10 +309,11 @@ class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
-        if self.object.extent is None:
-            context['extent'] = False
-        else:
-            assign_project_extent_context(context, self.object)
+        context['geojson'] = json.dumps(
+            SpatialUnitGeoJsonSerializer(
+                self.object.spatial_units.all(), many=True).data
+        )
+
         return context
 
     def get_object(self, queryset=None):
@@ -363,6 +348,8 @@ def add_wizard_permission_required(self, view, request):
     else:
         return 'project.create'
 
+
+# ===> TODO: ADD SUPER-USER CHECK HERE
 
 class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
     permission_required = add_wizard_permission_required
@@ -548,7 +535,7 @@ class ProjectUnarchive(ProjectEdit, ArchiveMixin, generic.DetailView):
 
 class ProjectDataDownload(mixins.ProjectMixin,
                           LoginPermissionRequiredMixin,
-                          generic.edit.FormMixin,
+                          base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'organization/project_download.html'
     permission_required = 'project.download'

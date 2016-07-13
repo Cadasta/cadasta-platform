@@ -20,7 +20,7 @@ world_shp = os.path.abspath(os.path.join(
 ))
 
 
-def run(verbose=True):
+def run(verbose=False):
     WorldBorder.objects.all().delete()
     lm = LayerMapping(WorldBorder, world_shp, world_mapping,
                       transform=False, encoding='iso-8859-1')

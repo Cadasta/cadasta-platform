@@ -36,3 +36,53 @@ function add_map_controls(map) {
   map.addControl(new Geolocate());
   return map
 }
+
+function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
+  var projectBounds;
+
+  if (projectExtent) {
+    var boundary = L.geoJson(
+      projectExtent,
+      {
+        style: {
+            stroke: true, 
+            color: "#0e305e",
+            weight: 2,
+            dashArray: "5, 5",
+            opacity: 1,
+            fill: false
+        }
+      }
+    );
+    boundary.addTo(map);
+    projectBounds = boundary.getBounds();
+    if (fitBounds === 'project') {map.fitBounds(projectBounds);}
+  }
+
+  var geoJson = L.geoJson(null, {
+    style: { weight: 2 },
+    onEachFeature: function(feature, layer) {
+      layer.bindPopup("<div class=\"text-wrap\">" +
+                      "<h2><span>Location</span>" +
+                      feature.properties.type + "</h2></div>" +
+                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + trans['open'] + "</a>"  +
+                      "</div>");
+    }
+  });
+
+  L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+  geoJson.addData(spatialUnits);
+
+  if (fitBounds === 'locations') {
+    if (spatialUnits.features.length) {
+      map.fitBounds(L.geoJson(spatialUnits).getBounds());
+    } else if (projectBounds) {
+      map.fitBounds(projectBounds);
+    }
+  }
+
+  var markerGroup = L.markerClusterGroup.layerSupport()
+  markerGroup.addTo(map);
+  markerGroup.checkIn(geoJson);
+  geoJson.addTo(map);  
+}

@@ -65,10 +65,16 @@ class UserListTest(UserTestCase):
         expected = render_to_string(
             'organization/user_list.html',
             {'object_list': users,
-             'user': self.request.user},
+             'user': self.request.user,
+             'is_superuser': False},
             request=self.request)
 
         assert response.status_code == 200
+        if expected != content:
+            with open('expected.txt', 'w') as fp:
+                print(expected, file=fp)
+            with open('content.txt', 'w') as fp:
+                print(content, file=fp)
         assert expected == content
 
     def test_get_with_unauthorized_user(self):

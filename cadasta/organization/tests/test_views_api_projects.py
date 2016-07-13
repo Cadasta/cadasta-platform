@@ -9,10 +9,11 @@ from tutelary.models import Policy, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
-from core.tests.factories import RoleFactory
 from .factories import OrganizationFactory, ProjectFactory, clause
 from ..models import Project, ProjectRole, OrganizationRole
 from ..views import api
+
+from tutelary.models import Role
 
 
 class ProjectUsersAPITest(UserTestCase):
@@ -385,8 +386,7 @@ class ProjectListAPITest(UserTestCase):
         assign_user_policies(self.user, policy)
 
         self.super_user = UserFactory.create()
-        su_pol = Policy.objects.get(name='superuser')
-        su_role = RoleFactory.create(name='superuser', policies=[su_pol])
+        su_role = Role.objects.get(name='superuser')
         self.super_user.assign_policies(su_role)
 
     def _get(self, user=None, query=None, status=None, length=None):

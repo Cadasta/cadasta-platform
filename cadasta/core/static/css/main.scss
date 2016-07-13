@@ -113,6 +113,8 @@ header {
   position: relative;
   height: $header-height;
   background-color: $brand-primary;
+  -webkit-box-shadow: 0 1px 4px rgba(31,54,79,.2);
+  -moz-box-shadow: 0 1px 4px rgba(31,54,79,.2);
   box-shadow: 0 1px 4px rgba(31,54,79,.2);
   &.header {
     top: 0;
@@ -525,6 +527,7 @@ header {
   padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
+  -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
   box-shadow: 0 0 6px rgba(0,0,0,.3);
   border-radius: 4px;
 }
@@ -621,7 +624,6 @@ header {
     padding-bottom: 14px;
     text-shadow: none;
   }
-
   h3 {
     font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
@@ -665,14 +667,15 @@ header {
     position: relative;
     background: #fff;
     margin: 0 auto;
-    padding: 30px;
+    padding: 24px;
     overflow-x: hidden;
     overflow-y: scroll;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
+    -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
     z-index: 300;
     .btn {
-      min-width: 120px;
+      min-width: 110px;
     }
     .more-menu {
       width: auto !important;
@@ -721,7 +724,7 @@ header {
       background: transparent;
       padding: 20px 15px;
       .btn {
-        min-width: 120px;
+        min-width: 110px;
         margin-right: 20px;
         margin-bottom: 10px;
         &:last-child {
@@ -732,6 +735,16 @@ header {
   }
   .nav-tabs {
     margin-bottom: 20px;
+  }
+  .detail .nav-tabs {
+    li > a {
+      font-size: 13px;
+      padding: 10px;
+    }
+    li.active > a, li.active > a:hover, li.active > a:focus {
+      border-color: $table-border-color;
+      border-bottom-color: transparent;
+    }
   }
 }
 
@@ -768,6 +781,10 @@ textarea.form-control {
 
 /* =Table for sort and filter
 -------------------------------------------------------------- */
+
+.dataTables_wrapper {
+  clear: both;
+}
 
 @media (max-width: $screen-sm-max) {
   .dataTables_wrapper .col-sm-6 {
@@ -866,6 +883,18 @@ div.dataTables_wrapper div.dataTables_info /* showing number total */ {
 
 .tab-content div.dataTables_wrapper div.dataTables_filter input {
   max-width: 100px;
+}
+
+table.table-location { // location details in map area
+  border-top: none;
+  border-bottom: none;
+  tr:first-child td {
+    border-top: none;
+  }
+  label {
+    text-transform: uppercase;
+    font-size: 12px;
+  }
 }
 
 @media (max-width: $screen-sm-max) {
@@ -1006,11 +1035,8 @@ img.org-logo, img#org-logo {
   }
 }
 
-button#add-contact { // below contacts table
-  background: transparent;
-  border: 0;
-  float: left !important;
-  color: $link-color !important;
+button#add-contact,
+button#add_btn { // below contacts table and party table
   padding: 0;
 }
 
@@ -1070,6 +1096,11 @@ button#add-contact { // below contacts table
 
 .alert {
   text-align: center;
+  max-width: 50%;
+  margin: 0 auto;
+  -webkit-box-shadow:: 10px 10px 6px -8px rgba(0,0,0,.5);
+  -moz-box-shadow:  10px 10px 6px -8px rgba(0,0,0,.5);
+  box-shadow:  10px 10px 6px -8px rgba(0,0,0,.5);
 }
 
 .translation-wrapper {
@@ -1079,6 +1110,18 @@ button#add-contact { // below contacts table
 #messages { // success messages on top of map
   position: relative;
   z-index: 999;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.alert-error { // same as alert-danger
+  @include alert-variant($alert-danger-bg, $alert-danger-border, $alert-danger-text);
+}
+
+@media (max-width: $screen-sm-max) {
+  .alert {
+    max-width: none;
+  }
 }
 
 /* =Modals
@@ -1092,19 +1135,33 @@ button#add-contact { // below contacts table
     font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
   }
+  h4.step {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    opacity: 0.8;
+    font-weight: 300;
+    letter-spacing: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: solid 1px #d9dadb;
+  }
   .modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
+    padding-left: 30px;
+    padding-right: 30px;
   }
   .modal-footer {
     background: $body-bg;
     border-bottom-left-radius: 6px;
     border-bottom-right-radius: 6px;
+    padding-left: 30px;
+    padding-right: 30px;
     .btn {
       min-width: 100px;
     }
   }
-  button#add-contact {
+  button#add-contact, button#add_btn {
     background: transparent;
     color: $link-color !important;
     border: 0;
@@ -1113,21 +1170,32 @@ button#add-contact { // below contacts table
   }
 }
 
-/* =Chrome fix for fonts
+/* =Error messaging for forms
 -------------------------------------------------------------- */
 
-@media all and (-webkit-min-device-pixel-ratio:0) and (min-resolution: .001dpcm) { 
-  body {
-    -webkit-animation-delay: 0.1s;
-    -webkit-animation-name: fontfix;
-    -webkit-animation-duration: 0.1s;
-    -webkit-animation-iteration-count: 1;
-    -webkit-animation-timing-function: linear;
-  }
-
-  @-webkit-keyframes fontfix {
-    from { opacity: 1; }
-    to   { opacity: 1; }
-  }
-
+.form-group.has-error {
+  background-color: $alert-warning-bg;
+  padding: 10px;
 }
+  
+ul.errorlist {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none !important;
+  li {
+    background-color: $alert-warning-bg;
+    color: $alert-danger-text;
+    padding: 2px 8px;
+  }
+}
+
+/* =Map location details
+-------------------------------------------------------------- */
+
+.content-single .detail h2 span {
+  font-size: 14px;
+  color: #a6a7a8;
+  display: block;
+  text-transform: uppercase;
+  padding-bottom: 2px;
+ } 

@@ -2,24 +2,35 @@
 
 {% load i18n %}
 {% load leaflet_tags %}
+{% load staticfiles %}
 
 {% block extra_head %}
 {% leaflet_css %}
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
 {% leaflet_js %}
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="{% static 'js/map_utils.js' %}"></script>
+<script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
 <script>
- function project_map_init(map, options) {
-   {% if extent %}
-   var sw = L.latLng({{ slat }}, {{ wlon }});
-   var ne = L.latLng({{ nlat }}, {{ elon }});
-   var bounds = L.latLngBounds(sw, ne);
-   map.fitBounds(bounds);
-   var boundary = L.polygon({{ boundary }});
-   boundary.addTo(map);
-   {% endif %}
- }
+  function project_map_init(map, options) {
+    var trans = {
+      open: "{% trans 'Open location' %}"
+    };
+
+    {% if project.extent %}
+    var projectExtent = {{ project.extent.geojson|safe }};
+    {% else %}
+    var projectExtent = null;
+    {% endif %}
+    var spatialUnits = {{ geojson|safe }};
+
+    renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
+  }
 </script>
 {% endblock %}
 

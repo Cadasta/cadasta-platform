@@ -1,12 +1,13 @@
 from .base import Page
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
 
 
 class OrganizationPage(Page):
     BY_MODAL_FADE = (By.CSS_SELECTOR, "div.modal.fade.in")
     BY_MODAL_BACKDROP = (By.CLASS_NAME, 'modal-backdrop')
-    BY_ORG_LOGO = (By.CLASS_NAME, 'org-logo')
+    BY_ORG_OVERVIEW = (
+        By.XPATH, "//h2[normalize-space(.)='Organization Overview']"
+    )
 
     def __init__(self, test):
         super().__init__(test)
@@ -43,7 +44,7 @@ class OrganizationPage(Page):
     def go_to_organization_page(self, new=False):
         row = "[2]" if new else "[1]"
         org_page = self.get_table_row(row)
-        self.click_through(org_page, self.BY_ORG_LOGO)
+        self.click_through(org_page, self.BY_ORG_OVERVIEW)
 
     def get_org_description_and_members(self):
         return self.get_page_content(
@@ -77,7 +78,7 @@ class OrganizationPage(Page):
 
     def click_on_submit_button(self):
         submit = self.get_edit_modal_form("button[@name='submit']")
-        self.click_through(submit, self.BY_ORG_LOGO)
+        self.click_through(submit, self.BY_ORG_OVERVIEW)
 
     def get_fields(self):
         return {

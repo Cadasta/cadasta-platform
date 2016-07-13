@@ -269,7 +269,7 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
 
     def __str__(self):
         return "<TenureRelationship: <{party}> {type} <{su}>>".format(
-            party=self.party.name, su=self.spatial_unit.name,
+            party=self.party.name, su=self.spatial_unit.get_type_display(),
             type=self.tenure_type.label)
 
     def __repr__(self):
@@ -283,3 +283,36 @@ class TenureRelationshipType(models.Model):
     label = models.CharField(max_length=200)
 
     history = HistoricalRecords()
+
+
+TENURE_RELATIONSHIP_TYPES = (
+    ('AL', 'All Types'),
+    ('CR', 'Carbon Rights'),
+    ('CO', 'Concessionary Rights'),
+    ('CU', 'Customary Rights'),
+    ('EA', 'Easement'),
+    ('ES', 'Equitable Servitude'),
+    ('FH', 'Freehold'),
+    ('GR', 'Grazing Rights'),
+    ('HR', 'Hunting/Fishing/Harvest Rights'),
+    ('IN', 'Indigenous Land Rights'),
+    ('JT', 'Joint Tenancy'),
+    ('LH', 'Leasehold'),
+    ('LL', 'Longterm Leasehold'),
+    ('MR', 'Mineral Rights'),
+    ('OC', 'Occupancy (No Documented Rights)'),
+    ('TN', 'Tenancy (Documented Sub-lease)'),
+    ('TC', 'Tenancy In Common'),
+    ('UC', 'Undivided Co-ownership'),
+    ('WR', 'Water Rights')
+)
+
+
+def load_tenure_relationship_types():
+    for tr_type in TENURE_RELATIONSHIP_TYPES:
+        if not TenureRelationshipType.objects.filter(
+                id=tr_type[0], label=tr_type[1]
+        ).exists():
+            TenureRelationshipType.objects.create(
+                id=tr_type[0], label=tr_type[1]
+            )

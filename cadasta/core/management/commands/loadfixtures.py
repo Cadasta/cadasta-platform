@@ -21,9 +21,9 @@ class Command(BaseCommand):
         data = FixturesData()
 
         if options['delete']:
+            data.delete_test_projects()
             data.delete_test_users()
             data.delete_test_organizations()
-            data.delete_test_projects()
 
         else:
             data.add_test_organizations()

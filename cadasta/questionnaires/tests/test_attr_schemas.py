@@ -7,8 +7,8 @@ from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
+from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
@@ -25,17 +25,16 @@ from .attr_schemas import (location_relationship_xform_group,
 from .factories import QuestionnaireFactory
 
 path = os.path.dirname(settings.BASE_DIR)
+ensure_dirs(add='s3/uploads/xls-forms')
 
 
-class CreateAttributeSchemaTest(TestCase):
-
+class CreateAttributeSchemaTest(UserTestCase):
     def test_create_attribute_schemas(self):
-        ensure_dirs()
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
         ).read()
-        form = storage.save('xls-form-attrs.xlsx', file)
+        form = storage.save('xls-forms/xls-form-attrs.xlsx', file)
         project = ProjectFactory.create()
         models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -99,7 +98,7 @@ class CreateAttributeSchemaTest(TestCase):
             project=project, dict=location_xform_group,
             content_type=content_type, errors=[])
         spatial_unit = SpatialUnitFactory.create(
-            name='Test', project=project,
+            project=project,
             attributes={
                 'quality': 'polygon_high'
             }
@@ -125,7 +124,7 @@ class CreateAttributeSchemaTest(TestCase):
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             SpatialUnitFactory.create(
-                name='TestLocation', project=project,
+                project=project,
                 attributes={
                     'invalid_attribute': 'yes',
                 }
@@ -303,7 +302,7 @@ class CreateAttributeSchemaTest(TestCase):
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
         ).read()
-        form = storage.save('xls-form.xlsx', file)
+        form = storage.save('xls-forms/xls-form.xlsx', file)
         project = ProjectFactory.create(name='TestProject')
         q1 = models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -335,15 +334,16 @@ class CreateAttributeSchemaTest(TestCase):
         assert s1 != s2
 
 
-class ConditionalAttributeSchemaTest(TestCase):
+class ConditionalAttributeSchemaTest(UserTestCase):
 
     def setUp(self):
+        super().setUp()
         ensure_dirs()
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
         ).read()
-        form = storage.save('xls-form-attrs.xlsx', file)
+        form = storage.save('xls-forms/xls-form-attrs.xlsx', file)
         self.content_type = ContentType.objects.get(
             app_label='party', model='party')
         self.project = ProjectFactory.create(name='TestProject')

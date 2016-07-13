@@ -6,6 +6,8 @@ from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 import django.contrib.gis.db.models as gismodels
 from simple_history.models import HistoricalRecords
+from shapely.geometry import Polygon
+from shapely.wkt import dumps
 
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
@@ -238,27 +240,21 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
 
 
 def reassign_project_extent(instance):
-    if instance.extent:
-        points = [list(x) for x in list(instance.extent.boundary.coords)]
-        extent_visible = True
-        for point in points:
-            if point[0] < -180 or point[0] > 180:
-                extent_visible = False
-                break
-        if extent_visible:
+    coords = [list(x) for x in list(instance.extent.boundary.coords)]
+    for point in coords:
+        if point[0] >= -180 and point[0] <= 180:
             return
-        extent = '(('
-        for i, point in enumerate(points):
-            while point[0] < -180:
-                point[0] += 360
-            while point[0] > 180:
-                point[0] -= 360
-            extent += ' '.join([str(point[0]), str(point[1])])
-            if i != len(points) - 1:
-                extent += ','
-        polygon = str(instance.extent).split(' ')[0]
-        new_extent = ('{} {}))'.format(polygon, extent))
-        instance.extent = new_extent
+    while coords[0][0] < -180:
+        for point in coords:
+            point[0] += 360
+    while coords[0][0] > 180:
+        for point in coords:
+            point[0] -= 360
+    extent = []
+    for point in coords:
+        latlng = [point[0], point[1]]
+        extent.append(tuple(latlng))
+    instance.extent = dumps(Polygon(extent))
 
 
 @receiver(models.signals.pre_save, sender=Project)

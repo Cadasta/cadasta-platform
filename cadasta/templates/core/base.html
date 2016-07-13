@@ -37,7 +37,13 @@
               <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
                 <img src="/static/img/avatar.jpg" class="avatar thumbnail">
-                <span class="visible-sm-inline visible-md-inline visible-lg-inline">{{ user.full_name }}</span>
+                <span class="visible-sm-inline visible-md-inline visible-lg-inline">
+                  {% if user.full_name %}
+                  {{ user.full_name }}
+                  {% else %}
+                  {{ user.username }}
+                  {% endif %}
+                </span>
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
@@ -74,12 +80,14 @@
                 <a href="{% url 'organization:list' %}">
                   {% trans "Organizations" %}
                 </a>
-              </li><!--
-              --><li class="users">
+              </li>
+              {% if is_superuser %}
+              <li class="users">
                 <a href="{% url 'user:list' %}">
                   {% trans "Users" %}
                 </a>
               </li>
+              {% endif %}
             </ul>
             <!-- Hamburger -->
             <div class="dropdown pull-right btn-group btn-hamburger visible-xs-inline visible-sm-inline">
@@ -126,7 +134,7 @@
           <p class="copy">
             {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
           </p>
-          <form action="{% url 'set_language' %}" method="post" class="language">
+          <form action="{% url 'set_language' %}" method="post" class="language" novalidate>
           {% csrf_token %}
             <select id="language" name="language">
               {% get_current_language as LANGUAGE_CODE %}
@@ -190,6 +198,9 @@
        $('.dropdown-toggle').dropdown();
        $('#language').change(function() { this.form.submit(); });
      });
+      window.setTimeout(function() {
+        $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+      }, 5000);
     </script>
   </body>
 </html>

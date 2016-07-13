@@ -7,13 +7,14 @@ from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
 from organization.tests.factories import ProjectFactory
+from questionnaires.exceptions import InvalidXLSForm
 
 from . import factories
 from .. import serializers
 from ..models import Questionnaire
-from ..exceptions import InvalidXLSForm
 
 path = os.path.dirname(settings.BASE_DIR)
+ensure_dirs(add='s3/uploads/xls-forms')
 
 
 class QuestionnaireSerializerTest(TestCase):
@@ -25,7 +26,7 @@ class QuestionnaireSerializerTest(TestCase):
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
         ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
+        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def test_deserialize(self):
@@ -52,6 +53,7 @@ class QuestionnaireSerializerTest(TestCase):
         assert serializer.data['title'] == questionnaire.title
         assert serializer.data['id_string'] == questionnaire.id_string
         assert serializer.data['xls_form'] == questionnaire.xls_form.url
+        assert serializer.data['xml_form'] == questionnaire.xml_form.url
         assert serializer.data['version'] == questionnaire.version
         assert len(serializer.data['questions']) == 1
 
@@ -78,6 +80,7 @@ class QuestionnaireSerializerTest(TestCase):
         assert serializer.data['title'] == questionnaire.title
         assert serializer.data['id_string'] == questionnaire.id_string
         assert serializer.data['xls_form'] == questionnaire.xls_form.url
+        assert serializer.data['xml_form'] == questionnaire.xml_form.url
         assert serializer.data['version'] == questionnaire.version
         assert 'project' not in serializer.data
 

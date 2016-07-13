@@ -10,27 +10,26 @@
 {% block content %}
 
 <form class="profile-form form-narrow" method="POST"
-      action="{% url 'account:profile' %}">
+      action="{% url 'account:profile' %}" novalidate>
   <h1>{% trans "Update your profile" %}</h1>
-
   {% csrf_token %}
-
   {{ form.non_field_errors }}
-  <div class="form-group">
-    {{ form.username.errors }}
+
+  <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
+    <label class="pull-right control-label">{{ form.username.errors }}</label>
     {% render_field form.username class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
-    {{ form.email.errors }}
+  <div class="form-group{% if form.email.errors %} has-error{% endif %}">
     <label for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
+    <label class="pull-right control-label">{{ form.email.errors }}</label>
     {% render_field form.email class+="form-control input-lg" %}
   </div>
 
-  <div class="form-group">
-    {{ form.full_name.errors }}
+  <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
     <label for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}</label>
+    <label class="pull-right control-label">{{ form.full_name.errors }}</label>
     {% render_field form.full_name class+="form-control input-lg" %}
   </div>
 

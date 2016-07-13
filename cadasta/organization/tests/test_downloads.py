@@ -2,7 +2,7 @@ import time
 import os
 from openpyxl import load_workbook, Workbook
 from zipfile import ZipFile
-from django.test import TestCase
+from buckets.test import utils as bucket_uitls
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
@@ -20,7 +20,7 @@ from ..download.xls import XLSExporter
 from ..download.resources import ResourceExporter
 
 
-class XLSTest(TestCase):
+class XLSTest(UserTestCase):
     def test_init(self):
         project = ProjectFactory.build()
         exporter = XLSExporter(project)
@@ -122,6 +122,7 @@ class ResourcesTest(UserTestCase):
 
     def test_make_resource_worksheet(self):
         ensure_dirs()
+        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
 
@@ -145,6 +146,7 @@ class ResourcesTest(UserTestCase):
             assert sheet[chr(i + 97) + '3'].value == data[1][i]
 
     def test_pack_resource_data(self):
+        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
 
@@ -170,6 +172,7 @@ class ResourcesTest(UserTestCase):
         assert rel.id in packed[6]
 
     def test_make_download(self):
+        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
         res = ResourceFactory.create(project=project)

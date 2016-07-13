@@ -2,10 +2,13 @@ from core.models import RandomIDModel
 from django.contrib.gis.db.models import GeometryField
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.dispatch import receiver
 from organization.models import Project
 from party import managers
 from tutelary.decorators import permissioned_model
 from simple_history.models import HistoricalRecords
+from shapely.geometry import Point, Polygon, LineString
+from shapely.wkt import dumps
 
 from . import messages
 from .choices import TYPE_CHOICES
@@ -27,10 +30,6 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     # All spatial units are associated with a single project.
     project = models.ForeignKey(Project, on_delete=models.CASCADE,
                                 related_name='spatial_units')
-
-    # All spatial units have a name used to provide
-    # a human-readable label for it.
-    name = models.CharField(max_length=200)
 
     # Spatial unit type: used to manage range of allowed attributes.
     type = models.CharField(max_length=2,
@@ -56,7 +55,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('type',)
 
     class TutelaryMeta:
         perm_type = 'spatial'
@@ -85,10 +84,43 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         )
 
     def __str__(self):
-        return "<SpatialUnit: {}>".format(self.name)
+        return "<SpatialUnit: {}>".format(self.get_type_display())
 
     def __repr__(self):
         return str(self)
+
+
+def reassign_spatial_geometry(instance):
+    if instance.geometry.boundary:
+        coords = [list(x) for x in list(instance.geometry.boundary.coords)]
+    else:
+        coords = [list(instance.geometry.coords)]
+    for point in coords:
+        if point[0] >= -180 and point[0] <= 180:
+            return
+    while coords[0][0] < -180:
+        for point in coords:
+            point[0] += 360
+    while coords[0][0] > 180:
+        for point in coords:
+            point[0] -= 360
+    geometry = []
+    for point in coords:
+        latlng = [point[0], point[1]]
+        geometry.append(tuple(latlng))
+    if len(geometry) > 1:
+        if geometry[0] == geometry[-1]:
+            instance.geometry = dumps(Polygon(geometry))
+        else:
+            instance.geometry = dumps(LineString(geometry))
+    else:
+        instance.geometry = dumps(Point(geometry))
+
+
+@receiver(models.signals.pre_save, sender=SpatialUnit)
+def check_extent(sender, instance, **kwargs):
+    if instance.geometry:
+        reassign_spatial_geometry(instance)
 
 
 class SpatialRelationshipManager(managers.BaseRelationshipManager):
@@ -187,7 +219,7 @@ class SpatialRelationship(RandomIDModel):
 
     def __str__(self):
         return "<SpatialRelationship: <{su1}> {type} <{su2}>>".format(
-            su1=self.su1.name, su2=self.su2.name,
+            su1=self.su1.get_type_display(), su2=self.su2.get_type_display(),
             type=dict(self.TYPE_CHOICES).get(self.type))
 
     def __repr__(self):

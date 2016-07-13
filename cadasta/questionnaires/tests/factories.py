@@ -1,4 +1,5 @@
 import factory
+import hashlib
 
 from core.tests.factories import ExtendedFactory
 from organization.tests.factories import ProjectFactory
@@ -13,6 +14,10 @@ class QuestionnaireFactory(ExtendedFactory):
     title = factory.Sequence(lambda n: "Questionnaire #%s" % n)
     id_string = factory.Sequence(lambda n: "q_id_%s" % n)
     xls_form = 'http://example.com/test.txt'
+    xml_form = 'http://example.com/test.txt'
+    version = 1
+    md5_hash = hashlib.md5((str(id_string) + str(version)
+                            ).encode()).hexdigest()
     project = factory.SubFactory(ProjectFactory)
 
     @factory.post_generation

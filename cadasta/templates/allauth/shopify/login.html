@@ -9,7 +9,7 @@
 <h1>{% trans 'Shopify Sign In' %}</h1>
 
 
-<form class="shopify_login" method="post" action="{% provider_login_url "shopify" %}">
+<form class="shopify_login" method="post" action="{% provider_login_url "shopify" %}" novalidate>
 {% csrf_token %}
 <label for="auth_param_shop">Enter your Shopify store name:
     <input type="text" placeholder="your-store" name="shop" id="auth_param_shop">

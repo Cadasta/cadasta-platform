@@ -39,13 +39,13 @@
             <!-- Starter text -->
             <h3 style="text-transform: none;">{% trans "You're ready to go" %}</h3>
             <p>
-              {% trans "You have successfully created your organization. What would you like to do next?" %}
+              {% trans "You have successfully created your organization.  You're now ready to add your first project." %}
             </p>
             <div class="btn-full">
               <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary btn-lg" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a new project" %}
               </a>
-              <a href="#" class="btn btn-primary btn-lg" role="button">
+              <a href="#" class="btn btn-primary btn-lg hidden" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add new members" %}
               </a>
             </div>
@@ -57,9 +57,11 @@
       <!-- Right detail  -->
       <div class="col-md-4 detail col-height">
         <section>
-          <div class="org-logo">
-            <img src="{{ organization.logo }}" alt="{{ organization.name }}" />
-          </div>
+          {% if organization.logo %}
+            <div class="org-logo">
+              <img src="{{ organization.logo }}" alt="{{ organization.name }}" />
+            </div>
+          {% endif %}
           <p>{{ organization.description }}<p>
           <div class="divider-thick"></div>
           <!-- Starter text -->

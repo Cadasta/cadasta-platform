@@ -4,7 +4,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.postgres import forms as pg_forms
 from django.contrib.gis import forms as gisforms
-from django.utils.text import slugify
+from core.util import slugify
 from django.utils.translation import ugettext as _
 from django.db import transaction
 
@@ -21,6 +21,11 @@ from .download.xls import XLSExporter
 from .download.resources import ResourceExporter
 
 FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
+QUESTIONNAIRE_TYPES = [
+    'application/msexcel',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+]
 
 
 def create_update_or_delete_project_role(project, user, role):
@@ -213,7 +218,10 @@ class ProjectAddDetails(forms.Form):
     description = forms.CharField(required=False, widget=forms.Textarea)
     access = PublicPrivateField(initial='public')
     url = forms.URLField(required=False)
-    questionaire = forms.CharField(required=False, widget=S3FileUploadWidget)
+    questionaire = forms.CharField(
+        required=False,
+        widget=S3FileUploadWidget(upload_to='xls-forms',
+                                  accepted_types=QUESTIONNAIRE_TYPES))
     contacts = ContactsField(form=ContactsForm, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -234,7 +242,10 @@ class ProjectAddDetails(forms.Form):
 
 class ProjectEditDetails(forms.ModelForm):
     urls = pg_forms.SimpleArrayField(forms.URLField(), required=False)
-    questionnaire = forms.CharField(required=False, widget=S3FileUploadWidget)
+    questionnaire = forms.CharField(
+        required=False,
+        widget=S3FileUploadWidget(upload_to='xls-forms',
+                                  accepted_types=QUESTIONNAIRE_TYPES))
     access = PublicPrivateField()
     contacts = ContactsField(form=ContactsForm, required=False)
 
@@ -262,10 +273,7 @@ class ProjectEditDetails(forms.ModelForm):
 class PermissionsForm:
     def check_admin(self, user):
         if not hasattr(self, 'su_role'):
-            try:
-                self.su_role = Role.objects.get(name='superuser')
-            except Role.DoesNotExist:
-                self.su_role = None
+            self.su_role = Role.objects.get(name='superuser')
 
         if not hasattr(self, 'admins'):
             self.admins = [

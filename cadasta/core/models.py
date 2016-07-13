@@ -1,5 +1,6 @@
 import itertools
-from django.utils.text import slugify
+import math
+from core.util import slugify
 from django.db import models
 
 from .util import random_id, ID_FIELD_LENGTH
@@ -33,8 +34,11 @@ class SlugModel:
         self.__original_slug = self.slug
 
     def save(self, *args, **kwargs):
+        max_length = self._meta.get_field('slug').max_length
         if not self.slug:
-            self.slug = slugify(self.name, allow_unicode=True)
+            self.slug = slugify(
+                self.name, max_length=max_length, allow_unicode=True
+            )
 
         orig = self.slug
 
@@ -42,6 +46,8 @@ class SlugModel:
             for x in itertools.count(1):
                 if not type(self).objects.filter(slug=self.slug).exists():
                     break
+                slug_length = max_length - int(math.log10(x)) - 2
+                orig = self.slug[:slug_length]
                 self.slug = '{}-{}'.format(orig, x)
 
         self.__original_slug = self.slug

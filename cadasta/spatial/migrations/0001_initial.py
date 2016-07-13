@@ -23,7 +23,6 @@ class Migration(migrations.Migration):
             name='HistoricalSpatialUnit',
             fields=[
                 ('id', models.CharField(db_index=True, max_length=24)),
-                ('name', models.CharField(max_length=200)),
                 ('geometry', django.contrib.gis.db.models.fields.GeometryField(null=True, srid=4326)),
                 ('type', models.CharField(choices=[('PA', 'Parcel'), ('CB', 'Community boundary'), ('BU', 'Building'), ('AP', 'Apartment'), ('PX', 'Project extent'), ('RW', 'Right-of-way'), ('UC', 'Utility corridor'), ('NP', 'National park boundary'), ('MI', 'Miscellaneous')], default='PA', max_length=2)),
                 ('attributes', jsonattrs.fields.JSONAttributeField(default=jsonattrs.fields.JSONAttributes)),
@@ -61,14 +60,13 @@ class Migration(migrations.Migration):
             name='SpatialUnit',
             fields=[
                 ('id', models.CharField(max_length=24, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=200)),
                 ('geometry', django.contrib.gis.db.models.fields.GeometryField(null=True, srid=4326)),
                 ('type', models.CharField(choices=[('PA', 'Parcel'), ('CB', 'Community boundary'), ('BU', 'Building'), ('AP', 'Apartment'), ('PX', 'Project extent'), ('RW', 'Right-of-way'), ('UC', 'Utility corridor'), ('NP', 'National park boundary'), ('MI', 'Miscellaneous')], default='PA', max_length=2)),
                 ('attributes', jsonattrs.fields.JSONAttributeField(default=jsonattrs.fields.JSONAttributes)),
                 ('project', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='spatial_units', to='organization.Project')),
             ],
             options={
-                'ordering': ('name',),
+                'ordering': ('type',),
             },
         ),
         migrations.CreateModel(

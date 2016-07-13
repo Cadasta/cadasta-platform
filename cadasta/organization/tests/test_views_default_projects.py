@@ -11,12 +11,11 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.messages.api import get_messages
 import pytest
 
-from tutelary.models import Policy, assign_user_policies
+from tutelary.models import Policy, Role, assign_user_policies
 from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
 from core.tests.base_test_case import UserTestCase
-from core.tests.factories import RoleFactory
 from accounts.tests.factories import UserFactory
 from organization.models import OrganizationRole, Project, ProjectRole
 from questionnaires.tests.factories import QuestionnaireFactory
@@ -82,7 +81,7 @@ class ProjectListTest(UserTestCase):
         self.user.assign_policies(*assigned_policies)
 
     def _get(self, user=None, status=None, projs=None,
-             make_org_member=None):
+             make_org_member=None, is_superuser=False):
         if user is None:
             user = self.user
         if projs is None:
@@ -102,7 +101,8 @@ class ProjectListTest(UserTestCase):
              sorted(projs,
                     key=lambda p: p.organization.slug + ':' + p.slug),
              'add_allowed': True,
-             'user': self.request.user},
+             'user': self.request.user,
+             'is_superuser': is_superuser},
             request=self.request)
 
         if expected != content:
@@ -140,12 +140,9 @@ class ProjectListTest(UserTestCase):
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
-        self._get(status=200, user=superuser,
+        self._get(status=200, user=superuser, is_superuser=True,
                   projs=Project.objects.all())
 
 
@@ -233,14 +230,16 @@ class ProjectDashboardTest(UserTestCase):
             OrganizationRole.objects.create(organization=other_org, user=user)
         return self._get(prj, user=user, status=status), prj
 
-    def _check_render(self, response, project, assign_context=False):
+    def _check_render(self, response, project,
+                      assign_context=False, is_superuser=False):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
         context['object'] = project
         context['project'] = project
-        if assign_context:
-            default.assign_project_extent_context(context, project)
+        context['geojson'] = '{"type": "FeatureCollection", "features": []}'
+        context['is_superuser'] = is_superuser
+
         expected = render_to_string(
             'organization/project_dashboard.html',
             context, request=self.request
@@ -263,13 +262,10 @@ class ProjectDashboardTest(UserTestCase):
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
         response = self._get(self.project1, user=superuser, status=200)
-        self._check_render(response, self.project1,)
+        self._check_render(response, self.project1, is_superuser=True)
 
     def test_get_non_existent_project(self):
         setattr(self.request, 'user', self.user)
@@ -315,15 +311,12 @@ class ProjectDashboardTest(UserTestCase):
 
     def test_get_private_project_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_pol = Policy.objects.get(name='superuser')
-        self.superuser_role = RoleFactory.create(
-            name='superuser', policies=[superuser_pol]
-        )
+        self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
         response, prj = self._get_private(
             user=superuser, status=200
         )
-        self._check_render(response, prj)
+        self._check_render(response, prj, is_superuser=True)
 
 
 class ProjectAddTest(UserTestCase):
@@ -419,14 +412,14 @@ class ProjectAddTest(UserTestCase):
         assert 'organization' not in form_initial
 
     def _get_xls_form(self, form_name):
-        ensure_dirs()
+        ensure_dirs(add='s3/uploads/xls-forms')
 
         path = os.path.dirname(settings.BASE_DIR)
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb').read()
-        form = storage.save(form_name + '.xlsx', file)
+        form = storage.save('xls-forms/' + form_name + '.xlsx', file)
         return form
 
     EXTENTS_POST_DATA = {
@@ -766,7 +759,7 @@ class ProjectEditDetailsTest(UserTestCase):
             path + '/questionnaires/tests/files/xls-form-invalid.xlsx',
             'rb'
         ).read()
-        questionnaire = storage.save('xls-form-invalid.xlsx', file)
+        questionnaire = storage.save('xls-forms/xls-form-invalid.xlsx', file)
         self.post_data['questionnaire'] = questionnaire
 
         user = UserFactory.create()

@@ -30,10 +30,10 @@ class SpatialUnitListTestCase(RecordListBaseTestCase,
         org = OrganizationFactory.create(slug='namati')
         prj = ProjectFactory.create(
             slug='test-project', organization=org, access=access)
-        SpatialUnitFactory.create(project=prj, name='Top of the world')
-        SpatialUnitFactory.create(project=prj, name='South Pole')
+        SpatialUnitFactory.create(project=prj, type='AP')
+        SpatialUnitFactory.create(project=prj, type='BU')
         SpatialUnitFactory.create(
-            project=prj, name='Center of the earth', type='RW')
+            project=prj, type='RW')
         self.num_records = 3
         return (org, prj)
 
@@ -47,26 +47,26 @@ class SpatialUnitListAPITest(SpatialUnitListTestCase,
         content = self._get(
             org_slug=org.slug, prj_slug=prj.slug,
             status=status_code.HTTP_200_OK, length=self.num_records)
-        assert extra_record.name not in (
-            [u['properties']['name'] for u in content['features']])
+        assert extra_record.id not in (
+            [u['properties']['id'] for u in content['features']])
 
-    def test_search_filter(self):
-        org, prj = self._test_objs()
-        content = self._get(
-            org_slug=org.slug, prj_slug=prj.slug,
-            status=status_code.HTTP_200_OK, length=1, query='search=earth')
-        assert all(
-            record['properties']['name'] == 'Center of the earth' for
-            record in content['features'])
+    # def test_search_filter(self):
+    #     org, prj = self._test_objs()
+    #     content = self._get(
+    #         org_slug=org.slug, prj_slug=prj.slug,
+    #         status=status_code.HTTP_200_OK, length=1, query='search=AP')
+    #     assert all(
+    #         record['properties']['type'] == 'AP' for
+    #         record in content['features'])
 
     def test_ordering(self):
         org, prj = self._test_objs()
         content = self._get(
             org_slug=org.slug, prj_slug=prj.slug,
             status=status_code.HTTP_200_OK, length=self.num_records,
-            query='ordering=name')
+            query='ordering=type')
         names = [
-            record['properties']['name'] for record in content['features']]
+            record['properties']['type'] for record in content['features']]
         assert names == sorted(names)
 
     def test_reverse_ordering(self):
@@ -74,9 +74,9 @@ class SpatialUnitListAPITest(SpatialUnitListTestCase,
         content = self._get(
             org_slug=org.slug, prj_slug=prj.slug,
             status=status_code.HTTP_200_OK, length=self.num_records,
-            query='ordering=-name')
+            query='ordering=-type')
         names = [
-            record['properties']['name'] for record in content['features']]
+            record['properties']['type'] for record in content['features']]
         assert names == sorted(names, reverse=True)
 
     def test_type_filter(self):
@@ -94,7 +94,7 @@ class SpatialUnitCreateAPITest(SpatialUnitListTestCase,
 
     default_create_data = {
         'properties': {
-            'name': "Small world"
+            'type': "AP"
         },
         'geometry': {
             'type': 'Point',
@@ -107,6 +107,7 @@ class SpatialUnitCreateAPITest(SpatialUnitListTestCase,
     def test_create_invalid_spatial_unit(self):
         org, prj = self._test_objs()
         invalid_data = {
+            'type': '',
             'geometry': {
                 'type': 'Point',
                 'coordinates': [100, 0]
@@ -115,12 +116,12 @@ class SpatialUnitCreateAPITest(SpatialUnitListTestCase,
         content = self._post(
             org_slug=org.slug, prj_slug=prj.slug,
             data=invalid_data, status=status_code.HTTP_400_BAD_REQUEST)
-        assert content['name'][0] == _("This field is required.")
+        assert content['type'][0] == _('"" is not a valid choice.')
 
     def test_create_spatial_unit_with_invalid_geometry(self):
         org, prj = self._test_objs()
         invalid_data = {
-            'name': "Cat points!",
+            'type': "BU",
             'geometry': {
                 'type': 'Cats',
                 'coordinates': [100, 0]
@@ -149,7 +150,7 @@ class SpatialUnitDetailTestCase(RecordDetailBaseTestCase):
         org = OrganizationFactory.create(slug='namati')
         prj = ProjectFactory.create(
             slug='test-project', organization=org, access=access)
-        su = SpatialUnitFactory.create(project=prj, name="House")
+        su = SpatialUnitFactory.create(project=prj, type='AP')
         self.su = su
         return (su, org)
 
@@ -165,24 +166,24 @@ class SpatialUnitUpdateAPITest(SpatialUnitDetailTestCase,
                                RecordUpdateAPITest):
 
     def get_valid_updated_data(self):
-        return {'name': "Way Cooler Name"}
+        return {'type': "BU"}
 
     def check_for_updated(self, content):
         data = self.get_valid_updated_data()
-        assert content['properties']['name'] == data['name']
+        assert content['properties']['type'] == data['type']
 
     def check_for_unchanged(self, content):
-        assert content['properties']['name'] == self.su.name
+        assert content['properties']['type'] == self.su.type
 
     # Additional tests
 
     def test_update_with_invalid_data(self):
 
-        def get_invalid_data(): return {'name': ''}
+        def get_invalid_data(): return {'type': ''}
 
         content = self._test_patch_public_record(
             get_invalid_data, status_code.HTTP_400_BAD_REQUEST)
-        assert content['name'][0] == _('This field may not be blank.')
+        assert content['type'][0] == _('"" is not a valid choice.')
 
     def test_update_with_invalid_geometry(self):
 

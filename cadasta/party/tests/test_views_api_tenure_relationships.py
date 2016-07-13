@@ -34,8 +34,8 @@ class TenureRelationshipCreateTestCase(RecordCreateBaseTestCase):
             slug='test-project', organization=org, access=access)
         party1 = PartyFactory.create(project=prj, name='Landowner')
         party2 = PartyFactory.create(project=prj, name='Family')
-        su1 = SpatialUnitFactory.create(project=prj, name='Parcel')
-        su2 = SpatialUnitFactory.create(project=prj, name='House')
+        su1 = SpatialUnitFactory.create(project=prj, type='PA')
+        su2 = SpatialUnitFactory.create(project=prj, type='PA')
         TR = TenureRelationshipFactory
         rel1 = TR.create(project=prj, party=party1, spatial_unit=su1)
         TR.create(project=prj, party=party1, spatial_unit=su2)
@@ -100,8 +100,8 @@ class TenureRelationshipDetailTestCase(RecordDetailBaseTestCase):
             slug='test-project', organization=org, access=access)
         party = PartyFactory.create(project=prj, name='Landowner')
         party2 = PartyFactory.create(project=prj, name='Family')
-        spatial_unit = SpatialUnitFactory.create(project=prj, name='Parcel')
-        spatial_unit2 = SpatialUnitFactory.create(project=prj, name='House')
+        spatial_unit = SpatialUnitFactory.create(project=prj, type='PA')
+        spatial_unit2 = SpatialUnitFactory.create(project=prj, type='PA')
         rel = TenureRelationshipFactory.create(
             project=prj, party=party, spatial_unit=spatial_unit)
         self.party2 = party2
@@ -132,7 +132,7 @@ class TenureRelationshipUpdateAPITest(TenureRelationshipDetailTestCase,
 
     def check_for_unchanged(self, content):
         assert content['party']['name'] == "Landowner"
-        assert content['spatial_unit']['properties']['name'] == "Parcel"
+        assert content['spatial_unit']['properties']['type'] == "PA"
 
     # Additional tests
 

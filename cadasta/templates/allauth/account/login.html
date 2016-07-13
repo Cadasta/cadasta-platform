@@ -25,29 +25,20 @@
 </div>
 {% endif %}
 
-<form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}">
+<form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}" novalidate>
   <h1>{% trans "Sign in to your account" %}</h1>
 
   {% csrf_token %}
 
   <div class="form-group{% if form.login.errors %} has-error{% endif %}">
-    <label for="id_login" class="control-label">Username</label>
-    <label class="pull-right control-label">
-      {% for error in form.login.errors %}
-      {{ error|escape }}
-      {% endfor %}
-    </label>
+    <label for="id_login">Username</label>
+    <label class="pull-right control-label">{{ form.login.errors }}</label>
     {% render_field form.login class+="form-control input-lg" placeholder="" %}
   </div>
 
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
-    <label for="id_password" class="control-label">Password</label>
-    <label class="pull-right control-label">
-      {% for error in form.password.errors %}
-      {{ error|escape }}
-      {% endfor %}
-    </label>
-
+    <label for="id_password">Password</label>
+    <label class="pull-right control-label">{{ form.password.errors }}</label>
     {% render_field form.password class+="form-control input-lg" placeholder="" %}
   </div>
 

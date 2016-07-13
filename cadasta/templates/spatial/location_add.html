@@ -28,26 +28,20 @@
       var map = e.originalEvent.detail.map;
       add_map_controls(map);
 
-      var data = {{ geojson|safe }};
+      // TODO: It seems Leaflet has a bug with L.geoJson()
+      // not returning the correct bounds (see #377 for details)
+      var trans = {
+        open: "{% trans 'Open location' %}"
+      };
 
-      var geoJson = L.geoJson(null, {
-        onEachFeature: function(feature, layer) {
-          layer.bindPopup("<div class=\"text-wrap\">" +
-                         "<h2><span>Location</span>" +
-                         feature.properties.type + "</h2></div>" +
-                         "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
-                         "</div>");
-        }
-      });
+      {% if object.extent %}
+      var projectExtent = {{ object.extent.geojson|safe }};
+      {% else %}
+      var projectExtent = null;
+      {% endif %}
+      var spatialUnits = {{ geojson|safe }};
 
-      L.Deflate(map, {minSize: 20, layerGroup: geoJson});
-      geoJson.addData(data);
-
-      var markerGroup = L.markerClusterGroup.layerSupport()
-      markerGroup.addTo(map);
-      markerGroup.checkIn(geoJson);
-      geoJson.addTo(map);
-      map.fitBounds(geoJson.getBounds());
+      renderFeatures(map, projectExtent, spatialUnits, trans, 'project');
    });
  });
 </script>

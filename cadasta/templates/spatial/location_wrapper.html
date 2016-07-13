@@ -17,33 +17,35 @@
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
+<script src="{% static 'js/map_utils.js' %}"></script>
 <!-- Detail extra script-->
 <script>
   function locations_map_init(map, options) {
-    var locations_data = {{ geojson|safe }};
-    var geoJson = L.geoJson(null);
+    var trans = {
+      open: "{% trans 'Open location' %}"
+    };
 
-    L.Deflate(map, {minSize: 20, layerGroup: geoJson});
-    geoJson.addData(locations_data);
+    {% if object.extent %}
+    var projectExtent = {{ object.extent.geojson|safe }};
+    {% else %}
+    var projectExtent = null;
+    {% endif %}
+    var spatialUnits = {{ geojson|safe }};
 
-    var markerGroup = L.markerClusterGroup.layerSupport()
-    markerGroup.addTo(map);
-    markerGroup.checkIn(geoJson);
-    geoJson.addTo(map);
+    renderFeatures(map, projectExtent, spatialUnits, trans, false);
 
     var data = {{ location.geometry.geojson|safe }};
     var location = L.geoJson(data, {
-      style: {color: '#edaa00', fillColor: '#edaa00'},
+      style: {color: '#edaa00', fillColor: '#edaa00', weight: 3},
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                        "<h2><span>Location</span>{{ location.get_type_display }}</h2></div>" +
-                       "<div class=\"btn-wrap\"><a href='{% url 'locations:detail' object.organization.slug object.slug location.id %}' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open Location' %}</a>"  +
+                       "<div class=\"btn-wrap\"><a href='{% url 'locations:detail' object.organization.slug object.slug location.id %}' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open location' %}</a>"  +
                        "</div>");
       }
     });
     location.addTo(map);
     map.fitBounds(location.getBounds());
-    map.setZoom(map.getZoom() - 2);
   }
 
   $(document).ready(function() {

@@ -15,6 +15,7 @@ from ..models import Questionnaire
 from .factories import QuestionnaireFactory
 
 path = os.path.dirname(settings.BASE_DIR)
+ensure_dirs(add='s3/uploads/xls-forms')
 
 
 class QuestionnaireDetailTest(UserTestCase):
@@ -49,7 +50,7 @@ class QuestionnaireDetailTest(UserTestCase):
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
         ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
+        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def _get(self, user=None, status=None, project=None):
