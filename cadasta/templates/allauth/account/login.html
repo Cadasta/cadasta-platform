@@ -5,6 +5,7 @@
 {% load account socialaccount %}
 
 {% block top-nav %}registration{% endblock %}
+{% block body-class %}tinted-bg{% endblock %}
 
 {% block title %} | {% trans "Sign In" %}{% endblock %}
 
@@ -69,7 +70,5 @@
     <a href="{% url 'account_signup' %}">Register here</a>
   </p>
 </form>
-
-<div class="tinted-bg"></div>
 
 {% endblock %}

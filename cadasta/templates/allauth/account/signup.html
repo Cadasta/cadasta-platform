@@ -4,6 +4,7 @@
 {% load i18n %}
 
 {% block top-nav %}registration{% endblock %}
+{% block body-class %}tinted-bg{% endblock %}
 
 {% block title %} | {% trans "Register" %}{% endblock %}
 
@@ -72,7 +73,5 @@
     {% blocktrans %}Already have an account? <a href="{{ login_url }}">Sign in</a>{% endblocktrans %}
   </p>
 </form>
-
-<div class="tinted-bg"></div>
 
 {% endblock %}
