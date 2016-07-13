@@ -70,16 +70,15 @@ class ModelHelper():
         )
 
     def _format_geometry(self, coords, geoshape=False):
-
         if coords == '':
             return ''
-
         if '\n' in coords:
             coords = coords.replace('\n', '')
         coords = coords.split(';')
         if (coords[-1] == ''):
             coords.pop()
         if geoshape:
+            coords.pop()
             coords.append(coords[0])
         if len(coords) > 1:
             points = []
