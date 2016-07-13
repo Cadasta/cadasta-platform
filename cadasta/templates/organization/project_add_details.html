@@ -61,9 +61,11 @@
                     </div>
                   </div>
                   <div class="col-sm-4">
+                    {% if init_org_logo %}
                     <div id="org-wrapper">
                       <img class="org-logo {{ init_org_hidden }}" id="org-logo" src="{{ init_org_logo }}" />
                     </div>
+                    {% endif %}
                   </div>
                 </div>
               </div>
@@ -86,7 +88,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="row">
               <div class="col-md-9">
                 <div class="form-group{% if wizard.form.description.errors %} has-error{% endif %}">
