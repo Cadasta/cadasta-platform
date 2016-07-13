@@ -14,7 +14,8 @@ from tutelary.models import Role
 from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
-from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.tests.factories import (QuestionnaireFactory,
+                                            QuestionFactory)
 from questionnaires.managers import create_attrs_schema
 from party.models import Party
 from resources.models import Resource
@@ -30,6 +31,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 
 class XFormListTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -94,29 +96,38 @@ class XFormListTest(UserTestCase):
         assert questionnaire.xml_form.url in content
 
     def test_get_without_data(self):
-        # content = self._get(status=200)
         request = APIRequestFactory().get(self.url)
         force_authenticate(request, user=self.user)
         response = api.XFormListView.as_view({'get': 'list'})(request).render()
         content = response.content.decode('utf-8')
-        # check that render returned an empty string
         assert 'formID' not in content
         assert 'downloadUrl' not in content
         assert 'hash' not in content
 
 
 class XFormSubmissionTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create()
         self.prj = ProjectFactory.create(organization=self.org)
+        self.prj_2 = ProjectFactory.create(organization=self.org)
         OrganizationRole.objects.create(
             organization=self.org, user=self.user, admin=True)
         QuestionnaireFactory.create(
             project=self.prj,
             xls_form=self._get_form('test_standard_questionnaire'),
-            title='test_standard_questionnaire')
+            name='test_standard_questionnaire')
+        q = QuestionnaireFactory.create(
+            project=self.prj_2,
+            xls_form=self._get_form('test_standard_questionnaire_2'),
+            name='test_standard_questionnaire_2')
+        QuestionFactory.create(
+            name='location_geometry',
+            label='Location of Parcel',
+            type='GS',
+            questionnaire=q)
         self.url = '/collect/submission/'
         self.superuser_role = Role.objects.get(name='superuser')
 
@@ -126,6 +137,10 @@ class XFormSubmissionTest(UserTestCase):
                 app_label='party', model='party'), errors=[])
         create_attrs_schema(
             project=self.prj, dict=location_xform_group,
+            content_type=ContentType.objects.get(
+                app_label='spatial', model='spatialunit'), errors=[])
+        create_attrs_schema(
+            project=self.prj_2, dict=location_xform_group,
             content_type=ContentType.objects.get(
                 app_label='spatial', model='spatialunit'), errors=[])
         create_attrs_schema(
@@ -171,13 +186,13 @@ class XFormSubmissionTest(UserTestCase):
                 data[file.name] = file
         else:
             file = InMemoryUploadedFile(
-                    io.StringIO(image),
-                    field_name='test_image',
-                    name='test_image.png',
-                    content_type='image/png',
-                    size=len(image),
-                    charset='utf-8',
-                )
+                io.StringIO(image),
+                field_name='test_image',
+                name='test_image.png',
+                content_type='image/png',
+                size=len(image),
+                charset='utf-8',
+            )
             data[file.name] = file
 
         form = InMemoryUploadedFile(
@@ -236,7 +251,7 @@ class XFormSubmissionTest(UserTestCase):
         assert location in party.tenure_relationships.all()
         assert Resource.objects.filter(name__contains='test_image').exists()
         assert location.resources[0] == Resource.objects.get(
-                                            name__contains='test_image')
+            name__contains='test_image')
         assert len(party.resources) == 0
 
     def test_multiple_resource_upload(self):
@@ -254,9 +269,9 @@ class XFormSubmissionTest(UserTestCase):
         assert Resource.objects.filter(name__contains='test_image').exists()
         assert Resource.objects.filter(name__contains='this-is-fine').exists()
         assert location.resources[0] == Resource.objects.get(
-                                            name__contains='test_image')
+            name__contains='test_image')
         assert party.resources[0] == Resource.objects.get(
-                                            name__contains='this-is-fine')
+            name__contains='this-is-fine')
 
     def test_invalid_resource_upload(self):
         # testing submitting with a missing xml_submission_file
@@ -268,13 +283,16 @@ class XFormSubmissionTest(UserTestCase):
         self._post(form='line_form', status=201)
         self._post(form='poly_form', status=201)
         self._post(form='missing_semi_form', status=201)
+        self._post(form='geoshape_form', status=201)
         polygon = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
         line = SpatialUnit.objects.get(attributes={'name': 'Line'})
         point = SpatialUnit.objects.get(attributes={'name': 'Missing Semi'})
+        geoshape = SpatialUnit.objects.get(attributes={'name': 'Geoshape'})
 
         assert polygon.geometry.geom_type == 'Polygon'
         assert line.geometry.geom_type == 'LineString'
         assert point.geometry.geom_type == 'Point'
+        assert geoshape.geometry.geom_type == 'Polygon'
 
     def test_questionnaire_not_found(self):
         with pytest.raises(ValidationError):

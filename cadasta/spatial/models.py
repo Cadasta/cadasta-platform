@@ -91,10 +91,13 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
 
 def reassign_spatial_geometry(instance):
-    if instance.geometry.boundary:
-        coords = [list(x) for x in list(instance.geometry.boundary.coords)]
+    coords = list(instance.geometry.coords)
+    if type(coords[0]) == float:
+        coords = [coords]
     else:
-        coords = [list(instance.geometry.coords)]
+        while (type(coords[0][0]) != float):
+            coords = coords[0]
+        coords = [list(x) for x in coords]
     for point in coords:
         if point[0] >= -180 and point[0] <= 180:
             return
