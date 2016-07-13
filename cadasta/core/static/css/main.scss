@@ -624,7 +624,6 @@ header {
     padding-bottom: 14px;
     text-shadow: none;
   }
-
   h3 {
     font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
@@ -782,6 +781,10 @@ textarea.form-control {
 
 /* =Table for sort and filter
 -------------------------------------------------------------- */
+
+.dataTables_wrapper {
+  clear: both;
+}
 
 @media (max-width: $screen-sm-max) {
   .dataTables_wrapper .col-sm-6 {
@@ -1032,7 +1035,8 @@ img.org-logo, img#org-logo {
   }
 }
 
-button#add-contact { // below contacts table
+button#add-contact,
+button#add_btn { // below contacts table and party table
   padding: 0;
 }
 
@@ -1131,6 +1135,16 @@ button#add-contact { // below contacts table
     font-family: 'Roboto Condensed', sans-serif;
     text-transform: uppercase;
   }
+  h4.step {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    opacity: 0.8;
+    font-weight: 300;
+    letter-spacing: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: solid 1px #d9dadb;
+  }
   .modal-body {
     max-height: calc(100vh - 200px);
     overflow-y: auto;
@@ -1147,7 +1161,7 @@ button#add-contact { // below contacts table
       min-width: 100px;
     }
   }
-  button#add-contact {
+  button#add-contact, button#add_btn {
     background: transparent;
     color: $link-color !important;
     border: 0;

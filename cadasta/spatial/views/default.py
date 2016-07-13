@@ -69,6 +69,9 @@ class LocationDetail(LoginPermissionRequiredMixin,
         context = super().get_context_data(*args, **kwargs)
         context['relationships'] = TenureRelationship.objects.filter(
             spatial_unit=context['location'])
+        num_relationships = TenureRelationship.objects.filter(
+            spatial_unit=context['location']).count()
+        context['has_relationships'] = (num_relationships > 0)
         return context
 
 
