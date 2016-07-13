@@ -242,7 +242,7 @@ MISSING_SEMI_FORM = '''<?xml version=\'1.0\' ?>
         <title />
         <party_type>IN</party_type>
         <party_name>Stever Rogers</party_name>
-        <location_geometry>40.6890612 -73.9925067 0.0 0.0
+        <location_geometry>340.6890612 -373.9925067 0.0 0.0
         </location_geometry>
         <location_type>MI</location_type>
         <location_photo>test_image.png</location_photo>
@@ -269,6 +269,37 @@ MISSING_SEMI_FORM = '''<?xml version=\'1.0\' ?>
             <instanceID>uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad</instanceID>
         </meta>
     </test_standard_questionnaire>'''.strip()
+
+GEOSHAPE_FORM = '''<?xml version=\'1.0\' ?>
+    <test_standard_questionnaire_2 id="test_standard_questionnaire_2">
+        <start>2016-07-07T16:38:20.310-04</start>
+        <end>2016-07-07T16:39:23.673-04</end>
+        <today>2016-07-07</today>
+        <deviceid>00:bb:3a:44:d0:fb</deviceid>
+        <title />
+        <party_type>IN</party_type>
+        <party_name>Natashia Romanoff</party_name>
+        <location_geometry>45.56342779158167 -122.67650283873081 0.0 0.0;
+        45.56176327330353 -122.67669159919024 0.0 0.0;
+        45.56151562182025 -122.67490658909082 0.0 0.0;
+        45.563479432877415 -122.67494414001703 0.0 0.0;
+        45.56176327330353 -122.67669159919024 0.0 0.0
+        </location_geometry>
+        <location_type>MI</location_type>
+        <location_photo>test_image.png</location_photo>
+        <party_photo />
+        <tenure_type>LH</tenure_type>
+        <location_attributes>
+            <name>Geoshape</name>
+        </location_attributes>
+        <party_attributes_default />
+        <party_attributes_individual />
+        <party_relationship_attributes />
+        <tenure_relationship_attributes />
+        <meta>
+            <instanceID>uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad</instanceID>
+        </meta>
+    </test_standard_questionnaire_2>'''.strip()
 
 BAD_QUESTIONNAIRE = '''<?xml version=\'1.0\' ?>
     <tax_return id="tax_return">
@@ -320,5 +351,6 @@ responses = {
     'line_form': LINE_FORM,
     'poly_form': POLY_FORM,
     'missing_semi_form': MISSING_SEMI_FORM,
+    'geoshape_form': GEOSHAPE_FORM,
     'bad_questionnaire': BAD_QUESTIONNAIRE
 }

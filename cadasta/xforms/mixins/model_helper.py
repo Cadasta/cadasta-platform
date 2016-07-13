@@ -3,7 +3,7 @@ from shapely.wkt import dumps
 from django.forms import ValidationError
 from django.core.files.storage import get_storage_class
 
-from questionnaires.models import Questionnaire
+from questionnaires.models import Questionnaire, Question
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from resources.models import Resource
 from spatial.models import SpatialUnit
@@ -18,9 +18,10 @@ class ModelHelper():
         self.arg = arg
 
     def add_data_to_models(self, data):
-        project = self.get_questionnaire(data=data['id']).project
+        questionnaire = self.get_questionnaire(data=data['id'])
+        project = questionnaire.project
         party = self.add_data_to_party(data, project)
-        location = self.add_data_to_spatial_unit(data, project)
+        location = self.add_data_to_spatial_unit(data, project, questionnaire)
         self.add_data_to_tenure_relationship(data, party, location, project)
         return {'project': project, 'party': party, 'location': location}
 
@@ -33,11 +34,14 @@ class ModelHelper():
         )
         return party
 
-    def add_data_to_spatial_unit(self, data, project):
+    def add_data_to_spatial_unit(self, data, project, questionnaire):
+        geoshape = Question.objects.filter(
+             questionnaire=questionnaire, type='GS').exists()
         location = SpatialUnit.objects.create(
             project=project,
             type=data['location_type'],
-            geometry=self._format_geometry(data['location_geometry']),
+            geometry=self._format_geometry(
+                data['location_geometry'], geoshape),
             attributes=data['location_attributes']
         )
         return location
@@ -65,35 +69,38 @@ class ModelHelper():
             project=project
         )
 
-    def _format_geometry(self, coords):
-            if coords == '':
-                return ''
+    def _format_geometry(self, coords, geoshape=False):
 
-            if '\n' in coords:
-                coords = coords.replace('\n', '')
-            coords = coords.split(';')
-            if (coords[-1] == ''):
-                coords.pop()
-            if len(coords) > 1:
-                points = []
-                for coord in coords:
-                    coord = coord.split(' ')
-                    coord = [x for x in coord if x]
-                    latlng = [float(coord[1]),
-                              float(coord[0])]
-                    points.append(tuple(latlng))
-                if (coords[0] != coords[-1] or len(coords) == 2):
-                    return dumps(LineString(points))
-                else:
-                    return dumps(Polygon(points))
+        if coords == '':
+            return ''
+
+        if '\n' in coords:
+            coords = coords.replace('\n', '')
+        coords = coords.split(';')
+        if (coords[-1] == ''):
+            coords.pop()
+        if geoshape:
+            coords.append(coords[0])
+        if len(coords) > 1:
+            points = []
+            for coord in coords:
+                coord = coord.split(' ')
+                coord = [x for x in coord if x]
+                latlng = [float(coord[1]),
+                          float(coord[0])]
+                points.append(tuple(latlng))
+            if (coords[0] != coords[-1] or len(coords) == 2):
+                return dumps(LineString(points))
             else:
-                latlng = coords[0].split(' ')
-                latlng = [x for x in latlng if x]
-                return dumps(Point(float(latlng[1]), float(latlng[0])))
+                return dumps(Polygon(points))
+        else:
+            latlng = coords[0].split(' ')
+            latlng = [x for x in latlng if x]
+            return dumps(Point(float(latlng[1]), float(latlng[0])))
 
     def get_questionnaire(self, data):
         try:
-            return Questionnaire.objects.get(title=data)
+            return Questionnaire.objects.get(name=data)
         except Questionnaire.DoesNotExist:
             raise ValidationError('Questionnaire not found.')
 
