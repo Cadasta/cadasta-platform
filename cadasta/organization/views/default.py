@@ -12,6 +12,7 @@ from django.contrib import messages
 import formtools.wizard.views as wizard
 
 import core.views.generic as generic
+from core.views.mixins import SuperUserCheckMixin
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
 from core.views.mixins import ArchiveMixin
 from accounts.models import User
@@ -349,9 +350,9 @@ def add_wizard_permission_required(self, view, request):
         return 'project.create'
 
 
-# ===> TODO: ADD SUPER-USER CHECK HERE
-
-class ProjectAddWizard(LoginPermissionRequiredMixin, wizard.SessionWizardView):
+class ProjectAddWizard(SuperUserCheckMixin,
+                       LoginPermissionRequiredMixin,
+                       wizard.SessionWizardView):
     permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
 
