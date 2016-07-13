@@ -4192,6 +4192,19 @@ ul.resource-actions > li {
 .content-single .detail .btn-full .btn {
   padding: 10px 12px; }
 
+.content-single .detail .tab-pane .top-btn {
+  margin-top: 0;
+  margin-bottom: 10px;
+  width: 100%;
+  text-align: right;
+  background: #f2f4f7;
+  padding: 10px;
+  position: relative;
+  top: -20px; }
+
+.content-single .detail .tab-pane .top-btn .btn-group {
+  margin-bottom: 0; }
+
 #project-map h2 {
   padding-bottom: 0; }
 
@@ -5482,6 +5495,9 @@ textarea.form-control {
 
 /* =Table for sort and filter
 -------------------------------------------------------------- */
+.dataTables_wrapper {
+  clear: both; }
+
 @media (max-width: 991px) {
   .dataTables_wrapper .col-sm-6 {
     width: 50% !important;
@@ -5674,7 +5690,8 @@ img.org-logo, img#org-logo {
   .top-btn .btn-rt {
     min-width: 20px; }
 
-button#add-contact {
+button#add-contact,
+button#add_btn {
   padding: 0; }
 
 .btn-full {
@@ -5756,6 +5773,16 @@ button#add-contact {
   font-family: 'Roboto Condensed', sans-serif;
   text-transform: uppercase; }
 
+.modal h4.step {
+  font-family: 'Roboto Condensed', sans-serif;
+  text-transform: uppercase;
+  opacity: 0.8;
+  font-weight: 300;
+  letter-spacing: 0;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: solid 1px #d9dadb; }
+
 .modal .modal-body {
   max-height: calc(100vh - 200px);
   overflow-y: auto;
@@ -5771,7 +5798,7 @@ button#add-contact {
   .modal .modal-footer .btn {
     min-width: 100px; }
 
-.modal button#add-contact {
+.modal button#add-contact, .modal button#add_btn {
   background: transparent;
   color: #2e51a3 !important;
   border: 0;
