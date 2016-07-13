@@ -8,6 +8,13 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 DEFAULT_FILE_STORAGE = 'buckets.storage.S3Storage'
 
+AWS = {
+  'BUCKET': os.environ['S3_BUCKET'],
+  'ACCESS_KEY': os.environ['S3_ACCESS_KEY'],
+  'SECRET_KEY': os.environ['S3_SECRET_KEY'],
+  'REGION': 'us-west-2'
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
@@ -37,6 +44,9 @@ ROOT_URLCONF = 'config.urls.production'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = '/opt/cadasta/cadasta-platform/cadasta/media/'
 
 # Debug logging...
 LOGGING = {

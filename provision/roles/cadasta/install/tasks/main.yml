@@ -28,7 +28,10 @@
       SECRET_KEY="{{ secret_key }}"
       EMAIL_HOST_USER="{{ email_host_user }}"
       EMAIL_HOST_PASSWORD="{{ email_host_password }}"
-      DJANGO_SETTINGS_MODULE={{ django_settings }}
+      S3_BUCKET="{{ s3_bucket }}"
+      S3_ACCESS_KEY="{{ s3_access_key }}"
+      S3_SECRET_KEY="{{ s3_secret_key }}"
+      DJANGO_SETTINGS_MODULE="{{ django_settings }}"
 
 - name: Enable environment variables for SSH
   become: yes
@@ -46,6 +49,9 @@
       Defaults	env_keep += EMAIL_HOST_USER
       Defaults	env_keep += EMAIL_HOST_PASSWORD
       Defaults	env_keep += DJANGO_SETTINGS_MODULE
+      Defaults  env_keep += S3_BUCKET
+      Defaults  env_keep += S3_ACCESS_KEY
+      Defaults  env_keep += S3_SECRET_KEY
 
 # This is VERY ugly.  The problem is that Ansible keeps SSH
 # connections open across tasks, so the environment variable changes
