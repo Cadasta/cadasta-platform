@@ -49,14 +49,21 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
         survey = data[list(data.keys())[0]]
         model_helper = ModelHelper()
         create_models = model_helper.add_data_to_models(survey)
+        location_photo = None
+        party_photo = None
+        for key in survey:
+            if key == 'location_photo':
+                location_photo = survey[key]
+            elif key == 'party_photo':
+                party_photo = survey[key]
 
         return {
                 'message': _("Successful submission."),
                 'formid': list(data.keys())[0],
                 'instanceID': survey['meta']['instanceID'],
                 'project': create_models['project'],
-                'location_photo': survey['location_photo'],
+                'location_photo': location_photo,
                 'location': create_models['location'].id,
-                'party_photo': survey['party_photo'],
+                'party_photo': party_photo,
                 'party': create_models['party'].id
             }
