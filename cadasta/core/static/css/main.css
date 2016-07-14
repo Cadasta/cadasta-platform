@@ -3739,15 +3739,14 @@ table th[class*="col-"] {
 
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
-.tinted-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
+body.tinted-bg {
   height: 100%;
   width: 100%;
-  z-index: 1;
   background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
-  background-size: cover; }
+  background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  -webkit-background-size: cover; }
 
 .form-narrow {
   margin: 0 auto;
@@ -5343,6 +5342,11 @@ header {
   #organization-single #page-content {
     position: relative;
     top: 0; } }
+
+/* =Main container
+-------------------------------------------------------------- */
+main.container-fluid {
+  padding-bottom: 50px; }
 
 /* =Main content to right of sidebar
 -------------------------------------------------------------- */

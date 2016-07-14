@@ -1,15 +1,12 @@
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
 
-.tinted-bg { // photo for login and register forms
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 1;
-    background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
-    background-size: cover;
+body.tinted-bg { // photo for login and register forms
+  background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
+  background-size: cover; 
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  -webkit-background-size: cover;
 }
 
 .form-narrow {

@@ -582,6 +582,13 @@ header {
   }
 }
 
+/* =Main container
+-------------------------------------------------------------- */
+
+main.container-fluid {
+  padding-bottom: 50px; // for footer
+}
+
 /* =Main content to right of sidebar
 -------------------------------------------------------------- */
 
