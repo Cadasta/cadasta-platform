@@ -70,7 +70,7 @@ body, #cadasta {
   height: 100%;
   min-height: 100%;
   margin: 0;
-  overflow: scroll;
+  overflow: auto;
 }
 
 #cadasta {
@@ -259,10 +259,11 @@ header {
   }
 }
 
+#dashboard .header,
 #project-single .header,
 #project-wizard .header,
 #organization-single .header { 
-  position: absolute;
+  position: fixed;
 }
 
 /* =User links & links in registration
@@ -617,11 +618,12 @@ main.container-fluid {
   padding: 0;
   overflow: hidden;
   overflow-y: scroll;
+  height: 100%;
+  height: -webkit-calc(100% - 30px);
+  height: -moz-calc(100% - 30px);
+  height: calc(100% - 30px);
   > .row { // for map to expand need height
     height: 100%;
-    height: -webkit-calc(100% - 30px);
-    height: -moz-calc(100% - 30px);
-    height: calc(100% - 30px);
     margin-right: 0;
   }
   h2 {
@@ -676,7 +678,7 @@ main.container-fluid {
     margin: 0 auto;
     padding: 24px;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
     -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -753,6 +755,10 @@ main.container-fluid {
       border-bottom-color: transparent;
     }
   }
+}
+
+body.map .content-single {
+  overflow-y: hidden;
 }
 
 @media (max-width: $screen-sm-max) {
@@ -904,6 +910,11 @@ table.table-location { // location details in map area
   }
 }
 
+table#select-list {
+  border-bottom-width: 1px;
+  margin-bottom: 0;
+}
+
 @media (max-width: $screen-sm-max) {
   table {
     overflow-x: auto;
@@ -919,7 +930,8 @@ div.org-logo {
 }
 
 .org-text {
-  margin-left: 160px;
+  // margin-left: 160px; adjusted until upload field is added
+  margin-left: 0;
 }
 
 .member-pic {
@@ -978,6 +990,10 @@ div.org-logo {
 img.org-logo, img#org-logo {
   max-width: 120px;
   max-height: 50px;
+}
+
+#organizations .table div.org-logo {
+  display: none; // hidden until upload field is added
 }
 
 @media (max-width: $screen-xs-max) {
@@ -1043,7 +1059,7 @@ img.org-logo, img#org-logo {
 }
 
 button#add-contact,
-button#add_btn { // below contacts table and party table
+button#add-party { // below contacts table and party table
   padding: 0;
 }
 
@@ -1067,6 +1083,18 @@ button#add_btn { // below contacts table and party table
   &:hover {
     background-color: darken($btn-primary-bg, 5%);
   }
+}
+
+div.add-btn-btm { // add party link at bottom of table 
+  padding: 10px 24px;
+  text-align: left;
+  border-bottom: 3px solid $table-border-color;
+  margin-bottom: 20px;
+}
+
+#new-item {
+  background: $body-bg;
+  padding: 20px 20px 0 20px;
 }
 
 .more-menu {
@@ -1168,7 +1196,7 @@ button#add_btn { // below contacts table and party table
       min-width: 100px;
     }
   }
-  button#add-contact, button#add_btn {
+  button#add-contact, button#add-party {
     background: transparent;
     color: $link-color !important;
     border: 0;
@@ -1205,4 +1233,4 @@ ul.errorlist {
   display: block;
   text-transform: uppercase;
   padding-bottom: 2px;
- } 
+}

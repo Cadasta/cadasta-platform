@@ -37,9 +37,9 @@ class NewEntityWidget(HiddenInput):
 
     def render(self, name, value, attrs={}):
         html = (
-            '<button class="btn btn-block btn-primary"'
-            '        id="add_btn" type="button">Add new party</button>'
-            '<input id="new_enitity_field" type="hidden"'
+            '<button class="btn btn-link"'
+            '        id="add-party" type="button">Add party</button>'
+            '<input id="new_entity_field" type="hidden"'
             '       name="{name}" value="{value}">'
         )
 

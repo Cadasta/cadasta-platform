@@ -3740,8 +3740,6 @@ table th[class*="col-"] {
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
 body.tinted-bg {
-  height: 100%;
-  width: 100%;
   background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
   background-size: cover;
   -moz-background-size: cover;
@@ -4326,7 +4324,7 @@ body, #cadasta {
   height: 100%;
   min-height: 100%;
   margin: 0;
-  overflow: scroll; }
+  overflow: auto; }
 
 #cadasta {
   display: table;
@@ -4716,10 +4714,11 @@ header {
   #users .nav .dropdown-menu > li.users > a {
     background: #edaa00; }
 
+#dashboard .header,
 #project-single .header,
 #project-wizard .header,
 #organization-single .header {
-  position: absolute; }
+  position: fixed; }
 
 /* =User links & links in registration
 -------------------------------------------------------------- */
@@ -5371,12 +5370,13 @@ main.container-fluid {
   z-index: 900;
   padding: 0;
   overflow: hidden;
-  overflow-y: scroll; }
+  overflow-y: scroll;
+  height: 100%;
+  height: -webkit-calc(100% - 30px);
+  height: -moz-calc(100% - 30px);
+  height: calc(100% - 30px); }
   .content-single > .row {
     height: 100%;
-    height: -webkit-calc(100% - 30px);
-    height: -moz-calc(100% - 30px);
-    height: calc(100% - 30px);
     margin-right: 0; }
   .content-single h2 {
     color: #0e305e;
@@ -5420,7 +5420,7 @@ main.container-fluid {
     margin: 0 auto;
     padding: 24px;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
     -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
@@ -5474,6 +5474,9 @@ main.container-fluid {
   .content-single .detail .nav-tabs li.active > a, .content-single .detail .nav-tabs li.active > a:hover, .content-single .detail .nav-tabs li.active > a:focus {
     border-color: #e7e8ea;
     border-bottom-color: transparent; }
+
+body.map .content-single {
+  overflow-y: hidden; }
 
 @media (max-width: 991px) {
   .content-single {
@@ -5586,6 +5589,10 @@ table.table-location {
     text-transform: uppercase;
     font-size: 12px; }
 
+table#select-list {
+  border-bottom-width: 1px;
+  margin-bottom: 0; }
+
 @media (max-width: 991px) {
   table {
     overflow-x: auto; } }
@@ -5597,7 +5604,7 @@ div.org-logo {
   padding: 10px; }
 
 .org-text {
-  margin-left: 160px; }
+  margin-left: 0; }
 
 .member-pic {
   padding-bottom: 12px; }
@@ -5647,6 +5654,9 @@ img.org-logo, img#org-logo {
   max-width: 120px;
   max-height: 50px; }
 
+#organizations .table div.org-logo {
+  display: none; }
+
 @media (max-width: 767px) {
   img.org-logo, img#org-logo {
     max-width: 80px;
@@ -5695,7 +5705,7 @@ img.org-logo, img#org-logo {
     min-width: 20px; }
 
 button#add-contact,
-button#add_btn {
+button#add-party {
   padding: 0; }
 
 .btn-full {
@@ -5713,6 +5723,16 @@ button#add_btn {
 
 .btn-primary:hover {
   background-color: #009975; }
+
+div.add-btn-btm {
+  padding: 10px 24px;
+  text-align: left;
+  border-bottom: 3px solid #e7e8ea;
+  margin-bottom: 20px; }
+
+#new-item {
+  background: #f2f4f7;
+  padding: 20px 20px 0 20px; }
 
 .more-menu {
   float: left;
@@ -5802,7 +5822,7 @@ button#add_btn {
   .modal .modal-footer .btn {
     min-width: 100px; }
 
-.modal button#add-contact, .modal button#add_btn {
+.modal button#add-contact, .modal button#add-party {
   background: transparent;
   color: #2e51a3 !important;
   border: 0;

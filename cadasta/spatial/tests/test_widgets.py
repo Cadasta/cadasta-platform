@@ -25,9 +25,9 @@ class NewEntityWidgetTest(TestCase):
     def test_render_value(self):
         widget = NewEntityWidget()
         expected = (
-            '<button class="btn btn-block btn-primary"'
-            '        id="add_btn" type="button">Add new party</button>'
-            '<input id="new_enitity_field" type="hidden"'
+            '<button class="btn btn-link"'
+            '        id="add-party" type="button">Add party</button>'
+            '<input id="new_entity_field" type="hidden"'
             '       name="name" value="value">'
         )
         rendered = widget.render(name='name', value='value')
@@ -36,9 +36,9 @@ class NewEntityWidgetTest(TestCase):
     def test_render_no_value(self):
         widget = NewEntityWidget()
         expected = (
-            '<button class="btn btn-block btn-primary"'
-            '        id="add_btn" type="button">Add new party</button>'
-            '<input id="new_enitity_field" type="hidden"'
+            '<button class="btn btn-link"'
+            '        id="add-party" type="button">Add party</button>'
+            '<input id="new_entity_field" type="hidden"'
             '       name="name" value="">'
         )
         rendered = widget.render(name='name', value=None)

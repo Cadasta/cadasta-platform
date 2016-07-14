@@ -1,5 +1,5 @@
-$('button#add_btn').click(function() {
-  $('table#select-list').toggleClass('hidden');
+$('button#add-party').click(function() {
+  $('div#select-party').toggleClass('hidden');
   $('div#new-item').toggleClass('hidden');
 });
 
