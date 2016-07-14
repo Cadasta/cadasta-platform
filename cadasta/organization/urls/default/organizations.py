@@ -79,11 +79,11 @@ urlpatterns = [
         default.OrganizationMembersAdd.as_view(),
         name='members_add'),
     url(
-        r'^(?P<slug>[-\w]+)/members/(?P<username>[-\w]+)/$',
+        r'^(?P<slug>[-\w]+)/members/(?P<username>[-@+.\w]+)/$',
         default.OrganizationMembersEdit.as_view(),
         name='members_edit'),
     url(
-        r'^(?P<slug>[-\w]+)/members/(?P<username>[-\w]+)/remove/$',
+        r'^(?P<slug>[-\w]+)/members/(?P<username>[-@+.\w]+)/remove/$',
         default.OrganizationMembersRemove.as_view(),
         name='members_remove'),
 ]

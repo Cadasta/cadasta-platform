@@ -70,9 +70,17 @@ class UserUrlsTest(TestCase):
         url = reverse('user:activate', kwargs={'user': 'user-name'})
         assert (url == '/users/user-name/activate/')
 
+        url = reverse('user:activate', kwargs={'user': 'user-name-with-+@.'})
+        assert (url == '/users/user-name-with-+@./activate/')
+
         resolved = resolve('/users/user-name/activate/')
         assert resolved.func.__name__ == default.UserActivation.__name__
         assert resolved.kwargs['user'] == 'user-name'
+        assert resolved.func.view_initkwargs['new_state'] is True
+
+        resolved = resolve('/users/user-name-with-+@./activate/')
+        assert resolved.func.__name__ == default.UserActivation.__name__
+        assert resolved.kwargs['user'] == 'user-name-with-+@.'
         assert resolved.func.view_initkwargs['new_state'] is True
 
     def test_user_deactivate(self):
@@ -205,11 +213,25 @@ class OrganizationMembersUrlsTest(TestCase):
         )
         assert url == '/organizations/org-slug/members/some-user/'
 
+        url = reverse(
+            'organization:members_edit',
+            kwargs={'slug': 'org-slug', 'username': 'some-user-with-+@.'}
+        )
+        assert url == '/organizations/org-slug/members/some-user-with-+@./'
+
         resolved = resolve('/organizations/org-slug/members/some-user/')
         assert (resolved.func.__name__ ==
                 default.OrganizationMembersEdit.__name__)
         assert resolved.kwargs['slug'] == 'org-slug'
         assert resolved.kwargs['username'] == 'some-user'
+
+        resolved = resolve(
+            '/organizations/org-slug/members/some-user-with-+@./'
+        )
+        assert (resolved.func.__name__ ==
+                default.OrganizationMembersEdit.__name__)
+        assert resolved.kwargs['slug'] == 'org-slug'
+        assert resolved.kwargs['username'] == 'some-user-with-+@.'
 
     def test_member_remove(self):
         url = reverse(
@@ -218,8 +240,23 @@ class OrganizationMembersUrlsTest(TestCase):
         )
         assert url == '/organizations/org-slug/members/some-user/remove/'
 
+        url = reverse(
+            'organization:members_remove',
+            kwargs={'slug': 'org-slug', 'username': 'some-user-with-+@.'}
+        )
+        assert (url ==
+                '/organizations/org-slug/members/some-user-with-+@./remove/')
+
         resolved = resolve('/organizations/org-slug/members/some-user/remove/')
         assert (resolved.func.__name__ ==
                 default.OrganizationMembersRemove.__name__)
         assert resolved.kwargs['slug'] == 'org-slug'
         assert resolved.kwargs['username'] == 'some-user'
+
+        resolved = resolve(
+            '/organizations/org-slug/members/some-user-with-+@./remove/'
+        )
+        assert (resolved.func.__name__ ==
+                default.OrganizationMembersRemove.__name__)
+        assert resolved.kwargs['slug'] == 'org-slug'
+        assert resolved.kwargs['username'] == 'some-user-with-+@.'
