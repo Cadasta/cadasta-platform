@@ -36,12 +36,24 @@ class OrganizationUrlTest(TestCase):
                         kwargs={'slug': 'org-slug', 'username': 'n_smith'}) ==
                 version_url('/organizations/org-slug/users/n_smith/'))
 
+        assert (reverse(version_ns('organization:users_detail'),
+                        kwargs={'slug': 'org-slug',
+                                'username': 'n_smith-@+.'}) ==
+                version_url('/organizations/org-slug/users/n_smith-@+./'))
+
         resolved = resolve(
             version_url('/organizations/org-slug/users/n_smith/'))
 
         assert resolved.func.__name__ == api.OrganizationUsersDetail.__name__
         assert resolved.kwargs['slug'] == 'org-slug'
         assert resolved.kwargs['username'] == 'n_smith'
+
+        resolved = resolve(
+            version_url('/organizations/org-slug/users/n_smith-@+./'))
+
+        assert resolved.func.__name__ == api.OrganizationUsersDetail.__name__
+        assert resolved.kwargs['slug'] == 'org-slug'
+        assert resolved.kwargs['username'] == 'n_smith-@+.'
 
 
 class ProjectUrlTest(TestCase):
@@ -96,9 +108,26 @@ class ProjectUrlTest(TestCase):
             '/organizations/habitat/projects/123abc/users/barbara/')
         assert actual == expected
 
+        actual = reverse(
+            version_ns('organization:project_users_detail'),
+            kwargs={'organization': 'habitat',
+                    'project': '123abc',
+                    'username': 'barbara-@+.'}
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/users/barbara-@+./')
+        assert actual == expected
+
         resolved = resolve(version_url(
             '/organizations/habitat/projects/123abc/users/barbara/'))
         assert resolved.func.__name__ == api.ProjectUsersDetail.__name__
         assert resolved.kwargs['organization'] == 'habitat'
         assert resolved.kwargs['project'] == '123abc'
         assert resolved.kwargs['username'] == 'barbara'
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/users/barbara-@+./'))
+        assert resolved.func.__name__ == api.ProjectUsersDetail.__name__
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['username'] == 'barbara-@+.'
