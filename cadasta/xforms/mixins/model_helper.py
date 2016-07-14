@@ -30,7 +30,7 @@ class ModelHelper():
             project=project,
             name=data['party_name'],
             type=data['party_type'],
-            attributes=self.get_party_attributes(data)
+            attributes=self.get_attributes(data, 'party')
         )
         return party
 
@@ -42,7 +42,7 @@ class ModelHelper():
             type=data['location_type'],
             geometry=self._format_geometry(
                 data['location_geometry'], geoshape),
-            attributes=data['location_attributes']
+            attributes=self.get_attributes(data, 'location')
         )
         return location
 
@@ -53,7 +53,7 @@ class ModelHelper():
             spatial_unit=location,
             tenure_type=TenureRelationshipType.objects.get(
                             id=data['tenure_type']),
-            attributes=data['tenure_relationship_attributes']
+            attributes=self.get_attributes(data, 'tenure_relationship')
         )
 
     def add_data_to_resource(self, data, user, project, content_object=None):
@@ -101,15 +101,28 @@ class ModelHelper():
         try:
             return Questionnaire.objects.get(name=data)
         except Questionnaire.DoesNotExist:
-            raise ValidationError('Questionnaire not found.')
+            try:
+                return Questionnaire.objects.get(id_string=data)
+            except Questionnaire.DoesNotExist:
+                raise ValidationError('Questionnaire not found.')
 
-    def get_party_attributes(self, data):
-        party_attributes = {}
+    def get_attributes(self, data, model_type):
+        """
+        Used to combine all possible attribute groups together
+        based on model type.
+
+        location_attributes_default = {'name': 'whatever'}
+        location_attributes_individual = {'foo': 'bar'}
+
+        returned:
+            attributes = {'name':'whatever', 'foo':'bar'}
+        """
+        attributes = {}
         for key in data:
-            if 'party_attributes' in key:
-                for attribute in data[key]:
-                    party_attributes[attribute] = data[key][attribute]
-        return party_attributes
+            if '{}_attributes'.format(model_type) in key:
+                for item in data[key]:
+                    attributes[item] = data[key][item]
+        return attributes
 
     # ~~~~~~~~~~~~~~~
     # Adding location<->location and party<->party relationship's later
