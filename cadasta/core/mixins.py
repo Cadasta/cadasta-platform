@@ -11,7 +11,8 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         msg = super().handle_no_permission()
         messages.add_message(self.request, messages.WARNING,
                              msg[0] if len(msg) > 0 and len(msg[0]) > 0
-                             else _("PERMISSION DENIED"))
+                             else _("You don't have permission "
+                                    "for this action."))
 
         referer = self.request.META.get('HTTP_REFERER')
         redirect_url = self.request.META.get('HTTP_REFERER', '/')
