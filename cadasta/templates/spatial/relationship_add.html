@@ -11,7 +11,7 @@
 {% block form_modal %}
 <div class="modal-backdrop">
   <div class="modal show" data-backdrop="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST">
           <div class="modal-header">
@@ -24,49 +24,59 @@
           <div class="modal-body">
             {% csrf_token %}
 
-            {% render_field form.id class+="form-control input-lg" %}
+            <h4 class="step">{% trans "1. Connected party" %}</h4>
+            <div id="select-party" class="clearfix">
+              <label>Choose a party to connect to this location</label>
+              {% render_field form.id class+="form-control" %}
+              <div class="add-btn-btm clearfix">
+                {% render_field form.new_entity class+="form-control" %}
+              </div>
+            </div>
 
-            {% render_field form.new_entity class+="form-control input-lg" %}
+            <div id="new-item" class="clearfix{% if not form.new_entity.value %} hidden{% endif %}">
 
-            <div id="new-item" {% if not form.new_entity.value %}class="hidden"{% endif %}>
-              <div class="form-group">
-                {{ form.name.errors }}
-                <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-                {% render_field form.name class+="form-control input-lg" %}
+              <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+                <label for="{{ form.name.id_for_label }}">{% trans "Party name" %}</label>
+                <label class="pull-right control-label">{{ form.name.errors }}</label>
+                {% render_field form.name class+="form-control" %}
               </div>
 
-              <div class="form-group">
-                {{ form.party_type.errors }}
-                <label for="{{ form.party_type.id_for_label }}">{% trans "Party Type" %}</label>
-                {% render_field form.party_type class+="form-control input-lg" %}
+              <div class="form-group{% if form.party_type.errors %} has-error{% endif %}">
+                <label for="{{ form.party_type.id_for_label }}">{% trans "Party type" %}</label>
+                <label class="pull-right control-label">{{ form.party_type.errors }}</label>
+                {% render_field form.party_type class+="form-control" %}
               </div>
 
               {% for field in form %}
                 {% if "party::" in field.name %}
-                <div class="form-group">
-                  {{ field.errors }}
-                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                  {% render_field field class+="form-control input-lg" %}
-                </div>
+                  <div class="form-group{% if field.errors %} has-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <label class="pull-right control-label">{{ field.errors }}</label>
+                    {% render_field field class+="form-control" %}
+                  </div>
                 {% endif %}
               {% endfor %}
+
             </div>
 
-            <div class="form-group">
-              {{ form.tenure_type.errors }}
+            <h4 class="step">{% trans "2. Relationship details" %}</h4>
+
+            <div class="form-group{% if form.tenure_type.errors %} has-error{% endif %}">
               <label for="{{ form.tenure_type.id_for_label }}">{% trans "Tenure Type" %}</label>
-              {% render_field form.tenure_type class+="form-control input-lg" %}
+              <label class="pull-right control-label">{{ form.tenure_type.errors }}</label>
+              {% render_field form.tenure_type class+="form-control" %}
             </div>
 
             {% for field in form %}
               {% if "relationship::" in field.name %}
-              <div class="form-group">
-                {{ field.errors }}
+              <div class="form-group{% if field.errors %} has-error{% endif %}">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {% render_field field class+="form-control input-lg" %}
+                <label class="pull-right control-label">{{ field.errors }}</label>
+                {% render_field field class+="form-control" %}
               </div>
               {% endif %}
             {% endfor %}
+
           </div>
 
           <div class="modal-footer">
