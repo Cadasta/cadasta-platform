@@ -7,6 +7,7 @@ from django.contrib.gis import forms as gisforms
 from core.util import slugify
 from django.utils.translation import ugettext as _
 from django.db import transaction
+from django.forms.utils import ErrorDict
 
 from leaflet.forms.widgets import LeafletWidget
 from tutelary.models import Role
@@ -63,6 +64,7 @@ class ContactsForm(forms.Form):
         if self.data.get(self.prefix + '-remove') != 'on':
             super().full_clean()
         else:
+            self._errors = ErrorDict()
             self.cleaned_data = {'remove': True}
 
     def clean(self):
