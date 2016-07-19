@@ -14,7 +14,13 @@ from .widgets import SelectPartyWidget, NewEntityWidget
 
 
 class LocationForm(AttributeModelForm):
-    geometry = gisforms.GeometryField(widget=LeafletWidget())
+    geometry = gisforms.GeometryField(
+        widget=LeafletWidget(),
+        error_messages={
+            'required': _('No map location was provided. Please use the tools '
+                          'provided on the left side of the map to mark your '
+                          'new location.')}
+    )
     attributes_field = 'attributes'
 
     class Meta:
