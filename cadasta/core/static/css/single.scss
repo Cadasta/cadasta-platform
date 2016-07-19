@@ -195,6 +195,24 @@
   }
 }
 
+/* =Stats on overview page
+-------------------------------------------------------------- */
+
+.stats {
+  li {
+    width: 30%;
+    border-right: solid 1px $table-border-color;
+    text-align: center;
+    .num {
+      font-size: 48px;
+      font-weight: 600;
+    }
+    &:last-child {
+      border-right: none;
+    }
+  }
+}
+
 /* =Map location details in right column
 -------------------------------------------------------------- */
 
