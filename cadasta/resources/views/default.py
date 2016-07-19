@@ -1,4 +1,5 @@
-from django.views import generic
+from core.views import generic
+import django.views.generic as base_generic
 from core.views.mixins import ArchiveMixin
 
 from core.mixins import LoginPermissionRequiredMixin
@@ -19,7 +20,7 @@ class ProjectResources(LoginPermissionRequiredMixin,
 
 class ProjectResourcesAdd(LoginPermissionRequiredMixin,
                           ProjectResourceMixin,
-                          generic.edit.FormMixin,
+                          base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'resources/project_add_existing.html'
     form_class = AddResourceFromLibraryForm

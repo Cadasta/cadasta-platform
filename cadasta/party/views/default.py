@@ -1,4 +1,5 @@
-from django.views import generic
+from core.views import generic
+import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
 from jsonattrs.mixins import JsonAttrsMixin
 from core.mixins import LoginPermissionRequiredMixin
@@ -69,7 +70,7 @@ class PartiesDelete(LoginPermissionRequiredMixin,
 
 class PartyResourcesAdd(LoginPermissionRequiredMixin,
                         mixins.PartyResourceMixin,
-                        generic.edit.FormMixin,
+                        base_generic.edit.FormMixin,
                         generic.DetailView):
     template_name = 'party/resources_add.html'
     form_class = AddResourceFromLibraryForm
@@ -137,7 +138,7 @@ class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
 
 class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
                                    mixins.PartyRelationshipResourceMixin,
-                                   generic.edit.FormMixin,
+                                   base_generic.edit.FormMixin,
                                    generic.DetailView):
     template_name = 'party/relationship_resources_add.html'
     form_class = AddResourceFromLibraryForm
