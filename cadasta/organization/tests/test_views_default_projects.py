@@ -530,6 +530,46 @@ class ProjectAddTest(UserTestCase):
 
         assert Questionnaire.objects.filter(project=proj).exists() is False
 
+    def test_full_flow_long_slug(self):
+        project_name = (
+            "Very Long Name For The Purposes of Testing That"
+            " Slug Truncation Functions Correctly"
+        )
+        expected_slug = 'very-long-name-for-the-purposes-of-testing-that-sl'
+        self.client.force_login(self.user)
+        extents_response = self.client.post(
+            reverse('project:add'), self.EXTENTS_POST_DATA
+        )
+        assert extents_response.status_code == 200
+        details_post_data = self.DETAILS_POST_DATA.copy()
+        details_post_data['details-name'] = project_name
+        details_response = self.client.post(
+            reverse('project:add'), details_post_data
+        )
+        assert details_response.status_code == 200
+        permissions_response = self.client.post(
+            reverse('project:add'), self.PERMISSIONS_POST_DATA
+        )
+        assert permissions_response.status_code == 302
+        assert (
+            '/organizations/test-org/projects/{}/'.format(expected_slug)
+            in permissions_response['location']
+        )
+
+        proj = Project.objects.get(organization=self.org, slug=expected_slug)
+        assert proj.slug == expected_slug
+        assert proj.description == 'This is a test project'
+        assert ProjectRole.objects.filter(project=proj).count() == 3
+        for r in ProjectRole.objects.filter(project=proj):
+            if r.user.username == 'org_member_1':
+                assert r.role == 'PM'
+            elif r.user.username == 'org_member_2':
+                assert r.role == 'DC'
+            elif r.user.username == 'org_member_3':
+                assert r.role == 'PU'
+            else:
+                assert False
+
 
 class ProjectEditGeometryTest(UserTestCase):
     post_data = {
