@@ -80,7 +80,7 @@ msgid "Spanish"
 msgstr ""
 
 #: core/mixins.py:13
-msgid "PERMISSION DENIED"
+msgid "You don't have permission for this action."
 msgstr ""
 
 #: core/tests/test_translations.py:11 templates/accounts/profile.html.py:31

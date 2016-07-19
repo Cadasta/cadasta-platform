@@ -179,8 +179,8 @@ class LocationAddTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to add spatial units to this"
-                " project"
+        assert ("You don't have permission to add "
+                "locations to this project."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_get_with_unauthenticated_user(self):
@@ -200,8 +200,8 @@ class LocationAddTest(TestCase):
         response = self.request(method='POST', user=self.unauthorized_user)
         assert SpatialUnit.objects.count() == 0
         assert response.status_code == 302
-        assert ("You don't have permission to add spatial units to this"
-                " project"
+        assert ("You don't have permission to add "
+                "locations to this project."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_post_with_unauthenticated_user(self):
@@ -268,7 +268,7 @@ class LocationDetailTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to view this spatial unit."
+        assert ("You don't have permission to view this location."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_get_with_unauthenticated_user(self):
@@ -349,7 +349,7 @@ class LocationEditTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to update this spatial unit."
+        assert ("You don't have permission to update this location."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_get_with_unauthenticated_user(self):
@@ -369,7 +369,7 @@ class LocationEditTest(TestCase):
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to update this spatial unit."
+        assert ("You don't have permission to update this location."
                 in [str(m) for m in get_messages(self.request)])
         self.location.refresh_from_db()
         assert self.location.type != self.post_data['type']
@@ -433,7 +433,7 @@ class LocationDelete(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to remove this spatial unit."
+        assert ("You don't have permission to remove this location."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_get_with_unauthenticated_user(self):
@@ -452,7 +452,7 @@ class LocationDelete(TestCase):
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to remove this spatial unit."
+        assert ("You don't have permission to remove this location."
                 in [str(m) for m in get_messages(self.request)])
         assert SpatialUnit.objects.count() == 1
         assert TenureRelationship.objects.count() == 1
@@ -522,8 +522,8 @@ class LocationResourceAddTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to add resources to this spatial "
-                "unit"
+        assert ("You don't have permission to "
+                "add resources to this location."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_get_with_unauthenticated_user(self):
@@ -542,8 +542,8 @@ class LocationResourceAddTest(TestCase):
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to add resources to this spatial "
-                "unit"
+        assert ("You don't have permission to "
+                "add resources to this location."
                 in [str(m) for m in get_messages(self.request)])
         assert self.location.resources.count() == 1
         assert self.location.resources.first() == self.assigned
@@ -618,8 +618,8 @@ class LocationResourceNewTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to add resources to this spatial "
-                "unit"
+        assert ("You don't have permission to "
+                "add resources to this location."
                 in [str(m) for m in get_messages(self.request)])
 
     def test_get_with_unauthenticated_user(self):
@@ -637,8 +637,8 @@ class LocationResourceNewTest(TestCase):
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
         assert response.status_code == 302
-        assert ("You don't have permission to add resources to this spatial "
-                "unit"
+        assert ("You don't have permission to "
+                "add resources to this location."
                 in [str(m) for m in get_messages(self.request)])
         assert self.location.resources.count() == 0
 

@@ -5829,6 +5829,9 @@ div.add-btn-btm {
   float: left !important;
   padding: 0; }
 
+.modal .modal-6-12 .col-md-6 {
+  width: 100%; }
+
 /* =Error messaging for forms
 -------------------------------------------------------------- */
 .form-group.has-error {

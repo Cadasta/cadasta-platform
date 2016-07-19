@@ -1203,6 +1203,9 @@ div.add-btn-btm { // add party link at bottom of table
     float: left !important;
     padding: 0;
   }
+  .modal-6-12 .col-md-6 { // widen 6 columns to 12 for resource form
+    width: 100%;
+  }
 }
 
 /* =Error messaging for forms
