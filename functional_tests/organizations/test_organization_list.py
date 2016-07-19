@@ -1,12 +1,9 @@
 from base import FunctionalTest
 from pages.OrganizationList import OrganizationListPage
-from pages.Organization import OrganizationPage
 from pages.Login import LoginPage
 
 from tutelary.models import assign_user_policies, Policy
 from accounts.tests.factories import UserFactory
-from organization.tests.factories import OrganizationFactory
-from organization.models import OrganizationRole
 from core.tests.factories import PolicyFactory
 
 
@@ -15,7 +12,7 @@ class OrganizationListTest(FunctionalTest):
         super().setUp()
         PolicyFactory.load_policies()
         self.add_all_test_data()
-        user = UserFactory.create(
+        UserFactory.create(
             username='wyldstyle',
             password='password')
 

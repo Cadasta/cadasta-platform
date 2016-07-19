@@ -5,7 +5,6 @@ import re
 import os
 import os.path
 import shutil
-import random
 
 from urllib.parse import urlparse
 from selenium import webdriver
@@ -278,9 +277,6 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def xpath(self, tag, contents):
         return "//{}[normalize-space(.)='{}']".format(tag, contents)
-
-    def get_rand_bool(self):
-        return random.randint(0, 1) == 1
 
     def create_superuser(
         self,

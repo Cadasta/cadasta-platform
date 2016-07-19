@@ -1,5 +1,4 @@
 import re
-import time
 
 from .base import Page
 from selenium.webdriver.common.by import By
@@ -88,17 +87,13 @@ class ProjectAddPage(Page):
         return ('AU', 'BR', 'CN', 'US',)
 
     def set_geometry(self, country):
-
-        zoom_in = self.BY_CLASS('leaflet-control-zoom-in')
-        # zoom_in.click()  # Zoom 1
-        time.sleep(0.5)  # Give zoom animation time to settle
-
+        assert country in self.get_available_countries()
         if country == 'AU':
-            self.draw_rectangle(500, 310, 20, 20)
+            self.draw_rectangle(520, 330, 20, 20)
         if country == 'BR':
             self.draw_rectangle(250, 300, 20, 20)
         if country == 'CN':
-            self.draw_rectangle(450, 220, 20, 20)
+            self.draw_rectangle(480, 240, 20, 20)
         if country == 'US':
             self.draw_rectangle(170, 220, 20, 20)
 

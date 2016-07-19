@@ -1,5 +1,3 @@
-import random
-
 from base import FunctionalTest
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
@@ -59,7 +57,7 @@ class ProjectListAccessTest(FunctionalTest):
     def test_nonsuperuser(self):
         """Verify that a non-superuser can access the project list page."""
 
-        uid = random.randint(1, 9)
+        uid = 5
         LoginPage(self).login(
             self.test_data['users'][uid]['username'],
             self.test_data['users'][uid]['password'],

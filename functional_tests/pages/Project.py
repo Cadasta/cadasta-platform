@@ -23,13 +23,6 @@ class ProjectPage(Page):
         self.browser.get(self.url)
         return self
 
-    # def get_org_logo(self):
-    #     try:
-    #         url = self.BY_CSS('.org-logo img').get_attribute('src')
-    #     except NoSuchElementException:
-    #         url = ''
-    #     return url
-
     def get_org_name(self):
         return self.BY_CSS('.org-name').text
 
@@ -47,6 +40,5 @@ class ProjectPage(Page):
         based on the supplied test data for a project."""
 
         assert self.get_org_name() == target_project['_org_name']
-        # assert self.get_org_logo() == target_project['_org_logo']
         assert self.get_project_name() == target_project['name'].upper()
         assert self.get_project_description() == target_project['description']
