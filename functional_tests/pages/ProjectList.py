@@ -57,10 +57,7 @@ class ProjectListPage(Page):
             actual_project_description = (
                 cells[0].find_element_by_tag_name('p').text
             )
-            # Disabled for the moment because of problems with drawing
-            # geometry for tests.
-            #
-            # actual_country = cells[2].text
+            actual_country = cells[2].text
 
             target_project = None
             for project in projects:
@@ -79,13 +76,10 @@ class ProjectListPage(Page):
             assert actual_org_logo == expected_org_logo
             assert actual_project_name == target_project['name']
             assert actual_project_description == target_project['description']
-            # Disabled for the moment because of problems with drawing
-            # geometry for tests.
-            #
-            # expected_country = (
-            #     dict(countries)[target_project['country']]
-            #     if target_project['country'] else ''
-            # )
-            # assert actual_country == expected_country
+            expected_country = (
+                dict(countries)[target_project['country']]
+                if target_project['country'] else ''
+            )
+            assert actual_country == expected_country
 
             # TODO Check also last updated column

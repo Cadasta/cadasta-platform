@@ -1,10 +1,4 @@
-import random
-
-
 def get_test_data():
-
-    def get_rand_bool():
-        return random.randrange(2) == 1
 
     test_data = {}
 
@@ -53,11 +47,8 @@ def get_test_data():
         {
             'name': "Project Gutenberg",
             'slug': 'project-gutenberg',
-            'description': (
-                "Public project of UNESCO."
-                if get_rand_bool() else ''
-            ),
-            'country': ('PH' if get_rand_bool() else ''),
+            'description': "Public project of UNESCO.",
+            'country': 'DE',
             'access': 'public',
             '_org': 0,
             '_managers': (2, 3),
@@ -65,11 +56,8 @@ def get_test_data():
         {
             'name': "Wikipedia",
             'slug': 'wikipedia',
-            'description': (
-                "Private project of UNESCO."
-                if get_rand_bool() else ''
-            ),
-            'country': ('AT' if get_rand_bool() else ''),
+            'description': '',
+            'country': 'AT',
             'access': 'private',
             '_org': 0,
             '_managers': (4,),
@@ -77,24 +65,18 @@ def get_test_data():
         {
             'name': "OpenStreetMap",
             'slug': 'openstreetmap',
-            'description': (
-                "Public project of UNICEF."
-                if get_rand_bool() else ''
-            ),
-            'country': ('DE' if get_rand_bool() else ''),
-            'access': 'public',
+            'description': "Private project of UNICEF.",
+            'country': '',
+            'access': 'private',
             '_org': 1,
             '_managers': (6, 7),
         },
         {
             'name': "Linux Kernel",
             'slug': 'linux-kernel',
-            'description': (
-                "Private project of UNICEF."
-                if get_rand_bool() else ''
-            ),
-            'country': ('KE' if get_rand_bool() else ''),
-            'access': 'private',
+            'description': "",
+            'country': '',
+            'access': 'public',
             '_org': 1,
             '_managers': (8,),
         },

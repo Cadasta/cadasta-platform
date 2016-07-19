@@ -1,4 +1,3 @@
-import random
 import geography.load
 
 from base import FunctionalTest
@@ -137,9 +136,8 @@ class ProjectAddTest(FunctionalTest):
         assert proj_add_page.is_on_page()
         assert proj_add_page.is_on_subpage('geometry')
 
-        # Select random country, then set and submit geometry
-        countries = proj_add_page.get_available_countries()
-        project['country'] = random.choice(countries)
+        # Select country and submit geometry
+        project['country'] = 'AU' if access == 'public' else 'BR'
         proj_add_page.set_geometry(project['country'])
         proj_add_page.submit_geometry()
 
