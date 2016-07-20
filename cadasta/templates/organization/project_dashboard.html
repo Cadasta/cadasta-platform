@@ -55,23 +55,29 @@
         <div class="divider-thick"></div>
         {% if has_content %}
           <h3 style="text-transform: capitalize;">{% trans "Summary" %}</h3>
-          <p>
-          {% blocktrans count counter=num_locations %}
-          This project currently has {{ counter }} location,
-          {% plural %}
-          This project currently has {{ counter }} locations,
-          {% endblocktrans %}
-          {% blocktrans count counter=num_parties %}
-          {{ counter }} party, and
-          {% plural %}
-          {{ counter }} parties, and
-          {% endblocktrans %}
-          {% blocktrans count counter=num_resources %}
-          {{ counter }} resource.
-          {% plural %}
-          {{ counter }} resources.
-          {% endblocktrans %}
-          </p>
+          <ul class="list-inline stats">
+            <li>
+              {% blocktrans count counter=num_locations %}
+              <div class="num">{{ counter }}</div> location
+              {% plural %}
+              <div class="num">{{ counter }}</div> locations
+              {% endblocktrans %}
+            </li>
+            <li>
+              {% blocktrans count counter=num_parties %}
+              <div class="num">{{ counter }}</div> party
+              {% plural %}
+              <div class="num">{{ counter }}</div> parties
+              {% endblocktrans %}
+            </li>
+            <li>
+              {% blocktrans count counter=num_resources %}
+              <div class="num">{{ counter }}</div> resource
+              {% plural %}
+              <div class="num">{{ counter }}</div> resources
+              {% endblocktrans %}
+            </li>
+          </ul>
         {% else %}
           <!-- Starter text -->
           <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3> 

@@ -4172,6 +4172,18 @@ ul.resource-actions > li {
         #sidebar .nav-sidebar > li a .title {
           display: none; } }
 
+/* =Stats on overview page
+-------------------------------------------------------------- */
+.stats li {
+  width: 30%;
+  border-right: solid 1px #e7e8ea;
+  text-align: center; }
+  .stats li .num {
+    font-size: 48px;
+    font-weight: 600; }
+  .stats li:last-child {
+    border-right: none; }
+
 /* =Map location details in right column
 -------------------------------------------------------------- */
 .content-single .detail h2 {
@@ -5090,6 +5102,16 @@ header {
   .page-title h1, .page-title h2, h1, h2 {
     font-size: 1.8em; } }
 
+@media (min-width: 992px) {
+  .page-header .page-title h1, .page-header .page-title h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; }
+    .page-header .page-title h1:hover, .page-header .page-title h2:hover {
+      overflow: visible;
+      white-space: normal;
+      background-color: #0e305e; } }
+
 /* =Page header single project or organizations
 -------------------------------------------------------------- */
 #project-single .page-header,
@@ -5119,8 +5141,8 @@ header {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: 0;
-    position: relative;
-    top: -8px;
+    position: absolute;
+    top: 55px;
     display: inline-block; }
     #project-single .page-header .index-link:hover, #project-single .page-header .index-link:focus,
     #organization-single .page-header .index-link:hover,
@@ -5248,7 +5270,7 @@ header {
   #project-single .page-header h1, #project-single .page-header h2,
   #organization-single .page-header h1,
   #organization-single .page-header h2 {
-    margin-left: 14px; }
+    margin-left: 54px; }
   #project-single .page-header .top-btn,
   #organization-single .page-header .top-btn {
     margin-top: 18px; }
@@ -5273,6 +5295,10 @@ header {
     #project-single .page-header .more-menu,
     #organization-single .page-header .more-menu {
       width: 36px; }
+    #project-single .page-header h1, #project-single .page-header h2,
+    #organization-single .page-header h1,
+    #organization-single .page-header h2 {
+      margin-left: 14px; }
   #organization-single .page-header {
     padding-top: 18px; } }
 
