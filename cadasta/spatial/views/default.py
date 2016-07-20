@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from core.mixins import LoginPermissionRequiredMixin
 
 from resources.forms import AddResourceFromLibraryForm
-from party.models import TenureRelationship
 from party.messages import TENURE_REL_CREATE
 from . import mixins
 from .. import forms
@@ -64,15 +63,6 @@ class LocationDetail(LoginPermissionRequiredMixin,
     permission_required = 'spatial.view'
     permission_denied_message = error_messages.SPATIAL_VIEW
     attributes_field = 'attributes'
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['relationships'] = TenureRelationship.objects.filter(
-            spatial_unit=context['location'])
-        num_relationships = TenureRelationship.objects.filter(
-            spatial_unit=context['location']).count()
-        context['has_relationships'] = (num_relationships > 0)
-        return context
 
 
 class LocationEdit(LoginPermissionRequiredMixin,

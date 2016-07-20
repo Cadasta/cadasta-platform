@@ -51,7 +51,7 @@
 
   <!-- Relationship tab -->
   <div role="tabpanel" class="tab-pane" id="relationships">
-    {% if has_relationships %}
+    {% if location.tenurerelationship_set.all %}
       <div class="top-btn">
         <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary btn-sm">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
@@ -66,7 +66,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for rel in relationships %}
+          {% for rel in location.tenurerelationship_set.all %}
           <tr class="linked" onclick="window.document.location='{% url 'parties:relationship_detail' object.organization.slug object.slug rel.id %}';">
             <td>{{ rel.tenure_type.label }}</td>
             <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
@@ -90,28 +90,35 @@
 
   <!-- Resources tab -->
   <div role="tabpanel" class="tab-pane" id="resources">
-    <div class="top-btn">
-      <div class="btn-group btn-group-justified">
-        <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-          {% trans "Add from library" %}
-        </a>
-        <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
-          <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> 
-          {% trans "Upload new resource" %}
-        </a>
-      </div>
-    </div>
-    {% include 'resources/table_sm.html' with object_list=location.resources %}
-    <!--
-      <div>
-        <p>{% trans "This location does not have any connected resources. To add a resource, selection from the options below." %}</p>
-        <div class="btn-full btn-group btn-group-justified">
-          <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">{% trans "Add from library" %}</a>
-          <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">{% trans "Upload new resource" %}</a>
+    {% if location.resources %}
+      <div class="top-btn">
+        <div class="btn-group btn-group-justified">
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            {% trans "Add from library" %}
+          </a>
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+            {% trans "Upload new resource" %}
+          </a>
         </div>
       </div>
-    -->
+      {% include 'resources/table_sm.html' with object_list=location.resources %}
+    {% else %}
+      <div>
+        <p>{% trans "This location does not have any connected resources. To add a resource, select from the options below." %}</p>
+        <div class="btn-group btn-group-justified">
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            {% trans "Add from library" %}
+          </a>
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+            {% trans "Upload new resource" %}
+          </a>
+        </div>
+      </div>
+    {% endif %}
   </div>
   <!-- /resources tab -->
 
