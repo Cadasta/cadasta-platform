@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from core.mixins import LoginPermissionRequiredMixin
 
 from resources.forms import AddResourceFromLibraryForm
-from party.models import TenureRelationship
 from party.messages import TENURE_REL_CREATE
 from . import mixins
 from .. import forms
@@ -67,11 +66,9 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['relationships'] = TenureRelationship.objects.filter(
-            spatial_unit=context['location'])
-        num_relationships = TenureRelationship.objects.filter(
-            spatial_unit=context['location']).count()
-        context['has_relationships'] = (num_relationships > 0)
+        context['relationships'] = (
+            context['location'].tenurerelationship_set.all()
+        )
         return context
 
 

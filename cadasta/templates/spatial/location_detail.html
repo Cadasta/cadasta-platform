@@ -51,10 +51,10 @@
 
   <!-- Relationship tab -->
   <div role="tabpanel" class="tab-pane" id="relationships">
-    {% if has_relationships %}
+    {% if relationships %}
       <div class="top-btn">
         <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary btn-sm">
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
         {% trans "Add relationship" %}
         </a>
       </div>
@@ -79,7 +79,7 @@
         <p>{% trans "This location does not have any relationships and is not connected to any parties. To add your first relationship, select the button below." %}</p>
         <div class="btn-full">
           <a href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}" class="btn btn-primary">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
           {% trans "Add relationship" %}
           </a>
         </div>
@@ -90,28 +90,35 @@
 
   <!-- Resources tab -->
   <div role="tabpanel" class="tab-pane" id="resources">
-    <div class="top-btn">
-      <div class="btn-group btn-group-justified">
-        <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-          {% trans "Add from library" %}
-        </a>
-        <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
-          <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> 
-          {% trans "Upload new resource" %}
-        </a>
-      </div>
-    </div>
-    {% include 'resources/table_sm.html' with object_list=location.resources %}
-    <!--
-      <div>
-        <p>{% trans "This location does not have any connected resources. To add a resource, selection from the options below." %}</p>
-        <div class="btn-full btn-group btn-group-justified">
-          <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">{% trans "Add from library" %}</a>
-          <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">{% trans "Upload new resource" %}</a>
+    {% if location.resources %}
+      <div class="top-btn">
+        <div class="btn-group btn-group-justified">
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            {% trans "Add from library" %}
+          </a>
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+            {% trans "Upload new resource" %}
+          </a>
         </div>
       </div>
-    -->
+      {% include 'resources/table_sm.html' with object_list=location.resources %}
+    {% else %}
+      <div>
+        <p>{% trans "This location does not have any connected resources. To add a resource, select from the options below." %}</p>
+        <div class="btn-group btn-group-justified">
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            {% trans "Add from library" %}
+          </a>
+          <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
+            <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+            {% trans "Upload new resource" %}
+          </a>
+        </div>
+      </div>
+    {% endif %}
   </div>
   <!-- /resources tab -->
 
