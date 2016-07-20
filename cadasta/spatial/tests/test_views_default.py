@@ -597,7 +597,8 @@ class LocationResourceNewTest(TestCase):
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.png'
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
         }
 
     def test_get_with_authorized_user(self):
