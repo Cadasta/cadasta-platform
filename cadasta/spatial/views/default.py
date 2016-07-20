@@ -64,6 +64,13 @@ class LocationDetail(LoginPermissionRequiredMixin,
     permission_denied_message = error_messages.SPATIAL_VIEW
     attributes_field = 'attributes'
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['relationships'] = (
+            context['location'].tenurerelationship_set.all()
+        )
+        return context
+
 
 class LocationEdit(LoginPermissionRequiredMixin,
                    mixins.SpatialUnitObjectMixin,
