@@ -4,6 +4,7 @@ from pytest import raises
 from zipfile import ZipFile
 
 from django.conf import settings
+from django.forms.utils import ErrorDict
 
 from buckets.test import utils as bucket_uitls
 from buckets.test.storage import FakeS3Storage
@@ -561,6 +562,7 @@ class ContactsFormTest(UserTestCase):
         form = forms.ContactsForm(data=data, prefix='contacts')
         form.full_clean()
         assert form.cleaned_data == {'remove': True}
+        assert isinstance(form._errors, ErrorDict)
 
     def test_validate_valid_form_with_email(self):
         data = {
