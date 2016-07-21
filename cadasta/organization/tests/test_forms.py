@@ -244,6 +244,10 @@ class EditOrganizationMemberFormTest(UserTestCase):
 class ProjectAddDetailsTest(UserTestCase):
     def test_add_new_project_with_restricted_name(self):
         org = OrganizationFactory.create()
+        user = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=org, user=user, admin=True
+        )
         invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
         data = {
             'organization': org.slug,
@@ -254,7 +258,7 @@ class ProjectAddDetailsTest(UserTestCase):
             'contacts-0-email': '',
             'contacts-0-tel': ''
         }
-        form = forms.ProjectAddDetails(data=data)
+        form = forms.ProjectAddDetails(data=data, user=user)
         assert not form.is_valid()
         assert form.errors == {
             'name': ["Project name cannot be “Add” or “New”."]

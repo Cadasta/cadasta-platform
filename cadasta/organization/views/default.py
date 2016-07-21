@@ -10,6 +10,8 @@ from django.contrib import messages
 
 import formtools.wizard.views as wizard
 
+from tutelary.models import check_perms
+
 import core.views.generic as generic
 from core.views.mixins import SuperUserCheckMixin
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
@@ -54,6 +56,7 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
 
 
 class OrganizationDashboard(PermissionRequiredMixin,
+                            mixins.OrganizationUICheckMixin,
                             generic.DetailView):
     model = Organization
     template_name = 'organization/organization_dashboard.html'
@@ -114,7 +117,9 @@ class OrganizationUnarchive(OrgArchiveView):
     do_archive = False
 
 
-class OrganizationMembers(LoginPermissionRequiredMixin, generic.DetailView):
+class OrganizationMembers(LoginPermissionRequiredMixin,
+                          mixins.OrganizationUICheckMixin,
+                          generic.DetailView):
     model = Organization
     template_name = 'organization/organization_members.html'
     permission_required = 'org.users.list'
@@ -153,6 +158,7 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
+                              mixins.OrganizationUICheckMixin,
                               base_generic.edit.FormMixin,
                               generic.DetailView):
     slug_field = 'username'
@@ -264,9 +270,22 @@ class ProjectList(PermissionRequiredMixin,
                                   if p.access == 'public'
                                   else ('project.view_private',))
 
+    def add_allowed(self):
+        retval = Organization.objects.count() > 0
+        if retval:
+            u = self.request.user
+            if hasattr(u, 'organizations'):
+                retval = any([
+                    check_perms(u, ('project.create',), (o,))
+                    for o in u.organizations.all()
+                ])
+            else:
+                retval = False
+        return self.is_superuser or retval
+
     def get_context_data(self, **kwargs):
         context = super(ProjectList, self).get_context_data(**kwargs)
-        context['add_allowed'] = Organization.objects.count() > 0
+        context['add_allowed'] = self.add_allowed()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -287,7 +306,9 @@ class ProjectList(PermissionRequiredMixin,
         return super(generic.ListView, self).render_to_response(context)
 
 
-class ProjectDashboard(PermissionRequiredMixin, generic.DetailView):
+class ProjectDashboard(PermissionRequiredMixin,
+                       mixins.ProjectAdminCheckMixin,
+                       generic.DetailView):
     def get_actions(view, request):
         if view.get_object().public():
             return 'project.view'
@@ -412,7 +433,11 @@ class ProjectAddWizard(SuperUserCheckMixin,
         return result
 
     def get_form_kwargs(self, step=None):
-        if step == 'permissions':
+        if step == 'details':
+            return {
+                'user': self.request.user
+            }
+        elif step == 'permissions':
             return {
                 'organization': self.get_cleaned_data_for_step(
                     'details').get('organization')

@@ -100,7 +100,7 @@ class ProjectListTest(UserTestCase):
             {'object_list':
              sorted(projs,
                     key=lambda p: p.organization.slug + ':' + p.slug),
-             'add_allowed': True,
+             'add_allowed': is_superuser,
              'user': self.request.user,
              'is_superuser': is_superuser},
             request=self.request)
@@ -230,8 +230,8 @@ class ProjectDashboardTest(UserTestCase):
             OrganizationRole.objects.create(organization=other_org, user=user)
         return self._get(prj, user=user, status=status), prj
 
-    def _check_render(self, response, project,
-                      assign_context=False, is_superuser=False):
+    def _check_render(self, response, project, assign_context=False,
+                      is_superuser=False, is_administrator=False):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
@@ -239,6 +239,7 @@ class ProjectDashboardTest(UserTestCase):
         context['project'] = project
         context['geojson'] = '{"type": "FeatureCollection", "features": []}'
         context['is_superuser'] = is_superuser
+        context['is_administrator'] = is_administrator
 
         expected = render_to_string(
             'organization/project_dashboard.html',
@@ -265,7 +266,19 @@ class ProjectDashboardTest(UserTestCase):
         self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
         response = self._get(self.project1, user=superuser, status=200)
-        self._check_render(response, self.project1, is_superuser=True)
+        self._check_render(response, self.project1,
+                           is_superuser=True, is_administrator=True)
+
+    def test_get_with_org_admin(self):
+        org_admin = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=self.project1.organization,
+            user=org_admin,
+            admin=True
+        )
+        response = self._get(self.project1, user=org_admin, status=200)
+        self._check_render(response, self.project1,
+                           is_superuser=False, is_administrator=True)
 
     def test_get_non_existent_project(self):
         setattr(self.request, 'user', self.user)
@@ -316,7 +329,8 @@ class ProjectDashboardTest(UserTestCase):
         response, prj = self._get_private(
             user=superuser, status=200
         )
-        self._check_render(response, prj, is_superuser=True)
+        self._check_render(response, prj,
+                           is_superuser=True, is_administrator=True)
 
 
 class ProjectAddTest(UserTestCase):
@@ -341,6 +355,9 @@ class ProjectAddTest(UserTestCase):
 
         self.user = UserFactory.create()
         self.unauth_user = UserFactory.create()
+        self.superuser = UserFactory.create()
+        self.superuser.assign_policies(Role.objects.get(name='superuser'))
+
         setattr(self.request, 'user', self.user)
         assign_user_policies(self.user, self.policy)
 
@@ -461,7 +478,7 @@ class ProjectAddTest(UserTestCase):
     }
 
     def test_full_flow_valid(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.users[0])
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -497,7 +514,7 @@ class ProjectAddTest(UserTestCase):
         # assert proj.public
 
     def test_full_flow_invalid_xlsform(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.users[0])
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -536,7 +553,7 @@ class ProjectAddTest(UserTestCase):
             " Slug Truncation Functions Correctly"
         )
         expected_slug = 'very-long-name-for-the-purposes-of-testing-that-sl'
-        self.client.force_login(self.user)
+        self.client.force_login(self.superuser)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )

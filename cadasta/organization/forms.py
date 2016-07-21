@@ -10,7 +10,7 @@ from django.db import transaction
 from django.forms.utils import ErrorDict
 
 from leaflet.forms.widgets import LeafletWidget
-from tutelary.models import Role
+from tutelary.models import Role, check_perms
 from buckets.widgets import S3FileUploadWidget
 
 from accounts.models import User
@@ -226,12 +226,28 @@ class ProjectAddDetails(forms.Form):
                                   accepted_types=QUESTIONNAIRE_TYPES))
     contacts = ContactsField(form=ContactsForm, required=False)
 
+    def check_admin(self, user):
+        if not hasattr(self, 'su_role'):
+            self.su_role = Role.objects.get(name='superuser')
+
+        is_superuser = any([isinstance(pol, Role) and pol == self.su_role
+                            for pol in user.assigned_policies()])
+        return is_superuser
+
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        self.fields['organization'].choices = [
-            (o.slug, o.name) for o in Organization.objects.order_by('name')
-        ]
+        if self.check_admin(self.user):
+            self.fields['organization'].choices = [
+                (o.slug, o.name) for o in Organization.objects.order_by('name')
+            ]
+        else:
+            qs = self.user.organizations.all()
+            self.fields['organization'].choices = [
+                (o.slug, o.name) for o in qs.order_by('name')
+                if check_perms(self.user, ('project.create',), (o,))
+            ]
 
     def clean_name(self):
         name = self.cleaned_data['name']

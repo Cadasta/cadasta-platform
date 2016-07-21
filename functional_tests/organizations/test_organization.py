@@ -45,16 +45,7 @@ class OrganizationTest(FunctionalTest):
         assert "Username: testuser" in info
 
     def test_edit_organization(self):
-        """A registered admin user can edit an organization's information,
-        but a regular user cannot"""
-        LoginPage(self).login('testuser', 'password')
-        page = OrganizationPage(self)
-        page.go_to()
-        page.go_to_organization_page()
-
-        page.click_on_edit_button(success=False)
-        self.logout()
-
+        """A registered admin user can edit an organization's information."""
         LoginPage(self).login('admin_user', 'password')
         page = OrganizationPage(self)
         page.go_to()
@@ -81,19 +72,7 @@ class OrganizationTest(FunctionalTest):
         assert "A technology company." in info
 
     def test_archiving_organization(self):
-        """A registered admin user can archive/unarchive an organization,
-        but a regular member can't."""
-        LoginPage(self).login('testuser', 'password')
-        page = OrganizationPage(self)
-        page.go_to()
-        page.go_to_organization_page()
-
-        page.get_archive_button()
-
-        archive = page.click_on_archive_and_confirm()
-        assert archive == "Archive organization"
-        self.logout()
-
+        """A registered admin user can archive/unarchive an organization."""
         LoginPage(self).login('admin_user', 'password')
         page = OrganizationPage(self)
         page.go_to()
@@ -143,7 +122,10 @@ class OrganizationTest(FunctionalTest):
         assert title == "Organization #0\nTest Project".upper()
 
     def test_new_organization_view(self):
-        """An organization without projects has a different view."""
+        """An organization without projects has a different view for its
+        creator.
+
+        """
 
         LoginPage(self).login('testuser', 'password')
         page = OrganizationPage(self)

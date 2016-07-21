@@ -310,8 +310,15 @@ class FunctionalTest(StaticLiveServerTestCase):
             add_users=users)
         )
         orgs.append(OrganizationFactory.create(
-            name="Organization #1", description='This is a test.')
+            name="Organization #1", description='This is a test.',
+            add_users=[users[0]] if users is not None else None)
         )
+        if users is not None:
+            OrganizationRole.objects.create(
+                organization=orgs[1],
+                user=users[0],
+                admin=True
+            )
         return orgs
 
     def create_test_users(self):
