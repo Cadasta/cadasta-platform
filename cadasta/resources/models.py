@@ -1,5 +1,4 @@
 import os
-import magic
 from datetime import datetime
 from django.db import models
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -26,10 +25,11 @@ content_types = models.Q(app_label='organization', model='project')
 class Resource(RandomIDModel):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    file = S3FileField(upload_to='resources', validators=[validate_file_type])
+    file = S3FileField(upload_to='resources')
     original_file = models.CharField(max_length=200)
     file_versions = JSONField(null=True, blank=True)
-    mime_type = models.CharField(max_length=50)
+    mime_type = models.CharField(max_length=100,
+                                 validators=[validate_file_type])
     archived = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
     contributor = models.ForeignKey('accounts.User')
@@ -83,12 +83,16 @@ class Resource(RandomIDModel):
     @property
     def thumbnail(self):
         if not hasattr(self, '_thumbnail'):
+            icon = settings.MIME_LOOKUPS.get(self.mime_type, None)
             if 'image' in self.mime_type:
                 ext = self.file_name.split('.')[-1]
                 base_url = self.file.url[:self.file.url.rfind('.')]
                 self._thumbnail = base_url + '-128x128.' + ext
+            elif icon:
+                self._thumbnail = settings.ICON_URL.format(icon)
             else:
                 self._thumbnail = ''
+
         return self._thumbnail
 
     @property
@@ -108,8 +112,7 @@ def archive_file(sender, instance, **kwargs):
 @receiver(models.signals.post_save, sender=Resource)
 def create_thumbnails(sender, instance, created, **kwargs):
     if created or instance._orginial_url != instance.file.url:
-        file = instance.file.open()
-        if 'image' in magic.from_file(file.name, mime=True).decode():
+        if 'image' in instance.mime_type:
             io.ensure_dirs()
             file_name = instance.file.url.split('/')[-1]
             name = file_name[:file_name.rfind('.')]
@@ -120,6 +123,7 @@ def create_thumbnails(sender, instance, created, **kwargs):
 
             size = 128, 128
 
+            file = instance.file.open()
             thumb = thumbnail.make(file, size)
             thumb.save(write_path)
             if instance.file.field.upload_to:

@@ -13,7 +13,7 @@ class ResourceForm(forms.ModelForm):
 
     class Meta:
         model = Resource
-        fields = ['file', 'original_file', 'name', 'description']
+        fields = ['file', 'original_file', 'name', 'description', 'mime_type']
 
     def __init__(self, data=None, content_object=None, contributor=None,
                  project_id=None, *args, **kwargs):
@@ -21,9 +21,6 @@ class ResourceForm(forms.ModelForm):
         self.cnt_obj = content_object
         self.contributor = contributor
         self.project_id = project_id
-
-    def clean(self):
-        pass
 
     def save(self, *args, **kwargs):
         if self.instance.id:

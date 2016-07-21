@@ -279,7 +279,8 @@ class ProjectResourcesNewTest(UserTestCase):
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.png'
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
         }
 
         if user is None:
@@ -475,7 +476,8 @@ class ProjectResourcesEditTest(UserTestCase):
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.png'
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
         }
 
         setattr(self.request, 'method', 'POST')

@@ -24,7 +24,8 @@ class ResourceFormTest(UserTestCase):
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.jpg'
+            'original_file': 'image.jpg',
+            'mime_type': 'image/jpeg'
         }
         self.project = ProjectFactory.create()
 

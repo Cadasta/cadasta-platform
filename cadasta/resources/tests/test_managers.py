@@ -27,7 +27,8 @@ class ResourceModelTest(UserTestCase):
                                            file=file_name,
                                            content_object=project,
                                            contributor=user,
-                                           project=project)
+                                           project=project,
+                                           mime_type='image/jpeg')
         assert resource.name == 'Re'
         assert resource.content_objects.count() == 1
         assert resource.mime_type == 'image/jpeg'
