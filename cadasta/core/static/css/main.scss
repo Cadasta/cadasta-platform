@@ -751,7 +751,7 @@ main.container-fluid {
       background: transparent;
       padding: 20px 15px;
       .btn {
-        min-width: 110px;
+        min-width: 140px;
         margin-right: 20px;
         margin-bottom: 10px;
         &:last-child {
@@ -787,14 +787,18 @@ body.map .content-single {
       min-height: 300px;
     }
     .main-text {
-      padding: 20px 30px 50px 40px;
+      padding: 15px;
     }
     .detail {
       padding-top: 20px;
     }
+    .panel-buttons { // buttons at bottom of panels containing forms
+      .btn {
+        min-width: 110px;
+      }
+    }
   }
 }
-
 
 /* =Forms
 -------------------------------------------------------------- */
@@ -808,6 +812,23 @@ textarea.form-control {
   height: 34px;
   padding: 0 12px;
   cursor: pointer;
+}
+
+.spacing-lg { // for radio or checkboxes needing more space between items
+  margin-top: 30px;
+  li {
+    margin-left: 30px;
+    margin-bottom: 30px;
+    label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    small { 
+      margin-top: 6px;
+      font-weight: 300;
+      display: block;
+    }
+  }
 }
 
 /* =Table for sort and filter
@@ -1255,4 +1276,3 @@ ul.errorlist {
   text-transform: uppercase;
   padding-bottom: 2px;
 }
-
