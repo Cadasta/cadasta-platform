@@ -78,7 +78,7 @@ class PublicPrivateToggle(Widget):
 
 class ContactsWidget(Widget):
     html = (
-        '<table class="table">'
+        '<table class="table contacts-form">'
         '  <thead>'
         '    <tr>'
         '      <th>{name}</th>'

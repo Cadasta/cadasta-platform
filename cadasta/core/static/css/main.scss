@@ -1280,3 +1280,19 @@ ul.errorlist {
   text-transform: uppercase;
   padding-bottom: 2px;
 }
+
+/* =Contacts form styling
+-------------------------------------------------------------- */
+
+tr.contacts-error {
+  background: $alert-warning-bg;
+  li {
+    padding: 0;
+  }
+  +tr td {
+    border-top: none;
+    padding-top: 0;
+    background: $alert-warning-bg;
+  }
+}
+
