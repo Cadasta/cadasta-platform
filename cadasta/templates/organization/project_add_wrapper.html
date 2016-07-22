@@ -9,65 +9,57 @@
 
 <form action="" method="post" novalidate>
 {% csrf_token %}
+  <div class="row">
+    {% block step_content_1 %}{% endblock %}
 
-  <div class="col-md-12 content-single">
-    <div class="row">
-
-      {% block step_content_1 %}{% endblock %}
-
-      <div class="page-title">
-      <div class="wizard">
-        <ul class="steps">
-          <li class="{{ wizard_step_classes.extent }}">
-            <a>
-            <label class="wizard-step">1</label>
-            <span class="wizard-description">
-              {% trans "Draw Map" %}
-              <small>{% trans "Mark project boundary" %}</small>
-            </span>
-            </a>
-          </li>
-          <li class="{{ wizard_step_classes.details }}">
-            <a>
-            <label class="wizard-step">2</label>
-            <span class="wizard-description">
-              {% trans "Add Details" %}
-              <small>{% trans "Enter basic info" %}</small>
-            </span>
-            </a>
-          </li>
-          <li class="{{ wizard_step_classes.permissions }}">
-            <a>
-            <label class="wizard-step">3</label>
-            <span class="wizard-description">
-              {% trans "Assign Team" %}
-              <small>{% trans "Assign permissions" %}</small>
-            </span>
-            </a>
-          </li>
-        </ul>
-      </div>
-      <h1 class="new-project-page">{% trans "Add new project" %}</h1>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-
-          <h3>{% block step_title %}{% endblock %}</h3>
-
-          {% block step_instructions %}{% endblock %}
-
-          {% block step_content_2 %}{% endblock %}
-
-        </div>
-        <div class="panel-footer panel-buttons">
-          <button class="btn btn-primary" type="submit">{% trans 'Save and continue' %}</button>
-          <a class="btn btn-default" href="{% url 'project:list' %}">{% trans "Cancel" %}</a>
-        </div>
-      {% block step_content_3 %}{% endblock %}
-      </div>
+  <div class="page-title">
+    <div class="wizard pull-right">
+      <ul class="steps">
+        <li class="{{ wizard_step_classes.extent }}">
+          <a>
+          <label class="wizard-step">1</label>
+          <span class="wizard-description">
+            {% trans "Draw Map" %}
+            <small>{% trans "Mark project boundary" %}</small>
+          </span>
+          </a>
+        </li>
+        <li class="{{ wizard_step_classes.details }}">
+          <a>
+          <label class="wizard-step">2</label>
+          <span class="wizard-description">
+            {% trans "Add Details" %}
+            <small>{% trans "Enter basic info" %}</small>
+          </span>
+          </a>
+        </li>
+        <li class="{{ wizard_step_classes.permissions }}">
+          <a>
+          <label class="wizard-step">3</label>
+          <span class="wizard-description">
+            {% trans "Assign Team" %}
+            <small>{% trans "Assign permissions" %}</small>
+          </span>
+          </a>
+        </li>
+      </ul>
     </div>
+    <h1 class="new-project-page pull-left">{% trans "Add new project" %}</h1>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h3>{% block step_title %}{% endblock %}</h3>
+      {% block step_instructions %}{% endblock %}
+      {% block step_content_2 %}{% endblock %}
+    </div>
+    <div class="panel-footer panel-buttons clearfix">
+      <a class="btn btn-link pull-left" href="{% url 'project:list' %}">{% trans "Cancel" %}</a>
+      {% block step_content_buttons %}{% endblock %}
+    </div>
+    {% block step_content_3 %}{% endblock %}
   </div>
 
+  </div>
 </form>
 
 {% endblock %}

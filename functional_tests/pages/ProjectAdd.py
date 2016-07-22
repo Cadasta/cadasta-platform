@@ -149,9 +149,9 @@ class ProjectAddPage(Page):
 
     def submit_geometry(self):
         assert self.is_on_subpage('geometry')
-        submit = self.BY_CLASS('btn-primary')
+        submit_button = self.BY_CLASS('btn-primary')
         add_details_wait = (By.ID, 'id_details-organization')
-        self.test.click_through(submit, add_details_wait)
+        self.test.click_through(submit_button, add_details_wait)
         assert self.is_on_subpage('details')
 
     # -----------------------
@@ -253,7 +253,7 @@ class ProjectAddPage(Page):
         assert self.get_proj_url() == details['url']
 
     def click_submit_details(self):
-        submit_button = self.BY_XPATH("//button[@type='submit']")
+        submit_button = self.BY_CLASS('btn-primary')
         submit_button.click()
 
     def try_submit_details(self):
@@ -264,7 +264,7 @@ class ProjectAddPage(Page):
         assert self.is_on_subpage('details')
         assert re.fullmatch('\s*', self.get_name()) is not None
 
-        submit_button = self.BY_XPATH("//button[@type='submit']")
+        submit_button = self.BY_CLASS('btn-primary')
         error_wait = (By.CLASS_NAME, 'errorlist')
         self.test.click_through(submit_button, error_wait)
         assert self.is_on_subpage('details')
@@ -278,7 +278,7 @@ class ProjectAddPage(Page):
 
     def submit_details(self):
         assert self.is_on_subpage('details')
-        submit_button = self.BY_XPATH("//button[@type='submit']")
+        submit_button = self.BY_CLASS('btn-primary')
         next_header = "Assign permissions to members"
         xpath = "//h3[text()='{}']".format(next_header)
         set_perms_wait = (By.XPATH, xpath)
@@ -298,9 +298,9 @@ class ProjectAddPage(Page):
         )
         self.browser.execute_script(script)
 
-        submit = self.BY_CLASS('btn-primary')
+        submit_button = self.BY_CLASS('btn-primary')
         next_header = "Project Overview"
         xpath = "//h2[text()='{}' and not(*[2])]".format(next_header)
         proj_overview_wait = (By.XPATH, xpath)
-        self.test.click_through(submit, proj_overview_wait)
+        self.test.click_through(submit_button, proj_overview_wait)
         assert not self.is_on_page()

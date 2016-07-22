@@ -3,21 +3,21 @@
 
 .wizard {
   display: inline-block;
-  float: right;
-  width: 336px;
+  width: 280px;
   > ul {
     position: relative;
     display: table;
     width: 100%;
-    margin: 0 0 20px 0;
+    margin: 10px 0 20px 0;
     list-style: none;
     padding: 0;
     > li {
       display: table-cell;
       width: 1%;
       text-align: center;
-      a, a:hover {
+      a {
         position: relative;
+        cursor: default;
         display: block;
         opacity: 1;
         color: #666;
@@ -55,7 +55,7 @@
   width: 40px;
   height: 40px;
   margin: 0 auto 5px;
-  cursor: pointer;
+  cursor: default;
   text-align: center;
   color: #fafafa;
   border-radius: 100px;
@@ -88,9 +88,9 @@
 }
 .wizard > ul > li a .wizard-description:hover,
 .wizard > ul > li.enabled a .wizard-description {
-  opacity: 1;
-  -moz-opacity: 1;
-  text-decoration: none;
+  //opacity: 1;
+  //-moz-opacity: 1;
+  //text-decoration: none;
 }
 .wizard > ul > li a.disabled .wizard-step {
   background: #ccc;
@@ -113,26 +113,65 @@
 }
 
 #project-wizard {
-  .content-single .detail {
-    background: transparent;
+  .main-wizard {
+    padding: 24px;
+  }
+  .col-md-8.map {
+    padding-left: 0;
   }
   h1 { 
     color: $brand-darkblue;
     text-shadow: none;
-    margin: 34px auto 14px;
+    margin: 14px auto;
     font-size: 30px;
+    width: auto;
   }
-  .col-md-4.detail {
-    .wizard {
-      display: block;
-      float: none;
-    }
-    h1 {
-      width: 100%;
-    }
+  h2 {
+    color: $brand-darkblue;
+    text-transform: uppercase;
+    margin-top: 0;
+    padding-bottom: 14px;
+    text-shadow: none;
+  }
+  h3 {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    opacity: 0.8;
+    font-weight: 300;
+    letter-spacing: 0;
+  }
+  .page-title {
+    padding-bottom: 0;
+    padding-top: 0;
   }
   div#org-wrapper {
     margin-top: 16px;
     margin-bottom: 24px;
+  }
+  .panel {
+    clear: both;
+    .panel-body {
+      h3 {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: solid 1px $gray-light;
+      }
+    }
+    .panel-buttons { // buttons at bottom of panels containing forms
+      background: transparent;
+      text-align: right;
+      padding: 20px 30px;
+      .btn {
+        min-width: 160px !important;
+        margin-right: 20px;
+        margin-bottom: 10px;
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+      .btn-link {
+        min-width: 60px !important;
+      }
+    }
   }
 }
