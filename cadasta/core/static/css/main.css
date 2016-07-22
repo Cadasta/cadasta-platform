@@ -5487,7 +5487,7 @@ main.container-fluid {
       background: transparent;
       padding: 20px 15px; }
       .content-single .panel .panel-buttons .btn {
-        min-width: 110px;
+        min-width: 140px;
         margin-right: 20px;
         margin-bottom: 10px; }
         .content-single .panel .panel-buttons .btn:last-child {
@@ -5511,9 +5511,11 @@ body.map .content-single {
       height: 300px;
       min-height: 300px; }
     .content-single .main-text {
-      padding: 20px 30px 50px 40px; }
+      padding: 15px; }
     .content-single .detail {
-      padding-top: 20px; } }
+      padding-top: 20px; }
+    .content-single .panel-buttons .btn {
+      min-width: 110px; } }
 
 /* =Forms
 -------------------------------------------------------------- */
@@ -5525,6 +5527,19 @@ textarea.form-control {
   height: 34px;
   padding: 0 12px;
   cursor: pointer; }
+
+.spacing-lg {
+  margin-top: 30px; }
+  .spacing-lg li {
+    margin-left: 30px;
+    margin-bottom: 30px; }
+    .spacing-lg li label {
+      font-size: 16px;
+      font-weight: 600; }
+    .spacing-lg li small {
+      margin-top: 6px;
+      font-weight: 300;
+      display: block; }
 
 /* =Table for sort and filter
 -------------------------------------------------------------- */
