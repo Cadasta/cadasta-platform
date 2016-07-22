@@ -1,17 +1,19 @@
+import pytest
 import time
 import os
 from openpyxl import load_workbook, Workbook
 from zipfile import ZipFile
-from buckets.test import utils as bucket_uitls
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
 from jsonattrs.models import Attribute, AttributeType, Schema
 
+from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
 from resources.utils.io import ensure_dirs
 from resources.tests.factories import ResourceFactory
+from resources.tests.utils import clear_temp  # noqa
 from resources.models import ContentObject
 from core.tests.base_test_case import UserTestCase
 from party.tests.factories import TenureRelationshipFactory, PartyFactory
@@ -20,6 +22,7 @@ from ..download.xls import XLSExporter
 from ..download.resources import ResourceExporter
 
 
+@pytest.mark.usefixtures('clear_temp')
 class XLSTest(UserTestCase):
     def test_init(self):
         project = ProjectFactory.build()
@@ -114,6 +117,8 @@ class XLSTest(UserTestCase):
                         'spreadsheetml.sheet')
 
 
+@pytest.mark.usefixtures('clear_temp')
+@pytest.mark.usefixtures('make_dirs')
 class ResourcesTest(UserTestCase):
     def test_init(self):
         project = ProjectFactory.build()
@@ -122,7 +127,6 @@ class ResourcesTest(UserTestCase):
 
     def test_make_resource_worksheet(self):
         ensure_dirs()
-        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
 
@@ -146,7 +150,6 @@ class ResourcesTest(UserTestCase):
             assert sheet[chr(i + 97) + '3'].value == data[1][i]
 
     def test_pack_resource_data(self):
-        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
 
@@ -172,7 +175,7 @@ class ResourcesTest(UserTestCase):
         assert rel.id in packed[6]
 
     def test_make_download(self):
-        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
+        ensure_dirs()
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
         res = ResourceFactory.create(project=project)

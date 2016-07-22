@@ -14,7 +14,7 @@ from buckets.fields import S3FileField
 
 from core.models import RandomIDModel, ID_FIELD_LENGTH
 from .managers import ResourceManager
-from .validators import validate_file_type
+from .validators import validate_file_type, ACCEPTED_TYPES
 from .utils import thumbnail, io
 from . import messages
 
@@ -25,7 +25,7 @@ content_types = models.Q(app_label='organization', model='project')
 class Resource(RandomIDModel):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
-    file = S3FileField(upload_to='resources')
+    file = S3FileField(upload_to='resources', accepted_types=ACCEPTED_TYPES)
     original_file = models.CharField(max_length=200)
     file_versions = JSONField(null=True, blank=True)
     mime_type = models.CharField(max_length=100,
@@ -102,11 +102,12 @@ class Resource(RandomIDModel):
 
 @receiver(models.signals.pre_save, sender=Resource)
 def archive_file(sender, instance, **kwargs):
-    if instance._orginial_url != instance.file.url:
+    if instance._orginial_url and instance._orginial_url != instance.file.url:
         now = str(datetime.now())
         if not instance.file_versions:
             instance.file_versions = {}
         instance.file_versions[now] = instance._orginial_url
+    instance._orginial_url = instance.file.url
 
 
 @receiver(models.signals.post_save, sender=Resource)

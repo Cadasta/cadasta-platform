@@ -1,16 +1,10 @@
 from django import forms
 from django.contrib.contenttypes.models import ContentType
-from buckets.widgets import S3FileUploadWidget
 from .models import Resource, ContentObject
 from .fields import ResourceField
-from .validators import ACCEPTED_TYPES
 
 
 class ResourceForm(forms.ModelForm):
-    file = forms.CharField(
-        widget=S3FileUploadWidget(upload_to='resources',
-                                  accepted_types=ACCEPTED_TYPES))
-
     class Meta:
         model = Resource
         fields = ['file', 'original_file', 'name', 'description', 'mime_type']

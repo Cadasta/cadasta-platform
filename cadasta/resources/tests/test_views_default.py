@@ -9,18 +9,17 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.api import get_messages
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 from ..views import default
 from ..forms import ResourceForm, AddResourceFromLibraryForm
 from .factories import ResourceFactory
-
-ensure_dirs(add='s3/uploads/resources')
+from .utils import clear_temp  # noqa
 
 path = os.path.dirname(settings.BASE_DIR)
 clauses = {
@@ -39,6 +38,7 @@ clauses = {
 }
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -111,6 +111,7 @@ class ProjectResourcesTest(UserTestCase):
                       organization='some-org', project='some-project')
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesAddTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -227,6 +228,8 @@ class ProjectResourcesAddTest(UserTestCase):
         assert self.project.resources.first() == self.assigned
 
 
+@pytest.mark.usefixtures('clear_temp')
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesNewTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -273,7 +276,7 @@ class ProjectResourcesNewTest(UserTestCase):
     def _post(self, user=None, status=None, expected_redirect=None):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('image.jpg', file)
+        file_name = storage.save('resources/image.jpg', file)
 
         self.data = {
             'name': 'Some name',
@@ -345,6 +348,7 @@ class ProjectResourcesNewTest(UserTestCase):
         assert self.project.resources.count() == 0
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesDetailTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -420,6 +424,7 @@ class ProjectResourcesDetailTest(UserTestCase):
         assert '/account/login/' in response['location']
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesEditTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -471,7 +476,7 @@ class ProjectResourcesEditTest(UserTestCase):
 
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('image.jpg', file)
+        file_name = storage.save('resources/image.jpg', file)
         self.data = {
             'name': 'Some name',
             'description': '',
@@ -561,6 +566,7 @@ class ProjectResourcesEditTest(UserTestCase):
         assert self.project.resources.first().name != self.data['name']
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ResourceArchiveTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -646,6 +652,7 @@ class ResourceArchiveTest(UserTestCase):
         assert self.resource.archived is False
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ResourceUnArchiveTest(UserTestCase):
     def setUp(self):
         super().setUp()

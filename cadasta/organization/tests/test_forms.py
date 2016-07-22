@@ -1,12 +1,12 @@
 import os
 import random
+import pytest
 from pytest import raises
 from zipfile import ZipFile
 
 from django.conf import settings
 from django.forms.utils import ErrorDict
 
-from buckets.test import utils as bucket_uitls
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Role
 
@@ -15,10 +15,13 @@ from ..models import Organization, OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
 from resources.tests.factories import ResourceFactory
+from resources.tests.utils import clear_temp  # noqa
+from resources.utils.io import ensure_dirs
 
 
 class OrganizationTest(UserTestCase):
@@ -265,11 +268,10 @@ class ProjectAddDetailsTest(UserTestCase):
         }
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectEditDetailsTest(UserTestCase):
     def _get_form(self, form_name):
         path = os.path.dirname(settings.BASE_DIR)
-        bucket_uitls.ensure_dirs(add='s3/uploads/xls-forms')
-        bucket_uitls.ensure_dirs(add='s3/uploads/xml-forms')
 
         storage = FakeS3Storage()
         file = open(
@@ -712,8 +714,11 @@ class ContactsFormTest(UserTestCase):
         assert 'error-phone' in html
 
 
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
 class DownloadFormTest(UserTestCase):
     def test_init(self):
+        ensure_dirs()
         user = UserFactory.build()
         project = ProjectFactory.build()
         form = forms.DownloadForm(project, user)
@@ -721,7 +726,7 @@ class DownloadFormTest(UserTestCase):
         assert form.user == user
 
     def test_get_xls_download(self):
-        bucket_uitls.ensure_dirs()
+        ensure_dirs()
         data = {'type': 'xls'}
         user = UserFactory.create()
         project = ProjectFactory.create()
@@ -733,7 +738,7 @@ class DownloadFormTest(UserTestCase):
                         'spreadsheetml.sheet')
 
     def test_get_resources_download(self):
-        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
+        ensure_dirs()
         data = {'type': 'res'}
         user = UserFactory.create()
         project = ProjectFactory.create()
@@ -744,7 +749,7 @@ class DownloadFormTest(UserTestCase):
         assert mime == 'application/zip'
 
     def test_get_all_download(self):
-        bucket_uitls.ensure_dirs(add='s3/uploads/resources')
+        ensure_dirs()
         data = {'type': 'all'}
         user = UserFactory.create()
         project = ProjectFactory.create()

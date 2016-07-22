@@ -1,11 +1,12 @@
+import pytest
 import os
 from django.conf import settings
 from rest_framework.test import APIRequestFactory, force_authenticate
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from questionnaires.serializers import QuestionnaireSerializer
 from questionnaires.models import Questionnaire
@@ -15,16 +16,15 @@ from .. import serializers
 path = os.path.dirname(settings.BASE_DIR)
 
 
+@pytest.mark.usefixtures('make_dirs')
 class XFormListSerializerTest(UserTestCase):
     def _get_form(self, form_name):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
         ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
+        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def _test_serialize(self, https=False):
