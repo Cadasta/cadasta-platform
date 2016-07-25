@@ -271,7 +271,7 @@ class ProjectList(PermissionRequiredMixin,
                                   else ('project.view_private',))
 
     def add_allowed(self):
-        retval = Organization.objects.count() > 0
+        retval = Organization.objects.exists()
         if retval:
             u = self.request.user
             if hasattr(u, 'organizations'):
