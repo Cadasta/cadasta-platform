@@ -17,12 +17,13 @@
     <h1>
       <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">
         {{ object.organization.name }}
-      </a> 
+      </a>
       {{ object.name }}
     </h1>
     <div class="top-btn pull-right">
 
       <!-- More options menu -->
+      {% if is_administrator %}
       <div class="dropdown pull-right btn-more">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
@@ -33,6 +34,7 @@
           <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
           <li role="separator" class="divider"></li>
           <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Download data" %}</a></li>
+          {% if is_superuser %}
           <li role="separator" class="divider"></li>
           <li>
             {% if object.archived %}
@@ -41,8 +43,10 @@
             <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive project" %}</a>
             {% endif %}
           </li>
+          {% endif %}
         </ul>
       </div>
+      {% endif %}
 
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">

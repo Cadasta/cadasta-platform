@@ -22,6 +22,7 @@
     <div class="top-btn pull-right">
 
       <!-- More options menu -->
+      {% if is_administrator %}
       <div class="dropdown pull-right btn-more">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
@@ -38,8 +39,10 @@
           </li>
         </ul>
       </div>
+      {% endif %}
 
       <!-- Split add button -->
+      {% if add_allowed %}
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add project" %}
@@ -66,7 +69,7 @@
           <li><a href="{% url 'organization:members_add' organization.slug %}">{% trans "Add org member" %}</a></li>
         </ul>
       </div>
-
+      {% endif %}
     </div>
   </div>
 </div>

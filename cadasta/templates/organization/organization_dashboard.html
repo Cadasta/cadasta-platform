@@ -36,6 +36,7 @@
               </tbody>
             </table>
             {% else %}
+            {% if add_allowed %}
             <!-- Starter text -->
             <h3 style="text-transform: none;">{% trans "You're ready to go" %}</h3>
             <p>
@@ -49,6 +50,7 @@
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add new members" %}
               </a>
             </div>
+            {% endif %}
             {% endif %}
           </div>
         </div>
