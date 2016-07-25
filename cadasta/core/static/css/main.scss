@@ -389,6 +389,7 @@ header {
 .page-title { // page title
   padding-top: 2px;
   padding-bottom: 24px;
+  clear: both;
   h1, h2 {
     text-transform: uppercase;
     display: inline-block;
@@ -532,18 +533,13 @@ header {
 /* =Page Content
 -------------------------------------------------------------- */
 
-#page-content { // for page content
+#page-content { // for page content default for index pages without subnav that overlap page-header
   z-index: 800;
   position: relative;
+  padding-top: 30px;
   padding-bottom: 20px;
-}
-
-#projects #page-content,
-#organizations #page-content,
-#users #page-content { // index pages without subnav that overlap page-header
   max-width: 1220px;
   margin: -190px auto 10px;
-  padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
   -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -551,10 +547,17 @@ header {
   border-radius: 4px;
 }
 
+#project-wizard #page-content { // for non-map pages
+  background: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
 #dashboard #page-content,
 #registration #page-content,
 #project-single #page-content,
-#project-wizard #page-content,
+#project-wizard.map #page-content,
 #organization-single #page-content { // for single project and org pages with left subnav
   width: 100%;
   max-width: 100%;
@@ -571,7 +574,7 @@ header {
 }
 
 #dashboard #page-content,
-#project-wizard #page-content,
+#project-wizard.page #page-content,
 #registration #page-content { // full height page with only site header
   top: $header-height;
 }
@@ -594,7 +597,7 @@ header {
   }
 
   #project-single #page-content,
-  #project-wizard #page-content,
+  #project-wizard.page #page-content,
   #organization-single #page-content {
     position: relative;
     top: 0;
@@ -729,7 +732,7 @@ main.container-fluid {
     padding-top: 0;
   }
   .detail-edit { // edit on right
-    background: none;
+    background: $body-bg;
   }
   .panel { // content box in main panel 
     border: 1px solid $table-border-color;
@@ -792,13 +795,14 @@ body.map .content-single {
     .detail {
       padding-top: 20px;
     }
-    .panel-buttons { // buttons at bottom of panels containing forms
+    .panel-buttons { 
       .btn {
         min-width: 110px;
       }
     }
   }
 }
+
 
 /* =Forms
 -------------------------------------------------------------- */
