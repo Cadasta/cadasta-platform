@@ -195,7 +195,7 @@ class ContactsWidgetTest(TestCase):
 
         widget = ContactsWidget(attrs={'formset': formset})
         html = widget.render('contacts', value, attrs={'class': 'some'})
-        assert ('<table class="table">'
+        assert ('<table class="table contacts-form">'
                 '  <thead>'
                 '    <tr>'
                 '      <th>Name</th>'

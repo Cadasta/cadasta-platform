@@ -22,6 +22,7 @@ $(document).ready(function () {
         var row = target.parents('tr');
         row.hide();
         row.find('[name="' + prefix + '-remove"]').val('on');
+        row.prev('.contacts-error').hide();
     }
 
     function replaceAttr(el, attr, prefix, newPrefix) {
@@ -38,9 +39,9 @@ $(document).ready(function () {
         var tbody = target.parents('table').children('tbody');
 
         var prefix = target.attr('data-prefix');
-        var newRow = tbody.find("tr:first").clone(true);
+        var newRow = tbody.find("tr:not(.contacts-error)").first().clone(true);
         var newPrefix = prefix + '-' + getNumberOfForms(form, prefix);
-        
+
         var td = newRow.children('td')
         for (var i = 0, ilen = td.length; i < ilen; i++) {
             var elements = $(td[i]).children();
@@ -53,6 +54,8 @@ $(document).ready(function () {
                 });
                 el.value = '';
             }
+
+            $(td[i]).removeClass('has-error');
         }
         tbody.append(newRow.show());
 
@@ -61,4 +64,10 @@ $(document).ready(function () {
 
     $('.remove-contact').click(removeContact);
     $('#add-contact').click(addContact);
+    $('.contacts-form tr').has('input[name$=remove][value=on]').hide();
+
+    // Highlight specific input fields that have errors
+    $('tr.contacts-error.error-name').next().find('td').has('input[name$=name]').addClass('has-error');
+    $('tr.contacts-error.error-email').next().find('td').has('input[name$=email]').addClass('has-error');
+    $('tr.contacts-error.error-phone').next().find('td').has('input[name$=tel]').addClass('has-error');
 });

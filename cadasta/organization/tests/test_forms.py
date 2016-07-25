@@ -496,7 +496,105 @@ class ContactsFormTest(UserTestCase):
             '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
             '<td><a data-prefix="c" '
             'class="close remove-contact" href="#">'
-            '<span aria-hidden="true">&times;</span></a></td></tr>'
+            '<span aria-hidden="true">&times;</span></a></td></tr>\n'
+        )
+        assert expected == html
+
+    def test_as_table_with_no_name_error(self):
+        data = {
+            'c-name': '',
+            'c-email': 'john@beatles.uk',
+        }
+        form = forms.ContactsForm(data=data, prefix='c')
+        html = form.as_table()
+
+        expected = (
+            '<tr class="contacts-error  error-name">'
+            '<td colspan="4"><ul class="errorlist nonfield"><li>'
+            'Please provide a name.</li></ul></td></tr>\n'
+            '<tr>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" /></td>\n'
+            '<td><input id="id_c-email" name="c-email" type="email" '
+            'value="john@beatles.uk" /></td>\n'
+            '<td><input id="id_c-tel" name="c-tel" type="text" />'
+            '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
+            '<td><a data-prefix="c" '
+            'class="close remove-contact" href="#">'
+            '<span aria-hidden="true">&times;</span></a></td></tr>\n'
+        )
+        assert expected == html
+
+    def test_as_table_with_invalid_email_error(self):
+        data = {
+            'c-name': 'John',
+            'c-email': 'invalid email',
+        }
+        form = forms.ContactsForm(data=data, prefix='c')
+        html = form.as_table()
+
+        expected = (
+            '<tr class="contacts-error  error-email">'
+            '<td colspan="4"><ul class="errorlist nonfield"><li>'
+            'The provided email address is invalid.</li></ul></td></tr>\n'
+            '<tr>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" '
+            'value="John" /></td>\n'
+            '<td><input id="id_c-email" name="c-email" type="email" '
+            'value="invalid email" /></td>\n'
+            '<td><input id="id_c-tel" name="c-tel" type="text" />'
+            '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
+            '<td><a data-prefix="c" '
+            'class="close remove-contact" href="#">'
+            '<span aria-hidden="true">&times;</span></a></td></tr>\n'
+        )
+        assert expected == html
+
+    def test_as_table_with_no_name_and_invalid_email_error(self):
+        data = {
+            'c-name': '',
+            'c-email': 'invalid email',
+        }
+        form = forms.ContactsForm(data=data, prefix='c')
+        html = form.as_table()
+
+        expected = (
+            '<tr class="contacts-error  error-name error-email">'
+            '<td colspan="4"><ul class="errorlist nonfield"><li>'
+            'Please provide a name. '
+            'The provided email address is invalid.</li></ul></td></tr>\n'
+            '<tr>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" /></td>\n'
+            '<td><input id="id_c-email" name="c-email" type="email" '
+            'value="invalid email" /></td>\n'
+            '<td><input id="id_c-tel" name="c-tel" type="text" />'
+            '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
+            '<td><a data-prefix="c" '
+            'class="close remove-contact" href="#">'
+            '<span aria-hidden="true">&times;</span></a></td></tr>\n'
+        )
+        assert expected == html
+
+    def test_as_table_with_missing_email_or_phone_error(self):
+        data = {
+            'c-name': 'John',
+        }
+        form = forms.ContactsForm(data=data, prefix='c')
+        html = form.as_table()
+
+        expected = (
+            '<tr class="contacts-error  error-email error-phone">'
+            '<td colspan="4"><ul class="errorlist nonfield"><li>'
+            'Please provide either an email address or a phone number.'
+            '</li></ul></td></tr>\n'
+            '<tr>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" '
+            'value="John" /></td>\n'
+            '<td><input id="id_c-email" name="c-email" type="email" /></td>\n'
+            '<td><input id="id_c-tel" name="c-tel" type="text" />'
+            '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
+            '<td><a data-prefix="c" '
+            'class="close remove-contact" href="#">'
+            '<span aria-hidden="true">&times;</span></a></td></tr>\n'
         )
         assert expected == html
 
@@ -585,7 +683,21 @@ class ContactsFormTest(UserTestCase):
         form = forms.ContactsForm(data=data, prefix='contacts')
         assert form.is_valid() is True
 
-    def test_validate_invalid_form(self):
+    def test_validate_invalid_form_missing_name_invalid_email(self):
+        data = {
+            'contacts-name': '',
+            'contacts-email': 'invalid',
+            'contacts-tel': ''
+        }
+        form = forms.ContactsForm(data=data, prefix='contacts')
+        assert form.is_valid() is False
+        assert form.errors['name']
+        assert form.errors['email']
+        html = form.as_table()
+        assert 'error-name' in html
+        assert 'error-email' in html
+
+    def test_validate_invalid_form_missing_contact_data(self):
         data = {
             'contacts-name': 'John',
             'contacts-email': '',
@@ -593,8 +705,11 @@ class ContactsFormTest(UserTestCase):
         }
         form = forms.ContactsForm(data=data, prefix='contacts')
         assert form.is_valid() is False
-        assert ("Please provide either email or phone number" in
+        assert ("Please provide either an email address or a phone number." in
                 form.errors['__all__'])
+        html = form.as_table()
+        assert 'error-email' in html
+        assert 'error-phone' in html
 
 
 class DownloadFormTest(UserTestCase):

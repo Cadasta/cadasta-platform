@@ -5928,4 +5928,15 @@ ul.errorlist {
   text-transform: uppercase;
   padding-bottom: 2px; }
 
+/* =Contacts form styling
+-------------------------------------------------------------- */
+tr.contacts-error {
+  background: #fcf8e3; }
+  tr.contacts-error li {
+    padding: 0; }
+  tr.contacts-error + tr td {
+    border-top: none;
+    padding-top: 0;
+    background: #fcf8e3; }
+
 /*# sourceMappingURL=../../../../../static/css/main.css.map */
