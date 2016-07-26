@@ -61,7 +61,7 @@
       <table class="table table-hover datatable" data-paging-type="simple">
         <thead>
           <tr>
-            <th>{% trans "Relationship type" %}</th>
+            <th>{% trans "Relationship" %}</th>
             <th>{% trans "Party" %}</th>
           </tr>
         </thead>
@@ -99,7 +99,7 @@
           </a>
           <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
             <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-            {% trans "Upload new resource" %}
+            {% trans "Upload new" %}
           </a>
         </div>
       </div>
@@ -107,14 +107,14 @@
     {% else %}
       <div>
         <p>{% trans "This location does not have any connected resources. To add a resource, select from the options below." %}</p>
-        <div class="btn-group btn-group-justified">
+        <div class="btn-full btn-group btn-group-justified">
           <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             {% trans "Add from library" %}
           </a>
           <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
             <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-            {% trans "Upload new resource" %}
+            {% trans "Upload new" %}
           </a>
         </div>
       </div>

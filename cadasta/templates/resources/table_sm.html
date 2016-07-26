@@ -5,7 +5,7 @@
   <thead>
     <tr>
       <th class="col-md-10">{% trans "Resource" %}</th>
-      <th class="col-md-2">{% trans "Connections" %}</th>
+      <th class="col-md-2 hidden-md">{% trans "Connections" %}</th>
     </tr>
   </thead>
   <tbody>
@@ -19,7 +19,7 @@
           <strong>{{ resource.name }}</strong><br>{{ resource.file_name }}
         </div>
       </td>
-      <td>{{ resource.num_entities }}</td>
+      <td class="hidden-md">{{ resource.num_entities }}</td>
     </tr>
   {% endfor %}
   </tbody>

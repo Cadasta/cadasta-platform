@@ -811,10 +811,15 @@ textarea.form-control {
   max-height: 80px;
 }
 
+.file-well {
+  padding: 10px 20px;
+  margin-bottom: 0;
+}
+
 .file-input { // browse for file
   margin: 14px 0;
   height: 34px;
-  padding: 0 12px;
+  padding: 0;
   cursor: pointer;
 }
 
@@ -835,26 +840,75 @@ textarea.form-control {
   }
 }
 
+.input-group-addon {
+  background: $body-bg;
+}
+
 /* =Table for sort and filter
 -------------------------------------------------------------- */
 
 .dataTables_wrapper {
   clear: both;
+  .table-search { // search 
+    input {
+      margin-left: 0 !important;
+    }
+  }
+  .table-entries { // number of entries
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-right: 10px;
+    opacity: 0.8;
+  }
+  .table-num { // select number of entries per page
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-top: 3px;
+    padding-left: 10px;
+    border-left: 1px solid $table-border-color;
+    opacity: 0.8;
+    .input-sm {
+      padding: 5px;
+    }
+    select {
+      width: 55px !important;
+    }
+  }
+  .table-pagination { // pagination
+    float: right;
+    display: inline-block;
+    .pagination > li > a, 
+    .pagination > li > span {
+      color: $gray-dark;
+    }
+    .pagination > .disabled > a, .pagination > .disabled > a:focus, .pagination > .disabled > a:hover, .pagination > .disabled > span, .pagination > .disabled > span:focus, .pagination > .disabled > span:hover    {
+      color: $gray-medium;
+    }
+  }
+  table.dataTable thead {
+    .sorting::after {
+      content: initial;
+    }
+    .sorting_asc::after, .sorting_desc::after {
+      position: relative;
+      left: 8px;
+      display: inline-block;
+      font-size: 10px;
+      top: 1px;
+    }
+    .sorting_asc::after {
+      content: "\e253";
+    }
+    .sorting_desc::after {
+      content: "\e252";
+    }
+  }
 }
 
-@media (max-width: $screen-sm-max) {
-  .dataTables_wrapper .col-sm-6 {
-    width: 50% !important; // fix for col-xs-6
-    float: left !important;
-  }
-  
-  div.dataTables_wrapper div.dataTables_length {
-    text-align: left !important;
-  }
-  
-  div.dataTables_wrapper div.dataTables_filter {
-    text-align: right !important;
-  }
+.tab-content div.dataTables_wrapper div.dataTables_filter input {
+  max-width: 100px;
 }
 
 @media (max-width: 500px) {
@@ -909,36 +963,6 @@ textarea.form-control {
   div.org-logo {
     padding: 4px 0;
   }
-}
-
-table.dataTable thead {
-  .sorting::after {
-    content: initial;
-  }
-  .sorting_asc::after, .sorting_desc::after {
-    position: relative;
-    left: 8px;
-    display: inline-block;
-    font-size: 10px;
-    top: 1px;
-  }
-  .sorting_asc::after {
-    content: "\e253";
-  }
-  .sorting_desc::after {
-    content: "\e252";
-  }
-}
-
-div.dataTables_wrapper div.dataTables_length label /* show number dropdown */, 
-div.dataTables_wrapper div.dataTables_filter label /* search label */, 
-div.dataTables_wrapper div.dataTables_info /* showing number total */ {
-  opacity: 0.8;
-  font-size: 12px;
-}
-
-.tab-content div.dataTables_wrapper div.dataTables_filter input {
-  max-width: 100px;
 }
 
 table.table-location { // location details in map area
@@ -1295,4 +1319,3 @@ tr.contacts-error {
     background: $alert-warning-bg;
   }
 }
-

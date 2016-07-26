@@ -253,7 +253,6 @@ a {
     color: #1d3367;
     text-decoration: underline; }
   a:focus {
-    outline: thin dotted;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px; }
 
@@ -1228,7 +1227,6 @@ address {
   -ms-user-select: none;
   user-select: none; }
   .btn:focus, .btn.focus, .btn:active:focus, .btn:active.focus, .btn.active:focus, .btn.active.focus {
-    outline: thin dotted;
     outline: 5px auto -webkit-focus-ring-color;
     outline-offset: -2px; }
   .btn:hover, .btn:focus, .btn.focus {
@@ -1572,7 +1570,6 @@ select[size] {
 input[type="file"]:focus,
 input[type="radio"]:focus,
 input[type="checkbox"]:focus {
-  outline: thin dotted;
   outline: 5px auto -webkit-focus-ring-color;
   outline-offset: -2px; }
 
@@ -4231,7 +4228,7 @@ ul.resource-actions > li {
 
 .content-single .detail .tab-pane .top-btn {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   width: 100%;
   text-align: right;
   background: #f2f4f7;
@@ -5553,10 +5550,14 @@ body.map .content-single {
 textarea.form-control {
   max-height: 80px; }
 
+.file-well {
+  padding: 10px 20px;
+  margin-bottom: 0; }
+
 .file-input {
   margin: 14px 0;
   height: 34px;
-  padding: 0 12px;
+  padding: 0;
   cursor: pointer; }
 
 .spacing-lg {
@@ -5572,19 +5573,56 @@ textarea.form-control {
       font-weight: 300;
       display: block; }
 
+.input-group-addon {
+  background: #f2f4f7; }
+
 /* =Table for sort and filter
 -------------------------------------------------------------- */
 .dataTables_wrapper {
   clear: both; }
+  .dataTables_wrapper .table-search input {
+    margin-left: 0 !important; }
+  .dataTables_wrapper .table-entries {
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-right: 10px;
+    opacity: 0.8; }
+  .dataTables_wrapper .table-num {
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-top: 3px;
+    padding-left: 10px;
+    border-left: 1px solid #e7e8ea;
+    opacity: 0.8; }
+    .dataTables_wrapper .table-num .input-sm {
+      padding: 5px; }
+    .dataTables_wrapper .table-num select {
+      width: 55px !important; }
+  .dataTables_wrapper .table-pagination {
+    float: right;
+    display: inline-block; }
+    .dataTables_wrapper .table-pagination .pagination > li > a,
+    .dataTables_wrapper .table-pagination .pagination > li > span {
+      color: #595a5c; }
+    .dataTables_wrapper .table-pagination .pagination > .disabled > a, .dataTables_wrapper .table-pagination .pagination > .disabled > a:focus, .dataTables_wrapper .table-pagination .pagination > .disabled > a:hover, .dataTables_wrapper .table-pagination .pagination > .disabled > span, .dataTables_wrapper .table-pagination .pagination > .disabled > span:focus, .dataTables_wrapper .table-pagination .pagination > .disabled > span:hover {
+      color: #a6a7a8; }
+  .dataTables_wrapper table.dataTable thead .sorting::after {
+    content: initial; }
+  .dataTables_wrapper table.dataTable thead .sorting_asc::after, .dataTables_wrapper table.dataTable thead .sorting_desc::after {
+    position: relative;
+    left: 8px;
+    display: inline-block;
+    font-size: 10px;
+    top: 1px; }
+  .dataTables_wrapper table.dataTable thead .sorting_asc::after {
+    content: "\e253"; }
+  .dataTables_wrapper table.dataTable thead .sorting_desc::after {
+    content: "\e252"; }
 
-@media (max-width: 991px) {
-  .dataTables_wrapper .col-sm-6 {
-    width: 50% !important;
-    float: left !important; }
-  div.dataTables_wrapper div.dataTables_length {
-    text-align: left !important; }
-  div.dataTables_wrapper div.dataTables_filter {
-    text-align: right !important; } }
+.tab-content div.dataTables_wrapper div.dataTables_filter input {
+  max-width: 100px; }
 
 @media (max-width: 500px) {
   div.dataTables_wrapper div.dataTables_filter input {
@@ -5626,31 +5664,6 @@ textarea.form-control {
     min-width: 90px; }
   .table div.org-logo {
     padding: 4px 0; }
-
-table.dataTable thead .sorting::after {
-  content: initial; }
-
-table.dataTable thead .sorting_asc::after, table.dataTable thead .sorting_desc::after {
-  position: relative;
-  left: 8px;
-  display: inline-block;
-  font-size: 10px;
-  top: 1px; }
-
-table.dataTable thead .sorting_asc::after {
-  content: "\e253"; }
-
-table.dataTable thead .sorting_desc::after {
-  content: "\e252"; }
-
-div.dataTables_wrapper div.dataTables_length label,
-div.dataTables_wrapper div.dataTables_filter label,
-div.dataTables_wrapper div.dataTables_info {
-  opacity: 0.8;
-  font-size: 12px; }
-
-.tab-content div.dataTables_wrapper div.dataTables_filter input {
-  max-width: 100px; }
 
 table.table-location {
   border-top: none;
