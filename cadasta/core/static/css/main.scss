@@ -547,6 +547,10 @@ header {
   border-radius: 4px;
 }
 
+body.tinted-bg #page-content { // for bg image
+  background: transparent;
+}
+
 #project-wizard #page-content { // for non-map pages
   background: transparent;
   -webkit-box-shadow: none;
@@ -733,6 +737,9 @@ main.container-fluid {
   }
   .detail-edit { // edit on right
     background: $body-bg;
+    .panel-footer {
+      background: transparent;
+    }
   }
   .panel { // content box in main panel 
     border: 1px solid $table-border-color;
@@ -751,12 +758,10 @@ main.container-fluid {
       }
     }
     .panel-buttons { // buttons at bottom of panels containing forms
-      background: transparent;
       padding: 20px 15px;
       .btn {
         min-width: 140px;
         margin-right: 20px;
-        margin-bottom: 10px;
         &:last-child {
           margin-right: 0;
         }
@@ -850,6 +855,9 @@ textarea.form-control {
 .dataTables_wrapper {
   clear: both;
   .table-search { // search 
+    div.dataTables_filter {
+      text-align: left;
+    }
     input {
       margin-left: 0 !important;
     }
@@ -885,6 +893,10 @@ textarea.form-control {
     }
     .pagination > .disabled > a, .pagination > .disabled > a:focus, .pagination > .disabled > a:hover, .pagination > .disabled > span, .pagination > .disabled > span:focus, .pagination > .disabled > span:hover    {
       color: $gray-medium;
+    }
+    .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+      background-color: $gray-light;
+      border-color: #ddd;
     }
   }
   table.dataTable thead {
@@ -967,7 +979,6 @@ textarea.form-control {
 
 table.table-location { // location details in map area
   border-top: none;
-  border-bottom: none;
   tr:first-child td {
     border-top: none;
   }
@@ -1116,7 +1127,8 @@ img.org-logo, img#org-logo {
 -------------------------------------------------------------- */
 
 .top-btn {
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   .btn {
     min-width: 100px;
   }
@@ -1134,11 +1146,13 @@ button#add-party { // below contacts table and party table
   background: $gray-lighter;
   text-align: center;
   padding: 20px;
+  clear: both;
   margin: 20px 0;
   .btn {
     min-width: 200px;
-    margin: 10px;
-    padding: 10px 24px;
+  }
+  .btn-group .btn {
+    margin: 0;
   }
 }
 
@@ -1189,7 +1203,6 @@ div.add-btn-btm { // add party link at bottom of table
 @media (max-width: $screen-md-max) {
   .btn-full .btn {
     min-width: 100px;
-    padding: 10px;
   }
 }
 

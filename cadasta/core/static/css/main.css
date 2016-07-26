@@ -4221,10 +4221,8 @@ ul.resource-actions > li {
     padding-bottom: 2px; }
 
 .content-single .detail .btn-group {
-  margin-bottom: 20px; }
-
-.content-single .detail .btn-full .btn {
-  padding: 10px 12px; }
+  margin-left: auto;
+  margin-right: auto; }
 
 .content-single .detail .tab-pane .top-btn {
   margin-top: 0;
@@ -5348,6 +5346,9 @@ header {
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
   border-radius: 4px; }
 
+body.tinted-bg #page-content {
+  background: transparent; }
+
 #project-wizard #page-content {
   background: transparent;
   -webkit-box-shadow: none;
@@ -5500,6 +5501,8 @@ main.container-fluid {
     padding-top: 0; }
   .content-single .detail-edit {
     background: #f2f4f7; }
+    .content-single .detail-edit .panel-footer {
+      background: transparent; }
   .content-single .panel {
     border: 1px solid #e7e8ea;
     clear: both; }
@@ -5512,12 +5515,10 @@ main.container-fluid {
       padding-bottom: 10px;
       border-bottom: solid 1px #d9dadb; }
     .content-single .panel .panel-buttons {
-      background: transparent;
       padding: 20px 15px; }
       .content-single .panel .panel-buttons .btn {
         min-width: 140px;
-        margin-right: 20px;
-        margin-bottom: 10px; }
+        margin-right: 20px; }
         .content-single .panel .panel-buttons .btn:last-child {
           margin-right: 0; }
   .content-single .nav-tabs {
@@ -5580,6 +5581,8 @@ textarea.form-control {
 -------------------------------------------------------------- */
 .dataTables_wrapper {
   clear: both; }
+  .dataTables_wrapper .table-search div.dataTables_filter {
+    text-align: left; }
   .dataTables_wrapper .table-search input {
     margin-left: 0 !important; }
   .dataTables_wrapper .table-entries {
@@ -5608,6 +5611,9 @@ textarea.form-control {
       color: #595a5c; }
     .dataTables_wrapper .table-pagination .pagination > .disabled > a, .dataTables_wrapper .table-pagination .pagination > .disabled > a:focus, .dataTables_wrapper .table-pagination .pagination > .disabled > a:hover, .dataTables_wrapper .table-pagination .pagination > .disabled > span, .dataTables_wrapper .table-pagination .pagination > .disabled > span:focus, .dataTables_wrapper .table-pagination .pagination > .disabled > span:hover {
       color: #a6a7a8; }
+    .dataTables_wrapper .table-pagination .pagination > .active > a, .dataTables_wrapper .table-pagination .pagination > .active > a:focus, .dataTables_wrapper .table-pagination .pagination > .active > a:hover, .dataTables_wrapper .table-pagination .pagination > .active > span, .dataTables_wrapper .table-pagination .pagination > .active > span:focus, .dataTables_wrapper .table-pagination .pagination > .active > span:hover {
+      background-color: #d9dadb;
+      border-color: #ddd; }
   .dataTables_wrapper table.dataTable thead .sorting::after {
     content: initial; }
   .dataTables_wrapper table.dataTable thead .sorting_asc::after, .dataTables_wrapper table.dataTable thead .sorting_desc::after {
@@ -5666,8 +5672,7 @@ textarea.form-control {
     padding: 4px 0; }
 
 table.table-location {
-  border-top: none;
-  border-bottom: none; }
+  border-top: none; }
   table.table-location tr:first-child td {
     border-top: none; }
   table.table-location label {
@@ -5783,7 +5788,8 @@ img.org-logo, img#org-logo {
 /* =Buttons
 -------------------------------------------------------------- */
 .top-btn {
-  margin-top: 20px; }
+  margin-top: 10px;
+  margin-bottom: 10px; }
   .top-btn .btn {
     min-width: 100px; }
   .top-btn .btn-rt {
@@ -5797,11 +5803,12 @@ button#add-party {
   background: #eeeeee;
   text-align: center;
   padding: 20px;
+  clear: both;
   margin: 20px 0; }
   .btn-full .btn {
-    min-width: 200px;
-    margin: 10px;
-    padding: 10px 24px; }
+    min-width: 200px; }
+  .btn-full .btn-group .btn {
+    margin: 0; }
 
 .btn-link {
   min-width: 60px; }
@@ -5838,8 +5845,7 @@ div.add-btn-btm {
 
 @media (max-width: 1199px) {
   .btn-full .btn {
-    min-width: 100px;
-    padding: 10px; } }
+    min-width: 100px; } }
 
 /* =Alerts
 -------------------------------------------------------------- */

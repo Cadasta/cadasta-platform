@@ -43,10 +43,10 @@
               {% trans "You have successfully created your organization.  You're now ready to add your first project." %}
             </p>
             <div class="btn-full">
-              <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary btn-lg" role="button">
+              <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a new project" %}
               </a>
-              <a href="#" class="btn btn-primary btn-lg hidden" role="button">
+              <a href="#" class="btn btn-primary hidden" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add new members" %}
               </a>
             </div>

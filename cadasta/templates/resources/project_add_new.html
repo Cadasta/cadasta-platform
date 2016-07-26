@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
@@ -25,10 +26,8 @@
               <li role="presentation"><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}" role="tab">{% trans "From library" %}</a></li>
               <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
             </ul>
-  
             <h3>{% trans "Upload new file" %}</h3>
             <p>{% trans "To upload a new resource, select the file and provide the name and description below. Once complete, select the 'Save' button" %}.<br /><br /></p>
-
             {% include "resources/form.html" %}
           </div>
           <div class="panel-footer panel-buttons">
@@ -40,4 +39,5 @@
     </div>
   </div>
 </div>
+
 {% endblock %}

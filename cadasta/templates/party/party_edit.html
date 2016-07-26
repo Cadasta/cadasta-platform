@@ -4,7 +4,7 @@
 {% block modals %}
 <div class="modal-backdrop">
   <div class="modal show" data-backdrop="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST"
               action="{% url 'parties:edit' object.organization.slug object.slug form.instance.id %}">
@@ -24,7 +24,7 @@
                href="{% url 'parties:detail' object.organization.slug object.slug form.instance.id %}">
               {% trans "Cancel" %}
             </a>
-            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
+            <button type="submit" class="btn btn-primary" name="submit">
               {% trans "Save" %}
             </button>
           </div>
