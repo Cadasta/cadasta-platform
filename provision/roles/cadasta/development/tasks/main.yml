@@ -1,5 +1,7 @@
 - name: Install requirements
-  pip: virtualenv={{ virtualenv_path }} requirements={{ application_path }}requirements/dev.txt
+  pip: virtualenv="{{ virtualenv_path }}"
+       requirements="{{ application_path }}requirements/dev.txt"
+       extra_args="--find-links https://s3.amazonaws.com:443/cadasta-wheelhouse/index.html"
 
 - name: Activate virtual environment on VM login
   become: yes
