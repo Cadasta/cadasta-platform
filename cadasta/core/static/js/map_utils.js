@@ -50,7 +50,8 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
             weight: 2,
             dashArray: "5, 5",
             opacity: 1,
-            fill: false
+            fill: false,
+            clickable: false,
         }
       }
     );
