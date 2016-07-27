@@ -4,7 +4,6 @@
 <div class="row">
   <div class="col-md-6">
     {% csrf_token %}
-
     <div class="form-group{% if form.file.errors %} has-error{% endif %}">
       <label for="{{ form.file.id_for_label }}">{% trans "Select the file to upload" %}</label>
       <label class="pull-right control-label">{{ form.file.errors }}</label>
