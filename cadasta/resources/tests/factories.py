@@ -7,14 +7,8 @@ from accounts.tests.factories import UserFactory
 
 from ..models import Resource
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
-
-ensure_dirs(add='s3/uploads/resources')
-storage = FakeS3Storage()
-file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-file_name = storage.save('resources/image.jpg', file)
 
 
 class ResourceFactory(ExtendedFactory):
@@ -23,7 +17,21 @@ class ResourceFactory(ExtendedFactory):
 
     name = factory.Sequence(lambda n: "Resouce #%s" % n)
     description = factory.Sequence(lambda n: "Resource #%s description" % n)
-    file = file_name
     original_file = 'image.jpg'
     contributor = factory.SubFactory(UserFactory)
     project = factory.SubFactory(ProjectFactory)
+
+    @classmethod
+    def _prepare(cls, create, **kwargs):
+        resource = super()._prepare(create, **kwargs)
+
+        if not resource.file.url:
+            storage = FakeS3Storage()
+            file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
+            file_name = storage.save('resources/image.jpg', file)
+
+            resource.file = file_name
+            if create:
+                resource.save()
+
+        return resource

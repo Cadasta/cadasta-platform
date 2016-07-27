@@ -4,17 +4,15 @@ from django.test import TestCase
 from django.conf import settings
 
 from buckets.test.storage import FakeS3Storage
-from buckets.test.mocks import ensure_dirs
 
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
+from core.tests.util import make_dirs  # noqa
 from .. import models
 from ..managers import create_children, create_options
 from . import factories
 
 path = os.path.dirname(settings.BASE_DIR)
-ensure_dirs(add='s3/uploads/xls-forms')
-ensure_dirs(add='s3/uploads/xml-forms')
 
 
 class CreateChildrenTest(TestCase):
@@ -76,6 +74,7 @@ class CreateOptionsTest(TestCase):
         assert "Please provide at least one option for field 'qu'" in errors
 
 
+@pytest.mark.usefixtures('make_dirs')
 class QuestionnaireManagerTest(TestCase):
     def test_current(self):
         project = ProjectFactory.create()
@@ -93,8 +92,6 @@ class QuestionnaireManagerTest(TestCase):
         assert questionnaire == current
 
     def test_create_from_form(self):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
@@ -110,8 +107,6 @@ class QuestionnaireManagerTest(TestCase):
         assert model.version == 1
 
     def test_update_from_form(self):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
@@ -139,12 +134,10 @@ class QuestionnaireManagerTest(TestCase):
         assert project.current_questionnaire == model.id
 
     def test_create_from_invald_form(self):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(path + '/questionnaires/tests/files/'
                            'xls-form-invalid.xlsx', 'rb').read()
-        form = storage.save('xls-form-invalid.xlsx', file)
+        form = storage.save('xls-forms/xls-form-invalid.xlsx', file)
 
         with pytest.raises(InvalidXLSForm) as e:
             models.Questionnaire.objects.create_from_form(

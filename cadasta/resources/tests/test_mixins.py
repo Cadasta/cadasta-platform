@@ -1,9 +1,10 @@
+import pytest
 from django.db.models import Model
-from buckets.test.utils import ensure_dirs
 
 from ..mixins import ResourceModelMixin
 from .factories import ResourceFactory
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 
 
 class ResourceModel(ResourceModelMixin, Model):
@@ -11,9 +12,9 @@ class ResourceModel(ResourceModelMixin, Model):
         app_label = 'core'
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ResourceModelMixinTest(UserTestCase):
     def test_resources_property(self):
-        ensure_dirs(add='s3/uploads/resources')
         resource_model_1 = ResourceModel()
         resource_model_1.save()
 
@@ -27,7 +28,6 @@ class ResourceModelMixinTest(UserTestCase):
         assert resource_2 not in resource_model_1.resources
 
     def test_reload_resources(self):
-        ensure_dirs(add='s3/uploads/resources')
         resource_model_1 = ResourceModel()
         resource_model_1.save()
         ResourceFactory.create_batch(2, content_object=resource_model_1)

@@ -2,6 +2,7 @@ from datetime import datetime
 from django.test import TestCase
 from django.template.defaultfilters import date
 
+from core.tests.util import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from .factories import ResourceFactory
 from ..widgets import ResourceWidget

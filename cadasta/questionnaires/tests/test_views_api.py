@@ -1,13 +1,14 @@
 import os
 import json
+import pytest
 from django.conf import settings
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Policy
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from ..views import api
@@ -15,10 +16,9 @@ from ..models import Questionnaire
 from .factories import QuestionnaireFactory
 
 path = os.path.dirname(settings.BASE_DIR)
-ensure_dirs(add='s3/uploads/xls-forms')
-ensure_dirs(add='s3/uploads/xml-forms')
 
 
+@pytest.mark.usefixtures('make_dirs')
 class QuestionnaireDetailTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -44,8 +44,6 @@ class QuestionnaireDetailTest(UserTestCase):
         )
 
     def _get_form(self, form_name):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),

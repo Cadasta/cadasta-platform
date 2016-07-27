@@ -1,14 +1,29 @@
+import pytest
+import shutil
+import os
 from django.test import TestCase as DjangoTestCase
 from django.http import HttpRequest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
+from django.conf import settings
+from buckets.utils import ensure_dirs
 
 from core.tests.factories import PolicyFactory
 from accounts.tests.factories import UserFactory
 from jsonattrs.models import create_attribute_types
 from party.models import load_tenure_relationship_types
+
+
+@pytest.fixture(scope='class')
+def make_dirs(request):
+    ensure_dirs('uploads/resources', 'uploads/xls-forms', 'uploads/xml-forms',
+                'downloads')
+
+    def teardown():
+        shutil.rmtree(os.path.join(settings.MEDIA_ROOT, 's3'))
+    request.addfinalizer(teardown)
 
 
 class TestCase(DjangoTestCase):

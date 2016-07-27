@@ -1,3 +1,4 @@
+import pytest
 import os
 import os.path
 import json
@@ -9,17 +10,18 @@ from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.messages.api import get_messages
-import pytest
 
 from tutelary.models import Policy, Role, assign_user_policies
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.models import OrganizationRole, Project, ProjectRole
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.models import Questionnaire
+from resources.utils.io import ensure_dirs
+from resources.tests.utils import clear_temp  # noqa
 from ..views import default
 from .. import forms
 from .factories import OrganizationFactory, ProjectFactory, clause
@@ -333,6 +335,7 @@ class ProjectDashboardTest(UserTestCase):
                            is_superuser=True, is_administrator=True)
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectAddTest(UserTestCase):
     def setUp(self):
         super().setUp()
@@ -429,9 +432,6 @@ class ProjectAddTest(UserTestCase):
         assert 'organization' not in form_initial
 
     def _get_xls_form(self, form_name):
-        ensure_dirs(add='s3/uploads/xls-forms')
-        ensure_dirs(add='s3/uploads/xml-forms')
-
         path = os.path.dirname(settings.BASE_DIR)
         storage = FakeS3Storage()
         file = open(
@@ -693,6 +693,7 @@ class ProjectEditGeometryTest(UserTestCase):
         assert self.project.extent is None
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectEditDetailsTest(UserTestCase):
     post_data = {
         'name': 'New Name',
@@ -810,7 +811,6 @@ class ProjectEditDetailsTest(UserTestCase):
 
     def test_post_invalid_form(self):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs()
 
         storage = FakeS3Storage()
         file = open(
@@ -1098,9 +1098,12 @@ class ProjectUnarchiveTest(UserTestCase):
         assert self.prj.archived is True
 
 
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
 class ProjectDataDownloadTest(UserTestCase):
     def setUp(self):
         super().setUp()
+        ensure_dirs()
         self.view = default.ProjectDataDownload.as_view()
         self.request = HttpRequest()
 
@@ -1166,7 +1169,6 @@ class ProjectDataDownloadTest(UserTestCase):
         assert '/account/login/' in response['location']
 
     def test_post_with_authorized_user(self):
-        ensure_dirs()
         user = UserFactory.create()
         user.assign_policies(self.policy)
         response = self.req(user=user, method='POST', status=200)

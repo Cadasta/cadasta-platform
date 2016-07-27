@@ -6,12 +6,12 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Role
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from questionnaires.tests.factories import (QuestionnaireFactory,
@@ -30,8 +30,8 @@ from ..views import api
 path = os.path.dirname(settings.BASE_DIR)
 
 
+@pytest.mark.usefixtures('make_dirs')
 class XFormListTest(UserTestCase):
-
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -43,8 +43,6 @@ class XFormListTest(UserTestCase):
         self.superuser_role = Role.objects.get(name='superuser')
 
     def _get_form(self, form_name):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
@@ -105,8 +103,8 @@ class XFormListTest(UserTestCase):
         assert 'hash' not in content
 
 
+@pytest.mark.usefixtures('make_dirs')
 class XFormSubmissionTest(UserTestCase):
-
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -149,8 +147,6 @@ class XFormSubmissionTest(UserTestCase):
                 app_label='party', model='tenurerelationship'), errors=[])
 
     def _get_form(self, form_name):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
@@ -160,8 +156,6 @@ class XFormSubmissionTest(UserTestCase):
         return form
 
     def _get_resource(self, form_name):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/xforms/tests/files/{}.jpg'.format(form_name),

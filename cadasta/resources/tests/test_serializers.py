@@ -4,22 +4,18 @@ from django.conf import settings
 from rest_framework.serializers import ValidationError
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 
 from .factories import ResourceFactory
 from ..serializers import ResourceSerializer
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
 
-ensure_dirs(add='s3/uploads/resources')
-storage = FakeS3Storage()
-file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-file_name = storage.save('image.jpg', file)
 
-
+@pytest.mark.usefixtures('make_dirs')
 class ResourceSerializerTest(UserTestCase):
     def test_serialize_fields(self):
         resource = ResourceFactory.create()
@@ -33,6 +29,10 @@ class ResourceSerializerTest(UserTestCase):
         assert serialized_resource['file'] == resource.file.url
 
     def test_create_project_resource(self):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
+        file_name = storage.save('image.jpg', file)
+
         project = ProjectFactory.create()
         user = UserFactory.create()
         data = {

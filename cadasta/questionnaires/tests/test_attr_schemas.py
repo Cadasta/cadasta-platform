@@ -2,13 +2,13 @@ import os
 
 import pytest
 
-from buckets.test.mocks import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from jsonattrs.models import Attribute, Schema
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
@@ -25,10 +25,9 @@ from .attr_schemas import (location_relationship_xform_group,
 from .factories import QuestionnaireFactory
 
 path = os.path.dirname(settings.BASE_DIR)
-ensure_dirs(add='s3/uploads/xls-forms')
-ensure_dirs(add='s3/uploads/xml-forms')
 
 
+@pytest.mark.usefixtures('make_dirs')
 class CreateAttributeSchemaTest(UserTestCase):
     def test_create_attribute_schemas(self):
         storage = FakeS3Storage()
@@ -297,8 +296,6 @@ class CreateAttributeSchemaTest(UserTestCase):
             )
 
     def test_update_questionnaire_attribute_schema(self):
-        ensure_dirs()
-
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
@@ -335,11 +332,10 @@ class CreateAttributeSchemaTest(UserTestCase):
         assert s1 != s2
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ConditionalAttributeSchemaTest(UserTestCase):
-
     def setUp(self):
         super().setUp()
-        ensure_dirs()
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
