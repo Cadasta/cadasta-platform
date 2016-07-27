@@ -735,7 +735,17 @@ main.container-fluid {
         border-bottom: 0;
         padding-bottom: 6px;
       }
-    } 
+    }
+    .nav-tabs {
+      li > a {
+        font-size: 13px;
+        padding: 10px;
+      }
+      li.active > a, li.active > a:hover, li.active > a:focus {
+        border-color: $table-border-color;
+        border-bottom-color: transparent;
+      }
+    }
   }
   .row-height .detail { // columns fixed to match heights like org overview 
     padding-top: 0;
@@ -761,6 +771,9 @@ main.container-fluid {
         padding-bottom: 10px;
         border-bottom: solid 1px $gray-light;
       }
+      .top-add {
+        margin-bottom: -30px;
+      }
     }
     .panel-buttons { // buttons at bottom of panels containing forms
       padding: 20px 15px;
@@ -775,16 +788,6 @@ main.container-fluid {
   }
   .nav-tabs {
     margin-bottom: 20px;
-  }
-  .detail .nav-tabs {
-    li > a {
-      font-size: 13px;
-      padding: 10px;
-    }
-    li.active > a, li.active > a:hover, li.active > a:focus {
-      border-color: $table-border-color;
-      border-bottom-color: transparent;
-    }
   }
 }
 
@@ -924,7 +927,7 @@ textarea.form-control {
   }
 }
 
-.tab-content div.dataTables_wrapper div.dataTables_filter input {
+.detail div.dataTables_wrapper div.dataTables_filter input {
   max-width: 100px;
 }
 
@@ -1264,6 +1267,14 @@ div.add-btn-btm { // add party link at bottom of table
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: solid 1px #d9dadb;
+  }
+  .modal-header .nav-tabs {
+    position: relative;
+    top: $modal-title-padding + 1px;
+    left: 30px - $modal-title-padding;
+    li.active a {
+      background: $modal-content-bg;
+    }
   }
   .modal-body {
     max-height: calc(100vh - 200px);

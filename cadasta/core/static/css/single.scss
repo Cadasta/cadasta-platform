@@ -231,18 +231,8 @@
     margin-left: auto;
     margin-right: auto;
   }
-  .tab-pane .top-btn {
-    margin-top: 0;
-    margin-bottom: 0;
-    width: 100%;
-    text-align: right;
-    background: $body-bg;
-    padding: 10px;
-    position: relative;
-    top: -20px;
-  }
-  .tab-pane .top-btn .btn-group {
-    margin-bottom: 0;
+  .top-add {
+    margin-bottom: -30px;
   }
 }
 

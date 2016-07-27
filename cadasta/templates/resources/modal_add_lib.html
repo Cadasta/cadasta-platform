@@ -1,0 +1,35 @@
+{% load i18n %}
+
+<div class="modal-backdrop">
+  <div class="modal show" data-backdrop="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="POST">
+          <div class="modal-header">
+            <a class="close" href="{{ cancel_url }}{{ cancel_url_hash }}">
+              <span aria-hidden="true">&times;</span>
+            </a>
+            <h3 class="modal-title">{% trans "Add resource from library" %}</h3>
+            <ul class="nav nav-tabs" role="tablist">
+              <li role="presentation" class="active"><a href="" role="tab">{% trans "Add from library" %}</a></li>
+              <li role="presentation"><a href="{{ upload_url }}" role="tab">{% trans "Upload new" %}</a></li>
+            </ul>
+          </div>
+
+          <div class="modal-body">
+            {% include 'resources/table_add_lib.html' %}
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn btn-link cancel" href="{{ cancel_url }}{{ cancel_url_hash }}">
+              {% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary" name="submit">
+              {% trans "Save" %}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

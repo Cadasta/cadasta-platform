@@ -87,8 +87,12 @@ class ProjectResourcesTest(UserTestCase):
             content = response.render().content.decode('utf-8')
             expected = render_to_string(
                 'resources/project_list.html',
-                {'object_list': resources,
-                 'object': self.project},
+                {
+                    'object_list': resources,
+                    'object': self.project,
+                    'project_has_resources': (
+                        self.project.resource_set.exists()),
+                },
                 request=self.request
             )
             assert expected == content

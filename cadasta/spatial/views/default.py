@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from core.mixins import LoginPermissionRequiredMixin
 
 from resources.forms import AddResourceFromLibraryForm
+from resources.views.mixins import ProjectHasResourcesMixin
 from party.messages import TENURE_REL_CREATE
 from . import mixins
 from .. import forms
@@ -58,6 +59,7 @@ class LocationsAdd(LoginPermissionRequiredMixin,
 class LocationDetail(LoginPermissionRequiredMixin,
                      JsonAttrsMixin,
                      mixins.SpatialUnitObjectMixin,
+                     ProjectHasResourcesMixin,
                      generic.DetailView):
     template_name = 'spatial/location_detail.html'
     permission_required = 'spatial.view'
@@ -66,9 +68,7 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['relationships'] = (
-            context['location'].tenurerelationship_set.all()
-        )
+        context['relationships'] = self.object.tenurerelationship_set.all()
         return context
 
 
@@ -113,6 +113,7 @@ class LocationResourceAdd(LoginPermissionRequiredMixin,
 
 class LocationResourceNew(LoginPermissionRequiredMixin,
                           mixins.SpatialUnitResourceMixin,
+                          ProjectHasResourcesMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
     permission_required = 'spatial.resources.add'
