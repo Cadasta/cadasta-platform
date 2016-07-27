@@ -533,13 +533,18 @@ header {
 /* =Page Content
 -------------------------------------------------------------- */
 
-#page-content { // for page content default for index pages without subnav that overlap page-header
+#page-content { // for page content
   z-index: 800;
   position: relative;
-  padding-top: 30px;
   padding-bottom: 20px;
+}
+
+#projects #page-content,
+#organizations #page-content,
+#users #page-content { // index pages without subnav that overlap page-header
   max-width: 1220px;
   margin: -190px auto 10px;
+  padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
   -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
