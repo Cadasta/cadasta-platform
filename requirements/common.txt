@@ -27,3 +27,4 @@ django-jsonattrs==0.1.5
 openpyxl==2.3.5
 pytz==2016.4
 shapely==1.5.16
+gdal==1.11.2

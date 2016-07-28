@@ -12,13 +12,20 @@
       <h2>{% trans "Download project data" %}</h2>
       <div class="panel panel-default">
         <div class="panel-body">
-          <h3>Select your file format</h3>
+          <h3>Select your desired file format</h3>
           <ul class="list-unstyled spacing-lg">
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_shp" value="shp" {% if form.type.value == 'shp' %}checked{% endif%}>
+                {% trans "SHP" %}
+                <small>{% trans "A ZIP containing shape files for project locations, relationships, and parties." %}</small>
+              </label>
+            </li>
             <li class="radio">
               <label>
                 <input type="radio" name="type" id="data_xls" value="xls" {% if form.type.value == 'xls' %}checked{% endif%}>
                 {% trans "XLS" %}
-                <small>{% trans "A single file containing project locations, relationships, and parties." %}</small>
+                <small>{% trans "A single XLS spreadsheet containing project locations, relationships, and parties." %}</small>
               </label>
             </li>
             <li class="radio">
@@ -32,7 +39,7 @@
               <label>
                 <input type="radio" name="type" id="data_all" value="all" {% if form.type.value == 'all' %}checked{% endif%}>
                 {% trans "All data" %}
-                <small>{% trans "A zip file containing all project data XLS files and all resources." %}</small>
+                <small>{% trans "A zip file containing all project data XLS and SHP files and all resources." %}</small>
               </label>
             </li>
           </ul>

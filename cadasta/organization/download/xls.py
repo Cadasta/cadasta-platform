@@ -2,50 +2,23 @@ import os
 from openpyxl import Workbook
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from jsonattrs.models import Schema
+
+from .base import Exporter
 
 
 MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 
-class XLSExporter():
-    def __init__(self, project):
-        self.project = project
-
+class XLSExporter(Exporter):
     def write_items(self, worksheet, queryset, content_type, model_attrs):
-        selectors = [
-            self.project.organization.id,
-            self.project.id,
-            self.project.current_questionnaire
-        ]
-        schemas = Schema.objects.lookup(
-            content_type=content_type, selectors=selectors
-        )
-        attrs = []
-        if schemas:
-            attrs = [a for s in schemas
-                     for a in s.attributes.all() if not a.omit]
+        schema_attrs = self.get_schema_attrs(content_type)
 
         # write column labels
-        worksheet.append(model_attrs + [a.name for a in attrs])
+        worksheet.append(model_attrs + [a.name for a in schema_attrs])
 
         # write data
         for i, item in enumerate(queryset):
-            values = []
-            for j, attr in enumerate(model_attrs):
-                if '.' in attr:
-                    attr_items = attr.split('.')
-                    value = None
-                    for a in attr_items:
-                        value = (getattr(item, a)
-                                 if not value else getattr(value, a))
-                    values.append(value)
-                else:
-                    values.append(getattr(item, attr))
-
-            for j, attr in enumerate(attrs):
-                values.append(item.attributes.get(attr.name, ''))
-
+            values = self.get_values(item, model_attrs, schema_attrs)
             worksheet.append(values)
 
     def write_locations(self):
@@ -61,7 +34,8 @@ class XLSExporter():
         parties = self.project.parties.all()
         content_type = ContentType.objects.get(app_label='party',
                                                model='party')
-        self.write_items(worksheet, parties, content_type, ['id', 'name'])
+        self.write_items(worksheet, parties, content_type,
+                         ['id', 'name', 'type'])
 
     def write_relationships(self):
         worksheet = self.workbook.create_sheet(title='relationships')

@@ -725,6 +725,36 @@ class DownloadFormTest(UserTestCase):
         assert form.project == project
         assert form.user == user
 
+    def test_get_shape_download(self):
+        ensure_dirs()
+        data = {'type': 'shp'}
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+        form = forms.DownloadForm(project, user, data=data)
+        assert form.is_valid() is True
+        path, mime = form.get_file()
+        assert '{}-{}'.format(project.id, user.id) in path
+        assert (mime == 'application/zip')
+
+        with ZipFile(path, 'r') as testzip:
+            assert len(testzip.namelist()) == 16
+            assert project.slug + '-point.dbf' in testzip.namelist()
+            assert project.slug + '-point.prj' in testzip.namelist()
+            assert project.slug + '-point.shp' in testzip.namelist()
+            assert project.slug + '-point.shx' in testzip.namelist()
+            assert project.slug + '-line.dbf' in testzip.namelist()
+            assert project.slug + '-line.prj' in testzip.namelist()
+            assert project.slug + '-line.shp' in testzip.namelist()
+            assert project.slug + '-line.shx' in testzip.namelist()
+            assert project.slug + '-polygon.dbf' in testzip.namelist()
+            assert project.slug + '-polygon.prj' in testzip.namelist()
+            assert project.slug + '-polygon.shp' in testzip.namelist()
+            assert project.slug + '-polygon.shx' in testzip.namelist()
+            assert 'relationships.csv' in testzip.namelist()
+            assert 'parties.csv' in testzip.namelist()
+            assert 'locations.csv' in testzip.namelist()
+            assert 'README.txt' in testzip.namelist()
+
     def test_get_xls_download(self):
         ensure_dirs()
         data = {'type': 'xls'}
@@ -762,7 +792,8 @@ class DownloadFormTest(UserTestCase):
         assert mime == 'application/zip'
 
         with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 3
+            assert len(testzip.namelist()) == 4
             assert res.original_file in testzip.namelist()
             assert 'resources.xlsx' in testzip.namelist()
             assert 'data.xlsx' in testzip.namelist()
+            assert 'data-shp.zip' in testzip.namelist()
