@@ -1,43 +1,15 @@
-{% extends "organization/project_wrapper.html" %}
+{% extends "resources/project_list.html" %}
 {% load i18n %}
 
-{% block page_title %}Upload new resource | {% endblock %}
-{% block left-nav %}resources{% endblock %}
+{% block page_title %}Upload new resource for project | {% endblock %}
 
 {% block extra_script %}
   {{ form.media }}
   {% include "resources/scripts.html" %}
 {% endblock %}
 
-{% block content %}
-
-<div class="col-md-12 content-single">
-  <div class="row">
-    <!-- Main text  -->
-    <div class="col-md-12 main-text">
-      <div class="page-title">
-        <h2>{% trans "Resources: Add" %}</h2>
-      </div>
-      <form method="POST">
-      {% csrf_token %}
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <ul class="nav nav-tabs" role="tablist">
-              <li role="presentation"><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}" role="tab">{% trans "From library" %}</a></li>
-              <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
-            </ul>
-            <h3>{% trans "Upload new file" %}</h3>
-            <p>{% trans "To upload a new resource, select the file and provide the name and description below. Once complete, select the 'Save' button" %}.<br /><br /></p>
-            {% include "resources/form.html" %}
-          </div>
-          <div class="panel-footer panel-buttons">
-            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-            <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
+{% block modals %}
+{% url 'resources:project_list' object.organization.slug object.slug as cancel_url %}
+{% url 'resources:project_add_existing' object.organization.slug object.slug as add_lib_url %}
+{% include 'resources/modal_upload.html' %}
 {% endblock %}

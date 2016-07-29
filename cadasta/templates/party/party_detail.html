@@ -54,17 +54,25 @@
           <!-- /party information -->
           <!-- Party resources -->
           <h3>{% trans "Resources" %}</h3>
-          <div class="top-btn pull-right">
-            <div class="btn-group">
+          {% if party.resources %}
+            <div class="top-btn pull-right top-add">
               <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                {% trans "Add from library" %}</a>
-              <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
-                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-                {% trans "Upload new" %}</a>
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
             </div>
-          </div>
-          {% include 'resources/table.html' with object_list=party.resources %}
+            {% include 'resources/table.html' with object_list=party.resources %}
+          {% else %}
+            <div>
+              <p>{% trans "This party does not have any connected resources. To add a resource, select the button below." %}</p>
+              <div class="btn-full">
+                {% if project_has_resources %}
+                <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                {% else %}
+                <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
+                {% endif %}
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+              </div>
+            </div>
+          {% endif %}
           <!-- /party resources -->
         </div>
       </div>

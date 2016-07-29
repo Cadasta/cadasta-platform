@@ -4228,18 +4228,8 @@ ul.resource-actions > li {
   margin-left: auto;
   margin-right: auto; }
 
-.content-single .detail .tab-pane .top-btn {
-  margin-top: 0;
-  margin-bottom: 0;
-  width: 100%;
-  text-align: right;
-  background: #f2f4f7;
-  padding: 10px;
-  position: relative;
-  top: -20px; }
-
-.content-single .detail .tab-pane .top-btn .btn-group {
-  margin-bottom: 0; }
+.content-single .detail .top-add {
+  margin-bottom: -30px; }
 
 #project-map h2 {
   padding-bottom: 0; }
@@ -5505,6 +5495,12 @@ main.container-fluid {
       .content-single .detail ul.list-divider li:last-child {
         border-bottom: 0;
         padding-bottom: 6px; }
+    .content-single .detail .nav-tabs li > a {
+      font-size: 13px;
+      padding: 10px; }
+    .content-single .detail .nav-tabs li.active > a, .content-single .detail .nav-tabs li.active > a:hover, .content-single .detail .nav-tabs li.active > a:focus {
+      border-color: #e7e8ea;
+      border-bottom-color: transparent; }
   .content-single .row-height .detail {
     padding-top: 0; }
   .content-single .detail-edit {
@@ -5522,6 +5518,8 @@ main.container-fluid {
       margin-bottom: 10px;
       padding-bottom: 10px;
       border-bottom: solid 1px #d9dadb; }
+    .content-single .panel .panel-body .top-add {
+      margin-bottom: -30px; }
     .content-single .panel .panel-buttons {
       padding: 20px 15px; }
       .content-single .panel .panel-buttons .btn {
@@ -5531,12 +5529,6 @@ main.container-fluid {
           margin-right: 0; }
   .content-single .nav-tabs {
     margin-bottom: 20px; }
-  .content-single .detail .nav-tabs li > a {
-    font-size: 13px;
-    padding: 10px; }
-  .content-single .detail .nav-tabs li.active > a, .content-single .detail .nav-tabs li.active > a:hover, .content-single .detail .nav-tabs li.active > a:focus {
-    border-color: #e7e8ea;
-    border-bottom-color: transparent; }
 
 body.map .content-single {
   overflow-y: hidden; }
@@ -5635,7 +5627,7 @@ textarea.form-control {
   .dataTables_wrapper table.dataTable thead .sorting_desc::after {
     content: "\e252"; }
 
-.tab-content div.dataTables_wrapper div.dataTables_filter input {
+.detail div.dataTables_wrapper div.dataTables_filter input {
   max-width: 100px; }
 
 @media (max-width: 500px) {
@@ -5905,6 +5897,13 @@ div.add-btn-btm {
   margin-bottom: 10px;
   padding-bottom: 10px;
   border-bottom: solid 1px #d9dadb; }
+
+.modal .modal-header .nav-tabs {
+  position: relative;
+  top: 16px;
+  left: 15px; }
+  .modal .modal-header .nav-tabs li.active a {
+    background: #fff; }
 
 .modal .modal-body {
   max-height: calc(100vh - 200px);

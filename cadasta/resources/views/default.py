@@ -4,13 +4,14 @@ from core.views.mixins import ArchiveMixin
 
 from core.mixins import LoginPermissionRequiredMixin
 
-from .mixins import ProjectResourceMixin, ResourceObjectMixin
+from . import mixins
 from ..forms import AddResourceFromLibraryForm
 from .. import messages as error_messages
 
 
 class ProjectResources(LoginPermissionRequiredMixin,
-                       ProjectResourceMixin,
+                       mixins.ProjectResourceMixin,
+                       mixins.ProjectHasResourcesMixin,
                        generic.ListView):
     template_name = 'resources/project_list.html'
     permission_required = 'resource.list'
@@ -19,7 +20,7 @@ class ProjectResources(LoginPermissionRequiredMixin,
 
 
 class ProjectResourcesAdd(LoginPermissionRequiredMixin,
-                          ProjectResourceMixin,
+                          mixins.ProjectResourceMixin,
                           base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'resources/project_add_existing.html'
@@ -39,7 +40,8 @@ class ProjectResourcesAdd(LoginPermissionRequiredMixin,
 
 
 class ProjectResourcesNew(LoginPermissionRequiredMixin,
-                          ProjectResourceMixin,
+                          mixins.ProjectResourceMixin,
+                          mixins.ProjectHasResourcesMixin,
                           generic.CreateView):
     template_name = 'resources/project_add_new.html'
     permission_required = 'resource.add'
@@ -50,7 +52,7 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
 
 
 class ProjectResourcesDetail(LoginPermissionRequiredMixin,
-                             ResourceObjectMixin,
+                             mixins.ResourceObjectMixin,
                              generic.DetailView):
     template_name = 'resources/project_detail.html'
     permission_required = 'resource.view'
@@ -63,7 +65,7 @@ class ProjectResourcesDetail(LoginPermissionRequiredMixin,
 
 
 class ProjectResourcesEdit(LoginPermissionRequiredMixin,
-                           ResourceObjectMixin,
+                           mixins.ResourceObjectMixin,
                            generic.UpdateView):
     template_name = 'resources/edit.html'
     permission_required = 'resource.edit'
@@ -72,7 +74,7 @@ class ProjectResourcesEdit(LoginPermissionRequiredMixin,
 
 class ResourceArchive(LoginPermissionRequiredMixin,
                       ArchiveMixin,
-                      ResourceObjectMixin,
+                      mixins.ResourceObjectMixin,
                       generic.UpdateView):
     do_archive = True
     permission_required = 'resource.archive'
@@ -81,7 +83,7 @@ class ResourceArchive(LoginPermissionRequiredMixin,
 
 class ResourceUnarchive(LoginPermissionRequiredMixin,
                         ArchiveMixin,
-                        ResourceObjectMixin,
+                        mixins.ResourceObjectMixin,
                         generic.UpdateView):
     do_archive = False
     permission_required = 'resource.unarchive'

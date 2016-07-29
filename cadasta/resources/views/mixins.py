@@ -82,3 +82,12 @@ class ResourceObjectMixin(ProjectResourceMixin):
         context = super().get_context_data(*args, **kwargs)
         context['resource'] = self.get_object()
         return context
+
+
+class ProjectHasResourcesMixin(ProjectMixin):
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['project_has_resources'] = (
+            self.get_project().resource_set.exists()
+        )
+        return context

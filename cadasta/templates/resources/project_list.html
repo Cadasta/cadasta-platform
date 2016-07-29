@@ -12,14 +12,17 @@
     <div class="col-md-12 main-text">
       <div class="page-title">
         <h2>{% trans "Resources" %}</h2>
-        <div class="top-btn pull-right">
-          <a class="btn btn-primary" href="{% url 'resources:project_add_existing' project=object.slug organization=object.organization.slug %}">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
-          </a>
-        </div>
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
+          <div class="top-btn pull-right top-add">
+            {% if project_has_resources %}
+            <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_existing' project=object.slug organization=object.organization.slug %}">
+            {% else %}
+            <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_new' project=object.slug organization=object.organization.slug %}">
+            {% endif %}
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+          </div>
           {% include 'resources/table.html' %}
         </div>
       </div>
