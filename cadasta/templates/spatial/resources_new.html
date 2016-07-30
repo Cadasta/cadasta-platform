@@ -1,11 +1,11 @@
-{% extends "spatial/location_wrapper.html" %}
+{% extends "spatial/location_detail.html" %}
 {% load i18n %}
 
 {% block page_title %}Upload new resource for location | {% endblock %}
 
-{% block extra_script %}
+{% block location_extra_script %}
   {{ form.media }}
-  {% include "resources/scripts.html" %}
+  {% include "resources/script_upload.html" %}
 {% endblock %}
 
 {% block modals %}

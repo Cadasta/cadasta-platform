@@ -3,6 +3,10 @@
 
 {% block page_title %}Add new resource for project | {% endblock %}
 
+{% block extra_script %}
+  {% include 'resources/script_add_lib.html' %}
+{% endblock %}
+
 {% block modals %}
 {% url 'resources:project_list' object.organization.slug object.slug as cancel_url %}
 {% url 'resources:project_add_new' object.organization.slug object.slug as upload_url %}
