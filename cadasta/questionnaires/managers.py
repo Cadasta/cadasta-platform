@@ -1,19 +1,19 @@
-import os
-import itertools
-import re
 import hashlib
+import itertools
+import os
+import re
+from datetime import datetime
+
+from lxml import etree
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
-
 from django.db import models, transaction
-from django.db.models import Max
 from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType, Schema
-from pyxform.xls2json import parse_file_to_json
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
-
+from pyxform.xls2json import parse_file_to_json
 from questionnaires.exceptions import InvalidXLSForm
 
 ATTRIBUTE_GROUPS = {
@@ -79,7 +79,6 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
     fields = []
     selectors = (project.organization.pk, project.pk,
                  project.current_questionnaire)
-
     # check if the attribute group has a relevant bind statement,
     # eg ${party_type}='IN'
     # this enables conditional attribute schema creation
@@ -131,52 +130,47 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
 
 class QuestionnaireManager(models.Manager):
 
-    def current(self, **kwargs):
-        max = self.filter(**kwargs).aggregate(Max('version'))['version__max']
-        return self.get(version=max, **kwargs)
-
     def create_from_form(self, xls_form=None, project=None):
         with transaction.atomic():
             instance = self.model(
                 xls_form=xls_form,
                 project=project
             )
-
             json = parse_file_to_json(instance.xls_form.file.name)
-
-            try:
-                current = self.current(
-                    project=project,
-                    name=json.get('name'))
-                version = current.version + 1
-            except self.model.DoesNotExist:
-                version = 1
-
-            instance.name = json.get('name')
+            instance.filename = json.get('name')
             instance.title = json.get('title')
             instance.id_string = json.get('id_string')
-            instance.version = version
+            instance.version = int(
+                datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4]
+            )
             instance.md5_hash = self.get_hash(
-                instance.id_string, instance.version)
-            # ignoring pyxform errors to provide more verbose errors later.
+                instance.filename, instance.id_string, instance.version
+            )
+
+            errors = []
+
             try:
                 survey = create_survey_element_from_dict(json)
-                xml_form = survey.xml().toprettyxml()
-                content = str.encode(xml_form)
+                xml_form = survey.xml().toxml()
+                # insert version attr into the xform instance root node
+                xml = self.insert_version_attribute(
+                    xml_form, instance.filename, instance.version
+                )
                 name = os.path.join(instance.xml_form.field.upload_to,
-                                    os.path.basename(instance.name))
+                                    os.path.basename(instance.filename))
                 url = instance.xml_form.storage.save(
-                    '{}.xml'.format(name), content)
-
+                    '{}.xml'.format(name), xml)
                 instance.xml_form = url
-            except PyXFormError:
-                pass
+            except PyXFormError as e:
+                errors.append(
+                    _('{error}'.format(
+                        error=str(e)))
+                )
+
             instance.save()
 
             project.current_questionnaire = instance.id
             project.save()
-
-            errors = []
 
             create_children(
                 children=json.get('children'),
@@ -190,9 +184,23 @@ class QuestionnaireManager(models.Manager):
 
             return instance
 
-    def get_hash(self, id_string, version):
-        string = str(id_string) + str(version)
+    def get_hash(self, filename, id_string, version):
+        string = str(filename) + str(id_string) + str(version)
         return hashlib.md5(string.encode()).hexdigest()
+
+    def insert_version_attribute(self, xform, root_node, version):
+        ns = {'xf': 'http://www.w3.org/2002/xforms'}
+        root = etree.fromstring(xform)
+        inst = root.find(
+            './/xf:instance/xf:{root_node}'.format(
+                root_node=root_node
+            ), namespaces=ns
+        )
+        inst.set('version', str(version))
+        xml = etree.tostring(
+            root, method='xml', encoding='utf-8', pretty_print=True
+        )
+        return xml
 
 
 class QuestionGroupManager(models.Manager):
