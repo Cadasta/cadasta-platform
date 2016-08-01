@@ -46,7 +46,8 @@ IMAGE_2 = '''
     '''.strip()
 
 FORM = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire id="test_standard_questionnaire">
+    <test_standard_questionnaire
+        id="test_standard_questionnaire" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -82,7 +83,8 @@ FORM = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire>'''.strip()
 
 FORM_2_RESOURCES = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire id="test_standard_questionnaire">
+    <test_standard_questionnaire
+        id="test_standard_questionnaire" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -118,7 +120,8 @@ FORM_2_RESOURCES = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire>'''.strip()
 
 INVALID_FORM = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire id="test_standard_questionnaire">
+    <test_standard_questionnaire
+        id="test_standard_questionnaire" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -154,7 +157,8 @@ INVALID_FORM = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire>'''.strip()
 
 POLY_FORM = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire id="test_standard_questionnaire">
+    <test_standard_questionnaire
+        id="test_standard_questionnaire" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -193,7 +197,8 @@ POLY_FORM = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire>'''.strip()
 
 LINE_FORM = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire id="test_standard_questionnaire">
+    <test_standard_questionnaire
+        id="test_standard_questionnaire" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -234,7 +239,8 @@ LINE_FORM = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire>'''.strip()
 
 MISSING_SEMI_FORM = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire id="test_standard_questionnaire">
+    <test_standard_questionnaire
+        id="test_standard_questionnaire" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -271,7 +277,8 @@ MISSING_SEMI_FORM = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire>'''.strip()
 
 GEOSHAPE_FORM = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire_2 id="test_standard_questionnaire_2">
+    <test_standard_questionnaire_2
+        id="test_standard_questionnaire_2" version="20160727122111">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>
@@ -298,7 +305,7 @@ GEOSHAPE_FORM = '''<?xml version=\'1.0\' ?>
     </test_standard_questionnaire_2>'''.strip()
 
 BAD_QUESTIONNAIRE = '''<?xml version=\'1.0\' ?>
-    <tax_return id="tax_return">
+    <tax_return id="tax_return" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
         <end>2016-07-07T16:39:23.673-04</end>
         <today>2016-07-07</today>

@@ -1,28 +1,30 @@
+from buckets.fields import S3FileField
+from core.models import RandomIDModel
 from django.db import models
 from django.utils.translation import ugettext as _
-
-from tutelary.decorators import permissioned_model
 from simple_history.models import HistoricalRecords
-from buckets.fields import S3FileField
+from tutelary.decorators import permissioned_model
 
-from core.models import RandomIDModel
 from . import managers, messages
 
 
 @permissioned_model
 class Questionnaire(RandomIDModel):
-    name = models.CharField(max_length=100)
+    filename = models.CharField(max_length=100)
     title = models.CharField(max_length=500)
     id_string = models.CharField(max_length=50)
     xls_form = S3FileField(upload_to='xls-forms')
     xml_form = S3FileField(upload_to='xml-forms', default=False)
     project = models.ForeignKey('organization.Project',
                                 related_name='questionnaires')
-    version = models.IntegerField(default=1)
+    version = models.BigIntegerField(default=1)
     md5_hash = models.CharField(max_length=50, default=False)
 
     objects = managers.QuestionnaireManager()
     history = HistoricalRecords()
+
+    class Meta:
+        unique_together = ('id_string', 'version')
 
     class TutelaryMeta:
         perm_type = 'questionnaire'

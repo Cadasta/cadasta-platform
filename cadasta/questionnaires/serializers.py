@@ -1,10 +1,11 @@
-from rest_framework import serializers
 from buckets.serializers import S3Field
+from rest_framework import serializers
 
 from . import models
 
 
 class QuestionOptionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.QuestionOption
         fields = ('id', 'name', 'label',)
@@ -12,6 +13,7 @@ class QuestionOptionSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.Question
         fields = ('id', 'name', 'label', 'type', 'required', 'constraint',)
@@ -40,25 +42,31 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
 class QuestionnaireSerializer(serializers.ModelSerializer):
     xls_form = S3Field()
     xml_form = S3Field(required=False)
+    id_string = serializers.CharField(
+        max_length=50, required=False, default=''
+    )
+    version = serializers.IntegerField(required=False, default=1)
     questions = serializers.SerializerMethodField()
     question_groups = QuestionGroupSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Questionnaire
-        fields = ('id', 'name', 'title', 'id_string', 'xls_form', 'xml_form',
-                  'version', 'questions', 'question_groups', 'md5_hash')
-        read_only_fields = ('id', 'name', 'title', 'id_string', 'version',
-                            'questions', 'question_groups')
+        fields = (
+            'id', 'filename', 'title', 'id_string', 'xls_form', 'xml_form',
+            'version', 'questions', 'question_groups', 'md5_hash'
+        )
+        read_only_fields = (
+            'id', 'filename', 'title', 'id_string', 'version',
+            'questions', 'question_groups'
+        )
 
     def create(self, validated_data):
         project = self.context['project']
         form = validated_data['xls_form']
-
         instance = models.Questionnaire.objects.create_from_form(
             xls_form=form,
             project=project
         )
-
         return instance
 
     def get_questions(self, instance):

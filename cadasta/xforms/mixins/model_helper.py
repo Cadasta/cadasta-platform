@@ -1,12 +1,14 @@
-from shapely.geometry import Point, Polygon, LineString
+from shapely.geometry import LineString, Point, Polygon
 from shapely.wkt import dumps
-from django.forms import ValidationError
-from django.core.files.storage import get_storage_class
 
-from questionnaires.models import Questionnaire, Question
+from django.core.files.storage import get_storage_class
+from django.forms import ValidationError
 from party.models import Party, TenureRelationship, TenureRelationshipType
+from questionnaires.models import Question, Questionnaire
 from resources.models import Resource
 from spatial.models import SpatialUnit
+
+from ..exceptions import XFormOutOfDateError
 
 
 class ModelHelper():
@@ -14,12 +16,22 @@ class ModelHelper():
     todo:
     Update storage after upgrading to latest django-buckets
     """
+
     def __init__(self, *arg):
         self.arg = arg
 
     def add_data_to_models(self, data):
-        questionnaire = self.get_questionnaire(data=data['id'])
+        questionnaire = self.get_questionnaire(
+            id_string=data['id'], version=data['version']
+        )
         project = questionnaire.project
+
+        if project.current_questionnaire != questionnaire.id:
+            raise XFormOutOfDateError(
+                """Form out of date. Download the latest version of the form for this project.
+                """
+            )
+
         party = self.add_data_to_party(data, project)
         location = self.add_data_to_spatial_unit(data, project, questionnaire)
         self.add_data_to_tenure_relationship(data, party, location, project)
@@ -36,7 +48,7 @@ class ModelHelper():
 
     def add_data_to_spatial_unit(self, data, project, questionnaire):
         geoshape = Question.objects.filter(
-             questionnaire=questionnaire, type='GS').exists()
+            questionnaire=questionnaire, type='GS').exists()
         location = SpatialUnit.objects.create(
             project=project,
             type=data['location_type'],
@@ -52,7 +64,7 @@ class ModelHelper():
             party=party,
             spatial_unit=location,
             tenure_type=TenureRelationshipType.objects.get(
-                            id=data['tenure_type']),
+                id=data['tenure_type']),
             attributes=self.get_attributes(data, 'tenure_relationship')
         )
 
@@ -97,14 +109,13 @@ class ModelHelper():
             latlng = [x for x in latlng if x]
             return dumps(Point(float(latlng[1]), float(latlng[0])))
 
-    def get_questionnaire(self, data):
+    def get_questionnaire(self, id_string, version):
         try:
-            return Questionnaire.objects.get(name=data)
+            return Questionnaire.objects.get(
+                id_string=id_string, version=int(version)
+            )
         except Questionnaire.DoesNotExist:
-            try:
-                return Questionnaire.objects.get(id_string=data)
-            except Questionnaire.DoesNotExist:
-                raise ValidationError('Questionnaire not found.')
+            raise ValidationError('Questionnaire not found.')
 
     def get_attributes(self, data, model_type):
         """
@@ -131,16 +142,19 @@ class ModelHelper():
     def upload_files(self, data, survey):
         user = data.user
         data = data.FILES
-        project = self.get_questionnaire(data=survey['formid']).project
+        questionnaire = self.get_questionnaire(
+            id_string=survey['id_string'], version=survey['version']
+        )
+        project = questionnaire.project
         for i in data:
             content_object = None
             if i != 'xml_submission_file':
                 if i == survey['location_photo']:
                     content_object = SpatialUnit.objects.get(
-                                    id=survey['location'])
+                        id=survey['location'])
                 elif i == survey['party_photo']:
                     content_object = Party.objects.get(
-                                    id=survey['party'])
+                        id=survey['party'])
 
                 self.add_data_to_resource(data=data[i],
                                           user=user,

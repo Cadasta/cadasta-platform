@@ -1,37 +1,41 @@
-import os
 import io
+import os
+
 import pytest
-from django.conf import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from lxml import etree
 
+from accounts.tests.factories import UserFactory
 from buckets.test.storage import FakeS3Storage
-from rest_framework.test import APIRequestFactory, force_authenticate
-from tutelary.models import Role
-
 from core.tests.base_test_case import UserTestCase
 from core.tests.util import make_dirs  # noqa
-from accounts.tests.factories import UserFactory
-from organization.tests.factories import OrganizationFactory, ProjectFactory
-from questionnaires.tests.factories import (QuestionnaireFactory,
-                                            QuestionFactory)
-from questionnaires.managers import create_attrs_schema
-from party.models import Party
-from resources.models import Resource
-from spatial.models import SpatialUnit
-from .attr_schemas import (location_xform_group,
-                           party_xform_group,
-                           tenure_relationship_xform_group)
-from xforms.tests.files.test_resources import images, responses
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from organization.models import OrganizationRole
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+from party.models import Party
+from questionnaires.managers import create_attrs_schema
+from questionnaires.models import Questionnaire
+from questionnaires.tests.factories import (QuestionFactory,
+                                            QuestionnaireFactory)
+from resources.models import Resource
+from rest_framework.test import APIRequestFactory, force_authenticate
+from spatial.models import SpatialUnit
+from tutelary.models import Role
+from xforms.tests.files.test_resources import images, responses
+
 from ..views import api
+from .attr_schemas import (default_party_xform_group,
+                           individual_party_xform_group, location_xform_group,
+                           tenure_relationship_xform_group)
 
 path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
 class XFormListTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -70,8 +74,8 @@ class XFormListTest(UserTestCase):
         questionnaire = QuestionnaireFactory.create(
             project=self.prj, xls_form=self._get_form('xls-form'))
         content = self._get(status=200)
-
         assert questionnaire.md5_hash in content
+        assert str(questionnaire.version) in content
         assert questionnaire.xml_form.url in content
 
     def test_get_xforms_with_unauthroized_user(self):
@@ -93,6 +97,34 @@ class XFormListTest(UserTestCase):
         assert questionnaire.md5_hash in content
         assert questionnaire.xml_form.url in content
 
+    def test_get_xforms_with_no_superuser(self):
+        user = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, admin=False)
+        version = 2016072516330112
+        q1 = QuestionnaireFactory.create(
+            project=self.prj, xls_form=self._get_form('xls-form'),
+            version=version, id_string='test_form_1'
+        )
+        q2 = QuestionnaireFactory.create(
+            project=self.prj, xls_form=self._get_form('xls-form'),
+            version=version + 1, id_string='test_form_2'
+        )
+        assert Questionnaire.objects.all().count() == 2
+        assert q1.version != q2.version
+
+        content = self._get(user=user, status=200)
+        xml = etree.fromstring(content.encode('utf-8'))
+        ns = {'xf': 'http://openrosa.org/xforms/xformsList'}
+        # expect one xform element in response
+        assert len(xml.xpath('.//xf:xform', namespaces=ns)) == 1
+        assert xml.find(
+            './/xf:xform/xf:version', namespaces=ns
+        ).text == str(version + 1)
+        assert xml.find(
+            './/xf:xform/xf:formID', namespaces=ns
+        ).text == 'test_form_2'
+
     def test_get_without_data(self):
         request = APIRequestFactory().get(self.url)
         force_authenticate(request, user=self.user)
@@ -105,6 +137,7 @@ class XFormListTest(UserTestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class XFormSubmissionTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -116,11 +149,16 @@ class XFormSubmissionTest(UserTestCase):
         QuestionnaireFactory.create(
             project=self.prj,
             xls_form=self._get_form('test_standard_questionnaire'),
-            name='test_standard_questionnaire')
+            filename='test_standard_questionnaire',
+            id_string='test_standard_questionnaire',
+            version=20160727122110)
         q = QuestionnaireFactory.create(
             project=self.prj_2,
             xls_form=self._get_form('test_standard_questionnaire_2'),
-            name='test_standard_questionnaire_2')
+            filename='test_standard_questionnaire_2',
+            id_string='test_standard_questionnaire_2',
+            version=20160727122111)
+
         QuestionFactory.create(
             name='location_geometry',
             label='Location of Parcel',
@@ -129,8 +167,13 @@ class XFormSubmissionTest(UserTestCase):
         self.url = '/collect/submission/'
         self.superuser_role = Role.objects.get(name='superuser')
 
+        # project 1
         create_attrs_schema(
-            project=self.prj, dict=party_xform_group,
+            project=self.prj, dict=default_party_xform_group,
+            content_type=ContentType.objects.get(
+                app_label='party', model='party'), errors=[])
+        create_attrs_schema(
+            project=self.prj, dict=individual_party_xform_group,
             content_type=ContentType.objects.get(
                 app_label='party', model='party'), errors=[])
         create_attrs_schema(
@@ -138,11 +181,25 @@ class XFormSubmissionTest(UserTestCase):
             content_type=ContentType.objects.get(
                 app_label='spatial', model='spatialunit'), errors=[])
         create_attrs_schema(
+            project=self.prj, dict=tenure_relationship_xform_group,
+            content_type=ContentType.objects.get(
+                app_label='party', model='tenurerelationship'), errors=[])
+
+        # project 2
+        create_attrs_schema(
+            project=self.prj_2, dict=default_party_xform_group,
+            content_type=ContentType.objects.get(
+                app_label='party', model='party'), errors=[])
+        create_attrs_schema(
+            project=self.prj_2, dict=individual_party_xform_group,
+            content_type=ContentType.objects.get(
+                app_label='party', model='party'), errors=[])
+        create_attrs_schema(
             project=self.prj_2, dict=location_xform_group,
             content_type=ContentType.objects.get(
                 app_label='spatial', model='spatialunit'), errors=[])
         create_attrs_schema(
-            project=self.prj, dict=tenure_relationship_xform_group,
+            project=self.prj_2, dict=tenure_relationship_xform_group,
             content_type=ContentType.objects.get(
                 app_label='party', model='tenurerelationship'), errors=[])
 
@@ -152,7 +209,7 @@ class XFormSubmissionTest(UserTestCase):
             path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb'
         ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
+        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def _get_resource(self, form_name):
@@ -228,7 +285,6 @@ class XFormSubmissionTest(UserTestCase):
 
         if status is not None:
             assert response.status_code == status
-
         return content
 
     def test_survey_upload(self):
@@ -301,3 +357,14 @@ class XFormSubmissionTest(UserTestCase):
             request).render()
 
         assert response.status_code == 204
+
+    def test_form_not_current_questionnaire(self):
+        # update the default form to a new version
+        QuestionnaireFactory.create(
+            project=self.prj,
+            xls_form=self._get_form('test_standard_questionnaire'),
+            filename='test_standard_questionnaire_updated',
+            id_string='test_standard_questionnaire',
+            version=20160727122111
+        )
+        self._post(form='form', status=410)

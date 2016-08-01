@@ -1,10 +1,8 @@
-from rest_framework import serializers
-from django.utils.translation import gettext as _
-
 from core.serializers import FieldSelectorSerializer
-from xforms.mixins.model_helper import ModelHelper
-
+from django.utils.translation import gettext as _
 from pyxform.xform2json import XFormToDict
+from rest_framework import serializers
+from xforms.mixins.model_helper import ModelHelper
 
 
 class XFormListSerializer(FieldSelectorSerializer,
@@ -44,8 +42,8 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
 
     def create(self, request, *args, **kwargs):
         data = XFormToDict(
-            request['xml_submission_file'].read().decode('ascii')
-            ).get_dict()
+            request['xml_submission_file'].read().decode('utf-8')
+        ).get_dict()
         survey = data[list(data.keys())[0]]
         model_helper = ModelHelper()
         create_models = model_helper.add_data_to_models(survey)
@@ -58,12 +56,14 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
                 party_photo = survey[key]
 
         return {
-                'message': _("Successful submission."),
-                'formid': list(data.keys())[0],
-                'instanceID': survey['meta']['instanceID'],
-                'project': create_models['project'],
-                'location_photo': location_photo,
-                'location': create_models['location'].id,
-                'party_photo': party_photo,
-                'party': create_models['party'].id
-            }
+            'message': _("Successful submission."),
+            'formid': list(data.keys())[0],
+            'id_string': survey['id'],
+            'version': survey['version'],
+            'instanceID': survey['meta']['instanceID'],
+            'project': create_models['project'],
+            'location_photo': location_photo,
+            'location': create_models['location'].id,
+            'party_photo': party_photo,
+            'party': create_models['party'].id
+        }

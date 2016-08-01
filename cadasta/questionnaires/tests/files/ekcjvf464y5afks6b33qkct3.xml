@@ -1,0 +1,112 @@
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:jr="http://openrosa.org/javarosa" xmlns:orx="http://openrosa.org/xforms" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<h:head>
+		<h:title>Jurassic Park Survey</h:title>
+		<model>
+			<instance>
+				<ekcjvf464y5afks6b33qkct3 id="jurassic_park_survey">
+					<start/>
+					<end/>
+					<today/>
+					<deviceid/>
+					<title/>
+					<party_type/>
+					<party_name/>
+					<location_attributes>
+						<location_name/>
+					</location_attributes>
+					<location_geometry/>
+					<location_type/>
+					<location_photo/>
+					<party_photo/>
+					<tenure_type/>
+					<party_attributes/>
+					<location_relationship_attributes/>
+					<party_relationship_attributes/>
+					<tenure_relationship_attributes/>
+					<meta>
+						<instanceID/>
+					</meta>
+				</ekcjvf464y5afks6b33qkct3>
+			</instance>
+			<bind jr:preload="timestamp" jr:preloadParams="start" nodeset="/ekcjvf464y5afks6b33qkct3/start" type="dateTime"/>
+			<bind jr:preload="timestamp" jr:preloadParams="end" nodeset="/ekcjvf464y5afks6b33qkct3/end" type="dateTime"/>
+			<bind jr:preload="date" jr:preloadParams="today" nodeset="/ekcjvf464y5afks6b33qkct3/today" type="date"/>
+			<bind jr:preload="property" jr:preloadParams="deviceid" nodeset="/ekcjvf464y5afks6b33qkct3/deviceid" type="string"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/title" readonly="true()" type="string"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/party_type" type="select1"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/party_name" type="string"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/location_attributes/location_name" type="string"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/location_geometry" type="geoshape"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/location_type" type="select1"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/location_photo" type="binary"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/party_photo" type="binary"/>
+			<bind nodeset="/ekcjvf464y5afks6b33qkct3/tenure_type" type="select1"/>
+			<bind calculate="concat('uuid:', uuid())" nodeset="/ekcjvf464y5afks6b33qkct3/meta/instanceID" readonly="true()" type="string"/>
+		</model>
+	</h:head>
+	<h:body>
+		<input ref="/ekcjvf464y5afks6b33qkct3/title">
+			<label>Little Free Library Survey</label>
+		</input>
+		<select1 ref="/ekcjvf464y5afks6b33qkct3/party_type">
+			<label>Party Classification</label>
+			<item>
+				<label>Group</label>
+				<value>gr</value>
+			</item>
+			<item>
+				<label>Individual</label>
+				<value>in</value>
+			</item>
+			<item>
+				<label>Corporation</label>
+				<value>co</value>
+			</item>
+		</select1>
+		<input ref="/ekcjvf464y5afks6b33qkct3/party_name">
+			<label>Community Name</label>
+		</input>
+		<group ref="/ekcjvf464y5afks6b33qkct3/location_attributes">
+			<label>Location Attributes</label>
+			<input ref="/ekcjvf464y5afks6b33qkct3/location_attributes/location_name">
+				<label>Name of Location</label>
+			</input>
+		</group>
+		<input ref="/ekcjvf464y5afks6b33qkct3/location_geometry">
+			<label>Location of Parcel</label>
+			<hint>GPS coordinates can only be collected when outside.</hint>
+		</input>
+		<select1 ref="/ekcjvf464y5afks6b33qkct3/location_type">
+			<label>What is the land feature?</label>
+			<item>
+				<label>Miscellaneous</label>
+				<value>MI</value>
+			</item>
+		</select1>
+		<upload mediatype="image/*" ref="/ekcjvf464y5afks6b33qkct3/location_photo">
+			<label>Photo of Parcel?</label>
+		</upload>
+		<upload mediatype="image/*" ref="/ekcjvf464y5afks6b33qkct3/party_photo">
+			<label>Photo of Party?</label>
+		</upload>
+		<select1 ref="/ekcjvf464y5afks6b33qkct3/tenure_type">
+			<label>What is the social tenure type?</label>
+			<item>
+				<label>All Types</label>
+				<value>AL</value>
+			</item>
+		</select1>
+		<group ref="/ekcjvf464y5afks6b33qkct3/party_attributes">
+			<label>Party Attributes</label>
+		</group>
+		<group ref="/ekcjvf464y5afks6b33qkct3/location_relationship_attributes">
+			<label>Location relationship attributes</label>
+		</group>
+		<group ref="/ekcjvf464y5afks6b33qkct3/party_relationship_attributes">
+			<label>Party relationship attributes</label>
+		</group>
+		<group ref="/ekcjvf464y5afks6b33qkct3/tenure_relationship_attributes">
+			<label>Tenure relationship attributes</label>
+		</group>
+	</h:body>
+</h:html>
