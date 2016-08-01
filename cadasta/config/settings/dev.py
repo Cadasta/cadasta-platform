@@ -58,3 +58,11 @@ ROOT_URLCONF = 'config.urls.dev'
 DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 MEDIA_URL = '/media/'
+
+# Use HTTP for OSM for testing only, to make caching tiles for
+# functional tests a bit simpler.
+LEAFLET_CONFIG['TILES'][0] = (
+    LEAFLET_CONFIG['TILES'][0][0],
+    'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    LEAFLET_CONFIG['TILES'][0][2]
+)

@@ -157,7 +157,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 
 LEAFLET_CONFIG = {
     'TILES': [('OpenStreetMap',
-               'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+               'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                {'attribution':
                 'Map data &copy; <a href="http://openstreetmap.org">'
                 'OpenStreetMap</a> contributors, '
