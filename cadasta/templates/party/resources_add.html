@@ -3,9 +3,12 @@
 
 {% block page_title %}Add new resource for party | {% endblock %}
 
+{% block extra_script %}
+  {% include 'resources/script_add_lib.html' %}
+{% endblock %}
+
 {% block modals %}
 {% url 'parties:detail' object.organization.slug object.slug party.id as cancel_url %}
 {% url 'parties:resource_new' object.organization.slug object.slug party.id as upload_url %}
 {% include 'resources/modal_add_lib.html' %}
 {% endblock %}
-
