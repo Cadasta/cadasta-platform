@@ -44,11 +44,11 @@ class QuestionnaireSerializerTest(TestCase):
         questionnaire = Questionnaire.objects.first()
 
         assert questionnaire.id_string == 'question_types'
-        assert questionnaire.name == 'xls-form'
+        assert questionnaire.filename == 'xls-form'
         assert questionnaire.title == 'Question types'
 
         assert serializer.data['id'] == questionnaire.id
-        assert serializer.data['name'] == questionnaire.name
+        assert serializer.data['filename'] == questionnaire.filename
         assert serializer.data['title'] == questionnaire.title
         assert serializer.data['id_string'] == questionnaire.id_string
         assert serializer.data['xls_form'] == questionnaire.xls_form.url
@@ -75,7 +75,7 @@ class QuestionnaireSerializerTest(TestCase):
         serializer = serializers.QuestionnaireSerializer(questionnaire)
 
         assert serializer.data['id'] == questionnaire.id
-        assert serializer.data['name'] == questionnaire.name
+        assert serializer.data['filename'] == questionnaire.filename
         assert serializer.data['title'] == questionnaire.title
         assert serializer.data['id_string'] == questionnaire.id_string
         assert serializer.data['xls_form'] == questionnaire.xls_form.url

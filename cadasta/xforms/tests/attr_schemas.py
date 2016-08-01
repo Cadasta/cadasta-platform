@@ -1,11 +1,22 @@
-party_xform_group = {
-    "label": "Party Attributes",
-    "name": "party_attributes",
+default_party_xform_group = {
+    "label": "Default Party Attributes",
+    "children": [
+        {
+            "label": "Notes",
+            "type": "text",
+            "name": "notes"
+        }
+    ],
     "type": "group",
+    "name": "party_attributes_default"
+}
+
+individual_party_xform_group = {
+    "label": "Individual Party Attributes",
     "children": [
         {
             "label": "Gender",
-            "name": "gender",
+            "default": "f",
             "choices": [
                 {
                     "label": "Male",
@@ -16,15 +27,12 @@ party_xform_group = {
                     "name": "f"
                 }
             ],
-            "default": "f",
-            "bind": {
-                "relevant": "${party_type}='individual'"
-            },
-            "type": "select one"
+            "type": "select one",
+            "name": "gender"
         },
         {
+            "default": "no",
             "label": "Homeowner",
-            "name": "homeowner",
             "hint": "Is homeowner",
             "choices": [
                 {
@@ -36,28 +44,44 @@ party_xform_group = {
                     "name": "no"
                 }
             ],
-            "default": "no",
-            "bind": {
-                "relevant": "${party_type}='individual'",
-            },
-            "type": "select one"
+            "type": "select one",
+            "name": "homeowner"
         },
         {
             "label": "Date of Birth",
+            "type": "date",
             "name": "dob",
             "bind": {
-                "relevant": "${party_type}='individual'",
                 "required": "yes"
             },
-            "type": "date"
-        },
-        {
-            "label": "Notes",
-            "name": "notes",
-            "type": "text",
-            "hint": "Additional Notes"
         }
     ],
+    "name": "party_attributes_individual",
+    "bind": {
+        "relevant": "${party_type}='IN'"
+    },
+    "type": "group"
+}
+
+group_party_attributes = {
+    "label": "Group Party Attributes",
+    "children": [
+        {
+            "label": "Number of Members",
+            "type": "integer",
+            "name": "number_of_members"
+        },
+        {
+            "label": "Date Group Formed",
+            "type": "date",
+            "name": "date_formed"
+        }
+    ],
+    "name": "party_attributes_group",
+    "bind": {
+        "relevant": "${party_type}='GR'"
+    },
+    "type": "group"
 }
 
 location_xform_group = {
