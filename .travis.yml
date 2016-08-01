@@ -30,7 +30,7 @@ before_script:
   - mkdir cadasta/geography/data
   - export WBDATA=ne_10m_admin_0_countries.zip
   - export DATADIR=cadasta/geography/data
-  - wget -O $DATADIR/$WBDATA http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/$WBDATA
+  - wget -O $DATADIR/$WBDATA https://cadasta-miscellaneous.s3.amazonaws.com/$WBDATA
   - unzip $DATADIR/$WBDATA -d $DATADIR
 
 env:
