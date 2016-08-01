@@ -672,7 +672,7 @@ main.container-fluid {
   }
   .divider-thick {
     border-top: solid 7px $table-border-color;
-    margin: 24px auto;
+    margin: 20px auto;
   }
   .btn-block {
     margin: 24px auto;
@@ -744,6 +744,38 @@ main.container-fluid {
       li.active > a, li.active > a:hover, li.active > a:focus {
         border-color: $table-border-color;
         border-bottom-color: transparent;
+      }
+    }
+    h4 {
+      font-family: 'Roboto Condensed', sans-serif;
+      text-transform: uppercase;
+      opacity: 0.8;
+      letter-spacing: 0;
+      padding-top: 10px;
+    }
+    .glyphicon { // url and contacts in overview
+      opacity: 0.7;
+      padding-right: 12px;
+    }
+    dl.contacts { // contacts in overview
+      dt {
+        border-top: dotted 1px $table-border-color;
+        padding-top: 10px;
+        padding-bottom: 6px;
+        padding-left: 30px;
+        &:first-child {
+          border-top: none;
+          padding-top: 0;
+        }
+      }
+      dd {
+        padding-bottom: 10px;
+        padding-left: 30px;
+        a {
+          display: block;
+          font-size: 13px;
+          padding-bottom: 4px;
+        }
       }
     }
   }
