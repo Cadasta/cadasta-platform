@@ -138,7 +138,8 @@ class OrganizationPage(Page):
 
     def get_view_all_button(self):
         return self.get_page_content(
-            "//div[contains(@class, 'detail')]//a")
+            "//div[contains(@class, 'detail')]//a"
+            "[contains(./text(), 'View all')]")
 
     def click_on_view_all_button(self, successful=True):
         view_all = self.get_view_all_button()

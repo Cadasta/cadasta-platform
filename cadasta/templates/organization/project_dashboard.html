@@ -52,9 +52,24 @@
       <section>
         <h2>Project Overview</h2>
         <p>{{ object.description }}</p>
+        {% if object.urls.0 %}
+          <p><a href="{{ object.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ object.urls.0 }}</a></p>
+        {% endif %}
+        {% if object.contacts %}
+          <h4>Contact information</h4>
+          <dl class="contacts">
+          {% for contact in object.contacts %}
+            <dt>{{ contact.name }}</dt>
+            <dd class="clearfix">
+              {% if contact.email %}<a href="mailto:{{ contact.email }}"><span class="glyphicon glyphicon-envelope"></span>{{ contact.email }}</a>{% endif %}
+              {% if contact.tel %} <a href="tel:{{ contact.tel }}"><span class="glyphicon glyphicon-earphone"></span>{{ contact.tel }}</a>{% endif %}
+            </dd>
+          {% endfor %}
+          </dl>
+        {% endif %}
         <div class="divider-thick"></div>
         {% if has_content %}
-          <h3 style="text-transform: capitalize;">{% trans "Summary" %}</h3>
+          <h4>{% trans "Project stats" %}</h4>
           <ul class="list-inline stats">
             <li>
               {% blocktrans count counter=num_locations %}

@@ -5445,7 +5445,7 @@ main.container-fluid {
     letter-spacing: 0; }
   .content-single .divider-thick {
     border-top: solid 7px #e7e8ea;
-    margin: 24px auto; }
+    margin: 20px auto; }
   .content-single .btn-block {
     margin: 24px auto; }
   .content-single .page-title {
@@ -5501,6 +5501,30 @@ main.container-fluid {
     .content-single .detail .nav-tabs li.active > a, .content-single .detail .nav-tabs li.active > a:hover, .content-single .detail .nav-tabs li.active > a:focus {
       border-color: #e7e8ea;
       border-bottom-color: transparent; }
+    .content-single .detail h4 {
+      font-family: 'Roboto Condensed', sans-serif;
+      text-transform: uppercase;
+      opacity: 0.8;
+      letter-spacing: 0;
+      padding-top: 10px; }
+    .content-single .detail .glyphicon {
+      opacity: 0.7;
+      padding-right: 12px; }
+    .content-single .detail dl.contacts dt {
+      border-top: dotted 1px #e7e8ea;
+      padding-top: 10px;
+      padding-bottom: 6px;
+      padding-left: 30px; }
+      .content-single .detail dl.contacts dt:first-child {
+        border-top: none;
+        padding-top: 0; }
+    .content-single .detail dl.contacts dd {
+      padding-bottom: 10px;
+      padding-left: 30px; }
+      .content-single .detail dl.contacts dd a {
+        display: block;
+        font-size: 13px;
+        padding-bottom: 4px; }
   .content-single .row-height .detail {
     padding-top: 0; }
   .content-single .detail-edit {
