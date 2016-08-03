@@ -66,9 +66,10 @@
                     {% endfor %}
                   </tbody>
                 </table>
-                <div class="btn-full">
-                  <button type="submit" class="btn btn-primary btn-lg" name="submit">Save</button>
-                </div>
+              </div>
+              <div class="panel-footer panel-buttons">
+                <button type="submit" class="btn btn-primary" name="submit">Save</button>
+                <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">Cancel</a>
               </div>
             </div>
           </div>

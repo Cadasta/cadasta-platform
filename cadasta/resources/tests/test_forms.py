@@ -1,30 +1,34 @@
 import os
+import pytest
 from django.conf import settings
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
 from ..forms import ResourceForm, AddResourceFromLibraryForm
 from .factories import ResourceFactory
+from .utils import clear_temp  # noqa
 
 path = os.path.dirname(settings.BASE_DIR)
 
 
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
 class ResourceFormTest(UserTestCase):
     def setUp(self):
         super().setUp()
-        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('image.jpg', file)
+        file_name = storage.save('resources/image.jpg', file)
 
         self.data = {
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.jpg'
+            'original_file': 'image.jpg',
+            'mime_type': 'image/jpeg'
         }
         self.project = ProjectFactory.create()
 
@@ -54,9 +58,9 @@ class ResourceFormTest(UserTestCase):
         assert self.project.resources.first().contributor == user
 
 
+@pytest.mark.usefixtures('make_dirs')
 class AddResourceFromLibraryFormTest(UserTestCase):
     def test_init(self):
-        ensure_dirs(add='s3/uploads/resources')
         prj = ProjectFactory.create()
         prj_res = ResourceFactory.create(project=prj, content_object=prj)
         res = ResourceFactory.create(project=prj)
@@ -68,7 +72,6 @@ class AddResourceFromLibraryFormTest(UserTestCase):
         assert form.fields[res.id].initial is False
 
     def test_save(self):
-        ensure_dirs(add='s3/uploads/resources')
         prj = ProjectFactory.create()
         prj_res = ResourceFactory.create(project=prj, content_object=prj)
         res = ResourceFactory.create(project=prj)

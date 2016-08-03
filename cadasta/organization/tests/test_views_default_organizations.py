@@ -188,6 +188,13 @@ class OrganizationDashboardTest(UserTestCase):
         self.user = UserFactory.create()
         setattr(self.request, 'user', self.user)
 
+        self.org_admin = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=self.org_admin,
+            admin=True
+        )
+
     def _get(self, slug, status=None, user=None, make_org_member=None,):
         if user is None:
             user = self.user
@@ -199,7 +206,8 @@ class OrganizationDashboardTest(UserTestCase):
             assert response.status_code == status
         return response
 
-    def _check_ok(self, response, org=None, member=False, is_superuser=False):
+    def _check_ok(self, response, org=None, member=False,
+                  is_superuser=False, is_administrator=None):
         content = response.render().content.decode('utf-8')
 
         context = RequestContext(self.request)
@@ -212,6 +220,10 @@ class OrganizationDashboardTest(UserTestCase):
             context['projects'] = Project.objects.filter(
                 organization__slug=org.slug, access='public')
         context['is_superuser'] = is_superuser
+        if is_administrator is None:
+            is_administrator = is_superuser
+        context['add_allowed'] = is_administrator
+        context['is_administrator'] = is_administrator
 
         expected = render_to_string(
             'organization/organization_dashboard.html',
@@ -246,6 +258,10 @@ class OrganizationDashboardTest(UserTestCase):
         superuser.assign_policies(self.superuser_role)
         response = self._get(self.org.slug, user=superuser, status=200)
         self._check_ok(response, member=True, is_superuser=True)
+
+    def test_get_org_with_org_admin(self):
+        response = self._get(self.org.slug, user=self.org_admin, status=200)
+        self._check_ok(response, member=True, is_administrator=True)
 
 
 class OrganizationEditTest(UserTestCase):

@@ -1,0 +1,17 @@
+  <script>
+    'use strict';
+    $(function() {
+      var form = $('.modal form');
+      form.submit(function() {
+        var cells = $('.modal .datatable').DataTable().column().nodes();
+        for (var i = 0; i < cells.length; i++) {
+          var checkbox = cells[i].childNodes[0];
+          if (checkbox.checked) {
+            checkbox.checked = false;
+            form.append('<input type="hidden" name="' + checkbox.name + '" value="on" />');
+          }
+        }
+        return true;
+      });
+    });
+  </script>

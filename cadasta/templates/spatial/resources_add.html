@@ -1,39 +1,14 @@
-{% extends "spatial/location_wrapper.html" %}
+{% extends "spatial/location_detail.html" %}
 {% load i18n %}
-{% load widget_tweaks %}
 
-{% block page_title %}Add new resource | {% endblock %}
+{% block page_title %}Add new resource for location | {% endblock %}
+
+{% block location_extra_script %}
+  {% include 'resources/script_add_lib.html' %}
+{% endblock %}
 
 {% block modals %}
-<div class="modal-backdrop">
-  <div class="modal show" data-backdrop="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <form method="POST">
-          <div class="modal-header">
-            <a class="close" href="{% url 'locations:detail' object.organization.slug object.slug location.id %}#resources">
-              <span aria-hidden="true">&times;</span>
-            </a>
-            <h3 class="modal-title">{% trans "Add resource from library" %}</h3>
-          </div>
-
-          <div class="modal-body">
-            {% include 'resources/table_add_lib.html' %}
-          </div>
-
-          <div class="modal-footer">
-            <a class="btn btn-link cancel"
-               href="{% url 'locations:detail' object.organization.slug object.slug location.id %}#resources">
-              {% trans "Cancel" %}
-            </a>
-            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
-              {% trans "Save" %}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
+{% url 'locations:detail' object.organization.slug object.slug location.id as cancel_url %}
+{% url 'locations:resource_new' object.organization.slug object.slug location.id as upload_url %}
+{% include 'resources/modal_add_lib.html' with cancel_url_hash="#resources" %}
 {% endblock %}

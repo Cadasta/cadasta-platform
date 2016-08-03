@@ -4,28 +4,34 @@
 
 {% block location_panel %}
 
-<h2>{% trans "Edit Relationship" %}</h2>
-
-<form method="POST">
-  {% csrf_token %}
-  <div class="form-group">
-    {{ form.tenure_type.errors }}
-    <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>
-    {% render_field form.tenure_type class+="form-control input-lg" %}
+<div class="col-md-4 detail detail-edit">
+  <h2>{% trans "Edit Relationship" %}</h2>
+  <div class="panel panel-default">
+    <form method="POST">
+    {% csrf_token %}
+      <div class="panel-body">
+        <h3>Details</h3>
+        <div class="clearfix form-group{% if form.tenure_type.errors %} has-error{% endif %}">
+          <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship type" %}</label>
+          <label class="pull-right control-label">{{ form.tenure_type.errors }}</label>
+          {% render_field form.tenure_type class+="form-control" %}
+        </div>
+        {% for field in form %}
+          {% if "attributes" in field.name %}
+          <div class="clearfix form-group{% if field.errors %} has-error{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <label class="pull-right control-label">{{ field.errors }}</label>
+            {% render_field field class+="form-control" %}
+          </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      <div class="panel-footer panel-buttons">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}" class="btn btn-default">Cancel</a>
+      </div>
+    </form>
   </div>
-
-  {% for field in form %}
-    {% if "attributes" in field.name %}
-    <div class="form-group">
-      {{ field.errors }}
-      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-      {% render_field field class+="form-control input-lg" %}
-    </div>
-    {% endif %}
-  {% endfor %}
-  <button type="submit" class="btn btn-primary">Submit</button>
-  <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}" class="btn btn-link">Cancel</a>
-</form>
-
+</div>
 
 {% endblock %}

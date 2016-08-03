@@ -3,24 +3,22 @@ import os
 from django.test import TestCase
 from django.conf import settings
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
+from core.tests.util import make_dirs  # noqa
 
 from . import factories
 from .. import serializers
 from ..models import Questionnaire
 
 path = os.path.dirname(settings.BASE_DIR)
-ensure_dirs(add='s3/uploads/xls-forms')
-ensure_dirs(add='s3/uploads/xml-forms')
 
 
+@pytest.mark.usefixtures('make_dirs')
 class QuestionnaireSerializerTest(TestCase):
     def _get_form(self, form_name):
-        ensure_dirs()
 
         storage = FakeS3Storage()
         file = open(

@@ -12,35 +12,34 @@
       <h2>{% trans "Download project data" %}</h2>
       <div class="panel panel-default">
         <div class="panel-body">
-          <h4>Select your file format</h4>
-
-          <div class="radio">
-            <label>
-              <input type="radio" name="type" id="data_xls" value="xls" {% if form.type.value == 'xls' %}checked{% endif%}>
-              <strong>{% trans "XLS" %}</strong><br>
-              {% trans "A single file containing project locations, relationships, and parties." %}
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" name="type" id="data_res" value="res" {% if form.type.value == 'res' %}checked{% endif%}>
-              <strong>{% trans "Resources" %}</strong><br>
-              {% trans "A zip file containing all resources." %}
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" name="type" id="data_all" value="all" {% if form.type.value == 'all' %}checked{% endif%}>
-              <strong>{% trans "All data" %}</strong><br>
-              {% trans "A zip file containing all project data XLS files and all resources." %}
-            </label>
-          </div>
-
+          <h3>Select your file format</h3>
+          <ul class="list-unstyled spacing-lg">
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_xls" value="xls" {% if form.type.value == 'xls' %}checked{% endif%}>
+                {% trans "XLS" %}
+                <small>{% trans "A single file containing project locations, relationships, and parties." %}</small>
+              </label>
+            </li>
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_res" value="res" {% if form.type.value == 'res' %}checked{% endif%}>
+                {% trans "Resources" %}
+                <small>{% trans "A zip file containing all resources." %}</small>
+              </label>
+            </li>
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_all" value="all" {% if form.type.value == 'all' %}checked{% endif%}>
+                {% trans "All data" %}
+                <small>{% trans "A zip file containing all project data XLS files and all resources." %}</small>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <div class="panel-footer panel-buttons">
           <button type="submit" class="btn btn-primary">
             {% trans "Download" %}
-          </button>
-          <button type="button" class="btn btn-link cancel" data-dismiss="modal">
-            {% trans "Cancel" %}
           </button>
         </div>
       </div>

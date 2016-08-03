@@ -1,6 +1,8 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
+{% block left-nav %}map{% endblock %}
+
 {% block content %}
 
 <div class="col-sm-12 content-single">
@@ -8,39 +10,70 @@
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <div class="page-title">
-        <h2>{% trans "Party" %}</h2>
-        <a href="{% url 'parties:edit' object.organization.slug object.slug party.id %}">Edit</a>
-        <a href="{% url 'parties:delete' object.organization.slug object.slug party.id %}">Delete</a>
+        <h2>{% trans "Party detail" %}</h2>
+        <div class="top-btn pull-right">
+          <!-- More options menu -->
+          <div class="dropdown pull-right btn-more">
+              <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+                <span class="more-menu glyphicon glyphicon-option-vertical"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="dLabel">
+                <li><a href="{% url 'parties:edit' object.organization.slug object.slug party.id %}">{% trans "Edit party" %}</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{% url 'parties:delete' object.organization.slug object.slug party.id %}">{% trans "Delete party" %}</a></li>
+              </ul>
+            </div>
+        </div>
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
-          <table class="table table-striped">
-            <tbody>
-              <tr>
-                <td><strong>Name</strong></td>
-                <td>{{ party.name }}</td>
-              </tr>
-              <tr>
-                <td><strong>Type</strong></td>
-                <td>{{ party.get_type_display }}</td>
-              </tr>
-              {% for attr in attributes %}
-              <tr>
-                <td><strong>{{ attr.0 }}</strong></td>
-                <td>{{ attr.1 }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-
+          <!-- Party information -->
+          <h3>{% trans "Details" %}</h3>
+          <div class="row">
+            <div class="col-md-6">
+              <table class="table table-location">
+                <tbody>
+                  <tr>
+                    <td class="col-md-4"><label>Name</label></td>
+                    <td class="col-md-8">{{ party.name }}</td>
+                  </tr>
+                  <tr>
+                    <td><label>Type</label></td>
+                    <td>{{ party.get_type_display }}</td>
+                  </tr>
+                  {% for attr in attributes %}
+                  <tr>
+                    <td><label>{{ attr.0 }}</label></td>
+                    <td>{{ attr.1 }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- /party information -->
+          <!-- Party resources -->
           <h3>{% trans "Resources" %}</h3>
-
-          {% include 'resources/table.html' with object_list=party.resources %}
-
-          <div class="btn-group btn-group-justified">
-            <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">{% trans "Add from library" %}</a>
-            <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">{% trans "Upload new resource" %}</a>
-          </div>    
+          {% if party.resources %}
+            <div class="top-btn pull-right top-add">
+              <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+            </div>
+            {% include 'resources/table.html' with object_list=party.resources %}
+          {% else %}
+            <div>
+              <p>{% trans "This party does not have any connected resources. To add a resource, select the button below." %}</p>
+              <div class="btn-full">
+                {% if project_has_resources %}
+                <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                {% else %}
+                <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
+                {% endif %}
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+              </div>
+            </div>
+          {% endif %}
+          <!-- /party resources -->
         </div>
       </div>
     </div>

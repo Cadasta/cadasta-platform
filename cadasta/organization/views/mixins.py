@@ -4,9 +4,9 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
-from tutelary.models import Role
+from tutelary.models import Role, check_perms
 
-from ..models import Organization, Project
+from ..models import Organization, Project, OrganizationRole, ProjectRole
 
 
 class OrganizationMixin:
@@ -83,3 +83,85 @@ class ProjectQuerySetMixin:
                 )
 
         return Project.objects.filter(access='public')
+
+
+class ProjectAdminCheckMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_admin = None
+
+    @property
+    def is_administrator(self):
+        if self.is_admin is None:
+            su_role = Role.objects.filter(name='superuser')
+            org_admins = [
+                role.user for role in OrganizationRole.objects.filter(
+                    organization=self.get_object().organization,
+                    admin=True
+                )
+            ]
+            proj_managers = [
+                role.user for role in ProjectRole.objects.filter(
+                    project=self.get_object(),
+                    role='PM'
+                )
+
+            ]
+            self.is_admin = False
+            if len(su_role) > 0:
+                if hasattr(self.request.user, 'assigned_policies'):
+                    if su_role[0] in self.request.user.assigned_policies():
+                        self.is_admin = True
+            if (self.request.user in org_admins or
+               self.request.user in proj_managers):
+                self.is_admin = True
+        return self.is_admin
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['is_administrator'] = self.is_administrator
+        return context
+
+
+class OrganizationUICheckMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.is_admin = None
+        self.add_allow = None
+
+    @property
+    def is_administrator(self):
+        if self.is_admin is None:
+            su_role = Role.objects.filter(name='superuser')
+            if hasattr(self, 'get_organization'):
+                org = self.get_organization()
+            else:
+                org = self.get_object()
+            org_admins = [
+                role.user for role in OrganizationRole.objects.filter(
+                    organization=org,
+                    admin=True
+                )
+            ]
+            self.is_admin = False
+            if len(su_role) > 0:
+                if hasattr(self.request.user, 'assigned_policies'):
+                    if su_role[0] in self.request.user.assigned_policies():
+                        self.is_admin = True
+            if self.request.user in org_admins:
+                self.is_admin = True
+        return self.is_admin
+
+    @property
+    def add_allowed(self):
+        if self.add_allow is None:
+            chk = check_perms(self.request.user, ('project.create',),
+                              (self.get_object(),))
+            self.add_allow = self.is_superuser or chk
+        return self.add_allow
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['add_allowed'] = self.add_allowed
+        context['is_administrator'] = self.is_administrator
+        return context

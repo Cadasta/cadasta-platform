@@ -1,42 +1,15 @@
 {% extends "party/party_detail.html" %}
 {% load i18n %}
 
+{% block page_title %}Upload new resource for party | {% endblock %}
+
 {% block extra_script %}
   {{ form.media }}
-  {% include "resources/scripts.html" %}
+  {% include "resources/script_upload.html" %}
 {% endblock %}
 
 {% block modals %}
-
-<div class="modal-backdrop">
-  <div class="modal show" data-backdrop="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <form method="POST">
-          <div class="modal-header">
-            <a class="close" href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">
-              <span aria-hidden="true">&times;</span>
-            </a>
-            <h3 class="modal-title">{% trans "Add new resource" %}</h3>
-          </div>
-
-          <div class="modal-body">
-              {% include "resources/form.html" %}  
-          </div>
-
-          <div class="modal-footer">
-            <a class="btn btn-link cancel"
-               href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">
-              {% trans "Cancel" %}
-            </a>
-            <button type="submit" class="btn btn-primary text-uppercase" name="submit">
-              {% trans "Save" %}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
+{% url 'parties:detail' object.organization.slug object.slug party.id as cancel_url %}
+{% url 'parties:resource_add' object.organization.slug object.slug party.id as add_lib_url %}
+{% include 'resources/modal_upload.html' %}
 {% endblock %}

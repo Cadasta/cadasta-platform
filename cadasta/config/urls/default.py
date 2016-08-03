@@ -48,6 +48,9 @@ api_v1 = [
         '(?P<project>[-\w]+)/relationships/',
         include('party.urls.api.relationships',
                 namespace='relationship')),
+
+    url(r'^docs/',
+        include('rest_framework_docs.urls'))
 ]
 
 api = [

@@ -30,7 +30,8 @@ class OrganizationMemberListPage(Page):
 
     def go_to_member_list_page(self):
         view_all = self.get_page_content(
-            "//div[contains(@class, 'detail')]//a")
+            "//div[contains(@class, 'detail')]//a"
+            "[contains(./text(), 'View all')]")
         self.click_through(
             view_all, (By.CLASS_NAME, 'page-title')
         )

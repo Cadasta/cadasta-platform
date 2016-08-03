@@ -1,15 +1,14 @@
 {% extends "organization/project_add_wrapper.html" %}
 
-{% load i18n %}
 {% load widget_tweaks %}
+{% load i18n %}
 
 {% block page_title %}| Assign team{% endblock %}
 
 {% block step_content_1 %}
 
-    <div class="row">
-      <!-- Main text  -->
-      <div class="col-md-12 main-text">
+  <!-- Main wizard  -->
+  <div class="col-md-12 main-wizard">
 
 {% endblock %}
 
@@ -53,9 +52,22 @@
 
 {% endblock %}
 
+{% block step_content_buttons %}
+<button class="btn btn-default" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
+  <span class="glyphicon glyphicon-triangle-left"></span>
+  {% trans "Previous" %}
+</button>
+<button class="btn btn-primary" type="submit">
+  {% trans 'Next' %}
+  <span class="glyphicon glyphicon-triangle-right"></span>
+</button>
+{% endblock %}
+
+
 {% block step_content_3 %}
 
       </div>
     </div>
+    <!-- / main wizard  -->
 
 {% endblock %}

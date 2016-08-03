@@ -6,13 +6,14 @@ from django.conf import settings
 from django.contrib.messages.api import get_messages
 from django.contrib.contenttypes.models import ContentType
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
+from core.tests.util import make_dirs  # noqa
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
 
 from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
+from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
 from core.tests.util import TestCase
 from spatial.models import SpatialUnit
@@ -421,13 +422,13 @@ class PartiesDeleteTest(TestCase):
         assert TenureRelationship.objects.count() == 1
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PartyResourcesAddTest(TestCase):
     view = default.PartyResourcesAdd
     template = 'party/resources_add.html'
     success_url_name = 'parties:detail'
 
     def set_up_models(self):
-        ensure_dirs(add='s3/uploads/resources')
         self.project = ProjectFactory.create()
         self.party = PartyFactory.create(project=self.project)
         self.assigned = ResourceFactory.create(project=self.project,
@@ -512,6 +513,8 @@ class PartyResourcesAddTest(TestCase):
         assert self.party.resources.first() == self.assigned
 
 
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
 class PartyResourcesNewTest(TestCase):
     view = default.PartyResourcesNew
     template = 'party/resources_new.html'
@@ -543,16 +546,16 @@ class PartyResourcesNewTest(TestCase):
 
     def get_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('image.jpg', file)
+        file_name = storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.png'
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
         }
 
     def test_get_with_authorized_user(self):
@@ -851,13 +854,13 @@ class PartyRelationshipDeleteTest(TestCase):
         assert TenureRelationship.objects.count() == 1
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PartyRelationshipResourceAddTest(TestCase):
     view = default.PartyRelationshipResourceAdd
     template = 'party/relationship_resources_add.html'
     success_url_name = 'parties:relationship_detail'
 
     def set_up_models(self):
-        ensure_dirs(add='s3/uploads/resources')
         self.project = ProjectFactory.create()
         self.relationship = TenureRelationshipFactory.create(
             project=self.project)
@@ -947,6 +950,7 @@ class PartyRelationshipResourceAddTest(TestCase):
         assert self.relationship.resources.first() == self.assigned
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PartyRelationshipResourceNewTest(TestCase):
     view = default.PartyRelationshipResourceNew
     template = 'party/relationship_resources_new.html'
@@ -981,16 +985,16 @@ class PartyRelationshipResourceNewTest(TestCase):
 
     def get_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
-        ensure_dirs(add='s3/uploads/resources')
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('image.jpg', file)
+        file_name = storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',
             'description': '',
             'file': file_name,
-            'original_file': 'image.png'
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
         }
 
     def test_get_with_authorized_user(self):

@@ -51,6 +51,7 @@
   become_user: "{{ app_user }}"
   pip: virtualenv="{{ virtualenv_path }}"
        requirements="{{ application_path }}requirements/common.txt"
+       extra_args="--find-links https://s3.amazonaws.com:443/cadasta-wheelhouse/index.html"
 
 - name: Set up logging directory
   become: yes
@@ -65,7 +66,7 @@
 - name: Download world boundary data files
   become: yes
   become_user: "{{ app_user }}"
-  get_url: url=http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/10m/cultural/ne_10m_admin_0_countries.zip
+  get_url: url=https://cadasta-miscellaneous.s3.amazonaws.com/ne_10m_admin_0_countries.zip
            dest="{{ application_path }}cadasta/geography/data/ne_10m_admin_0_countries.zip"
 
 - name: Unzip world boundary data files

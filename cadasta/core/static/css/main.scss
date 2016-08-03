@@ -389,6 +389,7 @@ header {
 .page-title { // page title
   padding-top: 2px;
   padding-bottom: 24px;
+  clear: both;
   h1, h2 {
     text-transform: uppercase;
     display: inline-block;
@@ -551,10 +552,21 @@ header {
   border-radius: 4px;
 }
 
+body.tinted-bg #page-content { // for bg image
+  background: transparent;
+}
+
+#project-wizard #page-content { // for non-map pages
+  background: transparent;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
 #dashboard #page-content,
 #registration #page-content,
 #project-single #page-content,
-#project-wizard #page-content,
+#project-wizard.map #page-content,
 #organization-single #page-content { // for single project and org pages with left subnav
   width: 100%;
   max-width: 100%;
@@ -571,7 +583,7 @@ header {
 }
 
 #dashboard #page-content,
-#project-wizard #page-content,
+#project-wizard.page #page-content,
 #registration #page-content { // full height page with only site header
   top: $header-height;
 }
@@ -594,7 +606,7 @@ header {
   }
 
   #project-single #page-content,
-  #project-wizard #page-content,
+  #project-wizard.page #page-content,
   #organization-single #page-content {
     position: relative;
     top: 0;
@@ -660,7 +672,7 @@ main.container-fluid {
   }
   .divider-thick {
     border-top: solid 7px $table-border-color;
-    margin: 24px auto;
+    margin: 20px auto;
   }
   .btn-block {
     margin: 24px auto;
@@ -723,13 +735,58 @@ main.container-fluid {
         border-bottom: 0;
         padding-bottom: 6px;
       }
-    } 
+    }
+    .nav-tabs {
+      li > a {
+        font-size: 13px;
+        padding: 10px;
+      }
+      li.active > a, li.active > a:hover, li.active > a:focus {
+        border-color: $table-border-color;
+        border-bottom-color: transparent;
+      }
+    }
+    h4 {
+      font-family: 'Roboto Condensed', sans-serif;
+      text-transform: uppercase;
+      opacity: 0.8;
+      letter-spacing: 0;
+      padding-top: 10px;
+    }
+    .glyphicon { // url and contacts in overview
+      opacity: 0.7;
+      padding-right: 12px;
+    }
+    dl.contacts { // contacts in overview
+      dt {
+        border-top: dotted 1px $table-border-color;
+        padding-top: 10px;
+        padding-bottom: 6px;
+        padding-left: 30px;
+        &:first-child {
+          border-top: none;
+          padding-top: 0;
+        }
+      }
+      dd {
+        padding-bottom: 10px;
+        padding-left: 30px;
+        a {
+          display: block;
+          font-size: 13px;
+          padding-bottom: 4px;
+        }
+      }
+    }
   }
   .row-height .detail { // columns fixed to match heights like org overview 
     padding-top: 0;
   }
   .detail-edit { // edit on right
-    background: none;
+    background: $body-bg;
+    .panel-footer {
+      background: transparent;
+    }
   }
   .panel { // content box in main panel 
     border: 1px solid $table-border-color;
@@ -746,14 +803,15 @@ main.container-fluid {
         padding-bottom: 10px;
         border-bottom: solid 1px $gray-light;
       }
+      .top-add {
+        margin-bottom: -30px;
+      }
     }
     .panel-buttons { // buttons at bottom of panels containing forms
-      background: transparent;
       padding: 20px 15px;
       .btn {
-        min-width: 110px;
+        min-width: 140px;
         margin-right: 20px;
-        margin-bottom: 10px;
         &:last-child {
           margin-right: 0;
         }
@@ -762,16 +820,6 @@ main.container-fluid {
   }
   .nav-tabs {
     margin-bottom: 20px;
-  }
-  .detail .nav-tabs {
-    li > a {
-      font-size: 13px;
-      padding: 10px;
-    }
-    li.active > a, li.active > a:hover, li.active > a:focus {
-      border-color: $table-border-color;
-      border-bottom-color: transparent;
-    }
   }
 }
 
@@ -787,10 +835,15 @@ body.map .content-single {
       min-height: 300px;
     }
     .main-text {
-      padding: 20px 30px 50px 40px;
+      padding: 15px;
     }
     .detail {
       padding-top: 20px;
+    }
+    .panel-buttons { 
+      .btn {
+        min-width: 110px;
+      }
     }
   }
 }
@@ -803,11 +856,37 @@ textarea.form-control {
   max-height: 80px;
 }
 
+.file-well {
+  padding: 10px 20px;
+  margin-bottom: 0;
+}
+
 .file-input { // browse for file
   margin: 14px 0;
   height: 34px;
-  padding: 0 12px;
+  padding: 0;
   cursor: pointer;
+}
+
+.spacing-lg { // for radio or checkboxes needing more space between items
+  margin-top: 30px;
+  li {
+    margin-left: 30px;
+    margin-bottom: 30px;
+    label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    small { 
+      margin-top: 6px;
+      font-weight: 300;
+      display: block;
+    }
+  }
+}
+
+.input-group-addon {
+  background: $body-bg;
 }
 
 /* =Table for sort and filter
@@ -815,21 +894,73 @@ textarea.form-control {
 
 .dataTables_wrapper {
   clear: both;
+  .table-search { // search 
+    div.dataTables_filter {
+      text-align: left;
+    }
+    input {
+      margin-left: 0 !important;
+    }
+  }
+  .table-entries { // number of entries
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-right: 10px;
+    opacity: 0.8;
+  }
+  .table-num { // select number of entries per page
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-top: 3px;
+    padding-left: 10px;
+    border-left: 1px solid $table-border-color;
+    opacity: 0.8;
+    .input-sm {
+      padding: 5px;
+    }
+    select {
+      width: 55px !important;
+    }
+  }
+  .table-pagination { // pagination
+    float: right;
+    display: inline-block;
+    .pagination > li > a, 
+    .pagination > li > span {
+      color: $gray-dark;
+    }
+    .pagination > .disabled > a, .pagination > .disabled > a:focus, .pagination > .disabled > a:hover, .pagination > .disabled > span, .pagination > .disabled > span:focus, .pagination > .disabled > span:hover    {
+      color: $gray-medium;
+    }
+    .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+      background-color: $gray-light;
+      border-color: #ddd;
+    }
+  }
+  table.dataTable thead {
+    .sorting::after {
+      content: initial;
+    }
+    .sorting_asc::after, .sorting_desc::after {
+      position: relative;
+      left: 8px;
+      display: inline-block;
+      font-size: 10px;
+      top: 1px;
+    }
+    .sorting_asc::after {
+      content: "\e253";
+    }
+    .sorting_desc::after {
+      content: "\e252";
+    }
+  }
 }
 
-@media (max-width: $screen-sm-max) {
-  .dataTables_wrapper .col-sm-6 {
-    width: 50% !important; // fix for col-xs-6
-    float: left !important;
-  }
-  
-  div.dataTables_wrapper div.dataTables_length {
-    text-align: left !important;
-  }
-  
-  div.dataTables_wrapper div.dataTables_filter {
-    text-align: right !important;
-  }
+.detail div.dataTables_wrapper div.dataTables_filter input {
+  max-width: 100px;
 }
 
 @media (max-width: 500px) {
@@ -886,39 +1017,8 @@ textarea.form-control {
   }
 }
 
-table.dataTable thead {
-  .sorting::after {
-    content: initial;
-  }
-  .sorting_asc::after, .sorting_desc::after {
-    position: relative;
-    left: 8px;
-    display: inline-block;
-    font-size: 10px;
-    top: 1px;
-  }
-  .sorting_asc::after {
-    content: "\e253";
-  }
-  .sorting_desc::after {
-    content: "\e252";
-  }
-}
-
-div.dataTables_wrapper div.dataTables_length label /* show number dropdown */, 
-div.dataTables_wrapper div.dataTables_filter label /* search label */, 
-div.dataTables_wrapper div.dataTables_info /* showing number total */ {
-  opacity: 0.8;
-  font-size: 12px;
-}
-
-.tab-content div.dataTables_wrapper div.dataTables_filter input {
-  max-width: 100px;
-}
-
 table.table-location { // location details in map area
   border-top: none;
-  border-bottom: none;
   tr:first-child td {
     border-top: none;
   }
@@ -1067,7 +1167,8 @@ img.org-logo, img#org-logo {
 -------------------------------------------------------------- */
 
 .top-btn {
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   .btn {
     min-width: 100px;
   }
@@ -1085,11 +1186,13 @@ button#add-party { // below contacts table and party table
   background: $gray-lighter;
   text-align: center;
   padding: 20px;
+  clear: both;
   margin: 20px 0;
   .btn {
     min-width: 200px;
-    margin: 10px;
-    padding: 10px 24px;
+  }
+  .btn-group .btn {
+    margin: 0;
   }
 }
 
@@ -1140,7 +1243,6 @@ div.add-btn-btm { // add party link at bottom of table
 @media (max-width: $screen-md-max) {
   .btn-full .btn {
     min-width: 100px;
-    padding: 10px;
   }
 }
 
@@ -1197,6 +1299,14 @@ div.add-btn-btm { // add party link at bottom of table
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: solid 1px #d9dadb;
+  }
+  .modal-header .nav-tabs {
+    position: relative;
+    top: $modal-title-padding + 1px;
+    left: 30px - $modal-title-padding;
+    li.active a {
+      background: $modal-content-bg;
+    }
   }
   .modal-body {
     max-height: calc(100vh - 200px);
@@ -1256,3 +1366,17 @@ ul.errorlist {
   padding-bottom: 2px;
 }
 
+/* =Contacts form styling
+-------------------------------------------------------------- */
+
+tr.contacts-error {
+  background: $alert-warning-bg;
+  li {
+    padding: 0;
+  }
+  +tr td {
+    border-top: none;
+    padding-top: 0;
+    background: $alert-warning-bg;
+  }
+}

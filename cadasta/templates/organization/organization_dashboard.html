@@ -36,19 +36,21 @@
               </tbody>
             </table>
             {% else %}
+            {% if add_allowed %}
             <!-- Starter text -->
             <h3 style="text-transform: none;">{% trans "You're ready to go" %}</h3>
             <p>
               {% trans "You have successfully created your organization.  You're now ready to add your first project." %}
             </p>
             <div class="btn-full">
-              <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary btn-lg" role="button">
+              <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a new project" %}
               </a>
-              <a href="#" class="btn btn-primary btn-lg hidden" role="button">
+              <a href="#" class="btn btn-primary hidden" role="button">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add new members" %}
               </a>
             </div>
+            {% endif %}
             {% endif %}
           </div>
         </div>
@@ -63,6 +65,21 @@
             </div>
           {% endif %}
           <p>{{ organization.description }}<p>
+          {% if organization.urls.0 %}
+            <p><a href="{{ organization.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ organization.urls.0 }}</a></p>
+          {% endif %}
+          {% if organization.contacts %}
+            <h4>Contact information</h4>
+            <dl class="contacts">
+            {% for contact in organization.contacts %}
+              <dt>{{ contact.name }}</dt>
+              <dd class="clearfix">
+                {% if contact.email %}<a href="mailto:{{ contact.email }}"><span class="glyphicon glyphicon-envelope"></span>{{ contact.email }}</a>{% endif %}
+                {% if contact.tel %} <a href="tel:{{ contact.tel }}"><span class="glyphicon glyphicon-earphone"></span>{{ contact.tel }}</a>{% endif %}
+              </dd>
+            {% endfor %}
+            </dl>
+          {% endif %}
           <div class="divider-thick"></div>
           <!-- Starter text -->
           <h3>{% trans "Members" %}</h3>

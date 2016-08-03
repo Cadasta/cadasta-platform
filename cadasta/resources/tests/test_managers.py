@@ -1,25 +1,26 @@
 import os
+import pytest
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 
 from ..models import Resource
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
 
-ensure_dirs(add='s3/uploads/resources')
-storage = FakeS3Storage()
-file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-file_name = storage.save('image.jpg', file)
 
-
+@pytest.mark.usefixtures('make_dirs')
 class ResourceModelTest(UserTestCase):
     def test_project_resource(self):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
+        file_name = storage.save('resources/image.jpg', file)
+
         project = ProjectFactory.create()
         user = UserFactory.create()
 
@@ -27,7 +28,8 @@ class ResourceModelTest(UserTestCase):
                                            file=file_name,
                                            content_object=project,
                                            contributor=user,
-                                           project=project)
+                                           project=project,
+                                           mime_type='image/jpeg')
         assert resource.name == 'Re'
         assert resource.content_objects.count() == 1
         assert resource.mime_type == 'image/jpeg'

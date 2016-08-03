@@ -1,3 +1,4 @@
+import pytest
 import os
 import json
 from django.http import QueryDict
@@ -6,19 +7,14 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Policy
 
 from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from .factories import ResourceFactory
 from ..views import api
 
-from buckets.test.utils import ensure_dirs
 from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
-
-ensure_dirs(add='s3/uploads/resources')
-storage = FakeS3Storage()
-file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-file_name = storage.save('resources/image.jpg', file)
 
 clauses = {
     'clause': [
@@ -36,9 +32,16 @@ clauses = {
 }
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesTest(UserTestCase):
     def setUp(self):
         super().setUp()
+
+        self.storage = FakeS3Storage()
+        self.file = open(
+            path + '/resources/tests/files/image.jpg', 'rb').read()
+        self.file_name = self.storage.save('resources/image.jpg', self.file)
+
         self.project = ProjectFactory.create()
         self.resources = ResourceFactory.create_batch(
             2, content_object=self.project)
@@ -124,7 +127,7 @@ class ProjectResourcesTest(UserTestCase):
         data = {
             'name': 'New resource',
             'description': '',
-            'file': file_name,
+            'file': self.file_name,
             'original_file': 'image.png'
         }
         self._post(self.project.organization.slug,
@@ -137,7 +140,7 @@ class ProjectResourcesTest(UserTestCase):
         data = {
             'name': 'New resource',
             'description': '',
-            'file': file_name
+            'file': self.file_name
         }
         self._post(self.project.organization.slug,
                    self.project.slug,
@@ -170,11 +173,11 @@ class ProjectResourcesTest(UserTestCase):
         assert 'name' in response
 
     def test_search_for_file(self):
-        not_found = storage.save('resources/bild.jpg', file)
+        not_found = self.storage.save('resources/bild.jpg', self.file)
         project = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'file': file_name},
-            {'content_object': project, 'file': file_name},
+            {'content_object': project, 'file': self.file_name},
+            {'content_object': project, 'file': self.file_name},
             {'content_object': project, 'file': not_found}
         ])
         self._get(project.organization.slug,
@@ -227,9 +230,11 @@ class ProjectResourcesTest(UserTestCase):
         assert(names == sorted(names, reverse=True))
 
 
+@pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesDetailTest(UserTestCase):
     def setUp(self):
         super().setUp()
+
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project)
         self.view = api.ProjectResourcesDetail.as_view()

@@ -5,6 +5,7 @@ from jsonattrs.mixins import JsonAttrsMixin
 from core.mixins import LoginPermissionRequiredMixin
 
 from resources.forms import AddResourceFromLibraryForm
+from resources.views.mixins import ProjectHasResourcesMixin
 from . import mixins
 from .. import forms
 from .. import messages as error_messages
@@ -39,6 +40,7 @@ class PartiesAdd(LoginPermissionRequiredMixin,
 class PartiesDetail(LoginPermissionRequiredMixin,
                     JsonAttrsMixin,
                     mixins.PartyObjectMixin,
+                    ProjectHasResourcesMixin,
                     generic.DetailView):
     template_name = 'party/party_detail.html'
     permission_required = 'party.view'
@@ -87,6 +89,7 @@ class PartyResourcesAdd(LoginPermissionRequiredMixin,
 
 class PartyResourcesNew(LoginPermissionRequiredMixin,
                         mixins.PartyResourceMixin,
+                        ProjectHasResourcesMixin,
                         generic.CreateView):
     template_name = 'party/resources_new.html'
     permission_required = 'party.resources.add'
@@ -96,6 +99,7 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
 class PartyRelationshipDetail(LoginPermissionRequiredMixin,
                               JsonAttrsMixin,
                               mixins.PartyRelationshipObjectMixin,
+                              ProjectHasResourcesMixin,
                               generic.DetailView):
     template_name = 'party/relationship_detail.html'
     permission_required = 'tenure_rel.view'
@@ -130,6 +134,7 @@ class PartyRelationshipDelete(LoginPermissionRequiredMixin,
 
 class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
                                    mixins.PartyRelationshipResourceMixin,
+                                   ProjectHasResourcesMixin,
                                    generic.CreateView):
     template_name = 'party/relationship_resources_new.html'
     permission_required = 'tenure_rel.resources.add'

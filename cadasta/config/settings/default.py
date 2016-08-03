@@ -157,7 +157,7 @@ ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 
 LEAFLET_CONFIG = {
     'TILES': [('OpenStreetMap',
-               'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+               'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                {'attribution':
                 'Map data &copy; <a href="http://openstreetmap.org">'
                 'OpenStreetMap</a> contributors, '
@@ -243,4 +243,27 @@ JSONATTRS_SCHEMA_SELECTORS = {
         'project.organization.pk', 'project.pk',
         'project.current_questionnaire'
     )
+}
+
+ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-platformprod'
+            '-bucket/icons/{}.png')
+
+MIME_LOOKUPS = {
+    'application/pdf': 'pdf',
+    'audio/mpeg3': 'mp3',
+    'audio/x-mpeg-3': 'mp3',
+    'video/mpeg': 'mp3',
+    'video/x-mpeg': 'mp3',
+    'video/mp4': 'mp4',
+    'application/msword': 'doc',
+    'application/vnd.openxmlformats-officedocument.'
+    'wordprocessingml.document': 'docx',
+    'application/msexcel': 'xls',
+    'application/vnd.ms-excel': 'xls',
+    'application/vnd.openxmlformats-'
+    'officedocument.spreadsheetml.sheet': 'xlsx',
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/gif': 'gif',
+    'image/tiff': 'tiff'
 }

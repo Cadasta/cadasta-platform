@@ -228,23 +228,11 @@
     }
   }
   .btn-group {
-    margin-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
   }
-  .btn-full .btn {
-    padding: 10px 12px;
-  }
-  .tab-pane .top-btn {
-    margin-top: 0;
-    margin-bottom: 10px;
-    width: 100%;
-    text-align: right;
-    background: $body-bg;
-    padding: 10px;
-    position: relative;
-    top: -20px;
-  }
-  .tab-pane .top-btn .btn-group {
-    margin-bottom: 0;
+  .top-add {
+    margin-bottom: -30px;
   }
 }
 

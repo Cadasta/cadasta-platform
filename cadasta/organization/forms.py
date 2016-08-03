@@ -10,7 +10,7 @@ from django.db import transaction
 from django.forms.utils import ErrorDict
 
 from leaflet.forms.widgets import LeafletWidget
-from tutelary.models import Role
+from tutelary.models import Role, check_perms
 from buckets.widgets import S3FileUploadWidget
 
 from accounts.models import User
@@ -48,17 +48,26 @@ class ContactsForm(forms.Form):
 
     def as_table(self):
         html = self._html_output(
-            normal_row='<td>%(errors)s%(field)s%(help_text)s</td>',
-            error_row='<td colspan="3">%s</td></tr><tr>',
+            normal_row='<td>%(field)s%(help_text)s</td>',
+            error_row=('<tr class="contacts-error {error_types}">'
+                       '<td colspan="4">%s</td></tr>\n<tr>'),
             row_ender='</td>',
             help_text_html='<br /><span class="helptext">%s</span>',
             errors_on_separate_row=False)
-
         closeBtn = ('<td><a data-prefix="' + self.prefix + '" '
                     'class="close remove-contact" href="#">'
                     '<span aria-hidden="true">&times;</span></a></td>')
+        html = ('' if self.errors else '<tr>') + html + closeBtn + '</tr>\n'
 
-        return '<tr>' + html + closeBtn + '</tr>'
+        error_types = ''
+        if 'name' in self.errors:
+            error_types += ' error-name'
+        if 'email' in self.errors:
+            error_types += ' error-email'
+        if hasattr(self, 'contact_details_is_missing'):
+            error_types += ' error-email error-phone'
+
+        return html.format(error_types=error_types)
 
     def full_clean(self):
         if self.data.get(self.prefix + '-remove') != 'on':
@@ -69,10 +78,21 @@ class ContactsForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        if (not self.errors and
-                not cleaned_data['email'] and not cleaned_data['tel']):
-            raise forms.ValidationError(_("Please provide either email or "
-                                          "phone number"))
+        error_msgs = []
+        if 'name' in self.errors:
+            error_msgs.append(_("Please provide a name."))
+        if 'email' in self.errors:
+            error_msgs.append(_("The provided email address is invalid."))
+        if (
+            not self.errors and
+            not cleaned_data['email'] and
+            not cleaned_data['tel']
+        ):
+            self.contact_details_is_missing = True
+            error_msgs.append(_(
+                "Please provide either an email address or a phone number."))
+        if error_msgs:
+            raise forms.ValidationError(" ".join(error_msgs))
         return cleaned_data
 
     def clean_string(self, value):
@@ -226,12 +246,28 @@ class ProjectAddDetails(forms.Form):
                                   accepted_types=QUESTIONNAIRE_TYPES))
     contacts = ContactsField(form=ContactsForm, required=False)
 
+    def check_admin(self, user):
+        if not hasattr(self, 'su_role'):
+            self.su_role = Role.objects.get(name='superuser')
+
+        is_superuser = any([isinstance(pol, Role) and pol == self.su_role
+                            for pol in user.assigned_policies()])
+        return is_superuser
+
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        self.fields['organization'].choices = [
-            (o.slug, o.name) for o in Organization.objects.order_by('name')
-        ]
+        if self.check_admin(self.user):
+            self.fields['organization'].choices = [
+                (o.slug, o.name) for o in Organization.objects.order_by('name')
+            ]
+        else:
+            qs = self.user.organizations.all()
+            self.fields['organization'].choices = [
+                (o.slug, o.name) for o in qs.order_by('name')
+                if check_perms(self.user, ('project.create',), (o,))
+            ]
 
     def clean_name(self):
         name = self.cleaned_data['name']

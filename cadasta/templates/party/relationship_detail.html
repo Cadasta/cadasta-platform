@@ -1,42 +1,70 @@
 {% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
 
-{% block form_script %}
-  {{ form.media }}
-  {% include "resources/scripts.html" %}
-{% endblock %}
-
 {% block location_panel %}
 
-<h2>{% trans "Relationship" %}</h2>
+<div class="col-md-4 detail">
+  <section>
+    <div class="page-title">
+      <h2>{% trans "Relationship" %}</h2>
+      <div class="top-btn pull-right">
+        <!-- More options menu -->
+        <div class="dropdown pull-right btn-more">
+            <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+              <span class="more-menu glyphicon glyphicon-option-vertical"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dLabel">
+              <li><a href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}">{% trans "Edit relationship" %}</a></li>
+              <li role="separator" class="divider"></li>
+              <li><a href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}">{% trans "Delete relationship" %}</a></li>
+            </ul>
+          </div>
+      </div>
+    </div>
 
-<a href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}">Edit</a> | 
-<a href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}">Delete</a>
+    <!-- Relationship information -->
+    <h3>{% trans "Details" %}</h3>
+    <table class="table table-location">
+      <tr>
+        <td><label>{% trans "Type" %}</label></td>
+        <td>{{ relationship.tenure_type.label }}</td>
+      </tr>
+      <tr>
+        <td><label>{% trans "Party" %}</label></td>
+        <td><a href="{% url 'parties:detail' object.organization.slug object.slug relationship.party.id %}">{{ relationship.party.name }}</a></td>
+      </tr>
+      {% for attr in attributes %}
+      <tr>
+        <td><label>{{ attr.0 }}</label></td>
+        <td>{{ attr.1 }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <!-- /relationship information -->
 
-<table class="table table-hover">
-  <tr>
-    <td><strong>{% trans "Type" %}</strong></td>
-    <td>{{ relationship.tenure_type.label }}</strong></td>
-  </tr>
-  <tr>
-    <td><strong>{% trans "Party" %}</td>
-    <td><a href="{% url 'parties:detail' object.organization.slug object.slug relationship.party.id %}">{{ relationship.party.name }}</a></td>
-  </tr>
-  {% for attr in attributes %}
-  <tr>
-    <td><strong>{{ attr.0 }}</strong></td>
-    <td>{{ attr.1 }}</td>
-  </tr>
-  {% endfor %}
-</table>
-
-<h3>{% trans "resources" %}</h3>
-
-{% include 'resources/table.html' with object_list=relationship.resources %}
-
-<div class="btn-group btn-group-justified">
-  <a class="btn btn-primary" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">{% trans "Add from library" %}</a>
-  <a class="btn btn-primary" href="{% url 'parties:relationship_resource_new' object.organization.slug object.slug relationship.id %}">{% trans "Upload new resource" %}</a>
+    <!-- Relationship resources -->
+    <h3>{% trans "Resources" %}</h3>
+    {% if relationship.resources %}
+      <div class="top-btn pull-right top-add">
+        <a class="btn btn-primary btn-sm" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+      </div>
+      {% include 'resources/table_sm.html' with object_list=relationship.resources %}
+    {% else %}
+      <div>
+        <p>{% trans "This relationship does not have any connected resources. To add a resource, select the button below." %}</p>
+        <div class="btn-full">
+          {% if project_has_resources %}
+          <a class="btn btn-primary" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">
+          {% else %}
+          <a class="btn btn-primary" href="{% url 'parties:relationship_resource_new' object.organization.slug object.slug relationship.id %}">
+          {% endif %}
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+        </div>
+      </div>
+    {% endif %}
+    <!-- /relationship resources -->
+  </section>
 </div>
 
 {% endblock %}

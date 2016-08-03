@@ -1,2 +1,19 @@
 #!/bin/bash
+
+if [[ $# == 0 ]]
+then
+    mode=DEFAULT
+elif [[ $# == 1 && "$1" == '--debug' ]]
+then
+    mode=DEBUG
+else
+    echo "Usage: runserver [--debug]"
+    exit 1
+fi
+
+if [ $mode == DEBUG ]
+then
+    export DJANGO_SETTINGS_MODULE=config.settings.dev_debug
+fi
+
 exec ./manage.py runserver 0.0.0.0:8000

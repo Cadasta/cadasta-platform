@@ -1,8 +1,8 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
-{% block left-nav %}map{% endblock %}
 {% block body-class %} map{% endblock %}
+{% block left-nav %}map{% endblock %}
 
 {% load leaflet_tags %}
 {% load staticfiles %}
@@ -41,7 +41,7 @@
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                        "<h2><span>Location</span>{{ location.get_type_display }}</h2></div>" +
-                       "<div class=\"btn-wrap\"><a href='{% url 'locations:detail' object.organization.slug object.slug location.id %}' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open location' %}</a>"  +
+                       "<div class=\"btn-wrap\"><span class=\"btn-sm btn-block\">{% trans 'Currently viewing' %}</span>" +
                        "</div>");
       }
     });
@@ -62,7 +62,7 @@
       $('a[href=' + anchor + ']').tab('show');
   });
 </script>
-{% block form_script %}{% endblock %}
+{% block location_extra_script %}{% endblock %}
 {% endblock %}
 
 {% block content %}
@@ -75,11 +75,7 @@
     </div>
     <!-- / end overview map -->
     <!-- Overview detail  -->
-    <div class="col-md-4 detail">
-      <section>
-        {% block location_panel %}{% endblock %}
-      </section>
-    </div>
+    {% block location_panel %}{% endblock %}
     <!-- / overview detail -->
   </div>
 </div>

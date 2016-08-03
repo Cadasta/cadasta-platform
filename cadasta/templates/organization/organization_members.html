@@ -23,30 +23,30 @@
         <div class="panel-body">
           <!-- Members index -->
           <table class="table table-hover datatable" data-paging-type="simple">
-        <thead>
-          <tr>
-            <th>Member</th>
-            <th class="hidden-xs">Username</th>
-            <th class="hidden-xs">Email</th>
-            <th class="hidden-xs hidden-sm">Last login</th>
-          </tr>
-        </thead>
-        <tbody>
-        {% for user in organization.users.all %}
-          <tr class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
-            <td>{{ user.get_full_name }}
-              <div class="hidden-sm hidden-md hidden-lg">
-                {{ user.username }}<br />
-                {{ user.email }}
-              </div>
-            </td>
-            <td class="hidden-xs">{{ user.username }}</td>
-            <td class="hidden-xs">{{ user.email }}</td>
-            <td class="hidden-xs hidden-sm">{{ user.last_login }}</td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th class="hidden-xs">Username</th>
+                <th class="hidden-xs">Email</th>
+                <th class="hidden-xs hidden-sm">Last login</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for user in organization.users.all %}
+              <tr class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
+                <td>{{ user.get_full_name }}
+                  <div class="hidden-sm hidden-md hidden-lg">
+                    {{ user.username }}<br />
+                    {{ user.email }}
+                  </div>
+                </td>
+                <td class="hidden-xs">{{ user.username }}</td>
+                <td class="hidden-xs">{{ user.email }}</td>
+                <td class="hidden-xs hidden-sm">{{ user.last_login }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
         </div>
        </div>
      </div>
