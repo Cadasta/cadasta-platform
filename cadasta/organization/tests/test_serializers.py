@@ -12,7 +12,7 @@ from rest_framework.test import APIRequestFactory
 from core.tests.base_test_case import UserTestCase
 from accounts.tests.factories import UserFactory
 from .. import serializers
-from ..models import OrganizationRole, ProjectRole
+from ..models import OrganizationRole, ProjectRole, Project
 from .factories import OrganizationFactory, ProjectFactory
 
 
@@ -85,6 +85,65 @@ class OrganizationSerializerTest(UserTestCase):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
             'name': ["Organization name cannot be “Add” or “New”."]
+        }
+
+    def test_update_with_restricted_organization_name(self):
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+        org = OrganizationFactory.create(add_users=[user])
+
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {'name': random.choice(invalid_names)}
+        serializer = serializers.OrganizationSerializer(
+            org,
+            data=data,
+            partial=True,
+            context={'request': request}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': ["Organization name cannot be “Add” or “New”."]
+        }
+
+    def test_duplicate_organization_name(self):
+        existing_org = OrganizationFactory.create()
+
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        data = {'name': existing_org.name}
+        serializer = serializers.OrganizationSerializer(
+            data=data,
+            context={'request': request}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': ["Organization with this name already exists."]
+        }
+
+    def test_update_with_duplicate_organization_name(self):
+        org_1 = OrganizationFactory.create()
+        org_2 = OrganizationFactory.create()
+
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        data = {'name': org_1.name}
+        serializer = serializers.OrganizationSerializer(
+            org_2,
+            data=data,
+            partial=True,
+            context={'request': request}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': ["Organization with this name already exists."]
         }
 
 
@@ -161,6 +220,77 @@ class ProjectSerializerTest(TestCase):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
             'name': ["Project name cannot be “Add” or “New”."]
+        }
+
+    def test_update_with_restricted_project_name(self):
+        org = OrganizationFactory.create()
+        project = ProjectFactory.create(organization=org)
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {'name': random.choice(invalid_names)}
+        serializer = serializers.ProjectSerializer(
+            project,
+            data=data,
+            partial=True,
+            context={'organization': org}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': ["Project name cannot be “Add” or “New”."]
+        }
+
+    def test_duplicate_project_name(self):
+        existing_project = ProjectFactory.create()
+        org = existing_project.organization
+        data = {
+            'name': existing_project.name,
+            'organization': org,
+        }
+        serializer = serializers.ProjectSerializer(
+            data=data,
+            context={'organization': org}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': [
+                "Project with this name already exists in this organization."]
+        }
+
+    def test_duplicate_project_name_in_another_org(self):
+        existing_project = ProjectFactory.create()
+        another_org = OrganizationFactory.create()
+        data = {
+            'name': existing_project.name,
+            'organization': another_org,
+        }
+        serializer = serializers.ProjectSerializer(
+            data=data,
+            context={'organization': another_org}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        project_instance = serializer.instance
+        assert project_instance.name == existing_project.name
+        assert Project.objects.count() == 2
+
+    def test_update_with_duplicate_project_name(self):
+        project_1 = ProjectFactory.create()
+        org = project_1.organization
+        project_2 = ProjectFactory.create(organization=org)
+        data = {'name': project_1.name}
+        serializer = serializers.ProjectSerializer(
+            project_2,
+            data=data,
+            partial=True,
+            context={'organization': org}
+        )
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': [
+                "Project with this name already exists in this organization."]
         }
 
     def test_unicode_slug(self):

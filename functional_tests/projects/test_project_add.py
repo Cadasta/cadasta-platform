@@ -159,6 +159,7 @@ class ProjectAddTest(FunctionalTest):
         proj_add_page.set_access(project['access'])
         proj_add_page.set_description(project['description'])
         proj_add_page.try_submit_details()
+        proj_add_page.check_missing_name_error()
         proj_add_page.check_details(project)
 
         # Check that an error occurs when the project name is only whitespace
@@ -170,6 +171,7 @@ class ProjectAddTest(FunctionalTest):
         proj_add_page.set_access(project['access'])
         proj_add_page.set_proj_url(project['url'])
         proj_add_page.try_submit_details()
+        proj_add_page.check_missing_name_error()
         proj_add_page.check_details(project)
 
         # Set project name, final access, and invalid URL

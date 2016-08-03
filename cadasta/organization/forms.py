@@ -132,10 +132,9 @@ class OrganizationForm(forms.ModelForm):
         return self.to_list(self.data.get('urls'))
 
     def clean_name(self):
-        is_create = not self.instance.id
         name = self.cleaned_data['name']
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
-        if is_create and slugify(name, allow_unicode=True) in invalid_names:
+        if slugify(name, allow_unicode=True) in invalid_names:
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
         return name
@@ -265,10 +264,25 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
 
     def clean_name(self):
         name = self.cleaned_data['name']
+
+        # Check that name is not restricted
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
         if slugify(name, allow_unicode=True) in invalid_names:
             raise forms.ValidationError(
                 _("Project name cannot be “Add” or “New”."))
+
+        # Check that name is unique org-wide
+        # (Explicit validation because we are using a wizard and the
+        # unique_together validation cannot occur in the proper page)
+        not_unique = Project.objects.filter(
+            organization__slug=self.cleaned_data['organization'],
+            name=name,
+        ).exists()
+        if not_unique:
+            raise forms.ValidationError(
+                _("Project with this name already exists "
+                  "in this organization."))
+
         return name
 
 
@@ -300,6 +314,29 @@ class ProjectEditDetails(forms.ModelForm):
             self.instance.current_questionnaire = ''
 
         return super().save(*args, **kwargs)
+
+    def clean_name(self):
+        name = self.cleaned_data['name']
+
+        # Check that name is not restricted
+        invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
+        if slugify(name, allow_unicode=True) in invalid_names:
+            raise forms.ValidationError(
+                _("Project name cannot be “Add” or “New”."))
+
+        # Check that name is unique org-wide
+        # (Explicit validation because we are using a wizard and the
+        # unique_together validation cannot occur in the proper page)
+        not_unique = Project.objects.filter(
+            organization__slug=self.instance.organization.slug,
+            name=name,
+        ).exclude(id=self.instance.id).exists()
+        if not_unique:
+            raise forms.ValidationError(
+                _("Project with this name already exists "
+                  "in this organization."))
+
+        return name
 
 
 class PermissionsForm(SuperUserCheck):

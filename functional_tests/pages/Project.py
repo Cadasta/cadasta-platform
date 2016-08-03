@@ -1,5 +1,4 @@
 from .base import Page
-from selenium.common.exceptions import NoSuchElementException
 
 
 class ProjectPage(Page):

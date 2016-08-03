@@ -257,24 +257,33 @@ class ProjectAddPage(Page):
         submit_button.click()
 
     def try_submit_details(self):
-        """This method should be called when the project name is empty.
-        The method will attempt to submit the already set details and
-        verify that an error is issued due to the missing name."""
+        """This method should be called when the details form has at
+        least one error. The method will attempt to submit the already
+        set details and verify that an error is issued."""
 
         assert self.is_on_subpage('details')
-        assert re.fullmatch('\s*', self.get_name()) is not None
 
         submit_button = self.BY_CLASS('btn-primary')
         error_wait = (By.CLASS_NAME, 'errorlist')
         self.test.click_through(submit_button, error_wait)
         assert self.is_on_subpage('details')
 
-        # Assert that the error message is for the project name field
+    def check_missing_name_error(self):
+        # Assert that there is a missing project name error message
         assert self.BY_XPATH(
             "//div[@class='form-group has-error']/" +
             "input[@id='id_details-name']/../" +
             "label[contains(@class, 'control-label')]/" +
-            "ul[@class='errorlist']").text == 'This field is required.'
+            "ul[@class='errorlist']").text == "This field is required."
+
+    def check_duplicate_name_error(self):
+        # Assert that there is a missing project name error message
+        assert self.BY_XPATH(
+            "//div[@class='form-group has-error']/" +
+            "input[@id='id_details-name']/../" +
+            "label[contains(@class, 'control-label')]/" +
+            "ul[@class='errorlist']").text == (
+                "Project with this name already exists in this organization.")
 
     def submit_details(self):
         assert self.is_on_subpage('details')

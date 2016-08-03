@@ -28,9 +28,8 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
         detail_only_fields = ('users',)
 
     def validate_name(self, value):
-        is_create = not self.instance
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
-        if is_create and slugify(value, allow_unicode=True) in invalid_names:
+        if slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
         return value
@@ -53,11 +52,33 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     country = CountryField(required=False)
 
     def validate_name(self, value):
-        is_create = not self.instance
+
+        # Check that name is not restricted
         invalid_names = settings.CADASTA_INVALID_ENTITY_NAMES
-        if is_create and slugify(value, allow_unicode=True) in invalid_names:
+        if slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Project name cannot be “Add” or “New”."))
+
+        # Check that name is unique org-wide
+        # (Explicit validation: see comment in the Meta class)
+        is_create = not self.instance
+        if is_create:
+            org_slug = self.context['organization'].slug
+        else:
+            org_slug = self.instance.organization.slug
+        queryset = Project.objects.filter(
+            organization__slug=org_slug,
+            name=value,
+        )
+        if is_create:
+            not_unique = queryset.exists()
+        else:
+            not_unique = queryset.exclude(id=self.instance.id).exists()
+        if not_unique:
+            raise serializers.ValidationError(
+                _("Project with this name already exists "
+                  "in this organization."))
+
         return value
 
     class Meta:
@@ -66,6 +87,11 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
                   'archived', 'urls', 'contacts', 'users', 'access', 'slug')
         read_only_fields = ('id', 'country', 'slug')
         detail_only_fields = ('users',)
+
+        # Suppress automatic model-derived UniqueTogetherValidator because
+        # organization is a read-only field in the serializer.
+        # Instead, perform this validation explicitly in validate_name()
+        validators = []
 
     def create(self, validated_data):
         organization = self.context['organization']

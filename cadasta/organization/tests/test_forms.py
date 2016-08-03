@@ -52,17 +52,34 @@ class OrganizationTest(UserTestCase):
         assert org.slug == 'org'
         assert OrganizationRole.objects.filter(organization=org).count() == 1
 
-    def test_unique_slugs(self):
+    def test_duplicate_name_error(self):
         self.data['description'] = 'Org description #1'
         self._save(self.data)
         org1 = Organization.objects.first()
         assert org1.slug == 'org'
 
         self.data['description'] = 'Org description #2'
-        self._save(self.data, count=2)
-        orgs = Organization.objects.all()
-        assert len(orgs) == 2
-        assert orgs[0].slug != orgs[1].slug
+        form = forms.OrganizationForm(self.data, user=UserFactory.create())
+        assert form.is_valid() is False
+        assert form.errors == {
+            'name': ["Organization with this Name already exists."]
+        }
+        assert Organization.objects.count() == 1
+
+    # NOTE: This test is no longer possible because unique org names masks
+    # the testing of unique org slugs via OrganizationForm. Unique org slugs
+    # can only be tested via model unit tests.
+    # def test_unique_slugs(self):
+    #     self.data['description'] = 'Org description #1'
+    #     self._save(self.data)
+    #     org1 = Organization.objects.first()
+    #     assert org1.slug == 'org'
+    #
+    #     self.data['description'] = 'Org description #2'
+    #     self._save(self.data, count=2)
+    #     orgs = Organization.objects.all()
+    #     assert len(orgs) == 2
+    #     assert orgs[0].slug != orgs[1].slug
 
     def test_add_organization_with_url(self):
         self.data['urls'] = 'http://example.com'
@@ -117,6 +134,16 @@ class OrganizationTest(UserTestCase):
         assert org.name == self.data['name']
         assert org.description == self.data['description']
         assert org.slug == 'some-org'
+
+    def test_update_organization_with_restricted_name(self):
+        org = OrganizationFactory.create(slug='some-org')
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        self.data['name'] = random.choice(invalid_names)
+        form = forms.OrganizationForm(self.data, instance=org)
+        assert not form.is_valid()
+        assert form.errors == {
+            'name': ["Organization name cannot be “Add” or “New”."]
+        }
 
     def test_remove_all_contacts(self):
         org = OrganizationFactory.create(
@@ -267,6 +294,52 @@ class ProjectAddDetailsTest(UserTestCase):
             'name': ["Project name cannot be “Add” or “New”."]
         }
 
+    def test_add_new_project_with_duplicate_name(self):
+        org = OrganizationFactory.create()
+        user = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=org, user=user, admin=True
+        )
+        existing_project = ProjectFactory.create(
+            organization=org,
+            name="Same Project",
+        )
+        data = {
+            'organization': org.slug,
+            'name': existing_project.name,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+        form = forms.ProjectAddDetails(data=data, user=user)
+        assert not form.is_valid()
+        assert form.errors == {
+            'name': [
+                "Project with this name already exists in this organization."]
+        }
+
+    def test_add_new_project_with_duplicate_name_in_another_org(self):
+        org_1 = OrganizationFactory.create()
+        org_2 = OrganizationFactory.create()
+        user = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=org_2, user=user, admin=True
+        )
+        existing_project = ProjectFactory.create(organization=org_1)
+        data = {
+            'organization': org_2.slug,
+            'name': existing_project.name,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+        form = forms.ProjectAddDetails(data=data, user=user)
+        assert form.is_valid()
+
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectEditDetailsTest(UserTestCase):
@@ -377,6 +450,47 @@ class ProjectEditDetailsTest(UserTestCase):
         project.refresh_from_db()
         assert project.name == data['name']
         assert not project.current_questionnaire
+
+    def test_update_project_with_restricted_name(self):
+        project = ProjectFactory.create()
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = {
+            'name': random.choice(invalid_names),
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+        form = forms.ProjectEditDetails(
+            instance=project,
+            data=data,
+        )
+        assert not form.is_valid()
+        assert form.errors == {
+            'name': ["Project name cannot be “Add” or “New”."]
+        }
+
+    def test_update_project_with_duplicate_name(self):
+        project_1 = ProjectFactory.create()
+        project_2 = ProjectFactory.create(organization=project_1.organization)
+        data = {
+            'name': project_1.name,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+        form = forms.ProjectEditDetails(
+            instance=project_2,
+            data=data,
+        )
+        assert not form.is_valid()
+        assert form.errors == {
+            'name': [
+                "Project with this name already exists in this organization."]
+        }
 
 
 class UpdateProjectRolesTest(UserTestCase):

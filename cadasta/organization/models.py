@@ -30,7 +30,7 @@ def get_policy_instance(policy_name, variables):
 
 @permissioned_model
 class Organization(SlugModel, RandomIDModel):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
     archived = models.BooleanField(default=False)
@@ -175,6 +175,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
 
     class Meta:
         ordering = ('organization', 'name')
+        unique_together = ('organization', 'name')
 
     class TutelaryMeta:
         perm_type = 'project'
