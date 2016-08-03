@@ -4,7 +4,11 @@ upstream django {
 
 server {
     listen      80;
+    listen      443 ssl;
     server_name {{ api_url }};
+    ssl_certificate     /etc/ssl/private/domain.crt;
+    ssl_certificate_key /etc/ssl/private/domain.key;
+
     charset     utf-8;
     proxy_set_header Host $http_host;
     proxy_set_header X-Url-Scheme $scheme;
@@ -44,7 +48,11 @@ server {
 
 server {
     listen      80;
+    listen      443 ssl;
     server_name {{ main_url }};
+    ssl_certificate     /etc/ssl/private/domain.crt;
+    ssl_certificate_key /etc/ssl/private/domain.key;
+
     charset     utf-8;
 
     client_max_body_size 75M;
