@@ -1,84 +1,60 @@
-from django.http import HttpRequest
-from django.contrib.auth.models import AnonymousUser
-from django.template.loader import render_to_string
-from django.template import RequestContext
-from django.contrib import messages
-from django.contrib.messages.storage.fallback import FallbackStorage
+from django.test import TestCase
+from skivvy import ViewTestCase
 
 from accounts.tests.factories import UserFactory
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 from ..views.default import AccountProfile
 from ..forms import ProfileForm
 
 
-class ProfileTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
-        self.view = AccountProfile.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
-        setattr(self.request, 'user', AnonymousUser())
+class ProfileTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = AccountProfile
+    template = 'accounts/profile.html'
 
-        # Mock up messages middleware.
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
+    def setup_template_context(self):
+        return {
+            'form': ProfileForm(instance=self.user)
+        }
 
     def test_get_profile(self):
-        user = UserFactory.create()
-        setattr(self.request, 'user', user)
-
-        response = self.view(self.request).render()
-        content = response.content.decode('utf-8')
-
-        form = ProfileForm(instance=user)
-        context = RequestContext(self.request)
-        context['form'] = form
-
-        expected = render_to_string('accounts/profile.html', context)
+        self.user = UserFactory.create()
+        response = self.request(user=self.user)
 
         assert response.status_code == 200
-        assert content == expected
+        assert response.content == self.expected_content
 
     def test_update_profile(self):
         user = UserFactory.create(username='John')
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'POST', {
+        post_data = {
             'username': 'John',
             'email': user.email,
-            'full_name': 'John Lennon',
-        })
-
-        self.view(self.request)
+            'full_name': 'John Lennon'
+        }
+        response = self.request(method='POST', post_data=post_data, user=user)
+        response.status_code == 200
 
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
 
     def test_get_profile_when_no_user_is_signed_in(self):
-        response = self.view(self.request)
+        response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_update_profile_when_no_user_is_signed_in(self):
-        setattr(self.request, 'method', 'POST')
-
-        response = self.view(self.request)
+        response = self.request(method='POST', post_data={})
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_update_profile_duplicate_email(self):
         user1 = UserFactory.create(username='John',
                                    full_name='John Lennon')
         user2 = UserFactory.create(username='Bill')
-        setattr(self.request, 'user', user2)
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'POST', {
+        post_data = {
             'username': 'Bill',
             'email': user1.email,
             'full_name': 'Bill Bloggs',
-        })
+        }
 
-        self.view(self.request)
-        msgs = messages.get_messages(self.request)
-        assert list(msgs)[0].message == 'Failed to update profile information'
+        response = self.request(method='POST', user=user2, post_data=post_data)
+        assert 'Failed to update profile information' in response.messages

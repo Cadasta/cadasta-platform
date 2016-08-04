@@ -127,6 +127,9 @@ class PartyRelationshipCreate(APIPermissionRequiredMixin,
     permission_required = 'party_rel.create'
     serializer_class = serializers.PartyRelationshipWriteSerializer
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
 
 class PartyRelationshipDetail(APIPermissionRequiredMixin,
                               mixins.PartyRelationshipQuerySetMixin,
@@ -157,6 +160,9 @@ class TenureRelationshipCreate(APIPermissionRequiredMixin,
 
     permission_required = 'tenure_rel.create'
     serializer_class = serializers.TenureRelationshipWriteSerializer
+
+    def get_perms_objects(self):
+        return [self.get_project()]
 
 
 class TenureRelationshipDetail(APIPermissionRequiredMixin,

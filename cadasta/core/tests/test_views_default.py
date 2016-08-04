@@ -1,49 +1,39 @@
 import json
+from skivvy import ViewTestCase
+
+from django.http import HttpRequest
+from django.test import TestCase
 
 from accounts.tests.factories import UserFactory
-from core.tests.base_test_case import UserTestCase
-from django.contrib.auth.models import AnonymousUser
-from django.http import HttpRequest
-from django.template import RequestContext
-from django.template.loader import render_to_string
-from django.test import TestCase
+from core.tests.utils.cases import UserTestCase
+from tutelary.models import Role
+from organization.tests.factories import OrganizationFactory, ProjectFactory
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
-from organization.tests.factories import OrganizationFactory, ProjectFactory
-from tutelary.models import Role
 
 from ..views.default import Dashboard, IndexPage, server_error
 
 
-class IndexPageTest(UserTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.view = IndexPage.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
-        setattr(self.request, 'user', AnonymousUser())
+class IndexPageTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = IndexPage
 
     def test_redirects_when_user_is_signed_in(self):
         user = UserFactory.create()
-        setattr(self.request, 'user', user)
-        response = self.view(self.request)
+        response = self.request(user=user)
         assert response.status_code == 302
-        assert '/dashboard/' in response['location']
+        assert '/dashboard/' in response.location
 
     def test_page_is_rendered_when_user_is_not_signed_in(self):
-        response = self.view(self.request)
+        response = self.request()
         assert response.status_code == 302
-        assert '/dashboard/' in response['location']
+        assert '/dashboard/' in response.location
 
 
-class DashboardTest(UserTestCase):
+class DashboardTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = Dashboard
+    template = 'core/dashboard.html'
 
-    def setUp(self):
-        super().setUp()
-        self.view = Dashboard.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
+    def setup_models(self):
         self.org = OrganizationFactory.create()
         extent = ('SRID=4326;'
                   'POLYGON ((-5.1031494140625000 8.1299292850467957, '
@@ -57,72 +47,50 @@ class DashboardTest(UserTestCase):
             name='Private Project',
             access='private', organization=self.org, extent=extent)
 
-        setattr(self.request, 'user', AnonymousUser())
-
-    def _test_projects_rendered(self, response, member=False, superuser=False):
-        content = response.render().content.decode('utf-8')
-
-        context = RequestContext(self.request)
-        projects = []
-        if superuser:
-            projects = Project.objects.filter(extent__isnull=False)
-        else:
-            if member:
-                projects.extend(Project.objects.filter(
-                    organization__slug=self.org.slug,
-                    access='private',
-                    extent__isnull=False))
-            projects.extend(Project.objects.filter(
-                            access='public',
-                            extent__isnull=False))
-        context['geojson'] = json.dumps(
-            ProjectGeometrySerializer(projects, many=True).data
-        )
-        context['is_superuser'] = superuser
-        expected = render_to_string(
-            'core/dashboard.html',
-            context
-        )
-
-        assert expected == content
+    def _render_geojson(self, projects):
+        return json.dumps(ProjectGeometrySerializer(projects, many=True).data)
 
     def test_page_is_rendered_when_user_is_not_signed_in(self):
-        response = self.view(self.request)
+        response = self.request()
         assert response.status_code == 200
 
     def test_page_is_rendered_when_user_is_signed_in(self):
         user = UserFactory.create()
-        setattr(self.request, 'user', user)
-        response = self.view(self.request)
+        response = self.request(user=user)
         assert response.status_code == 200
 
     def test_private_projects_rendered_when_org_member_is_signed_in(self):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org, user=user)
-        setattr(self.request, 'user', user)
-        response = self.view(self.request)
+        response = self.request(user=user)
+
+        gj = self._render_geojson(Project.objects.all())
+        expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
-        self._test_projects_rendered(response, member=True)
+        assert response.content == expected_content
 
     def test_private_projects_not_rendered_when_not_an_org_member(self):
         user = UserFactory.create()
-        setattr(self.request, 'user', user)
-        response = self.view(self.request)
+        response = self.request(user=user)
+
+        gj = self._render_geojson(Project.objects.filter(access='public'))
+        expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
-        self._test_projects_rendered(response)
+        assert response.content == expected_content
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
         self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
-        setattr(self.request, 'user', superuser)
-        response = self.view(self.request).render()
+        response = self.request(user=superuser)
+
+        gj = self._render_geojson(Project.objects.all())
+        expected_content = self.render_content(is_superuser=True, geojson=gj)
+        assert response.content == expected_content
         assert response.status_code == 200
-        self._test_projects_rendered(response, superuser=True)
 
 
 class ServerErrorTest(TestCase):
-
     def setUp(self):
         super().setUp()
         self.request = HttpRequest()

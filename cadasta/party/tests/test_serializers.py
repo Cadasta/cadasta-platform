@@ -1,13 +1,15 @@
 """Party serializer test cases."""
 
-from core.tests.base_test_case import UserTestCase
+from django.test import TestCase
+
+from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party import serializers
 
 from .factories import PartyFactory
 
 
-class PartySerializerTest(UserTestCase):
+class PartySerializerTest(UserTestCase, TestCase):
     def test_serialize_party(self):
         party = PartyFactory.create()
         serializer = serializers.PartySerializer(party)

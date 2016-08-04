@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from tutelary.models import Policy
 
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
 from geography import load as load_countries
 from .factories import OrganizationFactory, ProjectFactory
@@ -26,7 +26,7 @@ class OrganizationTest(TestCase):
         assert type(org.id) is not int
 
 
-class OrganizationRoleTest(UserTestCase):
+class OrganizationRoleTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.oa_policy = Policy.objects.get(name='org-admin')
@@ -147,7 +147,7 @@ class ProjectTest(TestCase):
                 prj=project.slug))
 
 
-class ProjectRoleTest(UserTestCase):
+class ProjectRoleTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()

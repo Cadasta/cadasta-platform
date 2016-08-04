@@ -1,133 +1,303 @@
-from django.contrib.auth.models import AnonymousUser
-from django.utils.translation import gettext as _
-from rest_framework import status as status_code
+import json
+from django.test import TestCase
+from rest_framework.exceptions import PermissionDenied
+from tutelary.models import Policy, assign_user_policies
+from skivvy import APITestCase
 
-from organization.tests.factories import (ProjectFactory,
-                                          OrganizationFactory)
+from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import UserTestCase
+from organization.tests.factories import ProjectFactory, clause
+from organization.models import OrganizationRole
 from .factories import SpatialUnitFactory
-from .base_classes import (RecordListBaseTestCase,
-                           RecordCreateBaseTestCase,
-                           RecordListAPITest,
-                           RecordCreateAPITest,
-                           RecordDetailBaseTestCase,
-                           RecordDetailAPITest,
-                           RecordUpdateAPITest,
-                           RecordDeleteAPITest)
 from ..models import SpatialUnit
 from ..views import api
 
 
-class SpatialUnitListTestCase(RecordListBaseTestCase,
-                              RecordCreateBaseTestCase):
+def assign_policies(user):
+    clauses = {
+        'clause': [
+            {
+                "effect": "allow",
+                "object": ["*"],
+                "action": ["org.*"]
+            }, {
+                'effect': 'allow',
+                'object': ['organization/*'],
+                'action': ['org.*', "org.*.*"]
+            }, {
+                'effect': 'allow',
+                'object': ['project/*/*'],
+                'action': ['project.*', 'project.*.*', 'spatial.*']
+            }, {
+                'effect': 'allow',
+                'object': ['spatial/*/*/*'],
+                'action': ['spatial.*']
+            }
+        ]
+    }
+    policy = Policy.objects.create(
+        name='test-policy',
+        body=json.dumps(clauses))
+    assign_user_policies(user, policy)
 
-    record_model = SpatialUnit
 
-    def setUp(self):
-        super().setUp()
-        self.view = api.SpatialUnitList.as_view()
-        self.url = '/v1/organizations/{org}/projects/{prj}/spatial/'
+class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.SpatialUnitList
 
-    def _test_objs(self, access='public'):
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='test-project', organization=org, access=access)
-        SpatialUnitFactory.create(project=prj, type='AP')
-        SpatialUnitFactory.create(project=prj, type='BU')
-        SpatialUnitFactory.create(
-            project=prj, type='RW')
-        self.num_records = 3
-        return (org, prj)
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
 
-
-class SpatialUnitListAPITest(SpatialUnitListTestCase,
-                             RecordListAPITest):
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug
+        }
 
     def test_full_list(self):
-        org, prj = self._test_objs()
+        SpatialUnitFactory.create_batch(2, project=self.prj)
         extra_record = SpatialUnitFactory.create()
-        content = self._get(
-            org_slug=org.slug, prj_slug=prj.slug,
-            status=status_code.HTTP_200_OK, length=self.num_records)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content) == 2
         assert extra_record.id not in (
-            [u['properties']['id'] for u in content['features']])
+            [u['properties']['id'] for u in response.content['features']])
 
     def test_full_list_with_unauthorized_user(self):
-        org, prj = self._test_objs()
-        self._get(
-            org_slug=org.slug, prj_slug=prj.slug, user=AnonymousUser(),
-            status=status_code.HTTP_200_OK, length=self.num_records
-        )
+        SpatialUnitFactory.create_batch(2, project=self.prj)
+        extra_record = SpatialUnitFactory.create()
 
-    # def test_search_filter(self):
-    #     org, prj = self._test_objs()
-    #     content = self._get(
-    #         org_slug=org.slug, prj_slug=prj.slug,
-    #         status=status_code.HTTP_200_OK, length=1, query='search=AP')
-    #     assert all(
-    #         record['properties']['type'] == 'AP' for
-    #         record in content['features'])
+        response = self.request()
+        assert response.status_code == 200
+        assert len(response.content) == 2
+        assert extra_record.id not in (
+            [u['properties']['id'] for u in response.content['features']])
 
     def test_ordering(self):
-        org, prj = self._test_objs()
-        content = self._get(
-            org_slug=org.slug, prj_slug=prj.slug,
-            status=status_code.HTTP_200_OK, length=self.num_records,
-            query='ordering=type')
-        names = [
-            record['properties']['type'] for record in content['features']]
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+
+        response = self.request(user=self.user, get_data={'ordering': 'type'})
+        assert response.status_code == 200
+        assert len(response.content['features']) == 3
+        names = [su['properties']['type'] for su in
+                 response.content['features']]
         assert names == sorted(names)
 
     def test_reverse_ordering(self):
-        org, prj = self._test_objs()
-        content = self._get(
-            org_slug=org.slug, prj_slug=prj.slug,
-            status=status_code.HTTP_200_OK, length=self.num_records,
-            query='ordering=-type')
-        names = [
-            record['properties']['type'] for record in content['features']]
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+
+        response = self.request(user=self.user, get_data={'ordering': '-type'})
+        assert response.status_code == 200
+        assert len(response.content['features']) == 3
+        names = [su['properties']['type'] for su in
+                 response.content['features']]
         assert names == sorted(names, reverse=True)
 
     def test_type_filter(self):
-        org, prj = self._test_objs()
-        content = self._get(
-            org_slug=org.slug, prj_slug=prj.slug,
-            status=status_code.HTTP_200_OK, length=1, query='type=RW')
-        assert all(
-            record['properties']['type'] == 'RW' for
-            record in content['features'])
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+        response = self.request(user=self.user, get_data={'type': 'RW'})
+        assert response.status_code == 200
+        assert len(response.content['features']) == 1
 
+    def test_get_full_list_organization_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'some-org'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
 
-class SpatialUnitCreateAPITest(SpatialUnitListTestCase,
-                               RecordCreateAPITest):
+    def test_get_full_list_project_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'some-prj'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
 
-    default_create_data = {
-        'properties': {
-            'type': "AP"
-        },
-        'geometry': {
-            'type': 'Point',
-            'coordinates': [100, 0]
+    def test_list_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        SpatialUnitFactory.create_batch(2, project=self.prj)
+        extra_record = SpatialUnitFactory.create()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content) == 2
+        assert extra_record.id not in (
+            [u['properties']['id'] for u in response.content['features']])
+
+    def test_list_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_list_private_records_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project.list'],
+                    'action': ['organization/*']
+                },
+                {
+                    'effect': 'allow',
+                    'object': ['project.view'],
+                    'action': ['project/*/*']
+                }
+            ]
         }
-    }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        assign_user_policies(self.user, restricted_policy)
 
-    # Additional tests
+        response = self.request(user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
-    def test_create_invalid_spatial_unit(self):
-        org, prj = self._test_objs()
-        invalid_data = {
-            'type': '',
+    def test_list_private_records_based_on_org_membership(self):
+        SpatialUnitFactory.create(project=self.prj)
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+
+
+class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.SpatialUnitList
+
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug
+        }
+
+    def setup_post_data(self):
+        return {
+            'properties': {
+                'type': "AP"
+            },
             'geometry': {
                 'type': 'Point',
                 'coordinates': [100, 0]
             }
         }
-        content = self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=invalid_data, status=status_code.HTTP_400_BAD_REQUEST)
-        assert content['type'][0] == _('"" is not a valid choice.')
+
+    def test_create_valid_record(self):
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 201
+        assert SpatialUnit.objects.count() == 1
+
+    def test_create_record_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == "Project not found."
+
+    def test_create_record_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == "Project not found."
+
+    def test_create_record_with_unauthorized_user(self):
+        response = self.request(method='POST')
+        assert response.status_code == 403
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 201
+        assert SpatialUnit.objects.count() == 1
+
+    def test_create_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='POST')
+        assert response.status_code == 403
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project.list'],
+                    'action': ['organization/*']
+                },
+                {
+                    'effect': 'allow',
+                    'object': ['project.view'],
+                    'action': ['project/*/*']
+                }
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        assign_user_policies(self.user, restricted_policy)
+
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 403
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record_based_on_org_membership(self):
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 403
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_invalid_spatial_unit(self):
+        invalid_data = {
+            'properties': {
+                'type': ""
+            },
+            'geometry': {
+                'type': 'Point',
+                'coordinates': [100, 0]
+            }
+        }
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data=invalid_data)
+        print(response.content)
+        assert response.status_code == 400
+        assert response.content['type'][0] == '"" is not a valid choice.'
 
     def test_create_spatial_unit_with_invalid_geometry(self):
-        org, prj = self._test_objs()
         invalid_data = {
             'type': "BU",
             'geometry': {
@@ -135,45 +305,124 @@ class SpatialUnitCreateAPITest(SpatialUnitListTestCase,
                 'coordinates': [100, 0]
             }
         }
-        content = self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=invalid_data, status=status_code.HTTP_400_BAD_REQUEST)
-        assert content['geometry'][0] == _(
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data=invalid_data)
+        assert response.status_code == 400
+        assert response.content['geometry'][0] == (
             "Invalid format: string or unicode input"
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
 
 
-class SpatialUnitDetailTestCase(RecordDetailBaseTestCase):
+class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.SpatialUnitDetail
 
-    model_name = 'SpatialUnit'
-    record_factory = SpatialUnitFactory
-    record_id_url_var_name = 'spatial_id'
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.su = SpatialUnitFactory(project=self.prj)
 
-    def setUp(self):
-        super().setUp()
-        self.view = api.SpatialUnitDetail.as_view()
-        self.url = '/v1/organizations/{org}/projects/{prj}/spatial/{record}/'
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'spatial_id': self.su.id
+        }
 
-    def _test_objs(self, access='public'):
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='test-project', organization=org, access=access)
-        su = SpatialUnitFactory.create(project=prj, type='AP')
-        self.su = su
-        return (su, org)
+    def test_get_public_record_with_valid_user(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['properties']['id'] == self.su.id
+
+    def test_get_public_nonexistent_record(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'spatial_id': 'notanid'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "SpatialUnit not found."
+
+    def test_get_public_record_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_public_record_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_public_record_with_unauthorized_user(self):
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['properties']['id'] == self.su.id
+
+    def test_get_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        print(response.content)
+        assert response.content['properties']['id'] == self.su.id
 
 
-class SpatialUnitDetailAPITest(SpatialUnitDetailTestCase,
-                               RecordDetailAPITest):
+class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.SpatialUnitDetail
 
-    def is_id_in_content(self, content, record_id):
-        return content['properties']['id'] == record_id
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.su = SpatialUnitFactory(project=self.prj, type='PA')
 
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'spatial_id': self.su.id
+        }
 
-class SpatialUnitUpdateAPITest(SpatialUnitDetailTestCase,
-                               RecordUpdateAPITest):
-
-    def get_valid_updated_data(self):
+    def setup_post_data(self):
         return {'type': "BU"}
 
     def check_for_updated(self, content):
@@ -183,33 +432,250 @@ class SpatialUnitUpdateAPITest(SpatialUnitDetailTestCase,
     def check_for_unchanged(self, content):
         assert content['properties']['type'] == self.su.type
 
-    # Additional tests
+    def test_update_with_valid_data(self):
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        self.su.refresh_from_db()
+        assert self.su.type == 'BU'
+
+    def test_update_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_update_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'project': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_update_with_nonexistent_record(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'spatial_id': 'some-su'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "SpatialUnit not found."
+
+    def test_update_with_unauthorized_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_update_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        self.su.refresh_from_db()
+        assert self.su.type == 'BU'
+
+    def test_update_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_update_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_update_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+
+        response = self.request(user=user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_update_private_record_based_on_org_admin(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user,
+                                        admin=True)
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        self.su.refresh_from_db()
+        assert self.su.type == 'BU'
 
     def test_update_with_invalid_data(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                post_data={'type': ''})
 
-        def get_invalid_data(): return {'type': ''}
-
-        content = self._test_patch_public_record(
-            get_invalid_data, status_code.HTTP_400_BAD_REQUEST)
-        assert content['type'][0] == _('"" is not a valid choice.')
+        assert response.status_code == 400
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+        assert response.content['type'][0] == '"" is not a valid choice.'
 
     def test_update_with_invalid_geometry(self):
-
-        def get_invalid_data():
-            return {
+        invalid_data = {
                 'geometry': {
                     'type': 'Cats',
                     'coordinates': [100, 0]
                 }
             }
 
-        content = self._test_patch_public_record(
-            get_invalid_data, status_code.HTTP_400_BAD_REQUEST)
-        assert content['geometry'][0] == _(
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                post_data=invalid_data)
+        assert response.status_code == 400
+        assert response.content['geometry'][0] == (
             "Invalid format: string or unicode input"
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
 
 
-class SpatialUnitDeleteAPITest(SpatialUnitDetailTestCase,
-                               RecordDeleteAPITest):
-    pass
+class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.SpatialUnitDetail
+
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.su = SpatialUnitFactory(project=self.prj, type='PA')
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'spatial_id': self.su.id
+        }
+
+    def test_delete_record(self):
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 204
+        assert SpatialUnit.objects.count() == 0
+
+    def test_delete_with_nonexistent_org(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_delete_with_nonexistent_project(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_delete_with_nonexistent_record(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'spatial_id': 'some-rel'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "SpatialUnit not found."
+
+    def test_delete_with_unauthorized_user(self):
+        response = self.request(method='DELETE')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialUnit.objects.count() == 1
+
+    def test_delete_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 204
+        assert SpatialUnit.objects.count() == 0
+
+    def test_delete_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='DELETE')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialUnit.objects.count() == 1
+
+    def test_delete_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialUnit.objects.count() == 1
+
+    def test_delete_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+
+        response = self.request(method='DELETE', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialUnit.objects.count() == 1
+
+    def test_delete_private_record_based_on_org_admin(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user,
+                                        admin=True)
+
+        response = self.request(method='DELETE', user=user)
+        assert response.status_code == 204
+        assert SpatialUnit.objects.count() == 0

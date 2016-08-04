@@ -2,9 +2,10 @@
 
 import pytest
 
+from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
@@ -13,7 +14,7 @@ from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
 from .. import exceptions
 
 
-class PartyTest(UserTestCase):
+class PartyTest(UserTestCase, TestCase):
 
     def test_str(self):
         party = PartyFactory.create(name='TeaParty')
@@ -64,7 +65,7 @@ class PartyTest(UserTestCase):
                 id=party.id))
 
 
-class PartyRelationshipTest(UserTestCase):
+class PartyRelationshipTest(UserTestCase, TestCase):
 
     def test_str(self):
         project = ProjectFactory(name='TestProject')
@@ -134,7 +135,7 @@ class PartyRelationshipTest(UserTestCase):
             )
 
 
-class TenureRelationshipTest(UserTestCase):
+class TenureRelationshipTest(UserTestCase, TestCase):
 
     def test_str(self):
         project = ProjectFactory(name='TestProject')
@@ -209,7 +210,7 @@ class TenureRelationshipTest(UserTestCase):
                 id=tenurerel.id))
 
 
-class TenureRelationshipTypeTest(UserTestCase):
+class TenureRelationshipTypeTest(UserTestCase, TestCase):
     """Test TenureRelationshipType."""
 
     def test_tenure_relationship_types(self):
@@ -219,7 +220,7 @@ class TenureRelationshipTypeTest(UserTestCase):
         assert freehold.label == 'Freehold'
 
 
-class PartyTenureRelationshipsTest(UserTestCase):
+class PartyTenureRelationshipsTest(UserTestCase, TestCase):
     """Test TenureRelationships on Party."""
 
     def test_party_tenure_relationships(self):
@@ -229,7 +230,7 @@ class PartyTenureRelationshipsTest(UserTestCase):
         assert queryset[0] is not None
 
 
-class SpatialUnitTenureRelationshipsTest(UserTestCase):
+class SpatialUnitTenureRelationshipsTest(UserTestCase, TestCase):
     """Test TenureRelationships on SpatialUnit."""
 
     def test_spatial_unit_tenure_relationships(self):

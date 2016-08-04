@@ -1,15 +1,16 @@
 import os
-
 import pytest
 
 from buckets.test.storage import FakeS3Storage
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
 from django.conf import settings
+from django.test import TestCase
 
 from ..exceptions import InvalidGPXFile
 from ..models import (ContentObject, Resource, create_spatial_resource,
                       create_thumbnails)
+
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from .factories import ResourceFactory, SpatialResourceFactory
 from .utils import clear_temp  # noqa
 
@@ -18,8 +19,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class ResourceTest(UserTestCase):
-
+class ResourceTest(UserTestCase, TestCase):
     def test_file_name_property(self):
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_name == 'filename.txt'
@@ -211,7 +211,7 @@ class ResourceTest(UserTestCase):
             assert str(e) == 'Invalid GPX mime type: audio/mpeg'
 
 
-class SpatialResourceTest(UserTestCase):
+class SpatialResourceTest(UserTestCase, TestCase):
 
     def test_spatial_resource(self):
         storage = FakeS3Storage()

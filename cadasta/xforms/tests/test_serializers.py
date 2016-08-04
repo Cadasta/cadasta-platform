@@ -1,12 +1,13 @@
 import pytest
 import os
 from django.conf import settings
+from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from buckets.test.storage import FakeS3Storage
 
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from questionnaires.serializers import QuestionnaireSerializer
 from questionnaires.models import Questionnaire
@@ -17,7 +18,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
-class XFormListSerializerTest(UserTestCase):
+class XFormListSerializerTest(UserTestCase, TestCase):
     def _get_form(self, form_name):
         storage = FakeS3Storage()
         file = open(

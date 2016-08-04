@@ -5,19 +5,20 @@ import csv
 from openpyxl import load_workbook, Workbook
 from zipfile import ZipFile
 
+from django.test import TestCase
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 
 from jsonattrs.models import Attribute, AttributeType, Schema
 
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
 from resources.utils.io import ensure_dirs
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.models import ContentObject
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 from party.tests.factories import TenureRelationshipFactory, PartyFactory
 from party.models import TenureRelationshipType
 
@@ -27,7 +28,7 @@ from ..download.resources import ResourceExporter
 from ..download.shape import ShapeExporter
 
 
-class BaseExporterTest(UserTestCase):
+class BaseExporterTest(UserTestCase, TestCase):
     def test_init(self):
         project = ProjectFactory.build()
         exporter = Exporter(project)
@@ -101,7 +102,7 @@ class BaseExporterTest(UserTestCase):
 
 
 @pytest.mark.usefixtures('clear_temp')
-class ShapeTest(UserTestCase):
+class ShapeTest(UserTestCase, TestCase):
     def test_init(self):
         project = ProjectFactory.build()
         exporter = ShapeExporter(project)
@@ -325,7 +326,7 @@ class ShapeTest(UserTestCase):
 
 
 @pytest.mark.usefixtures('clear_temp')
-class XLSTest(UserTestCase):
+class XLSTest(UserTestCase, TestCase):
     def test_init(self):
         project = ProjectFactory.build()
         exporter = XLSExporter(project)
@@ -421,7 +422,7 @@ class XLSTest(UserTestCase):
 
 @pytest.mark.usefixtures('clear_temp')
 @pytest.mark.usefixtures('make_dirs')
-class ResourcesTest(UserTestCase):
+class ResourcesTest(UserTestCase, TestCase):
     def test_init(self):
         project = ProjectFactory.build()
         exporter = ResourceExporter(project)

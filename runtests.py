@@ -7,7 +7,7 @@ import os
 import subprocess
 
 
-BASE_PYTEST_ARGS = ['cadasta', '--cov=cadasta']
+BASE_PYTEST_ARGS = ['cadasta', '--cov=cadasta', '--cov-report=term-missing']
 PYTEST_ARGS = {
     'default': BASE_PYTEST_ARGS,
     'fast': BASE_PYTEST_ARGS + ['-q']

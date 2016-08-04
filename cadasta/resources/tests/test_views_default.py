@@ -2,19 +2,17 @@ import copy
 import json
 import os
 import pytest
-from django.http import HttpRequest, Http404
-from django.template.loader import render_to_string
-from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.conf import settings
-from django.contrib.messages.storage.fallback import FallbackStorage
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.messages.api import get_messages
+from django.test import TestCase
+from django.core.urlresolvers import reverse
 
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
+from skivvy import ViewTestCase
 
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
@@ -32,21 +30,34 @@ clauses = {
         {
             'effect': 'allow',
             'object': ['project/*/*'],
-            'action': ['resource.*'],
+            'action': ['resource.*']
         },
         {
             'effect': 'allow',
             'object': ['resource/*/*/*'],
-            'action': ['resource.*'],
-        },
-    ],
+            'action': ['resource.*']
+        }
+    ]
 }
 
 
+def assign_permissions(user, add_pols=None):
+    additional_clauses = copy.deepcopy(clauses)
+    if add_pols:
+        additional_clauses['clause'] += add_pols
+
+    policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(additional_clauses))
+    assign_user_policies(user, policy)
+
+
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectResources
+    template = 'resources/project_list.html'
+
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.resources = ResourceFactory.create_batch(
             2, content_object=self.project, project=self.project)
@@ -54,13 +65,8 @@ class ProjectResourcesTest(UserTestCase):
                                              project=self.project)
         ResourceFactory.create()
 
-        self.view = default.ProjectResources.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
-
-        additional_clauses = copy.deepcopy(clauses)
-        additional_clauses['clause'] += [
+        assign_permissions(self.user, [
             {
                 'effect': 'deny',
                 'object': ['resource/*/*/' + self.denied.id],
@@ -71,283 +77,205 @@ class ProjectResourcesTest(UserTestCase):
                 'object': ['resource/*/*/*'],
                 'action': ['resource.unarchive'],
             },
-        ]
+        ])
 
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(additional_clauses))
-        assign_user_policies(self.user, self.policy)
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
+        }
 
-    def _get(self, user=None, status=None, resources=None):
-        if user is None:
-            user = self.user
-            Policy.objects.get(name='default')
+    def setup_template_context(self, resources=None):
         if resources is None:
-            resources = self.resources
+            resources = Resource.objects.filter(
+                project=self.project,
+                archived=False).exclude(pk=self.denied.pk)
 
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
+        resource_list = []
+        if len(resources) > 0:
+            object_id = resources[0].project.id
+            attachments = ContentObject.objects.filter(object_id=object_id)
+            attachment_id_dict = {x.resource.id: x.id for x in attachments}
+            for resource in resources:
+                resource_list.append(resource)
+                attachment_id = attachment_id_dict.get(resource.id, None)
+                setattr(resource, 'attachment_id', attachment_id)
 
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
+        resource_count = self.project.resource_set.filter(
+            archived=False).count()
 
-        if status is not None:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            content = response.render().content.decode('utf-8')
-
-            resource_list = []
-            if len(resources) > 0:
-                object_id = resources[0].project.id
-                attachments = ContentObject.objects.filter(object_id=object_id)
-                attachment_id_dict = {x.resource.id: x.id for x in attachments}
-                for resource in resources:
-                    resource_list.append(resource)
-                    attachment_id = attachment_id_dict.get(resource.id, None)
-                    setattr(resource, 'attachment_id', attachment_id)
-
-            resource_set = self.project.resource_set.filter(archived=False)
-            expected = render_to_string(
-                'resources/project_list.html',
-                {
-                    'object_list': resources,
-                    'object': self.project,
-                    'has_unattached_resources': (
-                        resource_set.exists() and
-                        resource_set.count() != self.project.resources.count()
-                    ),
-                    'resource_list': resource_list,
-                },
-                request=self.request
-            )
-            assert expected == content
-        return response
+        return {
+            'object_list': resources,
+            'object': self.project,
+            'has_unattached_resources': (
+                resource_count > 0 and
+                resource_count != self.project.resources.count()
+            ),
+            'resource_list': resource_list,
+        }
 
     def test_get_list(self):
-        resources = Resource.objects.filter(project=self.project,
-                                            archived=False).exclude(
-                                            pk=self.denied.pk)
-        self._get(status=200, resources=resources)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_list_with_archived_resource(self):
+        ResourceFactory.create(project=self.project, archived=True)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_list_with_unattached_resource_using_nonunarchiver(self):
         ResourceFactory.create(project=self.project)
         resources = Resource.objects.filter(project=self.project).exclude(
                                             pk=self.denied.pk)
-        self._get(status=200, resources=resources)
-
-    def test_get_list_with_archived_resource(self):
-        ResourceFactory.create(project=self.project, archived=True)
-        resources = Resource.objects.filter(project=self.project,
-                                            archived=False).exclude(
-                                            pk=self.denied.pk)
-        self._get(status=200, resources=resources)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        context = self.setup_template_context(resources=resources)
+        assert response.content == self.render_content(**context)
 
     def test_get_list_with_archived_resource_using_unarchiver(self):
-        unarchiver = UserFactory.create()
-        policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-        assign_user_policies(unarchiver, policy)
+        assign_permissions(self.user)
         ResourceFactory.create(project=self.project, archived=True)
         resources = Resource.objects.filter(project=self.project)
-        self._get(status=200, user=unarchiver, resources=resources)
+        response = self.request(user=self.user)
+        context = self.setup_template_context(resources=resources)
+        assert response.content == self.render_content(**context)
 
     def test_get_with_unauthorized_user(self):
-        self._get(status=200, user=UserFactory.create(), resources=[])
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 200
+        context = self.setup_template_context(resources=[])
+        assert response.content == self.render_content(**context)
 
     def test_get_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_get_non_existent_project(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org', project='some-project')
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesAddTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectResourcesAdd
+    template = 'resources/project_add_existing.html'
+    success_url_name = 'resources:project_list'
+
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.attached = ResourceFactory.create(project=self.project,
                                                content_object=self.project)
         self.unattached = ResourceFactory.create(project=self.project)
 
-        self.view = default.ProjectResourcesAdd.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
+        assign_permissions(self.user)
 
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
+        }
 
-        assign_user_policies(self.user, self.policy)
+    def setup_template_context(self):
+        form = AddResourceFromLibraryForm(content_object=self.project,
+                                          project_id=self.project.id)
+        return {'object': self.project, 'form': form}
 
-    def _get(self, user=None, status=None):
-        if user is None:
-            user = self.user
-
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-
-        if status is not None:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            content = response.render().content.decode('utf-8')
-            form = AddResourceFromLibraryForm(content_object=self.project,
-                                              project_id=self.project.id)
-            expected = render_to_string(
-                'resources/project_add_existing.html',
-                {'object': self.project, 'form': form},
-                request=self.request
-            )
-            assert expected == content
-        return response
-
-    def _post(self, user=None, status=None, expected_redirect=None):
-        data = {
+    def setup_post_data(self):
+        return {
             self.attached.id: False,
             self.unattached.id: True,
         }
 
-        if user is None:
-            user = self.user
-
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'POST', data)
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-
-        if status is not None:
-            assert response.status_code == status
-        if expected_redirect:
-            assert expected_redirect in response['location']
-
     def test_get_list(self):
-        self._get(status=200)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
-        self._get(status=302, user=UserFactory.create())
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to add resources."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_get_non_existent_project(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org', project='some-project')
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
     def test_update(self):
-        redirect_url = reverse(
-            'resources:project_list',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug
-            }
-        )
-        self._post(status=302, expected_redirect=redirect_url)
         project_resources = self.project.resources.all()
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert response.location == self.expected_success_url
         assert len(project_resources) == 2
         assert self.attached in project_resources
         assert self.unattached in project_resources
 
     def test_update_with_custom_redirect(self):
-        setattr(self.request, 'GET', {'next': '/organizations/'})
-        self._post(status=302, expected_redirect='/organizations/#resources')
         project_resources = self.project.resources.all()
+        response = self.request(method='POST', user=self.user,
+                                get_data={'next': '/organizations/'})
+        assert response.status_code == 302
+        assert response.location == '/organizations/#resources'
         assert len(project_resources) == 2
         assert self.attached in project_resources
         assert self.unattached in project_resources
 
     def test_post_with_unauthorized_user(self):
-        self._post(status=302, user=UserFactory.create())
+        response = self.request(method='POST', user=UserFactory.create())
         assert ("You don't have permission to add resources."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         assert self.project.resources.count() == 1
         assert self.project.resources.first() == self.attached
 
     def test_post_with_unauthenticated_user(self):
-        self._post(status=302, user=AnonymousUser(),
-                   expected_redirect='/account/login/')
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
         assert self.project.resources.count() == 1
         assert self.project.resources.first() == self.attached
 
 
 @pytest.mark.usefixtures('clear_temp')
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesNewTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectResourcesNew
+    template = 'resources/project_add_new.html'
+    success_url_name = 'resources:project_list'
+
+    def setup_models(self):
         self.project = ProjectFactory.create()
-
-        self.view = default.ProjectResourcesNew.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
+        assign_permissions(self.user)
 
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
+        }
 
-        assign_user_policies(self.user, self.policy)
+    def setup_template_context(self):
+        form = ResourceForm()
+        return {'object': self.project, 'form': form}
 
-    def _get(self, user=None, status=None):
-        if user is None:
-            user = self.user
-
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-
-        if status is not None:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            content = response.render().content.decode('utf-8')
-            form = ResourceForm()
-            expected = render_to_string(
-                'resources/project_add_new.html',
-                {'object': self.project, 'form': form},
-                request=self.request
-            )
-            assert expected == content
-        return response
-
-    def _post(self, user=None, status=None, expected_redirect=None):
+    def setup_post_data(self):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('resources/image.jpg', file)
 
-        self.data = {
+        return {
             'name': 'Some name',
             'description': '',
             'file': file_name,
@@ -355,114 +283,79 @@ class ProjectResourcesNewTest(UserTestCase):
             'mime_type': 'image/jpeg'
         }
 
-        if user is None:
-            user = self.user
+    def test_get_form(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'POST', self.data)
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
+    def test_get_non_existent_project(self):
+        with pytest.raises(Http404):
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
+    def test_get_with_unauthorized_user(self):
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
+        assert ("You don't have permission to add resources."
+                in response.messages)
 
-        if status is not None:
-            assert response.status_code == status
-        if expected_redirect:
-            assert expected_redirect in response['location']
+    def test_get_with_unauthenticated_user(self):
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
-    def _post_invalid(self, user=None, status=None, expected_redirect=None):
+    def test_create(self):
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert response.location == self.expected_success_url
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first().name == 'Some name'
+
+    def test_create_invalid_gpx(self):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/mp3.xml', 'rb').read()
         file_name = storage.save('resources/mp3.xml', file)
 
-        self.data = {
+        data = {
             'name': 'Some name',
             'description': '',
             'file': file_name,
             'original_file': 'image.png',
             'mime_type': 'text/xml'
         }
-
-        if user is None:
-            user = self.user
-
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'POST', self.data)
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-
-        if status is not None:
-            assert response.status_code == status
-        if expected_redirect:
-            assert expected_redirect in response['location']
-
-    def test_get_form(self):
-        self._get(status=200)
-
-    def test_get_non_existent_project(self):
-        setattr(self.request, 'user', self.user)
-        with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org', project='some-project')
-
-    def test_get_with_unauthorized_user(self):
-        self._get(status=302, user=UserFactory.create())
-        assert ("You don't have permission to add resources."
-                in [str(m) for m in get_messages(self.request)])
-
-    def test_get_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
-
-    def test_create(self):
-        redirect_url = reverse(
-            'resources:project_list',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug
-            }
-        )
-        self._post(status=302, expected_redirect=redirect_url)
-        assert self.project.resources.count() == 1
-        assert self.project.resources.first().name == self.data['name']
-
-    def test_create_invalid_gpx(self):
-        self._post_invalid()
+        response = self.request(method='POST', user=self.user, post_data=data)
+        assert response.status_code == 200
         assert self.project.resources.count() == 0
 
     def test_create_with_custom_redirect(self):
-        setattr(self.request, 'GET', {'next': '/organizations/'})
-        self._post(status=302, expected_redirect='/organizations/#resources')
+        response = self.request(method='POST', user=self.user,
+                                get_data={'next': '/organizations/'})
+        assert response.status_code == 302
+        assert response.location == '/organizations/#resources'
         assert self.project.resources.count() == 1
-        assert self.project.resources.first().name == self.data['name']
+        assert self.project.resources.first().name == 'Some name'
 
     def test_post_with_unauthorized_user(self):
-        self._post(status=302, user=UserFactory.create())
+        response = self.request(method='POST', user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to add resources."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         assert self.project.resources.count() == 0
 
     def test_post_with_unauthenticated_user(self):
-        self._post(status=302,
-                   user=AnonymousUser(),
-                   expected_redirect='/account/login/')
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
         assert self.project.resources.count() == 0
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesDetailTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ProjectResourcesDetailTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectResourcesDetail
+    template = 'resources/project_detail.html'
+
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.org_slug = self.project.organization.slug
         self.resource = ResourceFactory.create(project=self.project)
@@ -486,165 +379,110 @@ class ProjectResourcesDetailTest(UserTestCase):
             content_object=self.tenurerel,
         )
 
-        self.view = default.ProjectResourcesDetail.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
+        assign_permissions(self.user)
 
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-        assign_user_policies(self.user, self.policy)
-
-    def _get(self, user=None, status=None):
-        if user is None:
-            user = self.user
-
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.org_slug,
-                             project=self.project.slug,
-                             resource=self.resource.id)
-
-        if status is not None:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            content = response.render().content.decode('utf-8')
-            expected = render_to_string(
-                'resources/project_detail.html',
+    def setup_template_context(self):
+        return {
+            'object': self.project,
+            'resource': self.resource,
+            'can_edit': True,
+            'can_archive': True,
+            'attachment_list': [
                 {
                     'object': self.project,
-                    'resource': self.resource,
-                    'can_edit': True,
-                    'can_archive': True,
-                    'attachment_list': [
-                        {
-                            'object': self.project,
-                            'id': self.project_attachment.id,
-                        },
-                        {
-                            'object': self.location,
-                            'id': self.location_attachment.id,
-                        },
-                        {
-                            'object': self.party,
-                            'id': self.party_attachment.id,
-                        },
-                        {
-                            'object': self.tenurerel,
-                            'id': self.tenurerel_attachment.id,
-                        },
-                    ],
+                    'id': self.project_attachment.id,
                 },
-                request=self.request
-            )
-            assert expected == content
-        return response
+                {
+                    'object': self.location,
+                    'id': self.location_attachment.id,
+                },
+                {
+                    'object': self.party,
+                    'id': self.party_attachment.id,
+                },
+                {
+                    'object': self.tenurerel,
+                    'id': self.tenurerel_attachment.id,
+                },
+            ],
+        }
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+            'resource': self.resource.id
+        }
 
     def test_get_page(self):
-        self._get(status=200)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_non_existent_project(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org',
-                      project='some-project',
-                      resource=self.resource.id)
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
     def test_get_non_existent_resource(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization=self.project.organization.slug,
-                      project=self.project.slug,
-                      resource='abc123')
+            self.request(user=self.user, url_kwargs={'resource': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        self._get(status=302, user=UserFactory.create())
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to view this resource."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesEditTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectResourcesEdit
+    template = 'resources/edit.html'
+    success_url_name = 'resources:project_detail'
+
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,
                                                project=self.project)
 
-        self.view = default.ProjectResourcesEdit.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
+        assign_permissions(self.user)
 
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-        assign_user_policies(self.user, self.policy)
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+            'resource': self.resource.id
+        }
 
-    def _get(self, user=None, status=None):
-        if user is None:
-            user = self.user
-
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug,
-                             resource=self.resource.id)
-
-        if status is not None:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            content = response.render().content.decode('utf-8')
-            form = ResourceForm(instance=self.resource)
-            cancel_url = self.request.GET.get('next', None)
-            if cancel_url:
-                cancel_url += '#resources'
-            else:
-                cancel_url = reverse(
-                    'resources:project_detail',
-                    kwargs={
-                        'organization': self.project.organization.slug,
-                        'project': self.project.slug,
-                        'resource': self.resource.id,
-                    }
-                )
-            expected = render_to_string(
-                'resources/edit.html',
-                {
-                    'object': self.project,
-                    'form': form,
-                    'cancel_url': cancel_url,
-                },
-                request=self.request
+    def setup_template_context(self):
+        form = ResourceForm(instance=self.resource)
+        return {
+            'object': self.project,
+            'form': form,
+            'cancel_url': reverse(
+                'resources:project_detail',
+                kwargs={
+                    'organization': self.project.organization.slug,
+                    'project': self.project.slug,
+                    'resource': self.resource.id,
+                }
             )
-            assert expected == content
-        return response
+        }
 
-    def _post(self, user=None, status=None, expected_redirect=None, get=None):
-        if user is None:
-            user = self.user
-
+    def setup_post_data(self):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('resources/image.jpg', file)
-        self.data = {
+        return {
             'name': 'Some name',
             'description': '',
             'file': file_name,
@@ -652,143 +490,112 @@ class ProjectResourcesEditTest(UserTestCase):
             'mime_type': 'image/jpeg'
         }
 
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'POST', self.data)
-        if get:
-            setattr(self.request, 'GET', get)
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug,
-                             resource=self.resource.id)
-
-        if status is not None:
-            assert response.status_code == status
-        if expected_redirect:
-            assert expected_redirect in response['location']
-        return response
-
     def test_get_form(self):
-        self._get(status=200)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_form_with_next_query_parameter(self):
+        response = self.request(user=self.user,
+                                get_data={'next': '/organizations/'})
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            cancel_url='/organizations/#resources')
+
+    def test_get_form_with_location_next_query_parameter(self):
+        url = ('https://example.com/organizations/sample-org/'
+               'projects/sample-proj/records/'
+               'locations/jvzsiszjzrbpecm69549u2z5/')
+        response = self.request(user=self.user, get_data={'next': url})
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            cancel_url=url + '#resources')
 
     def test_get_non_existent_project(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org',
-                      project='some-project',
-                      resource=self.resource.id)
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
     def test_get_non_existent_resource(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization=self.project.organization.slug,
-                      project=self.project.slug,
-                      resource='abc123')
+            self.request(user=self.user, url_kwargs={'resource': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        self._get(status=302, user=UserFactory.create())
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to edit this resource."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_update(self):
-        redirect_url = reverse(
-            'resources:project_detail',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug,
-                'resource': self.resource.id,
-            }
-        )
-        self._post(status=302, expected_redirect=redirect_url)
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert response.location == self.expected_success_url
         assert self.project.resources.count() == 1
-        assert self.project.resources.first().name == self.data['name']
+        assert self.project.resources.first().name == 'Some name'
 
     def test_update_with_custom_redirect(self):
-        self._post(status=302,
-                   expected_redirect='http://example.com/#resources',
-                   get={'next': 'http://example.com/'})
+        get = {'next': 'http://example.com/'}
+        response = self.request(method='POST', user=self.user, get_data=get)
+        assert response.status_code == 302
+        assert response.location == 'http://example.com/#resources'
         assert self.project.resources.count() == 1
-        assert self.project.resources.first().name == self.data['name']
+        assert self.project.resources.first().name == 'Some name'
 
     def test_post_with_unauthorized_user(self):
-        self._post(status=302, user=UserFactory.create())
+        response = self.request(method='POST', user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to edit this resource."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         assert self.project.resources.count() == 1
-        assert self.project.resources.first().name != self.data['name']
+        assert self.project.resources.first().name != 'Some name'
 
     def test_post_with_unauthenticated_user(self):
-        response = self._post(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
         assert self.project.resources.count() == 1
-        assert self.project.resources.first().name != self.data['name']
+        assert self.project.resources.first().name != 'Some name'
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ResourceArchiveTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ResourceArchiveTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ResourceArchive
+    template = 'resources:project_list'
+    success_url_name = 'resources:project_detail'
+
+    def setup_models(self):
         self.user = UserFactory.create()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,
                                                project=self.project)
+        assign_permissions(self.user)
 
-        self.view = default.ResourceArchive.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        self.redirect_url = reverse(
-            'resources:project_detail',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug,
-                'resource': self.resource.id,
-            }
-        )
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-        assign_user_policies(self.user, self.policy)
-
-    def _get(self, user=None, status=None, redirect_url=None):
-        if not user:
-            user = self.user
-
-        setattr(self.request, 'user', user)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug,
-                             resource=self.resource.id)
-
-        if status:
-            assert response.status_code == status
-        if redirect_url:
-            assert redirect_url in response['location']
-        return response
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+            'resource': self.resource.id
+        }
 
     def test_archive(self):
-        self._get(status=302, redirect_url=self.redirect_url)
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert response.location == self.expected_success_url
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
     def test_archive_with_custom_redirect(self):
-        setattr(self.request, 'GET', {'next': '/dashboard/'})
-        self._get(status=302, redirect_url='/dashboard/#resources')
+        response = self.request(user=self.user,
+                                get_data={'next': '/dashboard/'})
+        assert response.status_code == 302
+        assert response.location == '/dashboard/#resources'
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
@@ -806,154 +613,114 @@ class ResourceArchiveTest(UserTestCase):
             name='allow',
             body=json.dumps(additional_clauses))
         assign_user_policies(self.user, policy)
-        redirect_url = reverse(
+        expected_success_url = reverse(
             'resources:project_list',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
             }
         )
-        self._get(status=302, redirect_url=redirect_url)
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert response.location == expected_success_url
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
     def test_archive_with_project_does_not_exist(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org',
-                      project='some-project',
-                      resource=self.resource.id)
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
         self.resource.refresh_from_db()
         assert self.resource.archived is False
 
     def test_archive_resource_does_not_exist(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization=self.project.organization.slug,
-                      project=self.project.slug,
-                      resource='abc123')
+            self.request(user=self.user, url_kwargs={'resource': 'abc123'})
 
     def test_archive_with_unauthorized_user(self):
-        self._get(status=302, user=UserFactory.create())
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to delete this resource."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
         self.resource.refresh_from_db()
         assert self.resource.archived is False
 
     def test_archive_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
         self.resource.refresh_from_db()
         assert self.resource.archived is False
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ResourceUnArchiveTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ResourceUnArchiveTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ResourceUnarchive
+    template = 'resources:project_list'
+    success_url_name = 'resources:project_detail'
+
+    def setup_models(self):
         self.user = UserFactory.create()
         self.project = ProjectFactory.create()
         self.resource = ResourceFactory.create(content_object=self.project,
                                                project=self.project,
                                                archived=True)
+        assign_permissions(self.user)
 
-        self.view = default.ResourceUnarchive.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        self.redirect_url = reverse(
-            'resources:project_detail',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug,
-                'resource': self.resource.id,
-            }
-        )
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-        assign_user_policies(self.user, self.policy)
-
-    def _get(self, user=None, status=None, redirect_url=None):
-        if not user:
-            user = self.user
-
-        setattr(self.request, 'user', user)
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug,
-                             resource=self.resource.id)
-
-        if status:
-            assert response.status_code == status
-        if redirect_url:
-            assert redirect_url in response['location']
-
-        return response
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+            'resource': self.resource.id
+        }
 
     def test_unarchive(self):
-        self._get(status=302, redirect_url=self.redirect_url)
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert response.location == self.expected_success_url
 
         self.resource.refresh_from_db()
         assert self.resource.archived is False
 
     def test_unarchive_with_project_does_not_exist(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org',
-                      project='some-project',
-                      resource=self.resource.id)
+            self.request(user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
     def test_unarchive_resource_does_not_exist(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization=self.project.organization.slug,
-                      project=self.project.slug,
-                      resource='abc123')
+            self.request(user=self.user, url_kwargs={'resource': 'abc123'})
 
     def test_unarchive_with_unauthorized_user(self):
-        setattr(self.request, 'user', UserFactory.create())
         with pytest.raises(Http404):
-            self.view(self.request,
-                      organization=self.project.organization.slug,
-                      project=self.project.slug,
-                      resource=self.resource.id)
-
+            self.request(user=UserFactory.create())
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
     def test_unarchive_with_unauthenticated_user(self):
-        response = self._get(status=302, user=AnonymousUser())
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ResourceDetachTest(UserTestCase):
-    def setUp(self):
-        super().setUp()
+class ResourceDetachTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ResourceDetach
+    success_url_name = 'resources:project_list'
 
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.location = SpatialUnitFactory.create(project=self.project)
         self.resource = ResourceFactory.create(project=self.project)
@@ -967,30 +734,14 @@ class ResourceDetachTest(UserTestCase):
         )
 
         self.user = UserFactory.create()
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-        assign_user_policies(self.user, self.policy)
+        assign_permissions(self.user)
 
-        self.view = default.ResourceDetach.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'POST')
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-        self.redirect_url = reverse(
-            'resources:project_list',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug
-            }
-        )
-
-    def _post(self, attachment_id, user=None):
+    def setup_post_data(self):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('resources/image.jpg', file)
-        self.data = {
+
+        return {
             'name': 'Some name',
             'description': '',
             'file': file_name,
@@ -998,18 +749,19 @@ class ResourceDetachTest(UserTestCase):
             'mime_type': 'image/jpeg'
         }
 
-        if user is None:
-            user = self.user
-        setattr(self.request, 'user', user)
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+            'resource': self.resource.id,
+            'attachment': self.project_attachment.id
+        }
 
-        response = self.view(
-            self.request,
-            organization=self.project.organization.slug,
-            project=self.project.slug,
-            resource=self.resource.id,
-            attachment=attachment_id,
-        )
-        return response
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
+        }
 
     def refresh_objects_from_db(self):
         self.resource.refresh_from_db()
@@ -1019,9 +771,9 @@ class ResourceDetachTest(UserTestCase):
         self.location.reload_resources()
 
     def test_detach_from_project(self):
-        response = self._post(self.project_attachment.id)
+        response = self.request(method='POST', user=self.user)
         assert response.status_code == 302
-        assert self.redirect_url in response['location']
+        assert self.expected_success_url in response.location
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 1
         assert self.project.resources.count() == 0
@@ -1030,9 +782,12 @@ class ResourceDetachTest(UserTestCase):
         assert location_resources.first() == self.resource
 
     def test_detach_from_location(self):
-        response = self._post(self.location_attachment.id)
+        response = self.request(
+            method='POST',
+            user=self.user,
+            url_kwargs={'attachment': self.location_attachment.id})
         assert response.status_code == 302
-        assert self.redirect_url in response['location']
+        assert self.expected_success_url in response.location
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 1
         assert self.location.resources.count() == 0
@@ -1041,10 +796,10 @@ class ResourceDetachTest(UserTestCase):
         assert project_resources.first() == self.resource
 
     def test_detach_with_custom_redirect(self):
-        setattr(self.request, 'GET', {'next': '/dashboard/'})
-        response = self._post(self.project_attachment.id)
+        response = self.request(method='POST', user=self.user,
+                                get_data={'next': '/dashboard/'})
         assert response.status_code == 302
-        assert '/dashboard/#resources' in response['location']
+        assert '/dashboard/#resources' in response.location
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 1
         assert self.project.resources.count() == 0
@@ -1053,55 +808,38 @@ class ResourceDetachTest(UserTestCase):
         assert location_resources.first() == self.resource
 
     def test_detach_with_nonexistent_project(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(
-                self.request,
-                organization='some-org',
-                project='some-project',
-                resource=self.resource.id,
-                attachment=self.project_attachment.id,
-            )
+            self.request(method='POST', user=self.user,
+                         url_kwargs={'organization': 'some-org',
+                                     'project': 'some-project'})
+
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 2
         assert self.project.resources.count() == 1
         assert self.location.resources.count() == 1
 
     def test_detach_with_nonexistent_resource(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(
-                self.request,
-                organization=self.project.organization.slug,
-                project=self.project.slug,
-                resource='abc123',
-                attachment=self.project_attachment.id,
-            )
+            self.request(method='POST', user=self.user,
+                         url_kwargs={'resource': 'abc123'})
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 2
         assert self.project.resources.count() == 1
         assert self.location.resources.count() == 1
 
     def test_detach_with_nonexistent_attachment(self):
-        setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
-            self.view(
-                self.request,
-                organization=self.project.organization.slug,
-                project=self.project.slug,
-                resource=self.resource.id,
-                attachment='abc123',
-            )
+            self.request(method='POST', user=self.user,
+                         url_kwargs={'attachment': 'abc123'})
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 2
         assert self.project.resources.count() == 1
         assert self.location.resources.count() == 1
 
     def test_detach_with_unauthorized_user(self):
-        response = self._post(self.project_attachment.id,
-                              user=UserFactory.create())
+        response = self.request(method='POST', user=UserFactory.create())
         assert ("You don't have permission to edit this resource."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         assert response.status_code == 302
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 2
@@ -1109,9 +847,9 @@ class ResourceDetachTest(UserTestCase):
         assert self.location.resources.count() == 1
 
     def test_detach_with_unauthenticated_user(self):
-        response = self._post(self.project_attachment.id, user=AnonymousUser())
+        response = self.request(method='POST')
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 2
         assert self.project.resources.count() == 1

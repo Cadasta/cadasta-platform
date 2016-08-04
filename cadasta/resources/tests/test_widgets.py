@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.template.defaultfilters import date
 from django.contrib.contenttypes.models import ContentType
 
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.files import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
 from .factories import ResourceFactory
