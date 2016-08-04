@@ -20,6 +20,7 @@ from .choices import ADMIN_CHOICES, ROLE_CHOICES
 from .fields import ProjectRoleField, PublicPrivateField, ContactsField
 from .download.xls import XLSExporter
 from .download.resources import ResourceExporter
+from .download.shape import ShapeExporter
 
 FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
 QUESTIONNAIRE_TYPES = [
@@ -375,7 +376,8 @@ class ProjectEditPermissions(PermissionsForm, forms.Form):
 
 
 class DownloadForm(forms.Form):
-    CHOICES = (('all', 'All data'), ('xls', 'XLS'), ('res', 'Resources'))
+    CHOICES = (('all', 'All data'), ('xls', 'XLS'), ('shp', 'SHP'),
+               ('res', 'Resources'))
     type = forms.ChoiceField(choices=CHOICES, initial='xls')
 
     def __init__(self, project, user, *args, **kwargs):
@@ -389,7 +391,10 @@ class DownloadForm(forms.Form):
         file_name = '{}-{}-{}'.format(self.project.id, self.user.id, t)
         type = self.cleaned_data['type']
 
-        if type == 'xls':
+        if type == 'shp':
+            e = ShapeExporter(self.project)
+            path, mime = e.make_download(file_name + '-shp')
+        elif type == 'xls':
             e = XLSExporter(self.project)
             path, mime = e.make_download(file_name + '-xls')
         elif type == 'res':
@@ -398,11 +403,14 @@ class DownloadForm(forms.Form):
         elif type == 'all':
             res_exporter = ResourceExporter(self.project)
             xls_exporter = XLSExporter(self.project)
+            shp_exporter = ShapeExporter(self.project)
             path, mime = res_exporter.make_download(file_name + '-res')
             data_path, _ = xls_exporter.make_download(file_name + '-xls')
+            shp_path, _ = shp_exporter.make_download(file_name + '-shp')
 
             with ZipFile(path, 'a') as myzip:
                 myzip.write(data_path, arcname='data.xlsx')
+                myzip.write(shp_path, arcname='data-shp.zip')
                 myzip.close()
 
         return path, mime
