@@ -10,10 +10,11 @@ from django.db import transaction
 from django.forms.utils import ErrorDict
 
 from leaflet.forms.widgets import LeafletWidget
-from tutelary.models import Role, check_perms
+from tutelary.models import check_perms
 from buckets.widgets import S3FileUploadWidget
 
 from accounts.models import User
+from core.form_mixins import SuperUserCheck
 from questionnaires.models import Questionnaire
 from .models import Organization, Project, OrganizationRole, ProjectRole
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
@@ -235,7 +236,7 @@ class ProjectAddExtents(forms.ModelForm):
         fields = ['extent']
 
 
-class ProjectAddDetails(forms.Form):
+class ProjectAddDetails(SuperUserCheck, forms.Form):
     organization = forms.ChoiceField()
     name = forms.CharField(max_length=100)
     description = forms.CharField(required=False, widget=forms.Textarea)
@@ -247,19 +248,11 @@ class ProjectAddDetails(forms.Form):
                                   accepted_types=QUESTIONNAIRE_TYPES))
     contacts = ContactsField(form=ContactsForm, required=False)
 
-    def check_admin(self, user):
-        if not hasattr(self, 'su_role'):
-            self.su_role = Role.objects.get(name='superuser')
-
-        is_superuser = any([isinstance(pol, Role) and pol == self.su_role
-                            for pol in user.assigned_policies()])
-        return is_superuser
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
-        if self.check_admin(self.user):
+        if self.is_superuser(self.user):
             self.fields['organization'].choices = [
                 (o.slug, o.name) for o in Organization.objects.order_by('name')
             ]
@@ -309,11 +302,8 @@ class ProjectEditDetails(forms.ModelForm):
         return super().save(*args, **kwargs)
 
 
-class PermissionsForm:
+class PermissionsForm(SuperUserCheck):
     def check_admin(self, user):
-        if not hasattr(self, 'su_role'):
-            self.su_role = Role.objects.get(name='superuser')
-
         if not hasattr(self, 'admins'):
             self.admins = [
                 role.user for role in OrganizationRole.objects.filter(
@@ -322,9 +312,7 @@ class PermissionsForm:
                 )
             ]
 
-        is_superuser = any([isinstance(pol, Role) and pol == self.su_role
-                            for pol in user.assigned_policies()])
-        return is_superuser or user in self.admins
+        return self.is_superuser(user) or user in self.admins
 
     def set_fields(self):
         for user in self.organization.users.all():
