@@ -40,15 +40,15 @@ class SlugModel:
                 self.name, max_length=max_length, allow_unicode=True
             )
 
-        orig = self.slug
+        orig_slug = self.slug
 
         if not self.id or self.__original_slug != self.slug:
             for x in itertools.count(1):
                 if not type(self).objects.filter(slug=self.slug).exists():
                     break
                 slug_length = max_length - int(math.log10(x)) - 2
-                orig = self.slug[:slug_length]
-                self.slug = '{}-{}'.format(orig, x)
+                trial_slug = orig_slug[:slug_length]
+                self.slug = '{}-{}'.format(trial_slug, x)
 
         self.__original_slug = self.slug
 
