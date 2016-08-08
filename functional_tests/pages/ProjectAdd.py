@@ -256,6 +256,11 @@ class ProjectAddPage(Page):
         submit_button = self.BY_CLASS('btn-primary')
         submit_button.click()
 
+    def click_previous_details(self):
+        previous_button = self.BY_CLASS('btn-details-previous')
+        self.test.click_through(previous_button,
+                                (By.CLASS_NAME, 'project-extent-map'))
+
     def try_submit_details(self):
         """This method should be called when the details form has at
         least one error. The method will attempt to submit the already

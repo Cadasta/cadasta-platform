@@ -516,6 +516,18 @@ class ProjectAddTest(UserTestCase):
         assert Questionnaire.objects.filter(project=proj).exists() is True
         # assert proj.public
 
+    def test_wizard_previous(self):
+        self.client.force_login(self.users[0])
+        extents_response = self.client.post(
+            reverse('project:add'), self.EXTENTS_POST_DATA
+        )
+        assert extents_response.status_code == 200
+        self.DETAILS_POST_DATA['wizard_goto_step'] = 'extents'
+        details_response = self.client.post(
+            reverse('project:add'), self.DETAILS_POST_DATA
+        )
+        assert details_response.status_code == 200
+
     def test_full_flow_invalid_xlsform(self):
         self.client.force_login(self.users[0])
         extents_response = self.client.post(

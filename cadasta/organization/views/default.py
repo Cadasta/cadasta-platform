@@ -411,6 +411,15 @@ class ProjectAddWizard(SuperUserCheckMixin,
 
         return result
 
+    def render_goto_step(self, goto_step, **kwargs):
+        form = self.get_form(data=self.request.POST, files=self.request.FILES)
+        if form.is_valid():
+            self.storage.set_step_data(self.steps.current,
+                                       self.process_step(form))
+            self.storage.set_step_files(self.steps.current,
+                                        self.process_step_files(form))
+        return super().render_goto_step(goto_step, **kwargs)
+
     def get_form_kwargs(self, step=None):
         if step == 'details':
             return {
