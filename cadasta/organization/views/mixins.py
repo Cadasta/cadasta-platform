@@ -96,13 +96,13 @@ class ProjectAdminCheckMixin:
             su_role = Role.objects.filter(name='superuser')
             org_admins = [
                 role.user for role in OrganizationRole.objects.filter(
-                    organization=self.get_object().organization,
+                    organization=self.get_project().organization,
                     admin=True
                 )
             ]
             proj_managers = [
                 role.user for role in ProjectRole.objects.filter(
-                    project=self.get_object(),
+                    project=self.get_project(),
                     role='PM'
                 )
 

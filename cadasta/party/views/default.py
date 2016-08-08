@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from jsonattrs.mixins import JsonAttrsMixin
 from core.mixins import LoginPermissionRequiredMixin
 
+from organization.views import mixins as organization_mixins
 from resources.forms import AddResourceFromLibraryForm
 from resources.views.mixins import ProjectHasResourcesMixin
 from . import mixins
@@ -40,6 +41,7 @@ class PartiesAdd(LoginPermissionRequiredMixin,
 class PartiesDetail(LoginPermissionRequiredMixin,
                     JsonAttrsMixin,
                     mixins.PartyObjectMixin,
+                    organization_mixins.ProjectAdminCheckMixin,
                     ProjectHasResourcesMixin,
                     generic.DetailView):
     template_name = 'party/party_detail.html'
@@ -50,6 +52,7 @@ class PartiesDetail(LoginPermissionRequiredMixin,
 
 class PartiesEdit(LoginPermissionRequiredMixin,
                   mixins.PartyObjectMixin,
+                  organization_mixins.ProjectAdminCheckMixin,
                   generic.UpdateView):
     template_name = 'party/party_edit.html'
     form_class = forms.PartyForm
@@ -59,6 +62,7 @@ class PartiesEdit(LoginPermissionRequiredMixin,
 
 class PartiesDelete(LoginPermissionRequiredMixin,
                     mixins.PartyObjectMixin,
+                    organization_mixins.ProjectAdminCheckMixin,
                     generic.DeleteView):
     template_name = 'party/party_delete.html'
     permission_required = 'party.delete'
@@ -72,6 +76,7 @@ class PartiesDelete(LoginPermissionRequiredMixin,
 
 class PartyResourcesAdd(LoginPermissionRequiredMixin,
                         mixins.PartyResourceMixin,
+                        organization_mixins.ProjectAdminCheckMixin,
                         base_generic.edit.FormMixin,
                         generic.DetailView):
     template_name = 'party/resources_add.html'
@@ -89,6 +94,7 @@ class PartyResourcesAdd(LoginPermissionRequiredMixin,
 
 class PartyResourcesNew(LoginPermissionRequiredMixin,
                         mixins.PartyResourceMixin,
+                        organization_mixins.ProjectAdminCheckMixin,
                         ProjectHasResourcesMixin,
                         generic.CreateView):
     template_name = 'party/resources_new.html'
@@ -99,6 +105,7 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
 class PartyRelationshipDetail(LoginPermissionRequiredMixin,
                               JsonAttrsMixin,
                               mixins.PartyRelationshipObjectMixin,
+                              organization_mixins.ProjectAdminCheckMixin,
                               ProjectHasResourcesMixin,
                               generic.DetailView):
     template_name = 'party/relationship_detail.html'
@@ -109,6 +116,7 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
 
 class PartyRelationshipEdit(LoginPermissionRequiredMixin,
                             mixins.PartyRelationshipObjectMixin,
+                            organization_mixins.ProjectAdminCheckMixin,
                             generic.UpdateView):
     template_name = 'party/relationship_edit.html'
     form_class = forms.TenureRelationshipEditForm
@@ -121,6 +129,7 @@ class PartyRelationshipEdit(LoginPermissionRequiredMixin,
 
 class PartyRelationshipDelete(LoginPermissionRequiredMixin,
                               mixins.PartyRelationshipObjectMixin,
+                              organization_mixins.ProjectAdminCheckMixin,
                               generic.DeleteView):
     template_name = 'party/relationship_delete.html'
     permission_required = 'tenure_rel.delete'
@@ -134,6 +143,7 @@ class PartyRelationshipDelete(LoginPermissionRequiredMixin,
 
 class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
                                    mixins.PartyRelationshipResourceMixin,
+                                   organization_mixins.ProjectAdminCheckMixin,
                                    ProjectHasResourcesMixin,
                                    generic.CreateView):
     template_name = 'party/relationship_resources_new.html'
@@ -143,6 +153,7 @@ class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
 
 class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
                                    mixins.PartyRelationshipResourceMixin,
+                                   organization_mixins.ProjectAdminCheckMixin,
                                    base_generic.edit.FormMixin,
                                    generic.DetailView):
     template_name = 'party/relationship_resources_add.html'

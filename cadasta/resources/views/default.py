@@ -5,6 +5,7 @@ from core.views.mixins import ArchiveMixin
 from core.mixins import LoginPermissionRequiredMixin
 
 from . import mixins
+from organization.views import mixins as organization_mixins
 from ..forms import AddResourceFromLibraryForm
 from .. import messages as error_messages
 
@@ -12,6 +13,7 @@ from .. import messages as error_messages
 class ProjectResources(LoginPermissionRequiredMixin,
                        mixins.ProjectResourceMixin,
                        mixins.ProjectHasResourcesMixin,
+                       organization_mixins.ProjectAdminCheckMixin,
                        generic.ListView):
     template_name = 'resources/project_list.html'
     permission_required = 'resource.list'
@@ -22,6 +24,7 @@ class ProjectResources(LoginPermissionRequiredMixin,
 class ProjectResourcesAdd(LoginPermissionRequiredMixin,
                           mixins.ProjectResourceMixin,
                           base_generic.edit.FormMixin,
+                          organization_mixins.ProjectAdminCheckMixin,
                           generic.DetailView):
     template_name = 'resources/project_add_existing.html'
     form_class = AddResourceFromLibraryForm
@@ -42,6 +45,7 @@ class ProjectResourcesAdd(LoginPermissionRequiredMixin,
 class ProjectResourcesNew(LoginPermissionRequiredMixin,
                           mixins.ProjectResourceMixin,
                           mixins.ProjectHasResourcesMixin,
+                          organization_mixins.ProjectAdminCheckMixin,
                           generic.CreateView):
     template_name = 'resources/project_add_new.html'
     permission_required = 'resource.add'
@@ -53,6 +57,7 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
 
 class ProjectResourcesDetail(LoginPermissionRequiredMixin,
                              mixins.ResourceObjectMixin,
+                             organization_mixins.ProjectAdminCheckMixin,
                              generic.DetailView):
     template_name = 'resources/project_detail.html'
     permission_required = 'resource.view'
@@ -66,6 +71,7 @@ class ProjectResourcesDetail(LoginPermissionRequiredMixin,
 
 class ProjectResourcesEdit(LoginPermissionRequiredMixin,
                            mixins.ResourceObjectMixin,
+                           organization_mixins.ProjectAdminCheckMixin,
                            generic.UpdateView):
     template_name = 'resources/edit.html'
     permission_required = 'resource.edit'
