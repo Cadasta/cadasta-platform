@@ -1,11 +1,10 @@
 import os
 import json
-from django.http import Http404, HttpResponse
+from django.http import HttpResponse
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404
 import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
-from django.utils.translation import gettext as _
 from django.contrib import messages
 
 import formtools.wizard.views as wizard
@@ -294,6 +293,7 @@ class ProjectList(PermissionRequiredMixin,
 
 class ProjectDashboard(PermissionRequiredMixin,
                        mixins.ProjectAdminCheckMixin,
+                       mixins.ProjectMixin,
                        generic.DetailView):
     def get_actions(view, request):
         if view.get_object().public():
@@ -324,15 +324,7 @@ class ProjectDashboard(PermissionRequiredMixin,
         return context
 
     def get_object(self, queryset=None):
-        queryset = Project.objects.filter(
-            organization__slug=self.kwargs.get('organization'),
-            slug=self.kwargs.get('project')
-        )
-        try:
-            obj = queryset.get()
-        except queryset.model.DoesNotExist:
-            raise Http404(_("No projects found matching the query"))
-        return obj
+        return self.get_project()
 
 
 PROJECT_ADD_FORMS = [('extents', forms.ProjectAddExtents),
@@ -475,6 +467,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
 
 
 class ProjectEdit(mixins.ProjectMixin,
+                  mixins.ProjectAdminCheckMixin,
                   LoginPermissionRequiredMixin):
     model = Project
     permission_required = 'project.update'
@@ -545,6 +538,7 @@ class ProjectUnarchive(ProjectEdit, ArchiveMixin, generic.DetailView):
 
 class ProjectDataDownload(mixins.ProjectMixin,
                           LoginPermissionRequiredMixin,
+                          mixins.ProjectAdminCheckMixin,
                           base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'organization/project_download.html'

@@ -10,6 +10,7 @@ from resources.forms import AddResourceFromLibraryForm
 from resources.views.mixins import ProjectHasResourcesMixin
 from party.messages import TENURE_REL_CREATE
 from . import mixins
+from organization.views import mixins as organization_mixins
 from .. import forms
 from ..serializers import SpatialUnitGeoJsonSerializer
 from .. import messages as error_messages
@@ -17,6 +18,7 @@ from .. import messages as error_messages
 
 class LocationsList(LoginPermissionRequiredMixin,
                     mixins.SpatialQuerySetMixin,
+                    organization_mixins.ProjectAdminCheckMixin,
                     generic.ListView):
     template_name = 'spatial/location_map.html'
     permission_required = 'spatial.list'

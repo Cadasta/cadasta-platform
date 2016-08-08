@@ -5,6 +5,7 @@ from core.views.mixins import ArchiveMixin
 from core.mixins import LoginPermissionRequiredMixin
 
 from . import mixins
+from organization.views import mixins as organization_mixins
 from ..forms import AddResourceFromLibraryForm
 from .. import messages as error_messages
 
@@ -12,6 +13,7 @@ from .. import messages as error_messages
 class ProjectResources(LoginPermissionRequiredMixin,
                        mixins.ProjectResourceMixin,
                        mixins.ProjectHasResourcesMixin,
+                       organization_mixins.ProjectAdminCheckMixin,
                        generic.ListView):
     template_name = 'resources/project_list.html'
     permission_required = 'resource.list'
