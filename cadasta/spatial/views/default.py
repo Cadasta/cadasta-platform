@@ -28,6 +28,7 @@ class LocationsList(LoginPermissionRequiredMixin,
 
 class LocationsAdd(LoginPermissionRequiredMixin,
                    mixins.SpatialQuerySetMixin,
+                   organization_mixins.ProjectAdminCheckMixin,
                    generic.CreateView):
     form_class = forms.LocationForm
     template_name = 'spatial/location_add.html'
@@ -61,6 +62,7 @@ class LocationsAdd(LoginPermissionRequiredMixin,
 class LocationDetail(LoginPermissionRequiredMixin,
                      JsonAttrsMixin,
                      mixins.SpatialUnitObjectMixin,
+                     organization_mixins.ProjectAdminCheckMixin,
                      ProjectHasResourcesMixin,
                      generic.DetailView):
     template_name = 'spatial/location_detail.html'
@@ -76,6 +78,7 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
 class LocationEdit(LoginPermissionRequiredMixin,
                    mixins.SpatialUnitObjectMixin,
+                   organization_mixins.ProjectAdminCheckMixin,
                    generic.UpdateView):
     template_name = 'spatial/location_edit.html'
     form_class = forms.LocationForm
@@ -85,6 +88,7 @@ class LocationEdit(LoginPermissionRequiredMixin,
 
 class LocationDelete(LoginPermissionRequiredMixin,
                      mixins.SpatialUnitObjectMixin,
+                     organization_mixins.ProjectAdminCheckMixin,
                      generic.DeleteView):
     template_name = 'spatial/location_delete.html'
     permission_required = 'spatial.delete'
@@ -99,6 +103,7 @@ class LocationDelete(LoginPermissionRequiredMixin,
 class LocationResourceAdd(LoginPermissionRequiredMixin,
                           mixins.SpatialUnitResourceMixin,
                           base_generic.edit.FormMixin,
+                          organization_mixins.ProjectAdminCheckMixin,
                           generic.DetailView):
     template_name = 'spatial/resources_add.html'
     form_class = AddResourceFromLibraryForm
@@ -115,6 +120,7 @@ class LocationResourceAdd(LoginPermissionRequiredMixin,
 
 class LocationResourceNew(LoginPermissionRequiredMixin,
                           mixins.SpatialUnitResourceMixin,
+                          organization_mixins.ProjectAdminCheckMixin,
                           ProjectHasResourcesMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
@@ -134,6 +140,7 @@ class LocationResourceNew(LoginPermissionRequiredMixin,
 
 class TenureRelationshipAdd(LoginPermissionRequiredMixin,
                             mixins.SpatialUnitRelationshipMixin,
+                            organization_mixins.ProjectAdminCheckMixin,
                             generic.CreateView):
     template_name = 'spatial/relationship_add.html'
     form_class = forms.TenureRelationshipForm

@@ -24,6 +24,7 @@ class ProjectResources(LoginPermissionRequiredMixin,
 class ProjectResourcesAdd(LoginPermissionRequiredMixin,
                           mixins.ProjectResourceMixin,
                           base_generic.edit.FormMixin,
+                          organization_mixins.ProjectAdminCheckMixin,
                           generic.DetailView):
     template_name = 'resources/project_add_existing.html'
     form_class = AddResourceFromLibraryForm
@@ -44,6 +45,7 @@ class ProjectResourcesAdd(LoginPermissionRequiredMixin,
 class ProjectResourcesNew(LoginPermissionRequiredMixin,
                           mixins.ProjectResourceMixin,
                           mixins.ProjectHasResourcesMixin,
+                          organization_mixins.ProjectAdminCheckMixin,
                           generic.CreateView):
     template_name = 'resources/project_add_new.html'
     permission_required = 'resource.add'
@@ -55,6 +57,7 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
 
 class ProjectResourcesDetail(LoginPermissionRequiredMixin,
                              mixins.ResourceObjectMixin,
+                             organization_mixins.ProjectAdminCheckMixin,
                              generic.DetailView):
     template_name = 'resources/project_detail.html'
     permission_required = 'resource.view'
@@ -68,6 +71,7 @@ class ProjectResourcesDetail(LoginPermissionRequiredMixin,
 
 class ProjectResourcesEdit(LoginPermissionRequiredMixin,
                            mixins.ResourceObjectMixin,
+                           organization_mixins.ProjectAdminCheckMixin,
                            generic.UpdateView):
     template_name = 'resources/edit.html'
     permission_required = 'resource.edit'
