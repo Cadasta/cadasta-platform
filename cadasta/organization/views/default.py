@@ -10,8 +10,6 @@ from django.contrib import messages
 
 import formtools.wizard.views as wizard
 
-from tutelary.models import check_perms
-
 import core.views.generic as generic
 from core.views.mixins import SuperUserCheckMixin
 from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
@@ -56,7 +54,8 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
 
 
 class OrganizationDashboard(PermissionRequiredMixin,
-                            mixins.OrganizationUICheckMixin,
+                            mixins.OrgAdminCheckMixin,
+                            mixins.ProjectCreateCheckMixin,
                             generic.DetailView):
     model = Organization
     template_name = 'organization/organization_dashboard.html'
@@ -118,7 +117,8 @@ class OrganizationUnarchive(OrgArchiveView):
 
 
 class OrganizationMembers(LoginPermissionRequiredMixin,
-                          mixins.OrganizationUICheckMixin,
+                          mixins.OrgAdminCheckMixin,
+                          mixins.ProjectCreateCheckMixin,
                           generic.DetailView):
     model = Organization
     template_name = 'organization/organization_members.html'
@@ -158,7 +158,8 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
-                              mixins.OrganizationUICheckMixin,
+                              mixins.OrgAdminCheckMixin,
+                              mixins.ProjectCreateCheckMixin,
                               base_generic.edit.FormMixin,
                               generic.DetailView):
     slug_field = 'username'
@@ -262,31 +263,16 @@ class UserActivation(LoginPermissionRequiredMixin, base_generic.View):
 
 
 class ProjectList(PermissionRequiredMixin,
-                  mixins.ProjectQuerySetMixin, generic.ListView):
+                  mixins.ProjectQuerySetMixin,
+                  mixins.ProjectCreateCheckMixin,
+                  generic.ListView):
     model = Project
     template_name = 'organization/project_list.html'
     permission_required = 'project.list'
     permission_filter_queryset = (lambda self, view, p: ('project.view',)
                                   if p.access == 'public'
                                   else ('project.view_private',))
-
-    def add_allowed(self):
-        retval = Organization.objects.exists()
-        if retval:
-            u = self.request.user
-            if hasattr(u, 'organizations'):
-                retval = any([
-                    check_perms(u, ('project.create',), (o,))
-                    for o in u.organizations.all()
-                ])
-            else:
-                retval = False
-        return self.is_superuser or retval
-
-    def get_context_data(self, **kwargs):
-        context = super(ProjectList, self).get_context_data(**kwargs)
-        context['add_allowed'] = self.add_allowed()
-        return context
+    project_create_check_multiple = True
 
     def get(self, request, *args, **kwargs):
         if (hasattr(self.request.user, 'assigned_policies') and

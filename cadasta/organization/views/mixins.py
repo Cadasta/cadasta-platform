@@ -123,11 +123,47 @@ class ProjectAdminCheckMixin:
         return context
 
 
-class OrganizationUICheckMixin:
+class ProjectCreateCheckMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_allow = None
+
+    @property
+    def add_allowed(self):
+        if self.add_allow is None:
+            if (hasattr(self, 'project_create_check_multiple') and
+               self.project_create_check_multiple):
+                self.add_allow = self.add_allowed_multiple()
+            else:
+                self.add_allow = self.add_allowed_single()
+            self.add_allow = self.add_allow or self.is_superuser
+        return self.add_allow
+
+    def add_allowed_single(self):
+        return check_perms(self.request.user, ('project.create',),
+                           (self.get_object(),))
+
+    def add_allowed_multiple(self):
+        chk = False
+        if Organization.objects.exists():
+            u = self.request.user
+            if hasattr(u, 'organizations'):
+                chk = any([
+                    check_perms(u, ('project.create',), (o,))
+                    for o in u.organizations.all()
+                ])
+        return chk
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['add_allowed'] = self.add_allowed
+        return context
+
+
+class OrgAdminCheckMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.is_admin = None
-        self.add_allow = None
 
     @property
     def is_administrator(self):
@@ -152,16 +188,7 @@ class OrganizationUICheckMixin:
                 self.is_admin = True
         return self.is_admin
 
-    @property
-    def add_allowed(self):
-        if self.add_allow is None:
-            chk = check_perms(self.request.user, ('project.create',),
-                              (self.get_object(),))
-            self.add_allow = self.is_superuser or chk
-        return self.add_allow
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['add_allowed'] = self.add_allowed
         context['is_administrator'] = self.is_administrator
         return context
