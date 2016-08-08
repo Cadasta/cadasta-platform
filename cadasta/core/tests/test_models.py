@@ -98,6 +98,15 @@ class SlugModelTest(TestCase):
         assert instance1.slug != instance2.slug
         assert instance2.slug == 'test-name-1'
 
+    def test_duplicate_slug_100_times(self):
+        for i in range(0, 101):
+            instance = MySlugModel()
+            instance.name = ("Test Name")
+            instance.save()
+
+        assert MySlugModel.objects.count() == 101
+        assert instance.slug == 'test-name-100'
+
     def test_keep_slug(self):
         instance = MySlugModel()
         instance.name = 'Test Name'
@@ -136,17 +145,12 @@ class SlugModelTest(TestCase):
         print(instance1.slug)
         print(instance2.slug)
 
-    def test_duplicate_slug_long_name_ten_times(self):
-        for i in range(0, 100):
+    def test_duplicate_slug_long_name_100_times(self):
+        for i in range(0, 101):
             instance = MySlugModel()
             instance.name = ('Very Long Name For The Purposes of Testing '
                              'That Slug Truncation Functions Correctly')
             instance.save()
-
-        instance = MySlugModel()
-        instance.name = ('Very Long Name For The Purposes of '
-                         'Testing That Slug Truncation Functions Correctly')
-        instance.save()
 
         assert MySlugModel.objects.count() == 101
         assert instance.slug[-4:] == '-100'
