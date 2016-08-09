@@ -87,6 +87,20 @@ class OrganizationTest(UserTestCase):
         org = Organization.objects.first()
         assert org.urls == ['http://example.com']
 
+    def test_add_organization_with_semivalid_url(self):
+        self.data['urls'] = 'example.com'
+        self._save(self.data)
+        org = Organization.objects.first()
+        assert org.urls == ['http://example.com']
+
+    def test_add_organization_with_invalid_url(self):
+        self.data['urls'] = 'invalid url'
+        form = forms.OrganizationForm(self.data, user=UserFactory.create())
+        assert not form.is_valid()
+        assert form.errors == {
+            'urls': ["Enter a valid URL."]
+        }
+
     def test_add_organization_with_contact(self):
         self.data['contacts-0-name'] = "Ringo Starr"
         self.data['contacts-0-email'] = 'ringo@beatles.uk'
@@ -272,48 +286,40 @@ class EditOrganizationMemberFormTest(UserTestCase):
 
 
 class ProjectAddDetailsTest(UserTestCase):
-    def test_add_new_project_with_restricted_name(self):
-        org = OrganizationFactory.create()
-        user = UserFactory.create()
+    def setUp(self):
+        super().setUp()
+        self.org = OrganizationFactory.create()
+        self.user = UserFactory.create()
         OrganizationRole.objects.create(
-            organization=org, user=user, admin=True
+            organization=self.org, user=self.user, admin=True
         )
-        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
-        data = {
-            'organization': org.slug,
-            'name': random.choice(invalid_names),
+        self.data = {
+            'organization': self.org.slug,
+            'name': "Project Name",
+            'description': "",
+            'urls': '',
             'contacts-TOTAL_FORMS': 1,
             'contacts-INITIAL_FORMS': 0,
             'contacts-0-name': '',
             'contacts-0-email': '',
             'contacts-0-tel': ''
         }
-        form = forms.ProjectAddDetails(data=data, user=user)
+
+    def test_add_new_project_with_restricted_name(self):
+        invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
+        data = self.data.copy()
+        data['name'] = random.choice(invalid_names)
+        form = forms.ProjectAddDetails(data=data, user=self.user)
         assert not form.is_valid()
         assert form.errors == {
             'name': ["Project name cannot be “Add” or “New”."]
         }
 
     def test_add_new_project_with_duplicate_name(self):
-        org = OrganizationFactory.create()
-        user = UserFactory.create()
-        OrganizationRole.objects.create(
-            organization=org, user=user, admin=True
-        )
-        existing_project = ProjectFactory.create(
-            organization=org,
-            name="Same Project",
-        )
-        data = {
-            'organization': org.slug,
-            'name': existing_project.name,
-            'contacts-TOTAL_FORMS': 1,
-            'contacts-INITIAL_FORMS': 0,
-            'contacts-0-name': '',
-            'contacts-0-email': '',
-            'contacts-0-tel': ''
-        }
-        form = forms.ProjectAddDetails(data=data, user=user)
+        existing_project = ProjectFactory.create(organization=self.org)
+        data = self.data.copy()
+        data['name'] = existing_project.name
+        form = forms.ProjectAddDetails(data=data, user=self.user)
         assert not form.is_valid()
         assert form.errors == {
             'name': [
@@ -321,28 +327,44 @@ class ProjectAddDetailsTest(UserTestCase):
         }
 
     def test_add_new_project_with_duplicate_name_in_another_org(self):
-        org_1 = OrganizationFactory.create()
-        org_2 = OrganizationFactory.create()
-        user = UserFactory.create()
-        OrganizationRole.objects.create(
-            organization=org_2, user=user, admin=True
-        )
-        existing_project = ProjectFactory.create(organization=org_1)
-        data = {
-            'organization': org_2.slug,
-            'name': existing_project.name,
+        another_org = OrganizationFactory.create()
+        existing_project = ProjectFactory.create(organization=another_org)
+        data = self.data.copy()
+        data['name'] = existing_project.name
+        form = forms.ProjectAddDetails(data=data, user=self.user)
+        assert form.is_valid()
+
+    def test_add_new_project_with_semivalid_url(self):
+        data = self.data.copy()
+        data['url'] = 'cadasta.org'
+        form = forms.ProjectAddDetails(data=data, user=self.user)
+        assert form.is_valid()
+
+    def test_add_new_project_with_invalid_url(self):
+        data = self.data.copy()
+        data['url'] = 'invalid url'
+        form = forms.ProjectAddDetails(data=data, user=self.user)
+        assert not form.is_valid()
+        assert form.errors == {
+            'url': ["Enter a valid URL."]
+        }
+
+
+@pytest.mark.usefixtures('make_dirs')
+class ProjectEditDetailsTest(UserTestCase):
+    def setUp(self):
+        self.project = ProjectFactory.create()
+        self.data = {
+            'name': self.project.name,
+            'description': self.project.description,
+            'urls': '',
             'contacts-TOTAL_FORMS': 1,
             'contacts-INITIAL_FORMS': 0,
             'contacts-0-name': '',
             'contacts-0-email': '',
             'contacts-0-tel': ''
         }
-        form = forms.ProjectAddDetails(data=data, user=user)
-        assert form.is_valid()
 
-
-@pytest.mark.usefixtures('make_dirs')
-class ProjectEditDetailsTest(UserTestCase):
     def _get_form(self, form_name):
         path = os.path.dirname(settings.BASE_DIR)
 
@@ -452,44 +474,42 @@ class ProjectEditDetailsTest(UserTestCase):
         assert not project.current_questionnaire
 
     def test_update_project_with_restricted_name(self):
-        project = ProjectFactory.create()
         invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
-        data = {
-            'name': random.choice(invalid_names),
-            'contacts-TOTAL_FORMS': 1,
-            'contacts-INITIAL_FORMS': 0,
-            'contacts-0-name': '',
-            'contacts-0-email': '',
-            'contacts-0-tel': ''
-        }
-        form = forms.ProjectEditDetails(
-            instance=project,
-            data=data,
-        )
+        data = self.data.copy()
+        data['name'] = random.choice(invalid_names)
+        form = forms.ProjectEditDetails(instance=self.project, data=data)
         assert not form.is_valid()
         assert form.errors == {
             'name': ["Project name cannot be “Add” or “New”."]
         }
 
     def test_update_project_with_duplicate_name(self):
-        project_1 = ProjectFactory.create()
-        project_2 = ProjectFactory.create(organization=project_1.organization)
-        data = {
-            'name': project_1.name,
-            'contacts-TOTAL_FORMS': 1,
-            'contacts-INITIAL_FORMS': 0,
-            'contacts-0-name': '',
-            'contacts-0-email': '',
-            'contacts-0-tel': ''
-        }
-        form = forms.ProjectEditDetails(
-            instance=project_2,
-            data=data,
-        )
+        another_project = ProjectFactory.create(
+            organization=self.project.organization)
+        data = self.data.copy()
+        data['name'] = another_project.name
+        form = forms.ProjectEditDetails(instance=self.project, data=data)
         assert not form.is_valid()
         assert form.errors == {
             'name': [
                 "Project with this name already exists in this organization."]
+        }
+
+    def test_update_project_with_semivalid_url(self):
+        data = self.data.copy()
+        data['urls'] = 'cadasta.org'
+        form = forms.ProjectEditDetails(instance=self.project, data=data)
+        assert form.is_valid()
+        project = form.save()
+        assert project.urls == ['http://cadasta.org']
+
+    def test_update_project_with_invalid_url(self):
+        data = self.data.copy()
+        data['urls'] = 'invalid url'
+        form = forms.ProjectEditDetails(instance=self.project, data=data)
+        assert not form.is_valid()
+        assert form.errors == {
+            'urls': ["Enter a valid URL."]
         }
 
 
