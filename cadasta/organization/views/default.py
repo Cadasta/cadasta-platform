@@ -406,7 +406,8 @@ class ProjectAddWizard(SuperUserCheckMixin,
         result = self.get_form_step_data(form)
 
         if 'details-organization' in result:
-            self.organization = result['details-organization']
+            self.storage.extra_data['organization'] = (
+                result['details-organization'])
 
         return result
 
@@ -417,8 +418,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
             }
         elif step == 'permissions':
             return {
-                'organization': self.get_cleaned_data_for_step(
-                    'details').get('organization')
+                'organization': self.storage.extra_data['organization'],
             }
         else:
             return {}
