@@ -459,8 +459,8 @@ class ProjectAddTest(UserTestCase):
         'details-url': 'http://www.test.org',
         'details-contacts-TOTAL_FORMS': 1,
         'details-contacts-INITIAL_FORMS': 0,
-        'details-contacts-0-name': '',
-        'details-contacts-0-email': '',
+        'details-contacts-0-name': "John Lennon",
+        'details-contacts-0-email': 'john@beatles.co.uk',
         'details-contacts-0-tel': ''
     }
     PERMISSIONS_POST_DATA = {
@@ -499,6 +499,9 @@ class ProjectAddTest(UserTestCase):
         proj = Project.objects.get(organization=self.org, name='Test Project')
         assert proj.slug == 'test-project'
         assert proj.description == 'This is a test project'
+        assert len(proj.contacts) == 1
+        assert proj.contacts[0]['name'] == "John Lennon"
+        assert proj.contacts[0]['email'] == 'john@beatles.co.uk'
         assert ProjectRole.objects.filter(project=proj).count() == 3
         for r in ProjectRole.objects.filter(project=proj):
             if r.user.username == 'org_member_1':
@@ -535,6 +538,9 @@ class ProjectAddTest(UserTestCase):
         proj = Project.objects.get(organization=self.org, name='Test Project')
         assert proj.slug == 'test-project'
         assert proj.description == 'This is a test project'
+        assert len(proj.contacts) == 1
+        assert proj.contacts[0]['name'] == "John Lennon"
+        assert proj.contacts[0]['email'] == 'john@beatles.co.uk'
         for r in ProjectRole.objects.filter(project=proj):
             if r.user.username == 'org_member_1':
                 assert r.role == 'PM'
@@ -576,6 +582,9 @@ class ProjectAddTest(UserTestCase):
         proj = Project.objects.get(organization=self.org, slug=expected_slug)
         assert proj.slug == expected_slug
         assert proj.description == 'This is a test project'
+        assert len(proj.contacts) == 1
+        assert proj.contacts[0]['name'] == "John Lennon"
+        assert proj.contacts[0]['email'] == 'john@beatles.co.uk'
         assert ProjectRole.objects.filter(project=proj).count() == 3
         for r in ProjectRole.objects.filter(project=proj):
             if r.user.username == 'org_member_1':
