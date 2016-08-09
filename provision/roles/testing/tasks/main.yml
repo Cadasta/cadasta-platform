@@ -9,7 +9,7 @@
 - name: Download Firefox 46 install bundle
   become: yes
   become_user: root
-  get_url: url=https://ftp.mozilla.org/pub/firefox/releases/46.0.1/linux-x86_64/en-US/firefox-46.0.1.tar.bz2
+  get_url: url=https://cadasta-miscellaneous.s3.amazonaws.com/firefox-46.0.1.tar.bz2
            dest=/opt/firefox-46.0.1.tar.bz2
 
 - name: Unpack Firefox 46 install bundle
