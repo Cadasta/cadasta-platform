@@ -3732,11 +3732,12 @@ table th[class*="col-"] {
     text-align: right;
     padding: 20px 30px; }
     #project-wizard .panel .panel-buttons .btn {
+      float: right;
       min-width: 160px !important;
-      margin-right: 20px;
+      margin-left: 20px;
       margin-bottom: 10px; }
-      #project-wizard .panel .panel-buttons .btn:last-child {
-        margin-right: 0; }
+      #project-wizard .panel .panel-buttons .btn:first-child {
+        margin-left: 0; }
     #project-wizard .panel .panel-buttons .btn-link {
       min-width: 60px !important; }
 
