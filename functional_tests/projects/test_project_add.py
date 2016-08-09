@@ -186,9 +186,15 @@ class ProjectAddTest(FunctionalTest):
         proj_add_page.click_submit_details()
         proj_add_page.check_details(project)
 
-        # Correct the URL and finally submit details
+        # Correct the URL, press "Previous" then "Next" and ensure
+        # that details settings are preserved.
         project['url'] = self.test_data['project_url']
         proj_add_page.set_proj_url(project['url'])
+        proj_add_page.click_previous_details()
+        proj_add_page.submit_geometry()
+        proj_add_page.check_details(project)
+
+        # Finally submit details
         proj_add_page.submit_details()
 
         # Set permissions
