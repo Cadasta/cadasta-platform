@@ -426,12 +426,14 @@ class ProjectAddWizard(SuperUserCheckMixin,
     def done(self, form_list, form_dict, **kwargs):
         form_data = [form.cleaned_data for form in form_list]
         extent = form_data[0]['extent']
+        organization = form_data[1]['organization']
         name = form_data[1]['name']
         description = form_data[1]['description']
-        organization = form_data[1]['organization']
+        access = form_data[1].get('access')
         url = form_data[1]['url']
         questionaire = form_data[1].get('questionaire')
-        access = form_data[1].get('access')
+        contacts = form_data[1].get('contacts')
+
         org = Organization.objects.get(slug=organization)
 
         user_roles = []
@@ -444,7 +446,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
             project = Project.objects.create(
                 name=name, organization=org,
                 description=description, urls=[url], extent=extent,
-                access=access
+                access=access, contacts=contacts
             )
             for username, role in user_roles:
                 user = User.objects.get(username=username)
