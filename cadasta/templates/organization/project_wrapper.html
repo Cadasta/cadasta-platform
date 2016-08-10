@@ -143,12 +143,12 @@
         <p>{% trans "Are you sure you want to archive this project?" %}</p>
       </div>
       <div class="modal-footer">
+        <a href="{% url 'organization:project-archive' object.organization.slug object.slug %}" class="btn btn-danger archive-final pull-right" role="button">
+          {% trans "Yes, archive this project" %}
+        </a>
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:project-archive' object.organization.slug object.slug %}"  class="btn btn-primary archive-final" role="button">
-          {% trans "Yes, archive this project" %}
-        </a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -169,12 +169,12 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-link cancel-u" data-dismiss="modal">
-          {% trans "Cancel" %}
-        </button>
-        <a href="{% url 'organization:project-unarchive' object.organization.slug object.slug %}"  class="btn btn-primary unarchive-final" role="button">
+        <a href="{% url 'organization:project-unarchive' object.organization.slug object.slug %}" class="btn btn-primary unarchive-final pull-right" role="button">
           {% trans "Yes, unarchive this project" %}
         </a>
+        <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

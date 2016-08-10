@@ -104,13 +104,13 @@ $(document).ready(function() {
           </div>
 
           <div class="modal-footer">
-            <a class="btn btn-link cancel"
-               href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
-              {% trans "Cancel" %}
-            </a>
-            <button type="submit" class="btn btn-primary" name="submit">
+            <button type="submit" class="btn btn-primary pull-right" name="submit">
               {% trans "Save" %}
             </button>
+            <a class="btn btn-link cancel"
+              href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
+              {% trans "Cancel" %}
+            </a>
           </div>
         </form>
       </div>

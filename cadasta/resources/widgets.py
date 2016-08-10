@@ -14,11 +14,12 @@ class ResourceWidget(CheckboxInput):
         '    <label for="{name}"><strong>{resource.name}</strong></label>'
         '    <br>{resource.file_name}'
         '  </td>'
-        '  <td>{resource.file_type}</td>'
+        '  <td class="hidden-xs hidden-sm">{resource.file_type}</td>'
         '  <td>{resource.num_entities}</td>'
-        '  <td>{resource.contributor.full_name}<br>'
+        '  <td class="hidden-xs hidden-sm">'
+        '      {resource.contributor.full_name}<br>'
         '      {resource.contributor.username}</td>'
-        '  <td>{date_updated}</td>'
+        '  <td class="hidden-xs hidden-sm">{date_updated}</td>'
         '</tr>'
     )
 

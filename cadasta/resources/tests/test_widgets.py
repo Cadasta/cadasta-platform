@@ -17,11 +17,12 @@ class ResourceWidgetTest(TestCase):
             '    <label for="file"><strong>Resource</strong></label>'
             '    <br>file.txt'
             '  </td>'
-            '  <td>txt</td>'
+            '  <td class="hidden-xs hidden-sm">txt</td>'
             '  <td>0</td>'
-            '  <td>John Lennon<br>'
+            '  <td class="hidden-xs hidden-sm">'
+            '      John Lennon<br>'
             '      john</td>'
-            '  <td>{updated}</td>'
+            '  <td class="hidden-xs hidden-sm">{updated}</td>'
         )
         user = UserFactory.build(
             full_name='John Lennon',

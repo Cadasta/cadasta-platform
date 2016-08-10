@@ -53,14 +53,17 @@
 {% block step_title %}{% trans "Draw project on map" %}{% endblock %}
 {% block step_instructions %}
   <p>
-    {% blocktrans %}
-    Use the map tools to outline your project location boundaries. 
-    Once complete, select the save button below.
-    {% endblocktrans %}
+    {% blocktrans %}Use the tools provided on the left side of the map to outline your new project boundary. Once complete, select the save button below.{% endblocktrans %}
   </p>
+  <div class="alert alert-info alert-full clearfix row" role="alert">
+    <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
+    <div>
+    {% blocktrans %}We encourage you to mark the area in which your project takes place (if your project doesn't include the entire world). This makes interactions simpler and also helps other users to find your project.{% endblocktrans %}
+    </div>
+  </div>
 {% endblock %}
 {% block step_content_buttons %}
-  <button class="btn btn-primary" type="submit">
+  <button class="btn btn-primary pull-right" type="submit">
     {% trans 'Next' %}
     <span class="glyphicon glyphicon-triangle-right"></span>
   </button>

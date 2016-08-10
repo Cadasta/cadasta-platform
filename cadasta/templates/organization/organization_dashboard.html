@@ -120,12 +120,12 @@
         <p>{% trans "Are you sure you want to archive this organization?" %}</p>
       </div>
       <div class="modal-footer">
+        <a href="{% url 'organization:archive' organization.slug %}" class="btn btn-danger archive-final pull-right" role="button">
+          {% trans "Yes, archive this organization" %}
+        </a>
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:archive' organization.slug %}"  class="btn btn-primary archive-final" role="button">
-          {% trans "Yes, archive this organization" %}
-        </a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -146,12 +146,12 @@
         </p>
       </div>
       <div class="modal-footer">
+        <a href="{% url 'organization:unarchive' organization.slug %}" class="btn btn-primary unarchive-final pull-right" role="button">
+          {% trans "Yes, unarchive this organization" %}
+        </a>
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'organization:unarchive' organization.slug %}"  class="btn btn-primary unarchive-final" role="button">
-          {% trans "Yes, unarchive this organization" %}
-        </a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

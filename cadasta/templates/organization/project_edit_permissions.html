@@ -38,7 +38,7 @@
           </div>
           <div class="panel-footer panel-buttons">
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-            <a class="btn btn-default" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
+            <a class="btn btn-default cancel" href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}">{% trans "Cancel" %}</a>
           </div>
         </div>
       </div>
