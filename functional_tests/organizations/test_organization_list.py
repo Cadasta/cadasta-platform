@@ -86,7 +86,7 @@ class OrganizationListTest(FunctionalTest):
         fields = page.get_fields()
         fields['name'].send_keys('Organization #2')
         fields['description'].send_keys('This is a test organization')
-        fields['urls'].send_keys('test.com')
+        fields['urls'].send_keys('invalid url')
         page.try_submit(err=['urls'], ok=['name', 'description'])
 
         fields = page.get_fields()

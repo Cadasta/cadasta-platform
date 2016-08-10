@@ -110,7 +110,11 @@ class ContactsForm(forms.Form):
 
 
 class OrganizationForm(forms.ModelForm):
-    urls = pg_forms.SimpleArrayField(forms.URLField(), required=False)
+    urls = pg_forms.SimpleArrayField(
+        forms.URLField(required=False),
+        required=False,
+        error_messages={'item_invalid': ""},
+    )
     contacts = ContactsField(form=ContactsForm, required=False)
     access = PublicPrivateField()
 
@@ -121,15 +125,6 @@ class OrganizationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(OrganizationForm, self).__init__(*args, **kwargs)
-
-    def to_list(self, value):
-        if value:
-            return [value]
-        else:
-            return []
-
-    def clean_urls(self):
-        return self.to_list(self.data.get('urls'))
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -287,7 +282,11 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
 
 
 class ProjectEditDetails(forms.ModelForm):
-    urls = pg_forms.SimpleArrayField(forms.URLField(), required=False)
+    urls = pg_forms.SimpleArrayField(
+        forms.URLField(required=False),
+        required=False,
+        error_messages={'item_invalid': ""},
+    )
     questionnaire = forms.CharField(
         required=False,
         widget=S3FileUploadWidget(upload_to='xls-forms',
