@@ -1177,8 +1177,7 @@ img.org-logo, img#org-logo {
   }
 }
 
-button#add-contact,
-button#add-party { // below contacts table and party table
+button#add-contact { // below contacts table
   padding: 0;
 }
 
@@ -1324,7 +1323,7 @@ div.add-btn-btm { // add party link at bottom of table
       min-width: 100px;
     }
   }
-  button#add-contact, button#add-party {
+  button#add-contact {
     background: transparent;
     color: $link-color !important;
     border: 0;
@@ -1378,5 +1377,40 @@ tr.contacts-error {
     border-top: none;
     padding-top: 0;
     background: $alert-warning-bg;
+  }
+}
+
+/* =Party selection widget
+-------------------------------------------------------------- */
+
+#select-party {
+  label {
+    display: block;
+  }
+  #party-select {
+    width: 100%;
+  }
+  .select2 {
+    display: block;
+    margin: 0.5em 0;
+    width: 100%;
+  }
+  #add-party {
+    padding: 6px 18px;
+    .glyphicon {
+      opacity: 0.5;
+      padding-right: 8px;
+    }
+  }
+}
+
+.select2-container {
+  .party-name {
+    display: block;
+  }
+  .party-type {
+    display: block;
+    font-size: 0.85em;
+    opacity: 0.75;
   }
 }

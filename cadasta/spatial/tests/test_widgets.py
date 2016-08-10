@@ -12,21 +12,22 @@ class SelectPartyWidgetTest(TestCase):
 
         widget = SelectPartyWidget(project=project)
         rendered = widget.render(name='name', value='value')
-        assert '<input type="hidden" name="name" value="value">' in rendered
-        assert ('<tr data-id="' + party_1.id + '"><td>' + party_1.name + ''
-                '</td><td>' + party_1.get_type_display() + '</td><tr>'
-                in rendered)
-        assert ('<tr data-id="' + party_2.id + '"><td>' + party_2.name + ''
-                '</td><td>' + party_2.get_type_display() + '</td><tr>'
-                in rendered)
+        assert ('<select id="party-select" name="name">' in rendered)
+        assert ('<option value="' + party_1.id + '" data-type="'
+                '' + party_1.get_type_display() + '">' + party_1.name + ''
+                '</option>' in rendered)
+        assert ('<option value="' + party_2.id + '" data-type="'
+                '' + party_2.get_type_display() + '">' + party_2.name + ''
+                '</option>' in rendered)
 
 
 class NewEntityWidgetTest(TestCase):
     def test_render_value(self):
         widget = NewEntityWidget()
         expected = (
-            '<button class="btn btn-link"'
-            '        id="add-party" type="button">Add party</button>'
+            '<button class="btn btn-default" id="add-party" type="button">'
+            '<span class="glyphicon glyphicon-plus" aria-hidden="true">'
+            '</span> Add party</button>'
             '<input id="new_entity_field" type="hidden"'
             '       name="name" value="value">'
         )
@@ -36,8 +37,9 @@ class NewEntityWidgetTest(TestCase):
     def test_render_no_value(self):
         widget = NewEntityWidget()
         expected = (
-            '<button class="btn btn-link"'
-            '        id="add-party" type="button">Add party</button>'
+            '<button class="btn btn-default" id="add-party" type="button">'
+            '<span class="glyphicon glyphicon-plus" aria-hidden="true">'
+            '</span> Add party</button>'
             '<input id="new_entity_field" type="hidden"'
             '       name="name" value="">'
         )

@@ -5820,8 +5820,7 @@ img.org-logo, img#org-logo {
   .top-btn .btn-rt {
     min-width: 20px; }
 
-button#add-contact,
-button#add-party {
+button#add-contact {
   padding: 0; }
 
 .btn-full {
@@ -5945,7 +5944,7 @@ div.add-btn-btm {
   .modal .modal-footer .btn {
     min-width: 100px; }
 
-.modal button#add-contact, .modal button#add-party {
+.modal button#add-contact {
   background: transparent;
   color: #2e51a3 !important;
   border: 0;
@@ -5989,5 +5988,32 @@ tr.contacts-error {
     border-top: none;
     padding-top: 0;
     background: #fcf8e3; }
+
+/* =Party selection widget
+-------------------------------------------------------------- */
+#select-party label {
+  display: block; }
+
+#select-party #party-select {
+  width: 100%; }
+
+#select-party .select2 {
+  display: block;
+  margin: 0.5em 0;
+  width: 100%; }
+
+#select-party #add-party {
+  padding: 6px 18px; }
+  #select-party #add-party .glyphicon {
+    opacity: 0.5;
+    padding-right: 8px; }
+
+.select2-container .party-name {
+  display: block; }
+
+.select2-container .party-type {
+  display: block;
+  font-size: 0.85em;
+  opacity: 0.75; }
 
 /*# sourceMappingURL=../../../../../static/css/main.css.map */
