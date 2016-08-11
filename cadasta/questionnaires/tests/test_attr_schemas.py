@@ -20,7 +20,8 @@ from .. import models
 from ..managers import create_attrs_schema
 from .attr_schemas import (location_relationship_xform_group,
                            location_xform_group,
-                           party_relationship_xform_group, party_xform_group,
+                           party_relationship_xform_group,
+                           individual_party_xform_group,
                            tenure_relationship_xform_group)
 from .factories import QuestionnaireFactory
 
@@ -50,10 +51,11 @@ class CreateAttributeSchemaTest(UserTestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=party_xform_group,
+            project=project, dict=individual_party_xform_group,
             content_type=content_type, errors=[])
         party = PartyFactory.create(
             name='TestParty', project=project,
+            type='IN',
             attributes={
                 'homeowner': 'yes',
                 'dob': '1980-01-01'
@@ -63,7 +65,8 @@ class CreateAttributeSchemaTest(UserTestCase):
         schema = Schema.objects.get(content_type=content_type)
         assert schema is not None
         assert schema.selectors == [
-            project.organization.pk, project.pk, project.current_questionnaire]
+            project.organization.pk, project.pk,
+            project.current_questionnaire, party.type]
         assert 'homeowner' in party.attributes.attributes
         assert 'dob' in party.attributes.attributes
         assert 'gender' in party.attributes.attributes
@@ -77,7 +80,7 @@ class CreateAttributeSchemaTest(UserTestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=party_xform_group,
+            project=project, dict=individual_party_xform_group,
             content_type=content_type, errors=[])
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
@@ -260,7 +263,7 @@ class CreateAttributeSchemaTest(UserTestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=party_xform_group,
+            project=project, dict=individual_party_xform_group,
             content_type=content_type, errors=[])
         # with pytest.raises(ValidationError):
         #     PartyFactory.create(
@@ -283,7 +286,7 @@ class CreateAttributeSchemaTest(UserTestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=party_xform_group,
+            project=project, dict=individual_party_xform_group,
             content_type=content_type, errors=[])
         assert 1 == Schema.objects.all().count()
         with pytest.raises(ValidationError):

@@ -43,13 +43,14 @@ class XFormListSerializerTest(UserTestCase):
 
         assert questionnaire.is_valid(raise_exception=True) is True
         questionnaire.save()
-        form = Questionnaire.objects.get(name__contains='xls-form')
+        form = Questionnaire.objects.get(filename__contains='xls-form')
 
         serializer = serializers.XFormListSerializer(
             form, context={'request': request})
 
         assert serializer.data['formID'] == questionnaire.data['id_string']
         assert serializer.data['name'] == questionnaire.data['title']
+        assert serializer.data['version'] == questionnaire.data['version']
         protocol = 'https' if https else 'http'
         assert (serializer.data['downloadUrl'] ==
                 protocol + '://localhost:8000' +
@@ -67,3 +68,7 @@ class XFormListSerializerTest(UserTestCase):
         assert serializer.data['formID'] == ''
         assert 'downloadUrl' not in serializer.data.keys()
         assert serializer.data['hash'] == ''
+
+
+class XFormSubmissionSerializerTest(UserTestCase):
+    pass
