@@ -2,14 +2,14 @@ import os
 
 import pytest
 from lxml import etree
-from buckets.test.storage import FakeS3Storage
 
+from buckets.test.storage import FakeS3Storage
+from core.tests.util import make_dirs  # noqa
 from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
-from core.tests.util import make_dirs  # noqa
 
 from . import factories
 from .. import models
@@ -123,6 +123,7 @@ class QuestionnaireManagerTest(TestCase):
         storage = FakeS3Storage()
         file = open(path + '/questionnaires/tests/files/'
                            'xls-form-invalid.xlsx', 'rb').read()
+
         form = storage.save('xls-forms/xls-form-invalid.xlsx', file)
         with pytest.raises(InvalidXLSForm) as e:
             models.Questionnaire.objects.create_from_form(

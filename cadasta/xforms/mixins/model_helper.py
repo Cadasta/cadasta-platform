@@ -1,19 +1,17 @@
 from shapely.geometry import LineString, Point, Polygon
 from shapely.wkt import dumps
-from pyxform.xform2json import XFormToDict
 
-from django.core.files.storage import get_storage_class
 from django.core.exceptions import ValidationError
+from django.core.files.storage import get_storage_class
 from django.db import transaction
-from rest_framework.response import Response
-from rest_framework import status
-
+from django.utils.translation import ugettext as _
 from party.models import Party, TenureRelationship, TenureRelationshipType
+from pyxform.xform2json import XFormToDict
 from questionnaires.models import Question, Questionnaire
 from resources.models import Resource
 from spatial.models import SpatialUnit
-from xforms.models import XFormSubmission
 from xforms.exceptions import InvalidXMLSubmission
+from xforms.models import XFormSubmission
 
 
 class ModelHelper():
@@ -30,19 +28,28 @@ class ModelHelper():
             id_string=data['id'], version=data['version']
         )
         project = questionnaire.project
+
+        if project.current_questionnaire != questionnaire.id:
+            raise InvalidXMLSubmission(_('Form out of date'))
+
         party = self.create_party(
             data=data,
-            project=project,)
+            project=project
+        )
+
         location = self.create_spatial_unit(
             data=data,
             project=project,
             questionnaire=questionnaire,
-            party=party,)
+            party=party
+        )
+
         self.create_tenure_relationship(
             data=data,
             project=project,
             party=party,
-            location=location,)
+            location=location
+        )
 
         return questionnaire, party.id, location.id
 
@@ -55,9 +62,8 @@ class ModelHelper():
                 attributes=self.get_attributes(data, 'party')
             )
         except Exception as e:
-            raise InvalidXMLSubmission([
-                "The party you submitted is contains the following error: {}".
-                format(e)])
+            raise InvalidXMLSubmission(_(
+                "Party error: {}".format(e)))
         return party
 
     def create_spatial_unit(self, data, project, questionnaire, party=None):
@@ -79,11 +85,8 @@ class ModelHelper():
                 attributes=self.get_attributes(data, 'location')
             )
         except Exception as e:
-            raise InvalidXMLSubmission([
-                """
-                The location you submitted
-                contains the following error: {}
-                """.format(e)])
+            raise InvalidXMLSubmission(_(
+                'Location error: {}'.format(e)))
         return location
 
     def create_tenure_relationship(self, data, party, location, project):
@@ -97,9 +100,8 @@ class ModelHelper():
                 attributes=self.get_attributes(data, 'tenure_relationship')
             )
         except Exception as e:
-            raise InvalidXMLSubmission([
-                "The tenure relationship you raised following error: {}".
-                format(e)])
+            raise InvalidXMLSubmission(_(
+                "Tenure relationship error: {}".format(e)))
 
     def add_file_to_resource(self, data, user, project, content_object=None):
         Storage = get_storage_class()
@@ -113,13 +115,11 @@ class ModelHelper():
                 mime_type=data.content_type,
                 contributor=user,
                 project=project,
-                original_file=data.name,
+                original_file=data.name
             )
             resource.full_clean()
         except Exception as e:
-            raise InvalidXMLSubmission([
-                "The resource {name} contains the following error: {e}".
-                format(name=data.name, e=e)])
+            raise InvalidXMLSubmission(_("{}".format(e)))
 
     def _format_geometry(self, coords, geoshape=False):
         if coords == '':
@@ -130,7 +130,7 @@ class ModelHelper():
         if (coords[-1] == ''):
             coords.pop()
         # fixes bug in geoshape:
-        #       Geoshape copies the second point, not the first.
+        # Geoshape copies the second point, not the first.
         if geoshape:
             coords.pop()
             coords.append(coords[0])
@@ -158,7 +158,7 @@ class ModelHelper():
                 id_string=id_string, version=int(version)
             )
         except Questionnaire.DoesNotExist:
-            raise ValidationError('Questionnaire not found.')
+            raise ValidationError(_('Questionnaire not found.'))
 
     def get_attributes(self, data, model_type):
         attributes = {}
@@ -174,9 +174,7 @@ class ModelHelper():
     # ~~~~~~~~~~~~~~~
     def upload_submission_data(self, request):
         if 'xml_submission_file' not in request.data.keys():
-            return Response(
-                {'error': 'XML submission file was not found.'},
-                status=status.HTTP_400_BAD_REQUEST)
+            raise InvalidXMLSubmission(_('XML submission not found'))
 
         xml_submission_file = request.data['xml_submission_file'].read()
         full_submission = XFormToDict(
@@ -187,7 +185,6 @@ class ModelHelper():
 
         with transaction.atomic():
             questionnaire, party, location = self.create_models(submission)
-
             location_photo = submission.get('location_photo', None)
             party_photo = submission.get('party_photo', None)
 

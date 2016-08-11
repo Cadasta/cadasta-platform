@@ -1,5 +1,4 @@
 from rest_framework import serializers
-
 from core.serializers import FieldSelectorSerializer
 from xforms.models import XFormSubmission
 from accounts.models import User
@@ -36,6 +35,7 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
     """
     Saves the full xml response from GeoODK Collect as a json object.
     """
+
     json_submission = serializers.JSONField(required=False)
     user = serializers.PrimaryKeyRelatedField(
         allow_null=True, queryset=User.objects.all(), required=False)

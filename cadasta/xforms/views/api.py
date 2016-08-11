@@ -1,17 +1,26 @@
 from django.utils.six import BytesIO
-from rest_framework import status, viewsets
-from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
-from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer
-from rest_framework.authentication import (BasicAuthentication,)
-from rest_framework.permissions import IsAuthenticated
-
-from tutelary.models import Role
+from django.utils.translation import ugettext as _
 from questionnaires.models import Questionnaire
+from rest_framework import status, viewsets
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from tutelary.models import Role
 from xforms.mixins.model_helper import ModelHelper
-from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
-from xforms.renderers import XFormListRenderer
 from xforms.mixins.openrosa_headers_mixin import OpenRosaHeadersMixin
+from xforms.renderers import XFormListRenderer
+from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
+
+from ..exceptions import InvalidXMLSubmission
+
+
+OPEN_ROSA_ENVELOPE = """
+    <OpenRosaResponse xmlns="http://openrosa.org/http/response">
+        <message>{message}</message>
+    </OpenRosaResponse>
+"""
 
 
 class XFormSubmissionViewSet(OpenRosaHeadersMixin,
@@ -32,12 +41,11 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
         if request.method.upper() == 'HEAD':
             return Response(headers=self.get_openrosa_headers(request),
                             status=status.HTTP_204_NO_CONTENT,)
-
-        instance = ModelHelper(
+        try:
+            instance = ModelHelper(
             ).upload_submission_data(request)
-
-        if type(instance) == Response:
-            return instance
+        except InvalidXMLSubmission as e:
+            return self._sendErrorResponse(request, e)
 
         serializer = XFormSubmissionSerializer(instance)
 
@@ -50,8 +58,20 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
         # has already been checked for, so no failsafe is necessary.
         if serializer.is_valid():
             data = serializer.save()
-            return Response(headers=self.get_openrosa_headers(request),
-                            status=status.HTTP_201_CREATED)
+            return Response(
+                headers=self.get_openrosa_headers(request),
+                status=status.HTTP_201_CREATED,
+                content_type='application/xml'
+            )
+
+    def _sendErrorResponse(self, request, e):
+        message = _(OPEN_ROSA_ENVELOPE.format(message=str(e)))
+        headers = self.get_openrosa_headers(
+            request, location=False, content_length=False)
+        return Response(
+            message, status=status.HTTP_400_BAD_REQUEST,
+            headers=headers, content_type='application/xml'
+        )
 
 
 class XFormListView(OpenRosaHeadersMixin,
