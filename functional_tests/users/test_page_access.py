@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+
 from base import FunctionalTest
 from pages.Users import UsersPage
 from pages.Login import LoginPage
@@ -37,6 +39,7 @@ class PageAccessTest(FunctionalTest):
         LoginPage(self).login(
             self.test_data['superuser']['username'],
             self.test_data['superuser']['password'],
+            wait=(By.ID, 'users')
         )
         assert UsersPage(self).is_on_page()
 
