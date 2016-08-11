@@ -1,3 +1,5 @@
+from selenium.webdriver.common.by import By
+
 import geography.load
 
 from base import FunctionalTest
@@ -110,6 +112,7 @@ class ProjectAddTest(FunctionalTest):
         LoginPage(self).login(
             self.test_data['superuser']['username'],
             self.test_data['superuser']['password'],
+            wait=(By.ID, 'project-wizard')
         )
         assert ProjectAddPage(self).is_on_page()
 
