@@ -4,8 +4,33 @@
 
 {% block page_title %}Add new relationship | {% endblock %}
 
+{% block extra_head %}
+{{ block.super }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+
 {% block location_extra_script %}
   {{ form.media }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+  <script>
+$(document).ready(function() {
+  var template = function(party) {
+    if (!party.id) {
+      return party.text;
+    }
+    return $(
+      '<div class="party-option">' +
+      '<strong class="party-name">' + party.text + '</strong>' +
+      '<span class="party-type">' + party.element.dataset.type + '</span>' +
+      '</div>'
+    );
+  };
+  $("#party-select").select2({
+    minimumResultsForSearch: 6,
+    templateResult: template,
+  });
+});
+  </script>
 {% endblock %}
 
 {% block form_modal %}
@@ -26,11 +51,10 @@
 
             <h4 class="step">{% trans "1. Connected party" %}</h4>
             <div id="select-party" class="clearfix">
-              <label>Choose a party to connect to this location</label>
+              <label>{% trans "Choose an existing party to connect to this location" %}</label>
               {% render_field form.id class+="form-control" %}
-              <div class="add-btn-btm clearfix">
-                {% render_field form.new_entity class+="form-control" %}
-              </div>
+              <label>{% trans "Or add a new party" %}</label>
+              {% render_field form.new_entity class+="form-control" %}
             </div>
 
             <div id="new-item" class="clearfix{% if not form.new_entity.value %} hidden{% endif %}">
