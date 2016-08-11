@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Users import UsersPage
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
@@ -12,21 +13,20 @@ class PageAccessTest(FunctionalTest):
         super().setUp()
         PolicyFactory.load_policies()
         self.test_data = {
-            'user1': {
-                'username': 'default1',
-                'password': 'password1',
-            },
-            'superuser': {
-                'username': 'superuser',
-                'password': 'password2',
-                '_is_superuser': True,
-            },
+            'users': [
+                {
+                    'username': 'default1',
+                    'password': 'password1',
+                },
+                {
+                    'username': 'superuser',
+                    'password': 'password2',
+                    '_is_superuser': True,
+                }
+            ]
         }
-        self.test_data['users'] = (
-            self.test_data['user1'],
-            self.test_data['superuser'],
-        )
-        self.load_test_data(self.test_data)
+        (self.user1, self.superuser) = self.test_data['users']
+        load_test_data(self.test_data)
 
     def test_nonloggedin_user(self):
         """A non-logged-in user cannot access the users page,
@@ -36,20 +36,16 @@ class PageAccessTest(FunctionalTest):
         assert LoginPage(self).is_on_page()
         assert self.get_url_query() == 'next=' + UsersPage.path
 
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-            wait=(By.ID, 'users')
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'],
+                              wait=(By.ID, 'users'))
         assert UsersPage(self).is_on_page()
 
     def test_nonsuperuser(self):
         """A logged-in non-superuser cannot access the users page."""
 
-        LoginPage(self).login(
-            self.test_data['user1']['username'],
-            self.test_data['user1']['password'],
-        )
+        LoginPage(self).login(self.user1['username'],
+                              self.user1['password'])
         self.browser.get(UsersPage(self).url)
         self.assert_has_message('alert', "have permission")
         assert DashboardPage(self).is_on_page()
@@ -57,10 +53,8 @@ class PageAccessTest(FunctionalTest):
     def test_superuser(self):
         """A logged-in superuser can access the users page."""
 
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'])
         UsersPage(self).go_to()
         assert UsersPage(self).is_on_page()
 
@@ -82,10 +76,7 @@ class PageAccessTest(FunctionalTest):
         navbar.
 
         """
-        LoginPage(self).login(
-            self.test_data['user1']['username'],
-            self.test_data['user1']['password'],
-        )
+        LoginPage(self).login(self.user1['username'], self.user1['password'])
         DashboardPage(self).go_to()
         assert not DashboardPage(self).has_nav_link('Users')
 
@@ -93,9 +84,7 @@ class PageAccessTest(FunctionalTest):
         """A logged-in superuser should see the "Users" link in the navbar.
 
         """
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'])
         DashboardPage(self).go_to()
         assert DashboardPage(self).has_nav_link('Users')

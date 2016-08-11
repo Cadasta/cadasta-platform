@@ -1,4 +1,5 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Profile import ProfilePage
 from pages.Login import LoginPage
 from core.tests.factories import PolicyFactory
@@ -14,7 +15,7 @@ class ProfileTest(FunctionalTest):
                 'password': 'password1',
             }]
         }
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def test_profile_view_and_edit(self):
         """A registered user can view and edit their profile."""

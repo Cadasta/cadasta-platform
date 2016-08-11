@@ -44,7 +44,7 @@ class LoginPage(Page):
         self.get_password_input().send_keys(password)
         return self.get_sign_in_button()
 
-    def login(self, username, password, wait=(By.CLASS_NAME, 'dashboard-map')):
+    def login(self, username, password, wait=(By.ID, 'dashboard-map')):
         self.test.click_through(self.setup(username, password), wait)
 
     def login_inactive(self, username, password):

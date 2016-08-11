@@ -61,7 +61,7 @@ class RegistrationPage(Page):
         return fields['register']
 
     def register(self, values):
-        self.test.click_through(self.setup(values), self.test.BY_ALERT)
+        self.test.click_through(self.setup(values), self.test.BY_DASHBOARD)
 
     def try_submit(self, err=None, ok=None):
         fields = self.get_fields()

@@ -1,7 +1,8 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
-from common_test_data.common_test_data_1 import get_test_data
+from fixtures.common_test_data_1 import get_test_data
 from core.tests.factories import PolicyFactory
 
 # from accounts.models import User
@@ -13,7 +14,7 @@ class ProjectListContentsTest(FunctionalTest):
         super().setUp()
         PolicyFactory.load_policies()
         self.test_data = get_test_data()
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def check_project_list(self, user_type, parent_org_idxs):
 

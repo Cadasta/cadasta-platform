@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 import geography.load
 
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Project import ProjectPage
 from pages.ProjectAdd import ProjectAddPage
 from pages.ProjectList import ProjectListPage
@@ -40,12 +41,27 @@ class ProjectAddTest(FunctionalTest):
                 'password': 'password4',
             },
         }
-        self.test_data['users'] = (
-            self.test_data['superuser'],
-            self.test_data['orgadmin'],
-            self.test_data['orgmember'],
-            self.test_data['unaffuser'],
-        )
+        self.test_data['users'] = [
+            {
+                'username': 'superuser',
+                'password': 'password2',
+                '_is_superuser': True,
+            },
+            {
+                'username': 'orgadmin',
+                'password': 'password1',
+            },
+            {
+                'username': 'orgmember',
+                'password': 'password3',
+            },
+            {
+                'username': 'plainuser',
+                'password': 'password4',
+            }
+        ]
+        (self.superuser, self.orgadmin,
+         self.orgmember, self.unaffuser) = self.test_data['users']
 
         # Define 2 orgs the OA is an admin of and 1 other org
         self.test_data['orgs'] = [
@@ -99,7 +115,7 @@ class ProjectAddTest(FunctionalTest):
         )
         self.test_data['project_url'] = 'http://sokovia-accords.un.org/'
 
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def test_nonloggedin_user(self):
         """A non-logged-in user cannot access the add project page,
@@ -110,8 +126,7 @@ class ProjectAddTest(FunctionalTest):
         assert self.get_url_query() == 'next=' + ProjectAddPage.path
 
         LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
+            self.superuser['username'], self.superuser['password'],
             wait=(By.ID, 'project-wizard')
         )
         assert ProjectAddPage(self).is_on_page()
@@ -126,10 +141,8 @@ class ProjectAddTest(FunctionalTest):
         assert access in ('public', 'private')
 
         # Log in as org admin
-        LoginPage(self).login(
-            self.test_data['orgadmin']['username'],
-            self.test_data['orgadmin']['password'],
-        )
+        LoginPage(self).login(self.orgadmin['username'],
+                              self.orgadmin['password'])
 
         # Declare working project data for verification
         project = {}
@@ -227,10 +240,8 @@ class ProjectAddTest(FunctionalTest):
         self.logout()
 
         # Check new project as an org member
-        LoginPage(self).login(
-            self.test_data['orgmember']['username'],
-            self.test_data['orgmember']['password'],
-        )
+        LoginPage(self).login(self.orgmember['username'],
+                              self.orgmember['password'])
         proj_page.go_to()
         assert proj_page.is_on_page()
         proj_page.check_page_contents(project)
@@ -240,10 +251,8 @@ class ProjectAddTest(FunctionalTest):
         self.logout()
 
         # Check new project as an unaffiliated user
-        LoginPage(self).login(
-            self.test_data['unaffuser']['username'],
-            self.test_data['unaffuser']['password'],
-        )
+        LoginPage(self).login(self.unaffuser['username'],
+                              self.unaffuser['password'])
         proj_page.go_to()
         if access == 'public':
             assert proj_page.is_on_page()

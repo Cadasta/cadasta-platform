@@ -1,4 +1,5 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Project import ProjectPage
 from pages.ProjectAdd import ProjectAddPage
 from pages.ProjectList import ProjectListPage
@@ -14,14 +15,14 @@ class ProjectAddDuplicateTest(FunctionalTest):
 
         # Define 1 OA
         self.test_data = {
-            'orgadmin': {
-                'username': 'orgadmin',
-                'password': 'password1',
-            },
+            'users': [
+                {
+                    'username': 'orgadmin',
+                    'password': 'password1',
+                }
+            ]
         }
-        self.test_data['users'] = (
-            self.test_data['orgadmin'],
-        )
+        self.orgadmin = self.test_data['users'][0]
 
         # Define 2 orgs the OA is an admin of
         self.test_data['orgs'] = [
@@ -72,7 +73,7 @@ class ProjectAddDuplicateTest(FunctionalTest):
             },
         ]
 
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def generic_test_add_duplicate_project(self, from_same_org=True):
 
@@ -91,10 +92,8 @@ class ProjectAddDuplicateTest(FunctionalTest):
         project['slug'] = duplicated_proj['slug'] + '-1'
 
         # Log in as org admin
-        LoginPage(self).login(
-            self.test_data['orgadmin']['username'],
-            self.test_data['orgadmin']['password'],
-        )
+        LoginPage(self).login(self.orgadmin['username'],
+                              self.orgadmin['password'])
 
         # Go to the add project wizard and
         # proceed to step 2 and input the project name
