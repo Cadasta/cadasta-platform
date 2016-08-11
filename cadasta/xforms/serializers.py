@@ -1,10 +1,8 @@
 from rest_framework import serializers
-from django.utils.translation import gettext as _
-
 from core.serializers import FieldSelectorSerializer
-from xforms.mixins.model_helper import ModelHelper
-
-from pyxform.xform2json import XFormToDict
+from xforms.models import XFormSubmission
+from accounts.models import User
+from questionnaires.models import Questionnaire
 
 
 class XFormListSerializer(FieldSelectorSerializer,
@@ -35,35 +33,14 @@ class XFormListSerializer(FieldSelectorSerializer,
 class XFormSubmissionSerializer(FieldSelectorSerializer,
                                 serializers.Serializer):
     """
-    Serves up the /collect/submissions/ api requests
-    Serializes and creates party, spatial, and tunure relationships models
-    Stores images in S3 buckets
-    Returns number of successful forms submitted
+    Saves the full xml response from GeoODK Collect as a json object.
     """
-    xml_submission_file = serializers.FileField()
 
-    def create(self, request, *args, **kwargs):
-        data = XFormToDict(
-            request['xml_submission_file'].read().decode('ascii')
-            ).get_dict()
-        survey = data[list(data.keys())[0]]
-        model_helper = ModelHelper()
-        create_models = model_helper.add_data_to_models(survey)
-        location_photo = None
-        party_photo = None
-        for key in survey:
-            if key == 'location_photo':
-                location_photo = survey[key]
-            elif key == 'party_photo':
-                party_photo = survey[key]
+    json_submission = serializers.JSONField(required=False)
+    user = serializers.PrimaryKeyRelatedField(
+        allow_null=True, queryset=User.objects.all(), required=False)
+    questionnaire = serializers.PrimaryKeyRelatedField(
+        allow_null=True, queryset=Questionnaire.objects.all(), required=False)
 
-        return {
-                'message': _("Successful submission."),
-                'formid': list(data.keys())[0],
-                'instanceID': survey['meta']['instanceID'],
-                'project': create_models['project'],
-                'location_photo': location_photo,
-                'location': create_models['location'].id,
-                'party_photo': party_photo,
-                'party': create_models['party'].id
-            }
+    def create(self, validated_data):
+        return XFormSubmission.objects.create(**validated_data)
