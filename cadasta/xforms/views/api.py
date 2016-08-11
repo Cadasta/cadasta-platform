@@ -1,21 +1,24 @@
-from rest_framework import status
-from rest_framework.parsers import FormParser, MultiPartParser
-
-# from xforms.util.authentication import DigestAuthentication
-# from rest_framework_digestauth.authentication import DigestAuthentication
-from rest_framework.authentication import (BasicAuthentication,)
-from rest_framework.permissions import IsAuthenticated
+from django.utils.translation import ugettext as _
 from questionnaires.models import Questionnaire
-from xforms.mixins.model_helper import ModelHelper
-
-from tutelary.models import Role
-
-from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
-from xforms.renderers import XFormListRenderer
-from rest_framework import viewsets
+from rest_framework import status, viewsets
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from tutelary.models import Role
+from xforms.mixins.model_helper import ModelHelper
 from xforms.mixins.openrosa_headers_mixin import OpenRosaHeadersMixin
+from xforms.renderers import XFormListRenderer
+from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
+
+from ..exceptions import XFormOutOfDateError
+
+
+OPEN_ROSA_ENVELOPE = """
+    <OpenRosaResponse xmlns="http://openrosa.org/http/response">
+        <message>{message}</message>
+    </OpenRosaResponse>
+"""
 
 
 class XFormSubmissionViewSet(OpenRosaHeadersMixin,
@@ -31,7 +34,13 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
             return Response(headers=self.get_openrosa_headers(request),
                             status=status.HTTP_204_NO_CONTENT,)
         if serializer.is_valid():
-            data = serializer.save()
+            try:
+                data = serializer.save()
+            except XFormOutOfDateError as e:
+                message = _(OPEN_ROSA_ENVELOPE.format(message=str(e)))
+                headers = self.get_openrosa_headers(request, location=False)
+                return Response(
+                    message, headers=headers, status=status.HTTP_410_GONE)
             ModelHelper().upload_files(request, data)
             return Response(headers=self.get_openrosa_headers(request),
                             status=status.HTTP_201_CREATED)
@@ -50,12 +59,18 @@ class XFormListView(OpenRosaHeadersMixin,
         forms = []
         policies = self.request.user.assigned_policies()
         orgs = self.request.user.organizations.all()
-
         if Role.objects.get(name='superuser') in policies:
             return Questionnaire.objects.all()
         for org in orgs:
-            forms.extend(Questionnaire.objects.filter(
-                project__organization=org))
+            projects = org.projects.all()
+            for project in projects:
+                try:
+                    questionnaire = Questionnaire.objects.get(
+                        id=project.current_questionnaire
+                    )
+                    forms.append(questionnaire)
+                except Questionnaire.DoesNotExist:
+                    pass
         return forms
 
     def get_queryset(self):

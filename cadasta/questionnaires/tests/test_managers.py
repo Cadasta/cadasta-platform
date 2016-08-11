@@ -1,21 +1,25 @@
-import pytest
 import os
-from django.test import TestCase
-from django.conf import settings
+
+import pytest
+from lxml import etree
 
 from buckets.test.storage import FakeS3Storage
-
+from core.tests.util import make_dirs  # noqa
+from django.conf import settings
+from django.db import IntegrityError
+from django.test import TestCase
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
-from core.tests.util import make_dirs  # noqa
+
+from . import factories
 from .. import models
 from ..managers import create_children, create_options
-from . import factories
 
 path = os.path.dirname(settings.BASE_DIR)
 
 
 class CreateChildrenTest(TestCase):
+
     def test_create_children_where_children_is_none(self):
         children = None
         create_children(children)
@@ -47,15 +51,16 @@ class CreateChildrenTest(TestCase):
         create_children(children, kwargs={'questionnaire': questionnaire})
 
         assert models.QuestionGroup.objects.filter(
-                questionnaire=questionnaire).count() == 1
+            questionnaire=questionnaire).count() == 1
         assert models.Question.objects.filter(
-                questionnaire=questionnaire).count() == 2
+            questionnaire=questionnaire).count() == 2
         assert models.Question.objects.filter(
-                questionnaire=questionnaire,
-                question_group__isnull=False).count() == 1
+            questionnaire=questionnaire,
+            question_group__isnull=False).count() == 1
 
 
 class CreateOptionsTest(TestCase):
+
     def test_create_options(self):
         question = factories.QuestionFactory.create()
         options = [
@@ -65,7 +70,7 @@ class CreateOptionsTest(TestCase):
         ]
         create_options(options, question)
         assert models.QuestionOption.objects.filter(
-                question=question).count() == 3
+            question=question).count() == 3
 
     def test_create_options_with_empty_list(TestCase):
         errors = []
@@ -76,35 +81,19 @@ class CreateOptionsTest(TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class QuestionnaireManagerTest(TestCase):
-    def test_current(self):
-        project = ProjectFactory.create()
-        factories.QuestionnaireFactory.create(version=1,
-                                              project=project,
-                                              name='questions')
-        current = factories.QuestionnaireFactory.create(version=2,
-                                                        project=project,
-                                                        name='questions')
-
-        questionnaire = models.Questionnaire.objects.current(
-            project=project,
-            name='questions'
-        )
-        assert questionnaire == current
 
     def test_create_from_form(self):
         storage = FakeS3Storage()
         file = open(
             path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
         form = storage.save('xls-forms/xls-form.xlsx', file)
-
         model = models.Questionnaire.objects.create_from_form(
             xls_form=form,
             project=ProjectFactory.create()
         )
         assert model.id_string == 'question_types'
-        assert model.name == 'xls-form'
+        assert model.filename == 'xls-form'
         assert model.title == 'Question types'
-        assert model.version == 1
 
     def test_update_from_form(self):
         storage = FakeS3Storage()
@@ -113,7 +102,6 @@ class QuestionnaireManagerTest(TestCase):
         form = storage.save('xls-forms/xls-form.xlsx', file)
 
         project = ProjectFactory.create()
-
         m1 = models.Questionnaire.objects.create_from_form(
             xls_form=form,
             project=project
@@ -125,18 +113,17 @@ class QuestionnaireManagerTest(TestCase):
         )
 
         assert model.id_string == 'question_types'
-        assert model.name == 'xls-form'
+        assert model.filename == 'xls-form'
         assert model.title == 'Question types'
-        assert model.version == 2
 
         assert m1.id != model.id
-        assert m1.version == 1
         assert project.current_questionnaire == model.id
 
     def test_create_from_invald_form(self):
         storage = FakeS3Storage()
         file = open(path + '/questionnaires/tests/files/'
                            'xls-form-invalid.xlsx', 'rb').read()
+
         form = storage.save('xls-forms/xls-form-invalid.xlsx', file)
 
         with pytest.raises(InvalidXLSForm) as e:
@@ -150,8 +137,41 @@ class QuestionnaireManagerTest(TestCase):
         assert models.QuestionGroup.objects.exists() is False
         assert models.Question.objects.exists() is False
 
+    def test_insert_version_attr(self):
+        xform = open(
+            path + '/questionnaires/tests/files/ekcjvf464y5afks6b33qkct3.xml',
+            'r').read()
+        id_string = 'jurassic_park_survey'
+        version = '2016072518593012'
+        filename = 'ekcjvf464y5afks6b33qkct3'
+        xml = models.Questionnaire.objects.insert_version_attribute(
+            xform, filename, version
+        )
+        root = etree.fromstring(xml)
+        ns = {'xf': 'http://www.w3.org/2002/xforms'}
+        root_node = root.find(
+            './/xf:instance/xf:{root_node}'.format(
+                root_node=filename
+            ), namespaces=ns
+        )
+        assert root_node is not None
+        assert root_node.get('id') == id_string
+        assert root_node.get('version') == version
+
+    def test_unique_together_idstring_version(self):
+        q1 = factories.QuestionnaireFactory.create(
+            id_string='jurassic_park_survey'
+        )
+        version = q1.version
+        with pytest.raises(IntegrityError):
+            factories.QuestionnaireFactory.create(
+                id_string='jurassic_park_survey',
+                version=version
+            )
+
 
 class QuestionGroupManagerTest(TestCase):
+
     def test_create_from_dict(self):
         question_group_dict = {
             'label': 'Basic Select question types',
@@ -170,6 +190,7 @@ class QuestionGroupManagerTest(TestCase):
 
 
 class QuestionManagerTest(TestCase):
+
     def test_create_from_dict(self):
         question_dict = {
             'hint': 'For this field (type=integer)',
