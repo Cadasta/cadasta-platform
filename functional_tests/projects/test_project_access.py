@@ -1,8 +1,9 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Project import ProjectPage
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
-from common_test_data.common_test_data_1 import get_test_data
+from fixtures.common_test_data_1 import get_test_data
 from tutelary.models import assign_user_policies, Policy
 from core.tests.factories import PolicyFactory
 
@@ -13,7 +14,7 @@ class ProjectAccessTest(FunctionalTest):
         super().setUp()
         PolicyFactory.load_policies()
         self.test_data = get_test_data()
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def check_project_pages(self, user_type, parent_org_idxs):
 

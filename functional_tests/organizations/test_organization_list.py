@@ -1,4 +1,6 @@
 from base import FunctionalTest
+from fixtures import load_test_data
+from fixtures.common_test_data_2 import get_test_data
 from pages.OrganizationList import OrganizationListPage
 from pages.Login import LoginPage
 
@@ -11,7 +13,7 @@ class OrganizationListTest(FunctionalTest):
     def setUp(self):
         super().setUp()
         PolicyFactory.load_policies()
-        self.add_all_test_data()
+        load_test_data(get_test_data())
         UserFactory.create(
             username='wyldstyle',
             password='password')

@@ -1,4 +1,6 @@
 from base import FunctionalTest
+from fixtures import load_test_data
+from fixtures.common_test_data_2 import get_test_data
 from pages.OrganizationMemberList import OrganizationMemberListPage
 from pages.Organization import OrganizationPage
 from pages.OrganizationMember import OrganizationMemberPage
@@ -13,9 +15,9 @@ class OrganizationMemberListTest(FunctionalTest):
     def setUp(self):
         super().setUp()
         PolicyFactory.load_policies()
-        orgs = self.add_all_test_data()
+        test_objs = load_test_data(get_test_data())
         OrganizationRole.objects.create(
-                organization=orgs[0],
+                organization=test_objs['organizations'][0],
                 user=UserFactory.create(
                         username='admin_user',
                         password='password'),

@@ -1,3 +1,4 @@
+from fixtures import load_test_data
 from base import FunctionalTest
 from pages.Users import UsersPage
 from pages.Login import LoginPage
@@ -11,29 +12,28 @@ class ActivationTest(FunctionalTest):
         super().setUp()
         PolicyFactory.load_policies()
         self.test_data = {
-            'inactive_user': {
-                'username': 'default1',
-                'password': 'password1',
-                'is_active': False,
-            },
-            'active_user': {
-                'username': 'default2',
-                'password': 'password2',
-                'is_active': True,
-            },
-            'superuser': {
-                'username': 'superuser',
-                'password': 'password3',
-                'is_active': True,
-                '_is_superuser': True,
-            },
+            'users': [
+                {
+                    'username': 'default1',
+                    'password': 'password1',
+                    'is_active': False,
+                },
+                {
+                    'username': 'default2',
+                    'password': 'password2',
+                    'is_active': True,
+                },
+                {
+                    'username': 'superuser',
+                    'password': 'password3',
+                    'is_active': True,
+                    '_is_superuser': True,
+                }
+            ]
         }
-        self.test_data['users'] = (
-            self.test_data['inactive_user'],
-            self.test_data['active_user'],
-            self.test_data['superuser'],
-        )
-        self.load_test_data(self.test_data)
+        (self.inactive_user, self.active_user,
+         self.superuser) = self.test_data['users']
+        load_test_data(self.test_data)
 
     # ---------- TEST HELPER FUNCTIONS ----------
 
@@ -62,10 +62,8 @@ class ActivationTest(FunctionalTest):
         by looking at the state of the activate/deactivate button
         on the users management page."""
 
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'])
         users_page = UsersPage(self)
         users_page.go_to()
         for username in iter(statuses.keys()):
@@ -84,10 +82,7 @@ class ActivationTest(FunctionalTest):
             statuses[user['username']] = user['is_active']
 
         if user_data:
-            LoginPage(self).login(
-                user_data['username'],
-                user_data['password'],
-            )
+            LoginPage(self).login(user_data['username'], user_data['password'])
         self.access_direct_activate_urls()
         self.browser.get(self.live_server_url)
         if user_data:
@@ -103,10 +98,8 @@ class ActivationTest(FunctionalTest):
             statuses[user['username']] = user['is_active']
 
         # Activate/deactivate user using the superuser
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'])
         users_page = UsersPage(self)
         users_page.go_to()
         users_page.click_de_activate_button(user_data['username'])
@@ -114,10 +107,7 @@ class ActivationTest(FunctionalTest):
 
         # Check that activated user can now log in
         if not user_data['is_active']:
-            LoginPage(self).login(
-                user_data['username'],
-                user_data['password'],
-            )
+            LoginPage(self).login(user_data['username'], user_data['password'])
             self.logout()
 
         # Check that deactivated user cannot log in
@@ -131,19 +121,19 @@ class ActivationTest(FunctionalTest):
     # ---------- ACTUAL SPECIFIC TESTS ----------
 
     def test_inactive_user(self):
-        self.check_inactive_login(self.test_data['inactive_user'])
+        self.check_inactive_login(self.inactive_user)
 
     def test_nonloggedin_user_direct_url_access(self):
         self.generic_test_direct_url_access()
 
     def test_nonsuperuser_direct_url_access(self):
-        self.generic_test_direct_url_access(self.test_data['active_user'])
+        self.generic_test_direct_url_access(self.active_user)
 
     def test_superuser_direct_url_access(self):
-        self.generic_test_direct_url_access(self.test_data['superuser'])
+        self.generic_test_direct_url_access(self.superuser)
 
     def test_activate_user(self):
-        self.generic_test_de_activate_user(self.test_data['inactive_user'])
+        self.generic_test_de_activate_user(self.inactive_user)
 
     def test_deactivate_user(self):
-        self.generic_test_de_activate_user(self.test_data['active_user'])
+        self.generic_test_de_activate_user(self.active_user)

@@ -1,4 +1,5 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
 
@@ -15,7 +16,7 @@ class LoginTest(FunctionalTest):
                 'password': 'password1',
             }]
         }
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def test_unregistered_user(self):
         """An unregistered user cannot log in."""
@@ -45,7 +46,7 @@ class LoginTest(FunctionalTest):
             self.test_data['users'][0]['username'],
             self.test_data['users'][0]['password'],
         )
-        self.click_through(sign_in_button, self.BY_ALERT)
+        self.click_through(sign_in_button, self.BY_DASHBOARD)
 
         dashboard_page = DashboardPage(self)
         assert dashboard_page.is_on_page()

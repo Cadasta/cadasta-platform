@@ -1,4 +1,5 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Registration import RegistrationPage
 from pages.Login import LoginPage
 from pages.Dashboard import DashboardPage
@@ -15,7 +16,7 @@ class RegistrationTest(FunctionalTest):
                 'password': 'password1',
             }]
         }
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def test_register_user(self):
         """An unregistered user can register with valid user details."""
@@ -53,7 +54,7 @@ class RegistrationTest(FunctionalTest):
         fields['password1'].send_keys('very_secret')
         fields['password2'].clear()
         fields['password2'].send_keys('very_secret')
-        self.click_through(fields['register'], self.BY_ALERT)
+        self.click_through(fields['register'], self.BY_DASHBOARD)
         self.assert_has_message('alert', "signed in")
 
         dashboard_page = DashboardPage(self)

@@ -1,4 +1,5 @@
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
 from core.tests.factories import PolicyFactory
@@ -22,10 +23,8 @@ class ProjectListAccessTest(FunctionalTest):
                 'username': 'default' + str(uid),
                 'password': 'password1',
             })
-        self.test_data = {
-            'users': users,
-            'superuser': users[0],
-        }
+        self.test_data = { 'users': users }
+        self.superuser = users[0]
 
         # Define 2 orgs and their members
         self.test_data['orgs'] = [
@@ -46,7 +45,7 @@ class ProjectListAccessTest(FunctionalTest):
             },
         ]
 
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def test_nonloggedin_user(self):
         """Verify that a non-logged-in user can access
@@ -58,17 +57,13 @@ class ProjectListAccessTest(FunctionalTest):
         """Verify that a non-superuser can access the project list page."""
 
         uid = 5
-        LoginPage(self).login(
-            self.test_data['users'][uid]['username'],
-            self.test_data['users'][uid]['password'],
-        )
+        LoginPage(self).login(self.test_data['users'][uid]['username'],
+                              self.test_data['users'][uid]['password'])
         ProjectListPage(self).go_to_and_check_on_page()
 
     def test_superuser(self):
         """Verify that a superuser can access the project list page."""
 
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'])
         ProjectListPage(self).go_to_and_check_on_page()

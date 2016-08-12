@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from django.utils import formats
 from base import FunctionalTest
+from fixtures import load_test_data
 from pages.Users import UsersPage
 from pages.Login import LoginPage
 from core.tests.factories import PolicyFactory
@@ -40,8 +41,8 @@ class PageListTest(FunctionalTest):
             })
         self.test_data = {
             'users': users,
-            'superuser': users[0],
         }
+        self.superuser = users[0]
 
         # Define 2 orgs and their members
         self.test_data['orgs'] = [
@@ -55,7 +56,7 @@ class PageListTest(FunctionalTest):
             },
         ]
 
-        self.load_test_data(self.test_data)
+        load_test_data(self.test_data)
 
     def test_list(self):
         """The index page should display the complete and correct user
@@ -64,10 +65,8 @@ class PageListTest(FunctionalTest):
         # Get time now for superuser's last login time
         login_time = datetime.now(tz=timezone.utc)
 
-        LoginPage(self).login(
-            self.test_data['superuser']['username'],
-            self.test_data['superuser']['password'],
-        )
+        LoginPage(self).login(self.superuser['username'],
+                              self.superuser['password'])
 
         users_page = UsersPage(self)
         users_page.go_to()
@@ -103,7 +102,7 @@ class PageListTest(FunctionalTest):
                 assert re.match('^[, ]*$', actual_orgs)
 
             # Check last login is displayed correctly
-            if user == self.test_data['superuser']:
+            if user == self.superuser:
                 # Fuzzy checking for superuser
                 try:
                     self.check_last_login(username, login_time)

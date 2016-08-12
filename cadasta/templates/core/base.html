@@ -194,7 +194,7 @@
     {% block extra_script %}{% endblock %}
     <script>
     $(document).ready(function () {
-      $('.datatable').DataTable({ 
+      $('.datatable').DataTable({
         conditionalPaging: true,
         "dom": '<"table-search"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
         "language": {
@@ -212,7 +212,7 @@
       $('#language').change(function() { this.form.submit(); });
     });
     window.setTimeout(function() {
-      $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).remove(); });
+      $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
     }, 5000);
     </script>
   </body>
