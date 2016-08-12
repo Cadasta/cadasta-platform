@@ -709,7 +709,6 @@ class OrganizationMembersEditTest(UserTestCase):
         context['organization'] = self.org
         context['form'] = forms.EditOrganizationMemberForm(
             None, self.org, self.member)
-        context['user'] = self.member
 
         expected = render_to_string(
             'organization/organization_members_edit.html',
