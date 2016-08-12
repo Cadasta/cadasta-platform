@@ -177,6 +177,11 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     def get_queryset(self):
         return self.get_organization().users.all()
 
+    def get_context_object_name(self, obj):
+        # Dummy context so that the currently viewed user does not
+        # override the logged-in user
+        return 'org_member'
+
     def get_form(self):
         if self.request.method == 'POST':
             return self.form_class(self.request.POST,
