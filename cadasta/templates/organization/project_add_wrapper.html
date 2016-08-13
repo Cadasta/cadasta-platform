@@ -53,8 +53,8 @@
       {% block step_content_2 %}{% endblock %}
     </div>
     <div class="panel-footer panel-buttons clearfix">
-      <a class="btn btn-link pull-left" href="{% url 'project:list' %}">{% trans "Cancel" %}</a>
       {% block step_content_buttons %}{% endblock %}
+      <a class="btn btn-link pull-left cancel" href="{% url 'project:list' %}">{% trans "Cancel" %}</a>
     </div>
     {% block step_content_3 %}{% endblock %}
   </div>

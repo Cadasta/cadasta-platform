@@ -59,7 +59,7 @@
                       {% render_field wizard.form.organization class+="form-control" %}
                     </div>
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-4 hidden-xs">
                     {% if init_org_logo %}
                     <div id="org-wrapper">
                       <img class="org-logo {{ init_org_hidden }}" id="org-logo" src="{{ init_org_logo }}" />
@@ -128,16 +128,17 @@
 {% endblock %}
 
 {% block step_content_buttons %}
-<button class="btn btn-primary" type="submit">
-  {% trans 'Next' %}
-  <span class="glyphicon glyphicon-triangle-right"></span>
-</button>
-<button class="btn btn-default btn-details-previous" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
-  <span class="glyphicon glyphicon-triangle-left"></span>
-  {% trans "Previous" %}
-</button>
+<div class="btn-group btn-reverse" role="group">
+  <button class="btn btn-primary pull-right" type="submit">
+    {% trans 'Next' %}
+    <span class="glyphicon glyphicon-triangle-right"></span>
+  </button>
+  <button class="btn btn-default btn-details-previous" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
+    <span class="glyphicon glyphicon-triangle-left"></span>
+    {% trans "Previous" %}
+  </button>
+</div>
 {% endblock %}
-
 
 {% block step_content_3 %}
 

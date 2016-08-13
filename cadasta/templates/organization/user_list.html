@@ -51,7 +51,7 @@
       <form method="POST"
             action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}" novalidate>
         {% csrf_token %}
-        <button type="submit" class="btn btn-sm {{ user.is_active|yesno:_("btn-primary,btn-default") }}">
+        <button type="submit" class="btn btn-sm {{ user.is_active|yesno:_("btn-danger,btn-default") }}">
           {{ user.is_active|yesno:_("Deactivate,Activate") }}
         </button>
       </form>

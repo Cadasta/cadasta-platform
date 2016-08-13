@@ -23,12 +23,12 @@
           </div>
 
           <div class="modal-footer">
+            <button type="submit" class="btn btn-primary pull-right" name="submit">
+              {% trans "Save" %}
+            </button>
             <a class="btn btn-link cancel" href="{{ cancel_url }}{{ cancel_url_hash }}">
               {% trans "Cancel" %}
             </a>
-            <button type="submit" class="btn btn-primary" name="submit">
-              {% trans "Submit" %}
-            </button>
           </div>
         </form>
       </div>

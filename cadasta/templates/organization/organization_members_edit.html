@@ -36,7 +36,7 @@
                   {% render_field form.org_role class+="form-control" %}
                 </div>
                 <div class="btn-full">
-                  <button type="button" class="btn btn-default" name="remove" data-toggle="modal" data-target="#remove_confirm">
+                  <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm">
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove member</button>
                 </div>
               </div>
@@ -96,8 +96,8 @@
         <p>Are you sure you want to remove this member?</p>
       </div>
       <div class="modal-footer">
+        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-danger confirm pull-right">Yes, remove this member</a>
         <button type="button" class="btn btn-link" name="cancel" data-dismiss="modal">Cancel</button>
-        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-primary confirm">Yes, remove this member</a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

@@ -18,11 +18,11 @@
         </div>
   
         <div class="modal-footer">
+          <button type="submit" value="Confirm" class="btn btn-danger archive-final pull-right">{% trans "Yes, delete this party" %}</button>
           <a href="{% url 'parties:detail' object.organization.slug object.slug party.id %}" class="btn btn-link cancel">
             {% trans "Cancel" %}
           </a>
           {% csrf_token %}
-          <button type="submit" value="Confirm" class="btn btn-primary archive-final">{% trans "Yes, delete this party" %}</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

@@ -251,7 +251,7 @@ header {
 #project-single .nav .dropdown-menu > li.projects,
 #project-wizard .nav .dropdown-menu > li.projects,
 #organizations .nav .dropdown-menu > li.organizations,
-#organization-single .dropdown-menu > .nav li.organizations,
+#organization-single .nav .dropdown-menu > li.organizations,
 #users .nav .dropdown-menu > li.users {
   border-top: none;
   > a {
@@ -281,7 +281,7 @@ header {
     min-width: 224px;
     min-width: 160px; // beta
   }
-  .caret {
+  .caret, .glyphicon-user {
     margin-left: 14px;
     color: lighten($btn-blue-bg, 20%);
     transition: all 0.3s ease 0s;
@@ -298,7 +298,7 @@ header {
     &:focus {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
       transition: all 0.3s ease 0s;
-       .caret {
+       .caret, .glyphicon-user {
          color: #fff;
        }
     }
@@ -332,6 +332,7 @@ header {
     }
     .dropdown-menu {
       min-width: auto;
+      left: -10px;
     }
     .caret {
       margin-left: 4px;
@@ -408,20 +409,26 @@ header {
       color: $brand-lightblue;
     }
   }
+  h2 {
+    width: 80%;
+  }
 }
 
 @media (max-width: $screen-sm-max) {
   .page-header {
     padding-top: 24px;
   }
-  .page-title h1, .page-title h2, h1, h2 {
-    font-size: 2em;
-  }
 }
 
 @media (max-width: $screen-xs-max) {
   .page-title h1, .page-title h2, h1, h2 {
     font-size: 1.8em;
+  }
+  .page-title h2, h2 {
+    font-size: 1.6em;
+  }
+  h3 {
+    font-size: 1.4em;
   }
 }
 
@@ -434,7 +441,6 @@ header {
       &:hover{
         overflow: visible; 
         white-space: normal; 
-        background-color: $brand-darkblue;
       }
     }
   }
@@ -504,20 +510,20 @@ header {
   #project-single .page-header, 
   #organization-single .page-header { 
     overflow: visible;
+    padding-top: 8px;
     padding-bottom: 4px;
     border-bottom: solid 1px $brand-darkerblue;
     margin-top: 0;
+    margin-bottom: 0;
     height: auto;
-    min-height: 104px;
+    min-height: 74px;
     .more-menu {
       width: 36px;
+      height: 36px;
     }
     h1, h2 {
         margin-left: 14px;
     }
-  }
-  #organization-single .page-header { 
-    padding-top: 18px; 
   }
 }
 
@@ -610,6 +616,7 @@ body.tinted-bg #page-content { // for bg image
   #organization-single #page-content {
     position: relative;
     top: 0;
+    //background: #fff;
   }
 }
 
@@ -633,6 +640,9 @@ main.container-fluid {
 }
 
 @media (max-width: $screen-sm-max) {
+  main.container-fluid {
+    padding-bottom: 0;
+  }
   #project-single #page-content main,
   #organization-single #page-content main { 
     margin-left: 0;
@@ -682,7 +692,7 @@ main.container-fluid {
     padding-top: 0;
     .top-btn{
       margin-top: 0;
-      }
+    }
   }
   .map { // main panel map
     height: 100%;
@@ -746,6 +756,9 @@ main.container-fluid {
         border-bottom-color: transparent;
       }
     }
+    section > p:first-child {
+      padding-top: 20px;
+    }
     h4 {
       font-family: 'Roboto Condensed', sans-serif;
       text-transform: uppercase;
@@ -753,7 +766,7 @@ main.container-fluid {
       letter-spacing: 0;
       padding-top: 10px;
     }
-    .glyphicon { // url and contacts in overview
+    .glyphicon-globe, .glyphicon-envelope, .glyphicon-earphone { // url and contacts in overview
       opacity: 0.7;
       padding-right: 12px;
     }
@@ -800,6 +813,7 @@ main.container-fluid {
     .panel-body {
       h3 {
         margin-bottom: 10px;
+        margin-top: 4px;
         padding-bottom: 10px;
         border-bottom: solid 1px $gray-light;
       }
@@ -807,14 +821,13 @@ main.container-fluid {
         margin-bottom: -30px;
       }
     }
-    .panel-buttons { // buttons at bottom of panels containing forms
+    .panel-footer {
+      background: lighten($body-bg, 2%);
+    }
+    .panel-buttons { // holds buttons at bottom of panels containing forms
       padding: 20px 15px;
       .btn {
-        min-width: 140px;
-        margin-right: 20px;
-        &:last-child {
-          margin-right: 0;
-        }
+        min-width: 110px;
       }
     }
   }
@@ -837,17 +850,31 @@ body.map .content-single {
     .main-text {
       padding: 15px;
     }
-    .detail {
-      padding-top: 20px;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .content-single {
+    .panel-buttons .btn {
+      width: 100%;
+      margin-bottom: 10px;
     }
-    .panel-buttons { 
+    .panel .panel-body {
+      font-size: 12px;
+    }
+    .detail {
       .btn {
-        min-width: 110px;
+        min-width: 70px;
+      }
+      .nav-tabs li > a {
+        font-size: 12px;
+      }
+      .tab-content {
+        font-size: 12px;
       }
     }
   }
 }
-
 
 /* =Forms
 -------------------------------------------------------------- */
@@ -970,10 +997,6 @@ textarea.form-control {
 }
 
 @media (max-width: 400px) {
-  #project-single div.dataTables_wrapper div.dataTables_filter input, 
-  #organization-single div.dataTables_wrapper div.dataTables_filter input {
-    max-width: inherit;
-  }
   #project-single .dataTables_wrapper .col-sm-6, 
   #organization-single .dataTables_wrapper .col-sm-6 {
     width: 100% !important; // fix for col-xs-6
@@ -982,6 +1005,24 @@ textarea.form-control {
   #project-single div.dataTables_wrapper div.dataTables_filter,
   #organization-single div.dataTables_wrapper div.dataTables_filter {
     text-align: left !important;
+  }
+  .dataTables_wrapper {
+    .table-entries { // number of entries
+      font-size: 10px;
+      padding-right: 5px;
+    }
+    .table-num { // select number of entries per page
+      font-size: 10px;
+      padding-top: 0;
+      padding-left: 5px;
+      .input-sm {
+        padding: 2px;
+      }
+      select {
+        width: 50px !important;
+        font-size: 10px;
+      }
+    }
   }
 }
 
@@ -1033,10 +1074,23 @@ table#select-list {
   margin-bottom: 0;
 }
 
-@media (max-width: $screen-sm-max) {
+@media (max-width: $screen-xs-max) {
   table {
     overflow-x: auto;
   }
+}
+
+@media (max-width: 500px) {
+ .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
+    padding: 8px;
+    font-size: 12px;
+ }
+ .form-group, .form-control, .public-private-widget, .s3-buckets .file-input {
+   font-size: 12px;
+ }
+ .form-control {
+   padding: 6px;
+ }
 }
 
 /* =Organizations
@@ -1170,15 +1224,11 @@ img.org-logo, img#org-logo {
   margin-top: 10px;
   margin-bottom: 10px;
   .btn {
-    min-width: 100px;
+    min-width: 140px;
   }
   .btn-rt {
     min-width: 20px;
   }
-}
-
-button#add-contact { // below contacts table
-  padding: 0;
 }
 
 .btn-full {
@@ -1227,10 +1277,13 @@ div.add-btn-btm { // add party link at bottom of table
 }
 
 @media (max-width: $screen-sm-max) {
+ .top-btn .btn {
+    min-width: 80px;
+  }
   #project-single .page-header, 
   #organization-single .page-header {
     .top-btn {
-      padding: 8px 14px;
+      padding: 4px 14px 0;
       margin-top: 0;
       .btn {
         min-width: auto;
@@ -1255,6 +1308,25 @@ div.add-btn-btm { // add party link at bottom of table
   -webkit-box-shadow:: 10px 10px 6px -8px rgba(0,0,0,.5);
   -moz-box-shadow:  10px 10px 6px -8px rgba(0,0,0,.5);
   box-shadow:  10px 10px 6px -8px rgba(0,0,0,.5);
+}
+
+.form-narrow .alert {
+  max-width: 100%;
+  margin-bottom: 20px;
+}
+
+.alert-full {
+  max-width: 100%;
+  text-align: left;
+  display: table;
+  box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-box-shadow: none;
+  > div {
+    display: table-cell;
+    vertical-align: top;
+    padding: 4px;
+  }
 }
 
 .translation-wrapper {
@@ -1308,7 +1380,7 @@ div.add-btn-btm { // add party link at bottom of table
     }
   }
   .modal-body {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 240px);
     overflow-y: auto;
     padding-left: 30px;
     padding-right: 30px;
@@ -1323,15 +1395,21 @@ div.add-btn-btm { // add party link at bottom of table
       min-width: 100px;
     }
   }
-  button#add-contact {
-    background: transparent;
-    color: $link-color !important;
-    border: 0;
-    float: left !important;
-    padding: 0;
-  }
   .modal-6-12 .col-md-6 { // widen 6 columns to 12 for resource form
     width: 100%;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .modal .modal-footer .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .modal .modal-footer .btn-link {
+    margin-bottom: 0;
+  }
+  .nav-tabs a {
+    font-size: 12px;
   }
 }
 
@@ -1414,3 +1492,4 @@ tr.contacts-error {
     opacity: 0.75;
   }
 }
+

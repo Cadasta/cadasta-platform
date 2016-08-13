@@ -59,12 +59,12 @@
         <p>{% trans "Are you sure you want to archive this resource?" %}</p>
       </div>
       <div class="modal-footer">
+        <a href="{% url 'resources:archive' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}"  class="btn btn-danger archive-final pull-right" role="button">
+          {% trans "Yes, archive this resource" %}
+        </a>
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">
           {% trans "Cancel" %}
         </button>
-        <a href="{% url 'resources:archive' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}"  class="btn btn-primary archive-final" role="button">
-          {% trans "Yes, archive this resource" %}
-        </a>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -85,12 +85,12 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-link cancel-u" data-dismiss="modal">
-          {% trans "Cancel" %}
-        </button>
-        <a href="{% url 'resources:unarchive' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}"  class="btn btn-primary unarchive-final" role="button">
+        <a href="{% url 'resources:unarchive' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}"  class="btn btn-primary unarchive-final pull-right" role="button">
           {% trans "Yes, unarchive this resource" %}
         </a>
+        <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

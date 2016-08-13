@@ -44,11 +44,19 @@
         <h2>{% trans "Edit project location" %}</h2>
         <div class="panel panel-default">
           <div class="panel-body">
-            <p>{% blocktrans %}Use the map tools to modify your project location boundaries. Once complete, select the save button below.{% endblocktrans %}</p>
+            <p>
+              {% blocktrans %}Use the tools provided on the left side of the map to outline your project boundary. Once complete, select the save button below.{% endblocktrans %}
+            </p>
+            <div class="alert alert-info alert-full clearfix row" role="alert">
+              <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
+              <div>
+              {% blocktrans %}We encourage you to mark the area in which your project takes place (if your project doesn't include the entire world). This makes interactions simpler and also helps other users to find your project.{% endblocktrans %}
+              </div>
+            </div>
           </div>
           <div class="panel-footer panel-buttons">
             <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-            <a href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
+            <a href="{% url 'organization:project-dashboard' project.organization.slug project.slug %}" class="btn btn-default cancel">{% trans "Cancel" %}</a>
           </div>
         </div>
       </div>

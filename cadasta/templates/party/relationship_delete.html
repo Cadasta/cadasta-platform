@@ -15,11 +15,11 @@
           <p>{% trans "Are you sure you want to delete this relationship?" %}</p>
         </div>
         <div class="modal-footer">
+          <button type="submit" value="Confirm" class="btn btn-danger archive-final pull-right">{% trans "Yes, delete this relationship" %}</button>
           <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}"  class="btn btn-link cancel">
             {% trans "Cancel" %}
           </a>
           {% csrf_token %}
-          <button type="submit" value="Confirm" class="btn btn-primary archive-final">{% trans "Yes, delete this relationship" %}</button>
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

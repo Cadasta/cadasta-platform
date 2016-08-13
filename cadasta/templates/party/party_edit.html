@@ -20,13 +20,13 @@
           </div>
 
           <div class="modal-footer">
+            <button type="submit" class="btn btn-primary pull-right" name="submit">
+              {% trans "Save" %}
+            </button>
             <a class="btn btn-link cancel"
                href="{% url 'parties:detail' object.organization.slug object.slug form.instance.id %}">
               {% trans "Cancel" %}
             </a>
-            <button type="submit" class="btn btn-primary" name="submit">
-              {% trans "Save" %}
-            </button>
           </div>
         </form>
       </div>
