@@ -158,12 +158,15 @@ class QuestionnaireManagerTest(TestCase):
         assert root_node.get('version') == version
 
     def test_unique_together_idstring_version(self):
+        project = ProjectFactory.create()
         q1 = factories.QuestionnaireFactory.create(
+            project=project,
             id_string='jurassic_park_survey'
         )
         version = q1.version
         with pytest.raises(IntegrityError):
             factories.QuestionnaireFactory.create(
+                project=project,
                 id_string='jurassic_park_survey',
                 version=version
             )

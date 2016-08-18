@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.six import BytesIO
 from django.utils.translation import ugettext as _
 from questionnaires.models import Questionnaire
@@ -15,6 +17,7 @@ from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
 
 from ..exceptions import InvalidXMLSubmission
 
+logger = logging.getLogger(__name__)
 
 OPEN_ROSA_ENVELOPE = """
     <OpenRosaResponse xmlns="http://openrosa.org/http/response">
@@ -45,6 +48,7 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
             instance = ModelHelper(
             ).upload_submission_data(request)
         except InvalidXMLSubmission as e:
+            logger.debug(str(e))
             return self._sendErrorResponse(request, e)
 
         serializer = XFormSubmissionSerializer(instance)
