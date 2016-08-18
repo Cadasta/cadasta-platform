@@ -24,7 +24,7 @@ class Questionnaire(RandomIDModel):
     history = HistoricalRecords()
 
     class Meta:
-        unique_together = ('id_string', 'version')
+        unique_together = ('project', 'id_string', 'version')
 
     class TutelaryMeta:
         perm_type = 'questionnaire'

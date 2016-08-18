@@ -32,8 +32,4 @@ class Migration(migrations.Migration):
             name='version',
             field=models.BigIntegerField(default=1),
         ),
-        migrations.AlterUniqueTogether(
-            name='questionnaire',
-            unique_together=set([('id_string', 'version')]),
-        ),
     ]
