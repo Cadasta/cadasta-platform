@@ -187,12 +187,12 @@ class AddOrganizationMemberForm(forms.Form):
 class EditOrganizationMemberForm(forms.Form):
     org_role = forms.ChoiceField(choices=ADMIN_CHOICES)
 
-    def __init__(self, data, organization, user, *args, **kwargs):
+    def __init__(self, data, org, user, current_user, *args, **kwargs):
         super(EditOrganizationMemberForm, self).__init__(data, *args, **kwargs)
         self.data = data
-        self.organization = organization
+        self.organization = org
         self.user = user
-
+        self.current_user = current_user
         self.org_role_instance = OrganizationRole.objects.get(
             user=user,
             organization=self.organization)
@@ -200,7 +200,7 @@ class EditOrganizationMemberForm(forms.Form):
         self.initial['org_role'] = 'A' if self.org_role_instance.admin else 'M'
 
         project_roles = ProjectRole.objects.filter(
-            project__organization=organization).values('project__id', 'role')
+            project__organization=org).values('project__id', 'role')
         project_roles = {r['project__id']: r['role'] for r in project_roles}
 
         for p in self.organization.projects.values_list('id', 'name'):
@@ -212,6 +212,15 @@ class EditOrganizationMemberForm(forms.Form):
                 required=False,
                 initial=role
             )
+
+    def clean_org_role(self):
+        org_role = self.cleaned_data['org_role']
+        if self.org_role_instance.admin and self.current_user == self.user:
+            if self.data.get('org_role') != 'A':
+                raise forms.ValidationError(
+                    _("Organization administrators cannot change their own" +
+                        " role in the organization."))
+        return org_role
 
     def save(self):
         self.org_role_instance.admin = self.data.get('org_role') == 'A'

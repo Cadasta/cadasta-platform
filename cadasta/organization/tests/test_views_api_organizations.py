@@ -73,7 +73,6 @@ class OrganizationListAPITest(UserTestCase):
         """
         OrganizationFactory.create_from_kwargs([{}, {'slug': 'unauthorized'}])
         content = self._get(user=self.unauth_user, status=200, length=1)
-        print(content[0])
         assert content[0]['slug'] != 'unauthorized'
 
     def test_full_list_with_unauthorized_user(self):
@@ -427,12 +426,14 @@ class OrganizationUsersDetailAPITest(UserTestCase):
             assert response.status_code == status
         return content
 
-    def _patch(self, org, username, data, status=None, count=None):
+    def _patch(self, org, username, data, user=None, status=None, count=None):
+        if not user:
+            user = self.user
         url = '/v1/organizations/{org}/users/{username}'
         request = APIRequestFactory().patch(
             url.format(org=org.slug, username=username),
             data=data, format='json')
-        force_authenticate(request, user=self.user)
+        force_authenticate(request, user=user)
         response = self.view(request, slug=org.slug,
                              username=username).render()
         content = json.loads(response.content.decode('utf-8'))
@@ -478,6 +479,22 @@ class OrganizationUsersDetailAPITest(UserTestCase):
         role = OrganizationRole.objects.get(organization=org, user=user)
         assert role.admin is True
 
+    def test_update_admin_user(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        self._patch(org, user.username, data={'admin': 'true'},
+                    status=200, count=1)
+        role = OrganizationRole.objects.get(organization=org, user=user)
+        assert role.admin is True
+
+        content = self._patch(org, user.username, user=user,
+                              data={'admin': 'false'}, status=400, count=1)
+        assert content['admin'][0] == ("Organization administrators cannot"
+                                       " change their own permissions within"
+                                       " the organization")
+        role = OrganizationRole.objects.get(organization=org, user=user)
+        assert role.admin is True
+
     def test_remove_user(self):
         user = UserFactory.create()
         user_to_remove = UserFactory.create()
@@ -485,6 +502,17 @@ class OrganizationUsersDetailAPITest(UserTestCase):
         self._delete(org, user_to_remove.username, status=204, count=1)
         assert user_to_remove not in org.users.all()
         assert user_to_remove in User.objects.all()
+
+    def test_remove_admin_user(self):
+        # admin users should not be able to remove themselves.
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        self._patch(org, user.username, data={'admin': 'true'},
+                    status=200, count=1)
+        content = self._delete(org, user.username,
+                               user=user, status=403, count=1)
+        assert user in org.users.all()
+        assert content['detail'] == PermissionDenied.default_detail
 
     def test_remove_with_unauthorized_user(self):
         user = UserFactory.create()

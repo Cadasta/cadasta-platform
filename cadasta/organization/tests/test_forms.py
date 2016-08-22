@@ -239,16 +239,38 @@ class EditOrganizationMemberFormTest(UserTestCase):
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
         user = UserFactory.create()
+        current_user = UserFactory.create()
 
         data = {'org_role': 'A'}
 
         org_role = OrganizationRole.objects.create(organization=org, user=user)
-        form = forms.EditOrganizationMemberForm(data, org, user)
+        OrganizationRole.objects.create(
+            organization=org, user=current_user, admin=True)
+        form = forms.EditOrganizationMemberForm(data, org, user, current_user)
 
         form.save()
         org_role.refresh_from_db()
 
         assert form.is_valid() is True
+        assert org_role.admin is True
+
+    def test_edit_admin_role(self):
+        # Should fail, since admins are not allowed to alter
+        # their own permissions.
+        org = OrganizationFactory.create()
+        user = UserFactory.create()
+
+        data = {'org_role': 'M'}
+
+        org_role = OrganizationRole.objects.create(
+            organization=org, user=user, admin=True)
+        form = forms.EditOrganizationMemberForm(data, org, user, user)
+        assert not form.is_valid()
+        assert form.errors == {
+            'org_role': ["Organization administrators cannot change their" +
+                         " own role in the organization."]
+        }
+        org_role.refresh_from_db()
         assert org_role.admin is True
 
     def test_edit_project_roles(self):
@@ -270,7 +292,7 @@ class EditOrganizationMemberFormTest(UserTestCase):
             prj_4.id: 'Pb'
         }
 
-        form = forms.EditOrganizationMemberForm(data, org, user)
+        form = forms.EditOrganizationMemberForm(data, org, user, user)
 
         form.save()
         org_role.refresh_from_db()

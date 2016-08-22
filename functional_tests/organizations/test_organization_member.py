@@ -21,6 +21,7 @@ class OrganizationMemberTest(FunctionalTest):
                 organization=test_objs['organizations'][0],
                 user=UserFactory.create(
                         username='admin_user',
+                        full_name='Admin User',
                         password='password'),
                 admin=True)
 
@@ -64,6 +65,29 @@ class OrganizationMemberTest(FunctionalTest):
         roles = page.get_role_options()
         assert roles["admin"].text == roles["selected"].text
 
+    def test_changing_an_admins_organizational_role(self):
+        """An admin member can change a member's role in the organization."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+        page.go_to_admin_member_page()
+
+        roles = page.get_role_options()
+        assert roles["admin"].text == roles["selected"].text
+
+        roles["member"].click()
+        page.click_submit_button()
+        self.get_screenshot()
+        # get error message
+        # assert you stayed on the same page.
+        roles = page.get_role_options()
+        errors = page.get_org_role_error()
+        assert errors.text == ("Organization administrators cannot change" +
+                               " their own role in the organization.")
+
     def test_removing_a_member_from_an_organization(self):
         """An admin member can remove a member from an organization."""
 
@@ -81,6 +105,21 @@ class OrganizationMemberTest(FunctionalTest):
 
         members = page.get_table_row().text
         assert "Test User" not in members
+
+    def test_removing_an_admin_member_from_an_organization(self):
+        """An admin member can remove a member from an organization."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+        page.go_to_admin_member_page()
+
+        assert page.get_member_title() == "MEMBER: Admin User"
+
+        page.click_disabled_remove_button()
+        assert page.get_member_title() == "MEMBER: Admin User"
 
     def test_changing_member_project_permissions(self):
         """An admin user can change a member's permissions
@@ -121,4 +160,4 @@ class OrganizationMemberTest(FunctionalTest):
         page.go_to_testuser_member_page()
 
         roles = page.get_role_options()
-        assert roles["admin"].text == roles["selected"].text
+        assert roles['selected'].text == "Administrator"
