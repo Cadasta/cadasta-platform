@@ -7,7 +7,7 @@ from skivvy import APITestCase
 
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
-from .factories import OrganizationFactory, clause
+from .factories import OrganizationFactory, clause, ProjectFactory
 from ..models import Organization, OrganizationRole
 from ..views import api
 
@@ -73,13 +73,16 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         """
         It should return only one archived organization.
         """
-        OrganizationFactory.create_from_kwargs(
-            [{'archived': True}, {'archived': False}]
-        )
+        org = OrganizationFactory.create(archived=True)
+        OrganizationFactory.create(archived=False)
+        OrganizationRole.objects.create(organization=org,
+                                        user=self.user,
+                                        admin=True)
         response = self.request(user=self.user, get_data={'archived': True})
         assert response.status_code == 200
         assert len(response.content) == 1
         assert response.content[0]['archived'] is True
+
 
     def test_search_filter(self):
         """
@@ -225,6 +228,20 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 404
         assert response.content['detail'] == "Organization not found."
 
+    def test_get_archived_organization_with_authorized_user(self):
+        org = OrganizationFactory.create(slug='org', archived=True)
+        OrganizationRole.objects.create(
+            organization=org, user=self.user, admin=True)
+        content = self._get(org.slug, status=200)
+        assert content['id'] == org.id
+        assert 'users' in content
+
+    def test_get_archived_organization_with_unauthorized_user(self):
+        org = OrganizationFactory.create(slug='org', archived=True)
+        content = self._get(org.slug, user=AnonymousUser(), status=403)
+        print(content)
+        assert 'users' not in content
+
     def test_valid_update(self):
         data = {'name': 'Org Name'}
         response = self.request(method='PATCH', user=self.user, post_data=data)
@@ -253,6 +270,7 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         self.org.refresh_from_db()
         assert self.org.archived is True
+        # add test for archiving project, and updating archived org.
 
     def test_archive_with_unauthorized_user(self):
         clauses = {
@@ -276,6 +294,7 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         self.org.refresh_from_db()
         assert self.org.archived is False
+        assert self.prj.archived is False
 
     def test_unarchive_unauthorized_user(self):
         clauses = {
@@ -366,6 +385,12 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 404
         assert response.content['detail'] == "Organization not found."
 
+    def test_add_user_to_archived_organization(self):
+        new_user = UserFactory.create()
+        org = OrganizationFactory.create(archived=True)
+        content = self._post(org, {'username': new_user.username}, status=403)
+        assert content['detail'] == PermissionDenied.default_detail
+
 
 class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.OrganizationUsersDetail
@@ -423,6 +448,14 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
                                             user=self.user)
         assert role.admin is True
 
+    def test_update_user_in_archived_organization(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user], archived=True)
+        self._patch(org, user.username, data={'roles': {'admin': True}},
+                    status=403)
+        role = OrganizationRole.objects.get(organization=org, user=user)
+        assert role.admin is False
+
     def test_remove_user(self):
         user_to_remove = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org,
@@ -469,3 +502,13 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
                                 url_kwargs={'organization': 'blah'})
         assert response.status_code == 404
         assert response.content['detail'] == "Organization not found."
+
+    def test_remove_user_from_archived_organization(self):
+        assert False
+        # Rewrite in new style
+        user = UserFactory.create()
+        user_two = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user, user_two],
+                                         archived=True)
+        content = self._delete(org, user.username, status=403, count=2)
+        assert content['detail'] == PermissionDenied.default_detail

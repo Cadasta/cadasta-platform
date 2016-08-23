@@ -6,6 +6,7 @@ from rest_framework import generics, filters, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from tutelary.mixins import APIPermissionRequiredMixin
+from core.mixins import update_permissions
 
 from party.models import (PartyRelationship,
                           TenureRelationship)
@@ -28,7 +29,7 @@ class PartyList(APIPermissionRequiredMixin,
     ordering_fields = ('name',)
     permission_required = {
         'GET': 'party.list',
-        'POST': 'party.create'
+        'POST': update_permissions('party.create')
     }
     # permission_filter_queryset = ('project.',)
 
@@ -46,8 +47,8 @@ class PartyDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'party.view',
-        'PATCH': 'party.update',
-        'DELETE': 'party.delete',
+        'PATCH': update_permissions('party.update'),
+        'DELETE': update_permissions('party.delete'),
     }
 
 
@@ -124,7 +125,7 @@ class PartyRelationshipCreate(APIPermissionRequiredMixin,
                               mixins.PartyRelationshipQuerySetMixin,
                               generics.CreateAPIView):
 
-    permission_required = 'party_rel.create'
+    permission_required = update_permissions('party_rel.create')
     serializer_class = serializers.PartyRelationshipWriteSerializer
 
     def get_perms_objects(self):
@@ -139,8 +140,8 @@ class PartyRelationshipDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'party_rel.view',
-        'PATCH': 'party_rel.update',
-        'DELETE': 'party_rel.delete'
+        'PATCH': update_permissions('party_rel.update'),
+        'DELETE': update_permissions('party_rel.delete')
     }
 
     def get_serializer_class(self):
@@ -158,7 +159,7 @@ class TenureRelationshipCreate(APIPermissionRequiredMixin,
                                mixins.TenureRelationshipQuerySetMixin,
                                generics.CreateAPIView):
 
-    permission_required = 'tenure_rel.create'
+    permission_required = update_permissions('tenure_rel.create')
     serializer_class = serializers.TenureRelationshipWriteSerializer
 
     def get_perms_objects(self):
@@ -173,8 +174,8 @@ class TenureRelationshipDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'tenure_rel.view',
-        'PATCH': 'tenure_rel.update',
-        'DELETE': 'tenure_rel.delete'
+        'PATCH': update_permissions('tenure_rel.update'),
+        'DELETE': update_permissions('tenure_rel.delete')
     }
 
     def get_serializer_class(self):

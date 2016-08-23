@@ -1,6 +1,7 @@
 from rest_framework import generics, filters, status
 from rest_framework.response import Response
 from tutelary.mixins import APIPermissionRequiredMixin
+from core.mixins import update_permissions
 
 from spatial import serializers
 from . import mixins
@@ -10,6 +11,8 @@ class SpatialUnitList(APIPermissionRequiredMixin,
                       mixins.SpatialQuerySetMixin,
                       generics.ListCreateAPIView):
     def get_actions(self, request):
+        if self.get_project().archived:
+            return ['project.view_archived', 'spatial.list']
         if self.get_project().public():
             return ['project.view', 'spatial.list']
         else:
@@ -23,7 +26,7 @@ class SpatialUnitList(APIPermissionRequiredMixin,
 
     permission_required = {
         'GET': get_actions,
-        'POST': 'spatial.create',
+        'POST': update_permissions('spatial.create'),
     }
 
     def get_perms_objects(self):
@@ -39,8 +42,8 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'spatial.view',
-        'PATCH': 'spatial.update',
-        'DELETE': 'spatial.delete'
+        'PATCH': update_permissions('spatial.update'),
+        'DELETE': update_permissions('spatial.delete')
     }
 
     def destroy(self, request, *args, **kwargs):
@@ -52,7 +55,7 @@ class SpatialRelationshipCreate(APIPermissionRequiredMixin,
                                 mixins.SpatialRelationshipQuerySetMixin,
                                 generics.CreateAPIView):
 
-    permission_required = 'spatial_rel.create'
+    permission_required = update_permissions('spatial_rel.create')
     serializer_class = serializers.SpatialRelationshipWriteSerializer
 
     def get_perms_objects(self):
@@ -67,8 +70,8 @@ class SpatialRelationshipDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'spatial_rel.view',
-        'PATCH': 'spatial_rel.update',
-        'DELETE': 'spatial_rel.delete'
+        'PATCH': update_permissions('spatial_rel.update'),
+        'DELETE': update_permissions('spatial_rel.delete')
     }
 
     def get_serializer_class(self):

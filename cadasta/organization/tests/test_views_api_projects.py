@@ -116,6 +116,13 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         assert ('User with username or email some-user does not exist'
                 in response.content['username'])
 
+    def test_add_user_to_archived_project(self):
+        user_to_add = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user_to_add])
+        project = ProjectFactory.create(organization=org, archived=True)
+        self._post(project.organization.slug, project,
+                   {'username': user_to_add.username}, status=403, count=0)
+
 
 class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.ProjectUsersDetail
@@ -188,12 +195,21 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
                                        user=self.test_user)
         assert role.role == 'PU'
 
+    def test_update_user_with_archived_project(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user], archived=True)
+        self._patch(project.organization.slug, project.slug,
+                    user.username, {'role': 'PM'}, status=403)
+        role = ProjectRole.objects.get(project=project, user=user)
+        assert role.role == 'PU'
+
     def test_delete_user(self):
         self.test_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=[self.test_user])
         response = self.request(method='DELETE', user=self.user)
         assert response.status_code == 204
         assert self.project.users.count() == 0
+        assert User.objects.filter(username=user.username).exists()
 
     def test_delete_user_with_unauthorized_user(self):
         self.test_user = UserFactory.create()
@@ -201,6 +217,12 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='DELETE')
         assert response.status_code == 403
         assert self.project.users.count() == 1
+
+    def test_delete_user_in_archived_project(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create(add_users=[user], archived=True)
+        self._delete(project.organization.slug, project, user.username,
+                     status=403, count=1)
 
 
 class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
@@ -238,7 +260,7 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_filter_active(self):
         """
-        It should return only one active project.
+        It should return only one archived project.
         """
         ProjectFactory.create(organization=self.organization, archived=True)
         ProjectFactory.create(organization=self.organization, archived=False)
@@ -353,6 +375,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
     def test_empty_list_with_unauthorized_user(self):
         """
         It should 403 "You do not have permission to perform this action."
+        NOTE: THIS IS ALL WRONG! NEEDS TO BE FIXED!
         """
         response = self.request()
         assert response.status_code == 403
@@ -542,6 +565,14 @@ class ProjectCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert Project.objects.count() == 0
         assert response.content['name'][0] == 'This field is required.'
 
+    def test_create_project_in_archived_organization(self):
+        OrganizationFactory.create(slug='habitat', archived=True)
+        data = {
+            'name': 'Project',
+            'description': 'Project description',
+        }
+        self._post('habitat', data, status=403, count=0)
+
 
 class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.ProjectDetail
@@ -580,6 +611,25 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(url_kwargs={'project': 'some-project'})
         assert response.status_code == 404
         assert response.content['detail'] == "Project not found."
+
+    def test_get_archived_project_with_unauthorized_user(self):
+        organization, project = self._test_objs()
+        project.archived = True
+        project.save()
+        content = self._get('namati', project.slug, user=AnonymousUser(),
+                            status=403)
+        assert content['detail'] == PermissionDenied.default_detail
+
+    def test_get_archived_project_with_admin_user(self):
+        organization, project = self._test_objs()
+        project.archived = True
+        project.save()
+        OrganizationRole.objects.create(organization=organization,
+                                        user=self.user, admin=True)
+        content = self._get('namati', project.slug, user=self.user,
+                            status=200)
+        assert content['id'] == project.id
+        assert 'users' in content
 
     def test_get_private_project(self):
         self.project.access = 'private'
@@ -667,6 +717,9 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         self.project.refresh_from_db()
         assert self.project.archived is True
+
+        self._patch('namati', project, {'name': 'OPDP'}, status=403)
+        assert project.name != 'OPDP'
 
     def test_unarchive(self):
         self.project.archived = True

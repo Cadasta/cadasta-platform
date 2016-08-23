@@ -164,6 +164,17 @@ class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
         assert response.content['non_field_errors'][0] == (
             err_msg.format(other_party.project.slug, self.prj.slug))
 
+    def test_create_valid_record_with_archived_project(self):
+        assert False
+        org, prj = self._test_objs()
+        prj.archived = True
+        prj.save()
+        prj.refresh_from_db()
+        self._post(
+            org_slug=org.slug, prj_slug=prj.slug,
+            data=self.default_create_data,
+            status=status_code.HTTP_403_FORBIDDEN)
+
 
 class TenureRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.TenureRelationshipDetail
@@ -538,7 +549,17 @@ class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(organization=self.prj.organization,
                                         user=user,
                                         admin=True)
-
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert TenureRelationship.objects.count() == 0
+
+    def test_update_valid_record_with_archived_project(self):
+        assert False
+        rel, org = self._test_objs()
+        rel.project.archived = True
+        rel.project.save()
+        rel.project.refresh_from_db()
+
+        self._test_patch_public_record(
+            self.get_valid_updated_data, status_code.HTTP_403_FORBIDDEN,
+            org_slug=org.slug, prj_slug=rel.project.slug, record=rel)

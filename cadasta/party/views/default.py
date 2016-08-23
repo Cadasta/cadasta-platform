@@ -2,7 +2,7 @@ from core.views import generic
 import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
 from jsonattrs.mixins import JsonAttrsMixin
-from core.mixins import LoginPermissionRequiredMixin
+from core.mixins import LoginPermissionRequiredMixin, update_permissions
 
 from organization.views import mixins as organization_mixins
 from resources.forms import AddResourceFromLibraryForm
@@ -26,7 +26,7 @@ class PartiesAdd(LoginPermissionRequiredMixin,
                  generic.CreateView):
     form_class = forms.PartyForm
     template_name = 'party/party_add.html'
-    permission_required = 'party.create'
+    permission_required = update_permissions('party.create')
     permission_denied_message = error_messages.PARTY_CREATE
 
     def get_perms_objects(self):
@@ -57,7 +57,7 @@ class PartiesEdit(LoginPermissionRequiredMixin,
                   generic.UpdateView):
     template_name = 'party/party_edit.html'
     form_class = forms.PartyForm
-    permission_required = 'party.update'
+    permission_required = update_permissions('party.update')
     permission_denied_message = error_messages.PARTY_UPDATE
 
 
@@ -66,7 +66,7 @@ class PartiesDelete(LoginPermissionRequiredMixin,
                     organization_mixins.ProjectAdminCheckMixin,
                     generic.DeleteView):
     template_name = 'party/party_delete.html'
-    permission_required = 'party.delete'
+    permission_required = update_permissions('party.delete')
     permission_denied_message = error_messages.PARTY_DELETE
 
     def get_success_url(self):
@@ -82,7 +82,7 @@ class PartyResourcesAdd(LoginPermissionRequiredMixin,
                         generic.DetailView):
     template_name = 'party/resources_add.html'
     form_class = AddResourceFromLibraryForm
-    permission_required = 'party.resources.add'
+    permission_required = update_permissions('party.resources.add')
     permission_denied_message = error_messages.PARTY_RESOURCES_ADD
 
     def post(self, request, *args, **kwargs):
@@ -99,7 +99,7 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
                         resource_mixins.HasUnattachedResourcesMixin,
                         generic.CreateView):
     template_name = 'party/resources_new.html'
-    permission_required = 'party.resources.add'
+    permission_required = update_permissions('party.resources.add')
     permission_denied_message = error_messages.PARTY_RESOURCES_ADD
 
 
@@ -122,7 +122,7 @@ class PartyRelationshipEdit(LoginPermissionRequiredMixin,
                             generic.UpdateView):
     template_name = 'party/relationship_edit.html'
     form_class = forms.TenureRelationshipEditForm
-    permission_required = 'tenure_rel.update'
+    permission_required = update_permissions('tenure_rel.update')
     permission_denied_message = error_messages.TENURE_REL_UPDATE
 
     def get_success_url(self):
@@ -134,7 +134,7 @@ class PartyRelationshipDelete(LoginPermissionRequiredMixin,
                               organization_mixins.ProjectAdminCheckMixin,
                               generic.DeleteView):
     template_name = 'party/relationship_delete.html'
-    permission_required = 'tenure_rel.delete'
+    permission_required = update_permissions('tenure_rel.delete')
     permission_denied_message = error_messages.TENURE_REL_DELETE
 
     def get_success_url(self):
@@ -149,7 +149,7 @@ class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
                                    resource_mixins.HasUnattachedResourcesMixin,
                                    generic.CreateView):
     template_name = 'party/relationship_resources_new.html'
-    permission_required = 'tenure_rel.resources.add'
+    permission_required = update_permissions('tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
 
 
@@ -160,7 +160,7 @@ class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
                                    generic.DetailView):
     template_name = 'party/relationship_resources_add.html'
     form_class = AddResourceFromLibraryForm
-    permission_required = 'tenure_rel.resources.add'
+    permission_required = update_permissions('tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
 
     def post(self, request, *args, **kwargs):

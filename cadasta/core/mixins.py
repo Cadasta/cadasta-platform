@@ -46,3 +46,16 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
 class LoginPermissionRequiredMixin(PermissionRequiredMixin,
                                    mixins.LoginPermissionRequiredMixin):
     pass
+
+
+def update_permissions(permission, obj=None):
+    def set_permissions(self, request, view=None):
+        if (hasattr(self, 'get_organization') and
+                self.get_organization().archived):
+                    return False
+        if (hasattr(self, 'get_project') and self.get_project().archived):
+            return False
+        if obj and self.get_object().archived:
+            return False
+        return permission
+    return set_permissions

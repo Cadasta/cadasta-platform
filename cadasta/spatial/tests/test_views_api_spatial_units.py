@@ -167,12 +167,26 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_list_private_records_based_on_org_membership(self):
         SpatialUnitFactory.create(project=self.prj)
-
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
                                         user=user)
         response = self.request(user=user)
         assert response.status_code == 200
+
+    def test_archived_filter_with_unauthorized_user(self):
+        org, prj = self._test_objs(archived=True)
+        self._get(
+            org_slug=org.slug, prj_slug=prj.slug, user=self.restricted_user,
+            status=status_code.HTTP_403_FORBIDDEN)
+
+    def test_archived_filter_with_org_admin(self):
+        org, prj = self._test_objs(archived=True)
+        extra_record = SpatialUnitFactory.create()
+        content = self._get(
+            org_slug=org.slug, prj_slug=prj.slug,
+            status=status_code.HTTP_200_OK, length=self.num_records)
+        assert extra_record.id not in (
+            [u['properties']['id'] for u in content['features']])
 
 
 class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
@@ -312,6 +326,16 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['geometry'][0] == (
             "Invalid format: string or unicode input"
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
+
+    def test_create_archived_project(self):
+        org, prj = self._test_objs()
+        prj.archived = True
+        prj.save()
+        prj.refresh_from_db()
+        self._post(
+            org_slug=org.slug, prj_slug=prj.slug,
+            data=self.default_create_data,
+            status=status_code.HTTP_403_FORBIDDEN)
 
 
 class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -567,6 +591,16 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['geometry'][0] == (
             "Invalid format: string or unicode input"
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
+
+    def test_update_with_archived_project(self):
+        su, org = self._test_objs()
+        su.project.archived = True
+        su.project.save()
+        su.project.refresh_from_db()
+
+        self._test_patch_public_record(
+            self.get_valid_updated_data, status_code.HTTP_403_FORBIDDEN,
+            org_slug=org.slug, prj_slug=su.project.slug, record=su)
 
 
 class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):

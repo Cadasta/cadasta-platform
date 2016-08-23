@@ -105,3 +105,36 @@ class OrganizationListTest(FunctionalTest):
 
         organization_table = page.get_new_organization_title_in_table()
         assert "Organization #2" in organization_table
+
+    def test_archived_orgs_appear_for_admin_user(self):
+        """The option to filter active/archived organizations is available to
+        organization administrators."""
+
+        LoginPage(self).login('testadmin', 'password')
+        page = OrganizationListPage(self)
+        page.go_to()
+
+        organization_title = page.get_organization_title_in_table()
+        assert organization_title == 'Organization #0'
+
+        page.click_archive_filter("Archived")
+        organization_title = page.get_organization_title_in_table()
+        assert organization_title == 'Archived Organization Archived'
+
+        first_org = page.sort_table_by("descending", col="organization")
+        assert first_org == 'Archived Organization Archived'
+        first_org = page.sort_table_by("ascending", col="organization")
+
+        page.click_archive_filter("All")
+        organization_title = page.get_organization_title_in_table()
+        assert first_org == 'Archived Organization Archived'
+
+        first_org = page.sort_table_by("descending", col="organization")
+        organization_title = page.get_organization_title_in_table()
+        assert organization_title == 'Organization #1'
+        first_org = page.sort_table_by("ascending", col="organization")
+
+        page.click_archive_filter("Archived")
+        page.click_archive_filter("Active")
+        organization_title = page.get_organization_title_in_table()
+        assert organization_title == 'Organization #0'

@@ -214,6 +214,14 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
                          url_kwargs={'organization': 'some-org',
                                      'project': 'some-project'})
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._get(status=302)
+        assert ("You don't have permission to add resources."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_update(self):
         project_resources = self.project.resources.all()
         response = self.request(method='POST', user=self.user)
@@ -244,6 +252,16 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first() == self.attached
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._post(status=302)
+        assert ("You don't have permission to add resources."
+                in [str(m) for m in get_messages(self.request)])
         assert self.project.resources.count() == 1
         assert self.project.resources.first() == self.attached
 
@@ -305,6 +323,14 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._get(status=302)
+        assert ("You don't have permission to add resources."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_create(self):
         response = self.request(method='POST', user=self.user)
         assert response.status_code == 302
@@ -348,6 +374,14 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
         assert self.project.resources.count() == 0
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._post(status=302)
+        assert ("You don't have permission to add resources."
+                in [str(m) for m in get_messages(self.request)])
 
 
 @pytest.mark.usefixtures('make_dirs')
@@ -532,6 +566,14 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._get(status=302)
+        assert ("You don't have permission to edit this resource."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_update(self):
         response = self.request(method='POST', user=self.user)
         assert response.status_code == 302
@@ -561,6 +603,16 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
         assert self.project.resources.count() == 1
         assert self.project.resources.first().name != 'Some name'
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._post(status=302)
+        assert ("You don't have permission to edit this resource."
+                in [str(m) for m in get_messages(self.request)])
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first().name != self.data['name']
 
 
 @pytest.mark.usefixtures('make_dirs')

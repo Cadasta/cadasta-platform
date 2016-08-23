@@ -140,6 +140,21 @@ class ProjectResourcesTest(APITestCase, UserTestCase, TestCase):
         assert self.project.resources.count() == 3
         assert 'This field may not be blank.' in response.content['name']
 
+    def test_add_archived_project(self):
+        data = {
+            'name': 'New resource',
+            'description': '',
+            'file': self.file_name
+        }
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        self._post(self.project.organization.slug,
+                   self.project.slug,
+                   data,
+                   status=403,
+                   count=3,)
+
     def test_search_for_file(self):
         not_found = self.storage.save('resources/bild.jpg', self.file)
         prj = ProjectFactory.create()
@@ -324,6 +339,20 @@ class ProjectResourcesDetailTest(APITestCase, UserTestCase, TestCase):
         assert 'name' in response.content
         self.resource.refresh_from_db()
         assert self.resource.name != self.post_data['name']
+
+    def test_update_archived_project(self):
+        data = {'name': 'Updated'}
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        content = self._patch(self.project.organization.slug,
+                              self.project.slug,
+                              self.resource.id,
+                              data,
+                              status=403)
+        assert 'id' not in content
+        self.resource.refresh_from_db()
+        assert self.resource.name != data['name']
 
     def test_archive_resource(self):
         data = {'archived': True}

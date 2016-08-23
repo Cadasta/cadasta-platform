@@ -190,6 +190,16 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add "
+                "locations to this project."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -214,6 +224,16 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assert SpatialUnit.objects.count() == 0
         assert response.status_code == 302
         assert '/account/login/' in response.location
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(method='POST', user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add "
+                "locations to this project."
+                in [str(m) for m in get_messages(self.request)])
 
 
 class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
@@ -359,6 +379,15 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to update this location."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -385,6 +414,15 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
         self.location.refresh_from_db()
         assert self.location.type != self.post_data['type']
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(method='POST', user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to update this location."
+                in [str(m) for m in get_messages(self.request)])
 
 
 class LocationDelete(ViewTestCase, UserTestCase, TestCase):
@@ -447,6 +485,15 @@ class LocationDelete(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to remove this location."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -470,6 +517,17 @@ class LocationDelete(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert SpatialUnit.objects.count() == 1
+        assert TenureRelationship.objects.count() == 1
+
+    def test_POST_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(method='POST', user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to remove this location."
+                in [str(m) for m in get_messages(self.request)])
         assert SpatialUnit.objects.count() == 1
         assert TenureRelationship.objects.count() == 1
 
@@ -539,6 +597,16 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to "
+                "add resources to this location."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -564,6 +632,18 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert self.location.resources.count() == 1
+        assert self.location.resources.first() == self.attached
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(method='POST', user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to "
+                "add resources to this location."
+                in [str(m) for m in get_messages(self.request)])
         assert self.location.resources.count() == 1
         assert self.location.resources.first() == self.attached
 
@@ -639,6 +719,16 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to "
+                "add resources to this location."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -660,6 +750,17 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert self.location.resources.count() == 0
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(method='POST', user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to "
+                "add resources to this location."
+                in [str(m) for m in get_messages(self.request)])
         assert self.location.resources.count() == 0
 
 
@@ -790,6 +891,16 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add tenure relationships to "
+                "this project."
+                in [str(m) for m in get_messages(self.request)])
+
     def test_post_new_party_with_authorized(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -898,5 +1009,17 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert TenureRelationship.objects.count() == 0
+        assert Party.objects.count() == 0
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        self.project.refresh_from_db()
+        response = self.request(method='POST', user=self.authorized_user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add tenure relationships to "
+                "this project."
+                in [str(m) for m in get_messages(self.request)])
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 0

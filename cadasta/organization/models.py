@@ -67,6 +67,9 @@ class Organization(SlugModel, RandomIDModel):
             ('org.view',
              {'description': _("View existing organizations"),
               'error_message': messages.ORG_VIEW}),
+            ('org.view_archived',
+             {'description': _("View archived organization"),
+              'error_message': messages.ORG_VIEW}),
             ('org.update',
              {'description': _("Update an existing organization"),
               'error_message': messages.ORG_EDIT}),
@@ -97,7 +100,7 @@ class Organization(SlugModel, RandomIDModel):
         return str(self)
 
     def public_projects(self):
-        return self.projects.filter(access='public')
+        return self.projects.filter(access='public', archived=False)
 
     def all_projects(self):
         return self.projects.all()
@@ -193,6 +196,9 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
               'error_message': messages.PROJ_VIEW}),
             ('project.view_private',
              {'description': _("View private projects"),
+              'error_message': messages.PROJ_VIEW}),
+            ('project.view_archived',
+             {'description': _("View archived projects"),
               'error_message': messages.PROJ_VIEW}),
             ('project.update',
              {'description': _("Update an existing project"),

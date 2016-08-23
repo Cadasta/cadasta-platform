@@ -32,12 +32,18 @@
 <table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
+      <th class="unarchived">{% trans Archived %}</th>
       <th class="col-md-10">{% trans "Organization" %}</th>
       <th class="col-md-2 hidden-xs">{% trans "Projects" %}</th>
     </tr>
   </thead>
   {% for org in object_list %}
   <tr class="linked" onclick="window.document.location='{% url 'organization:dashboard' slug=org.slug %}';">
+  {% if org.archived %}
+    <td class="archived"><div>True</div></td>
+  {% else %}
+    <td class="unarchived"><div>False</div></td>
+  {% endif %}
     <td>
       {% if org.logo %}
       <div class="org-logo">
@@ -46,7 +52,11 @@
       </div>
       {% endif %}
       <div class="org-text">
-        <h4>{{ org.name }}</h4>
+        <h4>{{ org.name }}
+        {% if org.archived %}
+          <span class="label label-danger">Archived</span>
+        {% endif %}
+        </h4>
         {% if org.description %}
           <p>{{ org.description }}</p>
         {% endif %}

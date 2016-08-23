@@ -46,6 +46,9 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         ProjectFactory.create(
             name='Private Project',
             access='private', organization=self.org, extent=extent)
+        ProjectFactory.create(
+            name='Archived Project', archived=True,
+            organization=self.org, extent=extent)
 
     def _render_geojson(self, projects):
         return json.dumps(ProjectGeometrySerializer(projects, many=True).data)
@@ -58,6 +61,7 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         response = self.request(user=user)
         assert response.status_code == 200
+        self._test_projects_rendered(response)
 
     def test_private_projects_rendered_when_org_member_is_signed_in(self):
         user = UserFactory.create()
