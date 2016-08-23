@@ -17,7 +17,7 @@ from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
 
 from ..exceptions import InvalidXMLSubmission
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('xform.submissions')
 
 OPEN_ROSA_ENVELOPE = """
     <OpenRosaResponse xmlns="http://openrosa.org/http/response">
