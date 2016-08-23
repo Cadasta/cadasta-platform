@@ -3,7 +3,18 @@ upstream django {
 }
 
 server {
-    listen      80;
+    listen      80; #force redirect to https for API URLs
+    server_name {{ api_url }};
+    return      301         https://{{ api_url }}$request_uri;
+}
+
+server {
+    listen      80; #force redirect to https for platform URLs
+    server_name {{ main_url }};
+    return      301         https://{{ main_url }}$request_uri;
+}
+
+server {
     listen      443 ssl;
     server_name {{ api_url }};
     ssl_certificate     /etc/ssl/private/domain.crt;
@@ -47,7 +58,6 @@ server {
 }
 
 server {
-    listen      80;
     listen      443 ssl;
     server_name {{ main_url }};
     ssl_certificate     /etc/ssl/private/domain.crt;
