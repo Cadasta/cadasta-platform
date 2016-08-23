@@ -66,3 +66,33 @@ LEAFLET_CONFIG['TILES'][0] = (
     'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     LEAFLET_CONFIG['TILES'][0][2]
 )
+
+# Debug logging...
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        }
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/debug.log',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'xform.submissions': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
+        }
+    },
+}

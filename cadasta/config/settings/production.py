@@ -52,11 +52,17 @@ MEDIA_ROOT = '/opt/cadasta/cadasta-platform/cadasta/media/'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        }
+    },
     'handlers': {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/var/log/django/debug.log',
+            'formatter': 'simple'
         },
     },
     'loggers': {
@@ -65,5 +71,9 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'xform.submissions': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
+        }
     },
 }
