@@ -7,14 +7,14 @@
     // organization.
     {
       "effect": "allow",
-      "action": ["project.*", "project.users.*", "questionaire.*",
+      "action": ["project.*", "project.users.*", "questionnaire.*",
                  "resource.*", "spatial.*", "spatial_rel.*",
                  "party.*", "party_rel.*", "tenure_rel.*"],
       "object": ["project/$organization/$project"]
     },
     {
       "effect": "deny",
-      "action": ["project.archive", "project.unarchive", "questionaire.add"],
+      "action": ["project.archive", "project.unarchive", "questionnaire.add"],
       "object": ["project/$organization/$project"]
     },
 

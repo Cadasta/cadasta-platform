@@ -1,33 +1,35 @@
-import pytest
+import json
 import os
 import os.path
-import json
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import HttpRequest, Http404
-from django.contrib.auth.models import AnonymousUser
-from django.template.loader import render_to_string
-from django.template import RequestContext
-from django.contrib.messages.storage.fallback import FallbackStorage
-from django.contrib.messages.api import get_messages
 
-from tutelary.models import Policy, Role, assign_user_policies
+import pytest
+
+from accounts.tests.factories import UserFactory
 from buckets.test.storage import FakeS3Storage
-
 from core.tests.base_test_case import UserTestCase
 from core.tests.util import make_dirs  # noqa
-from accounts.tests.factories import UserFactory
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.messages.api import get_messages
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpRequest
+from django.template import RequestContext
+from django.template.loader import render_to_string
 from organization.models import OrganizationRole, Project, ProjectRole
-from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.models import Questionnaire
-from resources.utils.io import ensure_dirs
+from questionnaires.tests.factories import QuestionnaireFactory
 from resources.tests.utils import clear_temp  # noqa
-from ..views import default
+from resources.utils.io import ensure_dirs
+from tutelary.models import Policy, Role, assign_user_policies
+
 from .. import forms
+from ..views import default
 from .factories import OrganizationFactory, ProjectFactory, clause
 
 
 class ProjectListTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectList.as_view()
@@ -115,7 +117,7 @@ class ProjectListTest(UserTestCase):
         assert expected == content
 
     def test_get_with_valid_user(self):
-        self._get(status=200, projs=self.projs+self.unauth_projs)
+        self._get(status=200, projs=self.projs + self.unauth_projs)
 
     def test_get_with_unauthenticated_user(self):
         self._get(status=200, user=AnonymousUser(),
@@ -127,7 +129,7 @@ class ProjectListTest(UserTestCase):
         # above because the policy includes clauses denying access to
         # some projects.
         self._get(status=200, user=UserFactory.create(),
-                  projs=self.projs+self.unauth_projs)
+                  projs=self.projs + self.unauth_projs)
 
     def test_get_with_org_membership(self):
         self._get(status=200, make_org_member=[self.ok_org1],
@@ -138,7 +140,7 @@ class ProjectListTest(UserTestCase):
         self._get(status=200, make_org_member=[self.ok_org1, self.ok_org2],
                   projs=self.projs + self.unauth_projs + [
                       self.priv_proj1, self.priv_proj2, self.priv_proj3
-                  ])
+        ])
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
@@ -149,6 +151,7 @@ class ProjectListTest(UserTestCase):
 
 
 class ProjectDashboardTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectDashboard.as_view()
@@ -337,6 +340,7 @@ class ProjectDashboardTest(UserTestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectAddTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectAddWizard.as_view()
@@ -476,6 +480,19 @@ class ProjectAddTest(UserTestCase):
         'permissions-org_member_3': 'PU',
         'permissions-bad_user': 'PU'
     }
+    DETAILS_POST_DATA_MANIPULATED = {
+        'project_add_wizard-current_step': 'details',
+        'details-organization': 'test-org',
+        'details-name': 'Test Project FAKE',
+        'details-description': 'This is a test project',
+        'details-access': 'on',
+        'details-url': 'http://www.test.org',
+        'details-contacts-TOTAL_FORMS': 1,
+        'details-contacts-INITIAL_FORMS': 0,
+        'details-contacts-0-name': "John Lennon",
+        'details-contacts-0-email': 'john@beatles.co.uk',
+        'details-contacts-0-tel': ''
+    }
 
     def test_full_flow_valid(self):
         self.client.force_login(self.users[0])
@@ -483,7 +500,7 @@ class ProjectAddTest(UserTestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['details-questionaire'] = self._get_xls_form(
+        self.DETAILS_POST_DATA['details-questionnaire'] = self._get_xls_form(
             'xls-form')
         details_response = self.client.post(
             reverse('project:add'), self.DETAILS_POST_DATA
@@ -534,36 +551,23 @@ class ProjectAddTest(UserTestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['details-questionaire'] = self._get_xls_form(
+        details_post_data = self.DETAILS_POST_DATA.copy()
+        details_post_data[
+            'details-questionnaire'] = self._get_xls_form(
             'xls-form-invalid')
         details_response = self.client.post(
-            reverse('project:add'), self.DETAILS_POST_DATA
+            reverse('project:add'), details_post_data
         )
         assert details_response.status_code == 200
         permissions_response = self.client.post(
             reverse('project:add'), self.PERMISSIONS_POST_DATA
         )
-        assert permissions_response.status_code == 302
-        assert ('/organizations/test-org/projects/test-project/' in
-                permissions_response['location'])
-
-        proj = Project.objects.get(organization=self.org, name='Test Project')
-        assert proj.slug == 'test-project'
-        assert proj.description == 'This is a test project'
-        assert len(proj.contacts) == 1
-        assert proj.contacts[0]['name'] == "John Lennon"
-        assert proj.contacts[0]['email'] == 'john@beatles.co.uk'
-        for r in ProjectRole.objects.filter(project=proj):
-            if r.user.username == 'org_member_1':
-                assert r.role == 'PM'
-            elif r.user.username == 'org_member_2':
-                assert r.role == 'DC'
-            elif r.user.username == 'org_member_3':
-                assert r.role == 'PU'
-            else:
-                assert False
-
-        assert Questionnaire.objects.filter(project=proj).exists() is False
+        assert permissions_response.status_code == 200
+        assert permissions_response.context_data['form'].is_valid() is False
+        with pytest.raises(Project.DoesNotExist) as e:
+            Project.objects.get(
+                organization=self.org, slug='test-project')
+            assert e.message == 'Project matching query does not exist.'
 
     def test_full_flow_long_slug(self):
         project_name = (
@@ -585,6 +589,7 @@ class ProjectAddTest(UserTestCase):
         permissions_response = self.client.post(
             reverse('project:add'), self.PERMISSIONS_POST_DATA
         )
+
         assert permissions_response.status_code == 302
         assert (
             '/organizations/test-org/projects/{}/'.format(expected_slug)
@@ -779,7 +784,7 @@ class ProjectEditDetailsTest(UserTestCase):
             {'project': self.project,
              'object': self.project,
              'form': forms.ProjectEditDetails(
-                instance=self.project)},
+                 instance=self.project)},
             request=self.request)
 
         assert expected == content
@@ -797,8 +802,8 @@ class ProjectEditDetailsTest(UserTestCase):
             {'project': self.project,
              'object': self.project,
              'form': forms.ProjectEditDetails(
-                instance=self.project,
-                initial={'questionnaire': questionnaire.xls_form.url})},
+                 instance=self.project,
+                 initial={'questionnaire': questionnaire.xls_form.url})},
             request=self.request)
 
         assert expected == content
@@ -847,9 +852,9 @@ class ProjectEditDetailsTest(UserTestCase):
         content = response.content.decode('utf-8')
 
         form = forms.ProjectEditDetails(
-                instance=self.project,
-                initial={'questionnaire': questionnaire},
-                data=self.post_data)
+            instance=self.project,
+            initial={'questionnaire': questionnaire},
+            data=self.post_data)
 
         form.add_error('questionnaire',
                        "Unknown question type 'interger'.")
@@ -889,6 +894,7 @@ class ProjectEditDetailsTest(UserTestCase):
 
 
 class ProjectEditPermissionsTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectEditPermissions.as_view()
@@ -1002,6 +1008,7 @@ class ProjectEditPermissionsTest(UserTestCase):
 
 
 class ProjectArchiveTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectArchive.as_view()
@@ -1062,6 +1069,7 @@ class ProjectArchiveTest(UserTestCase):
 
 
 class ProjectUnarchiveTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectUnarchive.as_view()
@@ -1124,6 +1132,7 @@ class ProjectUnarchiveTest(UserTestCase):
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
 class ProjectDataDownloadTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         ensure_dirs()

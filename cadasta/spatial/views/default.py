@@ -50,7 +50,7 @@ class LocationsAdd(LoginPermissionRequiredMixin,
                 {'name': 'project',
                  'value': prj,
                  'selector': prj.id},
-                {'name': 'questionaire',
+                {'name': 'questionnaire',
                  'value': prj.current_questionnaire,
                  'selector': prj.current_questionnaire}
             )
@@ -176,7 +176,7 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
                 {'name': 'project',
                  'value': prj,
                  'selector': prj.id},
-                {'name': 'questionaire',
+                {'name': 'questionnaire',
                  'value': prj.current_questionnaire,
                  'selector': prj.current_questionnaire}
             )

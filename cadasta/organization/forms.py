@@ -1,27 +1,27 @@
 import time
 from zipfile import ZipFile
-from django import forms
-from django.conf import settings
-from django.contrib.postgres import forms as pg_forms
-from django.contrib.gis import forms as gisforms
-from core.util import slugify
-from django.utils.translation import ugettext as _
-from django.db import transaction
-from django.forms.utils import ErrorDict
-
-from leaflet.forms.widgets import LeafletWidget
-from tutelary.models import check_perms
-from buckets.widgets import S3FileUploadWidget
 
 from accounts.models import User
+from buckets.widgets import S3FileUploadWidget
 from core.form_mixins import SuperUserCheck
+from core.util import slugify
+from django import forms
+from django.conf import settings
+from django.contrib.gis import forms as gisforms
+from django.contrib.postgres import forms as pg_forms
+from django.db import transaction
+from django.forms.utils import ErrorDict
+from django.utils.translation import ugettext as _
+from leaflet.forms.widgets import LeafletWidget
 from questionnaires.models import Questionnaire
-from .models import Organization, Project, OrganizationRole, ProjectRole
+from tutelary.models import check_perms
+
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
-from .fields import ProjectRoleField, PublicPrivateField, ContactsField
-from .download.xls import XLSExporter
 from .download.resources import ResourceExporter
 from .download.shape import ShapeExporter
+from .download.xls import XLSExporter
+from .fields import ContactsField, ProjectRoleField, PublicPrivateField
+from .models import Organization, OrganizationRole, Project, ProjectRole
 
 FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
 QUESTIONNAIRE_TYPES = [
@@ -245,7 +245,7 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
     description = forms.CharField(required=False, widget=forms.Textarea)
     access = PublicPrivateField(initial='public')
     url = forms.URLField(required=False)
-    questionaire = forms.CharField(
+    questionnaire = forms.CharField(
         required=False,
         widget=S3FileUploadWidget(upload_to='xls-forms',
                                   accepted_types=QUESTIONNAIRE_TYPES))
@@ -348,6 +348,7 @@ class ProjectEditDetails(forms.ModelForm):
 
 
 class PermissionsForm(SuperUserCheck):
+
     def check_admin(self, user):
         if not hasattr(self, 'admins'):
             self.admins = [
@@ -379,6 +380,7 @@ class PermissionsForm(SuperUserCheck):
 
 
 class ProjectAddPermissions(PermissionsForm, forms.Form):
+
     def __init__(self, organization, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if organization is not None:
@@ -387,6 +389,7 @@ class ProjectAddPermissions(PermissionsForm, forms.Form):
 
 
 class ProjectEditPermissions(PermissionsForm, forms.Form):
+
     def __init__(self, *args, **kwargs):
         self.project = kwargs.pop('instance')
         super().__init__(*args, **kwargs)
