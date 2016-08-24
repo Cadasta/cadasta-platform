@@ -466,9 +466,24 @@ class ProjectResourcesEditTest(UserTestCase):
         if response.status_code == 200:
             content = response.render().content.decode('utf-8')
             form = ResourceForm(instance=self.resource)
+            cancel_url = self.request.GET.get('next', None)
+            if cancel_url:
+                cancel_url += '#resources'
+            else:
+                cancel_url = reverse(
+                    'resources:project_list',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug
+                    }
+                )
             expected = render_to_string(
                 'resources/edit.html',
-                {'object': self.project, 'form': form},
+                {
+                    'object': self.project,
+                    'form': form,
+                    'cancel_url': cancel_url,
+                },
                 request=self.request
             )
             assert expected == content
@@ -510,6 +525,17 @@ class ProjectResourcesEditTest(UserTestCase):
         return response
 
     def test_get_form(self):
+        self._get(status=200)
+
+    def test_get_form_with_next_query_parameter(self):
+        self.request.GET['next'] = '/organizations/'
+        self._get(status=200)
+
+    def test_get_form_with_location_next_query_parameter(self):
+        url = ('https://example.com/organizations/sample-org/'
+               'projects/sample-proj/records/'
+               'locations/jvzsiszjzrbpecm69549u2z5/')
+        self.request.GET['next'] = url
         self._get(status=200)
 
     def test_get_non_existent_project(self):
