@@ -216,6 +216,12 @@
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
     }, 5000);
     </script>
+    <script>
+      window.inlineManualTracking = {
+        uid: "{{ user.id }}", 
+        username: "{{ user.username }}"
+      }
+    </script>
     <script>!function(){var e=document.createElement("script"),t=document.getElementsByTagName("script")[0];e.async=1,e.src="https://inlinemanual.com/embed/player.b4b392a6f77d7d0d6e04cee62b835187.js",e.charset="UTF-8",t.parentNode.insertBefore(e,t)}();</script>
   </body>
 </html>
