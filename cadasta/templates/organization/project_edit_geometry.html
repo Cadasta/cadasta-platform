@@ -4,7 +4,7 @@
 {% load i18n %}
 {% load leaflet_tags %}
 
-{% block page_title %}Edit project location | {% endblock %}
+{% block page_title %}Edit project boundary | {% endblock %}
 {% block body-class %} map{% endblock %}
 
 
@@ -34,18 +34,18 @@
 {% csrf_token %}
   <div class="col-md-12 content-single">
     <div class="row">
-      <!-- Location map  -->
+      <!-- Boundary map  -->
       <div class="col-md-8 map">
         {{ form.extent }}
       </div>
-      <!-- / location map -->
-      <!-- Location detail  -->
+      <!-- / Boundary map -->
+      <!-- Boundary detail  -->
       <div class="col-md-4 detail detail-edit">
-        <h2>{% trans "Edit project location" %}</h2>
+        <h2>{% trans "Edit project boundary" %}</h2>
         <div class="panel panel-default">
           <div class="panel-body">
             <p>
-              {% blocktrans %}Use the tools provided on the left side of the map to outline your project boundary. Once complete, select the save button below.{% endblocktrans %}
+              {% blocktrans %}Use the tools provided on the left side of the map to update your project boundary. Once complete, select the save button below.{% endblocktrans %}
             </p>
             <div class="alert alert-info alert-full clearfix row" role="alert">
               <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
@@ -60,7 +60,7 @@
           </div>
         </div>
       </div>
-      <!-- / location detail -->
+      <!-- / Boundary detail -->
     </div>
   </div>
 </form>

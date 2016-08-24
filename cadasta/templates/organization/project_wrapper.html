@@ -29,7 +29,7 @@
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
-          <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project location" %}</a></li>
+          <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
           <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
           <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
           <li role="separator" class="divider"></li>
@@ -54,7 +54,7 @@
         </a>
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="caret"></span>
-          <span class="sr-only">Toggle Add</span>
+          <span class="sr-only">{%trans "Toggle add" %}</span>
         </button>
         <ul class="dropdown-menu">
           <!--<li><a href="#">{% trans "Add party" %}</a></li>
