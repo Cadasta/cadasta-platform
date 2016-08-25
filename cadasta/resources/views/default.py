@@ -77,6 +77,11 @@ class ProjectResourcesEdit(LoginPermissionRequiredMixin,
     permission_required = 'resource.edit'
     permission_denied_message = error_messages.RESOURCE_EDIT
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['cancel_url'] = self.get_success_url()
+        return context
+
 
 class ResourceArchive(LoginPermissionRequiredMixin,
                       ArchiveMixin,
