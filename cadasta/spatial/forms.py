@@ -101,8 +101,8 @@ class TenureRelationshipForm(forms.Form):
                 'initial': initial
             }
             field = form_field_from_name(atype.form_field)
-            if atype.form_field == 'CharField':
-                args['max_length'] = 32
+            # if atype.form_field == 'CharField':
+            #     args['max_length'] = 32
             if (atype.form_field == 'ChoiceField' or
                atype.form_field == 'MultipleChoiceField'):
                 args['choices'] = list(map(lambda c: (c, c), attr.choices))
