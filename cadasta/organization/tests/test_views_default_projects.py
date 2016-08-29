@@ -1,33 +1,38 @@
 import json
 import os
 import os.path
+
 import pytest
 
-from django.test import TestCase
-from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.http import HttpRequest, Http404
-from django.template.loader import render_to_string
-from django.contrib.messages.storage.fallback import FallbackStorage
-from django.contrib.auth.models import AnonymousUser
-
-from tutelary.models import Policy, Role, assign_user_policies
+from accounts.tests.factories import UserFactory
 from buckets.test.storage import FakeS3Storage
-from skivvy import ViewTestCase
-
 from core.tests.utils.cases import UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
-from accounts.tests.factories import UserFactory
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.gis.geos import Point
+from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpRequest
+from django.template.loader import render_to_string
+from django.test import TestCase
+from jsonattrs.models import Attribute, Schema
 from organization.models import OrganizationRole, Project, ProjectRole
+from party.models import Party, TenureRelationship
+from party.tests.factories import PartyFactory
+from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.tests.utils import get_form
-from questionnaires.models import Questionnaire
+from resources.models import Resource
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
+from skivvy import ViewTestCase
+from spatial.models import SpatialUnit
 from spatial.serializers import SpatialUnitGeoJsonSerializer
 from spatial.tests.factories import SpatialUnitFactory
-from party.tests.factories import PartyFactory
+from tutelary.models import Policy, Role, assign_user_policies
 
 from .. import forms
 from ..views import default
@@ -36,10 +41,10 @@ from .factories import OrganizationFactory, ProjectFactory, clause
 
 def assign_policies(user):
     clauses = {
-            'clause': [
-                clause('allow', ['project.*'], ['project/*/*'])
-            ]
-        }
+        'clause': [
+            clause('allow', ['project.*'], ['project/*/*'])
+        ]
+    }
     policy = Policy.objects.create(name='allow', body=json.dumps(clauses))
     assign_user_policies(user, policy)
 
@@ -268,12 +273,12 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_project_extent(self):
         self.project.extent = (
-                    'SRID=4326;'
-                    'POLYGON ((-5.1031494140625000 8.1299292850467957, '
-                    '-5.0482177734375000 7.6837733211111425, '
-                    '-4.6746826171875000 7.8252894725496338, '
-                    '-4.8641967773437491 8.2278005261522775, '
-                    '-5.1031494140625000 8.1299292850467957))')
+            'SRID=4326;'
+            'POLYGON ((-5.1031494140625000 8.1299292850467957, '
+            '-5.0482177734375000 7.6837733211111425, '
+            '-4.6746826171875000 7.8252894725496338, '
+            '-4.8641967773437491 8.2278005261522775, '
+            '-5.1031494140625000 8.1299292850467957))')
         self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -406,6 +411,7 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectAddTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.view = default.ProjectAddWizard.as_view()
@@ -500,7 +506,7 @@ class ProjectAddTest(UserTestCase, TestCase):
             reverse(
                 'organization:project-add',
                 kwargs={'organization': self.org.slug}
-                ))
+            ))
         assert response.status_code == 302
         assert '/projects/new/' not in response['location']
 
@@ -1305,3 +1311,365 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+
+
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
+class ProjectDataImportTest(UserTestCase, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        path = os.path.dirname(settings.BASE_DIR)
+        self.view = default.ProjectDataImportWizard.as_view()
+        self.request = HttpRequest()
+        setattr(self.request, 'method', 'GET')
+
+        clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*']),
+                clause('allow', ['project.import'], ['project/*/*']),
+            ]
+        }
+        self.policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
+        self.user = UserFactory.create()
+        self.unauth_user = UserFactory.create()
+
+        setattr(self.request, 'user', self.user)
+        assign_user_policies(self.user, self.policy)
+
+        self.org = OrganizationFactory.create(
+            name='Test Org', slug='test-org'
+        )
+
+        self.valid_csv = '/organization/tests/files/test.csv'
+        self.invalid_csv = '/organization/tests/files/test_invalid.csv'
+        self.geoshape_csv = '/organization/tests/files/test_geoshape.csv'
+        self.geotrace_csv = '/organization/tests/files/test_geotrace.csv'
+        self.invalid_file_type = '/organization/tests/files/test_invalid.kml'
+        self.missing_attr_csv = '/organization/tests/files/missing_attr.csv'
+
+        self.path = os.path.dirname(settings.BASE_DIR)
+
+        self.project = ProjectFactory.create(
+            name='Test CSV Import',
+            slug='test-csv-import', organization=self.org)
+        storage = FakeS3Storage()
+        xlscontent = open(
+            path + '/organization/tests/files/uttaran_test.xlsx', 'rb'
+        ).read()
+        form = storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+        Questionnaire.objects.create_from_form(
+            xls_form=form,
+            project=self.project
+        )
+        # test for expected schema and attribute creation
+        assert 2 == Schema.objects.all().count()
+        assert 39 == Attribute.objects.all().count()
+
+        self.ATTRIBUTES = [
+            'deed_of_land', 'amount_othersland', 'educational_qualification',
+            'name_mouza', 'land_calculation', 'how_aquire_landwh',
+            'female_member', 'mutation_of_land', 'amount_agriland',
+            'nid_number', 'class_hh', 'j_l', 'how_aquire_landt',
+            'boundary_conflict', 'dakhal_on_land', 'village_name',
+            'how_aquire_landp', 'how_aquire_landd', 'ownership_conflict',
+            'occupation_hh', 'others_conflict', 'how_aquire_landm',
+            'khatain_of_land', 'male_member', 'mobile_no', 'how_aquire_landw',
+            'everything', 'name_father_hus'
+        ]
+        self.EXTRA_ATTRS = [
+            'conflicts_resolution', 'current_address', 'data_collector_name',
+            'gender', 'howconflict_resolution', 'land_amount', 'land_class',
+            'legal_support', 'legal_support_details', 'marital_status',
+            'multiple_landowners'
+        ]
+        self.EXTRA_HEADERS = [
+            'audio_hh', 'conflicts_resoulation', 'location_geometry',
+            'geo_type', 'howconflict_resoulation', 'image_hh', 'name_of_hh',
+            'phonenumber', 'present_add'
+        ]
+        self.SELECT_FILE_POST_DATA = {
+            'project_data_import_wizard-current_step': 'select_file',
+            'select_file-name': 'Test Imports',
+            'select_file-description': 'A description of the import',
+            'select_file-type': 'csv'
+        }
+        self.MAP_ATTRIBUTES_POST_DATA = {
+            'project_data_import_wizard-current_step': 'map_attributes',
+            'attributes': self.ATTRIBUTES,
+            'extra_attrs': self.EXTRA_ATTRS,
+            'extra_headers': self.EXTRA_HEADERS
+        }
+        self.SELECT_DEFAULTS_POST_DATA = {
+            'project_data_import_wizard-current_step': 'select_defaults',
+            'select_defaults-party_name_field': 'name_of_hh',
+            'select_defaults-file': path + '/core/media/test/temp/test.csv',
+            'select_defaults-party_type': 'IN',
+            'select_defaults-location_type': 'PA',
+            'select_defaults-geometry_field': 'location_geometry',
+            'select_defaults-geometry_type_field': 'geo_type',
+        }
+
+    def _get(self, status=None, check_content=False, login_redirect=False):
+        response = self.client.get(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug})
+        )
+        if status is not None:
+            assert response.status_code == status
+        if login_redirect:
+            assert '/account/login/' in response['location']
+        if check_content:
+            content = response.content.decode('utf-8')
+            expected = render_to_string(
+                'organization/project_select_import.html',
+                context=response.context_data,
+                request=response.wsgi_request
+            )
+            assert expected == content
+
+    def test_initial_get_valid(self):
+        self.client.force_login(self.user)
+        self._get(status=200, check_content=True)
+
+    def test_initial_get_with_unauthorized_user(self):
+        self.client.force_login(self.unauth_user)
+        self._get(status=302, check_content=False)
+
+    def test_initial_get_with_unauthenticated_user(self):
+        self._get(status=302, login_redirect=True)
+
+    def test_full_flow_valid(self):
+        self.client.force_login(self.user)
+        csvfile = open(self.path + self.valid_csv, 'rb').read()
+        file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        post_data['select_file-is_resource'] = True
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.SELECT_DEFAULTS_POST_DATA
+        )
+        assert select_defaults_response.status_code == 302
+
+        assert ('/organizations/test-org/projects/test-csv-import/' in
+                select_defaults_response['location'])
+
+        proj = Project.objects.get(
+            organization=self.org, name='Test CSV Import')
+        assert Party.objects.filter(project_id=proj.pk).count() == 10
+        assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 10
+        assert Resource.objects.filter(project_id=proj.pk).count() == 1
+        assert TenureRelationship.objects.filter(
+            project_id=proj.pk).count() == 10
+
+        for su in SpatialUnit.objects.filter(project_id=proj.pk).all():
+            if su.geometry is not None:
+                assert type(su.geometry) is Point
+
+    def test_full_flow_invalid_value(self):
+        self.client.force_login(self.user)
+        csvfile = open(self.path + self.invalid_csv, 'rb').read()
+        file = SimpleUploadedFile('test_invalid.csv', csvfile, 'text/csv')
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.SELECT_DEFAULTS_POST_DATA
+        )
+        assert select_defaults_response.status_code == 200
+
+        proj = Project.objects.get(
+            organization=self.org, name='Test CSV Import')
+        assert Party.objects.filter(project_id=proj.pk).count() == 0
+        assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 0
+        assert TenureRelationship.objects.filter(
+            project_id=proj.pk).count() == 0
+
+    def test_full_flow_invalid_file_type(self):
+        self.client.force_login(self.user)
+        invalid_file = open(self.path + self.invalid_file_type, 'rb').read()
+        file = SimpleUploadedFile(
+            'test_invalid.kml', invalid_file, 'application/kml')
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.SELECT_DEFAULTS_POST_DATA
+        )
+        assert select_defaults_response.status_code == 200
+
+        proj = Project.objects.get(
+            organization=self.org, name='Test CSV Import')
+        assert Party.objects.filter(project_id=proj.pk).count() == 0
+        assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 0
+        assert TenureRelationship.objects.filter(
+            project_id=proj.pk).count() == 0
+
+    def test_wizard_goto_step(self):
+        self.client.force_login(self.user)
+
+        csvfile = open(self.path + self.valid_csv, 'rb').read()
+        file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+        post_data = self.SELECT_DEFAULTS_POST_DATA.copy()
+        post_data['wizard_goto_step'] = 'map_attributes'
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_defaults_response.status_code == 200
+
+        post_data = self.MAP_ATTRIBUTES_POST_DATA.copy()
+        post_data['wizard_goto_step'] = 'select_file'
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert map_attributes_response.status_code == 200
+
+    def test_full_flow_valid_no_resource(self):
+        self.client.force_login(self.user)
+        csvfile = open(self.path + self.valid_csv, 'rb').read()
+        file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        post_data['select_file-is_resource'] = False
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.SELECT_DEFAULTS_POST_DATA
+        )
+        assert select_defaults_response.status_code == 302
+
+        assert ('/organizations/test-org/projects/test-csv-import/' in
+                select_defaults_response['location'])
+
+        proj = Project.objects.get(
+            organization=self.org, name='Test CSV Import')
+        assert Party.objects.filter(project_id=proj.pk).count() == 10
+        assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 10
+        assert Resource.objects.filter(project_id=proj.pk).count() == 0
+        assert TenureRelationship.objects.filter(
+            project_id=proj.pk).count() == 10
+
+        for su in SpatialUnit.objects.filter(project_id=proj.pk).all():
+            if su.geometry is not None:
+                assert type(su.geometry) is Point

@@ -17,5 +17,11 @@ $(function() {
     $('input[name="original_file"]').val(file.name);
     $('input[name="details-original_file"]').val(file.name);
     $('input[name="mime_type"]').val(file.type);
+
+    // import wizard
+    $('input[name="select_file-original_file"]').val(file.name);
+    $('input[name="select_file-mime_type"]').val(file.type);
+
   });
+
 });

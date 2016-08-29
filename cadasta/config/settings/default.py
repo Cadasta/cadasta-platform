@@ -283,6 +283,29 @@ JSONATTRS_SCHEMA_SELECTORS = {
     )
 }
 
+ATTRIBUTE_GROUPS = {
+    'location_attributes': {
+        'app_label': 'spatial',
+        'model': 'spatialunit'
+    },
+    'location_relationship_attributes': {
+        'app_label': 'spatial',
+        'model': 'spatialrelationship'
+    },
+    'party_attributes': {
+        'app_label': 'party',
+        'model': 'party'
+    },
+    'party_relationship_attributes': {
+        'app_label': 'party',
+        'model': 'partyrelationship'
+    },
+    'tenure_relationship_attributes': {
+        'app_label': 'party',
+        'model': 'tenurerelationship'
+    }
+}
+
 ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-platformprod'
             '-bucket/icons/{}.png')
 
@@ -304,9 +327,15 @@ MIME_LOOKUPS = {
     'officedocument.spreadsheetml.sheet': 'xlsx',
     'text/xml': 'xml',
     'application/xml': 'xml',
+    'text/csv': 'csv',
+    'text/plain': 'csv',
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/gif': 'gif',
     'image/tif': 'tiff',
     'image/tiff': 'tiff'
 }
+
+FILE_UPLOAD_HANDLERS = [
+    'organization.views.handlers.S3FileUploadHandler',
+]

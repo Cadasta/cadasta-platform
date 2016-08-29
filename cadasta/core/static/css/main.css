@@ -3759,6 +3759,9 @@ table th[class*="col-"] {
       max-width: 50%;
       min-width: 50% !important; } }
 
+#configure-defaults-wizard .padded {
+  margin-left: 1em; }
+
 .public-private-widget {
   min-height: 70px; }
   .public-private-widget > label {

@@ -1,31 +1,34 @@
 import os
 import random
-import pytest
-from pytest import raises
 from zipfile import ZipFile
 
 from django.conf import settings
 from django.forms.utils import ErrorDict
 from django.test import TestCase
+import pytest
+from pytest import raises
 
+from accounts.tests.factories import UserFactory
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Role
+
+
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
+from questionnaires.tests.factories import QuestionnaireFactory
+from django.core.files.uploadedfile import SimpleUploadedFile
+from questionnaires.exceptions import InvalidXLSForm
+from resources.tests.factories import ResourceFactory
+from resources.tests.utils import clear_temp  # noqa
+from resources.utils.io import ensure_dirs
 
 from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
-from core.tests.utils.cases import UserTestCase
-from core.tests.utils.files import make_dirs  # noqa
-from questionnaires.tests.factories import QuestionnaireFactory
-from questionnaires.exceptions import InvalidXLSForm
-from accounts.tests.factories import UserFactory
-from resources.tests.factories import ResourceFactory
-from resources.tests.utils import clear_temp  # noqa
-from resources.utils.io import ensure_dirs
-
 
 class OrganizationTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.data = {
@@ -199,6 +202,7 @@ class OrganizationTest(UserTestCase, TestCase):
 
 
 class AddOrganizationMemberFormTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.org = OrganizationFactory.create()
@@ -237,6 +241,7 @@ class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 
 
 class EditOrganizationMemberFormTest(UserTestCase, TestCase):
+
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
         user = UserFactory.create()
@@ -309,6 +314,7 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
 
 
 class ProjectAddDetailsTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.org = OrganizationFactory.create()
@@ -419,6 +425,7 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectEditDetailsTest(UserTestCase, TestCase):
+
     def setUp(self):
         self.project = ProjectFactory.create()
         self.data = {
@@ -513,8 +520,8 @@ class ProjectEditDetailsTest(UserTestCase, TestCase):
         project.refresh_from_db()
         assert project.name == data['name']
         assert (project.questionnaires.get(
-                    id=project.current_questionnaire
-                ).xls_form.url == data['questionnaire'])
+            id=project.current_questionnaire
+        ).xls_form.url == data['questionnaire'])
 
     def test_delete_questionnaire(self):
         project = ProjectFactory.create()
@@ -583,6 +590,7 @@ class ProjectEditDetailsTest(UserTestCase, TestCase):
 
 
 class UpdateProjectRolesTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
@@ -627,6 +635,7 @@ class UpdateProjectRolesTest(UserTestCase, TestCase):
 
 
 class ProjectEditPermissionsTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
@@ -690,6 +699,7 @@ class ProjectEditPermissionsTest(UserTestCase, TestCase):
 
 
 class ContactsFormTest(UserTestCase, TestCase):
+
     def test_as_table(self):
         form = forms.ContactsForm(prefix='c')
         html = form.as_table()
@@ -920,6 +930,7 @@ class ContactsFormTest(UserTestCase, TestCase):
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
 class DownloadFormTest(UserTestCase, TestCase):
+
     def test_init(self):
         ensure_dirs()
         user = UserFactory.build()
@@ -1000,3 +1011,31 @@ class DownloadFormTest(UserTestCase, TestCase):
             assert 'resources.xlsx' in testzip.namelist()
             assert 'data.xlsx' in testzip.namelist()
             assert 'data-shp.zip' in testzip.namelist()
+
+
+class SelectImportFormTest(UserTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.org = OrganizationFactory.create(name='Test Org')
+        self.project = ProjectFactory.create(
+            name='Test Project', organization=self.org)
+        self.user = UserFactory.create()
+        self.invalid_file_type = '/organization/tests/files/test_invalid.kml'
+        self.path = os.path.dirname(settings.BASE_DIR)
+        self.data = {
+            'name': 'Test Imports',
+            'description': 'A description of the import',
+            'type': 'csv'
+        }
+
+    def test_invalid_file_type(self):
+        invalid_file = open(self.path + self.invalid_file_type, 'rb').read()
+        file = SimpleUploadedFile(
+            'test_invalid.kml', invalid_file, 'application/kml')
+        file_dict = {'file': file}
+        form = forms.SelectImportForm(
+            files=file_dict, data=self.data,
+            project=self.project, user=self.user)
+        assert form.is_valid() is False
+        assert form.errors['file'][0] == 'Invalid file type'
