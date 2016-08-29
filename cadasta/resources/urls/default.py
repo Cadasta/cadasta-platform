@@ -32,6 +32,10 @@ urls = [
         r'^resources/(?P<resource>[-\w]+)/unarchive/$',
         default.ResourceUnarchive.as_view(),
         name='unarchive'),
+    url(
+        r'^resources/(?P<resource>[-\w]+)/detach/(?P<attachment>[-\w]+)/$',
+        default.ResourceDetach.as_view(),
+        name='detach'),
 ]
 
 urlpatterns = [

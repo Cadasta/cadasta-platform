@@ -1,9 +1,10 @@
 from django.core.urlresolvers import reverse
+from django.contrib.contenttypes.models import ContentType
 from django.http import Http404
 
 from organization.views.mixins import ProjectMixin
 
-from ..models import Resource
+from ..models import Resource, ContentObject
 from ..serializers import ResourceSerializer
 from ..forms import ResourceForm
 
@@ -13,7 +14,14 @@ class ResourceViewMixin:
     serializer_class = ResourceSerializer
 
     def get_queryset(self):
-        return self.get_content_object().resources.all()
+        if hasattr(self, 'use_resource_library_queryset'):
+            resource_library = self.get_project().resource_set
+            if self.is_superuser:
+                return resource_library.all()
+            else:
+                return resource_library.filter(archived=False)
+        else:
+            return self.get_content_object().resources.all()
 
     def get_model_context(self):
         return {
@@ -84,10 +92,58 @@ class ResourceObjectMixin(ProjectResourceMixin):
         return context
 
 
-class ProjectHasResourcesMixin(ProjectMixin):
+class HasUnattachedResourcesMixin(ProjectMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['project_has_resources'] = (
-            self.get_project().resource_set.exists()
+
+        # Determine the object that can have resources
+        if hasattr(self, 'get_content_object'):
+            # This is for views for uploading a new resource
+            # or the ProjectResources view
+            object = self.get_content_object()
+        elif hasattr(self, 'object'):
+            # This is for views that list entity resources
+            object = self.object
+
+        project_resource_set = self.get_project().resource_set.filter(
+            archived=False)
+        if (
+            project_resource_set.exists() and
+            project_resource_set.count() != object.resources.count()
+        ):
+            context['has_unattached_resources'] = True
+
+        return context
+
+
+class DetachableResourcesListMixin(ProjectMixin):
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        # Get current object whose resources is being listed
+        if hasattr(self, 'get_object'):
+            content_object = self.get_object()
+        else:
+            content_object = self.get_project()
+        model_type = ContentType.objects.get_for_model(content_object)
+
+        # Get the list of resources to be displayed
+        if hasattr(self, 'get_resource_list'):
+            resource_list = self.get_resource_list()
+        else:
+            resource_list = content_object.resources.all()
+
+        # Get attachment IDs as a dictionary keyed on resource IDs
+        attachments = ContentObject.objects.filter(
+            content_type__pk=model_type.id,
+            object_id=content_object.id,
         )
+        attachment_id_dict = {x.resource.id: x.id for x in attachments}
+
+        # Update resource list with attachment IDs referring to the object
+        for resource in resource_list:
+            attachment_id = attachment_id_dict.get(resource.id, None)
+            setattr(resource, 'attachment_id', attachment_id)
+
+        context['resource_list'] = resource_list
         return context

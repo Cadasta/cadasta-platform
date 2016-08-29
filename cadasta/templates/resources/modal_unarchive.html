@@ -1,0 +1,27 @@
+{% load i18n %}
+
+<div class="modal fade" id="undelete_resource_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Restore deleted resource" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Are you sure you want to restore this deleted resource?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="{{ unarchive_url }}?next={{ success_url }}" class="btn btn-primary unarchive-final pull-right" role="button">
+          {% trans "Yes, restore this resource" %}
+        </a>
+        <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

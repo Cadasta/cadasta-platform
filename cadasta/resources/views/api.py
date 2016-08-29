@@ -1,9 +1,11 @@
 from rest_framework import generics, filters
 from tutelary.mixins import APIPermissionRequiredMixin
+from core.views.mixins import SuperUserCheckMixin
 from .mixins import ProjectResourceMixin
 
 
 class ProjectResources(APIPermissionRequiredMixin,
+                       SuperUserCheckMixin,
                        ProjectResourceMixin,
                        generics.ListCreateAPIView):
     filter_backends = (filters.DjangoFilterBackend,
@@ -17,9 +19,11 @@ class ProjectResources(APIPermissionRequiredMixin,
         'POST': 'resource.add'
     }
     permission_filter_queryset = ('resource.view',)
+    use_resource_library_queryset = True
 
 
 class ProjectResourcesDetail(APIPermissionRequiredMixin,
+                             SuperUserCheckMixin,
                              ProjectResourceMixin,
                              generics.RetrieveUpdateAPIView):
     def patch_actions(self, request):
@@ -37,3 +41,4 @@ class ProjectResourcesDetail(APIPermissionRequiredMixin,
         'GET': 'resource.view',
         'PATCH': patch_actions
     }
+    use_resource_library_queryset = True

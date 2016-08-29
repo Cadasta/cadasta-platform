@@ -10,12 +10,16 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.api import get_messages
 
 from buckets.test.storage import FakeS3Storage
-from tutelary.models import Policy, assign_user_policies
+from tutelary.models import Policy, Role, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
 from core.tests.util import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
+from spatial.tests.factories import SpatialUnitFactory
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from accounts.tests.factories import UserFactory
+from resources.models import Resource
+from ..models import ContentObject
 from ..views import default
 from ..forms import ResourceForm, AddResourceFromLibraryForm
 from .factories import ResourceFactory
@@ -64,10 +68,17 @@ class ProjectResourcesTest(UserTestCase):
             name='allow',
             body=json.dumps(clauses))
         assign_user_policies(self.user, self.policy)
+        self.superuser_role = Role.objects.get(name='superuser')
 
     def _get(self, user=None, status=None, resources=None):
         if user is None:
             user = self.user
+            Policy.objects.get(name='default')
+        if hasattr(user, 'assigned_policies'):
+            is_superuser = self.superuser_role in user.assigned_policies()
+        else:
+            is_superuser = False
+        is_administrator = is_superuser
         if resources is None:
             resources = self.resources
 
@@ -85,13 +96,30 @@ class ProjectResourcesTest(UserTestCase):
 
         if response.status_code == 200:
             content = response.render().content.decode('utf-8')
+
+            resource_list = []
+            if len(resources) > 0:
+                object_id = resources[0].project.id
+                attachments = ContentObject.objects.filter(object_id=object_id)
+                attachment_id_dict = {x.resource.id: x.id for x in attachments}
+                for resource in resources:
+                    resource_list.append(resource)
+                    attachment_id = attachment_id_dict.get(resource.id, None)
+                    setattr(resource, 'attachment_id', attachment_id)
+
+            resource_set = self.project.resource_set.filter(archived=False)
             expected = render_to_string(
                 'resources/project_list.html',
                 {
                     'object_list': resources,
                     'object': self.project,
-                    'project_has_resources': (
-                        self.project.resource_set.exists()),
+                    'has_unattached_resources': (
+                        resource_set.exists() and
+                        resource_set.count() != self.project.resources.count()
+                    ),
+                    'resource_list': resource_list,
+                    'is_superuser': is_superuser,
+                    'is_administrator': is_administrator,
                 },
                 request=self.request
             )
@@ -99,7 +127,30 @@ class ProjectResourcesTest(UserTestCase):
         return response
 
     def test_get_list(self):
-        self._get(status=200)
+        resources = Resource.objects.filter(project=self.project,
+                                            archived=False).exclude(
+                                            pk=self.denied.pk)
+        self._get(status=200, resources=resources)
+
+    def test_get_list_with_unattached_resource_using_nonsuperuser(self):
+        ResourceFactory.create(project=self.project)
+        resources = Resource.objects.filter(project=self.project).exclude(
+                                            pk=self.denied.pk)
+        self._get(status=200, resources=resources)
+
+    def test_get_list_with_archived_resource(self):
+        ResourceFactory.create(project=self.project, archived=True)
+        resources = Resource.objects.filter(project=self.project,
+                                            archived=False).exclude(
+                                            pk=self.denied.pk)
+        self._get(status=200, resources=resources)
+
+    def test_get_list_with_archived_resource_using_superuser(self):
+        superuser = UserFactory.create()
+        superuser.assign_policies(self.policy, self.superuser_role)
+        ResourceFactory.create(project=self.project, archived=True)
+        resources = Resource.objects.filter(project=self.project)
+        self._get(status=200, user=superuser, resources=resources)
 
     def test_get_with_unauthorized_user(self):
         self._get(status=200, user=UserFactory.create(), resources=[])
@@ -120,9 +171,9 @@ class ProjectResourcesAddTest(UserTestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
-        self.assigned = ResourceFactory.create(project=self.project,
+        self.attached = ResourceFactory.create(project=self.project,
                                                content_object=self.project)
-        self.unassigned = ResourceFactory.create(project=self.project)
+        self.unattached = ResourceFactory.create(project=self.project)
 
         self.view = default.ProjectResourcesAdd.as_view()
         self.request = HttpRequest()
@@ -165,8 +216,8 @@ class ProjectResourcesAddTest(UserTestCase):
 
     def _post(self, user=None, status=None, expected_redirect=None):
         data = {
-            self.assigned.id: False,
-            self.unassigned.id: True,
+            self.attached.id: False,
+            self.unattached.id: True,
         }
 
         if user is None:
@@ -215,21 +266,23 @@ class ProjectResourcesAddTest(UserTestCase):
             }
         )
         self._post(status=302, expected_redirect=redirect_url)
-        assert self.project.resources.count() == 1
-        assert self.project.resources.first() == self.unassigned
+        project_resources = self.project.resources.all()
+        assert len(project_resources) == 2
+        assert self.attached in project_resources
+        assert self.unattached in project_resources
 
     def test_post_with_unauthorized_user(self):
         self._post(status=302, user=UserFactory.create())
         assert ("You don't have permission to add resources."
                 in [str(m) for m in get_messages(self.request)])
         assert self.project.resources.count() == 1
-        assert self.project.resources.first() == self.assigned
+        assert self.project.resources.first() == self.attached
 
     def test_post_with_unauthenticated_user(self):
         self._post(status=302, user=AnonymousUser(),
                    expected_redirect='/account/login/')
         assert self.project.resources.count() == 1
-        assert self.project.resources.first() == self.assigned
+        assert self.project.resources.first() == self.attached
 
 
 @pytest.mark.usefixtures('clear_temp')
@@ -357,8 +410,27 @@ class ProjectResourcesDetailTest(UserTestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
-        self.resource = ResourceFactory.create(content_object=self.project,
-                                               project=self.project)
+        self.org_slug = self.project.organization.slug
+        self.resource = ResourceFactory.create(project=self.project)
+        self.location = SpatialUnitFactory.create(project=self.project)
+        self.party = PartyFactory.create(project=self.project)
+        self.tenurerel = TenureRelationshipFactory.create(project=self.project)
+        self.project_attachment = ContentObject.objects.create(
+            resource_id=self.resource.id,
+            content_object=self.project,
+        )
+        self.location_attachment = ContentObject.objects.create(
+            resource_id=self.resource.id,
+            content_object=self.location,
+        )
+        self.party_attachment = ContentObject.objects.create(
+            resource_id=self.resource.id,
+            content_object=self.party,
+        )
+        self.tenurerel_attachment = ContentObject.objects.create(
+            resource_id=self.resource.id,
+            content_object=self.tenurerel,
+        )
 
         self.view = default.ProjectResourcesDetail.as_view()
         self.request = HttpRequest()
@@ -380,7 +452,7 @@ class ProjectResourcesDetailTest(UserTestCase):
         setattr(self.request, '_messages', self.messages)
 
         response = self.view(self.request,
-                             organization=self.project.organization.slug,
+                             organization=self.org_slug,
                              project=self.project.slug,
                              resource=self.resource.id)
 
@@ -391,9 +463,68 @@ class ProjectResourcesDetailTest(UserTestCase):
             content = response.render().content.decode('utf-8')
             expected = render_to_string(
                 'resources/project_detail.html',
-                {'object_list': self.project.resources,
-                 'object': self.project,
-                 'resource': self.resource},
+                {
+                    'object': self.project,
+                    'resource': self.resource,
+                    'attachment_list': [
+                        {
+                            'url': reverse(
+                                'organization:project-dashboard',
+                                kwargs={
+                                    'organization': self.org_slug,
+                                    'project': self.project.slug,
+                                },
+                            ),
+                            'class': "Project",
+                            'name': self.project.name,
+                            'id': self.project_attachment.id,
+                        },
+                        {
+                            'url': reverse(
+                                'locations:detail',
+                                kwargs={
+                                    'organization': self.org_slug,
+                                    'project': self.project.slug,
+                                    'location': self.location.id,
+                                },
+                            ),
+                            'class': "Location",
+                            'name': self.location.get_type_display(),
+                            'id': self.location_attachment.id,
+                        },
+                        {
+                            'url': reverse(
+                                'parties:detail',
+                                kwargs={
+                                    'organization': self.org_slug,
+                                    'project': self.project.slug,
+                                    'party': self.party.id,
+                                },
+                            ),
+                            'class': "Party",
+                            'name': self.party.name,
+                            'id': self.party_attachment.id,
+                        },
+                        {
+                            'url': reverse(
+                                'parties:relationship_detail',
+                                kwargs={
+                                    'organization': self.org_slug,
+                                    'project': self.project.slug,
+                                    'relationship': self.tenurerel.id,
+                                },
+                            ),
+                            'class': "Relationship",
+                            'name': "<{party}> {type} <{su}>".format(
+                                party=self.tenurerel.party.name,
+                                su=(self.tenurerel.spatial_unit.
+                                    get_type_display()),
+                                type=self.tenurerel.tenure_type.label,
+                            ),
+                            'id': self.tenurerel_attachment.id,
+                        },
+                    ],
+                },
                 request=self.request
             )
             assert expected == content
@@ -772,3 +903,172 @@ class ResourceUnArchiveTest(UserTestCase):
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
+
+
+@pytest.mark.usefixtures('make_dirs')
+class ResourceDetachTest(UserTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.project = ProjectFactory.create()
+        self.location = SpatialUnitFactory.create(project=self.project)
+        self.resource = ResourceFactory.create(project=self.project)
+        self.project_attachment = ContentObject.objects.create(
+            resource_id=self.resource.id,
+            content_object=self.project,
+        )
+        self.location_attachment = ContentObject.objects.create(
+            resource_id=self.resource.id,
+            content_object=self.location,
+        )
+
+        self.user = UserFactory.create()
+        self.policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        assign_user_policies(self.user, self.policy)
+
+        self.view = default.ResourceDetach.as_view()
+        self.request = HttpRequest()
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+        self.redirect_url = reverse(
+            'resources:project_list',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug
+            }
+        )
+
+    def _post(self, attachment_id, user=None):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
+        file_name = storage.save('resources/image.jpg', file)
+        self.data = {
+            'name': 'Some name',
+            'description': '',
+            'file': file_name,
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
+        }
+
+        if user is None:
+            user = self.user
+        setattr(self.request, 'user', user)
+
+        response = self.view(
+            self.request,
+            organization=self.project.organization.slug,
+            project=self.project.slug,
+            resource=self.resource.id,
+            attachment=attachment_id,
+        )
+        return response
+
+    def refresh_objects_from_db(self):
+        self.resource.refresh_from_db()
+        self.project.refresh_from_db()
+        self.project.reload_resources()
+        self.location.refresh_from_db()
+        self.location.reload_resources()
+
+    def test_detach_from_project(self):
+        response = self._post(self.project_attachment.id)
+        assert response.status_code == 302
+        assert self.redirect_url in response['location']
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 1
+        assert self.project.resources.count() == 0
+        location_resources = self.location.resources
+        assert location_resources.count() == 1
+        assert location_resources.first() == self.resource
+
+    def test_detach_from_location(self):
+        response = self._post(self.location_attachment.id)
+        assert response.status_code == 302
+        assert self.redirect_url in response['location']
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 1
+        assert self.location.resources.count() == 0
+        project_resources = self.project.resources
+        assert project_resources.count() == 1
+        assert project_resources.first() == self.resource
+
+    def test_detach_with_next_url(self):
+        setattr(self.request, 'GET', {'next': '/dashboard/'})
+        response = self._post(self.project_attachment.id)
+        assert response.status_code == 302
+        assert '/dashboard/' in response['location']
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 1
+        assert self.project.resources.count() == 0
+        location_resources = self.location.resources
+        assert location_resources.count() == 1
+        assert location_resources.first() == self.resource
+
+    def test_detach_with_nonexistent_project(self):
+        setattr(self.request, 'user', self.user)
+        with pytest.raises(Http404):
+            self.view(
+                self.request,
+                organization='some-org',
+                project='some-project',
+                resource=self.resource.id,
+                attachment=self.project_attachment.id,
+            )
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 2
+        assert self.project.resources.count() == 1
+        assert self.location.resources.count() == 1
+
+    def test_detach_with_nonexistent_resource(self):
+        setattr(self.request, 'user', self.user)
+        with pytest.raises(Http404):
+            self.view(
+                self.request,
+                organization=self.project.organization.slug,
+                project=self.project.slug,
+                resource='abc123',
+                attachment=self.project_attachment.id,
+            )
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 2
+        assert self.project.resources.count() == 1
+        assert self.location.resources.count() == 1
+
+    def test_detach_with_nonexistent_attachment(self):
+        setattr(self.request, 'user', self.user)
+        with pytest.raises(Http404):
+            self.view(
+                self.request,
+                organization=self.project.organization.slug,
+                project=self.project.slug,
+                resource=self.resource.id,
+                attachment='abc123',
+            )
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 2
+        assert self.project.resources.count() == 1
+        assert self.location.resources.count() == 1
+
+    def test_detach_with_unauthorized_user(self):
+        response = self._post(self.project_attachment.id,
+                              user=UserFactory.create())
+        assert ("You don't have permission to edit this resource."
+                in [str(m) for m in get_messages(self.request)])
+        assert response.status_code == 302
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 2
+        assert self.project.resources.count() == 1
+        assert self.location.resources.count() == 1
+
+    def test_detach_with_unauthenticated_user(self):
+        response = self._post(self.project_attachment.id, user=AnonymousUser())
+        assert response.status_code == 302
+        assert '/account/login/' in response['location']
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 2
+        assert self.project.resources.count() == 1
+        assert self.location.resources.count() == 1

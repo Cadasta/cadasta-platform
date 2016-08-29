@@ -4,7 +4,7 @@ import json
 from django.http import QueryDict
 from django.conf import settings
 from rest_framework.test import APIRequestFactory, force_authenticate
-from tutelary.models import Policy
+from tutelary.models import Policy, Role
 
 from core.tests.base_test_case import UserTestCase
 from core.tests.util import make_dirs  # noqa
@@ -44,7 +44,7 @@ class ProjectResourcesTest(UserTestCase):
 
         self.project = ProjectFactory.create()
         self.resources = ResourceFactory.create_batch(
-            2, content_object=self.project)
+            2, content_object=self.project, project=self.project)
         self.denied = ResourceFactory.create(content_object=self.project,
                                              project=self.project)
         ResourceFactory.create()
@@ -57,11 +57,12 @@ class ProjectResourcesTest(UserTestCase):
             'action': ['resource.*']
         })
 
-        policy = Policy.objects.create(
+        self.policy = Policy.objects.create(
             name='allow',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
-        self.user.assign_policies(policy)
+        self.user.assign_policies(self.policy)
+        self.superuser_role = Role.objects.get(name='superuser')
 
     def _get(self, org, prj, query=None, user=None, status=None, count=None):
         if user is None:
@@ -149,7 +150,7 @@ class ProjectResourcesTest(UserTestCase):
                    count=3,
                    user=UserFactory.create())
 
-    def test_add_exisiting_resource(self):
+    def test_add_existing_resource(self):
         new_resource = ResourceFactory.create()
         data = {'id': new_resource.id}
         self._post(self.project.organization.slug,
@@ -174,40 +175,69 @@ class ProjectResourcesTest(UserTestCase):
 
     def test_search_for_file(self):
         not_found = self.storage.save('resources/bild.jpg', self.file)
-        project = ProjectFactory.create()
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'file': self.file_name},
-            {'content_object': project, 'file': self.file_name},
-            {'content_object': project, 'file': not_found}
+            {'content_object': prj, 'project': prj, 'file': self.file_name},
+            {'content_object': prj, 'project': prj, 'file': self.file_name},
+            {'content_object': prj, 'project': prj, 'file': not_found}
         ])
-        self._get(project.organization.slug,
-                  project.slug,
+        self._get(prj.organization.slug,
+                  prj.slug,
                   query='search=image',
                   status=200,
                   count=2)
 
-    def test_filter_active(self):
-        project = ProjectFactory.create()
+    def test_filter_unarchived(self):
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'archived': True},
-            {'content_object': project, 'archived': True},
-            {'content_object': project, 'archived': False},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': False},
         ])
-        self._get(project.organization.slug,
-                  project.slug,
+        self._get(prj.organization.slug,
+                  prj.slug,
+                  query='archived=False',
+                  status=200,
+                  count=1)
+
+    def test_filter_archived_with_nonsuperuser(self):
+        prj = ProjectFactory.create()
+        ResourceFactory.create_from_kwargs([
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': False},
+        ])
+        self._get(prj.organization.slug,
+                  prj.slug,
                   query='archived=True',
                   status=200,
-                  count=2)
+                  count=0)
+
+    def test_filter_archived_with_superuser(self):
+        prj = ProjectFactory.create()
+        ResourceFactory.create_from_kwargs([
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': False},
+        ])
+        superuser = UserFactory.create()
+        superuser.assign_policies(self.policy, self.superuser_role)
+        self._get(prj.organization.slug,
+                  prj.slug,
+                  query='archived=True',
+                  status=200,
+                  count=2,
+                  user=superuser)
 
     def test_ordering(self):
-        project = ProjectFactory.create()
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'name': 'A'},
-            {'content_object': project, 'name': 'B'},
-            {'content_object': project, 'name': 'C'},
+            {'content_object': prj, 'project': prj, 'name': 'A'},
+            {'content_object': prj, 'project': prj, 'name': 'B'},
+            {'content_object': prj, 'project': prj, 'name': 'C'},
         ])
-        content = self._get(project.organization.slug,
-                            project.slug,
+        content = self._get(prj.organization.slug,
+                            prj.slug,
                             query='ordering=name',
                             status=200,
                             count=3)
@@ -215,14 +245,14 @@ class ProjectResourcesTest(UserTestCase):
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
-        project = ProjectFactory.create()
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'name': 'A'},
-            {'content_object': project, 'name': 'B'},
-            {'content_object': project, 'name': 'C'},
+            {'content_object': prj, 'project': prj, 'name': 'A'},
+            {'content_object': prj, 'project': prj, 'name': 'B'},
+            {'content_object': prj, 'project': prj, 'name': 'C'},
         ])
-        content = self._get(project.organization.slug,
-                            project.slug,
+        content = self._get(prj.organization.slug,
+                            prj.slug,
                             query='ordering=-name',
                             status=200,
                             count=3)
@@ -236,14 +266,16 @@ class ProjectResourcesDetailTest(UserTestCase):
         super().setUp()
 
         self.project = ProjectFactory.create()
-        self.resource = ResourceFactory.create(content_object=self.project)
+        self.resource = ResourceFactory.create(content_object=self.project,
+                                               project=self.project)
         self.view = api.ProjectResourcesDetail.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/{res}'
-        policy = Policy.objects.create(
+        self.policy = Policy.objects.create(
             name='allow',
             body=json.dumps(clauses))
         self.user = UserFactory.create()
-        self.user.assign_policies(policy)
+        self.user.assign_policies(self.policy)
+        self.superuser_role = Role.objects.get(name='superuser')
 
     def _get(self, org, prj, res, user=None, status=None, count=None):
         if user is None:
@@ -379,29 +411,28 @@ class ProjectResourcesDetailTest(UserTestCase):
         self.resource.refresh_from_db()
         assert self.resource.archived is False
 
-    def test_unarchive_resource(self):
+    def test_unarchive_resource_with_nonsuperuser(self):
         self.resource.archived = True
         self.resource.save()
         data = {'archived': False}
+        self._patch(self.project.organization.slug,
+                    self.project.slug,
+                    self.resource.id,
+                    data,
+                    status=404)
+
+    def test_unarchive_resource_with_superuser(self):
+        self.resource.archived = True
+        self.resource.save()
+        data = {'archived': False}
+        superuser = UserFactory.create()
+        superuser.assign_policies(self.policy, self.superuser_role)
         content = self._patch(self.project.organization.slug,
                               self.project.slug,
                               self.resource.id,
                               data,
-                              status=200)
+                              status=200,
+                              user=superuser)
         assert content['id'] == self.resource.id
         self.resource.refresh_from_db()
         assert self.resource.archived is False
-
-    def test_unarchive_resource_with_unauthorized_user(self):
-        self.resource.archived = True
-        self.resource.save()
-        data = {'archived': False}
-        content = self._patch(self.project.organization.slug,
-                              self.project.slug,
-                              self.resource.id,
-                              data,
-                              status=403,
-                              user=UserFactory.create())
-        assert 'id' not in content
-        self.resource.refresh_from_db()
-        assert self.resource.archived is True

@@ -1,25 +1,33 @@
 {% load i18n %}
 
 <!-- Resources index - smaller version for right panel of map -->
-<table class="table table-hover datatable" data-paging-type="simple">
+<table class="table table-hover table-condensed datatable" data-paging-type="simple">
   <thead>
     <tr>
       <th class="col-md-10">{% trans "Resource" %}</th>
-      <th class="col-md-2 hidden-md">{% trans "Connections" %}</th>
+      <th class="col-md-2">&nbsp;</th>
     </tr>
   </thead>
   <tbody>
-  {% for resource in object_list %}
+  {% for resource in resource_list %}
     <tr class="linked" onclick="window.document.location='{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}';">
       <td>
         <div class="resource-60">
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
         <div class="resource-text">
-          <strong>{{ resource.name }}</strong><br>{{ resource.file_name }}
+          <p><strong>{{ resource.name }}</strong></p>
+          <p class="small">{{ resource.original_file }}</p>
         </div>
       </td>
-      <td class="hidden-md">{{ resource.num_entities }}</td>
+      <td>
+        <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm" role="button">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
+          </button>
+        </form>
+      </td>
     </tr>
   {% endfor %}
   </tbody>

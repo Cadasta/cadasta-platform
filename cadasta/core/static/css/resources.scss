@@ -1,14 +1,12 @@
 /* =Resources
 -------------------------------------------------------------- */
 
-
-div.resource-60 {
-  float: left;
-  padding: 0 10px;
-}
+ div.resource-60 {
+ }
 
 div.resource-text {
-  margin-left: 90px;
+  display: table-cell;
+  margin-left: 80px;
   word-wrap: break-word;
 }
 
@@ -23,6 +21,8 @@ ul.resource-actions > li {
   margin: 12px 0;
   &:first-child {
     padding-left: 0;
-    border-right: 1px solid $table-border-color;
+  }
+  &+li {
+    border-left: 1px solid $table-border-color;
   }
 }

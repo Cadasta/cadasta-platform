@@ -3994,12 +3994,9 @@ div.org-logo {
 
 /* =Resources
 -------------------------------------------------------------- */
-div.resource-60 {
-  float: left;
-  padding: 0 10px; }
-
 div.resource-text {
-  margin-left: 90px;
+  display: table-cell;
+  margin-left: 80px;
   word-wrap: break-word; }
 
 .panel-body h4 {
@@ -4011,8 +4008,9 @@ ul.resource-actions > li {
   padding: 4px 12px;
   margin: 12px 0; }
   ul.resource-actions > li:first-child {
-    padding-left: 0;
-    border-right: 1px solid #e7e8ea; }
+    padding-left: 0; }
+  ul.resource-actions > li + li {
+    border-left: 1px solid #e7e8ea; }
 
 /* =For styles only found in single project or organization pages
 -------------------------------------------------------------- */
@@ -5740,12 +5738,13 @@ textarea.form-control {
     text-transform: uppercase;
     font-size: 12px;
     opacity: 0.7;
-    padding: 4px 24px;
     background: #f2f4f7; }
   .table > tbody > tr.linked > td:hover {
     cursor: pointer; }
   .table .btn-sm {
-    min-width: 90px; }
+    min-width: 80px !important; }
+  .table .table-condensed .btn-sm {
+    min-width: 60px !important; }
   .table div.org-logo {
     padding: 4px 0; }
 
@@ -5928,7 +5927,7 @@ div.add-btn-btm {
   .btn-full .btn {
     min-width: 100px; } }
 
-/* =Alerts
+/* =Alerts and labels
 -------------------------------------------------------------- */
 .alert {
   text-align: center;
@@ -5971,6 +5970,14 @@ div.add-btn-btm {
     border-top-color: #e4b9c0; }
   .alert-error .alert-link {
     color: #843534; }
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: middle; }
+
+h1.label {
+  font-size: 14px; }
 
 @media (max-width: 991px) {
   .alert {
