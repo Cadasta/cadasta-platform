@@ -1,7 +1,0 @@
-- name: Load static data
-  become: yes
-  become_user: "{{ app_user }}"
-  django_manage: command=loadstatic
-                 app_path="{{ application_path }}cadasta"
-                 virtualenv="{{ virtualenv_path }}"
-                 settings="{{ django_settings }}"
