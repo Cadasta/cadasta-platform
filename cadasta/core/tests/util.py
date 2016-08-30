@@ -30,7 +30,7 @@ class TestCase(DjangoTestCase):
     def setUp(self):
         PolicyFactory.load_policies()
         create_attribute_types()
-        load_tenure_relationship_types()
+        load_tenure_relationship_types(force=True)
         self.authorized_user = UserFactory.create()
         self.unauthorized_user = UserFactory.create()
 

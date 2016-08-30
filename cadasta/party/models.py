@@ -308,7 +308,9 @@ TENURE_RELATIONSHIP_TYPES = (
 )
 
 
-def load_tenure_relationship_types():
+def load_tenure_relationship_types(force=False):
+    if force:
+        TenureRelationshipType.objects.all().delete()
     for tr_type in TENURE_RELATIONSHIP_TYPES:
         if not TenureRelationshipType.objects.filter(
                 id=tr_type[0], label=tr_type[1]
