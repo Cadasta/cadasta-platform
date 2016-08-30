@@ -1,21 +1,22 @@
 import json
 
-from django.http import HttpRequest
+from accounts.tests.factories import UserFactory
+from core.tests.base_test_case import UserTestCase
 from django.contrib.auth.models import AnonymousUser
+from django.http import HttpRequest
 from django.template import RequestContext
 from django.template.loader import render_to_string
-
-from core.tests.base_test_case import UserTestCase
-from tutelary.models import Role
-from accounts.tests.factories import UserFactory
-from organization.tests.factories import OrganizationFactory, ProjectFactory
+from django.test import TestCase
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+from tutelary.models import Role
 
-from ..views.default import IndexPage, Dashboard
+from ..views.default import Dashboard, IndexPage, server_error
 
 
 class IndexPageTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = IndexPage.as_view()
@@ -37,6 +38,7 @@ class IndexPageTest(UserTestCase):
 
 
 class DashboardTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
         self.view = Dashboard.as_view()
@@ -117,3 +119,14 @@ class DashboardTest(UserTestCase):
         response = self.view(self.request).render()
         assert response.status_code == 200
         self._test_projects_rendered(response, superuser=True)
+
+
+class ServerErrorTest(TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.request = HttpRequest()
+
+    def test_server_error(self):
+        response = server_error(self.request, template_name='500.html')
+        assert response.status_code == 500
