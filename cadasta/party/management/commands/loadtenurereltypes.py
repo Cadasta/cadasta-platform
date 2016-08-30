@@ -7,4 +7,4 @@ class Command(BaseCommand):
     help = "Load tenure relationship types."
 
     def handle(self, *args, **options):
-        load_tenure_relationship_types()
+        load_tenure_relationship_types(force=options['force'])

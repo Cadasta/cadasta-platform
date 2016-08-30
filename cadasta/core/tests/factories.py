@@ -29,7 +29,7 @@ class PolicyFactory(factory.django.DjangoModelFactory):
         return kwargs
 
     def load_policies():
-        load.run()
+        load.run(force=True)
 
 
 class RoleFactory(factory.django.DjangoModelFactory):

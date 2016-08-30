@@ -3,8 +3,13 @@ from django.conf import settings
 from tutelary import models
 
 
-def run(verbose=True):
+def run(verbose=True, force=False):
     PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
+
+    if force:
+        models.PermissionSet.objects.all().delete()
+        models.Role.objects.all().delete()
+        models.Policy.objects.all().delete()
 
     pols = {}
     for pol in ['default', 'superuser', 'org-admin', 'org-member',
