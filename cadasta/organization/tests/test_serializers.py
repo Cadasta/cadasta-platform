@@ -334,7 +334,7 @@ class OrganizationUserSerializerTest(UserTestCase):
 
         assert serializer.data['username'] == user.username
         assert serializer.data['email'] == user.email
-        assert serializer.data['role'] == 'User'
+        assert serializer.data['admin'] is False
 
     def test_list_to_representation(self):
         users = UserFactory.create_batch(2)
@@ -349,16 +349,17 @@ class OrganizationUserSerializerTest(UserTestCase):
 
         assert len(serializer.data) == 3
 
+        print(serializer.data)
         for u in serializer.data:
-            if u['username'] is org_admin.username:
-                assert u['role'] == 'Admin'
+            if u['username'] == org_admin.username:
+                assert u['admin'] is True
             else:
-                assert u['role'] == 'User'
+                assert u['admin'] is False
 
     def test_set_roles_with_username(self):
         user = UserFactory.create()
         org = OrganizationFactory.create()
-        data = {'username': user.username, 'role': 'Admin'}
+        data = {'username': user.username, 'admin': True}
         serializer = serializers.OrganizationUserSerializer(
             data=data,
             context={
@@ -377,7 +378,7 @@ class OrganizationUserSerializerTest(UserTestCase):
     def test_set_roles_with_email(self):
         user = UserFactory.create()
         org = OrganizationFactory.create()
-        data = {'username': user.email, 'role': 'Admin'}
+        data = {'username': user.email, 'admin': True}
         serializer = serializers.OrganizationUserSerializer(
             data=data,
             context={
@@ -395,7 +396,7 @@ class OrganizationUserSerializerTest(UserTestCase):
 
     def test_set_roles_for_user_that_does_not_exist(self):
         org = OrganizationFactory.create()
-        data = {'username': 'some-user', 'role': 'Admin'}
+        data = {'username': 'some-user', 'admin': True}
         serializer = serializers.OrganizationUserSerializer(
             data=data, context={'organization': org}
         )
@@ -410,7 +411,7 @@ class OrganizationUserSerializerTest(UserTestCase):
         org = OrganizationFactory.create()
         user1 = UserFactory.create(email='some-user@some.com')
         UserFactory.create(email='some-user@some.com')
-        data = {'username': user1.email, 'role': 'Admin'}
+        data = {'username': user1.email, 'admin': 'true'}
         serializer = serializers.OrganizationUserSerializer(
             data=data, context={'organization': org}
         )
@@ -427,7 +428,7 @@ class OrganizationUserSerializerTest(UserTestCase):
         org = OrganizationFactory.create(add_users=[user])
         serializer = serializers.OrganizationUserSerializer(
             user,
-            data={'role': 'Admin'},
+            data={'admin': 'True'},
             partial=True,
             context={'organization': org}
         )
@@ -466,7 +467,7 @@ class ProjectUserSerializerTest(UserTestCase):
         assert len(serializer.data) == 3
 
         for u in serializer.data:
-            if u['username'] is prj_admin.username:
+            if u['username'] == prj_admin.username:
                 assert u['role'] == 'PM'
             else:
                 assert u['role'] == 'PU'

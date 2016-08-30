@@ -4,7 +4,7 @@ from tutelary.mixins import APIPermissionRequiredMixin
 
 from accounts.models import User
 
-from ..models import Organization
+from ..models import Organization, OrganizationRole, ProjectRole
 from .. import serializers
 from . import mixins
 
@@ -63,9 +63,9 @@ class OrganizationUsersDetail(APIPermissionRequiredMixin,
     permission_required = 'org.users.remove'
 
     def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        role = self.org.users.get(id=user.id)
-        role.delete()
+        OrganizationRole.objects.get(
+            organization=self.org, user=self.get_object()
+        ).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -195,8 +195,8 @@ class ProjectUsersDetail(APIPermissionRequiredMixin,
     }
 
     def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        role = self.prj.users.get(id=user.id)
-        role.delete()
+        ProjectRole.objects.get(
+            project=self.prj, user=self.get_object()
+        ).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
