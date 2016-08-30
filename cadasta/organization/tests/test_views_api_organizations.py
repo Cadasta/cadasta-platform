@@ -8,6 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
+from accounts.models import User
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, clause
 from ..models import Organization, OrganizationRole
@@ -372,6 +373,8 @@ class OrganizationUsersAPITest(UserTestCase):
         org = self.create_normal_org()
         new_user = UserFactory.create()
         self._post(org, {'username': new_user.username}, status=201, count=3)
+        r = OrganizationRole.objects.get(organization=org, user=new_user)
+        assert not r.admin
 
     def test_add_user_with_unauthorized_user(self):
         org = self.create_normal_org()
@@ -470,7 +473,7 @@ class OrganizationUsersDetailAPITest(UserTestCase):
     def test_update_user(self):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
-        self._patch(org, user.username, data={'roles': {'admin': True}},
+        self._patch(org, user.username, data={'admin': 'true'},
                     status=200, count=1)
         role = OrganizationRole.objects.get(organization=org, user=user)
         assert role.admin is True
@@ -481,6 +484,7 @@ class OrganizationUsersDetailAPITest(UserTestCase):
         org = OrganizationFactory.create(add_users=[user, user_to_remove])
         self._delete(org, user_to_remove.username, status=204, count=1)
         assert user_to_remove not in org.users.all()
+        assert user_to_remove in User.objects.all()
 
     def test_remove_with_unauthorized_user(self):
         user = UserFactory.create()

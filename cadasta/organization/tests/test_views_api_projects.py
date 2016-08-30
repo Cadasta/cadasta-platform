@@ -8,6 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
+from accounts.models import User
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, ProjectFactory, clause
 from ..models import Project, ProjectRole, OrganizationRole
@@ -199,6 +200,7 @@ class ProjectUsersDetailAPITest(UserTestCase):
             assert response.status_code == status
         if count is not None:
             assert project.users.count() == count
+        assert User.objects.get(username=user) in User.objects.all()
 
     def test_get_user(self):
         user = UserFactory.create()

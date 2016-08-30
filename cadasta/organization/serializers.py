@@ -122,17 +122,18 @@ class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
 
 class EntityUserSerializer(serializers.Serializer):
     username = serializers.CharField()
-    role = serializers.CharField()
 
     def to_representation(self, instance):
         if isinstance(instance, User):
             rep = UserSerializer(instance).data
-            rep['role'] = self.get_role_json(instance)
+            rep[self.Meta.role_key] = self.get_role_json(instance)
             return rep
 
     def to_internal_value(self, data):
-        data['role'] = self.set_roles(data.get('role', None))
-        return super(EntityUserSerializer, self).to_internal_value(data)
+        data[self.Meta.role_key] = self.set_roles(
+            data.get(self.Meta.role_key, None)
+        )
+        return super().to_internal_value(data)
 
     def validate_username(self, value):
         error = ""
@@ -153,8 +154,10 @@ class EntityUserSerializer(serializers.Serializer):
     def create(self, validated_data):
         obj = self.context[self.Meta.context_key]
 
+        role_value = validated_data[self.Meta.role_key]
+
         create_kwargs = {
-            self.Meta.role_key: validated_data['role'],
+            self.Meta.role_key: role_value,
             self.Meta.context_key: obj,
             'user': self.user,
         }
@@ -169,8 +172,10 @@ class EntityUserSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         role = self.get_roles_object(instance)
 
-        if 'role' in validated_data:
-            setattr(role, self.Meta.role_key, validated_data['role'])
+        role_value = validated_data[self.Meta.role_key]
+
+        if self.Meta.role_key in validated_data:
+            setattr(role, self.Meta.role_key, role_value)
 
         role.save()
 
@@ -182,18 +187,18 @@ class OrganizationUserSerializer(EntityUserSerializer):
         role_model = OrganizationRole
         context_key = 'organization'
         role_key = 'admin'
+    admin = serializers.BooleanField()
 
     def get_roles_object(self, instance):
-        if not hasattr(self, 'role'):
-            self.role = OrganizationRole.objects.get(
-                user=instance,
-                organization=self.context['organization'])
+        self.role = OrganizationRole.objects.get(
+            user=instance,
+            organization=self.context['organization'])
 
         return self.role
 
     def get_role_json(self, instance):
         role = self.get_roles_object(instance)
-        return 'Admin' if role.admin else 'User'
+        return role.admin
 
     def set_roles(self, data):
         admin = False
@@ -233,6 +238,7 @@ class ProjectUserSerializer(EntityUserSerializer):
         role_model = ProjectRole
         context_key = 'project'
         role_key = 'role'
+    role = serializers.CharField()
 
     def validate_username(self, value):
         super(ProjectUserSerializer, self).validate_username(value)
@@ -244,10 +250,9 @@ class ProjectUserSerializer(EntityUserSerializer):
                   "organization").format(username=value))
 
     def get_roles_object(self, instance):
-        if not hasattr(self, 'role'):
-            self.role = ProjectRole.objects.get(
-                user=instance,
-                project=self.context['project'])
+        self.role = ProjectRole.objects.get(
+            user=instance,
+            project=self.context['project'])
 
         return self.role
 
