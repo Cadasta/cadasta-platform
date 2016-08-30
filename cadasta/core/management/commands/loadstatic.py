@@ -19,19 +19,30 @@ class Command(BaseCommand):
             default=False,
             help='Force object deletion and recreation'
         )
+        parser.add_argument(
+            '--update-policies',
+            action='store_true',
+            dest='update_policies',
+            default=False,
+            help='Force update of tutelary policies from JSON files'
+        )
 
     def handle(self, *args, **options):
-        # All of the following are idempotent unless "force" is used.
-        if options['force']:
-            print('FORCING STATIC DATA RELOAD!!!\n')
+        if options['update_policies']:
+            print('PERFORMING POLICY UPDATE FROM FILES!!!\n')
+            loadpolicies.Command().handle(force=False, update=True)
+        else:
+            # All of the following are idempotent unless "force" is used.
+            if options['force']:
+                print('FORCING STATIC DATA RELOAD!!!\n')
 
-        print('LOADING SITE\n')
-        loadsite.Command().handle(force=options['force'])
-        print('LOADING COUNTRIES\n')
-        loadcountries.Command().handle(force=options['force'])
-        print('LOADING POLICIES\n')
-        loadpolicies.Command().handle(force=options['force'])
-        print('LOADING ATTRIBUTE TYPES\n')
-        loadattrtypes.Command().handle(force=options['force'])
-        print('LOADING TENURE RELATIONSHIP TYPES\n')
-        loadtenurereltypes.Command().handle(force=options['force'])
+            print('LOADING SITE\n')
+            loadsite.Command().handle(force=options['force'])
+            print('LOADING COUNTRIES\n')
+            loadcountries.Command().handle(force=options['force'])
+            print('LOADING POLICIES\n')
+            loadpolicies.Command().handle(force=options['force'])
+            print('LOADING ATTRIBUTE TYPES\n')
+            loadattrtypes.Command().handle(force=options['force'])
+            print('LOADING TENURE RELATIONSHIP TYPES\n')
+            loadtenurereltypes.Command().handle(force=options['force'])

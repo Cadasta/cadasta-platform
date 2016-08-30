@@ -3,7 +3,7 @@ from django.conf import settings
 from tutelary import models
 
 
-def run(verbose=True, force=False):
+def run(verbose=True, force=False, update=False):
     PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
     if force:
@@ -16,6 +16,9 @@ def run(verbose=True, force=False):
                 'project-manager', 'data-collector', 'project-user']:
         try:
             pols[pol] = models.Policy.objects.get(name=pol)
+            if update:
+                pols[pol].body = open(PERMISSIONS_DIR + pol + '.json').read()
+                pols[pol].save()
         except:
             pols[pol] = models.Policy.objects.create(
                 name=pol,

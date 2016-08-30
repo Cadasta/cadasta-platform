@@ -7,4 +7,4 @@ class Command(BaseCommand):
     help = """Loads policy data."""
 
     def handle(self, *args, **options):
-        load.run(force=options['force'])
+        load.run(force=options['force'], update=options['update'])

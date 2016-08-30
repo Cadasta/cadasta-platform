@@ -93,8 +93,7 @@ class LocationsListTest(TestCase):
     def test_get_with_unauthorized_user(self):
         response, content = self.request(user=self.unauthorized_user)
         assert response.status_code == 200
-        assert content == self.expected_content(
-            geojson='{"type": "FeatureCollection", "features": []}')
+        assert content == self.expected_content()
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
