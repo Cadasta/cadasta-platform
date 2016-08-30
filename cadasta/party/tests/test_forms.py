@@ -1,4 +1,3 @@
-from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
 
@@ -63,9 +62,9 @@ class PartyFormTest(UserTestCase):
         assert party.attributes.get('fname') == 'test'
 
 
-class TenureRelationshipEditFormTest(TestCase):
+class TenureRelationshipEditFormTest(UserTestCase):
     def test_init(self):
         form = forms.TenureRelationshipEditForm(schema_selectors=())
-        tenure_types = TenureRelationshipType.objects.values_list('id',
-                                                                  'label')
-        assert list(form.fields['tenure_type'].choices) == list(tenure_types)
+        tenuretypes = TenureRelationshipType.objects.values_list('id', 'label')
+        assert len(tenuretypes) > 0
+        assert list(form.fields['tenure_type'].choices) == list(tenuretypes)

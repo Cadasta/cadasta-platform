@@ -61,9 +61,10 @@ class TenureRelationshipForm(forms.Form):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id'].widget = SelectPartyWidget(project.id)
-        tenure_types = TenureRelationshipType.objects.values_list('id',
-                                                                  'label')
-        self.fields['tenure_type'].choices = tenure_types
+        tenuretypes = TenureRelationshipType.objects.values_list('id', 'label')
+        self.fields['tenure_type'].choices = (
+            [('', _('Please select a relationship type'))] +
+            list(tenuretypes))
         self.project = project
         self.spatial_unit = spatial_unit
         self.add_attribute_fields(schema_selectors)

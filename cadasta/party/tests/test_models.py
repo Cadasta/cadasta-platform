@@ -183,7 +183,7 @@ class TenureRelationshipTypeTest(UserTestCase):
 
     def test_tenure_relationship_types(self):
         tenure_types = TenureRelationshipType.objects.all()
-        assert 19 == len(tenure_types)
+        assert 18 == len(tenure_types)
         freehold = TenureRelationshipType.objects.get(id='FH')
         assert freehold.label == 'Freehold'
 
