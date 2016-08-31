@@ -286,7 +286,6 @@ class TenureRelationshipType(models.Model):
 
 
 TENURE_RELATIONSHIP_TYPES = (
-    ('AL', 'All Types'),
     ('CR', 'Carbon Rights'),
     ('CO', 'Concessionary Rights'),
     ('CU', 'Customary Rights'),

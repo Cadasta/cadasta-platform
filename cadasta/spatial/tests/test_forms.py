@@ -2,11 +2,12 @@ import pytest
 from django.forms import ValidationError, CharField, ChoiceField, BooleanField
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
+from django.utils.translation import ugettext as _
 
 from core.tests.base_test_case import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import PartyFactory
-from party.models import TenureRelationship, Party
+from party.models import TenureRelationship, Party, TENURE_RELATIONSHIP_TYPES
 from .factories import SpatialUnitFactory
 from ..models import SpatialUnit
 from .. import forms
@@ -139,6 +140,13 @@ class TenureRelationshipFormTest(UserTestCase):
         assert isinstance(form.fields['party::p_bool'], BooleanField)
         assert form.fields['party::p_bool'].initial is False
         assert isinstance(form.fields['relationship::r_name'], CharField)
+        assert isinstance(form.fields['tenure_type'], ChoiceField)
+        assert form.fields['tenure_type'].choices == (
+            [('', _('Please select a relationship type'))] +
+            list(TENURE_RELATIONSHIP_TYPES)
+        )
+        assert ("All Types" not in
+                dict(form.fields['tenure_type'].choices).values())
 
     def test_clean_invalid_id(self):
         project = ProjectFactory.create()
