@@ -71,12 +71,12 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file','email_admins'],
+            'handlers': ['file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'xform.submissions': {
-            'handlers': ['file','email_admins'],
+            'handlers': ['file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         }
