@@ -38,7 +38,7 @@ EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
-SERVER_EMAIL = 'platform-errors@cadasta.org'
+SERVER_EMAIL = 'platform@cadasta.org'
 DEFAULT_FROM_EMAIL = 'platform@cadasta.org'
 ROOT_URLCONF = 'config.urls.production'
 
@@ -64,16 +64,21 @@ LOGGING = {
             'filename': '/var/log/django/debug.log',
             'formatter': 'simple'
         },
+        'email_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file','email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'xform.submissions': {
-            'handlers': ['file'],
-            'level': 'DEBUG'
+            'handlers': ['file','email_admins'],
+            'level': 'DEBUG',
+            'propagate': True,
         }
     },
 }
