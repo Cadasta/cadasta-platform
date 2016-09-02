@@ -62,8 +62,16 @@
                 <div class="form-group{% if form.questionnaire.errors %} has-error{% endif %}">
                   <label for="{{ form.questionnaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
                   <label class="pull-right control-label">{{ form.questionnaire.errors }}</label>
-                  {{ form.questionnaire }}
-                  <p class="help-block">Accepted file type: xls</p>
+                  <div class="well file-well">
+                    {{ form.questionnaire }}
+                    <p class="help-block">Accepted file types: xls, xlsx</p>
+                  </div>
+                  <div class="alert alert-info alert-full clearfix row" role="alert">
+                    <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
+                    <div>
+                        For assistance with questionnaires view our <a href="http://docs.cadasta.org/en/08-XLSForms.html" class="alert-link" target="_blank">user guide</a>.  To help you get started two samples have been provided: <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/minimum_cadasta_questionnaire.xlsx" class="alert-link">a minimal</a> and <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx" class="alert-link">a standard questionnaire</a>.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -111,7 +111,7 @@
       <!-- Page content -->
       <div id="page-content">
         {% block sub-nav %}{% endblock %}
-        <main class="container-fluid" role="main">
+        <main class="container-fluid{% block main-width %}{% endblock %}" role="main">
           {% if messages %}
           <div id="messages">
             {% for message in messages %}
