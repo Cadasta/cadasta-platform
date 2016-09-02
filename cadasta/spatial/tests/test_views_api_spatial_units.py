@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import gettext as _
 from rest_framework import status as status_code
 
@@ -49,6 +50,13 @@ class SpatialUnitListAPITest(SpatialUnitListTestCase,
             status=status_code.HTTP_200_OK, length=self.num_records)
         assert extra_record.id not in (
             [u['properties']['id'] for u in content['features']])
+
+    def test_full_list_with_unauthorized_user(self):
+        org, prj = self._test_objs()
+        self._get(
+            org_slug=org.slug, prj_slug=prj.slug, user=AnonymousUser(),
+            status=status_code.HTTP_200_OK, length=self.num_records
+        )
 
     # def test_search_filter(self):
     #     org, prj = self._test_objs()

@@ -20,6 +20,8 @@ class FixturesTest(TestCase):
         data.delete_test_projects()
         data.add_test_organizations()
         PolicyFactory.load_policies()
+        # Just for test coverage...
+        PolicyFactory.load_policies(update=True)
         create_attribute_types()
         load_tenure_relationship_types()
         data.add_test_users_and_roles()

@@ -9,6 +9,11 @@ from . import mixins
 class SpatialUnitList(APIPermissionRequiredMixin,
                       mixins.SpatialQuerySetMixin,
                       generics.ListCreateAPIView):
+    def get_actions(self, request):
+        if self.get_project().public():
+            return ['project.view', 'spatial.list']
+        else:
+            return ['project.view_private', 'spatial.list']
 
     serializer_class = serializers.SpatialUnitSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -17,7 +22,7 @@ class SpatialUnitList(APIPermissionRequiredMixin,
     filter_fields = ('type',)
 
     permission_required = {
-        'GET': 'spatial.list',
+        'GET': get_actions,
         'POST': 'spatial.create',
     }
 

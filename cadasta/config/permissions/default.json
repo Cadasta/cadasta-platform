@@ -26,6 +26,14 @@
       "effect": "allow",
       "action": ["project.view"],
       "object": ["project/*/*"]
+    },
+
+    {
+      // Any user is allowed to list the spatial units of public
+      // projects in an organization.
+      "effect": "allow",
+      "action": ["spatial.list"],
+      "object": ["project/*/*"]
     }
   ]
 }

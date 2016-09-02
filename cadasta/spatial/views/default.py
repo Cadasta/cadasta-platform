@@ -23,7 +23,6 @@ class LocationsList(LoginPermissionRequiredMixin,
     template_name = 'spatial/location_map.html'
     permission_required = 'spatial.list'
     permission_denied_message = error_messages.SPATIAL_LIST
-    permission_filter_queryset = ('spatial.view',)
 
 
 class LocationsAdd(LoginPermissionRequiredMixin,
