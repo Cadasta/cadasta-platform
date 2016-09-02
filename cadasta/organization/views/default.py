@@ -186,16 +186,25 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         if self.request.method == 'POST':
             return self.form_class(self.request.POST,
                                    self.get_organization(),
-                                   self.get_object())
+                                   self.get_object(),
+                                   self.request.user)
         else:
             return self.form_class(None,
                                    self.get_organization(),
-                                   self.get_object())
+                                   self.get_object(),
+                                   self.request.user)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['organization'] = self.get_organization()
         context['form'] = self.get_form()
+
+        org_admin = OrganizationRole.objects.get(
+           user=self.request.user,
+           organization=context['organization']).admin
+        context['org_admin'] = (org_admin and
+                                not self.is_superuser and
+                                context['org_member'] == self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):

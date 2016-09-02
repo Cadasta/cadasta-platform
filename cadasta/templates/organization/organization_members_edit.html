@@ -33,11 +33,21 @@
                 <div class="member-role form-group{% if form.org_role.errors %} has-error{% endif %}">
                   <label for="{{ form.org_role.id_for_label }}">Role</label>
                   <label class="pull-right control-label">{{ form.org_role.errors }}</label>
-                  {% render_field form.org_role class+="form-control" %}
+                  {% if org_admin %}
+                    {% render_field form.org_role class+="form-control" %}
+                  {% else %}
+                    {% render_field form.org_role class+="form-control" %}
+                  {% endif %}
                 </div>
                 <div class="btn-full">
-                  <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm">
+                  <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin %} disabled{% endif %}>
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove member</button>
+                    {% if org_admin %}
+                      <div class="alert alert-full" role="alert">
+                        <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
+                        <div>An organization administrator cannot remove themself.</div>
+                      </div>
+                    {% endif %}
                 </div>
               </div>
             </div>
@@ -83,7 +93,7 @@
 {% endblock %}
 
 {% block modals %}
-
+{% if not org_admin  %}
 <div class="modal fade" id="remove_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -102,5 +112,6 @@
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+{% endif %}
 
 {% endblock %}

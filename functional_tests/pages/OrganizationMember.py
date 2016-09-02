@@ -36,6 +36,14 @@ class OrganizationMemberPage(Page):
         testuser_title = self.get_member_title()
         return testuser_title
 
+    def go_to_admin_member_page(self):
+        testuser_page = self.get_table_row(
+            "[contains(@onclick, '/admin_user/')]"
+        )
+        self.click_through(testuser_page, (By.CLASS_NAME, 'page-title'))
+        testuser_title = self.get_member_title()
+        return testuser_title
+
     def get_form_field(self, xpath):
         return self.test.form_field(
                 'org-member-edit', xpath)
@@ -53,6 +61,10 @@ class OrganizationMemberPage(Page):
 
     def get_admin_role_option(self):
         return self.get_member_role_select("//option[contains(@value, 'A')]")
+
+    def get_org_role_error(self):
+        return self.get_form_field("div[contains(@class, 'member-role')]" +
+                                   "//ul[contains(@class, 'errorlist')]")
 
     def get_selected_role(self):
         return self.get_member_role_select(
@@ -72,6 +84,11 @@ class OrganizationMemberPage(Page):
 
     def click_remove_button(self):
         self.click_through(
+            self.test.button("remove"), (By.CSS_SELECTOR, "div.modal.fade.in")
+        )
+
+    def click_disabled_remove_button(self):
+        self.test.click_through_close(
             self.test.button("remove"), (By.CSS_SELECTOR, "div.modal.fade.in")
         )
 

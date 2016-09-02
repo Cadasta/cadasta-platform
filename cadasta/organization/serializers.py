@@ -151,6 +151,15 @@ class EntityUserSerializer(serializers.Serializer):
             if error:
                 raise serializers.ValidationError(error.format(value))
 
+    def validate_admin(self, role_value):
+        if 'request' in self.context:
+            if self.context['request'].user == self.instance:
+                if role_value != self.get_roles_object(self.instance).admin:
+                    raise serializers.ValidationError(
+                        _("Organization administrators cannot change their "
+                          "own permissions within the organization"))
+        return role_value
+
     def create(self, validated_data):
         obj = self.context[self.Meta.context_key]
 
@@ -171,7 +180,6 @@ class EntityUserSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         role = self.get_roles_object(instance)
-
         role_value = validated_data[self.Meta.role_key]
 
         if self.Meta.role_key in validated_data:

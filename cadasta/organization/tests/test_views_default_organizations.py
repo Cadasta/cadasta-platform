@@ -697,6 +697,7 @@ class OrganizationMembersEditTest(UserTestCase):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
         setattr(self.request, 'user', user)
+        OrganizationRole.objects.create(organization=self.org, user=user)
 
         response = self.view(
             self.request,
@@ -708,7 +709,8 @@ class OrganizationMembersEditTest(UserTestCase):
         context['object'] = self.member
         context['organization'] = self.org
         context['form'] = forms.EditOrganizationMemberForm(
-            None, self.org, self.member)
+            None, self.org, self.member, user)
+        # context['current_user'] = user
 
         expected = render_to_string(
             'organization/organization_members_edit.html',
@@ -791,6 +793,7 @@ class OrganizationMembersEditTest(UserTestCase):
     def test_post_with_invalid_form(self):
         user = UserFactory.create()
         assign_user_policies(user, self.policy)
+        OrganizationRole.objects.create(organization=self.org, user=user)
         setattr(self.request, 'user', user)
         setattr(self.request, 'method', 'POST')
         setattr(self.request, 'POST', {'org_role': 'X'})

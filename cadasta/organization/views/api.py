@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, filters, status
 from tutelary.mixins import APIPermissionRequiredMixin
 
@@ -63,8 +64,11 @@ class OrganizationUsersDetail(APIPermissionRequiredMixin,
     permission_required = 'org.users.remove'
 
     def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        if user == request.user:
+            raise PermissionDenied
         OrganizationRole.objects.get(
-            organization=self.org, user=self.get_object()
+            organization=self.org, user=user
         ).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
