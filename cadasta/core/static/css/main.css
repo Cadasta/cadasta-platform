@@ -232,7 +232,7 @@ html {
   -webkit-tap-highlight-color: transparent; }
 
 body {
-  font-family: "roboto", Helvetica, Arial, sans-serif;
+  font-family: "Roboto", Helvetica, Arial, "Noto Sans Bengali", sans-serif;
   font-size: 14px;
   line-height: 1.42857;
   color: #595a5c;
@@ -4263,7 +4263,7 @@ ul.resource-actions > li {
 /* =Leaflet popups
 -------------------------------------------------------------- */
 .leaflet-container {
-  font-family: "roboto", Helvetica, Arial, sans-serif !important;
+  font-family: "Roboto", Helvetica, Arial, "Noto Sans Bengali", sans-serif !important;
   z-index: 1; }
 
 .leaflet-popup-content-wrapper {
@@ -4354,6 +4354,12 @@ label[for="id_extents-location"] {
   font-weight: 300;
   font-style: normal; }
 
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  src: url("/static/fonts/NotoSansBengali/NotoSansBengali-Regular.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal; }
+
 /* =Basics
 -------------------------------------------------------------- */
 html {
@@ -4385,7 +4391,7 @@ body, #cadasta {
     padding-bottom: 0; } }
 
 h1, h2 {
-  font-family: 'Roboto Condensed', sans-serif; }
+  font-family: "Roboto Condensed", "Roboto", Helvetica, "Noto Sans Bengali", sans-serif; }
 
 h3, h4, h5 {
   letter-spacing: -0.3px; }
@@ -5313,7 +5319,8 @@ header {
   #project-single .page-header h1, #project-single .page-header h2,
   #organization-single .page-header h1,
   #organization-single .page-header h2 {
-    margin-left: 54px; }
+    margin-left: 54px;
+    padding-bottom: 8px; }
   #project-single .page-header .top-btn,
   #organization-single .page-header .top-btn {
     margin-top: 18px; }
@@ -5466,7 +5473,7 @@ main.container-fluid {
     padding-bottom: 14px;
     text-shadow: none; }
   .content-single h3 {
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: "Roboto Condensed", "Roboto", Helvetica, "Noto Sans Bengali", sans-serif;
     text-transform: uppercase;
     opacity: 0.8;
     font-weight: 300;
@@ -5532,7 +5539,7 @@ main.container-fluid {
     .content-single .detail section > p:first-child {
       padding-top: 20px; }
     .content-single .detail h4 {
-      font-family: 'Roboto Condensed', sans-serif;
+      font-family: "Roboto Condensed", "Roboto", Helvetica, "Noto Sans Bengali", sans-serif;
       text-transform: uppercase;
       opacity: 0.8;
       letter-spacing: 0;
@@ -5980,11 +5987,11 @@ div.add-btn-btm {
   overflow-y: initial !important; }
 
 .modal h3.modal-title {
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: "Roboto Condensed", "Roboto", Helvetica, "Noto Sans Bengali", sans-serif;
   text-transform: uppercase; }
 
 .modal h4.step {
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: "Roboto Condensed", "Roboto", Helvetica, "Noto Sans Bengali", sans-serif;
   text-transform: uppercase;
   opacity: 0.8;
   font-weight: 300;
