@@ -1,16 +1,17 @@
-from django.core.urlresolvers import reverse
-from django.http import Http404
-from core.views import generic
 import django.views.generic as base_generic
-from core.views.mixins import ArchiveMixin
-
 from core.mixins import LoginPermissionRequiredMixin
-
-from ..models import Resource, ContentObject
-from . import mixins
+from core.views import generic
+from core.views.mixins import ArchiveMixin
+from django.core.urlresolvers import reverse
+from django.forms import ValidationError
+from django.http import Http404
 from organization.views import mixins as organization_mixins
-from ..forms import AddResourceFromLibraryForm
+
+from . import mixins
 from .. import messages as error_messages
+from ..exceptions import InvalidGPXFile
+from ..forms import AddResourceFromLibraryForm
+from ..models import ContentObject, Resource
 
 
 class ProjectResources(LoginPermissionRequiredMixin,
@@ -68,6 +69,15 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
 
     def get_perms_objects(self):
         return [self.get_project()]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except InvalidGPXFile as e:
+            error = ValidationError(str(e))
+            form = self.get_form()
+            form.add_error('file', error)
+            return self.form_invalid(form)
 
 
 class ProjectResourcesDetail(LoginPermissionRequiredMixin,

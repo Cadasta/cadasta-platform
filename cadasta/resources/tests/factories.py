@@ -1,17 +1,20 @@
 import os
+
 import factory
-from django.conf import settings
-from core.tests.factories import ExtendedFactory
-from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
-
-from ..models import Resource
-
 from buckets.test.storage import FakeS3Storage
+from core.tests.factories import ExtendedFactory
+from django.conf import settings
+from django.utils import timezone
+from organization.tests.factories import ProjectFactory
+
+from ..models import Resource, SpatialResource
+
 path = os.path.dirname(settings.BASE_DIR)
 
 
 class ResourceFactory(ExtendedFactory):
+
     class Meta:
         model = Resource
 
@@ -35,3 +38,13 @@ class ResourceFactory(ExtendedFactory):
                 resource.save()
 
         return resource
+
+
+class SpatialResourceFactory(ExtendedFactory):
+
+    class Meta:
+        model = SpatialResource
+
+    name = factory.Sequence(lambda n: "LayerName #%s" % n)
+    time = timezone.now()
+    resource = factory.SubFactory(ResourceFactory)

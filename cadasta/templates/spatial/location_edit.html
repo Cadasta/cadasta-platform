@@ -8,14 +8,14 @@
 {% block body-class %} map{% endblock %}
 
 {% block extra_head %}
-{% leaflet_css plugins="draw,forms" %}
+{% leaflet_css plugins="draw,forms,groupedlayercontrol" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-{% leaflet_js plugins="draw,forms" %}
+{% leaflet_js plugins="draw,forms,groupedlayercontrol" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
@@ -25,6 +25,15 @@
   $(document).ready(function () {
     $(window).on('map:init', function(e) {
       var map = e.originalEvent.detail.map;
+      var options = e.originalEvent.detail.options;
+      switch_layer_controls(map, options);
+
+      var orgSlug = '{{ object.organization.slug }}';
+      var projectSlug = '{{ object.slug }}';
+      var url = '/api/v1/organizations/'
+              + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+      add_spatial_resources(map, url);
+
       add_map_controls(map);
 
       var data = {{ geojson|safe }};

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx
+    xmlns="http://www.topografix.com/GPX/1/1"
+    xmlns:gpxx="http://www.garmin.com/xmlschemas/WaypointExtension/v1"
+    xmlns:gpxtrx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+    xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+    creator="Oregon 550"
+    version="1.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">
+    <metadata>
+        <link href="http://www.garmin.com">
+            <text>Garmin International</text>
+        </link>
+        <time>2016-05-18T09:20:06Z</time>
+    </metadata>
+    <wpt lat="52.941277" lon="-8.034792">
+        <ele>159.297363</ele>
+        <time>2016-05-18T09:20:06Z</time>
+        <name>001</name>
+        <sym>Lodging</sym>
+    </wpt>
+    <wpt lat="52.946419" lon="-8.039001">
+        <ele>88.808327</ele>
+        <time>2016-05-18T10:04:17Z</time>
+        <name>002</name>
+        <sym>Lodging</sym>
+    </wpt>
+    <wpt lat="52.946421" lon="-8.039008">
+        <ele>89.445007</ele>
+        <time>2016-05-18T10:06:58Z</time>
+        <name>003</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946064" lon="-8.038319">
+        <ele>87.765770</ele>
+        <time>2016-05-18T10:08:56Z</time>
+        <name>004</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946153" lon="-8.037743">
+        <ele>88.544846</ele>
+        <time>2016-05-18T10:09:42Z</time>
+        <name>005</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946521" lon="-8.037001">
+        <ele>90.230118</ele>
+        <time>2016-05-18T10:10:45Z</time>
+        <name>006</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946283" lon="-8.036948">
+        <ele>91.034340</ele>
+        <time>2016-05-18T10:11:28Z</time>
+        <name>007</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946500" lon="-8.036520">
+        <ele>90.365944</ele>
+        <time>2016-05-18T10:12:52Z</time>
+        <name>008</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946646" lon="-8.036945">
+        <ele>91.291801</ele>
+        <time>2016-05-18T10:14:18Z</time>
+        <name>009</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946733" lon="-8.037329">
+        <ele>92.031578</ele>
+        <time>2016-05-18T10:14:57Z</time>
+        <name>010</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946578" lon="-8.037304">
+        <ele>89.177856</ele>
+        <time>2016-05-18T10:15:30Z</time>
+        <name>011</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946655" lon="-8.037608">
+        <ele>88.838951</ele>
+        <time>2016-05-18T10:16:14Z</time>
+        <name>012</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946620" lon="-8.037936">
+        <ele>89.070808</ele>
+        <time>2016-05-18T10:16:53Z</time>
+        <name>013</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946616" lon="-8.037954">
+        <ele>92.048050</ele>
+        <time>2016-05-18T10:17:13Z</time>
+        <name>014</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946628" lon="-8.037980">
+        <ele>88.055138</ele>
+        <time>2016-05-18T10:17:40Z</time>
+        <name>015</name>
+        <sym>Crossing</sym>
+    </wpt>
+    <wpt lat="52.946757" lon="-8.037970">
+        <ele>89.512466</ele>
+        <time>2016-05-18T10:18:39Z</time>
+        <name>016</name>
+        <sym>Crossing</sym>
+    </wpt>
+</gpx>

@@ -89,6 +89,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -178,6 +179,10 @@ LEAFLET_CONFIG = {
     'PLUGINS': {
         'draw': {
             'js': '/static/leaflet/draw/leaflet.draw.js'
+        },
+        'groupedlayercontrol': {
+            'js': '/static/js/leaflet.groupedlayercontrol.min.js',
+            'css': '/static/css/leaflet.groupedlayercontrol.min.css'
         }
     }
 }
@@ -266,6 +271,7 @@ MIME_LOOKUPS = {
     'application/vnd.ms-excel': 'xls',
     'application/vnd.openxmlformats-'
     'officedocument.spreadsheetml.sheet': 'xlsx',
+    'text/xml': 'xml',
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/gif': 'gif',

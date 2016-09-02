@@ -1,0 +1,32 @@
+<?xml version="2.0" encoding="UTF-8" standalone="no" ?>
+<gpx
+    xmlns="http://www.topografix.com/GPX/1/1"
+    xmlns:gpxx="http://www.garmin.com/xmlschemas/WaypointExtension/v1"
+    xmlns:gpxtrx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+    xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+    creator="Oregon 550"
+    version="1.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">
+    <metadata>
+        <link href="http://www.garmin.com">
+            <text>Garmin International</text>
+        </link>
+        <time>2016-09-01T08:50:59Z</time>
+    </metadata>
+    <rte>
+        <name>TEST</name>
+        <rtept lat="52.946419" lon="-8.039839">
+            <name>05973230688404</name>
+        </rtept>
+        <rtept lat="53.063194" lon="-8.229833">
+            <name>Lough Derg</name>
+        </rtept>
+        <rtept lat="53.537029" lon="-7.907280">
+            <name>06061460754125</name>
+        </rtept>
+        <rtept lat="54.116417" lon="-8.027824">
+            <name>05981810818596</name>
+        </rtept>
+    </rte>
+</gpx>

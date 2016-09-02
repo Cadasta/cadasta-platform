@@ -9,7 +9,7 @@
 {% load staticfiles %}
 
 {% block extra_script %}
-{% leaflet_js %}
+{% leaflet_js plugins="groupedlayercontrol"%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
@@ -23,6 +23,8 @@
       open: "{% trans 'Open location' %}"
     };
 
+    switch_layer_controls(map, options);
+
     {% if object.extent %}
     var projectExtent = {{ object.extent.geojson|safe }};
     {% else %}
@@ -31,12 +33,18 @@
     var spatialUnits = {{ geojson|safe }};
 
     renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
+
+    var orgSlug = '{{ object.organization.slug }}';
+    var projectSlug = '{{ object.slug }}';
+    var url = '/api/v1/organizations/'
+            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+    add_spatial_resources(map, url);
   }
 </script>
 {% endblock %}
 
 {% block extra_head %}
-{% leaflet_css %}
+{% leaflet_css plugins="groupedlayercontrol"%}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">

@@ -8,13 +8,13 @@
 {% load staticfiles %}
 
 {% block extra_head %}
-{% leaflet_css %}
+{% leaflet_css plugins="groupedlayercontrol"%}
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-{% leaflet_js %}
+{% leaflet_js plugins="groupedlayercontrol" %}
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
@@ -26,6 +26,8 @@
       open: "{% trans 'Open location' %}"
     };
 
+    switch_layer_controls(map, options);
+
     {% if object.extent %}
     var projectExtent = {{ object.extent.geojson|safe }};
     {% else %}
@@ -34,6 +36,13 @@
     var spatialUnits = {{ geojson|safe }};
 
     renderFeatures(map, projectExtent, spatialUnits, trans, false);
+    
+    var orgSlug = '{{ object.organization.slug }}';
+    var projectSlug = '{{ object.slug }}';
+    var url = '/api/v1/organizations/'
+            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+    add_spatial_resources(map, url);
+
 
     var data = {{ location.geometry.geojson|safe }};
     var location = L.geoJson(data, {

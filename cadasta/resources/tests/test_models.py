@@ -1,21 +1,25 @@
-import pytest
 import os
 
-from django.conf import settings
-
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
-from .factories import ResourceFactory
-from .utils import clear_temp  # noqa
-from ..models import ContentObject, Resource, create_thumbnails
+import pytest
 
 from buckets.test.storage import FakeS3Storage
+from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
+from django.conf import settings
+
+from ..exceptions import InvalidGPXFile
+from ..models import (ContentObject, Resource, create_spatial_resource,
+                      create_thumbnails)
+from .factories import ResourceFactory, SpatialResourceFactory
+from .utils import clear_temp  # noqa
+
 path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
 class ResourceTest(UserTestCase):
+
     def test_file_name_property(self):
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_name == 'filename.txt'
@@ -129,6 +133,14 @@ class ResourceTest(UserTestCase):
                 'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
                 'bucket/icons/xlsx.png')
 
+    def test_thumbnail_xml(self):
+        resource = ResourceFactory.build(
+            file='http://example.com/dir/filename.gpx',
+            mime_type=('text/xml'))
+        assert (resource.thumbnail ==
+                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
+                'bucket/icons/xml.png')
+
     def test_thumbnail_other(self):
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.pdf',
@@ -164,5 +176,49 @@ class ResourceTest(UserTestCase):
                                          mime_type='image/jpeg')
 
         create_thumbnails(Resource, resource, True)
-        assert os.path.isfile(os.path.join(settings.MEDIA_ROOT,
-                              's3/uploads/resources/thumb_test-128x128.jpg'))
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/thumb_test-128x128.jpg')
+        )
+
+    def test_create_spatial_resource(self):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/deramola.xml', 'rb').read()
+        file_name = storage.save('resources/deramola.xml', file)
+        resource = ResourceFactory.build(
+            file=file_name, mime_type='text/xml')
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/deramola.xml')
+        )
+        create_spatial_resource(Resource, resource, True)
+        spatial_resources = resource.spatial_resources.all()
+        assert spatial_resources.count() == 1
+        geom = spatial_resources[0].geom
+        assert len(geom) == 18
+        assert spatial_resources[0].name == 'waypoints'
+        assert spatial_resources[0].attributes == {}
+
+    def test_invalid_gpx_mime_type(self):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/mp3.xml', 'rb').read()
+        file_name = storage.save('resources/mp3.xml', file)
+        resource = ResourceFactory.build(
+            file=file_name, mime_type='text/xml')
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/mp3.xml')
+        )
+        with pytest.raises(InvalidGPXFile) as e:
+            create_spatial_resource(Resource, resource, True)
+            assert str(e) == 'Invalid GPX mime type: audio/mpeg'
+
+
+class SpatialResourceTest(UserTestCase):
+
+    def test_spatial_resource(self):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/tracks.gpx', 'rb').read()
+        file_name = storage.save('resources/tracks_test.gpx', file)
+        resource = ResourceFactory.build(
+            file=file_name, mime_type='text/xml')
+        spatial_resource = SpatialResourceFactory.create(resource=resource)
+        assert spatial_resource.project.pk == resource.project.pk
+        assert spatial_resource.archived == resource.archived

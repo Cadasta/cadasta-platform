@@ -45,7 +45,7 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
       projectExtent,
       {
         style: {
-            stroke: true, 
+            stroke: true,
             color: "#0e305e",
             weight: 2,
             dashArray: "5, 5",
@@ -82,8 +82,52 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
     }
   }
 
-  var markerGroup = L.markerClusterGroup.layerSupport()
+  var markerGroup = L.markerClusterGroup.layerSupport();
   markerGroup.addTo(map);
   markerGroup.checkIn(geoJson);
-  geoJson.addTo(map);  
+  geoJson.addTo(map);
+}
+
+function switch_layer_controls(map, options){
+    // swap out default layer switcher
+    var layers = options.djoptions.layers;
+    var baseLayers = {};
+    for (var l in layers){
+        var layer = layers[l];
+        var baseLayer = L.tileLayer(layer[1], layer[2]);
+        baseLayers[layer[0]] = baseLayer;
+    }
+    // select first layer by default
+    for (var l in baseLayers){
+        map.addLayer(baseLayers[l]);
+        break;
+    }
+    var groupedOptions = {
+      groupCheckboxes: false
+    };
+    map.removeControl(map.layerscontrol);
+    map.layerscontrol = L.control.groupedLayers(
+        baseLayers, groupedOptions).addTo(map);
+}
+
+function add_spatial_resources(map, url){
+    $.ajax(url).done(function(data){
+        if (data.length == 0) return;
+        var spatialResources = {};
+        $.each(data, function(idx, resource){
+            var name = resource.name;
+            var layers = {};
+            var group = new L.LayerGroup();
+            $.each(resource.spatial_resources, function(i, spatial_resource){
+                var layer = L.geoJson(spatial_resource.geom).addTo(group);
+                layers['name'] = spatial_resource.name;
+                layers['group'] = group;
+            });
+            spatialResources[name] = layers;
+        });
+        $.each(spatialResources, function(sr){
+            var layer = spatialResources[sr];
+            map.layerscontrol.addOverlay(layer['group'], layer['name'], sr);
+        })
+    });
 }
