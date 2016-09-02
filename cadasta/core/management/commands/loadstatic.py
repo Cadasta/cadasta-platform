@@ -41,7 +41,7 @@ class Command(BaseCommand):
             print('LOADING COUNTRIES\n')
             loadcountries.Command().handle(force=options['force'])
             print('LOADING POLICIES\n')
-            loadpolicies.Command().handle(force=options['force'])
+            loadpolicies.Command().handle(force=options['force'], update=False)
             print('LOADING ATTRIBUTE TYPES\n')
             loadattrtypes.Command().handle(force=options['force'])
             print('LOADING TENURE RELATIONSHIP TYPES\n')
