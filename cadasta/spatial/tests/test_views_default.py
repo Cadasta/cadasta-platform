@@ -16,7 +16,7 @@ from core.tests.util import TestCase, make_dirs  # noqa
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
-from party.tests.factories import TenureRelationshipFactory
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from party.models import Party, TenureRelationship
 
 from .factories import SpatialUnitFactory
@@ -725,9 +725,13 @@ class TenureRelationshipAddTest(TestCase):
                         {'name': 'questionnaire',
                          'value': self.project.current_questionnaire,
                          'selector': self.project.current_questionnaire}
-                    )),
+                    ),
+                    initial={
+                        'new_entity': not self.project.parties.exists(),
+                    },
+                ),
                 'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
-                    [self.spatial_unit], many=True).data)
+                    [self.spatial_unit], many=True).data),
                 }
 
     def test_get_with_authorized_user(self):
@@ -735,12 +739,12 @@ class TenureRelationshipAddTest(TestCase):
         assert response.status_code == 200
         assert content == self.expected_content()
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         with pytest.raises(Http404):
             self.request(user=self.authorized_user,
                          url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_location(self):
+    def test_get_non_existent_location(self):
         with pytest.raises(Http404):
             self.request(user=self.authorized_user,
                          url_kwargs={'location': 'abc123'})
@@ -757,7 +761,7 @@ class TenureRelationshipAddTest(TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response['location']
 
-    def test_post_with_authorized(self):
+    def test_post_new_party_with_authorized(self):
         response = self.request(method='POST', user=self.authorized_user)
         assert response.status_code == 302
         assert (response['location'] ==
@@ -770,14 +774,30 @@ class TenureRelationshipAddTest(TestCase):
         party = Party.objects.first()
         assert party.attributes.get('p_name') == 'Party Name'
 
-    def test_post_with_authorized_invalid_data(self):
+    def test_post_existing_party_with_authorized(self):
+        party = PartyFactory.create(project=self.project)
+        response = self.request(method='POST', user=self.authorized_user,
+                                data={'new_entity': '', 'id': party.id})
+        assert response.status_code == 302
+        assert (response['location'] ==
+                self.expected_success_url + '#relationships')
+
+        assert TenureRelationship.objects.count() == 1
+        rel = TenureRelationship.objects.first()
+        assert rel.attributes.get('r_name') == 'Rel Name'
+        assert Party.objects.count() == 1
+        assert Party.objects.first().name == party.name
+
+    def test_post_with_authorized_invalid_new_party_data(self):
         response, content = self.request(method='POST',
                                          user=self.authorized_user,
-                                         data={'name': ''})
+                                         data={'name': '',
+                                               'party_type': ''})
         assert response.status_code == 200
         context = self.get_template_context()
         data = self.get_post_data()
         data['name'] = ''
+        data['party_type'] = ''
         context['form'] = forms.TenureRelationshipForm(
             project=self.project,
             spatial_unit=self.spatial_unit,
@@ -799,6 +819,38 @@ class TenureRelationshipAddTest(TestCase):
 
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 0
+
+    def test_post_with_authorized_invalid_existing_party_data(self):
+        party = PartyFactory.create(project=self.project)
+        response, content = self.request(method='POST',
+                                         user=self.authorized_user,
+                                         data={'new_entity': ''})
+        assert response.status_code == 200
+        context = self.get_template_context()
+        data = self.get_post_data()
+        data['new_entity'] = ''
+        context['form'] = forms.TenureRelationshipForm(
+            project=self.project,
+            spatial_unit=self.spatial_unit,
+            data=data,
+            schema_selectors=(
+                {'name': 'organization',
+                 'value': self.project.organization,
+                 'selector': self.project.organization.id},
+                {'name': 'project',
+                 'value': self.project,
+                 'selector': self.project.id},
+                {'name': 'questionnaire',
+                 'value': self.project.current_questionnaire,
+                 'selector': self.project.current_questionnaire}
+            ))
+        expected = render_to_string(
+            self.template, context, request=self.request)
+        assert content == expected
+
+        assert TenureRelationship.objects.count() == 0
+        assert Party.objects.count() == 1
+        assert Party.objects.first().name == party.name
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)

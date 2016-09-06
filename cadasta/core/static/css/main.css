@@ -5906,10 +5906,6 @@ div.add-btn-btm {
   border-bottom: 3px solid #e7e8ea;
   margin-bottom: 20px; }
 
-#new-item {
-  background: #f2f4f7;
-  padding: 20px 20px 0 20px; }
-
 .more-menu {
   float: left;
   font-size: 24px;
@@ -6071,9 +6067,6 @@ tr.contacts-error {
 
 /* =Party selection widget
 -------------------------------------------------------------- */
-#select-party label {
-  display: block; }
-
 #select-party #party-select {
   width: 100%; }
 

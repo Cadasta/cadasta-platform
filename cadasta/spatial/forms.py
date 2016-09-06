@@ -46,13 +46,12 @@ REL_TYPE_CHOICES = (
 
 
 class TenureRelationshipForm(forms.Form):
-    id = forms.CharField(
-        required=False,
-        max_length=ID_FIELD_LENGTH)
+    # new_entity should be first because the other fields depend on it
     new_entity = forms.BooleanField(required=False, widget=NewEntityWidget())
+    id = forms.CharField(required=False, max_length=ID_FIELD_LENGTH)
     name = forms.CharField(required=False, max_length=200)
-    party_type = forms.ChoiceField(choices=Party.TYPE_CHOICES)
-    tenure_type = forms.ChoiceField(choices=[])
+    party_type = forms.ChoiceField(required=False, choices=[])
+    tenure_type = forms.ChoiceField(required=True, choices=[])
 
     class Media:
         js = ('/static/js/rel_tenure.js',)
@@ -61,16 +60,18 @@ class TenureRelationshipForm(forms.Form):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id'].widget = SelectPartyWidget(project.id)
-        tenuretypes = TenureRelationshipType.objects.values_list('id', 'label')
+        self.fields['party_type'].choices = (
+            [('', _("Please select a party type"))] +
+            list(Party.TYPE_CHOICES))
         self.fields['tenure_type'].choices = (
-            [('', _('Please select a relationship type'))] +
-            list(tenuretypes))
+            [('', _("Please select a relationship type"))] +
+            list(TenureRelationshipType.objects.values_list('id', 'label')))
         self.project = project
         self.spatial_unit = spatial_unit
         self.add_attribute_fields(schema_selectors)
 
     def clean_id(self):
-        new_entity = self.data.get('new_entity', None)
+        new_entity = self.cleaned_data.get('new_entity', None)
         id = self.cleaned_data.get('id', '')
 
         if not new_entity and not id:
@@ -84,6 +85,14 @@ class TenureRelationshipForm(forms.Form):
         if new_entity and not name:
             raise forms.ValidationError(_("This field is required."))
         return name
+
+    def clean_party_type(self):
+        new_entity = self.cleaned_data.get('new_entity', None)
+        party_type = self.cleaned_data.get('party_type', None)
+
+        if new_entity and not party_type:
+            raise forms.ValidationError(_("This field is required."))
+        return party_type
 
     def create_model_fields(self, model, field_prefix, selectors,
                             new_item=False):

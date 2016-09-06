@@ -7,6 +7,7 @@
 {% block extra_head %}
 {{ block.super }}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.9/select2-bootstrap.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block location_extra_script %}
@@ -28,6 +29,7 @@ $(document).ready(function() {
   $("#party-select").select2({
     minimumResultsForSearch: 6,
     templateResult: template,
+    theme: "bootstrap",
   });
 });
   </script>
@@ -48,13 +50,18 @@ $(document).ready(function() {
 
           <div class="modal-body">
             {% csrf_token %}
-
             <h4 class="step">{% trans "1. Connected party" %}</h4>
-            <div id="select-party" class="clearfix">
-              <label>{% trans "Choose an existing party to connect to this location" %}</label>
-              {% render_field form.id class+="form-control" %}
+            <div id="select-party" class="clearfix{% if form.new_entity.value %} hidden{% endif %}">
+              <div class="form-group{% if form.id.errors %} has-error{% endif %}">
+                <label for="{{ form.id.id_for_label }}">{% trans "Choose an existing party to connect to this location" %}</label>
+                <label class="pull-right control-label">{{ form.id.errors }}</label>
+                {{ form.id }}
+              </div>
+
               <label>{% trans "Or add a new party" %}</label>
-              {% render_field form.new_entity class+="form-control" %}
+              <div class="form-group">
+                {{ form.new_entity }}
+              </div>
             </div>
 
             <div id="new-item" class="clearfix{% if not form.new_entity.value %} hidden{% endif %}">
