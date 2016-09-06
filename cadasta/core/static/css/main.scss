@@ -48,6 +48,13 @@
   font-style: normal;
 }
 
+@font-face {
+    font-family: 'Noto Sans Bengali';
+    src: url('/static/fonts/NotoSansBengali/NotoSansBengali-Regular.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+
 /* =Basics
 -------------------------------------------------------------- */
 
@@ -85,7 +92,7 @@ body, #cadasta {
 }
 
 h1, h2 {
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: $font-family-sans-serif-alt;
 }
 
 h3, h4, h5 {
@@ -490,6 +497,7 @@ header {
   }
   h1, h2 {
     margin-left: 54px;
+    padding-bottom: 8px;
   }
   .top-btn {
     margin-top: 18px;
@@ -674,7 +682,7 @@ main.container-fluid {
     text-shadow: none;
   }
   h3 {
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: $font-family-sans-serif-alt;
     text-transform: uppercase;
     opacity: 0.8;
     font-weight: 300;
@@ -760,7 +768,7 @@ main.container-fluid {
       padding-top: 20px;
     }
     h4 {
-      font-family: 'Roboto Condensed', sans-serif;
+      font-family: $font-family-sans-serif-alt;
       text-transform: uppercase;
       opacity: 0.8;
       letter-spacing: 0;
@@ -1358,11 +1366,11 @@ div.add-btn-btm { // add party link at bottom of table
     overflow-y: initial !important
   }
   h3.modal-title {
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: $font-family-sans-serif-alt;
     text-transform: uppercase;
   }
   h4.step {
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: $font-family-sans-serif-alt;
     text-transform: uppercase;
     opacity: 0.8;
     font-weight: 300;
