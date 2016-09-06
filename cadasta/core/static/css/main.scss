@@ -1270,11 +1270,6 @@ div.add-btn-btm { // add party link at bottom of table
   margin-bottom: 20px;
 }
 
-#new-item {
-  background: $body-bg;
-  padding: 20px 20px 0 20px;
-}
-
 .more-menu {
   float: left;
   font-size: 24px;
@@ -1428,7 +1423,7 @@ div.add-btn-btm { // add party link at bottom of table
   background-color: $alert-warning-bg;
   padding: 10px;
 }
-  
+
 ul.errorlist {
   margin-bottom: 0;
   padding-left: 0;
@@ -1470,9 +1465,6 @@ tr.contacts-error {
 -------------------------------------------------------------- */
 
 #select-party {
-  label {
-    display: block;
-  }
   #party-select {
     width: 100%;
   }

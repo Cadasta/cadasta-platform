@@ -1,27 +1,31 @@
-from django.forms.widgets import HiddenInput
+from django.forms.widgets import Widget
 from django.utils.translation import ugettext as _
 from party.models import Party
 
 
-class SelectPartyWidget(HiddenInput):
+class SelectPartyWidget(Widget):
     def __init__(self, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project
 
     def render(self, name, value, attrs={}):
         prj_parties = Party.objects.filter(project_id=self.project)
-        parties = ['<option value="' + p.id + '" data-type="' +
-                   p.get_type_display() + '">' + p.name + '</option>'
-                   for p in prj_parties]
+        parties = [
+            '<option value="' + p.id + '" data-type="' +
+            p.get_type_display() + '"' +
+            (' selected="selected"' if p.id == value else '') + '>' +
+            p.name + '</option>' for p in prj_parties
+        ]
 
         return (
             '<select id="party-select" name="{name}">'
+            '<option value="" data-type="">Please select a party</option>'
             '{parties}'
             '</select>'
         ).format(parties=''.join(parties), name=name)
 
 
-class NewEntityWidget(HiddenInput):
+class NewEntityWidget(Widget):
     class Media:
         js = ('/static/js/rel_new_item.js',)
 

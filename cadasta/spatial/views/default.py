@@ -160,8 +160,12 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        prj = self.get_project()
 
+        kwargs['initial'] = {
+            'new_entity': not self.get_project().parties.exists(),
+        }
+
+        prj = self.get_project()
         kwargs['schema_selectors'] = ()
         if prj.current_questionnaire:
             kwargs['schema_selectors'] = (
