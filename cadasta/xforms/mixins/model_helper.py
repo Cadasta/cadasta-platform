@@ -7,7 +7,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from pyxform.xform2json import XFormToDict
-from questionnaires.models import Question, Questionnaire
+from questionnaires.models import Questionnaire
 from resources.models import Resource
 from spatial.models import SpatialUnit
 from xforms.exceptions import InvalidXMLSubmission
@@ -67,8 +67,6 @@ class ModelHelper():
         return party
 
     def create_spatial_unit(self, data, project, questionnaire, party=None):
-        geoshape = Question.objects.filter(
-            questionnaire=questionnaire, type='GS').exists()
         if 'location_geotrace' in data.keys():
             location_geometry = data['location_geotrace']
             geoshape = False
@@ -77,6 +75,7 @@ class ModelHelper():
             geoshape = True
         else:
             location_geometry = data['location_geometry']
+            geoshape = False
         try:
             location = SpatialUnit.objects.create(
                 project=project,
