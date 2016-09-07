@@ -15,7 +15,7 @@
         </p>
       </div>
       <div class="modal-footer">
-        <a href="{{ unarchive_url }}?next={{ success_url }}" class="btn btn-primary unarchive-final pull-right" role="button">
+        <a href="{{ unarchive_url }}{% if success_url %}?next={{ success_url }}{% endif %}" class="btn btn-primary unarchive-final pull-right" role="button">
           {% trans "Yes, restore this resource" %}
         </a>
         <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">

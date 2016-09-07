@@ -22,28 +22,29 @@
               <span class="label label-danger">{% trans "Deleted" %}</span>
             {% endif %}
           </h4>
-          <p>{{ resource.description }}<br><strong>{{ resource.file_name }}</strong></p>
+          <p>{{ resource.description }}<br><strong>{{ resource.original_file }}</strong></p>
           <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
           <ul class="list-inline resource-actions">
+            {% if can_edit %}
             <li>
-              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}">Edit resource</a>
-            </li>
-            {% if resource.archived %}
-            {% if is_superuser %}
-            <li>
-              <a href="#undelete_resource_confirm" data-toggle="modal">Restore deleted resource</a>
+              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}">{% trans "Edit resource" %}</a>
             </li>
             {% endif %}
-            {% else %}
+            {% if resource.archived %}
             <li>
-              <a href="#delete_resource_confirm" data-toggle="modal">Delete resource</a>
+              <a href="#undelete_resource_confirm" data-toggle="modal">{% trans "Restore deleted resource" %}</a>
             </li>
+            {% else %}
+            {% if can_archive %}
+            <li>
+              <a href="#delete_resource_confirm" data-toggle="modal">{% trans "Delete resource" %}</a>
+            </li>
+            {% endif %}
             {% endif %}
           </ul>
         </div>
         <div class="panel-footer panel-buttons">
-          <a href="{{ resource.file.url }}" class="btn btn-primary" download>Download</a>
-          <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-default">Cancel</a>
+          <a href="{{ resource.file.url }}" class="btn btn-primary" download>{% trans "Download" %}</a>
         </div>
       </div>
 
@@ -63,9 +64,9 @@
             </thead>
             <tbody>
               {% for attachment in attachment_list %}
-              <tr class="linked" onclick="window.document.location='{{ attachment.url }}';">
-                <td>{{ attachment.class }}</td>
-                <td>{{ attachment.name }}</td>
+              <tr class="linked" onclick="window.document.location='{{ attachment.object.ui_detail_url }}';">
+                <td>{{ attachment.object.ui_class_name }}</td>
+                <td>{{ attachment.object.ui_object_name }}</td>
                 <td>
                   <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id attachment.id %}?next={{ request.path }}">
                     {% csrf_token %}
@@ -93,6 +94,6 @@
 {% block form_modal %}
 {% url 'resources:archive' object.organization.slug object.slug resource.id as archive_url %}
 {% url 'resources:unarchive' object.organization.slug object.slug resource.id as unarchive_url %}
-{% include 'resources/modal_archive.html' with success_url=request.META.HTTP_REFERER %}
-{% include 'resources/modal_unarchive.html' with success_url=request.META.HTTP_REFERER %}
+{% include 'resources/modal_archive.html' %}
+{% include 'resources/modal_unarchive.html' %}
 {% endblock %}

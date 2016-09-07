@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import pytest
@@ -10,7 +11,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages.api import get_messages
 
 from buckets.test.storage import FakeS3Storage
-from tutelary.models import Policy, Role, assign_user_policies
+from tutelary.models import Policy, assign_user_policies
 
 from core.tests.base_test_case import UserTestCase
 from core.tests.util import make_dirs  # noqa
@@ -31,14 +32,14 @@ clauses = {
         {
             'effect': 'allow',
             'object': ['project/*/*'],
-            'action': ['resource.*']
+            'action': ['resource.*'],
         },
         {
             'effect': 'allow',
             'object': ['resource/*/*/*'],
-            'action': ['resource.*']
-        }
-    ]
+            'action': ['resource.*'],
+        },
+    ],
 }
 
 
@@ -58,27 +59,29 @@ class ProjectResourcesTest(UserTestCase):
         setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
 
-        clauses['clause'].append({
-            'effect': 'deny',
-            'object': ['resource/*/*/' + self.denied.id],
-            'action': ['resource.*']
-        })
+        addl_clauses = copy.deepcopy(clauses)
+        addl_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/' + self.denied.id],
+                'action': ['resource.*'],
+            },
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/*'],
+                'action': ['resource.unarchive'],
+            },
+        ]
 
         self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(clauses))
+            body=json.dumps(addl_clauses))
         assign_user_policies(self.user, self.policy)
-        self.superuser_role = Role.objects.get(name='superuser')
 
     def _get(self, user=None, status=None, resources=None):
         if user is None:
             user = self.user
             Policy.objects.get(name='default')
-        if hasattr(user, 'assigned_policies'):
-            is_superuser = self.superuser_role in user.assigned_policies()
-        else:
-            is_superuser = False
-        is_administrator = is_superuser
         if resources is None:
             resources = self.resources
 
@@ -118,8 +121,6 @@ class ProjectResourcesTest(UserTestCase):
                         resource_set.count() != self.project.resources.count()
                     ),
                     'resource_list': resource_list,
-                    'is_superuser': is_superuser,
-                    'is_administrator': is_administrator,
                 },
                 request=self.request
             )
@@ -132,7 +133,7 @@ class ProjectResourcesTest(UserTestCase):
                                             pk=self.denied.pk)
         self._get(status=200, resources=resources)
 
-    def test_get_list_with_unattached_resource_using_nonsuperuser(self):
+    def test_get_list_with_unattached_resource_using_nonunarchiver(self):
         ResourceFactory.create(project=self.project)
         resources = Resource.objects.filter(project=self.project).exclude(
                                             pk=self.denied.pk)
@@ -145,12 +146,15 @@ class ProjectResourcesTest(UserTestCase):
                                             pk=self.denied.pk)
         self._get(status=200, resources=resources)
 
-    def test_get_list_with_archived_resource_using_superuser(self):
-        superuser = UserFactory.create()
-        superuser.assign_policies(self.policy, self.superuser_role)
+    def test_get_list_with_archived_resource_using_unarchiver(self):
+        unarchiver = UserFactory.create()
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        assign_user_policies(unarchiver, policy)
         ResourceFactory.create(project=self.project, archived=True)
         resources = Resource.objects.filter(project=self.project)
-        self._get(status=200, user=superuser, resources=resources)
+        self._get(status=200, user=unarchiver, resources=resources)
 
     def test_get_with_unauthorized_user(self):
         self._get(status=200, user=UserFactory.create(), resources=[])
@@ -266,6 +270,14 @@ class ProjectResourcesAddTest(UserTestCase):
             }
         )
         self._post(status=302, expected_redirect=redirect_url)
+        project_resources = self.project.resources.all()
+        assert len(project_resources) == 2
+        assert self.attached in project_resources
+        assert self.unattached in project_resources
+
+    def test_update_with_custom_redirect(self):
+        setattr(self.request, 'GET', {'next': '/organizations/'})
+        self._post(status=302, expected_redirect='/organizations/#resources')
         project_resources = self.project.resources.all()
         assert len(project_resources) == 2
         assert self.attached in project_resources
@@ -392,6 +404,12 @@ class ProjectResourcesNewTest(UserTestCase):
         assert self.project.resources.count() == 1
         assert self.project.resources.first().name == self.data['name']
 
+    def test_create_with_custom_redirect(self):
+        setattr(self.request, 'GET', {'next': '/organizations/'})
+        self._post(status=302, expected_redirect='/organizations/#resources')
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first().name == self.data['name']
+
     def test_post_with_unauthorized_user(self):
         self._post(status=302, user=UserFactory.create())
         assert ("You don't have permission to add resources."
@@ -466,61 +484,23 @@ class ProjectResourcesDetailTest(UserTestCase):
                 {
                     'object': self.project,
                     'resource': self.resource,
+                    'can_edit': True,
+                    'can_archive': True,
                     'attachment_list': [
                         {
-                            'url': reverse(
-                                'organization:project-dashboard',
-                                kwargs={
-                                    'organization': self.org_slug,
-                                    'project': self.project.slug,
-                                },
-                            ),
-                            'class': "Project",
-                            'name': self.project.name,
+                            'object': self.project,
                             'id': self.project_attachment.id,
                         },
                         {
-                            'url': reverse(
-                                'locations:detail',
-                                kwargs={
-                                    'organization': self.org_slug,
-                                    'project': self.project.slug,
-                                    'location': self.location.id,
-                                },
-                            ),
-                            'class': "Location",
-                            'name': self.location.get_type_display(),
+                            'object': self.location,
                             'id': self.location_attachment.id,
                         },
                         {
-                            'url': reverse(
-                                'parties:detail',
-                                kwargs={
-                                    'organization': self.org_slug,
-                                    'project': self.project.slug,
-                                    'party': self.party.id,
-                                },
-                            ),
-                            'class': "Party",
-                            'name': self.party.name,
+                            'object': self.party,
                             'id': self.party_attachment.id,
                         },
                         {
-                            'url': reverse(
-                                'parties:relationship_detail',
-                                kwargs={
-                                    'organization': self.org_slug,
-                                    'project': self.project.slug,
-                                    'relationship': self.tenurerel.id,
-                                },
-                            ),
-                            'class': "Relationship",
-                            'name': "<{party}> {type} <{su}>".format(
-                                party=self.tenurerel.party.name,
-                                su=(self.tenurerel.spatial_unit.
-                                    get_type_display()),
-                                type=self.tenurerel.tenure_type.label,
-                            ),
+                            'object': self.tenurerel,
                             'id': self.tenurerel_attachment.id,
                         },
                     ],
@@ -602,10 +582,11 @@ class ProjectResourcesEditTest(UserTestCase):
                 cancel_url += '#resources'
             else:
                 cancel_url = reverse(
-                    'resources:project_list',
+                    'resources:project_detail',
                     kwargs={
                         'organization': self.project.organization.slug,
-                        'project': self.project.slug
+                        'project': self.project.slug,
+                        'resource': self.resource.id,
                     }
                 )
             expected = render_to_string(
@@ -658,17 +639,6 @@ class ProjectResourcesEditTest(UserTestCase):
     def test_get_form(self):
         self._get(status=200)
 
-    def test_get_form_with_next_query_parameter(self):
-        self.request.GET['next'] = '/organizations/'
-        self._get(status=200)
-
-    def test_get_form_with_location_next_query_parameter(self):
-        url = ('https://example.com/organizations/sample-org/'
-               'projects/sample-proj/records/'
-               'locations/jvzsiszjzrbpecm69549u2z5/')
-        self.request.GET['next'] = url
-        self._get(status=200)
-
     def test_get_non_existent_project(self):
         setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
@@ -696,10 +666,11 @@ class ProjectResourcesEditTest(UserTestCase):
 
     def test_update(self):
         redirect_url = reverse(
-            'resources:project_list',
+            'resources:project_detail',
             kwargs={
                 'organization': self.project.organization.slug,
-                'project': self.project.slug
+                'project': self.project.slug,
+                'resource': self.resource.id,
             }
         )
         self._post(status=302, expected_redirect=redirect_url)
@@ -744,10 +715,11 @@ class ResourceArchiveTest(UserTestCase):
         setattr(self.request, '_messages', self.messages)
 
         self.redirect_url = reverse(
-            'resources:project_list',
+            'resources:project_detail',
             kwargs={
                 'organization': self.project.organization.slug,
-                'project': self.project.slug
+                'project': self.project.slug,
+                'resource': self.resource.id,
             }
         )
         self.policy = Policy.objects.create(
@@ -778,6 +750,38 @@ class ResourceArchiveTest(UserTestCase):
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
+    def test_archive_with_custom_redirect(self):
+        setattr(self.request, 'GET', {'next': '/dashboard/'})
+        self._get(status=302, redirect_url='/dashboard/#resources')
+
+        self.resource.refresh_from_db()
+        assert self.resource.archived is True
+
+    def test_archive_with_no_unarchive_permission(self):
+        addl_clauses = copy.deepcopy(clauses)
+        addl_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/*'],
+                'action': ['resource.unarchive'],
+            },
+        ]
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(addl_clauses))
+        assign_user_policies(self.user, policy)
+        redirect_url = reverse(
+            'resources:project_list',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug,
+            }
+        )
+        self._get(status=302, redirect_url=redirect_url)
+
+        self.resource.refresh_from_db()
+        assert self.resource.archived is True
+
     def test_archive_with_project_does_not_exist(self):
         setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
@@ -799,7 +803,7 @@ class ResourceArchiveTest(UserTestCase):
 
     def test_archive_with_unauthorized_user(self):
         self._get(status=302, user=UserFactory.create())
-        assert ("You don't have permission to archive this resource."
+        assert ("You don't have permission to delete this resource."
                 in [str(m) for m in get_messages(self.request)])
 
         self.resource.refresh_from_db()
@@ -831,10 +835,11 @@ class ResourceUnArchiveTest(UserTestCase):
         setattr(self.request, '_messages', self.messages)
 
         self.redirect_url = reverse(
-            'resources:project_list',
+            'resources:project_detail',
             kwargs={
                 'organization': self.project.organization.slug,
-                'project': self.project.slug
+                'project': self.project.slug,
+                'resource': self.resource.id,
             }
         )
         self.policy = Policy.objects.create(
@@ -881,7 +886,7 @@ class ResourceUnArchiveTest(UserTestCase):
         self.resource.refresh_from_db()
         assert self.resource.archived is True
 
-    def test_archive_project_does_not_exist(self):
+    def test_unarchive_resource_does_not_exist(self):
         setattr(self.request, 'user', self.user)
         with pytest.raises(Http404):
             self.view(self.request,
@@ -890,9 +895,12 @@ class ResourceUnArchiveTest(UserTestCase):
                       resource='abc123')
 
     def test_unarchive_with_unauthorized_user(self):
-        self._get(status=302, user=UserFactory.create())
-        assert ("You don't have permission to unarchive this resource."
-                in [str(m) for m in get_messages(self.request)])
+        setattr(self.request, 'user', UserFactory.create())
+        with pytest.raises(Http404):
+            self.view(self.request,
+                      organization=self.project.organization.slug,
+                      project=self.project.slug,
+                      resource=self.resource.id)
 
         self.resource.refresh_from_db()
         assert self.resource.archived is True
@@ -996,11 +1004,11 @@ class ResourceDetachTest(UserTestCase):
         assert project_resources.count() == 1
         assert project_resources.first() == self.resource
 
-    def test_detach_with_next_url(self):
+    def test_detach_with_custom_redirect(self):
         setattr(self.request, 'GET', {'next': '/dashboard/'})
         response = self._post(self.project_attachment.id)
         assert response.status_code == 302
-        assert '/dashboard/' in response['location']
+        assert '/dashboard/#resources' in response['location']
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 1
         assert self.project.resources.count() == 0

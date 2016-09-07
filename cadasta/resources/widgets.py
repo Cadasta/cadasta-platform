@@ -27,25 +27,26 @@ class ResourceWidget(CheckboxInput):
         super().__init__(*args, **kwargs)
         self.resource = resource
 
+    def get_attachment_text(self, num_entities):
+        # TODO: There should be a way to make the pluralization logic
+        # localizable (maybe plural is > 2 in some locales)
+        if num_entities == 0:
+            return _("Unattached")
+        elif num_entities == 1:
+            return _("Attached to 1 other entity")
+        else:
+            plural_text = _("Attached to {number} other entities")
+            return plural_text.format(number=num_entities)
+
     def render(self, name, value, attrs=None):
         date_format = formats.get_format("DATETIME_FORMAT",
                                          lang=get_language())
         checkbox = super().render(name, value, attrs=attrs)
         num_entities = self.resource.num_entities
-        # TODO: There should be a way to make the pluralization logic
-        # localizable (maybe plural is > 2 in some locales)
-        if num_entities == 0:
-            attachment_text = _("Unattached")
-        elif num_entities == 1:
-            singular_text = _("Attached to {number} other entity")
-            attachment_text = singular_text.format(number=num_entities)
-        else:
-            plural_text = _("Attached to {number} other entities")
-            attachment_text = plural_text.format(number=num_entities)
         return self.html.format(
             name=name,
             resource=self.resource,
             checkbox=checkbox,
             date_updated=date(self.resource.last_updated, date_format),
-            attachment_text=attachment_text,
+            attachment_text=self.get_attachment_text(num_entities),
         )

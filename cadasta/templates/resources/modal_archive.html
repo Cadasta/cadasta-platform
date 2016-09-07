@@ -19,7 +19,7 @@
         </p>
       </div>
       <div class="modal-footer">
-        <a href="{{ archive_url }}?next={{ success_url }}" class="btn btn-danger archive-final pull-right" role="button">
+        <a href="{{ archive_url }}{% if success_url %}?next={{ success_url }}{% endif %}" class="btn btn-danger archive-final pull-right" role="button">
           {% trans "Yes, delete this resource" %}
         </a>
         <button type="button" class="btn btn-link cancel" data-dismiss="modal">

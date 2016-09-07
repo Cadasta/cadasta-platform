@@ -15,11 +15,7 @@ class ResourceViewMixin:
 
     def get_queryset(self):
         if hasattr(self, 'use_resource_library_queryset'):
-            resource_library = self.get_project().resource_set
-            if self.is_superuser:
-                return resource_library.all()
-            else:
-                return resource_library.filter(archived=False)
+            return self.get_project().resource_set.all()
         else:
             return self.get_content_object().resources.all()
 
@@ -58,38 +54,67 @@ class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):
         return context
 
     def get_success_url(self):
-        project = self.get_project()
-
         next_url = self.request.GET.get('next', None)
         if next_url:
             return next_url + '#resources'
 
+        project = self.get_project()
         return reverse(
             'resources:project_list',
             kwargs={
                 'organization': project.organization.slug,
-                'project': project.slug
+                'project': project.slug,
             }
         )
 
 
 class ResourceObjectMixin(ProjectResourceMixin):
     def get_object(self):
+        if hasattr(self, 'resource'):
+            return self.resource
         try:
-            return Resource.objects.get(
+            resource = Resource.objects.get(
+                project__organization__slug=self.kwargs['organization'],
                 project__slug=self.kwargs['project'],
                 id=self.kwargs['resource']
             )
         except Resource.DoesNotExist as e:
             raise Http404(e)
+        if (
+            resource.archived and
+            not self.request.user.has_perm('resource.unarchive', resource)
+        ):
+            raise Http404(Resource.DoesNotExist)
+        else:
+            self.resource = resource
+            return resource
 
     def get_perms_objects(self):
         return [self.get_object()]
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['resource'] = self.get_object()
+        resource = self.get_object()
+        user = self.request.user
+        context['resource'] = resource
+        context['can_edit'] = user.has_perm('resource.edit', resource)
+        context['can_archive'] = user.has_perm('resource.archive', resource)
         return context
+
+    def get_success_url(self):
+        next_url = self.request.GET.get('next', None)
+        if next_url:
+            return next_url + '#resources'
+
+        project = self.get_project()
+        return reverse(
+            'resources:project_detail',
+            kwargs={
+                'organization': project.organization.slug,
+                'project': project.slug,
+                'resource': self.get_object().id,
+            }
+        )
 
 
 class HasUnattachedResourcesMixin(ProjectMixin):
@@ -105,11 +130,11 @@ class HasUnattachedResourcesMixin(ProjectMixin):
             # This is for views that list entity resources
             object = self.object
 
-        project_resource_set = self.get_project().resource_set.filter(
-            archived=False)
+        project_resource_set_count = self.get_project().resource_set.filter(
+            archived=False).count()
         if (
-            project_resource_set.exists() and
-            project_resource_set.count() != object.resources.count()
+            project_resource_set_count > 0 and
+            project_resource_set_count != object.resources.count()
         ):
             context['has_unattached_resources'] = True
 

@@ -1,10 +1,11 @@
+import copy
 import pytest
 import os
 import json
 from django.http import QueryDict
 from django.conf import settings
 from rest_framework.test import APIRequestFactory, force_authenticate
-from tutelary.models import Policy, Role
+from tutelary.models import Policy
 
 from core.tests.base_test_case import UserTestCase
 from core.tests.util import make_dirs  # noqa
@@ -27,8 +28,8 @@ clauses = {
             'effect': 'allow',
             'object': ['resource/*/*/*'],
             'action': ['resource.*']
-        }
-    ]
+        },
+    ],
 }
 
 
@@ -51,18 +52,25 @@ class ProjectResourcesTest(UserTestCase):
         self.view = api.ProjectResources.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/'
 
-        clauses['clause'].append({
-            'effect': 'deny',
-            'object': ['resource/*/*/' + self.denied.id],
-            'action': ['resource.*']
-        })
+        addl_clauses = copy.deepcopy(clauses)
+        addl_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/' + self.denied.id],
+                'action': ['resource.*'],
+            },
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/*'],
+                'action': ['resource.unarchive'],
+            },
+        ]
 
         self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(clauses))
+            body=json.dumps(addl_clauses))
         self.user = UserFactory.create()
         self.user.assign_policies(self.policy)
-        self.superuser_role = Role.objects.get(name='superuser')
 
     def _get(self, org, prj, query=None, user=None, status=None, count=None):
         if user is None:
@@ -200,7 +208,7 @@ class ProjectResourcesTest(UserTestCase):
                   status=200,
                   count=1)
 
-    def test_filter_archived_with_nonsuperuser(self):
+    def test_filter_archived_with_nonunarchiver(self):
         prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
             {'content_object': prj, 'project': prj, 'archived': True},
@@ -213,21 +221,24 @@ class ProjectResourcesTest(UserTestCase):
                   status=200,
                   count=0)
 
-    def test_filter_archived_with_superuser(self):
+    def test_filter_archived_with_unarchiver(self):
         prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
             {'content_object': prj, 'project': prj, 'archived': True},
             {'content_object': prj, 'project': prj, 'archived': True},
             {'content_object': prj, 'project': prj, 'archived': False},
         ])
-        superuser = UserFactory.create()
-        superuser.assign_policies(self.policy, self.superuser_role)
+        unarchiver = UserFactory.create()
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        unarchiver.assign_policies(policy)
         self._get(prj.organization.slug,
                   prj.slug,
                   query='archived=True',
                   status=200,
                   count=2,
-                  user=superuser)
+                  user=unarchiver)
 
     def test_ordering(self):
         prj = ProjectFactory.create()
@@ -270,12 +281,21 @@ class ProjectResourcesDetailTest(UserTestCase):
                                                project=self.project)
         self.view = api.ProjectResourcesDetail.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/{res}'
+
+        addl_clauses = copy.deepcopy(clauses)
+        addl_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/*'],
+                'action': ['resource.unarchive'],
+            },
+        ]
+
         self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(clauses))
+            body=json.dumps(addl_clauses))
         self.user = UserFactory.create()
         self.user.assign_policies(self.policy)
-        self.superuser_role = Role.objects.get(name='superuser')
 
     def _get(self, org, prj, res, user=None, status=None, count=None):
         if user is None:
@@ -347,14 +367,14 @@ class ProjectResourcesDetailTest(UserTestCase):
                             self.project.slug,
                             self.resource.id,
                             status=404)
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == "Not found."
 
     def test_get_resource_from_project_that_does_not_exist(self):
         content = self._get(self.project.organization.slug,
                             'some-prj',
                             self.resource.id,
                             status=404)
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == "Not found."
 
     def test_update_resource(self):
         data = {'name': 'Updated'}
@@ -411,7 +431,26 @@ class ProjectResourcesDetailTest(UserTestCase):
         self.resource.refresh_from_db()
         assert self.resource.archived is False
 
-    def test_unarchive_resource_with_nonsuperuser(self):
+    def test_unarchive_resource(self):
+        self.resource.archived = True
+        self.resource.save()
+        data = {'archived': False}
+        unarchiver = UserFactory.create()
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        unarchiver.assign_policies(policy)
+        content = self._patch(self.project.organization.slug,
+                              self.project.slug,
+                              self.resource.id,
+                              data,
+                              status=200,
+                              user=unarchiver)
+        assert content['id'] == self.resource.id
+        self.resource.refresh_from_db()
+        assert self.resource.archived is False
+
+    def test_unarchive_resource_with_unauthorized_user(self):
         self.resource.archived = True
         self.resource.save()
         data = {'archived': False}
@@ -420,19 +459,3 @@ class ProjectResourcesDetailTest(UserTestCase):
                     self.resource.id,
                     data,
                     status=404)
-
-    def test_unarchive_resource_with_superuser(self):
-        self.resource.archived = True
-        self.resource.save()
-        data = {'archived': False}
-        superuser = UserFactory.create()
-        superuser.assign_policies(self.policy, self.superuser_role)
-        content = self._patch(self.project.organization.slug,
-                              self.project.slug,
-                              self.resource.id,
-                              data,
-                              status=200,
-                              user=superuser)
-        assert content['id'] == self.resource.id
-        self.resource.refresh_from_db()
-        assert self.resource.archived is False

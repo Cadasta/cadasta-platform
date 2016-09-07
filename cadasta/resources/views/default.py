@@ -1,7 +1,5 @@
 from django.core.urlresolvers import reverse
 from django.http import Http404
-from django.utils.translation import ugettext as _
-from django.contrib.contenttypes.models import ContentType
 from core.views import generic
 import django.views.generic as base_generic
 from core.views.mixins import ArchiveMixin
@@ -13,9 +11,6 @@ from . import mixins
 from organization.views import mixins as organization_mixins
 from ..forms import AddResourceFromLibraryForm
 from .. import messages as error_messages
-from organization.models import Project
-from spatial.models import SpatialUnit
-from party.models import Party
 
 
 class ProjectResources(LoginPermissionRequiredMixin,
@@ -27,7 +22,14 @@ class ProjectResources(LoginPermissionRequiredMixin,
     template_name = 'resources/project_list.html'
     permission_required = 'resource.list'
     permission_denied_message = error_messages.RESOURCE_LIST
-    permission_filter_queryset = ('resource.view',)
+
+    def filter_archived_resources(self, view, obj):
+        if obj.archived:
+            return ('resource.view', 'resource.unarchive')
+        else:
+            return ('resource.view',)
+
+    permission_filter_queryset = filter_archived_resources
     use_resource_library_queryset = True
 
     def get_resource_list(self):
@@ -80,76 +82,14 @@ class ProjectResourcesDetail(LoginPermissionRequiredMixin,
         context = super().get_context_data(*args, **kwargs)
 
         # Construct list of objects resource is attached to
-        attachment_list = []
-        project = self.get_project()
         attachments = ContentObject.objects.filter(resource=self.get_object())
-        type_lookup = ContentType.objects.get_for_model
-        for attachment in attachments:
-            content_type = attachment.content_type
-            object = content_type.get_object_for_this_type(
-                pk=attachment.object_id)
-
-            if content_type == type_lookup(Project):
-                url = reverse(
-                    'organization:project-dashboard',
-                    kwargs={
-                        'organization': project.organization.slug,
-                        'project': project.slug,
-                    },
-                )
-                class_name = _("Project")
-                name = project.name
-
-            elif content_type == type_lookup(SpatialUnit):
-                url = reverse(
-                    'locations:detail',
-                    kwargs={
-                        'organization': project.organization.slug,
-                        'project': project.slug,
-                        'location': attachment.object_id,
-                    },
-                )
-                class_name = _("Location")
-                name = object.get_type_display()
-
-            elif content_type == type_lookup(Party):
-                url = reverse(
-                    'parties:detail',
-                    kwargs={
-                        'organization': project.organization.slug,
-                        'project': project.slug,
-                        'party': attachment.object_id,
-                    },
-                )
-                class_name = _("Party")
-                name = object.name
-
-            else:  # content_type == type_lookup(TenureRelationship):
-                url = reverse(
-                    'parties:relationship_detail',
-                    kwargs={
-                        'organization': project.organization.slug,
-                        'project': project.slug,
-                        'relationship': attachment.object_id,
-                    },
-                )
-                class_name = _("Relationship")
-                name = "<{party}> {type} <{su}>".format(
-                    party=object.party.name,
-                    su=object.spatial_unit.get_type_display(),
-                    type=object.tenure_type.label,
-                )
-
-            # TODO: There should probably be an actual else case here that
-            # should be treated as an exception because it means that the
-            # resource is attached to an unexpected object
-
-            attachment_list.append({
-                'url': url,
-                'class': class_name,
-                'name': name,
+        attachment_list = [
+            {
+                'object': attachment.content_type.get_object_for_this_type(
+                    pk=attachment.object_id),
                 'id': attachment.id,
-            })
+            } for attachment in attachments
+        ]
 
         context['attachment_list'] = attachment_list
         return context
@@ -176,6 +116,31 @@ class ResourceArchive(LoginPermissionRequiredMixin,
     do_archive = True
     permission_required = 'resource.archive'
     permission_denied_message = error_messages.RESOURCE_ARCHIVE
+
+    def get_success_url(self):
+        next_url = self.request.GET.get('next', None)
+        if next_url:
+            return next_url + '#resources'
+
+        project = self.get_project()
+        resource = self.get_object()
+        if self.request.user.has_perm('resource.unarchive', resource):
+            return reverse(
+                'resources:project_detail',
+                kwargs={
+                    'organization': project.organization.slug,
+                    'project': project.slug,
+                    'resource': resource.id,
+                }
+            )
+        else:
+            return reverse(
+                'resources:project_list',
+                kwargs={
+                    'organization': project.organization.slug,
+                    'project': project.slug,
+                }
+            )
 
 
 class ResourceUnarchive(LoginPermissionRequiredMixin,

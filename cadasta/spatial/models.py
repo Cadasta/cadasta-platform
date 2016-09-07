@@ -1,4 +1,5 @@
 from core.models import RandomIDModel
+from django.core.urlresolvers import reverse
 from django.contrib.gis.db.models import GeometryField
 from django.db import models
 from django.utils.translation import ugettext as _
@@ -84,10 +85,29 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         )
 
     def __str__(self):
-        return "<SpatialUnit: {}>".format(self.get_type_display())
+        return "<SpatialUnit: {}>".format(self.ui_object_name)
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def ui_object_name(self):
+        return self.get_type_display()
+
+    @property
+    def ui_class_name(self):
+        return _("Location")
+
+    @property
+    def ui_detail_url(self):
+        return reverse(
+            'locations:detail',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug,
+                'location': self.id,
+            },
+        )
 
 
 def reassign_spatial_geometry(instance):

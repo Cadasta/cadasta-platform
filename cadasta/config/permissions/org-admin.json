@@ -47,6 +47,11 @@
       "effect": "allow",
       "action": ["resource.*"],
       "object": ["resource/$organization/*/*"]
+    },
+    {
+      "effect": "deny",
+      "action": ["resource.unarchive"],
+      "object": ["resource/$organization/*/*"]
     }
   ]
 }
