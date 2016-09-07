@@ -200,6 +200,7 @@ LANGUAGES = [
     ('fr', _('French')),
     ('de', _('German')),
     ('es', _('Spanish')),
+    ('pt', _('Portuguese')),
     ('sw', _('Swahili')),
 ]
 
