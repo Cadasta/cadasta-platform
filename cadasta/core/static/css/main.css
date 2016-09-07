@@ -5017,7 +5017,7 @@ header {
     .reg-links .btn-user .thumbnail {
       margin-right: 4px; }
   .reg-links .btn-reg {
-    min-width: auto;
+    min-width: 50px;
     margin-top: 24px;
     margin-left: 0;
     font-size: 12px;
