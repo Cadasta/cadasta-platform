@@ -85,13 +85,13 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         )
 
     def __str__(self):
-        return "<SpatialUnit: {}>".format(self.ui_object_name)
+        return "<SpatialUnit: {}>".format(self.name)
 
     def __repr__(self):
         return str(self)
 
     @property
-    def ui_object_name(self):
+    def name(self):
         return self.get_type_display()
 
     @property

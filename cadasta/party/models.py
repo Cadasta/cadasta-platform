@@ -117,10 +117,6 @@ class Party(ResourceModelMixin, RandomIDModel):
         return str(self)
 
     @property
-    def ui_object_name(self):
-        return self.name
-
-    @property
     def ui_class_name(self):
         return _("Party")
 
@@ -288,16 +284,16 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
         )
 
     def __str__(self):
-        return "<TenureRelationship: {}>".format(self.ui_object_name)
+        return "<TenureRelationship: {}>".format(self.name)
 
     def __repr__(self):
         return str(self)
 
     @property
-    def ui_object_name(self):
+    def name(self):
         return "<{party}> {type} <{su}>".format(
-            party=self.party.ui_object_name,
-            su=self.spatial_unit.ui_object_name,
+            party=self.party.name,
+            su=self.spatial_unit.name,
             type=self.tenure_type.label,
         )
 

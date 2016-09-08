@@ -135,6 +135,17 @@ class ProjectTest(TestCase):
         project = ProjectFactory.create(access='private')
         assert not project.public()
 
+    def test_ui_class_name(self):
+        project = ProjectFactory.create()
+        assert project.ui_class_name == "Project"
+
+    def test_ui_detail_url(self):
+        project = ProjectFactory.create()
+        assert project.ui_detail_url == (
+            '/organizations/{org}/projects/{prj}/'.format(
+                org=project.organization.slug,
+                prj=project.slug))
+
 
 class ProjectRoleTest(UserTestCase):
     def setUp(self):

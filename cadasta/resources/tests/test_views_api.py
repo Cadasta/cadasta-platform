@@ -52,8 +52,8 @@ class ProjectResourcesTest(UserTestCase):
         self.view = api.ProjectResources.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/'
 
-        addl_clauses = copy.deepcopy(clauses)
-        addl_clauses['clause'] += [
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
             {
                 'effect': 'deny',
                 'object': ['resource/*/*/' + self.denied.id],
@@ -68,7 +68,7 @@ class ProjectResourcesTest(UserTestCase):
 
         self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(addl_clauses))
+            body=json.dumps(additional_clauses))
         self.user = UserFactory.create()
         self.user.assign_policies(self.policy)
 
@@ -282,8 +282,8 @@ class ProjectResourcesDetailTest(UserTestCase):
         self.view = api.ProjectResourcesDetail.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/{res}'
 
-        addl_clauses = copy.deepcopy(clauses)
-        addl_clauses['clause'] += [
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
             {
                 'effect': 'deny',
                 'object': ['resource/*/*/*'],
@@ -293,7 +293,7 @@ class ProjectResourcesDetailTest(UserTestCase):
 
         self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(addl_clauses))
+            body=json.dumps(additional_clauses))
         self.user = UserFactory.create()
         self.user.assign_policies(self.policy)
 

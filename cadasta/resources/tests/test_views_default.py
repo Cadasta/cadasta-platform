@@ -59,8 +59,8 @@ class ProjectResourcesTest(UserTestCase):
         setattr(self.request, 'method', 'GET')
         self.user = UserFactory.create()
 
-        addl_clauses = copy.deepcopy(clauses)
-        addl_clauses['clause'] += [
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
             {
                 'effect': 'deny',
                 'object': ['resource/*/*/' + self.denied.id],
@@ -75,7 +75,7 @@ class ProjectResourcesTest(UserTestCase):
 
         self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(addl_clauses))
+            body=json.dumps(additional_clauses))
         assign_user_policies(self.user, self.policy)
 
     def _get(self, user=None, status=None, resources=None):
@@ -758,8 +758,8 @@ class ResourceArchiveTest(UserTestCase):
         assert self.resource.archived is True
 
     def test_archive_with_no_unarchive_permission(self):
-        addl_clauses = copy.deepcopy(clauses)
-        addl_clauses['clause'] += [
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
             {
                 'effect': 'deny',
                 'object': ['resource/*/*/*'],
@@ -768,7 +768,7 @@ class ResourceArchiveTest(UserTestCase):
         ]
         policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(addl_clauses))
+            body=json.dumps(additional_clauses))
         assign_user_policies(self.user, policy)
         redirect_url = reverse(
             'resources:project_list',

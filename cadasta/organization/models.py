@@ -227,10 +227,6 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
         return str(self)
 
     @property
-    def ui_object_name(self):
-        return self.name
-
-    @property
     def ui_class_name(self):
         return _("Project")
 
