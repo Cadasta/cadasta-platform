@@ -130,7 +130,7 @@ class QuestionnaireManagerTest(TestCase):
                 xls_form=form,
                 project=ProjectFactory.create()
             )
-        assert "'interger' is not an accepted question type" in e.value.errors
+        assert "Unknown question type 'interger'." in e.value.errors
 
         assert models.Questionnaire.objects.exists() is False
         assert models.QuestionGroup.objects.exists() is False

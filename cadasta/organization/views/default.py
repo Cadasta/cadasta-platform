@@ -1,27 +1,25 @@
-import os
 import json
-from django.http import HttpResponse
-from django.db import transaction
-from django.shortcuts import redirect, get_object_or_404
-import django.views.generic as base_generic
-from django.core.urlresolvers import reverse
-from django.contrib import messages
-
-import formtools.wizard.views as wizard
+import os
+from collections import OrderedDict
 
 import core.views.generic as generic
-from core.views.mixins import SuperUserCheckMixin
-from core.mixins import PermissionRequiredMixin, LoginPermissionRequiredMixin
-from core.views.mixins import ArchiveMixin
+import django.views.generic as base_generic
+import formtools.wizard.views as wizard
 from accounts.models import User
-from questionnaires.models import Questionnaire
+from core.mixins import LoginPermissionRequiredMixin, PermissionRequiredMixin
+from core.views.mixins import ArchiveMixin, SuperUserCheckMixin
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.models import Questionnaire
 from spatial.serializers import SpatialUnitGeoJsonSerializer
 
-from ..models import Organization, Project, OrganizationRole, ProjectRole
 from . import mixins
-from .. import forms
 from .. import messages as error_messages
+from .. import forms
+from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
@@ -200,8 +198,8 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         context['form'] = self.get_form()
 
         org_admin = OrganizationRole.objects.get(
-           user=self.request.user,
-           organization=context['organization']).admin
+            user=self.request.user,
+            organization=context['organization']).admin
         context['org_admin'] = (org_admin and
                                 not self.is_superuser and
                                 context['org_member'] == self.request.user)
@@ -289,8 +287,8 @@ class ProjectList(PermissionRequiredMixin,
 
     def get(self, request, *args, **kwargs):
         if (hasattr(self.request.user, 'assigned_policies') and
-           self.is_superuser):
-                projects = Project.objects.all()
+                self.is_superuser):
+            projects = Project.objects.all()
         else:
             projects = []
             projects.extend(Project.objects.filter(access='public'))
@@ -309,6 +307,7 @@ class ProjectDashboard(PermissionRequiredMixin,
                        mixins.ProjectAdminCheckMixin,
                        mixins.ProjectMixin,
                        generic.DetailView):
+
     def get_actions(view, request):
         if view.get_object().public():
             return 'project.view'
@@ -367,6 +366,13 @@ class ProjectAddWizard(SuperUserCheckMixin,
                        wizard.SessionWizardView):
     permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
+
+    class RevalidationError(Exception):
+
+        def __init__(self, step, form, **kwargs):
+            self.step = step
+            self.form = form
+            self.kwargs = kwargs
 
     def get_form_initial(self, step):
         initial = super().get_form_initial(step)
@@ -454,7 +460,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
         description = form_data[1]['description']
         access = form_data[1].get('access')
         url = form_data[1]['url']
-        questionaire = form_data[1].get('questionaire')
+        questionnaire = form_data[1].get('questionnaire')
         contacts = form_data[1].get('contacts')
 
         org = Organization.objects.get(slug=organization)
@@ -464,31 +470,58 @@ class ProjectAddWizard(SuperUserCheckMixin,
             role = form_data[2].get(user.username, None)
             if role:
                 user_roles.append((user, role))
-
-        with transaction.atomic():
-            project = Project.objects.create(
-                name=name, organization=org,
-                description=description, urls=[url], extent=extent,
-                access=access, contacts=contacts
-            )
-            for username, role in user_roles:
-                user = User.objects.get(username=username)
-                ProjectRole.objects.create(
-                    project=project, user=user, role=role
+        try:
+            with transaction.atomic():
+                project = Project.objects.create(
+                    name=name, organization=org,
+                    description=description, urls=[url], extent=extent,
+                    access=access, contacts=contacts
                 )
-
-            if questionaire:
-                try:
+                for username, role in user_roles:
+                    user = User.objects.get(username=username)
+                    ProjectRole.objects.create(
+                        project=project, user=user, role=role
+                    )
+                if questionnaire:
                     Questionnaire.objects.create_from_form(
                         project=project,
-                        xls_form=questionaire
+                        xls_form=questionnaire
                     )
-                except InvalidXLSForm as e:
-                    messages.warning(self.request, e)
+        except InvalidXLSForm as e:
+            details_form = form_dict['details']
+            details_form.add_error('questionnaire', e)
+            raise self.RevalidationError('details', details_form, **kwargs)
 
         return redirect('organization:project-dashboard',
                         organization=organization,
                         project=project.slug)
+
+    def render_done(self, form, **kwargs):
+        final_forms = OrderedDict()
+        # walk through the form list and try to validate the data again.
+        for form_key in self.get_form_list():
+            form_obj = self.get_form(
+                step=form_key,
+                data=self.storage.get_step_data(form_key),
+                files=self.storage.get_step_files(form_key)
+            )
+            if not form_obj.is_valid():  # pragma:  no cover
+                return self.render_revalidation_failure(
+                    form_key, form_obj, **kwargs
+                )
+            final_forms[form_key] = form_obj
+
+        # catch bad xform here
+        try:
+            done_response = self.done(
+                final_forms.values(), form_dict=final_forms, **kwargs
+            )
+        except self.RevalidationError as e:
+            return self.render_revalidation_failure(
+                e.step, e.form, **e.kwargs
+            )
+        self.storage.reset()
+        return done_response
 
 
 class ProjectEdit(mixins.ProjectMixin,

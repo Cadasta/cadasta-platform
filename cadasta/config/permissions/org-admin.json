@@ -12,7 +12,7 @@
     },
     {
       "effect": "allow",
-      "action": ["project.*", "project.users.*", "questionaire.*",
+      "action": ["project.*", "project.users.*", "questionnaire.*",
                  "resource.*", "spatial.*", "spatial_rel.*",
                  "party.*", "party_rel.*", "tenure_rel.*"],
       "object": ["project/$organization/*"]

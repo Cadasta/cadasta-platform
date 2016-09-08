@@ -131,25 +131,24 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
 class QuestionnaireManager(models.Manager):
 
     def create_from_form(self, xls_form=None, project=None):
-        with transaction.atomic():
-            instance = self.model(
-                xls_form=xls_form,
-                project=project
-            )
-            json = parse_file_to_json(instance.xls_form.file.name)
-            instance.filename = json.get('name')
-            instance.title = json.get('title')
-            instance.id_string = json.get('id_string')
-            instance.version = int(
-                datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4]
-            )
-            instance.md5_hash = self.get_hash(
-                instance.filename, instance.id_string, instance.version
-            )
+        try:
+            with transaction.atomic():
+                errors = []
+                instance = self.model(
+                    xls_form=xls_form,
+                    project=project
+                )
+                json = parse_file_to_json(instance.xls_form.file.name)
+                instance.filename = json.get('name')
+                instance.title = json.get('title')
+                instance.id_string = json.get('id_string')
+                instance.version = int(
+                    datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4]
+                )
+                instance.md5_hash = self.get_hash(
+                    instance.filename, instance.id_string, instance.version
+                )
 
-            errors = []
-
-            try:
                 survey = create_survey_element_from_dict(json)
                 xml_form = survey.xml().toxml()
                 # insert version attr into the xform instance root node
@@ -161,28 +160,27 @@ class QuestionnaireManager(models.Manager):
                 url = instance.xml_form.storage.save(
                     '{}.xml'.format(name), xml)
                 instance.xml_form = url
-            except PyXFormError as e:
-                errors.append(
-                    _('{error}'.format(
-                        error=str(e)))
+
+                instance.save()
+
+                project.current_questionnaire = instance.id
+                project.save()
+
+                create_children(
+                    children=json.get('children'),
+                    errors=errors,
+                    project=project,
+                    kwargs={'questionnaire': instance}
                 )
 
-            instance.save()
+                # all these errors handled by PyXForm so turning off for now
+                # if errors:
+                #     raise InvalidXLSForm(errors)
 
-            project.current_questionnaire = instance.id
-            project.save()
+                return instance
 
-            create_children(
-                children=json.get('children'),
-                errors=errors,
-                project=project,
-                kwargs={'questionnaire': instance}
-            )
-
-            if errors:
-                raise InvalidXLSForm(errors)
-
-            return instance
+        except PyXFormError as e:
+                raise InvalidXLSForm([str(e)])
 
     def get_hash(self, filename, id_string, version):
         string = str(filename) + str(id_string) + str(version)
@@ -233,12 +231,14 @@ class QuestionManager(models.Manager):
 
         type_dict = {name: code for code, name in instance.TYPE_CHOICES}
 
-        try:
-            instance.type = type_dict[dict.get('type')]
-        except KeyError as e:
-            errors.append(
-                _('{type} is not an accepted question type').format(type=e)
-            )
+        instance.type = type_dict[dict.get('type')]
+
+        # try:
+        #     instance.type = type_dict[dict.get('type')]
+        # except KeyError as e:
+        #     errors.append(
+        #         _('{type} is not an accepted question type').format(type=e)
+        #     )
 
         instance.name = dict.get('name')
         instance.label = dict.get('label')

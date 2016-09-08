@@ -124,6 +124,6 @@ class QuestionnaireDetailTest(UserTestCase):
         data = {'xls_form': form}
 
         content = self._put(data=data, status=400)
-        assert ("'interger' is not an accepted question type" in
+        assert ("Unknown question type 'interger'." in
                 content.get('xls_form'))
         assert Questionnaire.objects.filter(project=self.prj).count() == 0

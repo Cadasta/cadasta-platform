@@ -109,11 +109,11 @@
             <h3>2. Questionnaire</h3>
             <div class="row">
               <div class="col-md-9">
-                <div class="form-group{% if wizard.form.questionaire.errors %} has-error{% endif %}">
-                  <label for="{{ wizard.form.questionaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
-                  <label class="pull-right control-label">{{ wizard.form.questionaire.errors }}</label>
+                <div class="form-group{% if wizard.form.questionnaire.errors %} has-error{% endif %}">
+                  <label for="{{ wizard.form.questionnaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
+                  <label class="pull-right control-label">{{ wizard.form.questionnaire.errors }}</label>
                   <div class="well file-well">
-                    {% render_field wizard.form.questionaire class+="form-control" %}
+                    {% render_field wizard.form.questionnaire class+="form-control" %}
                     <p class="help-block">Accepted file types: xls, xlsx</p>
                   </div>
                   <div class="alert alert-info alert-full clearfix row" role="alert">
