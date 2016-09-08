@@ -198,8 +198,8 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         context['form'] = self.get_form()
 
         org_admin = OrganizationRole.objects.get(
-           user=self.request.user,
-           organization=context['organization']).admin
+            user=self.request.user,
+            organization=context['organization']).admin
         context['org_admin'] = (org_admin and
                                 not self.is_superuser and
                                 context['org_member'] == self.request.user)
@@ -368,6 +368,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
     form_list = PROJECT_ADD_FORMS
 
     class RevalidationError(Exception):
+
         def __init__(self, step, form, **kwargs):
             self.step = step
             self.form = form

@@ -858,11 +858,11 @@ class ProjectEditDetailsTest(UserTestCase):
 
         form.add_error('questionnaire',
                        "Unknown question type 'interger'.")
-        form.add_error('questionnaire',
-                       "'interger' is not an accepted question type")
-        form.add_error('questionnaire',
-                       "'select multiple list' is not an accepted question "
-                       "type")
+        # form.add_error('questionnaire',
+        #                "'interger' is not an accepted question type")
+        # form.add_error('questionnaire',
+        #                "'select multiple list' is not an accepted question "
+        #                "type")
 
         expected = render_to_string(
             'organization/project_edit_details.html',
