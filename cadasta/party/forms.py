@@ -29,7 +29,9 @@ class TenureRelationshipEditForm(AttributeModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        tenuretypes = TenureRelationshipType.objects.values_list('id', 'label')
+        tenuretypes = sorted(
+            TenureRelationshipType.objects.values_list('id', 'label')
+        )
         self.fields['tenure_type'].choices = tenuretypes
 
     def save(self):

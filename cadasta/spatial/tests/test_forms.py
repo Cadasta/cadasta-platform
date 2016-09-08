@@ -143,7 +143,7 @@ class TenureRelationshipFormTest(UserTestCase):
         assert isinstance(form.fields['tenure_type'], ChoiceField)
         assert form.fields['tenure_type'].choices == (
             [('', _('Please select a relationship type'))] +
-            list(TENURE_RELATIONSHIP_TYPES)
+            sorted(list(TENURE_RELATIONSHIP_TYPES))
         )
         assert ("All Types" not in
                 dict(form.fields['tenure_type'].choices).values())
