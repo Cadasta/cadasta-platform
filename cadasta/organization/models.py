@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django_countries.fields import CountryField
@@ -224,6 +225,20 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def ui_class_name(self):
+        return _("Project")
+
+    @property
+    def ui_detail_url(self):
+        return reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.organization.slug,
+                'project': self.slug,
+            },
+        )
 
     def save(self, *args, **kwargs):
         if ((self.country is None or self.country == '') and

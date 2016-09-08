@@ -1,10 +1,10 @@
 from rest_framework import generics, filters
 from tutelary.mixins import APIPermissionRequiredMixin
-from .mixins import ProjectResourceMixin
+from . import mixins
 
 
 class ProjectResources(APIPermissionRequiredMixin,
-                       ProjectResourceMixin,
+                       mixins.ProjectResourceMixin,
                        generics.ListCreateAPIView):
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
@@ -16,11 +16,19 @@ class ProjectResources(APIPermissionRequiredMixin,
         'GET': 'resource.list',
         'POST': 'resource.add'
     }
-    permission_filter_queryset = ('resource.view',)
+
+    def filter_archived_resources(self, view, obj):
+        if obj.archived:
+            return ('resource.view', 'resource.unarchive')
+        else:
+            return ('resource.view',)
+
+    permission_filter_queryset = filter_archived_resources
+    use_resource_library_queryset = True
 
 
 class ProjectResourcesDetail(APIPermissionRequiredMixin,
-                             ProjectResourceMixin,
+                             mixins.ResourceObjectMixin,
                              generics.RetrieveUpdateAPIView):
     def patch_actions(self, request):
         if hasattr(request, 'data'):
@@ -37,3 +45,4 @@ class ProjectResourcesDetail(APIPermissionRequiredMixin,
         'GET': 'resource.view',
         'PATCH': patch_actions
     }
+    use_resource_library_queryset = True

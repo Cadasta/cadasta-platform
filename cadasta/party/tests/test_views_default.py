@@ -431,9 +431,9 @@ class PartyResourcesAddTest(TestCase):
     def set_up_models(self):
         self.project = ProjectFactory.create()
         self.party = PartyFactory.create(project=self.project)
-        self.assigned = ResourceFactory.create(project=self.project,
+        self.attached = ResourceFactory.create(project=self.project,
                                                content_object=self.party)
-        self.unassigned = ResourceFactory.create(project=self.project)
+        self.unattached = ResourceFactory.create(project=self.project)
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -457,8 +457,8 @@ class PartyResourcesAddTest(TestCase):
 
     def get_post_data(self):
         return {
-            self.assigned.id: False,
-            self.unassigned.id: True,
+            self.attached.id: False,
+            self.unattached.id: True,
         }
 
     def test_get_with_authorized_user(self):
@@ -492,8 +492,10 @@ class PartyResourcesAddTest(TestCase):
         assert response.status_code == 302
         assert response['location'] == self.expected_success_url
 
-        assert self.party.resources.count() == 1
-        assert self.party.resources.first() == self.unassigned
+        party_resources = self.party.resources.all()
+        assert len(party_resources) == 2
+        assert self.attached in party_resources
+        assert self.unattached in party_resources
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
@@ -502,7 +504,7 @@ class PartyResourcesAddTest(TestCase):
                 in [str(m) for m in get_messages(self.request)])
 
         assert self.party.resources.count() == 1
-        assert self.party.resources.first() == self.assigned
+        assert self.party.resources.first() == self.attached
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
@@ -510,7 +512,7 @@ class PartyResourcesAddTest(TestCase):
         assert '/account/login/' in response['location']
 
         assert self.party.resources.count() == 1
-        assert self.party.resources.first() == self.assigned
+        assert self.party.resources.first() == self.attached
 
 
 @pytest.mark.usefixtures('make_dirs')
@@ -864,9 +866,9 @@ class PartyRelationshipResourceAddTest(TestCase):
         self.project = ProjectFactory.create()
         self.relationship = TenureRelationshipFactory.create(
             project=self.project)
-        self.assigned = ResourceFactory.create(
+        self.attached = ResourceFactory.create(
             project=self.project, content_object=self.relationship)
-        self.unassigned = ResourceFactory.create(project=self.project)
+        self.unattached = ResourceFactory.create(project=self.project)
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -892,8 +894,8 @@ class PartyRelationshipResourceAddTest(TestCase):
 
     def get_post_data(self):
         return {
-            self.assigned.id: False,
-            self.unassigned.id: True,
+            self.attached.id: False,
+            self.unattached.id: True,
         }
 
     def test_get_with_authorized_user(self):
@@ -928,8 +930,10 @@ class PartyRelationshipResourceAddTest(TestCase):
         assert response.status_code == 302
         assert response['location'] == self.expected_success_url
 
-        assert self.relationship.resources.count() == 1
-        assert self.relationship.resources.first() == self.unassigned
+        relationship_resources = self.relationship.resources.all()
+        assert len(relationship_resources) == 2
+        assert self.attached in relationship_resources
+        assert self.unattached in relationship_resources
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
@@ -939,7 +943,7 @@ class PartyRelationshipResourceAddTest(TestCase):
                 in [str(m) for m in get_messages(self.request)])
 
         assert self.relationship.resources.count() == 1
-        assert self.relationship.resources.first() == self.assigned
+        assert self.relationship.resources.first() == self.attached
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
@@ -947,7 +951,7 @@ class PartyRelationshipResourceAddTest(TestCase):
         assert '/account/login/' in response['location']
 
         assert self.relationship.resources.count() == 1
-        assert self.relationship.resources.first() == self.assigned
+        assert self.relationship.resources.first() == self.attached
 
 
 @pytest.mark.usefixtures('make_dirs')

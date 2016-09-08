@@ -1,5 +1,4 @@
 {% load i18n %}
-{% load widget_tweaks %}
 
 {% csrf_token %}
 <table class="table table-hover datatable" data-paging-type="simple">
@@ -8,14 +7,14 @@
       <th class="col-md-1"></th>
       <th class="col-md-4">{% trans "Resource" %}</th>
       <th class="col-md-1 hidden-xs hidden-sm">{% trans "Type" %}</th>
-      <th class="col-md-2">{% trans "Connections" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Contributor" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
+      <th class="col-md-2">{% trans "Attachments" %}</th>
     </tr>
   </thead>
   <tbody>
   {% for field in form %}
-    {% render_field field %}
+    {{ field }}
   {% endfor %}
   </tbody>
 </table>

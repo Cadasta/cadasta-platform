@@ -1051,14 +1051,17 @@ textarea.form-control {
     text-transform: uppercase;
     font-size: 12px;
     opacity: 0.7;
-    padding: 4px 24px;
+    //padding: 4px 24px;
     background: $body-bg;
   }
   > tbody > tr.linked > td:hover {
     cursor: pointer;
   }
   .btn-sm {
-    min-width: 90px;
+    min-width: 80px !important;
+  }
+  .table-condensed .btn-sm {
+    min-width: 60px !important;
   }
   div.org-logo {
     padding: 4px 0;
@@ -1300,7 +1303,7 @@ div.add-btn-btm { // add party link at bottom of table
   }
 }
 
-/* =Alerts
+/* =Alerts and labels
 -------------------------------------------------------------- */
 
 .alert {
@@ -1345,6 +1348,17 @@ div.add-btn-btm { // add party link at bottom of table
 .alert-error { // same as alert-danger
   @include alert-variant($alert-danger-bg, $alert-danger-border, $alert-danger-text);
 }
+
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+h1.label {
+  font-size: 14px;
+}
+
 
 @media (max-width: $screen-sm-max) {
   .alert {

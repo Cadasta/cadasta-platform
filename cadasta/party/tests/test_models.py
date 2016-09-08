@@ -51,6 +51,18 @@ class PartyTest(UserTestCase):
             })
         assert party.attributes['description'] == 'Mad Hatters Tea Party'
 
+    def test_ui_class_name(self):
+        party = PartyFactory.create()
+        assert party.ui_class_name == "Party"
+
+    def test_ui_detail_url(self):
+        party = PartyFactory.create()
+        assert party.ui_detail_url == (
+            '/organizations/{org}/projects/{prj}/records/parties/{id}/'.format(
+                org=party.project.organization.slug,
+                prj=party.project.slug,
+                id=party.id))
+
 
 class PartyRelationshipTest(UserTestCase):
 
@@ -176,6 +188,25 @@ class TenureRelationshipTest(UserTestCase):
             TenureRelationshipFactory.create(
                 party__project=project
             )
+
+    def test_name(self):
+        tenurerel = TenureRelationshipFactory.create()
+        assert tenurerel.name == "<{party}> {type} <{su}>".format(
+            party=tenurerel.party.name,
+            type=tenurerel.tenure_type.label,
+            su=tenurerel.spatial_unit.get_type_display())
+
+    def test_ui_class_name(self):
+        tenurerel = TenureRelationshipFactory.create()
+        assert tenurerel.ui_class_name == "Relationship"
+
+    def test_ui_detail_url(self):
+        tenurerel = TenureRelationshipFactory.create()
+        assert tenurerel.ui_detail_url == (
+            '/organizations/{org}/projects/{prj}/relationships/{id}/'.format(
+                org=tenurerel.project.organization.slug,
+                prj=tenurerel.project.slug,
+                id=tenurerel.id))
 
 
 class TenureRelationshipTypeTest(UserTestCase):

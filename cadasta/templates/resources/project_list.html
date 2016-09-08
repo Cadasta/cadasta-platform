@@ -16,12 +16,12 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="top-btn pull-right top-add">
-            {% if project_has_resources %}
+            {% if has_unattached_resources %}
             <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_existing' project=object.slug organization=object.organization.slug %}">
             {% else %}
             <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_new' project=object.slug organization=object.organization.slug %}">
             {% endif %}
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
           </div>
           {% include 'resources/table.html' %}
         </div>
@@ -30,4 +30,8 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block form_modal %}
+{% include 'resources/modal_unarchive.html' %}
 {% endblock %}

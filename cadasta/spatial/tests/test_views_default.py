@@ -473,9 +473,9 @@ class LocationResourceAddTest(TestCase):
     def set_up_models(self):
         self.project = ProjectFactory.create()
         self.location = SpatialUnitFactory.create(project=self.project)
-        self.assigned = ResourceFactory.create(project=self.project,
+        self.attached = ResourceFactory.create(project=self.project,
                                                content_object=self.location)
-        self.unassigned = ResourceFactory.create(project=self.project)
+        self.unattached = ResourceFactory.create(project=self.project)
 
     def assign_policies(self):
         assign_policies(self.authorized_user)
@@ -500,8 +500,8 @@ class LocationResourceAddTest(TestCase):
 
     def get_post_data(self):
         return {
-            self.assigned.id: False,
-            self.unassigned.id: True,
+            self.attached.id: False,
+            self.unattached.id: True,
         }
 
     def test_get_with_authorized_user(self):
@@ -536,8 +536,10 @@ class LocationResourceAddTest(TestCase):
         assert response.status_code == 302
         assert response['location'] == self.expected_success_url + '#resources'
 
-        assert self.location.resources.count() == 1
-        assert self.location.resources.first() == self.unassigned
+        location_resources = self.location.resources.all()
+        assert len(location_resources) == 2
+        assert self.attached in location_resources
+        assert self.unattached in location_resources
 
     def test_post_with_unauthorized_user(self):
         response = self.request(method='POST', user=self.unauthorized_user)
@@ -546,14 +548,14 @@ class LocationResourceAddTest(TestCase):
                 "add resources to this location."
                 in [str(m) for m in get_messages(self.request)])
         assert self.location.resources.count() == 1
-        assert self.location.resources.first() == self.assigned
+        assert self.location.resources.first() == self.attached
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response['location']
         assert self.location.resources.count() == 1
-        assert self.location.resources.first() == self.assigned
+        assert self.location.resources.first() == self.attached
 
 
 @pytest.mark.usefixtures('make_dirs')

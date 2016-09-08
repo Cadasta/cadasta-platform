@@ -11,7 +11,11 @@
       "action": ["resource.*"],
       "object": ["resource/$organization/$project/*"]
     },
-
+    {
+      "effect": "deny",
+      "action": ["resource.unarchive"],
+      "object": ["resource/$organization/$project/*"]
+    },
     {
       "effect": "allow",
       "action": ["spatial.*", "spatial.resources.*"],

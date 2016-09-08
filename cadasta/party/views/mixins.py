@@ -115,10 +115,8 @@ class PartyRelationshipObjectMixin(ProjectMixin):
 
 class PartyRelationshipResourceMixin(ResourceViewMixin,
                                      PartyRelationshipObjectMixin):
-    # UNUSED until party relationship list view is used
-    #
-    # def get_content_object(self):
-    #     return self.get_object()
+    def get_content_object(self):
+        return self.get_object()
 
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = {

@@ -78,6 +78,23 @@ class SpatialUnitTest(UserTestCase):
             })
         assert space.attributes['description'] == 'The happiest place on earth'
 
+    def test_name(self):
+        su = SpatialUnitFactory.create(type="RW")
+        assert su.name == "Right-of-way"
+
+    def test_ui_class_name(self):
+        su = SpatialUnitFactory.create()
+        assert su.ui_class_name == "Location"
+
+    def test_ui_detail_url(self):
+        su = SpatialUnitFactory.create()
+        assert su.ui_detail_url == (
+            '/organizations/{org}/projects/{prj}/'
+            'records/locations/{id}/'.format(
+                org=su.project.organization.slug,
+                prj=su.project.slug,
+                id=su.id))
+
 
 class SpatialRelationshipTest(UserTestCase):
 

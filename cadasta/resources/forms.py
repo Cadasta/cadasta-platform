@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.contenttypes.models import ContentType
 from .models import Resource, ContentObject
 from .fields import ResourceField
 
@@ -36,17 +35,18 @@ class AddResourceFromLibraryForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.content_object = content_object
-        self.project_resources = Resource.objects.filter(project_id=project_id)
+        self.project_resources = Resource.objects.filter(project_id=project_id,
+                                                         archived=False)
 
         for resource in self.project_resources:
-            self.fields[resource.id] = ResourceField(
-                label=resource.name,
-                initial=(resource in content_object.resources),
-                resource=resource
-            )
+            if resource not in content_object.resources:
+                self.fields[resource.id] = ResourceField(
+                    label=resource.name,
+                    initial=False,
+                    resource=resource
+                )
 
     def save(self):
-        model_type = ContentType.objects.get_for_model(self.content_object)
         object_resources = self.content_object.resources.values_list('id',
                                                                      flat=True)
         for key, value in self.cleaned_data.items():
@@ -55,11 +55,5 @@ class AddResourceFromLibraryForm(forms.Form):
                     resource_id=key,
                     content_object=self.content_object
                 )
-            elif not value and key in object_resources:
-                ContentObject.objects.filter(
-                    resource_id=key,
-                    content_type__pk=model_type.id,
-                    object_id=self.content_object.id
-                ).delete()
 
         self.content_object.reload_resources()

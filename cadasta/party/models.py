@@ -1,6 +1,7 @@
 """Party models."""
 
 from core.models import RandomIDModel
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
@@ -114,6 +115,21 @@ class Party(ResourceModelMixin, RandomIDModel):
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def ui_class_name(self):
+        return _("Party")
+
+    @property
+    def ui_detail_url(self):
+        return reverse(
+            'parties:detail',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug,
+                'party': self.id,
+            },
+        )
 
 
 @fix_model_for_attributes
@@ -268,12 +284,33 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
         )
 
     def __str__(self):
-        return "<TenureRelationship: <{party}> {type} <{su}>>".format(
-            party=self.party.name, su=self.spatial_unit.get_type_display(),
-            type=self.tenure_type.label)
+        return "<TenureRelationship: {}>".format(self.name)
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def name(self):
+        return "<{party}> {type} <{su}>".format(
+            party=self.party.name,
+            su=self.spatial_unit.name,
+            type=self.tenure_type.label,
+        )
+
+    @property
+    def ui_class_name(self):
+        return _("Relationship")
+
+    @property
+    def ui_detail_url(self):
+        return reverse(
+            'parties:relationship_detail',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug,
+                'relationship': self.id,
+            },
+        )
 
 
 class TenureRelationshipType(models.Model):

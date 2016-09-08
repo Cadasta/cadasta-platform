@@ -67,7 +67,7 @@ class Resource(RandomIDModel):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._orginial_url = self.file.url
+        self._original_url = self.file.url
 
     @property
     def file_name(self):
@@ -102,17 +102,21 @@ class Resource(RandomIDModel):
 
 @receiver(models.signals.pre_save, sender=Resource)
 def archive_file(sender, instance, **kwargs):
-    if instance._orginial_url and instance._orginial_url != instance.file.url:
+    if instance._original_url and instance._original_url != instance.file.url:
         now = str(datetime.now())
         if not instance.file_versions:
             instance.file_versions = {}
-        instance.file_versions[now] = instance._orginial_url
-    instance._orginial_url = instance.file.url
+        instance.file_versions[now] = instance._original_url
+    instance._original_url = instance.file.url
+
+    # Detach the resource when it is archived
+    if instance.archived:
+        ContentObject.objects.filter(resource=instance).delete()
 
 
 @receiver(models.signals.post_save, sender=Resource)
 def create_thumbnails(sender, instance, created, **kwargs):
-    if created or instance._orginial_url != instance.file.url:
+    if created or instance._original_url != instance.file.url:
         if 'image' in instance.mime_type:
             io.ensure_dirs()
             file_name = instance.file.url.split('/')[-1]

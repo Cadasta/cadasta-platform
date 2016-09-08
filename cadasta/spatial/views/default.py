@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from core.mixins import LoginPermissionRequiredMixin
 
 from resources.forms import AddResourceFromLibraryForm
-from resources.views.mixins import ProjectHasResourcesMixin
+from resources.views import mixins as resource_mixins
 from party.messages import TENURE_REL_CREATE
 from . import mixins
 from organization.views import mixins as organization_mixins
@@ -62,7 +62,8 @@ class LocationDetail(LoginPermissionRequiredMixin,
                      JsonAttrsMixin,
                      mixins.SpatialUnitObjectMixin,
                      organization_mixins.ProjectAdminCheckMixin,
-                     ProjectHasResourcesMixin,
+                     resource_mixins.HasUnattachedResourcesMixin,
+                     resource_mixins.DetachableResourcesListMixin,
                      generic.DetailView):
     template_name = 'spatial/location_detail.html'
     permission_required = 'spatial.view'
@@ -120,7 +121,7 @@ class LocationResourceAdd(LoginPermissionRequiredMixin,
 class LocationResourceNew(LoginPermissionRequiredMixin,
                           mixins.SpatialUnitResourceMixin,
                           organization_mixins.ProjectAdminCheckMixin,
-                          ProjectHasResourcesMixin,
+                          resource_mixins.HasUnattachedResourcesMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
     permission_required = 'spatial.resources.add'

@@ -1,3 +1,4 @@
+import copy
 import pytest
 import os
 import json
@@ -27,8 +28,8 @@ clauses = {
             'effect': 'allow',
             'object': ['resource/*/*/*'],
             'action': ['resource.*']
-        }
-    ]
+        },
+    ],
 }
 
 
@@ -44,24 +45,32 @@ class ProjectResourcesTest(UserTestCase):
 
         self.project = ProjectFactory.create()
         self.resources = ResourceFactory.create_batch(
-            2, content_object=self.project)
+            2, content_object=self.project, project=self.project)
         self.denied = ResourceFactory.create(content_object=self.project,
                                              project=self.project)
         ResourceFactory.create()
         self.view = api.ProjectResources.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/'
 
-        clauses['clause'].append({
-            'effect': 'deny',
-            'object': ['resource/*/*/' + self.denied.id],
-            'action': ['resource.*']
-        })
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/' + self.denied.id],
+                'action': ['resource.*'],
+            },
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/*'],
+                'action': ['resource.unarchive'],
+            },
+        ]
 
-        policy = Policy.objects.create(
+        self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(clauses))
+            body=json.dumps(additional_clauses))
         self.user = UserFactory.create()
-        self.user.assign_policies(policy)
+        self.user.assign_policies(self.policy)
 
     def _get(self, org, prj, query=None, user=None, status=None, count=None):
         if user is None:
@@ -149,7 +158,7 @@ class ProjectResourcesTest(UserTestCase):
                    count=3,
                    user=UserFactory.create())
 
-    def test_add_exisiting_resource(self):
+    def test_add_existing_resource(self):
         new_resource = ResourceFactory.create()
         data = {'id': new_resource.id}
         self._post(self.project.organization.slug,
@@ -174,40 +183,72 @@ class ProjectResourcesTest(UserTestCase):
 
     def test_search_for_file(self):
         not_found = self.storage.save('resources/bild.jpg', self.file)
-        project = ProjectFactory.create()
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'file': self.file_name},
-            {'content_object': project, 'file': self.file_name},
-            {'content_object': project, 'file': not_found}
+            {'content_object': prj, 'project': prj, 'file': self.file_name},
+            {'content_object': prj, 'project': prj, 'file': self.file_name},
+            {'content_object': prj, 'project': prj, 'file': not_found}
         ])
-        self._get(project.organization.slug,
-                  project.slug,
+        self._get(prj.organization.slug,
+                  prj.slug,
                   query='search=image',
                   status=200,
                   count=2)
 
-    def test_filter_active(self):
-        project = ProjectFactory.create()
+    def test_filter_unarchived(self):
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'archived': True},
-            {'content_object': project, 'archived': True},
-            {'content_object': project, 'archived': False},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': False},
         ])
-        self._get(project.organization.slug,
-                  project.slug,
+        self._get(prj.organization.slug,
+                  prj.slug,
+                  query='archived=False',
+                  status=200,
+                  count=1)
+
+    def test_filter_archived_with_nonunarchiver(self):
+        prj = ProjectFactory.create()
+        ResourceFactory.create_from_kwargs([
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': False},
+        ])
+        self._get(prj.organization.slug,
+                  prj.slug,
                   query='archived=True',
                   status=200,
-                  count=2)
+                  count=0)
+
+    def test_filter_archived_with_unarchiver(self):
+        prj = ProjectFactory.create()
+        ResourceFactory.create_from_kwargs([
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': True},
+            {'content_object': prj, 'project': prj, 'archived': False},
+        ])
+        unarchiver = UserFactory.create()
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        unarchiver.assign_policies(policy)
+        self._get(prj.organization.slug,
+                  prj.slug,
+                  query='archived=True',
+                  status=200,
+                  count=2,
+                  user=unarchiver)
 
     def test_ordering(self):
-        project = ProjectFactory.create()
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'name': 'A'},
-            {'content_object': project, 'name': 'B'},
-            {'content_object': project, 'name': 'C'},
+            {'content_object': prj, 'project': prj, 'name': 'A'},
+            {'content_object': prj, 'project': prj, 'name': 'B'},
+            {'content_object': prj, 'project': prj, 'name': 'C'},
         ])
-        content = self._get(project.organization.slug,
-                            project.slug,
+        content = self._get(prj.organization.slug,
+                            prj.slug,
                             query='ordering=name',
                             status=200,
                             count=3)
@@ -215,14 +256,14 @@ class ProjectResourcesTest(UserTestCase):
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
-        project = ProjectFactory.create()
+        prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': project, 'name': 'A'},
-            {'content_object': project, 'name': 'B'},
-            {'content_object': project, 'name': 'C'},
+            {'content_object': prj, 'project': prj, 'name': 'A'},
+            {'content_object': prj, 'project': prj, 'name': 'B'},
+            {'content_object': prj, 'project': prj, 'name': 'C'},
         ])
-        content = self._get(project.organization.slug,
-                            project.slug,
+        content = self._get(prj.organization.slug,
+                            prj.slug,
                             query='ordering=-name',
                             status=200,
                             count=3)
@@ -236,14 +277,25 @@ class ProjectResourcesDetailTest(UserTestCase):
         super().setUp()
 
         self.project = ProjectFactory.create()
-        self.resource = ResourceFactory.create(content_object=self.project)
+        self.resource = ResourceFactory.create(content_object=self.project,
+                                               project=self.project)
         self.view = api.ProjectResourcesDetail.as_view()
         self.url = '/v1/organizations/{org}/projects/{prj}/resources/{res}'
-        policy = Policy.objects.create(
+
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/*'],
+                'action': ['resource.unarchive'],
+            },
+        ]
+
+        self.policy = Policy.objects.create(
             name='allow',
-            body=json.dumps(clauses))
+            body=json.dumps(additional_clauses))
         self.user = UserFactory.create()
-        self.user.assign_policies(policy)
+        self.user.assign_policies(self.policy)
 
     def _get(self, org, prj, res, user=None, status=None, count=None):
         if user is None:
@@ -315,14 +367,14 @@ class ProjectResourcesDetailTest(UserTestCase):
                             self.project.slug,
                             self.resource.id,
                             status=404)
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == "Not found."
 
     def test_get_resource_from_project_that_does_not_exist(self):
         content = self._get(self.project.organization.slug,
                             'some-prj',
                             self.resource.id,
                             status=404)
-        assert content['detail'] == "Project not found."
+        assert content['detail'] == "Not found."
 
     def test_update_resource(self):
         data = {'name': 'Updated'}
@@ -383,11 +435,17 @@ class ProjectResourcesDetailTest(UserTestCase):
         self.resource.archived = True
         self.resource.save()
         data = {'archived': False}
+        unarchiver = UserFactory.create()
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        unarchiver.assign_policies(policy)
         content = self._patch(self.project.organization.slug,
                               self.project.slug,
                               self.resource.id,
                               data,
-                              status=200)
+                              status=200,
+                              user=unarchiver)
         assert content['id'] == self.resource.id
         self.resource.refresh_from_db()
         assert self.resource.archived is False
@@ -396,12 +454,8 @@ class ProjectResourcesDetailTest(UserTestCase):
         self.resource.archived = True
         self.resource.save()
         data = {'archived': False}
-        content = self._patch(self.project.organization.slug,
-                              self.project.slug,
-                              self.resource.id,
-                              data,
-                              status=403,
-                              user=UserFactory.create())
-        assert 'id' not in content
-        self.resource.refresh_from_db()
-        assert self.resource.archived is True
+        self._patch(self.project.organization.slug,
+                    self.project.slug,
+                    self.resource.id,
+                    data,
+                    status=404)

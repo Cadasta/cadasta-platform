@@ -1,7 +1,7 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
-{% block page_title %}Resource detail | {% endblock %}
+{% block page_title %}Resource detail: {{ resource.name }} | {% endblock %}
 {% block left-nav %}resources{% endblock %}
 
 {% block content %}
@@ -16,84 +16,84 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <img src="{{ resource.thumbnail }}" class="thumb-128">
-          <h4>{{ resource.name }}</h4>
-          <p>{{ resource.description }}<br><strong>{{ resource.file_name }}</strong></p>
+          <h4>
+            {{ resource.name }}
+            {% if resource.archived %}
+              <span class="label label-danger">{% trans "Deleted" %}</span>
+            {% endif %}
+          </h4>
+          <p>{{ resource.description }}<br><strong>{{ resource.original_file }}</strong></p>
           <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
           <ul class="list-inline resource-actions">
+            {% if can_edit %}
             <li>
-              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}">Edit resource</a>
+              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}">{% trans "Edit resource" %}</a>
             </li>
+            {% endif %}
+            {% if resource.archived %}
             <li>
-              {% if resource.archived %}
-              <a href="#unarchive_resource_confirm" data-toggle="modal">Unarchive resource</a>
-              {% else %}
-              <a href="#archive_resource_confirm" data-toggle="modal">Archive resource</a>
-              {% endif %}
+              <a href="#undelete_resource_confirm" data-toggle="modal">{% trans "Restore deleted resource" %}</a>
             </li>
+            {% else %}
+            {% if can_archive %}
+            <li>
+              <a href="#delete_resource_confirm" data-toggle="modal">{% trans "Delete resource" %}</a>
+            </li>
+            {% endif %}
+            {% endif %}
           </ul>
-          </div>
-          <div class="panel-footer panel-buttons">
-            <a href="{{ resource.file.url }}" class="btn btn-primary" download>Download</a>
-            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-default">Cancel</a>
-          </div>
+        </div>
+        <div class="panel-footer panel-buttons">
+          <a href="{{ resource.file.url }}" class="btn btn-primary" download>{% trans "Download" %}</a>
         </div>
       </div>
+
+      {% if not resource.archived %}
+      <!-- Attachments table -->
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h3>{% trans "Attached to" %}</h3>
+          {% if attachment_list %}
+          <table class="table table-hover datatable" data-paging-type="simple">
+            <thead>
+              <tr>
+                <th class="col-md-2">{% trans "Entity Class" %}</th>
+                <th class="col-md-8">{% trans "Entity Name or Description" %}</th>
+                <th class="col-md-2">{% trans "Detach" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for attachment in attachment_list %}
+              <tr class="linked" onclick="window.document.location='{{ attachment.object.ui_detail_url }}';">
+                <td>{{ attachment.object.ui_class_name }}</td>
+                <td>{{ attachment.object.name }}</td>
+                <td>
+                  <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id attachment.id %}?next={{ request.path }}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm" role="button">
+                      <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          {% trans "This resource is currently not attached to anything." %}
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 </div>
 
 {% endblock %}
 
-{% block modals %}
-
-<div class="modal fade" id="archive_resource_confirm" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h3 class="modal-title">{% trans "Archive resource" %}</h3>
-      </div>
-      <div class="modal-body">
-        <p>{% trans "Are you sure you want to archive this resource?" %}</p>
-      </div>
-      <div class="modal-footer">
-        <a href="{% url 'resources:archive' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}"  class="btn btn-danger archive-final pull-right" role="button">
-          {% trans "Yes, archive this resource" %}
-        </a>
-        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
-          {% trans "Cancel" %}
-        </button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div class="modal fade" id="unarchive_resource_confirm" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h3 class="modal-title">{% trans "Unarchive resource" %}</h3>
-      </div>
-      <div class="modal-body">
-        <p>
-          {% trans "Are you sure you want to unarchive this resource?" %}
-        </p>
-      </div>
-      <div class="modal-footer">
-        <a href="{% url 'resources:unarchive' object.organization.slug object.slug resource.id %}?next={{ request.META.HTTP_REFERER }}"  class="btn btn-primary unarchive-final pull-right" role="button">
-          {% trans "Yes, unarchive this resource" %}
-        </a>
-        <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">
-          {% trans "Cancel" %}
-        </button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
+{% block form_modal %}
+{% url 'resources:archive' object.organization.slug object.slug resource.id as archive_url %}
+{% url 'resources:unarchive' object.organization.slug object.slug resource.id as unarchive_url %}
+{% include 'resources/modal_archive.html' %}
+{% include 'resources/modal_unarchive.html' %}
 {% endblock %}
