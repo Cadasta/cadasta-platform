@@ -65,6 +65,8 @@ class PartyFormTest(UserTestCase):
 class TenureRelationshipEditFormTest(UserTestCase):
     def test_init(self):
         form = forms.TenureRelationshipEditForm(schema_selectors=())
-        tenuretypes = TenureRelationshipType.objects.values_list('id', 'label')
+        tenuretypes = sorted(
+            TenureRelationshipType.objects.values_list('id', 'label')
+        )
         assert len(tenuretypes) > 0
         assert list(form.fields['tenure_type'].choices) == list(tenuretypes)

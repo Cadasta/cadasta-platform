@@ -65,7 +65,7 @@ class TenureRelationshipForm(forms.Form):
             list(Party.TYPE_CHOICES))
         self.fields['tenure_type'].choices = (
             [('', _("Please select a relationship type"))] +
-            list(TenureRelationshipType.objects.values_list('id', 'label')))
+            sorted(TenureRelationshipType.objects.values_list('id', 'label')))
         self.project = project
         self.spatial_unit = spatial_unit
         self.add_attribute_fields(schema_selectors)
