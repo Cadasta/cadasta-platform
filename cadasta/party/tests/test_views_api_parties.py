@@ -189,7 +189,6 @@ class PartyCreateAPITest(UserTestCase):
         data = {
             'name': 'TestParty',
             'description': 'Some description',
-            'project': self.prj.id
         }
         self._post(self.org.slug,
                    self.prj.slug,

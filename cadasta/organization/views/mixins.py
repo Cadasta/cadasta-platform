@@ -11,6 +11,9 @@ from ..models import Organization, Project, OrganizationRole, ProjectRole
 
 class OrganizationMixin:
     def get_organization(self, lookup_kwarg='slug'):
+        if lookup_kwarg == 'slug' and hasattr(self, 'org_lookup'):
+            lookup_kwarg = self.org_lookup
+
         if not hasattr(self, 'org'):
             self.org = get_object_or_404(Organization,
                                          slug=self.kwargs[lookup_kwarg])
@@ -22,6 +25,7 @@ class OrganizationMixin:
 
 class OrganizationRoles(OrganizationMixin):
     lookup_field = 'username'
+    org_lookup = 'organization'
 
     def get_queryset(self):
         self.org = self.get_organization()

@@ -219,7 +219,7 @@ class OrganizationDetailAPITest(UserTestCase):
         url = '/v1/organizations/{slug}/'
         request = APIRequestFactory().get(url.format(slug=slug))
         force_authenticate(request, user=user)
-        response = self.view(request, slug=slug).render()
+        response = self.view(request, organization=slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -231,7 +231,7 @@ class OrganizationDetailAPITest(UserTestCase):
         url = '/v1/organizations/{slug}/'
         request = APIRequestFactory().patch(url.format(slug=slug), data)
         force_authenticate(request, user=user)
-        response = self.view(request, slug=slug).render()
+        response = self.view(request, organization=slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -327,7 +327,7 @@ class OrganizationUsersAPITest(UserTestCase):
         url = '/v1/organizations/{slug}/users/'
         request = APIRequestFactory().get(url.format(slug=org.slug))
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org.slug).render()
+        response = self.view(request, organization=org.slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -345,7 +345,7 @@ class OrganizationUsersAPITest(UserTestCase):
         url = '/v1/organizations/{slug}/users/'
         request = APIRequestFactory().post(url.format(slug=slug), data)
         force_authenticate(request, user=user)
-        response = self.view(request, slug=slug).render()
+        response = self.view(request, organization=slug).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -419,7 +419,7 @@ class OrganizationUsersDetailAPITest(UserTestCase):
         request = APIRequestFactory().get(url.format(org=org.slug,
                                                      username=username))
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org.slug,
+        response = self.view(request, organization=org.slug,
                              username=username).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
@@ -434,7 +434,7 @@ class OrganizationUsersDetailAPITest(UserTestCase):
             url.format(org=org.slug, username=username),
             data=data, format='json')
         force_authenticate(request, user=user)
-        response = self.view(request, slug=org.slug,
+        response = self.view(request, organization=org.slug,
                              username=username).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
@@ -455,7 +455,8 @@ class OrganizationUsersDetailAPITest(UserTestCase):
         request = APIRequestFactory().delete(url.format(org=slug,
                                                         username=username))
         force_authenticate(request, user=user)
-        response = self.view(request, slug=slug, username=username).render()
+        response = self.view(request, organization=slug,
+                             username=username).render()
         content = None
         if len(response.content) > 0:
             content = json.loads(response.content.decode('utf-8'))

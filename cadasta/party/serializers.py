@@ -5,18 +5,24 @@ from rest_framework import serializers
 
 from .models import Party, PartyRelationship, TenureRelationship
 from core.serializers import DetailSerializer, FieldSelectorSerializer
+from organization.serializers import NestedProjectSerializer
 from spatial.serializers import SpatialUnitSerializer
 
 
 class PartySerializer(DetailSerializer, FieldSelectorSerializer,
                       serializers.ModelSerializer):
+    project = NestedProjectSerializer(read_only=True)
 
     class Meta:
         model = Party
-        fields = ('id', 'name', 'type',
-                  'contacts', 'attributes', 'project', 'relationships')
-        read_only_fields = ('id',)
-        detail_only_fields = []
+        fields = ('id', 'name', 'type', 'contacts', 'attributes', 'project',)
+        read_only_fields = ('id', 'project',)
+        detail_only_fields = ('project',)
+
+    def create(self, validated_data):
+        project = self.context['project']
+        return Party.objects.create(
+            project=project, **validated_data)
 
 
 class PartyRelationshipReadSerializer(serializers.ModelSerializer):
