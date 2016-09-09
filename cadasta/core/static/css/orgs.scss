@@ -74,8 +74,34 @@ div.org-logo {
 }
 
 @media (max-width: $screen-sm-max) {
-  .col-height { 
+  .row-height, .col-height { 
     display: block;
+  }
+  #organization-single {
+    .content-single .row {
+      margin-left: 0;
+    }
+    .row-height {
+      display: table; 
+      margin: 0 auto;
+      background: #fff;
+    }
+    .detail {
+      display: table-row-group;
+      box-shadow: none;
+      section {
+        padding: 20px;
+      }
+    }
+    .main-text {
+      display: table-footer-group;
+      h2 {
+        margin-left: 20px;
+      }
+      .panel {
+        margin: 20px;
+      }
+    }
   }
 }
 

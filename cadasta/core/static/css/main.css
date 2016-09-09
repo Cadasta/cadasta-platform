@@ -3872,7 +3872,8 @@ footer {
     position: absolute;
     bottom: 0;
     top: auto;
-    height: 30px; } }
+    height: 30px;
+    overflow: hidden; } }
 
 @media (max-width: 400px) {
   footer form.language {
@@ -3882,9 +3883,7 @@ footer {
     footer form.language select {
       font-size: 9px; }
   footer .copy {
-    font-size: 9px; }
-  #dashboard footer .footer-links, #registration footer .footer-links {
-    display: none; } }
+    font-size: 9px; } }
 
 /* =Organizations
 -------------------------------------------------------------- */
@@ -3945,8 +3944,25 @@ div.org-logo {
   height: 100%; }
 
 @media (max-width: 991px) {
-  .col-height {
-    display: block; } }
+  .row-height, .col-height {
+    display: block; }
+  #organization-single .content-single .row {
+    margin-left: 0; }
+  #organization-single .row-height {
+    display: table;
+    margin: 0 auto;
+    background: #fff; }
+  #organization-single .detail {
+    display: table-row-group;
+    box-shadow: none; }
+    #organization-single .detail section {
+      padding: 20px; }
+  #organization-single .main-text {
+    display: table-footer-group; }
+    #organization-single .main-text h2 {
+      margin-left: 20px; }
+    #organization-single .main-text .panel {
+      margin: 20px; } }
 
 @media (min-width: 480px) {
   .row-xs-height {

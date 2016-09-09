@@ -133,7 +133,8 @@
       <footer class="footer" role="contentinfo">
         <div class="container-fluid">
           <p class="copy">
-            {% trans "Copyright" %} {% now "Y" %} {% trans "Cadasta. All Rights Reserved." %}
+            {% now 'Y' as copydate %}
+            {% blocktrans %}Copyright {{ copydate }} Cadasta. <span>All Rights Reserved.</span> {% endblocktrans %}
           </p>
           <form action="{% url 'set_language' %}" method="post" class="language" novalidate>
           {% csrf_token %}
