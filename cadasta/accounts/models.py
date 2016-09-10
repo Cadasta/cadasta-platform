@@ -67,6 +67,17 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
         """
         return self.full_name
 
+    def get_display_name(self):
+        """
+        Returns the display name.
+        If full name is present then return full name as display name
+        else return username.
+        """
+        if self.full_name != '':
+            return self.full_name
+        else:
+            return self.username
+
 
 @receiver(models.signals.post_save, sender=User)
 def assign_default_policy(sender, instance, **kwargs):

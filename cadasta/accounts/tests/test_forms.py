@@ -90,6 +90,22 @@ class ProfileFormTest(UserTestCase, TestCase):
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
 
+    def test_display_name(self):
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
+        assert user.get_display_name() == 'imagine71'
+
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'full_name': 'John Lennon',
+        }
+        form = ProfileForm(data, instance=user)
+        form.save()
+
+        user.refresh_from_db()
+        assert user.get_display_name() == 'John Lennon'
+
     def test_update_user_with_existing_username(self):
         UserFactory.create(username='existing')
         user = UserFactory.create(username='imagine71',
