@@ -47,7 +47,7 @@ class Questionnaire(RandomIDModel):
 
 class QuestionGroup(RandomIDModel):
     name = models.CharField(max_length=100)
-    label = models.CharField(max_length=500, null=True, blank=True)
+    label = models.CharField(max_length=2500, null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire,
                                       related_name='question_groups')
 
@@ -86,7 +86,7 @@ class Question(RandomIDModel):
                     ('PN', 'phonenumber'))
 
     name = models.CharField(max_length=100)
-    label = models.CharField(max_length=500, null=True, blank=True)
+    label = models.CharField(max_length=2500, null=True, blank=True)
     type = models.CharField(max_length=2, choices=TYPE_CHOICES)
     required = models.BooleanField(default=False)
     constraint = models.CharField(max_length=50, null=True, blank=True)
