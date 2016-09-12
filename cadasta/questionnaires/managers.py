@@ -130,12 +130,14 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
 
 class QuestionnaireManager(models.Manager):
 
-    def create_from_form(self, xls_form=None, project=None):
+    def create_from_form(self, xls_form=None, original_file=None,
+                         project=None):
         try:
             with transaction.atomic():
                 errors = []
                 instance = self.model(
                     xls_form=xls_form,
+                    original_file=original_file,
                     project=project
                 )
                 json = parse_file_to_json(instance.xls_form.file.name)

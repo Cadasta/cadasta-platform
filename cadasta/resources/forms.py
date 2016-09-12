@@ -4,6 +4,9 @@ from .fields import ResourceField
 
 
 class ResourceForm(forms.ModelForm):
+    class Media:
+        js = ('js/file-upload.js',)
+
     class Meta:
         model = Resource
         fields = ['file', 'original_file', 'name', 'description', 'mime_type']

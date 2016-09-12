@@ -89,11 +89,13 @@ class QuestionnaireManagerTest(TestCase):
         form = storage.save('xls-forms/xls-form.xlsx', file)
         model = models.Questionnaire.objects.create_from_form(
             xls_form=form,
+            original_file='original.xls',
             project=ProjectFactory.create()
         )
         assert model.id_string == 'question_types'
         assert model.filename == 'xls-form'
         assert model.title == 'Question types'
+        assert model.original_file == 'original.xls'
 
     def test_update_from_form(self):
         storage = FakeS3Storage()

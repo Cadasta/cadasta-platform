@@ -15,6 +15,7 @@ class Questionnaire(RandomIDModel):
     id_string = models.CharField(max_length=50)
     xls_form = S3FileField(upload_to='xls-forms')
     xml_form = S3FileField(upload_to='xml-forms', default=False)
+    original_file = models.CharField(max_length=200, null=True)
     project = models.ForeignKey('organization.Project',
                                 related_name='questionnaires')
     version = models.BigIntegerField(default=1)

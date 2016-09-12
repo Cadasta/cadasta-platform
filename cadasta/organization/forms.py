@@ -240,6 +240,9 @@ class ProjectAddExtents(forms.ModelForm):
 
 
 class ProjectAddDetails(SuperUserCheck, forms.Form):
+    class Media:
+        js = ('js/file-upload.js',)
+
     organization = forms.ChoiceField()
     name = forms.CharField(max_length=100)
     description = forms.CharField(required=False, widget=forms.Textarea)
@@ -249,6 +252,9 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
         required=False,
         widget=S3FileUploadWidget(upload_to='xls-forms',
                                   accepted_types=QUESTIONNAIRE_TYPES))
+    original_file = forms.CharField(required=False,
+                                    max_length=200,
+                                    widget=forms.HiddenInput)
     contacts = ContactsField(form=ContactsForm, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -300,8 +306,14 @@ class ProjectEditDetails(forms.ModelForm):
         required=False,
         widget=S3FileUploadWidget(upload_to='xls-forms',
                                   accepted_types=QUESTIONNAIRE_TYPES))
+    original_file = forms.CharField(required=False,
+                                    max_length=200,
+                                    widget=forms.HiddenInput)
     access = PublicPrivateField()
     contacts = ContactsField(form=ContactsForm, required=False)
+
+    class Media:
+        js = ('js/file-upload.js',)
 
     class Meta:
         model = Project
@@ -310,12 +322,14 @@ class ProjectEditDetails(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         new_form = self.data.get('questionnaire')
+        original_file = self.data.get('original_file')
         current_form = self.initial.get('questionnaire')
 
         if new_form:
             if current_form != new_form:
                 Questionnaire.objects.create_from_form(
                     xls_form=new_form,
+                    original_file=original_file,
                     project=self.instance
                 )
         else:
