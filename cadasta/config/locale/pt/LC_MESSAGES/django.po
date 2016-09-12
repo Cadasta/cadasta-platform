@@ -4,115 +4,116 @@
 # 
 # Translators:
 # Ian Ross <iross@cadasta.org>, 2016
+# Simon Norfolk <simon.norfolk@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-06 16:41+0000\n"
-"PO-Revision-Date: 2016-09-06 16:41+0000\n"
+"PO-Revision-Date: 2016-09-12 13:35+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
-"Language-Team: French (http://www.transifex.com/cadasta/cadasta-platform/language/fr/)\n"
+"Language-Team: Portuguese (http://www.transifex.com/cadasta/cadasta-platform/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: pt\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: accounts/forms.py:22 accounts/forms.py:58 accounts/serializers.py:39
 #: accounts/serializers.py:75 accounts/tests/test_forms.py:72
 #: accounts/tests/test_serializers.py:89
 #: accounts/tests/test_serializers.py:160
 msgid "Username cannot be “add” or “new”."
-msgstr ""
+msgstr "Nome de usuário não pode ser \"adicionar\" ou \"novo\"."
 
 #: accounts/forms.py:28 accounts/tests/test_forms.py:41
 msgid "Passwords do not match"
-msgstr "Les mots de passe ne correspondent pas"
+msgstr "As senhas não correspondem"
 
 #: accounts/forms.py:35 accounts/forms.py:66 accounts/tests/test_forms.py:56
 msgid "Another user with this email already exists"
-msgstr ""
+msgstr "Outro usuário com este email já existe"
 
 #: accounts/forms.py:55
 msgid "Another user with this username already exists"
-msgstr ""
+msgstr "Outro usuário com este nome de usuário já existe"
 
 #: accounts/manager.py:16 organization/serializers.py:145
 msgid "User with username or email {} does not exist"
-msgstr ""
+msgstr "Usuário com nome de usuário ou e-mail {} não existe"
 
 #: accounts/manager.py:21 organization/serializers.py:147
 msgid "More than one user found for username or email {}"
-msgstr ""
+msgstr "Mais de um usuário encontrado para nome de usuário ou e-mail {}"
 
 #: accounts/models.py:31
 msgid "full name"
-msgstr ""
+msgstr "nome completo"
 
 #: accounts/models.py:48
 msgid "user"
-msgstr ""
+msgstr "usuário"
 
 #: accounts/models.py:49
 msgid "users"
-msgstr ""
+msgstr "usuários"
 
 #: accounts/models.py:59 organization/messages.py:31
 msgid "You don't have permission to view user details"
-msgstr ""
+msgstr "Não tem permissão para ver os detalhes do usuário"
 
 #: accounts/models.py:62 organization/messages.py:32
 msgid "You don't have permission to update user details"
-msgstr ""
+msgstr "Não tem permissão para actualizar os detalhes do usuário"
 
 #: accounts/serializers.py:17 accounts/serializers.py:47
 #: accounts/tests/test_serializers.py:74
 msgid "Another user is already registered with this email address"
-msgstr ""
+msgstr "Outro usuário já está registrado com este endereço de e-mail"
 
 #: accounts/views/api.py:70
 msgid "The email has not been verified."
-msgstr "L'email n'a pas été verifié."
+msgstr "O e-mail não foi verificado."
 
 #: accounts/views/default.py:23
 msgid "Successfully updated profile information"
-msgstr ""
+msgstr "Detalhes de perfil actualizadas com êxito"
 
 #: accounts/views/default.py:28
 msgid "Failed to update profile information"
-msgstr ""
+msgstr "Falha na actualização dos detalhes de perfil"
 
 #: config/settings/default.py:199
 msgid "English"
-msgstr "Anglais"
+msgstr "Inglês"
 
 #: config/settings/default.py:200
 msgid "French"
-msgstr "Français"
+msgstr "Francês"
 
 #: config/settings/default.py:201
 msgid "German"
-msgstr "Allemand"
+msgstr "Alemão"
 
 #: config/settings/default.py:202
 msgid "Spanish"
-msgstr "Espagnol"
+msgstr "Espanhol"
 
 #: config/settings/default.py:203
 msgid "Swahili"
-msgstr ""
+msgstr "Swahili"
 
 #: core/mixins.py:14
 msgid "You don't have permission for this action."
-msgstr ""
+msgstr "Não tem permissão para esta acção."
 
 #: core/tests/test_translations.py:11
 msgid "First name"
-msgstr "Prénom"
+msgstr "Primeiro nome"
 
 #: core/tests/test_validators.py:38 core/tests/test_validators.py:40
 msgid "Please provide either name or description"
-msgstr "Veuillez fournir soit nom soit déscription"
+msgstr "Por favor, forneça ou nome ou descrição"
 
 #: core/tests/test_validators.py:55 core/validators.py:24
 #: organization/tests/test_validators.py:29
@@ -120,29 +121,29 @@ msgstr "Veuillez fournir soit nom soit déscription"
 #: organization/tests/test_views_api_projects.py:609 spatial/forms.py:78
 #: spatial/forms.py:86 spatial/forms.py:94
 msgid "This field is required."
-msgstr "Ce champ est obligatoire."
+msgstr "Este campo é obrigatório."
 
 #: core/tests/test_validators.py:70
 #, python-brace-format
 msgid "'{value}' is not a '{type}'"
-msgstr "'{value}' n'est pas un '{type}'"
+msgstr "'{value}' não é um '{type}'"
 
 #: core/validators.py:19
 msgid "Please provide either {}"
-msgstr "Veuillez fournir soit {}"
+msgstr "Por favor, forneça ou {}"
 
 #: core/validators.py:20
 msgid " or "
-msgstr "soit"
+msgstr "ou"
 
 #: core/views/api.py:17
 #, python-brace-format
 msgid "{name} not found."
-msgstr "{name} introuvable"
+msgstr "{name} não encontrado."
 
 #: organization/choices.py:4 organization/widgets.py:25
 msgid "Administrator"
-msgstr "Administrateur"
+msgstr "Administrador"
 
 #: organization/choices.py:5
 #: templates/organization/organization_members_edit.html:16
@@ -150,258 +151,258 @@ msgstr "Administrateur"
 #: templates/organization/project_edit_permissions.html:29
 #: templates/organization/user_list.html:30
 msgid "Member"
-msgstr "Membre"
+msgstr "Membro"
 
 #: organization/choices.py:7
 msgid "Project User"
-msgstr "Utilisateur du projet"
+msgstr "Usuário do projecto"
 
 #: organization/choices.py:8
 msgid "Data Collector"
-msgstr "Collectionneur de données"
+msgstr "Colector de dados"
 
 #: organization/choices.py:9
 msgid "Project Manager"
-msgstr "Directeur de Projet"
+msgstr "Gestor de projecto"
 
 #: organization/choices.py:11 organization/widgets.py:73
 msgid "Public"
-msgstr ""
+msgstr "Público"
 
 #: organization/choices.py:12 organization/widgets.py:74
 msgid "Private"
-msgstr ""
+msgstr "Privado"
 
 #: organization/forms.py:26
 msgid "Public User"
-msgstr ""
+msgstr "Usuário público"
 
 #: organization/forms.py:85
 msgid "Please provide a name."
-msgstr ""
+msgstr "Por favor, forneça um nome."
 
 #: organization/forms.py:87
 msgid "The provided email address is invalid."
-msgstr ""
+msgstr "O endereço de e-mail fornecido é inválido."
 
 #: organization/forms.py:95
 msgid "Please provide either an email address or a phone number."
-msgstr ""
+msgstr "Por favor, forneça um endereço de e-mail ou um número de telefone."
 
 #: organization/forms.py:134 organization/serializers.py:34
 msgid "Organization name cannot be “Add” or “New”."
-msgstr ""
+msgstr "Nome da organização não pode ser \"Adicionar\" ou \"Novo\"."
 
 #: organization/forms.py:172
 msgid "User is already a member of the organization."
-msgstr ""
+msgstr "Usuário já é membro da organização."
 
 #: organization/forms.py:221
 msgid ""
 "Organization administrators cannot change their own role in the "
 "organization."
-msgstr ""
+msgstr "Administradores da organização não pode mudar a sua própria tarefa na organização."
 
 #: organization/forms.py:276 organization/forms.py:333
 #: organization/serializers.py:60
 msgid "Project name cannot be “Add” or “New”."
-msgstr ""
+msgstr "Nome do projecto não pode ser \"Adicionar\" ou \"Novo\"."
 
 #: organization/forms.py:287 organization/forms.py:344
 #: organization/serializers.py:79
 msgid "Project with this name already exists in this organization."
-msgstr ""
+msgstr "Projecto com este nome já existe nesta organização."
 
 #: organization/messages.py:3
 msgid "You don't have permission to access this organization"
-msgstr ""
+msgstr "Não tem permissão para aceder a esta organização"
 
 #: organization/messages.py:4
 msgid "You don't have permission to update this organization"
-msgstr ""
+msgstr "Não tem permissão para actualizar esta organização"
 
 #: organization/messages.py:5
 msgid "You don't have permission to archive this organization"
-msgstr ""
+msgstr "Não tem permissão para arquivar esta organização"
 
 #: organization/messages.py:6
 msgid "You don't have permission to unarchive this organization"
-msgstr ""
+msgstr "Não tem permissão para desarquivar esta organização"
 
 #: organization/messages.py:7
 msgid "You don't have permission to view members of this organization"
-msgstr ""
+msgstr "Não tem permissão para visualizar os membros desta organização"
 
 #: organization/messages.py:9
 msgid "You don't have permission to add members to this organization"
-msgstr ""
+msgstr "Não tem permissão para adicionar membros a esta organização"
 
 #: organization/messages.py:11
 msgid "You don't have permission to edit roles of this organization"
-msgstr ""
+msgstr "Não tem permissão para editar funções desta organização "
 
 #: organization/messages.py:13
 msgid "You don't have permission to remove members from this organization"
-msgstr ""
+msgstr "Não tem permissão para remover membros desta organização"
 
 #: organization/messages.py:16
 msgid "You don't have permission to access this project"
-msgstr ""
+msgstr "Não tem permissão para aceder a este projecto"
 
 #: organization/messages.py:17
 msgid "You don't have permission to update this project"
-msgstr ""
+msgstr "Não tem permissão para actualizar este projecto"
 
 #: organization/messages.py:18
 msgid "You don't have permission to archive this project"
-msgstr ""
+msgstr "Não tem permissão para arquivar este projecto"
 
 #: organization/messages.py:19
 msgid "You don't have permission to unarchive this project"
-msgstr ""
+msgstr "Não tem permissão para desarquivar este projecto"
 
 #: organization/messages.py:20
 msgid "You don't have permission to view members of this project"
-msgstr ""
+msgstr "Não tem permissão para visualizar os membros deste projecto"
 
 #: organization/messages.py:22
 msgid "You don't have permission to add members to this project"
-msgstr ""
+msgstr "Não tem permissão para adicionar membros a este projecto"
 
 #: organization/messages.py:24
 msgid "You don't have permission to edit roles of this project"
-msgstr ""
+msgstr "Não tem permissão para editar funções deste projecto"
 
 #: organization/messages.py:26
 msgid "You don't have permission to remove members from this project"
-msgstr ""
+msgstr "Não tem permissão para remover membros deste projecto"
 
 #: organization/messages.py:28
 msgid "You don't have permission to download data from this project"
-msgstr ""
+msgstr "Não tem permissão para fazer download de dados a partir deste projecto"
 
 #: organization/models.py:61
 msgid "List existing organizations"
-msgstr "Lister organisations actuelles"
+msgstr "Listar organizações existentes"
 
 #: organization/models.py:64
 msgid "Create organizations"
-msgstr "Créer organisations"
+msgstr "Criar organizações"
 
 #: organization/models.py:67
 msgid "View existing organizations"
-msgstr "Voir organisations actuelles"
+msgstr "Visualizar organizações existentes"
 
 #: organization/models.py:70
 msgid "Update an existing organization"
-msgstr "Mettre une organisation actuelle à jour"
+msgstr "Actualizar uma organização existente"
 
 #: organization/models.py:73
 msgid "Archive an existing organization"
-msgstr "Archiver une organisation actuelle"
+msgstr "Arquivar uma organização existente"
 
 #: organization/models.py:76
 msgid "Unarchive an existing organization"
-msgstr "Déarchiver une organisation actuelle"
+msgstr "Desarquivar uma organização existente"
 
 #: organization/models.py:79
 msgid "List members of an organization"
-msgstr "Lister membres d'une organisation"
+msgstr "Listar os membros de uma organização"
 
 #: organization/models.py:82
 msgid "Add a member to an organization"
-msgstr "Ajouter un membre à une organisation"
+msgstr "Adicionar um membro a uma organização"
 
 #: organization/models.py:85
 msgid "Edit a member of an organization"
-msgstr ""
+msgstr "Editar um membro de uma organização "
 
 #: organization/models.py:88
 msgid "Remove a member from an organization"
-msgstr "Enlever un membre d'une organisation"
+msgstr "Remover um membro de uma organização"
 
 #: organization/models.py:185
 msgid "List existing projects in an organization"
-msgstr "Lister projets actuels dans une organisation"
+msgstr "Listar projectos existentes em uma organização"
 
 #: organization/models.py:188
 msgid "Create projects in an organization"
-msgstr "Créer projets dans une organisation"
+msgstr "Criar projectos em uma organização"
 
 #: organization/models.py:191
 msgid "View existing projects"
-msgstr "Voir projets actuels"
+msgstr "Visualizar projectos existentes"
 
 #: organization/models.py:194
 msgid "View private projects"
-msgstr ""
+msgstr "Visualizar projectos privados"
 
 #: organization/models.py:197
 msgid "Update an existing project"
-msgstr "Mettre un projet actuel à jour"
+msgstr "Actualizar um projecto existente"
 
 #: organization/models.py:200
 msgid "Archive an existing project"
-msgstr "Archiver un projet actuel"
+msgstr "Arquivar um projecto existente"
 
 #: organization/models.py:203
 msgid "Unarchive an existing project"
-msgstr "Déarchiver un projet actuel"
+msgstr "Desarquivar um projecto existente"
 
 #: organization/models.py:206
 msgid "List users within a project"
-msgstr "Lister utilisateurs dans un projet"
+msgstr "Lista usuários dentro dum projecto"
 
 #: organization/models.py:209
 msgid "Add user to a project"
-msgstr "Ajouter utilisateur à un projet"
+msgstr "Adicionar usuário a um projecto "
 
 #: organization/models.py:212
 msgid "Edit roles of user in a project"
-msgstr ""
+msgstr "Editar funções de usuário num projecto"
 
 #: organization/models.py:215
 msgid "Remove user from a project"
-msgstr "Enlever utilisateur d'un projet"
+msgstr "Remover o usuário dum projecto"
 
 #: organization/models.py:218
 msgid "Download data from a project"
-msgstr ""
+msgstr "Baixar os dados dum projecto"
 
 #: organization/serializers.py:159
 msgid ""
 "Organization administrators cannot change their own permissions within the "
 "organization"
-msgstr ""
+msgstr "Administradores da organização não pode mudar as suas próprias permissões dentro da organização"
 
 #: organization/serializers.py:236
 #, python-brace-format
 msgid "You have been added to organization {organization}"
-msgstr "On vous a ajouté à l'organisation {organization}"
+msgstr "Foi adicionado à organização {organization}"
 
 #: organization/serializers.py:257 organization/tests/test_serializers.py:501
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
-msgstr "Utilisateur {username} n'est pas membre de l'organisation du projet"
+msgstr "Usuário {username} não é membro da organização do projecto"
 
 #: organization/tests/test_serializers.py:406
 #: organization/tests/test_serializers.py:515
 #, python-brace-format
 msgid "User with username or email {username} does not exist"
-msgstr "Utilisateur avec nom d'utilisateur ou email {username} n'existe pas"
+msgstr "Usuário com nome de usuário ou e-mail {username} não existe"
 
 #: organization/tests/test_serializers.py:422
 #, python-brace-format
 msgid "More than one user found for username or email {email}"
-msgstr ""
+msgstr "Mais de um usuário encontrado com nome de usuário ou e-mail {email}"
 
 #: organization/tests/test_views_api_organizations.py:389
 msgid "User with username or email some_username does not exist"
-msgstr ""
+msgstr "Usuário com nome de usuário ou email some_username não existe"
 
 #: organization/tests/test_views_api_organizations.py:396
 msgid "Organization not found."
-msgstr "Organisation introuvable."
+msgstr "Organização não encontrada."
 
 #: organization/tests/test_views_api_projects.py:103
 #: organization/tests/test_views_api_projects.py:230
@@ -410,36 +411,36 @@ msgstr "Organisation introuvable."
 #: spatial/tests/base_classes.py:353 spatial/tests/base_classes.py:465
 #: spatial/tests/base_classes.py:618
 msgid "Project not found."
-msgstr "Project introuvable"
+msgstr "Projecto não encontrado."
 
 #: organization/tests/test_views_api_projects.py:123
 msgid "User with username or email some-user does not exist"
-msgstr ""
+msgstr "Usuário com nome de usuário ou e-mail some_user não existe"
 
 #: organization/tests/test_views_api_projects.py:223
 msgid "User not found."
-msgstr "Utilisateur introuvable"
+msgstr "Usuário não encontrado."
 
 #: organization/tests/test_views_api_projects.py:780
 msgid "This field may not be blank."
-msgstr "Ce champ ne peut pas rester vide."
+msgstr "Este campo não pode ficar em branco."
 
 #: organization/tests/test_views_api_users.py:201
 msgid "Cannot update last_login"
-msgstr ""
+msgstr "Não é possível actualizar last_login"
 
 #: organization/widgets.py:71
 msgid "Project visibility"
-msgstr ""
+msgstr "Visibilidade do projecto"
 
 #: organization/widgets.py:132 templates/party/party_form.html:6
 #: templates/party/party_list.html:17 templates/resources/form.html:17
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: organization/widgets.py:133
 msgid "Phone"
-msgstr ""
+msgstr "Telefone"
 
 #: organization/widgets.py:134 templates/accounts/profile.html:25
 #: templates/accounts/snippets/registration_form.html:18
@@ -449,693 +450,693 @@ msgstr "Email"
 
 #: organization/widgets.py:135
 msgid "Add contact"
-msgstr ""
+msgstr "Adicionar contacto"
 
 #: party/messages.py:4
 msgid "You don't have permission to view parties of this project."
-msgstr ""
+msgstr "Não tem permissão para visualizar as partes deste projecto."
 
 #: party/messages.py:6
 msgid "You don't have permission to add parties to this project."
-msgstr ""
+msgstr "Não tem permissão para adicionar partes a este projecto."
 
 #: party/messages.py:8
 msgid "You don't have permission to view this party."
-msgstr ""
+msgstr "Não tem permissão para visualizar esta parte."
 
 #: party/messages.py:10
 msgid "You don't have permission to update this party."
-msgstr ""
+msgstr "Não tem permissão para actualizar esta parte."
 
 #: party/messages.py:12
 msgid "You don't have permission to remove this party."
-msgstr ""
+msgstr "Não tem permissão para remover esta parte."
 
 #: party/messages.py:15
 msgid "You don't have permission to archive this party"
-msgstr ""
+msgstr "Não tem permissão para arquivar esta parte"
 
 #: party/messages.py:17
 msgid "You don't have permission to unarchive this party"
-msgstr ""
+msgstr "Não tem permissão para desarquivar esta parte"
 
 #: party/messages.py:19
 msgid "You don't have permission to add resources to this party"
-msgstr ""
+msgstr "Não tem permissão para adicionar recursos a esta parte"
 
 #: party/messages.py:22
 msgid "You don't have permission to view party relationships of this project."
-msgstr ""
+msgstr "Não tem permissão para visualizar relacionamentos de partes deste projecto."
 
 #: party/messages.py:24
 msgid "You don't have permission to add party relationships to this project."
-msgstr ""
+msgstr "Não tem permissão para adicionar relacionamentos de partes a este projecto."
 
 #: party/messages.py:26
 msgid "You don't have permission to view this party relationship."
-msgstr ""
+msgstr "Não tem permissão para visualizar este relacionamento de partes."
 
 #: party/messages.py:28
 msgid "You don't have permission to update this party relationship."
-msgstr ""
+msgstr "Não tem permissão para actualizar esta relacionamento de partes."
 
 #: party/messages.py:30
 msgid "You don't have permission to remove this party relationship."
-msgstr ""
+msgstr "Não tem permissão para remover este relacionamento de partes."
 
 #: party/messages.py:33
 msgid ""
 "You don't have permission to view tenure relationships of this project."
-msgstr ""
+msgstr "Não tem permissão para visualizar os relacionamentos de posse de terra deste projecto."
 
 #: party/messages.py:35
 msgid "You don't have permission to add tenure relationships to this project."
-msgstr ""
+msgstr "Não tem permissão para adicionar relacionamentos de posse de terra a este projecto."
 
 #: party/messages.py:37
 msgid "You don't have permission to view this tenure relationship."
-msgstr ""
+msgstr "Não tem permissão para visualizar este relacionamento de posse de terra."
 
 #: party/messages.py:39
 msgid "You don't have permission to update this tenure relationship."
-msgstr ""
+msgstr "Não tem permissão para actualizar este relacionamento de posse de terra."
 
 #: party/messages.py:41
 msgid "You don't have permission to remove this tenure relationship."
-msgstr ""
+msgstr "Não tem permissão para remover este relacionamento de posse de terra."
 
 #: party/messages.py:43
 msgid ""
 "You don't have permission to add resources to this tenure relationship."
-msgstr ""
+msgstr "Não tem permissão para adicionar recursos a este relacionamento de posse de terra."
 
 #: party/models.py:42
 msgid "Individual"
-msgstr ""
+msgstr "Individual"
 
 #: party/models.py:43
 msgid "Corporation"
-msgstr ""
+msgstr "Empresa"
 
 #: party/models.py:44
 msgid "Group"
-msgstr ""
+msgstr "Grupo"
 
 #: party/models.py:91
 msgid "List existing parties of a project"
-msgstr ""
+msgstr "Listar as partes existentes dum projecto "
 
 #: party/models.py:95
 msgid "Add a party to a project"
-msgstr ""
+msgstr "Adicionar uma parte dum projecto"
 
 #: party/models.py:99
 msgid "View an existing party"
-msgstr ""
+msgstr "Ver uma parte existente"
 
 #: party/models.py:102
 msgid "Update an existing party"
-msgstr ""
+msgstr "Actualizar uma parte existente"
 
 #: party/models.py:105
 msgid "Delete an existing party"
-msgstr ""
+msgstr "Remover uma parte existente"
 
 #: party/models.py:108
 msgid "Add resources to the party"
-msgstr ""
+msgstr "Adicionar recursos a uma parte existente"
 
 #: party/models.py:163
 msgid "List existing party relationships of a project"
-msgstr ""
+msgstr "Listar relacionamentos de partes existentes dum projecto"
 
 #: party/models.py:168
 msgid "Add a party relationship to a project"
-msgstr ""
+msgstr "Adicionar um relacionamento de partes a um projecto"
 
 #: party/models.py:172
 msgid "View an existing party relationship"
-msgstr ""
+msgstr "Visualizar um relacionamento de partes existente"
 
 #: party/models.py:175
 msgid "Update an existing party relationship"
-msgstr ""
+msgstr "Actualizar um relacionamento de partes existente"
 
 #: party/models.py:178
 msgid "Delete an existing party relationship"
-msgstr ""
+msgstr "Remover um relacionamento de partes existente"
 
 #: party/models.py:210
 msgid "Contractual/Share Crop"
-msgstr ""
+msgstr "Contractual / arrendatário"
 
 #: party/models.py:211
 msgid "Customary Arrangement"
-msgstr ""
+msgstr "De acordo com as normas costumeiras"
 
 #: party/models.py:212
 msgid "Gift"
-msgstr ""
+msgstr "Oferta"
 
 #: party/models.py:213
 msgid "Homestead"
-msgstr ""
+msgstr "Herdade"
 
 #: party/models.py:214
 msgid "Informal Occupant"
-msgstr ""
+msgstr "Ocupante informal"
 
 #: party/models.py:215
 msgid "Inheritance"
-msgstr ""
+msgstr "Herança"
 
 #: party/models.py:216
 msgid "Leasehold"
-msgstr ""
+msgstr "Arrendamento"
 
 #: party/models.py:217
 msgid "Purchased Freehold"
-msgstr ""
+msgstr "Propriedade livre e alodial"
 
 #: party/models.py:218
 msgid "Rental"
-msgstr ""
+msgstr "Propriedade alugado"
 
 #: party/models.py:219
 msgid "Other"
-msgstr ""
+msgstr "Outro"
 
 #: party/models.py:248
 msgid "List existing tenure relationships of a project"
-msgstr ""
+msgstr "Listar as relações de posse de terra existentes dum projecto"
 
 #: party/models.py:253
 msgid "Add a tenure relationship to a project"
-msgstr ""
+msgstr "Adicionar um relacionamento de posse de terra a um projecto"
 
 #: party/models.py:257
 msgid "View an existing tenure relationship"
-msgstr ""
+msgstr "Ver um relacionamento de posse de terra existente"
 
 #: party/models.py:260
 msgid "Update an existing tenure relationship"
-msgstr ""
+msgstr "Actualizar um relacionamento de posse de terra existente"
 
 #: party/models.py:263
 msgid "Delete an existing tenure relationship"
-msgstr ""
+msgstr "Remover um relacionamento de posse de terra existente"
 
 #: party/models.py:266
 msgid "Add a resource to a tenure relationship"
-msgstr ""
+msgstr "Adicionar um recurso a um relacionamento de posse de terra"
 
 #: party/serializers.py:53
 #: party/tests/test_views_api_party_relationships.py:72
 #: party/tests/test_views_api_party_relationships.py:155
 msgid "The parties must be different"
-msgstr ""
+msgstr "As partes devem ser diferentes"
 
 #: party/serializers.py:56
 #: party/tests/test_views_api_party_relationships.py:87
 #: party/tests/test_views_api_party_relationships.py:169
 msgid "'party1' project ({}) should be equal to 'party2' project ({})"
-msgstr ""
+msgstr "projecto 'party1' ({}) deve ser igual ao projecto 'party2' ({})"
 
 #: party/serializers.py:101
 #: party/tests/test_views_api_tenure_relationships.py:77
 #: party/tests/test_views_api_tenure_relationships.py:151
 msgid "'party' project ({}) should be equal to 'spatial_unit' project ({})"
-msgstr ""
+msgstr "projecto 'party' ({}) deve ser igual a projecto 'spatial_unit' ({})"
 
 #: party/tests/test_views_api_relationship_list.py:106 party/views/api.py:66
 msgid "Relationship class is unknown"
-msgstr ""
+msgstr "Classe de relacionamento é desconhecida"
 
 #: questionnaires/managers.py:74
 #, python-brace-format
 msgid "Please provide at least one option for field '{field_name}'"
-msgstr ""
+msgstr "Por favor, forneça pelo menos uma opção para o campo '{field_name}'"
 
 #: questionnaires/managers.py:166
 #, python-brace-format
 msgid "{error}"
-msgstr ""
+msgstr "{error}"
 
 #: questionnaires/managers.py:240
 #, python-brace-format
 msgid "{type} is not an accepted question type"
-msgstr ""
+msgstr "{type} não é um tipo de questão aceita"
 
 #: questionnaires/messages.py:3
 msgid "You don't have permission to view a questionnaire of this project"
-msgstr ""
+msgstr "Não tem permissão para visualizar um questionário deste projecto"
 
 #: questionnaires/messages.py:5
 msgid "You don't have permission to add a questionnaire to this project"
-msgstr ""
+msgstr "Não tem permissão para adicionar um questionário a este projecto"
 
 #: questionnaires/messages.py:7
 msgid "You don't have permission to edit the questionnaire of this project"
-msgstr ""
+msgstr "Não tem permissão para editar o questionário deste projecto"
 
 #: questionnaires/models.py:34
 msgid "View the questionnaire of the project"
-msgstr ""
+msgstr "Visualizar o questionário do projecto"
 
 #: questionnaires/models.py:38
 msgid "Add a questionnaire to the project"
-msgstr ""
+msgstr "Adicionar um questionário para o projecto"
 
 #: questionnaires/models.py:42
 msgid "Edit an existing questionnaire"
-msgstr ""
+msgstr "Editar um questionário existente"
 
 #: resources/messages.py:3
 msgid "You don't have permission to access the list of resources."
-msgstr ""
+msgstr "Não tem permissão para abrir a lista de recursos."
 
 #: resources/messages.py:4
 msgid "You don't have permission to add resources."
-msgstr ""
+msgstr "Não tem permissão para adicionar recursos."
 
 #: resources/messages.py:5
 msgid "You don't have permission to view this resource."
-msgstr ""
+msgstr "Não tem permissão para visualizar este recurso."
 
 #: resources/messages.py:6
 msgid "You don't have permission to edit this resource."
-msgstr ""
+msgstr "Não tem permissão para editar este recurso."
 
 #: resources/messages.py:7
 msgid "You don't have permission to archive this resource."
-msgstr ""
+msgstr "Não tem permissão para arquivar este recurso."
 
 #: resources/messages.py:8
 msgid "You don't have permission to unarchive this resource."
-msgstr ""
+msgstr "Não tem permissão para desarquivar este recurso."
 
 #: resources/models.py:47
 msgid "List resources"
-msgstr ""
+msgstr "Listar recursos"
 
 #: resources/models.py:51
 msgid "Add new resources"
-msgstr ""
+msgstr "Adicionar novos recursos"
 
 #: resources/models.py:55
 msgid "View resource"
-msgstr ""
+msgstr "Visualizar recurso"
 
 #: resources/models.py:58
 msgid "Edit resource"
-msgstr ""
+msgstr "Editar recurso"
 
 #: resources/models.py:61 templates/resources/project_detail.html:56
 msgid "Archive resource"
-msgstr ""
+msgstr "Arquivar recurso "
 
 #: resources/models.py:64 templates/resources/project_detail.html:80
 msgid "Unarchive resource"
-msgstr ""
+msgstr "Desarquivar recurso "
 
 #: resources/serializers.py:26
 msgid "Resource not found"
-msgstr ""
+msgstr "Recurso não encontrado "
 
 #: resources/validators.py:11
 #, python-brace-format
 msgid "Files of type {mime} are not accepted."
-msgstr ""
+msgstr "Ficheiros do tipo {mime} não são aceitos."
 
 #: spatial/choices.py:4
 msgid "Parcel"
-msgstr ""
+msgstr "Parcela"
 
 #: spatial/choices.py:5
 msgid "Community boundary"
-msgstr ""
+msgstr "Limite comunitária"
 
 #: spatial/choices.py:6
 msgid "Building"
-msgstr ""
+msgstr "Prédio"
 
 #: spatial/choices.py:7
 msgid "Apartment"
-msgstr ""
+msgstr "Apartamento"
 
 #: spatial/choices.py:8
 msgid "Project extent"
-msgstr ""
+msgstr "Tamanho do projecto"
 
 #: spatial/choices.py:9
 msgid "Right-of-way"
-msgstr ""
+msgstr "Direito de passagem"
 
 #: spatial/choices.py:10
 msgid "Utility corridor"
-msgstr ""
+msgstr "Corredor de utilidades"
 
 #: spatial/choices.py:11
 msgid "National park boundary"
-msgstr ""
+msgstr "Limite de parque nacional "
 
 #: spatial/choices.py:12
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Variado"
 
 #: spatial/forms.py:20
 msgid ""
 "No map location was provided. Please use the tools provided on the left side"
 " of the map to mark your new location."
-msgstr ""
+msgstr "Nenhuma localização no mapa foi fornecida. Por favor, use as ferramentas fornecidas no lado esquerdo do mapa para marcar a sua nova localização."
 
 #: spatial/forms.py:64
 msgid "Please select a party type"
-msgstr ""
+msgstr "Seleccionar um tipo de parte"
 
 #: spatial/forms.py:67 spatial/tests/test_forms.py:145
 msgid "Please select a relationship type"
-msgstr ""
+msgstr "Seleccionar um tipo de relacionamento"
 
 #: spatial/messages.py:5
 msgid "You don't have permission to view locations of this project."
-msgstr ""
+msgstr "Não tem permissão para visualizar localizações deste projecto."
 
 #: spatial/messages.py:7
 msgid "You don't have permission to add locations to this project."
-msgstr ""
+msgstr "Não tem permissão para adicionar localizações a este projecto."
 
 #: spatial/messages.py:9
 msgid "You don't have permission to view this location."
-msgstr ""
+msgstr "Não tem permissão para visualizar esta localização."
 
 #: spatial/messages.py:11
 msgid "You don't have permission to update this location."
-msgstr ""
+msgstr "Não tem permissão para actualizar esta localização."
 
 #: spatial/messages.py:13
 msgid "You don't have permission to remove this location."
-msgstr ""
+msgstr "Não tem permissão para remover esta localização."
 
 #: spatial/messages.py:14
 msgid "You don't have permission to add resources to this location."
-msgstr ""
+msgstr "Não tem permissão para adicionar recursos a esta localização."
 
 #: spatial/messages.py:17
 msgid ""
 "You don't have permission to view location relationships of this project."
-msgstr ""
+msgstr "Não tem permissão para visualizar os relacionamentos de localização desse projecto."
 
 #: spatial/messages.py:19
 msgid ""
 "You don't have permission to add location relationships to this project."
-msgstr ""
+msgstr "Não tem permissão para adicionar relacionamentos de localização a este projecto."
 
 #: spatial/messages.py:22
 msgid "You don't have permission to view this location relationship."
-msgstr ""
+msgstr "Não tem permissão para ver este relacionamento de localização."
 
 #: spatial/messages.py:24
 msgid "You don't have permission to update this location relationship."
-msgstr ""
+msgstr "Não tem permissão para actualizar este relacionamento de localização."
 
 #: spatial/messages.py:26
 msgid "You don't have permission to remove this location relationship."
-msgstr ""
+msgstr "Não tem permissão para remover este relacionamento de localização."
 
 #: spatial/models.py:65
 msgid "List existing spatial units of a project"
-msgstr ""
+msgstr "Listar unidades espaciais dum projecto existente"
 
 #: spatial/models.py:69
 msgid "Add a spatial unit to a project"
-msgstr ""
+msgstr "Adicionar uma unidade espacial a um projecto"
 
 #: spatial/models.py:73
 msgid "View an existing spatial unit"
-msgstr ""
+msgstr "Visualizar uma unidade espacial existente"
 
 #: spatial/models.py:76
 msgid "Update an existing spatial unit"
-msgstr ""
+msgstr "Actualizar uma unidade espacial existente"
 
 #: spatial/models.py:79
 msgid "Delete an existing spatial unit"
-msgstr ""
+msgstr "Remover uma unidade espacial existente"
 
 #: spatial/models.py:82
 msgid "Add resources to this spatial unit"
-msgstr ""
+msgstr "Adicionar recursos a esta unidade espacial"
 
 #: spatial/models.py:204
 msgid "List existing spatial relationships of a project"
-msgstr ""
+msgstr "Listar os relacionamentos espaciais dum projecto existente"
 
 #: spatial/models.py:209
 msgid "Add a spatial relationship to a project"
-msgstr ""
+msgstr "Adicionar um relacionamento espacial a um projecto"
 
 #: spatial/models.py:213
 msgid "View an existing spatial relationship"
-msgstr ""
+msgstr "Ver um relacionamento espacial existente"
 
 #: spatial/models.py:216
 msgid "Update an existing spatial relationship"
-msgstr ""
+msgstr "Actualizar um relacionamento espacial existente"
 
 #: spatial/models.py:219
 msgid "Delete an existing spatial relationship"
-msgstr ""
+msgstr "Remover um relacionamento espacial existente"
 
 #: spatial/serializers.py:98
 #: spatial/tests/test_views_api_spatial_relationships.py:75
 #: spatial/tests/test_views_api_spatial_relationships.py:157
 msgid "The spatial units must be different"
-msgstr ""
+msgstr "As unidades espaciais devem ser diferentes"
 
 #: spatial/serializers.py:101
 #: spatial/tests/test_views_api_spatial_relationships.py:89
 #: spatial/tests/test_views_api_spatial_relationships.py:170
 msgid "'su1' project ({}) should be equal to 'su2' project ({})"
-msgstr ""
+msgstr "projecto 'su1' ({}) deve ser igual a projecto 'su2' ({})"
 
 #: spatial/tests/base_classes.py:350 spatial/tests/base_classes.py:462
 #: spatial/tests/base_classes.py:615
 msgid "{} not found."
-msgstr ""
+msgstr "{} não encontrado."
 
 #: spatial/tests/test_views_api_spatial_units.py:127
 #: spatial/tests/test_views_api_spatial_units.py:194
 msgid "\"\" is not a valid choice."
-msgstr ""
+msgstr "\"\" não é uma escolha válida."
 
 #: spatial/tests/test_views_api_spatial_units.py:142
 #: spatial/tests/test_views_api_spatial_units.py:209
 msgid ""
 "Invalid format: string or unicode input unrecognized as GeoJSON, WKT EWKT or"
 " HEXEWKB."
-msgstr ""
+msgstr "Formato inválido: texto ou unicode não reconhecida como GeoJSON, WKT EWKT ou HEXEWKB."
 
 #: spatial/widgets.py:40 templates/organization/project_wrapper.html:60
 #: templates/organization/project_wrapper.html:74
 #: templates/party/party_add.html:10
 msgid "Add party"
-msgstr ""
+msgstr "Adicionar parte"
 
 #: templates/500.html:6 templates/500.html:9
 msgid "Platform Error"
-msgstr ""
+msgstr "Erro de Plataforma"
 
 #: templates/500.html:11
 msgid ""
 "We're sorry, our platform encountered an error while processing your "
 "request."
-msgstr ""
+msgstr "Lamentamos, mas a nossa plataforma encontrou um erro ao processar o seu pedido."
 
 #: templates/500.html:13
 msgid "Our developers have been notified."
-msgstr ""
+msgstr "Os nossos técnicos foram notificados."
 
 #: templates/accounts/email/activate_email.txt:2
 #, python-format
 msgid ""
 "You're receiving this email because you created an account on %(site_name)s."
-msgstr ""
+msgstr "Está a receber este e-mail porque criou uma conta no %(site_name)s."
 
 #: templates/accounts/email/activate_email.txt:4
 msgid "Please go to the following page to activate account:"
-msgstr ""
+msgstr "Por favor, vá para a página a seguir para activar a conta:"
 
 #: templates/accounts/email/activate_email.txt:9
 #: templates/organization/email/org_invite.txt:9
 msgid "Thanks for using our site!"
-msgstr ""
+msgstr "Obrigado por usar o nosso site!"
 
 #: templates/accounts/email/activate_email.txt:11
 #: templates/accounts/email/password_reset.txt:10
 #: templates/organization/email/org_invite.txt:11
 #, python-format
 msgid "The %(site_name)s team"
-msgstr "L'équipe %(site_name)s"
+msgstr "A equipe %(site_name)s"
 
 #: templates/accounts/email/activate_email_subject.txt:2
 #, python-format
 msgid "Account activation on %(site_name)s"
-msgstr ""
+msgstr "Activação da conta em %(site_name)s"
 
 #: templates/accounts/email/change_email.txt:3
 #, python-format
 msgid "You have recently changed your email address at %(site_name)s. "
-msgstr ""
+msgstr "Alterou recentemente o seu endereço de e-mail em %(site_name)s."
 
 #: templates/accounts/email/change_email.txt:5
 msgid "Please go to the following page to confirm your new email address. "
-msgstr ""
+msgstr "Por favor, vá para a seguinte página para confirmar o seu novo endereço de e-mail."
 
 #: templates/accounts/email/change_email.txt:10
 #, python-format
 msgid "The %(site_name)s Team. "
-msgstr "L'Équipe %(site_name)s."
+msgstr "A Equipe %(site_name)s"
 
 #: templates/accounts/email/change_email_subject.txt:2
 #, python-format
 msgid "Change of email on %(site_name)s"
-msgstr "Changement d'email sur %(site_name)s"
+msgstr "Mudança de e-mail em %(site_name)s"
 
 #: templates/accounts/email/password_reset.txt:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
-msgstr ""
+msgstr "Está a receber este e-mail porque pediu uma redefinição de senha para a sua conta de usuário em %(site_name)s."
 
 #: templates/accounts/email/password_reset.txt:4
 msgid "Please go to the following page and choose a new password:"
-msgstr ""
+msgstr "Por favor, vá para a página seguinte para escolher uma nova senha:"
 
 #: templates/accounts/email/password_reset.txt:8
 msgid "Your username, in case you've forgotten:"
-msgstr ""
+msgstr "Seu nome de usuário, caso tenha esquecido:"
 
 #: templates/accounts/profile.html:8
 msgid "Profile"
-msgstr "Profil"
+msgstr "Perfil"
 
 #: templates/accounts/profile.html:14
 msgid "Update your profile"
-msgstr "Mettre votre profil à jour"
+msgstr "Actualizar seu perfil"
 
 #: templates/accounts/profile.html:19
 #: templates/accounts/snippets/registration_form.html:11
 #: templates/organization/organization_dashboard.html:93
 msgid "Username"
-msgstr "Nom d'utilisateur"
+msgstr "Nome de usuário"
 
 #: templates/accounts/profile.html:31
 #: templates/accounts/snippets/registration_form.html:32
 msgid "Full name"
-msgstr ""
+msgstr "Nome completo"
 
 #: templates/accounts/profile.html:38
 msgid "Update profile"
-msgstr "Mettre votre profil à jour"
+msgstr "Actualizar perfil"
 
 #: templates/accounts/profile.html:41
 msgid "Password options"
-msgstr ""
+msgstr "Opções de senha"
 
 #: templates/accounts/profile.html:45
 #: templates/allauth/account/password_change.html:37
 msgid "Change password"
-msgstr "Changer mot de passe"
+msgstr "Mudar a senha"
 
 #: templates/accounts/profile.html:50
 #: templates/allauth/account/password_reset.html:27
 msgid "Reset password"
-msgstr "Réinitialiser mot de passe"
+msgstr "Reiniciar a senha"
 
 #: templates/accounts/snippets/registration_form.html:3
 #: templates/allauth/account/signup.html:9
 #: templates/allauth/account/signup.html:69 templates/core/base.html:65
 msgid "Register"
-msgstr "S'inscrire"
+msgstr "Registo"
 
 #: templates/accounts/snippets/registration_form.html:25
 msgid "Password"
-msgstr "Mot de passe"
+msgstr "Senha"
 
 #: templates/accounts/snippets/registration_form.html:36
 msgid "Submit"
-msgstr "Soumettre"
+msgstr "Enviar"
 
 #: templates/allauth/account/account_inactive.html:5
 #: templates/allauth/account/account_inactive.html:8
 msgid "Account Inactive"
-msgstr "Compte inactif"
+msgstr "Conta inactiva"
 
 #: templates/allauth/account/account_inactive.html:10
 msgid "This account is inactive."
-msgstr "Ce compte est inactif."
+msgstr "Esta conta está inactiva."
 
 #: templates/allauth/account/email.html:5
 msgid "Account"
-msgstr "Compte"
+msgstr "Conta"
 
 #: templates/allauth/account/email.html:8
 msgid "E-mail Addresses"
-msgstr ""
+msgstr "Endereços de e-mail"
 
 #: templates/allauth/account/email.html:10
 msgid "The following e-mail addresses are associated with your account:"
-msgstr ""
+msgstr "Os seguintes endereços de e-mail são associados à sua conta:"
 
 #: templates/allauth/account/email.html:24
 msgid "Verified"
-msgstr "Verifié"
+msgstr "Verificado"
 
 #: templates/allauth/account/email.html:26
 msgid "Unverified"
-msgstr "Non verifié"
+msgstr "Não verificado"
 
 #: templates/allauth/account/email.html:28
 msgid "Primary"
-msgstr "Primaire"
+msgstr "Primário"
 
 #: templates/allauth/account/email.html:34
 msgid "Make Primary"
-msgstr "Faire primaire"
+msgstr "Tornar primário"
 
 #: templates/allauth/account/email.html:35
 msgid "Re-send Verification"
-msgstr ""
+msgstr "Reenviar verificação"
 
 #: templates/allauth/account/email.html:36
 #: templates/allauth/socialaccount/connections.html:35
 msgid "Remove"
-msgstr "Enlever"
+msgstr "Remover"
 
 #: templates/allauth/account/email.html:43
 msgid "Warning:"
-msgstr ""
+msgstr "Atenção:"
 
 #: templates/allauth/account/email.html:43
 msgid ""
 "You currently do not have any e-mail address set up. You should really add "
 "an e-mail address so you can receive notifications, reset your password, "
 "etc."
-msgstr ""
+msgstr "Actualmente não tem qualquer endereço de e-mail configurado. Devia adicionar um endereço de e-mail para que possa receber notificações, redefinir a sua senha, etc."
 
 #: templates/allauth/account/email.html:48
 msgid "Add E-mail Address"
-msgstr ""
+msgstr "Adicionar endereço de e-mail"
 
 #: templates/allauth/account/email.html:53
 msgid "Add E-mail"
-msgstr ""
+msgstr "Adicionar e-mail"
 
 #: templates/allauth/account/email.html:62
 msgid "Do you really want to remove the selected e-mail address?"
-msgstr ""
+msgstr "Será que deseja remover o endereço de e-mail selecionado?"
 
 #: templates/allauth/account/email/email_confirmation_message.txt:1
 #, python-format
@@ -1145,15 +1146,15 @@ msgid ""
 "You're receiving this e-mail because user %(user_display)s at Cadasta Platform has given yours as an e-mail address to connect their account.\n"
 "\n"
 "To confirm this is correct, go to %(activate_url)s\n"
-msgstr ""
+msgstr "\nEstá a receber este e-mail porque o usuário %(user_display)s na Plataforma de Cadasta deu o seu como um endereço de e-mail para conectar a sua conta.\n\nPara confirmar que está correcto, vá para %(activate_url)s\n\n"
 
 #: templates/allauth/account/email/email_confirmation_message.txt:7
 msgid "Thank you from Cadasta."
-msgstr ""
+msgstr "Obrigado de Cadasta."
 
 #: templates/allauth/account/email/email_confirmation_subject.txt:3
 msgid "Please Confirm Your E-mail Address"
-msgstr ""
+msgstr "Por favor confirme o seu endereço de email"
 
 #: templates/allauth/account/email/password_reset_key_message.txt:1
 msgid ""
@@ -1161,111 +1162,111 @@ msgid ""
 "\n"
 "You're receiving this e-mail because you or someone else has requested a password for your user account at Cadasta Platform.\n"
 "It can be safely ignored if you did not request a password reset. Click the link below to reset your password."
-msgstr ""
+msgstr "\nEstá a receber este e-mail porque você, ou outra pessoa, tenha solicitado uma senha para a sua conta no Plataforma de Cadasta.\nPode ser ignorado se não solicitou uma nova senha. Clique no link abaixo para redefinir a sua senha."
 
 #: templates/allauth/account/email/password_reset_key_message.txt:8
 #, python-format
 msgid "In case you forgot, your username is %(username)s."
-msgstr ""
+msgstr "Caso tenha esquecido, o seu nome de usuário é %(username)s."
 
 #: templates/allauth/account/email/password_reset_key_message.txt:10
 msgid "Thank you for using Cadasta Platform!\n"
-msgstr ""
+msgstr "Obrigado por usar o Plataforma de Cadasta!\n\n"
 
 #: templates/allauth/account/email/password_reset_key_subject.txt:3
 msgid "Password Reset E-mail"
-msgstr ""
+msgstr "Endereço de e-mail reiniciar a senha"
 
 #: templates/allauth/account/email_confirm.html:6
 #: templates/allauth/account/email_confirm.html:10
 msgid "Confirm E-mail Address"
-msgstr ""
+msgstr "Confirmar o endereço de e-mail"
 
 #: templates/allauth/account/email_confirm.html:16
 #, python-format
 msgid ""
 "Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
 "address for user %(user_display)s."
-msgstr ""
+msgstr "Por favor, confirme que <a href=\"mailto:%(email)s\"> %(email)s</a> é um endereço de e-mail para o usuário %(user_display)s."
 
 #: templates/allauth/account/email_confirm.html:20
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmar"
 
 #: templates/allauth/account/email_confirm.html:27
 #, python-format
 msgid ""
 "This e-mail confirmation link expired or is invalid. Please <a "
 "href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
-msgstr ""
+msgstr "Este link de confirmação de e-mail expirou ou é inválido. Por favor <a Href=\"%(email_url)s\">emitir um novo pedido de confirmação de e-mail</a>."
 
 #: templates/allauth/account/login.html:10
 #: templates/allauth/account/login.html:65
 msgid "Sign In"
-msgstr ""
+msgstr "Login"
 
 #: templates/allauth/account/login.html:30
 msgid "Sign in to your account"
-msgstr ""
+msgstr "Faça login na sua conta"
 
 #: templates/allauth/account/login.html:48
 msgid "Forgotten password?"
-msgstr ""
+msgstr "Senha esquecida?"
 
 #: templates/allauth/account/logout.html:7
 #: templates/allauth/account/logout.html:10
 #: templates/allauth/account/logout.html:19
 msgid "Sign Out"
-msgstr ""
+msgstr "Sair"
 
 #: templates/allauth/account/logout.html:12
 msgid "Are you sure you want to sign out?"
-msgstr ""
+msgstr "Tem certeza que deseja sair?"
 
 #: templates/allauth/account/messages/cannot_delete_primary_email.txt:2
 #, python-format
 msgid "You cannot remove your primary e-mail address (%(email)s)."
-msgstr ""
+msgstr "Não pode remover o seu endereço de e-mail principal (%(email)s)."
 
 #: templates/allauth/account/messages/email_confirmation_sent.txt:2
 #, python-format
 msgid "Confirmation e-mail sent to %(email)s."
-msgstr ""
+msgstr "Confirmação de e-mail enviado para %(email)s."
 
 #: templates/allauth/account/messages/email_confirmed.txt:2
 #, python-format
 msgid "You have confirmed %(email)s."
-msgstr ""
+msgstr "Confirmou %(email)s."
 
 #: templates/allauth/account/messages/email_deleted.txt:2
 #, python-format
 msgid "Removed e-mail address %(email)s."
-msgstr ""
+msgstr "Removido endereço de e-mail %(email)s."
 
 #: templates/allauth/account/messages/logged_in.txt:4
 #, python-format
 msgid "Successfully signed in as %(name)s."
-msgstr ""
+msgstr "Login com êxito como %(name)s."
 
 #: templates/allauth/account/messages/logged_out.txt:2
 msgid "You have signed out."
-msgstr ""
+msgstr "Você saiu."
 
 #: templates/allauth/account/messages/password_changed.txt:2
 msgid "Password successfully changed."
-msgstr ""
+msgstr "Senha mudada com sucesso."
 
 #: templates/allauth/account/messages/password_set.txt:2
 msgid "Password successfully set."
-msgstr ""
+msgstr "Senha definida com sucesso."
 
 #: templates/allauth/account/messages/primary_email_set.txt:2
 msgid "Primary e-mail address set."
-msgstr ""
+msgstr "Endereço de e-mail primário definido."
 
 #: templates/allauth/account/messages/unverified_primary_email.txt:2
 msgid "Your primary e-mail address must be verified."
-msgstr ""
+msgstr "O seu endereço de e-mail principal deve ser verificado."
 
 #: templates/allauth/account/password_change.html:6
 #: templates/allauth/account/password_reset_from_key.html:4
@@ -1273,47 +1274,47 @@ msgstr ""
 #: templates/allauth/account/password_reset_from_key_done.html:4
 #: templates/allauth/account/password_reset_from_key_done.html:7
 msgid "Change Password"
-msgstr ""
+msgstr "Mudar Senha"
 
 #: templates/allauth/account/password_change.html:13
 msgid "Change your password"
-msgstr ""
+msgstr "Mudar a sua senha"
 
 #: templates/allauth/account/password_change.html:18
 msgid "Current password"
-msgstr ""
+msgstr "Senha actual"
 
 #: templates/allauth/account/password_change.html:24
 msgid "Enter a new password"
-msgstr ""
+msgstr "Insira uma nova senha"
 
 #: templates/allauth/account/password_change.html:30
 msgid "Confirm the new password"
-msgstr ""
+msgstr "Confirmar a nova senha"
 
 #: templates/allauth/account/password_reset.html:7
 #: templates/allauth/account/password_reset_done.html:6
 #: templates/allauth/account/password_reset_done.html:9
 msgid "Password Reset"
-msgstr ""
+msgstr "Redefinir Senha"
 
 #: templates/allauth/account/password_reset.html:13
 msgid "Reset your password"
-msgstr ""
+msgstr "Redefinir a sua senha"
 
 #: templates/allauth/account/password_reset.html:22
 msgid "Enter email"
-msgstr ""
+msgstr "Digitar endereço de e-mail"
 
 #: templates/allauth/account/password_reset_done.html:15
 msgid ""
 "We have sent you an e-mail. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr ""
+msgstr "Enviamos um e-mail. Por favor entrar em contacto connosco se não o receber dentro de alguns minutos."
 
 #: templates/allauth/account/password_reset_from_key.html:7
 msgid "Bad Token"
-msgstr ""
+msgstr "Bad Token"
 
 #: templates/allauth/account/password_reset_from_key.html:11
 #, python-format
@@ -1321,123 +1322,123 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a <a href=\"%(passwd_reset_url)s\">new password "
 "reset</a>."
-msgstr ""
+msgstr "O link de redefinição de senha era inválido, possivelmente porque já foi utilizado. Solicitar um <a href=\"%(passwd_reset_url)s\">new password reset</a>."
 
 #: templates/allauth/account/password_reset_from_key.html:17
 msgid "change password"
-msgstr ""
+msgstr "Mudar a senha"
 
 #: templates/allauth/account/password_reset_from_key.html:20
 #: templates/allauth/account/password_reset_from_key_done.html:8
 msgid "Your password is now changed."
-msgstr "Votre mot de passe a été changé."
+msgstr "A sua senha é alterada."
 
 #: templates/allauth/account/password_set.html:5
 #: templates/allauth/account/password_set.html:8
 #: templates/allauth/account/password_set.html:13
 msgid "Set Password"
-msgstr ""
+msgstr "Configurar a senha"
 
 #: templates/allauth/account/signup.html:30
 msgid "Register for a free account"
-msgstr ""
+msgstr "Cadastre-se para criar uma conta gratuita"
 
 #: templates/allauth/account/signup.html:73
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
-msgstr ""
+msgstr "Já tem uma conta? <a href=\"%(login_url)s\">Sign in</a>"
 
 #: templates/allauth/account/signup_closed.html:5
 #: templates/allauth/account/signup_closed.html:8
 msgid "Sign Up Closed"
-msgstr ""
+msgstr "Registar-se fechado"
 
 #: templates/allauth/account/signup_closed.html:10
 msgid "We are sorry, but the sign up is currently closed."
-msgstr ""
+msgstr "Lamentamos, mas o registo está actualmente fechado."
 
 #: templates/allauth/account/snippets/already_logged_in.html:5
 #, python-format
 msgid "You are currently logged in as <strong>%(user_display)s</strong>."
-msgstr ""
+msgstr "Está registado como <strong>%(user_display)s</ strong>."
 
 #: templates/allauth/account/verification_sent.html:5
 #: templates/allauth/account/verification_sent.html:8
 #: templates/allauth/account/verified_email_required.html:5
 #: templates/allauth/account/verified_email_required.html:8
 msgid "Verify Your E-mail Address"
-msgstr ""
+msgstr "Verificar o seu endereço de e-mail"
 
 #: templates/allauth/account/verification_sent.html:10
 msgid ""
 "We have sent an e-mail to you for verification. Follow the link provided to "
 "finalize the signup process. Please contact us if you do not receive it "
 "within a few minutes."
-msgstr ""
+msgstr "Enviamos um e-mail para a sua verificação. Siga o link fornecido para finalizar o processo de registo. Por favor, entre em contacto connosco se não o receber dentro de alguns minutos."
 
 #: templates/allauth/account/verified_email_required.html:12
 msgid ""
 "This part of the site requires us to verify that\n"
 "you are who you claim to be. For this purpose, we require that you\n"
 "verify ownership of your e-mail address. "
-msgstr ""
+msgstr "Esta parte do site nos obriga a verificar que\nvocê é quem você diz ser. Para este efeito, é necessário que você\n verifica a propriedade do seu endereço de e-mail."
 
 #: templates/allauth/account/verified_email_required.html:16
 msgid ""
 "We have sent an e-mail to you for\n"
 "verification. Please click on the link inside this e-mail. Please\n"
 "contact us if you do not receive it within a few minutes."
-msgstr ""
+msgstr "Enviamos um e-mail para a sua\n verificação. Por favor, clique no link dentro deste e-mail. Por favor\n entre em contacto connosco se não o receber dentro de alguns minutos."
 
 #: templates/allauth/account/verified_email_required.html:20
 #, python-format
 msgid ""
 "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your "
 "e-mail address</a>."
-msgstr ""
+msgstr "<Strong>Nota: </strong> Ainda pode <a href=\"%(email_url)s\">mudar o seu endereço de e-mail</a>."
 
 #: templates/allauth/openid/login.html:9
 msgid "OpenID Sign In"
-msgstr ""
+msgstr "OpenID Login"
 
 #: templates/allauth/shopify/login.html:9
 msgid "Shopify Sign In"
-msgstr ""
+msgstr "Shopify Login"
 
 #: templates/allauth/socialaccount/authentication_error.html:5
 #: templates/allauth/socialaccount/authentication_error.html:8
 msgid "Social Network Login Failure"
-msgstr ""
+msgstr "Login através da rede social falhado"
 
 #: templates/allauth/socialaccount/authentication_error.html:10
 msgid ""
 "An error occurred while attempting to login via your social network account."
-msgstr ""
+msgstr "Ocorreu um erro ao tentar entrar através da sua conta de rede social."
 
 #: templates/allauth/socialaccount/connections.html:5
 #: templates/allauth/socialaccount/connections.html:8
 msgid "Account Connections"
-msgstr ""
+msgstr "Conexões da conta"
 
 #: templates/allauth/socialaccount/connections.html:11
 msgid ""
 "You can sign in to your account using any of the following third party "
 "accounts:"
-msgstr ""
+msgstr "Pode fazer login na sua conta usando qualquer uma das seguintes contas de terceiros:"
 
 #: templates/allauth/socialaccount/connections.html:43
 msgid ""
 "You currently have no social network accounts connected to this account."
-msgstr ""
+msgstr "Actualmente não tem contas de redes sociais ligadas a esta conta."
 
 #: templates/allauth/socialaccount/connections.html:46
 msgid "Add a 3rd Party Account"
-msgstr ""
+msgstr "Adicionar uma conta de terceiro "
 
 #: templates/allauth/socialaccount/login_cancelled.html:5
 #: templates/allauth/socialaccount/login_cancelled.html:9
 msgid "Login Cancelled"
-msgstr ""
+msgstr "Login Cancelado"
 
 #: templates/allauth/socialaccount/login_cancelled.html:13
 #, python-format
@@ -1445,47 +1446,47 @@ msgid ""
 "You decided to cancel logging in to our site using one of your existing "
 "accounts. If this was a mistake, please proceed to <a "
 "href=\"%(login_url)s\">sign in</a>."
-msgstr ""
+msgstr "Decidiu cancelar o login no nosso site usando uma de suas contas existentes. Se foi um erro, proceder para <a href=\"%(login_url)s\">sign in</a>."
 
 #: templates/allauth/socialaccount/messages/account_connected.txt:2
 msgid "The social account has been connected."
-msgstr ""
+msgstr "A conta social foi conectada."
 
 #: templates/allauth/socialaccount/messages/account_connected_other.txt:2
 msgid "The social account is already connected to a different account."
-msgstr ""
+msgstr "A conta social já está conectada a uma conta diferente."
 
 #: templates/allauth/socialaccount/messages/account_disconnected.txt:2
 msgid "The social account has been disconnected."
-msgstr ""
+msgstr "A conta social foi desconectada."
 
 #: templates/allauth/socialaccount/signup.html:5
 msgid "Signup"
-msgstr ""
+msgstr "Inscrever-se"
 
 #: templates/allauth/socialaccount/signup.html:8
 #: templates/allauth/socialaccount/signup.html:19
 msgid "Sign Up"
-msgstr ""
+msgstr "Inscrever-se"
 
 #: templates/allauth/socialaccount/signup.html:10
 #, python-format
 msgid ""
 "You are about to use your %(provider_name)s account to login to\n"
 "%(site_name)s. As a final step, please complete the following form:"
-msgstr ""
+msgstr "Está prestes a usar a sua conta %(provider_name)s para acessar\n%(site_name)s. Como etapa final, por favor preencha o seguinte formulário:"
 
 #: templates/core/base.html:52
 msgid "Edit profile"
-msgstr ""
+msgstr "Editar perfil"
 
 #: templates/core/base.html:56
 msgid "Logout"
-msgstr ""
+msgstr "Sair"
 
 #: templates/core/base.html:64
 msgid "Sign in"
-msgstr ""
+msgstr "Login"
 
 #: templates/core/base.html:77 templates/core/base.html:99
 #: templates/organization/organization_dashboard.html:17
@@ -1494,75 +1495,75 @@ msgstr ""
 #: templates/organization/project_list.html:7
 #: templates/organization/project_list.html:15
 msgid "Projects"
-msgstr "Projets"
+msgstr "Projectos"
 
 #: templates/core/base.html:82 templates/core/base.html:100
 #: templates/organization/organization_list.html:8
 #: templates/organization/organization_list.html:16
 #: templates/organization/user_list.html:36
 msgid "Organizations"
-msgstr "Organisations"
+msgstr "Organizações"
 
 #: templates/core/base.html:88 templates/core/base.html:101
 #: templates/organization/user_list.html:7
 #: templates/organization/user_list.html:15
 msgid "Users"
-msgstr ""
+msgstr "Usuários"
 
 #: templates/core/base.html:103
 msgid "Information"
-msgstr ""
+msgstr "Informação "
 
 #: templates/core/base.html:136
 msgid "Copyright"
-msgstr ""
+msgstr "Direitos autorais"
 
 #: templates/core/base.html:136
 msgid "Cadasta. All Rights Reserved."
-msgstr ""
+msgstr "Cadasta. Todos os direitos reservados."
 
 #: templates/core/base.html:156
 msgid "About Us"
-msgstr ""
+msgstr "Sobre nós"
 
 #: templates/core/base.html:161
 msgid "Privacy"
-msgstr ""
+msgstr "Privacidade"
 
 #: templates/core/base.html:166
 msgid "Terms of Use"
-msgstr ""
+msgstr "Termos de Uso"
 
 #: templates/core/base.html:171
 msgid "Code of Conduct"
-msgstr ""
+msgstr "Código de Conduta"
 
 #: templates/core/base.html:176
 msgid "Visit us on Github"
-msgstr ""
+msgstr "Visite-nos no Github"
 
 #: templates/core/dashboard.html:38
 msgid "Open project"
-msgstr "Ouvrir projet"
+msgstr "Abrir Projecto"
 
 #: templates/organization/email/org_invite.txt:2
 #, python-format
 msgid ""
 "You're receiving this email because you have been added to %(organization)s "
 "on %(site_name)s."
-msgstr ""
+msgstr "Está a receber este e-mail porque foi adicionado à %(organization)s em %(site_name)s."
 
 #: templates/organization/email/org_invite.txt:4
 msgid "Did you not want to be added to this organization, click here:"
-msgstr ""
+msgstr "Será que você não quer ser adicionado a esta organização, clique aqui:"
 
 #: templates/organization/organization_add.html:5
 msgid "Add new organization"
-msgstr ""
+msgstr "Adicionar organização nova"
 
 #: templates/organization/organization_add.html:19
 msgid "Add organization"
-msgstr ""
+msgstr "Adicionar organização"
 
 #: templates/organization/organization_add.html:26
 #: templates/organization/organization_edit.html:27
@@ -1575,7 +1576,7 @@ msgstr ""
 #: templates/spatial/location_form.html:39
 #: templates/spatial/relationship_add.html:115
 msgid "Save"
-msgstr ""
+msgstr "Salvar"
 
 #: templates/organization/organization_add.html:29
 #: templates/organization/organization_dashboard.html:131
@@ -1597,110 +1598,110 @@ msgstr ""
 #: templates/spatial/location_form.html:40
 #: templates/spatial/relationship_add.html:119
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: templates/organization/organization_dashboard.html:15
 msgid "Organization Overview"
-msgstr ""
+msgstr "Organização Overview"
 
 #: templates/organization/organization_dashboard.html:23
 #: templates/organization/project_list.html:36
 msgid "Project"
-msgstr "Projet"
+msgstr "Projecto"
 
 #: templates/organization/organization_dashboard.html:24
 #: templates/organization/project_list.html:38
 msgid "Country"
-msgstr ""
+msgstr "País"
 
 #: templates/organization/organization_dashboard.html:25
 #: templates/organization/project_list.html:39
 #: templates/resources/table.html:11 templates/resources/table_add_lib.html:13
 msgid "Last updated"
-msgstr ""
+msgstr "Ultima actualização"
 
 #: templates/organization/organization_dashboard.html:41
 msgid "You're ready to go"
-msgstr ""
+msgstr "Está pronto para continuar"
 
 #: templates/organization/organization_dashboard.html:43
 msgid ""
 "You have successfully created your organization.  You're now ready to add "
 "your first project."
-msgstr ""
+msgstr "Criou com sucesso a sua organização. Está pronto para adicionar o seu primeiro projecto."
 
 #: templates/organization/organization_dashboard.html:47
 msgid "Add a new project"
-msgstr ""
+msgstr "Adicionar um novo projecto"
 
 #: templates/organization/organization_dashboard.html:50
 msgid "Add new members"
-msgstr ""
+msgstr "Adicionar novos membros"
 
 #: templates/organization/organization_dashboard.html:55
 msgid "This organization does not have any public projects."
-msgstr ""
+msgstr "Esta organização não tem nenhum projecto público."
 
 #: templates/organization/organization_dashboard.html:89
 #: templates/organization/organization_members.html:15
 #: templates/organization/organization_wrapper.html:100
 msgid "Members"
-msgstr "Membres"
+msgstr "Membros"
 
 #: templates/organization/organization_dashboard.html:99
 msgid "View all"
-msgstr ""
+msgstr "Ver tudo"
 
 #: templates/organization/organization_dashboard.html:121
 #: templates/organization/organization_wrapper.html:37
 msgid "Archive organization"
-msgstr ""
+msgstr "Arquivar organização "
 
 #: templates/organization/organization_dashboard.html:124
 msgid "Are you sure you want to archive this organization?"
-msgstr ""
+msgstr "Tem certeza de que deseja arquivar esta organização?"
 
 #: templates/organization/organization_dashboard.html:128
 msgid "Yes, archive this organization"
-msgstr ""
+msgstr "Sim, arquivar esta organização"
 
 #: templates/organization/organization_dashboard.html:145
 #: templates/organization/organization_wrapper.html:35
 msgid "Unarchive organization"
-msgstr ""
+msgstr "Desarquivar organização "
 
 #: templates/organization/organization_dashboard.html:149
 msgid "Are you sure you want to unarchive this organization?"
-msgstr ""
+msgstr "Tem certeza de que deseja desarquivar esta organização?"
 
 #: templates/organization/organization_dashboard.html:154
 msgid "Yes, unarchive this organization"
-msgstr ""
+msgstr "Sim, desarquivar esta organização"
 
 #: templates/organization/organization_edit.html:6
 msgid "Edit"
-msgstr ""
+msgstr "Editar"
 
 #: templates/organization/organization_edit.html:20
 #: templates/organization/organization_wrapper.html:31
 msgid "Edit organization"
-msgstr ""
+msgstr "Editar organização"
 
 #: templates/organization/organization_form.html:11
 msgid "Organization name"
-msgstr ""
+msgstr "Nome da organização"
 
 #: templates/organization/organization_form.html:23
 msgid "Organization description"
-msgstr ""
+msgstr "Descrição da organização"
 
 #: templates/organization/organization_form.html:29
 msgid "Organization URL"
-msgstr ""
+msgstr "URL da organização"
 
 #: templates/organization/organization_form.html:34
 msgid "Contacts"
-msgstr ""
+msgstr "Contactos"
 
 #: templates/organization/organization_list.html:19
 #: templates/organization/organization_members.html:18
@@ -1712,87 +1713,87 @@ msgstr ""
 #: templates/spatial/location_detail.html:60
 #: templates/spatial/location_detail.html:98
 msgid "Add"
-msgstr ""
+msgstr "Adicionar"
 
 #: templates/organization/organization_list.html:35
 #: templates/organization/project_list.html:37
 msgid "Organization"
-msgstr "Organisation"
+msgstr "Organização"
 
 #: templates/organization/organization_wrapper.html:48
 #: templates/organization/organization_wrapper.html:66
 msgid "Add project"
-msgstr ""
+msgstr "Adicionar projecto"
 
 #: templates/organization/organization_wrapper.html:55
 #: templates/organization/organization_wrapper.html:69
 msgid "Add org member"
-msgstr ""
+msgstr "Adicionar membro da organização "
 
 #: templates/organization/organization_wrapper.html:88
 #: templates/organization/project_wrapper.html:95
 #: templates/party/resources_list.html:16
 #: templates/spatial/location_detail.html:29
 msgid "Overview"
-msgstr ""
+msgstr "Visão geral"
 
 #: templates/organization/organization_wrapper.html:106
 #: templates/organization/project_wrapper.html:113
 msgid "Reports"
-msgstr ""
+msgstr "Relatórios"
 
 #: templates/organization/organization_wrapper.html:112
 #: templates/organization/project_wrapper.html:119
 msgid "Activity"
-msgstr ""
+msgstr "Actividade"
 
 #: templates/organization/project_add_details.html:34
 msgid "1. General Information"
-msgstr ""
+msgstr "1. Informações Gerais"
 
 #: templates/organization/project_add_details.html:57
 msgid "Select organization"
-msgstr ""
+msgstr "Selecionar organização"
 
 #: templates/organization/project_add_details.html:78
 #: templates/organization/project_edit_details.html:36
 msgid "Project name"
-msgstr "Nom de projet"
+msgstr "Nome do Projecto"
 
 #: templates/organization/project_add_details.html:94
 #: templates/organization/project_edit_details.html:46
 msgid "Project description"
-msgstr ""
+msgstr "Descrição do projecto"
 
 #: templates/organization/project_add_details.html:100
 #: templates/organization/project_edit_details.html:52
 msgid "Project URL"
-msgstr ""
+msgstr "URL do projecto"
 
 #: templates/organization/project_add_details.html:111
 #: templates/organization/project_edit_details.html:63
 msgid "Select the questionnaire file to use for this project"
-msgstr ""
+msgstr "Selecionar o ficheiro de questionário a ser usado para este projecto"
 
 #: templates/organization/project_add_details.html:133
 #: templates/organization/project_add_extents.html:67
 msgid "Next"
-msgstr ""
+msgstr "Próximo"
 
 #: templates/organization/project_add_details.html:138
 #: templates/organization/project_add_permissions.html:63
 msgid "Previous"
-msgstr ""
+msgstr "Anterior"
 
 #: templates/organization/project_add_extents.html:53
 msgid "Draw project on map"
-msgstr ""
+msgstr "Desenhar projecto no mapa"
 
 #: templates/organization/project_add_extents.html:56
 msgid ""
 "Use the tools provided on the left side of the map to outline your new "
 "project boundary. Once complete, select the save button below."
-msgstr ""
+msgstr "Use as ferramentas fornecidas no lado esquerdo do mapa para delinear o limite do seu novo projecto. Uma vez completo, selecione o botão salvar abaixo."
 
 #: templates/organization/project_add_extents.html:61
 #: templates/organization/project_edit_geometry.html:53
@@ -1800,11 +1801,11 @@ msgid ""
 "We encourage you to mark the area in which your project takes place (if your"
 " project doesn't include the entire world). This makes interactions simpler "
 "and also helps other users to find your project."
-msgstr ""
+msgstr "Encorajamos a marcação da área em que o seu projecto está sendo implementado (se o projecto não inclui o mundo inteiro). Isso faz com que as interações sejam mais simples e também ajuda outros usuários a encontrar o seu projecto."
 
 #: templates/organization/project_add_permissions.html:15
 msgid "Assign permissions to members"
-msgstr ""
+msgstr "Atribuir permissões para os membros"
 
 #: templates/organization/project_add_permissions.html:19
 msgid ""
@@ -1812,49 +1813,49 @@ msgid ""
 "      Not able to find a member?  Organization administrators must first\n"
 "      invite users to join your organization before permissions can be assigned.\n"
 "      "
-msgstr ""
+msgstr "\nNão é capaz de encontrar um membro? Administradores da organização deve primeiro\n convidar usuários para participar na sua organização antes de permissões podem ser atribuídas."
 
 #: templates/organization/project_add_permissions.html:40
 #: templates/organization/project_edit_permissions.html:30
 msgid "Email address"
-msgstr ""
+msgstr "Endereço de e-mail"
 
 #: templates/organization/project_add_permissions.html:41
 #: templates/organization/project_edit_permissions.html:31
 msgid "Permissions"
-msgstr "Droits d'accès"
+msgstr "Permissões"
 
 #: templates/organization/project_add_permissions.html:58
 msgid "Finish"
-msgstr ""
+msgstr "Terminar"
 
 #: templates/organization/project_add_wrapper.html:22
 msgid "Draw Map"
-msgstr ""
+msgstr "Desenhar Mapa"
 
 #: templates/organization/project_add_wrapper.html:23
 msgid "Mark project boundary"
-msgstr ""
+msgstr "Marcar limites do projecto"
 
 #: templates/organization/project_add_wrapper.html:31
 msgid "Add Details"
-msgstr "Ajouter detailles"
+msgstr "Adicionar detalhes"
 
 #: templates/organization/project_add_wrapper.html:32
 msgid "Enter basic info"
-msgstr ""
+msgstr "Insirir informações básicas"
 
 #: templates/organization/project_add_wrapper.html:40
 msgid "Assign Team"
-msgstr ""
+msgstr "Atribuir Equipe"
 
 #: templates/organization/project_add_wrapper.html:41
 msgid "Assign permissions"
-msgstr ""
+msgstr "Atribuir permissões"
 
 #: templates/organization/project_add_wrapper.html:47
 msgid "Add new project"
-msgstr "Ajouter nouveau projet"
+msgstr "Adicionar novo projecto"
 
 #: templates/organization/project_dashboard.html:22
 #: templates/spatial/location_add.html:36
@@ -1862,11 +1863,11 @@ msgstr "Ajouter nouveau projet"
 #: templates/spatial/location_map.html:23
 #: templates/spatial/location_wrapper.html:26
 msgid "Open location"
-msgstr ""
+msgstr "Abrir localização"
 
 #: templates/organization/project_dashboard.html:72
 msgid "Project stats"
-msgstr ""
+msgstr "Estatísticas de projecto"
 
 #: templates/organization/project_dashboard.html:75
 #, python-format
@@ -1878,8 +1879,8 @@ msgid_plural ""
 "\n"
 "              <div class=\"num\">%(counter)s</div> locations\n"
 "              "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n<div class = \"num\"> %(counter)s </ div> localizacao"
+msgstr[1] "\n<div class = \"num\"> %(counter)s </ div> localizacaoes"
 
 #: templates/organization/project_dashboard.html:82
 #, python-format
@@ -1891,8 +1892,8 @@ msgid_plural ""
 "\n"
 "              <div class=\"num\">%(counter)s</div> parties\n"
 "              "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n<div class=\"num\">%(counter)s</div> parte"
+msgstr[1] "\n<div class=\"num\">%(counter)s</div> partes"
 
 #: templates/organization/project_dashboard.html:89
 #, python-format
@@ -1904,46 +1905,46 @@ msgid_plural ""
 "\n"
 "              <div class=\"num\">%(counter)s</div> resources\n"
 "              "
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "\n              <div class=\"num\">%(counter)s</div> recurso\n              "
+msgstr[1] "\n              <div class=\"num\">%(counter)s</div> recursos\n              "
 
 #: templates/organization/project_dashboard.html:98
 msgid "Congratulations!"
-msgstr ""
+msgstr "Parabéns!"
 
 #: templates/organization/project_dashboard.html:99
 msgid ""
 "You have successfully created your project.  You're now ready to add your "
 "first location."
-msgstr ""
+msgstr "Criou com sucesso o seu projecto. Está pronto para adicionar a sua primeira localização."
 
 #: templates/organization/project_dashboard.html:103
 msgid "Add a location"
-msgstr ""
+msgstr "Adicionar uma localização"
 
 #: templates/organization/project_download.html:12
 msgid "Download project data"
-msgstr ""
+msgstr "Baixar dados do projecto"
 
 #: templates/organization/project_download.html:20
 msgid "SHP"
-msgstr ""
+msgstr "SHP"
 
 #: templates/organization/project_download.html:21
 msgid ""
 "A ZIP containing shape files for project locations, relationships, and "
 "parties."
-msgstr ""
+msgstr "Um arquivo (ZIP) contendo os shapefiles (SHP) para localizações de projectos, relacionamentos e partes."
 
 #: templates/organization/project_download.html:27
 msgid "XLS"
-msgstr ""
+msgstr "XLS"
 
 #: templates/organization/project_download.html:28
 msgid ""
 "A single XLS spreadsheet containing project locations, relationships, and "
 "parties."
-msgstr ""
+msgstr "Uma única folha de cálculo (XLS) contendo localizações de projectos, relacionamentos e partes."
 
 #: templates/organization/project_download.html:34
 #: templates/organization/project_wrapper.html:107
@@ -1953,399 +1954,399 @@ msgstr ""
 #: templates/resources/project_list.html:14
 #: templates/spatial/location_detail.html:31
 msgid "Resources"
-msgstr ""
+msgstr "Recursos"
 
 #: templates/organization/project_download.html:35
 msgid "A zip file containing all resources."
-msgstr ""
+msgstr "Um arquivo (ZIP) contendo todos os recursos."
 
 #: templates/organization/project_download.html:41
 msgid "All data"
-msgstr ""
+msgstr "Todos os dados"
 
 #: templates/organization/project_download.html:42
 msgid ""
 "A zip file containing all project data XLS and SHP files and all resources."
-msgstr ""
+msgstr "Um arquivo (ZIP) contendo todos os ficheiros de dados (XLS) e shapefiles (SHP) do projecto e todos os recursos."
 
 #: templates/organization/project_download.html:49
 msgid "Download"
-msgstr ""
+msgstr "Baixar"
 
 #: templates/organization/project_edit_details.html:22
 #: templates/organization/project_wrapper.html:33
 msgid "Edit project details"
-msgstr ""
+msgstr "Editar detalhes do projecto"
 
 #: templates/organization/project_edit_details.html:25
 msgid "1. General information"
-msgstr ""
+msgstr "1. Informações gerais"
 
 #: templates/organization/project_edit_details.html:59
 msgid "2. Questionnaire"
-msgstr ""
+msgstr "2. Questionário"
 
 #: templates/organization/project_edit_details.html:71
 msgid "3. Contacts"
-msgstr ""
+msgstr "3. Contactos"
 
 #: templates/organization/project_edit_geometry.html:44
 #: templates/organization/project_wrapper.html:32
 msgid "Edit project boundary"
-msgstr ""
+msgstr "Editar limites do projecto"
 
 #: templates/organization/project_edit_geometry.html:48
 msgid ""
 "Use the tools provided on the left side of the map to update your project "
 "boundary. Once complete, select the save button below."
-msgstr ""
+msgstr "Use as ferramentas fornecidas no lado esquerdo do mapa para actualizar o seu limite do projecto. Uma vez completo, selecione o botão salvar abaixo."
 
 #: templates/organization/project_edit_permissions.html:23
 #: templates/organization/project_wrapper.html:34
 msgid "Edit member permissions"
-msgstr ""
+msgstr "Editar permissões de membro"
 
 #: templates/organization/project_wrapper.html:36
 msgid "Download data"
-msgstr ""
+msgstr "Baixar dados"
 
 #: templates/organization/project_wrapper.html:41
 #: templates/organization/project_wrapper.html:164
 msgid "Unarchive project"
-msgstr ""
+msgstr "Desarquivar projecto "
 
 #: templates/organization/project_wrapper.html:43
 #: templates/organization/project_wrapper.html:140
 msgid "Archive project"
-msgstr ""
+msgstr "Arquivar projecto "
 
 #: templates/organization/project_wrapper.html:53
 #: templates/organization/project_wrapper.html:73
 msgid "Add location"
-msgstr ""
+msgstr "Adicionar localização "
 
 #: templates/organization/project_wrapper.html:57
 msgid "Toggle add"
-msgstr ""
+msgstr "Alternar add"
 
 #: templates/organization/project_wrapper.html:61
 #: templates/organization/project_wrapper.html:75
 #: templates/spatial/location_detail.html:85
 msgid "Add relationship"
-msgstr ""
+msgstr "Adicionar relacionamento"
 
 #: templates/organization/project_wrapper.html:62
 #: templates/organization/project_wrapper.html:76
 #: templates/spatial/location_detail.html:110
 msgid "Add resource"
-msgstr ""
+msgstr "Adicionar recurso"
 
 #: templates/organization/project_wrapper.html:64
 #: templates/organization/project_wrapper.html:78
 msgid "Import data"
-msgstr ""
+msgstr "Importar dados"
 
 #: templates/organization/project_wrapper.html:101
 msgid "Map"
-msgstr ""
+msgstr "Mapa"
 
 #: templates/organization/project_wrapper.html:143
 msgid "Are you sure you want to archive this project?"
-msgstr ""
+msgstr "Tem certeza de que deseja arquivar este projecto?"
 
 #: templates/organization/project_wrapper.html:147
 msgid "Yes, archive this project"
-msgstr ""
+msgstr "Sim, arquivar este projecto"
 
 #: templates/organization/project_wrapper.html:168
 msgid "Are you sure you want to unarchive this project?"
-msgstr ""
+msgstr "Tem certeza de que deseja desarquivar este projecto?"
 
 #: templates/organization/project_wrapper.html:173
 msgid "Yes, unarchive this project"
-msgstr ""
+msgstr "Sim, desarquivar este projecto"
 
 #: templates/organization/user_list.html:39
 msgid "Last login"
-msgstr ""
+msgstr "Último login"
 
 #: templates/organization/user_list.html:45
 msgid "disabled,active"
-msgstr ""
+msgstr "Desactivado, activa"
 
 #: templates/organization/user_list.html:54
 msgid "btn-danger,btn-default"
-msgstr ""
+msgstr "btn-danger, btn-default"
 
 #: templates/organization/user_list.html:55
 msgid "Deactivate,Activate"
-msgstr ""
+msgstr "Desactivar, Activar"
 
 #: templates/party/party_delete.html:13 templates/party/party_detail.html:23
 msgid "Delete party"
-msgstr ""
+msgstr "Remover parte"
 
 #: templates/party/party_delete.html:17
 msgid "Are you sure you want to delete this party?"
-msgstr ""
+msgstr "Tem certeza de que deseja remover esta parte?"
 
 #: templates/party/party_delete.html:21
 msgid "Yes, delete this party"
-msgstr ""
+msgstr "Sim, remover esta parte"
 
 #: templates/party/party_detail.html:13
 msgid "Party detail"
-msgstr ""
+msgstr "Detalhes de parte"
 
 #: templates/party/party_detail.html:21 templates/party/party_edit.html:15
 msgid "Edit party"
-msgstr ""
+msgstr "Editar parte"
 
 #: templates/party/party_detail.html:31
 #: templates/party/relationship_detail.html:26
 msgid "Details"
-msgstr ""
+msgstr "Detalhes"
 
 #: templates/party/party_detail.html:65
 msgid ""
 "This party does not have any connected resources. To add a resource, select "
 "the button below."
-msgstr ""
+msgstr "Esta parte não tem quaisquer recursos relacionados. Para adicionar um recurso, selecione o botão abaixo."
 
 #: templates/party/party_form.html:12 templates/party/party_list.html:18
 #: templates/party/relationship_detail.html:29
 #: templates/resources/table.html:8 templates/resources/table_add_lib.html:10
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: templates/party/party_list.html:10
 msgid "Parties"
-msgstr ""
+msgstr "Partes"
 
 #: templates/party/relationship_delete.html:12
 #: templates/party/relationship_detail.html:19
 msgid "Delete relationship"
-msgstr ""
+msgstr "Remover relacionamento"
 
 #: templates/party/relationship_delete.html:15
 msgid "Are you sure you want to delete this relationship?"
-msgstr ""
+msgstr "Tem certeza de que deseja remover este relacionamento?"
 
 #: templates/party/relationship_delete.html:18
 msgid "Yes, delete this relationship"
-msgstr ""
+msgstr "Sim, remover este relacionamento"
 
 #: templates/party/relationship_detail.html:9
 #: templates/spatial/location_detail.html:66
 msgid "Relationship"
-msgstr ""
+msgstr "Relacionamento"
 
 #: templates/party/relationship_detail.html:17
 msgid "Edit relationship"
-msgstr ""
+msgstr "Editar relacionamento "
 
 #: templates/party/relationship_detail.html:33
 #: templates/spatial/location_detail.html:67
 msgid "Party"
-msgstr ""
+msgstr "Parte"
 
 #: templates/party/relationship_detail.html:55
 msgid ""
 "This relationship does not have any connected resources. To add a resource, "
 "select the button below."
-msgstr ""
+msgstr "Este relacionamento não tem quaisquer recursos relacionados. Para adicionar um recurso, selecione o botão abaixo."
 
 #: templates/party/relationship_edit.html:8
 msgid "Edit Relationship"
-msgstr ""
+msgstr "Editar Relacionamento"
 
 #: templates/party/relationship_edit.html:15
 msgid "Relationship type"
-msgstr ""
+msgstr "Tipo de relacionamento"
 
 #: templates/party/resources_list.html:10
 msgid "Party resources"
-msgstr ""
+msgstr "Recursos de parte"
 
 #: templates/party/resources_list.html:17
 #: templates/spatial/location_detail.html:30
 msgid "Relationships"
-msgstr ""
+msgstr "Relacionamentos"
 
 #: templates/party/resources_list.html:23
 #: templates/resources/modal_add_lib.html:14
 #: templates/resources/modal_upload.html:15
 msgid "Add from library"
-msgstr ""
+msgstr "Adicionar da biblioteca"
 
 #: templates/party/resources_list.html:24
 #: templates/resources/modal_upload.html:12
 msgid "Upload new resource"
-msgstr ""
+msgstr "Carregar novo recurso"
 
 #: templates/resources/edit.html:19
 msgid "Resources: Edit"
-msgstr ""
+msgstr "Recursos: Editar"
 
 #: templates/resources/form.html:8
 msgid "Select the file to upload"
-msgstr ""
+msgstr "Selecione o ficheiro a ser carregado"
 
 #: templates/resources/form.html:22
 msgid "Description"
-msgstr ""
+msgstr "Descrição"
 
 #: templates/resources/modal_add_lib.html:12
 msgid "Add resource from library"
-msgstr ""
+msgstr "Adicionar recurso da biblioteca"
 
 #: templates/resources/modal_add_lib.html:15
 #: templates/resources/modal_upload.html:16
 msgid "Upload new"
-msgstr ""
+msgstr "Carregar novo"
 
 #: templates/resources/project_detail.html:14
 msgid "Resource detail"
-msgstr ""
+msgstr "Detalhe de recurso"
 
 #: templates/resources/project_detail.html:21
 #, python-format
 msgid "Added on %(date)s by %(user)s"
-msgstr ""
+msgstr "Adicionado em %(date)s por %(user)s"
 
 #: templates/resources/project_detail.html:59
 msgid "Are you sure you want to archive this resource?"
-msgstr ""
+msgstr "Tem certeza de que deseja arquivar este recurso?"
 
 #: templates/resources/project_detail.html:63
 msgid "Yes, archive this resource"
-msgstr ""
+msgstr "Sim, arquivar este recurso"
 
 #: templates/resources/project_detail.html:84
 msgid "Are you sure you want to unarchive this resource?"
-msgstr ""
+msgstr "Tem certeza de que deseja desarquivar este recurso?"
 
 #: templates/resources/project_detail.html:89
 msgid "Yes, unarchive this resource"
-msgstr ""
+msgstr "Sim, desarquivar este recurso"
 
 #: templates/resources/table.html:7 templates/resources/table_add_lib.html:9
 #: templates/resources/table_sm.html:7
 msgid "Resource"
-msgstr ""
+msgstr "Recurso"
 
 #: templates/resources/table.html:9 templates/resources/table_add_lib.html:11
 #: templates/resources/table_sm.html:8
 msgid "Connections"
-msgstr ""
+msgstr "Ligações"
 
 #: templates/resources/table.html:10 templates/resources/table_add_lib.html:12
 msgid "Contributor"
-msgstr ""
+msgstr "Contribuinte"
 
 #: templates/spatial/location_delete.html:16
 #: templates/spatial/location_detail.html:22
 msgid "Delete location"
-msgstr ""
+msgstr "Remover localização"
 
 #: templates/spatial/location_delete.html:19
 msgid "Are you sure you want to delete this location?"
-msgstr ""
+msgstr "Tem certeza de que deseja remover esta localização?"
 
 #: templates/spatial/location_delete.html:22
 msgid "Yes, delete this location"
-msgstr ""
+msgstr "Sim, eliminar esta localização"
 
 #: templates/spatial/location_detail.html:12
 msgid "Location"
-msgstr ""
+msgstr "Localização"
 
 #: templates/spatial/location_detail.html:20
 msgid "Edit location"
-msgstr ""
+msgstr "Editar localização"
 
 #: templates/spatial/location_detail.html:81
 msgid ""
 "This location does not have any relationships and is not connected to any "
 "parties. To add your first relationship, select the button below."
-msgstr ""
+msgstr "Esta localização não tem qualquer relacionamento e não está ligado a qualquer uma das partes. Para adicionar o seu primeiro relacionamento, selecione o botão abaixo."
 
 #: templates/spatial/location_detail.html:103
 msgid ""
 "This location does not have any connected resources. To add a resource, "
 "select the button below."
-msgstr ""
+msgstr "Esta localização não possui recursos ligados. Para adicionar um recurso, selecione o botão abaixo."
 
 #: templates/spatial/location_form.html:20
 msgid ""
 "1. Use the tools provided on the left side of the map to mark your new "
 "location."
-msgstr ""
+msgstr "1. Use as ferramentas fornecidas no lado esquerdo do mapa para marcar a sua nova localização."
 
 #: templates/spatial/location_form.html:24
 msgid "2. What type of location is this?"
-msgstr ""
+msgstr "2. Que tipo de localização é isto?"
 
 #: templates/spatial/location_wrapper.html:44
 msgid "Currently viewing"
-msgstr ""
+msgstr "Actualmente visualizando"
 
 #: templates/spatial/relationship_add.html:48
 msgid "Add new relationship"
-msgstr ""
+msgstr "Adicionar novo relacionamento"
 
 #: templates/spatial/relationship_add.html:53
 msgid "1. Connected party"
-msgstr ""
+msgstr "1. Parte ligado"
 
 #: templates/spatial/relationship_add.html:56
 msgid "Choose an existing party to connect to this location"
-msgstr ""
+msgstr "Escolha uma parte existente para se conectar a esta localização"
 
 #: templates/spatial/relationship_add.html:61
 msgid "Or add a new party"
-msgstr ""
+msgstr "Ou adicionar uma nova parte"
 
 #: templates/spatial/relationship_add.html:70
 msgid "Party name"
-msgstr ""
+msgstr "Nome da parte"
 
 #: templates/spatial/relationship_add.html:76
 msgid "Party type"
-msgstr ""
+msgstr "Tipo de parte"
 
 #: templates/spatial/relationship_add.html:93
 msgid "2. Relationship details"
-msgstr ""
+msgstr "2. Detalhes do relacionamento"
 
 #: templates/spatial/relationship_add.html:96
 msgid "Tenure Type"
-msgstr ""
+msgstr "Tipo de posse de terra"
 
 #: xforms/mixins/model_helper.py:33
 msgid "Form out of date"
-msgstr ""
+msgstr "Formulário fora de prazo"
 
 #: xforms/mixins/model_helper.py:66
 msgid "Party error: {}"
-msgstr ""
+msgstr "Erro parte: {}"
 
 #: xforms/mixins/model_helper.py:89
 msgid "Location error: {}"
-msgstr ""
+msgstr "Erro localização: {}"
 
 #: xforms/mixins/model_helper.py:104
 msgid "Tenure relationship error: {}"
-msgstr ""
+msgstr "Erro relacionamento de posse de terra: {}"
 
 #: xforms/mixins/model_helper.py:122
 msgid "{}"
-msgstr ""
+msgstr "{}"
 
 #: xforms/mixins/model_helper.py:161
 msgid "Questionnaire not found."
-msgstr ""
+msgstr "Questionário não foi encontrado. "
 
 #: xforms/mixins/model_helper.py:177
 msgid "XML submission not found"
-msgstr ""
+msgstr "Submissão de XML não encontrado"

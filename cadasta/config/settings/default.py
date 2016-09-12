@@ -200,13 +200,13 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 LANGUAGES = [
-    # ('ar', _('Arabic')), hiding until r2l fixed
+    # ('ar', _('Arabic')),    (hiding until RTL support fixed)
     ('en', _('English')),
-    ('fr', _('French')),
-    ('de', _('German')),
-    ('es', _('Spanish')),
+    # ('fr', _('French')),    (hiding until translation coverage >= 75%)
+    # ('de', _('German')),    (hiding until translation coverage >= 75%)
+    # ('es', _('Spanish')),   (hiding until translation coverage >= 75%)
     ('pt', _('Portuguese')),
-    ('sw', _('Swahili')),
+    # ('sw', _('Swahili')),   (hiding until translation coverage >= 75%)
 ]
 
 USE_L10N = True
