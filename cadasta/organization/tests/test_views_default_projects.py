@@ -1,41 +1,49 @@
 import json
 import os
 import os.path
-
 import pytest
 
-from accounts.tests.factories import UserFactory
-from buckets.test.storage import FakeS3Storage
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from django.test import TestCase
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
-from django.contrib.messages.api import get_messages
-from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
-from django.http import Http404, HttpRequest
-from django.template import RequestContext
+from django.http import HttpRequest, Http404
 from django.template.loader import render_to_string
+from django.contrib.messages.storage.fallback import FallbackStorage
+
+from tutelary.models import Policy, Role, assign_user_policies
+from buckets.test.storage import FakeS3Storage
+from skivvy import ViewTestCase
+
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
+from accounts.tests.factories import UserFactory
 from organization.models import OrganizationRole, Project, ProjectRole
-from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.tests.utils import get_form
+from questionnaires.models import Questionnaire
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
-from tutelary.models import Policy, Role, assign_user_policies
 
 from .. import forms
 from ..views import default
 from .factories import OrganizationFactory, ProjectFactory, clause
 
 
-class ProjectListTest(UserTestCase):
+def assign_policies(user):
+    clauses = {
+            'clause': [
+                clause('allow', ['project.*'], ['project/*/*'])
+            ]
+        }
+    policy = Policy.objects.create(name='allow', body=json.dumps(clauses))
+    assign_user_policies(user, policy)
 
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectList.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
 
+class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectList
+    template = 'organization/project_list.html'
+
+    def setup_models(self):
         self.ok_org1 = OrganizationFactory.create(name='OK org 1', slug='org1')
         self.ok_org2 = OrganizationFactory.create(name='OK org 2', slug='org2')
         self.unauth_org = OrganizationFactory.create(
@@ -84,90 +92,82 @@ class ProjectListTest(UserTestCase):
         assigned_policies.append(self.policy)
         self.user.assign_policies(*assigned_policies)
 
-    def _get(self, user=None, status=None, projs=None,
-             make_org_member=None, is_superuser=False):
-        if user is None:
-            user = self.user
-        if projs is None:
-            projs = self.projs
-        if make_org_member is not None:
-            for org in make_org_member:
-                OrganizationRole.objects.create(organization=org, user=user)
-        setattr(self.request, 'user', user)
-        response = self.view(self.request)
-        if status is not None:
-            assert response.status_code == status
-        content = response.render().content.decode('utf-8')
+    @property
+    def sort_key(self):
+        return lambda p: p.organization.slug + ':' + p.slug
 
-        expected = render_to_string(
-            'organization/project_list.html',
-            {'object_list':
-             sorted(projs,
-                    key=lambda p: p.organization.slug + ':' + p.slug),
-             'add_allowed': is_superuser,
-             'user': self.request.user,
-             'is_superuser': is_superuser},
-            request=self.request)
-
-        if expected != content:
-            with open('expected.txt', 'w') as fp:
-                print(expected, file=fp)
-            with open('content.txt', 'w') as fp:
-                print(content, file=fp)
-        assert expected == content
+    def setup_template_context(self):
+        projs = self.projs + self.unauth_projs
+        return {
+            'object_list': sorted(projs, key=self.sort_key),
+            'add_allowed': False,
+            'is_superuser': False
+        }
 
     def test_get_with_valid_user(self):
-        self._get(status=200, projs=self.projs + self.unauth_projs)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_unauthenticated_user(self):
-        self._get(status=200, user=AnonymousUser(),
-                  projs=self.projs + self.unauth_projs)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
         # Slight weirdness here: an unauthorized user can see *more*
         # projects than a user authorized with the policy defined
         # above because the policy includes clauses denying access to
         # some projects.
-        self._get(status=200, user=UserFactory.create(),
-                  projs=self.projs + self.unauth_projs)
+
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_org_membership(self):
-        self._get(status=200, make_org_member=[self.ok_org1],
-                  projs=(self.projs + self.unauth_projs +
-                         [self.priv_proj1, self.priv_proj2]))
+        OrganizationRole.objects.create(organization=self.ok_org1,
+                                        user=self.user)
+        response = self.request(user=self.user)
+        projs = (self.projs + self.unauth_projs +
+                 [self.priv_proj1, self.priv_proj2])
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projs, key=self.sort_key))
 
     def test_get_with_org_memberships(self):
-        self._get(status=200, make_org_member=[self.ok_org1, self.ok_org2],
-                  projs=self.projs + self.unauth_projs + [
-                      self.priv_proj1, self.priv_proj2, self.priv_proj3
-        ])
+        OrganizationRole.objects.create(organization=self.ok_org1,
+                                        user=self.user)
+        OrganizationRole.objects.create(organization=self.ok_org2,
+                                        user=self.user)
+        response = self.request(user=self.user)
+        projs = (self.projs + self.unauth_projs +
+                 [self.priv_proj1, self.priv_proj2, self.priv_proj3])
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projs, key=self.sort_key))
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
         self.superuser_role = Role.objects.get(name='superuser')
         superuser.assign_policies(self.superuser_role)
-        self._get(status=200, user=superuser, is_superuser=True,
-                  projs=Project.objects.all())
 
-
-class ProjectDashboardTest(UserTestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectDashboard.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
-
-        self.project1 = ProjectFactory.create()
-        self.project2 = ProjectFactory.create(
-            extent=('SRID=4326;'
-                    'POLYGON ((-5.1031494140625000 8.1299292850467957, '
-                    '-5.0482177734375000 7.6837733211111425, '
-                    '-4.6746826171875000 7.8252894725496338, '
-                    '-4.8641967773437491 8.2278005261522775, '
-                    '-5.1031494140625000 8.1299292850467957))')
+        response = self.request(user=superuser)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(Project.objects.all(), key=self.sort_key),
+            add_allowed=True,
+            is_superuser=True
         )
 
+
+class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectDashboard
+    template = 'organization/project_dashboard.html'
+
+    def setup_models(self):
+        self.project = ProjectFactory.create()
         clauses = {
             'clause': [
                 clause('allow',
@@ -182,6 +182,87 @@ class ProjectDashboardTest(UserTestCase):
             name='allow',
             body=json.dumps(clauses))
 
+        self.user = UserFactory.create()
+        self.user.assign_policies(self.policy)
+
+    def setup_template_context(self):
+        return {
+            'object': self.project,
+            'project': self.project,
+            'geojson': '{"type": "FeatureCollection", "features": []}',
+            'is_superuser': False,
+            'is_administrator': False
+        }
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
+        }
+
+    def test_get_with_authorized_user(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_unauthorized_user(self):
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_superuser(self):
+        superuser_role = Role.objects.get(name='superuser')
+        self.user.assign_policies(superuser_role)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(is_superuser=True,
+                                                       is_administrator=True)
+
+    def test_get_with_org_admin(self):
+        OrganizationRole.objects.create(
+            organization=self.project.organization,
+            user=self.user,
+            admin=True
+        )
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(is_administrator=True)
+
+    def test_get_non_existent_project(self):
+        with pytest.raises(Http404):
+            self.request(
+                user=self.user,
+                url_kwargs={'organization': 'some-org', 'project': 'some=prj'})
+
+    def test_get_with_project_extent(self):
+        self.project.extent = (
+                    'SRID=4326;'
+                    'POLYGON ((-5.1031494140625000 8.1299292850467957, '
+                    '-5.0482177734375000 7.6837733211111425, '
+                    '-4.6746826171875000 7.8252894725496338, '
+                    '-4.8641967773437491 8.2278005261522775, '
+                    '-5.1031494140625000 8.1299292850467957))')
+        self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_private_project(self):
+        self.project.access = 'private'
+        self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_private_project_with_unauthenticated_user(self):
+        self.project.access = 'private'
+        self.project.save()
+        response = self.request()
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
+
+    def test_get_private_project_without_permission(self):
         # Note, no project.view_private!
         restricted_clauses = {
             'clause': [
@@ -194,153 +275,50 @@ class ProjectDashboardTest(UserTestCase):
         restricted_policy = Policy.objects.create(
             name='restricted',
             body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
 
-        self.user = UserFactory.create()
-        self.user.assign_policies(self.policy)
-        self.restricted_user = UserFactory.create()
-        self.restricted_user.assign_policies(restricted_policy)
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-    def _get(self, project, user=None, status=None):
-        if user is None:
-            user = self.user
-        setattr(self.request, 'user', user)
-        response = self.view(self.request,
-                             organization=project.organization.slug,
-                             project=project.slug)
-        if status is not None:
-            assert response.status_code == status
-        return response
-
-    def _get_private(self, status=None, user=None, make_org_member=False,
-                     make_other_org_member=False, remove_org_member=False):
-        if user is None:
-            user = self.user
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='project', organization=org,
-            name='Test Project', access='private'
-        )
-        if make_org_member:
-            OrganizationRole.objects.create(organization=org, user=user)
-        if remove_org_member:
-            OrganizationRole.objects.filter(
-                organization=org, user=user
-            ).delete()
-        if make_other_org_member:
-            other_org = OrganizationFactory.create()
-            OrganizationRole.objects.create(organization=other_org, user=user)
-        return self._get(prj, user=user, status=status), prj
-
-    def _check_render(self, response, project, assign_context=False,
-                      is_superuser=False, is_administrator=False):
-        content = response.render().content.decode('utf-8')
-
-        context = RequestContext(self.request)
-        context['object'] = project
-        context['project'] = project
-        context['geojson'] = '{"type": "FeatureCollection", "features": []}'
-        context['is_superuser'] = is_superuser
-        context['is_administrator'] = is_administrator
-
-        expected = render_to_string(
-            'organization/project_dashboard.html',
-            context, request=self.request
-        )
-
-        assert expected == content
-
-    def _check_fail(self):
+        self.project.access = 'private'
+        self.project.save()
+        response = self.request()
+        assert response.status_code == 302
         assert ("You don't have permission to access this project"
-                in [str(m) for m in get_messages(self.request)])
-
-    def test_get_with_authorized_user(self):
-        response = self._get(self.project1, status=200)
-        self._check_render(response, self.project1)
-
-    def test_get_with_unauthorized_user(self):
-        response = self._get(self.project1, user=UserFactory.create(),
-                             status=200)
-        self._check_render(response, self.project1)
-
-    def test_get_with_superuser(self):
-        superuser = UserFactory.create()
-        self.superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(self.superuser_role)
-        response = self._get(self.project1, user=superuser, status=200)
-        self._check_render(response, self.project1,
-                           is_superuser=True, is_administrator=True)
-
-    def test_get_with_org_admin(self):
-        org_admin = UserFactory.create()
-        OrganizationRole.objects.create(
-            organization=self.project1.organization,
-            user=org_admin,
-            admin=True
-        )
-        response = self._get(self.project1, user=org_admin, status=200)
-        self._check_render(response, self.project1,
-                           is_superuser=False, is_administrator=True)
-
-    def test_get_non_existent_project(self):
-        setattr(self.request, 'user', self.user)
-        with pytest.raises(Http404):
-            self.view(self.request,
-                      organization='some-org', project='some-project')
-
-    def test_get_with_project_extent(self):
-        response = self._get(self.project2, status=200)
-        self._check_render(response, self.project2, assign_context=True)
-
-    def test_get_private_project(self):
-        response, prj = self._get_private(status=200)
-        self._check_render(response, prj)
-
-    def test_get_private_project_with_unauthenticated_user(self):
-        self._get_private(user=AnonymousUser(), status=302)
-        self._check_fail()
-
-    def test_get_private_project_without_permission(self):
-        self._get_private(user=self.restricted_user, status=302)
-        self._check_fail()
+                in response.messages)
 
     def test_get_private_project_based_on_org_membership(self):
-        response, prj = self._get_private(
-            user=UserFactory.create(), status=200, make_org_member=True
-        )
-        self._check_render(response, prj)
+        OrganizationRole.objects.create(organization=self.project.organization,
+                                        user=self.user)
+        self.project.access = 'private'
+        self.project.save()
+
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_private_project_with_other_org_membership(self):
-        self._get_private(
-            user=UserFactory.create(), status=302,
-            make_other_org_member=True
-        )
-        self._check_fail()
+        org = OrganizationFactory.create()
+        OrganizationRole.objects.create(organization=org, user=self.user)
+        self.project.access = 'private'
+        self.project.save()
 
-    def test_get_private_project_on_org_membership_removal(self):
-        self._get_private(
-            user=UserFactory.create(), status=302,
-            make_org_member=True, remove_org_member=True
-        )
-        self._check_fail()
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
 
     def test_get_private_project_with_superuser(self):
-        superuser = UserFactory.create()
+        self.project.access = 'private'
+        self.project.save()
+
         self.superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(self.superuser_role)
-        response, prj = self._get_private(
-            user=superuser, status=200
-        )
-        self._check_render(response, prj,
-                           is_superuser=True, is_administrator=True)
+        self.user.assign_policies(self.superuser_role)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(is_superuser=True,
+                                                       is_administrator=True)
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectAddTest(UserTestCase):
-
+class ProjectAddTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.view = default.ProjectAddWizard.as_view()
@@ -615,113 +593,84 @@ class ProjectAddTest(UserTestCase):
                 assert False
 
 
-class ProjectEditGeometryTest(UserTestCase):
+class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectEditGeometry
+    template = 'organization/project_edit_geometry.html'
+    success_url_name = 'organization:project-dashboard'
     post_data = {
         'extent': '{"coordinates": [[[12.37, 51.36], '
                   '[12.35, 51.34], [12.36, 51.33], [12.4, 51.33], '
                   '[12.38, 51.35], [12.37, 51.36]]], "type": "Polygon"}'
     }
 
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectEditGeometry.as_view()
-        self.request = HttpRequest()
-
+    def setup_models(self):
         self.project = ProjectFactory.create()
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.update'], ['project/*/*']),
-            ]
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
         }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
 
-    def req(self, method='GET', user=AnonymousUser(), status=None):
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'method', method)
-
-        if method == 'POST':
-            setattr(self.request, 'POST', self.post_data)
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-        if status:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            response = response.render()
-
-        return response
+    def setup_template_context(self):
+        return {'project': self.project,
+                'object': self.project,
+                'form': forms.ProjectAddExtents(instance=self.project)}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
+        assign_policies(user)
 
-        response = self.req(user=user, status=200)
-        content = response.content.decode('utf-8')
-
-        expected = render_to_string(
-            'organization/project_edit_geometry.html',
-            {'project': self.project,
-             'object': self.project,
-             'form': forms.ProjectAddExtents(instance=self.project)},
-            request=self.request)
-
-        assert expected == content
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
-        self.req(user=user, status=302)
+        response = self.request(user=user)
+        assert response.status_code == 302
         assert ("You don't have permission to update this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self.req(status=302)
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
-        response = self.req(user=user, method='POST', status=302)
-
-        expected_redirect = reverse(
-            'organization:project-dashboard',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug
-            }
-        )
-        assert expected_redirect in response['location']
+        assign_policies(user)
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 302
+        assert self.expected_success_url in response.location
         self.project.refresh_from_db()
         assert (json.loads(self.project.extent.json) ==
                 json.loads(self.post_data.get('extent')))
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
-        self.req(user=user, method='POST', status=302)
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 302
 
         assert ("You don't have permission to update this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         self.project.refresh_from_db()
         assert self.project.extent is None
 
     def test_post_with_unauthenticated_user(self):
-        response = self.req(method='POST', status=302)
-        assert '/account/login/' in response['location']
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
         self.project.refresh_from_db()
         assert self.project.extent is None
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectEditDetailsTest(UserTestCase):
+class ProjectEditDetailsTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectEditDetails
+    template = 'organization/project_edit_details.html'
+    success_url_name = 'organization:project-dashboard'
     post_data = {
         'name': 'New Name',
         'description': 'New Description',
@@ -735,128 +684,77 @@ class ProjectEditDetailsTest(UserTestCase):
         'contacts-0-tel': ''
     }
 
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectEditDetails.as_view()
-        self.request = HttpRequest()
-
+    def setup_models(self):
         self.project = ProjectFactory.create()
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.update'], ['project/*/*']),
-            ]
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
         }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
 
-    def req(self, method='GET', user=AnonymousUser(), status=None):
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'method', method)
-
-        if method == 'POST':
-            setattr(self.request, 'POST', self.post_data)
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-        if status:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            response = response.render()
-
-        return response
+    def setup_template_context(self):
+        return {'project': self.project,
+                'object': self.project,
+                'form': forms.ProjectEditDetails(instance=self.project)}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
+        assign_policies(user)
 
-        response = self.req(user=user, status=200)
-        content = response.content.decode('utf-8')
-
-        expected = render_to_string(
-            'organization/project_edit_details.html',
-            {'project': self.project,
-             'object': self.project,
-             'form': forms.ProjectEditDetails(
-                 instance=self.project)},
-            request=self.request)
-
-        assert expected == content
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_authorized_user_include_questionnaire(self):
         questionnaire = QuestionnaireFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
+        assign_policies(user)
 
-        response = self.req(user=user, status=200)
-        content = response.content.decode('utf-8')
-
-        expected = render_to_string(
-            'organization/project_edit_details.html',
-            {'project': self.project,
-             'object': self.project,
-             'form': forms.ProjectEditDetails(
-                 instance=self.project,
-                 initial={'questionnaire': questionnaire.xls_form.url})},
-            request=self.request)
-
-        assert expected == content
+        response = self.request(user=user)
+        form = forms.ProjectEditDetails(
+            instance=self.project,
+            initial={'questionnaire': questionnaire.xls_form.url})
+        assert response.status_code == 200
+        assert response.content == self.render_content(form=form)
 
     def test_get_with_unauthorized_user(self):
-        user = UserFactory.create()
-        self.req(user=user, status=302)
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
         assert ("You don't have permission to update this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self.req(status=302)
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
-        response = self.req(user=user, method='POST', status=302)
+        assign_policies(user)
+        response = self.request(user=user, method='POST')
 
-        expected_redirect = reverse(
-            'organization:project-dashboard',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug
-            }
-        )
-        assert expected_redirect in response['location']
+        assert response.status_code == 302
+        assert self.expected_success_url in response.location
         self.project.refresh_from_db()
         assert self.project.name == self.post_data['name']
         assert self.project.description == self.post_data['description']
 
     def test_post_invalid_form(self):
-        path = os.path.dirname(settings.BASE_DIR)
-
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/xls-form-invalid.xlsx',
-            'rb'
-        ).read()
-        questionnaire = storage.save('xls-forms/xls-form-invalid.xlsx', file)
-        self.post_data['questionnaire'] = questionnaire
-
+        question = get_form('xls-form-invalid')
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
-        response = self.req(user=user, method='POST', status=200)
-        content = response.content.decode('utf-8')
+        assign_policies(user)
 
+        response = self.request(user=user, method='POST',
+                                post_data={'questionnaire': question})
+        post_data = self.post_data.copy()
+        post_data.update({'questionnaire': question})
         form = forms.ProjectEditDetails(
             instance=self.project,
-            initial={'questionnaire': questionnaire},
-            data=self.post_data)
-
+            initial={'questionnaire': question},
+            data=post_data
+        )
+        form.is_valid()
         form.add_error('questionnaire',
                        "Unknown question type 'interger'.")
         # form.add_error('questionnaire',
@@ -865,52 +763,37 @@ class ProjectEditDetailsTest(UserTestCase):
         #                "'select multiple list' is not an accepted question "
         #                "type")
 
-        expected = render_to_string(
-            'organization/project_edit_details.html',
-            {'project': self.project,
-             'object': self.project,
-             'form': form},
-            request=self.request)
-
-        assert expected == content
-        self.post_data['questionnaire'] = ''
+        assert response.status_code == 200
+        assert response.content == self.render_content(form=form)
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
-        self.req(user=user, method='POST', status=302)
+        response = self.request(user=user, method='POST')
 
+        assert response.status_code == 302
         assert ("You don't have permission to update this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         self.project.refresh_from_db()
         assert self.project.name != self.post_data['name']
         assert self.project.description != self.post_data['description']
 
     def test_post_with_unauthenticated_user(self):
-        response = self.req(method='POST', status=302)
-        assert '/account/login/' in response['location']
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
         self.project.refresh_from_db()
         assert self.project.name != self.post_data['name']
         assert self.project.description != self.post_data['description']
 
 
-class ProjectEditPermissionsTest(UserTestCase):
+class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectEditPermissions
+    template = 'organization/project_edit_permissions.html'
+    success_url_name = 'organization:project-dashboard'
 
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectEditPermissions.as_view()
-        self.request = HttpRequest()
-
+    def setup_models(self):
         self.project = ProjectFactory.create()
-
-        clauses = {
-            'clause': [
-                clause('allow', ['project.update'], ['project/*/*']),
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
 
         self.project_user = UserFactory.create()
         OrganizationRole.objects.create(
@@ -923,300 +806,215 @@ class ProjectEditPermissionsTest(UserTestCase):
             role='DC'
         )
 
-        self.post_data = {
-            self.project_user.username: 'PM'
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
         }
 
-    def req(self, method='GET', user=AnonymousUser(), status=None):
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'method', method)
+    def setup_post_data(self):
+        return {self.project_user.username: 'PM'}
 
-        if method == 'POST':
-            setattr(self.request, 'POST', self.post_data)
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-        if status:
-            assert response.status_code == status
-
-        if response.status_code == 200:
-            response = response.render()
-
-        return response
+    def setup_template_context(self):
+        return {'project': self.project,
+                'object': self.project,
+                'form': forms.ProjectEditPermissions(instance=self.project)}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
+        assign_policies(user)
 
-        response = self.req(user=user, status=200)
-        content = response.content.decode('utf-8')
-
-        expected = render_to_string(
-            'organization/project_edit_permissions.html',
-            {'project': self.project,
-             'object': self.project,
-             'form': forms.ProjectEditPermissions(instance=self.project)},
-            request=self.request)
-
-        assert expected == content
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
-        self.req(user=user, status=302)
+        response = self.request(user=user)
+        assert response.status_code == 302
         assert ("You don't have permission to update this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self.req(status=302)
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
-        response = self.req(user=user, method='POST', status=302)
+        assign_policies(user)
+        response = self.request(user=user, method='POST')
 
-        expected_redirect = reverse(
-            'organization:project-dashboard',
-            kwargs={
-                'organization': self.project.organization.slug,
-                'project': self.project.slug
-            }
-        )
-        assert expected_redirect in response['location']
+        assert self.expected_success_url in response.location
         self.project_role.refresh_from_db()
         assert self.project_role.role == 'PM'
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
-        self.req(user=user, method='POST', status=302)
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 302
 
         assert ("You don't have permission to update this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         self.project_role.refresh_from_db()
         assert self.project_role.role == 'DC'
 
     def test_post_with_unauthenticated_user(self):
-        response = self.req(method='POST', status=302)
-        assert '/account/login/' in response['location']
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
         self.project_role.refresh_from_db()
         assert self.project_role.role == 'DC'
 
 
-class ProjectArchiveTest(UserTestCase):
+class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectArchive
 
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectArchive.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
+    def setup_models(self):
+        self.project = ProjectFactory.create()
 
-        self.prj = ProjectFactory.create()
-
-        clauses = {
-            'clause': [
-                clause('allow', ['project.*'], ['project/*/*'])
-            ]
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
         }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-    def get(self, user=AnonymousUser()):
-        setattr(self.request, 'user', user)
-
-        return self.view(self.request,
-                         organization=self.prj.organization.slug,
-                         project=self.prj.slug)
 
     def test_archive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
-        response = self.get(user)
+        assign_policies(user)
+        response = self.request(user=user)
 
-        self.prj.refresh_from_db()
+        self.project.refresh_from_db()
 
         assert response.status_code == 302
         assert ('/organizations/{}/projects/{}/'.format(
-            self.prj.organization.slug, self.prj.slug) in response['location'])
-        assert self.prj.archived is True
+            self.project.organization.slug, self.project.slug)
+            in response.location)
+        assert self.project.archived is True
 
     def test_archive_with_unauthorized_user(self):
         user = UserFactory.create()
-        response = self.get(user)
+        response = self.request(user=user)
 
-        self.prj.refresh_from_db()
+        self.project.refresh_from_db()
         assert response.status_code == 302
         assert ("You don't have permission to archive this project"
-                in [str(m) for m in get_messages(self.request)])
-        assert self.prj.archived is False
+                in response.messages)
+        assert self.project.archived is False
 
     def test_archive_with_unauthenticated_user(self):
-        response = self.get()
-        self.prj.refresh_from_db()
+        response = self.request()
+        self.project.refresh_from_db()
 
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
-        assert self.prj.archived is False
+        assert '/account/login/' in response.location
+        assert self.project.archived is False
 
 
-class ProjectUnarchiveTest(UserTestCase):
+class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectUnarchive
 
-    def setUp(self):
-        super().setUp()
-        self.view = default.ProjectUnarchive.as_view()
-        self.request = HttpRequest()
-        setattr(self.request, 'method', 'GET')
+    def setup_models(self):
+        self.project = ProjectFactory.create(archived=True)
 
-        self.prj = ProjectFactory.create(archived=True)
-
-        clauses = {
-            'clause': [
-                clause('allow', ['project.*'], ['project/*/*'])
-            ]
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
         }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-    def get(self, user=AnonymousUser()):
-        setattr(self.request, 'user', user)
-
-        return self.view(self.request,
-                         organization=self.prj.organization.slug,
-                         project=self.prj.slug)
 
     def test_archive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_user_policies(user, self.policy)
-        response = self.get(user)
+        assign_policies(user)
+        response = self.request(user=user)
 
-        self.prj.refresh_from_db()
+        self.project.refresh_from_db()
 
         assert response.status_code == 302
         assert ('/organizations/{}/projects/{}/'.format(
-            self.prj.organization.slug, self.prj.slug) in response['location'])
-        assert self.prj.archived is False
+            self.project.organization.slug, self.project.slug)
+            in response.location)
+        assert self.project.archived is False
 
     def test_archive_with_unauthorized_user(self):
         user = UserFactory.create()
-        response = self.get(user)
+        response = self.request(user=user)
 
-        self.prj.refresh_from_db()
+        self.project.refresh_from_db()
         assert response.status_code == 302
         assert ("You don't have permission to unarchive this project"
-                in [str(m) for m in get_messages(self.request)])
-        assert self.prj.archived is True
+                in response.messages)
+        assert self.project.archived is True
 
     def test_archive_with_unauthenticated_user(self):
-        response = self.get()
-        self.prj.refresh_from_db()
+        response = self.request()
+        self.project.refresh_from_db()
 
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
-        assert self.prj.archived is True
+        assert '/account/login/' in response.location
+        assert self.project.archived is True
 
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class ProjectDataDownloadTest(UserTestCase):
+class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ProjectDataDownload
+    post_data = {'type': 'xls', 'include_resources': False}
+    template = 'organization/project_download.html'
 
-    def setUp(self):
-        super().setUp()
+    def setup_models(self):
         ensure_dirs()
-        self.view = default.ProjectDataDownload.as_view()
-        self.request = HttpRequest()
-
         self.project = ProjectFactory.create()
+        self.user = UserFactory.create()
 
-        self.post_data = {'type': 'xls', 'include_resources': False}
-
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('allow', ['project.download'], ['project/*/*']),
-            ]
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
         }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
 
-    def req(self, method='GET', user=AnonymousUser(), status=None):
-        setattr(self.request, 'user', user)
-        setattr(self.request, 'method', method)
-
-        if method == 'POST':
-            setattr(self.request, 'POST', self.post_data)
-
-        setattr(self.request, 'session', 'session')
-        self.messages = FallbackStorage(self.request)
-        setattr(self.request, '_messages', self.messages)
-
-        response = self.view(self.request,
-                             organization=self.project.organization.slug,
-                             project=self.project.slug)
-        if status:
-            assert response.status_code == status
-
-        return response
+    def setup_template_context(self):
+        return {'project': self.project,
+                'object': self.project,
+                'form': forms.DownloadForm(project=self.project,
+                                           user=self.user)}
 
     def test_get_with_authorized_user(self):
-        user = UserFactory.create()
-        user.assign_policies(self.policy)
+        assign_policies(self.user)
 
-        response = self.req(user=user, status=200)
-        content = response.render().content.decode('utf-8')
-
-        expected = render_to_string(
-            'organization/project_download.html',
-            {'project': self.project,
-             'object': self.project,
-             'form': forms.DownloadForm(project=self.project,
-                                        user=user)},
-            request=self.request)
-
-        assert expected == content
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
-        user = UserFactory.create()
-        self.req(user=user, status=302)
+        response = self.request(user=self.user)
+        assert response.status_code == 302
         assert ("You don't have permission to download data from this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
-        response = self.req(status=302)
-        assert '/account/login/' in response['location']
+        response = self.request()
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        user = UserFactory.create()
-        user.assign_policies(self.policy)
-        response = self.req(user=user, method='POST', status=200)
-        assert (response._headers['content-disposition'][1] ==
+        assign_policies(self.user)
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 200
+        assert (response.headers['content-disposition'][1] ==
                 'attachment; filename={}.xlsx'.format(self.project.slug))
-        assert (response._headers['content-type'][1] ==
+        assert (response.headers['content-type'][1] ==
                 'application/vnd.openxmlformats-officedocument.'
                 'spreadsheetml.sheet')
 
     def test_post_with_unauthorized_user(self):
-        user = UserFactory.create()
-        self.req(user=user, method='POST', status=302)
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 302
         assert ("You don't have permission to download data from this project"
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_post_with_unauthenticated_user(self):
-        response = self.req(method='POST', status=302)
-        assert '/account/login/' in response['location']
+        response = self.request(method='POST')
+        assert response.status_code == 302
+        assert '/account/login/' in response.location

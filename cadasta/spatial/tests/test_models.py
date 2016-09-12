@@ -1,15 +1,16 @@
 import pytest
 
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party import exceptions
 from spatial.tests.factories import (SpatialUnitFactory,
                                      SpatialRelationshipFactory)
 
 
-class SpatialUnitTest(UserTestCase):
+class SpatialUnitTest(UserTestCase, TestCase):
 
     def test_str(self):
         spatial_unit = SpatialUnitFactory.create(type='PA')
@@ -96,7 +97,7 @@ class SpatialUnitTest(UserTestCase):
                 id=su.id))
 
 
-class SpatialRelationshipTest(UserTestCase):
+class SpatialRelationshipTest(UserTestCase, TestCase):
 
     def setUp(self):
         super().setUp()

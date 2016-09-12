@@ -1,7 +1,7 @@
 import pytest
 from django.test import TestCase
 from django.forms import BooleanField
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.files import make_dirs  # noqa
 from ..fields import ResourceField
 from ..widgets import ResourceWidget
 from .factories import ResourceFactory

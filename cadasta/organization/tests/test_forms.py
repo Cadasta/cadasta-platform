@@ -6,6 +6,7 @@ from zipfile import ZipFile
 
 from django.conf import settings
 from django.forms.utils import ErrorDict
+from django.test import TestCase
 
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Role
@@ -14,8 +15,8 @@ from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.exceptions import InvalidXLSForm
 from accounts.tests.factories import UserFactory
@@ -24,7 +25,7 @@ from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 
 
-class OrganizationTest(UserTestCase):
+class OrganizationTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.data = {
@@ -197,7 +198,7 @@ class OrganizationTest(UserTestCase):
         assert org.contacts == []
 
 
-class AddOrganizationMemberFormTest(UserTestCase):
+class AddOrganizationMemberFormTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.org = OrganizationFactory.create()
@@ -235,7 +236,7 @@ class AddOrganizationMemberFormTest(UserTestCase):
         self._save(identifier_field='username', ok=False)
 
 
-class EditOrganizationMemberFormTest(UserTestCase):
+class EditOrganizationMemberFormTest(UserTestCase, TestCase):
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
         user = UserFactory.create()
@@ -307,11 +308,12 @@ class EditOrganizationMemberFormTest(UserTestCase):
                 is False)
 
 
-class ProjectAddDetailsTest(UserTestCase):
+class ProjectAddDetailsTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.org = OrganizationFactory.create()
         self.user = UserFactory.create()
+
         OrganizationRole.objects.create(
             organization=self.org, user=self.user, admin=True
         )
@@ -373,7 +375,7 @@ class ProjectAddDetailsTest(UserTestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectEditDetailsTest(UserTestCase):
+class ProjectEditDetailsTest(UserTestCase, TestCase):
     def setUp(self):
         self.project = ProjectFactory.create()
         self.data = {
@@ -537,7 +539,7 @@ class ProjectEditDetailsTest(UserTestCase):
         }
 
 
-class UpdateProjectRolesTest(UserTestCase):
+class UpdateProjectRolesTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
@@ -581,7 +583,7 @@ class UpdateProjectRolesTest(UserTestCase):
         assert ProjectRole.objects.count() == 0
 
 
-class ProjectEditPermissionsTest(UserTestCase):
+class ProjectEditPermissionsTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
@@ -644,7 +646,7 @@ class ProjectEditPermissionsTest(UserTestCase):
         assert role_2.role == 'DC'
 
 
-class ContactsFormTest(UserTestCase):
+class ContactsFormTest(UserTestCase, TestCase):
     def test_as_table(self):
         form = forms.ContactsForm(prefix='c')
         html = form.as_table()
@@ -874,7 +876,7 @@ class ContactsFormTest(UserTestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class DownloadFormTest(UserTestCase):
+class DownloadFormTest(UserTestCase, TestCase):
     def test_init(self):
         ensure_dirs()
         user = UserFactory.build()

@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse, resolve
-from core.tests.url_utils import version_ns, version_url
+from core.tests.utils.urls import version_ns, version_url
 
 from ..views import api
 

@@ -1,15 +1,16 @@
 import random
 
 from django.utils.translation import gettext as _
+from django.test import TestCase
 
 from ..models import User
 from ..forms import RegisterForm, ProfileForm
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 
 from .factories import UserFactory
 
 
-class RegisterFormTest(UserTestCase):
+class RegisterFormTest(UserTestCase, TestCase):
     def test_valid_data(self):
         data = {
             'username': 'imagine71',
@@ -74,7 +75,7 @@ class RegisterFormTest(UserTestCase):
         assert User.objects.count() == 0
 
 
-class ProfileFormTest(UserTestCase):
+class ProfileFormTest(UserTestCase, TestCase):
     def test_update_user(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk')

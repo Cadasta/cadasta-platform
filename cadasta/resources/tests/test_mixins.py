@@ -1,10 +1,11 @@
 import pytest
 from django.db.models import Model
+from django.test import TestCase
 
 from ..mixins import ResourceModelMixin
 from .factories import ResourceFactory
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 
 
 class ResourceModel(ResourceModelMixin, Model):
@@ -13,7 +14,7 @@ class ResourceModel(ResourceModelMixin, Model):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ResourceModelMixinTest(UserTestCase):
+class ResourceModelMixinTest(UserTestCase, TestCase):
     def test_resources_property(self):
         resource_model_1 = ResourceModel()
         resource_model_1.save()

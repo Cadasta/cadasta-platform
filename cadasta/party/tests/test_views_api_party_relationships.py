@@ -1,176 +1,562 @@
-from django.utils.translation import ugettext as _
-from rest_framework import status as status_code
+import json
+from django.test import TestCase
 
+from rest_framework.exceptions import PermissionDenied
+from tutelary.models import Policy, assign_user_policies
+from skivvy import APITestCase
+
+from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import (ProjectFactory,
-                                          OrganizationFactory)
-from party.tests.factories import (PartyFactory,
-                                   PartyRelationshipFactory)
-from spatial.tests.base_classes import (RecordCreateBaseTestCase,
-                                        RecordCreateAPITest,
-                                        RecordDetailBaseTestCase,
-                                        RecordDetailAPITest,
-                                        RecordUpdateAPITest,
-                                        RecordDeleteAPITest)
+                                          OrganizationFactory,
+                                          clause)
+from organization.models import OrganizationRole
+from party.tests.factories import PartyFactory, PartyRelationshipFactory
 from party.models import PartyRelationship
 from party.views import api
 
 
-class PartyRelationshipCreateTestCase(RecordCreateBaseTestCase):
-
-    record_model = PartyRelationship
-
-    def setUp(self):
-        super().setUp()
-        self.view = api.PartyRelationshipCreate.as_view()
-        self.url = (
-            '/v1/organizations/{org}/projects/{prj}/'
-            'relationships/party/'
-        )
-
-    def _test_objs(self, access='public'):
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='test-project', organization=org, access=access)
-        party1 = PartyFactory.create(project=prj, name='Landowner')
-        party2 = PartyFactory.create(project=prj, name='Leaser')
-        party3 = PartyFactory.create(project=prj, name='Family')
-        PR = PartyRelationshipFactory
-        PR.create(project=prj, party1=party1, party2=party2)
-        PR.create(project=prj, party1=party2, party2=party3)
-        PR.create(project=prj, party1=party1, party2=party3)
-        self.party1 = party1
-        self.party2 = party2
-        self.party3 = party3
-        self.num_records = 3
-        return (org, prj)
+def assign_policies(user):
+    clauses = {
+        'clause': [
+            {
+                'effect': 'allow',
+                'object': ['project/*',
+                           'project/*/*',
+                           'spatial/*/*/*',
+                           'spatial_rel/*/*/*',
+                           'party/*/*/*',
+                           'party_rel/*/*/*',
+                           'tenure_rel/*/*/*'],
+                'action': ['project.*',
+                           'project.*.*',
+                           'spatial.*',
+                           'spatial_rel.*',
+                           'party.*',
+                           'party_rel.*',
+                           'tenure_rel.*']
+            }
+        ]
+    }
+    policy = Policy.objects.create(
+        name='basic-test',
+        body=json.dumps(clauses))
+    user.assign_policies(policy)
 
 
-class PartyRelationshipCreateAPITest(PartyRelationshipCreateTestCase,
-                                     RecordCreateAPITest):
+class PartyRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.PartyRelationshipCreate
 
-    @property
-    def default_create_data(self):
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+
+        self.org = OrganizationFactory.create(slug='namati')
+        self.prj = ProjectFactory.create(
+            slug='test-project', organization=self.org, access='public')
+        self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
+        self.party2 = PartyFactory.create(project=self.prj, name='Leaser')
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.org.slug,
+            'project': self.prj.slug
+        }
+
+    def setup_post_data(self):
         return {
             'party1': self.party2.id,
             'party2': self.party1.id,
             'type': 'C'
         }
 
-    # Additional tests
+    def test_create_valid_record(self):
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 201
+        assert PartyRelationship.objects.count() == 1
 
-    def test_create_invalid_record_with_dupe_su(self):
-        org, prj = self._test_objs()
+    def test_create_record_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == "Project not found."
+
+    def test_create_record_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == "Project not found."
+
+    def test_create_record_with_unauthorized_user(self):
+        response = self.request(method='POST')
+        assert response.status_code == 403
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 201
+        assert PartyRelationship.objects.count() == 1
+
+    def test_create_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='POST')
+        assert response.status_code == 403
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project.list'],
+                    'action': ['organization/*']
+                },
+                {
+                    'effect': 'allow',
+                    'object': ['project.view'],
+                    'action': ['project/*/*']
+                }
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        assign_user_policies(self.user, restricted_policy)
+
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 403
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record_based_on_org_membership(self):
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org, user=user)
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 403
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_invalid_record_with_same_party(self):
         invalid_data = {
             'party1': self.party2.id,
             'party2': self.party2.id,
             'type': 'C'
         }
-        content = self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=invalid_data, status=status_code.HTTP_400_BAD_REQUEST)
-        assert content['non_field_errors'][0] == _(
-            "The parties must be different")
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data=invalid_data)
+        assert response.status_code == 400
+        assert PartyRelationship.objects.count() == 0
+        assert (response.content['non_field_errors'][0] ==
+                "The parties must be different")
 
     def test_create_invalid_record_with_different_project(self):
-        org, prj = self._test_objs()
-        other_prj = ProjectFactory.create(slug='other', organization=org)
-        other_party = PartyFactory.create(project=other_prj, name="Other")
+        other_party = PartyFactory.create(name="Other")
         invalid_data = {
             'party1': self.party1.id,
             'party2': other_party.id,
             'type': 'C'
         }
-        content = self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=invalid_data, status=status_code.HTTP_400_BAD_REQUEST)
-        err_msg = _(
-            "'party1' project ({}) should be equal to 'party2' project ({})")
-        assert content['non_field_errors'][0] == (
-            err_msg.format(prj.slug, other_prj.slug))
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data=invalid_data)
+        assert response.status_code == 400
+        assert PartyRelationship.objects.count() == 0
+
+        err_msg = ("'party1' project ({}) should be equal to 'party2' "
+                   "project ({})")
+        assert response.content['non_field_errors'][0] == (
+            err_msg.format(self.prj.slug, other_party.project.slug))
 
 
-class PartyRelationshipDetailTestCase(RecordDetailBaseTestCase):
+class PartyRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.PartyRelationshipDetail
 
-    model_name = 'PartyRelationship'
-    record_factory = PartyRelationshipFactory
-    record_id_url_var_name = 'party_rel_id'
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
 
-    def setUp(self):
-        super().setUp()
-        self.view = api.PartyRelationshipDetail.as_view()
-        self.url = (
-            '/v1/organizations/{org}/projects/{prj}/'
-            'relationships/party/{record}/'
-        )
+        self.org = OrganizationFactory.create(slug='namati')
+        self.prj = ProjectFactory.create(
+            slug='test-project', organization=self.org, access='public')
+        self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
+        self.party2 = PartyFactory.create(project=self.prj, name='Leaser')
+        self.rel = PartyRelationshipFactory.create(
+            project=self.prj, party1=self.party1, party2=self.party2)
 
-    def _test_objs(self, access='public'):
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='test-project', organization=org, access=access)
-        party1 = PartyFactory.create(project=prj, name='Landowner')
-        party2 = PartyFactory.create(project=prj, name='Leaser')
-        party3 = PartyFactory.create(project=prj, name='Family')
-        rel = PartyRelationshipFactory.create(
-            project=prj, party1=party1, party2=party2)
-        self.party1 = party1
-        self.party2 = party2
-        self.party3 = party3
-        return (rel, org)
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.org.slug,
+            'project': self.prj.slug,
+            'party_rel_id': self.rel.id
+        }
+
+    def test_get_public_record_with_valid_user(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.rel.id
+
+    def test_get_public_nonexistent_record(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'party_rel_id': 'notanid'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "PartyRelationship not found."
+
+    def test_get_public_record_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_public_record_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_public_record_with_unauthorized_user(self):
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.rel.id
+
+    def test_get_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org, user=user)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.rel.id
 
 
-class PartyRelationshipDetailAPITest(PartyRelationshipDetailTestCase,
-                                     RecordDetailAPITest):
+class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.PartyRelationshipDetail
 
-    def is_id_in_content(self, content, record_id):
-        return content['id'] == record_id
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
 
+        self.org = OrganizationFactory.create(slug='namati')
+        self.prj = ProjectFactory.create(
+            slug='test-project', organization=self.org, access='public')
+        self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
+        self.party2 = PartyFactory.create(project=self.prj, name='Leaser')
+        self.rel = PartyRelationshipFactory.create(
+            project=self.prj, party1=self.party1, party2=self.party2)
+        self.party3 = PartyFactory.create(project=self.prj, name='Leaser')
 
-class PartyRelationshipUpdateAPITest(PartyRelationshipDetailTestCase,
-                                     RecordUpdateAPITest):
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.org.slug,
+            'project': self.prj.slug,
+            'party_rel_id': self.rel.id
+        }
 
-    def get_valid_updated_data(self):
+    def setup_post_data(self):
         return {
             'party1': self.party3.id,
             'party2': self.party1.id,
         }
 
-    def check_for_updated(self, content):
-        assert content['party1'] == self.party3.id
-        assert content['party2'] == self.party1.id
+    def test_update_with_valid_data(self):
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        assert response.content['party1'] == self.party3.id
+        assert response.content['party2'] == self.party1.id
 
-    def check_for_unchanged(self, content):
-        assert content['party1']['name'] == "Landowner"
-        assert content['party2']['name'] == "Leaser"
+    def test_update_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
 
-    # Additional tests
+    def test_update_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'project': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_update_with_nonexistent_record(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'party_rel_id': 'some-rel'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "PartyRelationship not found."
+
+    def test_update_with_unauthorized_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_update_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        assert response.content['party1'] == self.party3.id
+        assert response.content['party2'] == self.party1.id
+
+    def test_update_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_update_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_update_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org, user=user)
+
+        response = self.request(user=user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_update_private_record_based_on_org_admin(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=user,
+                                        admin=True)
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        assert response.content['party1'] == self.party3.id
+        assert response.content['party2'] == self.party1.id
 
     def test_update_invalid_record_with_dupe_parties(self):
-
-        def get_invalid_data():
-            return {'party2': self.party1.id}
-
-        content = self._test_patch_public_record(
-            get_invalid_data, status_code.HTTP_400_BAD_REQUEST)
-        assert content['non_field_errors'][0] == _(
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                post_data={'party1': self.party1.id})
+        assert response.status_code == 400
+        assert response.content['non_field_errors'][0] == (
             "The parties must be different")
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
 
     def test_update_invalid_record_with_different_project(self):
-
-        other_org = OrganizationFactory.create(slug='other')
-        other_prj = ProjectFactory.create(slug='other', organization=other_org)
-        other_party = PartyFactory.create(project=other_prj, name="Other")
-
-        def get_invalid_data():
-            return {'party2': other_party.id}
-
-        content = self._test_patch_public_record(
-            get_invalid_data, status_code.HTTP_400_BAD_REQUEST)
-        err_msg = _(
+        other_party = PartyFactory.create(name="Other")
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                post_data={'party2': other_party.id})
+        assert response.status_code == 400
+        err_msg = (
             "'party1' project ({}) should be equal to 'party2' project ({})")
-        assert content['non_field_errors'][0] == (
-            err_msg.format(self.party1.project.slug, other_prj.slug))
+        assert response.content['non_field_errors'][0] == (
+            err_msg.format(self.party1.project.slug, other_party.project.slug))
 
 
-class PartyRelationshipDeleteAPITest(PartyRelationshipDetailTestCase,
-                                     RecordDeleteAPITest):
-    pass
+class PartyRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.PartyRelationshipDetail
+
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+
+        self.org = OrganizationFactory.create(slug='namati')
+        self.prj = ProjectFactory.create(
+            slug='test-project', organization=self.org, access='public')
+        self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
+        self.party2 = PartyFactory.create(project=self.prj, name='Leaser')
+        self.rel = PartyRelationshipFactory.create(
+            project=self.prj, party1=self.party1, party2=self.party2)
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.org.slug,
+            'project': self.prj.slug,
+            'party_rel_id': self.rel.id
+        }
+
+    def test_delete_record(self):
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 204
+        assert PartyRelationship.objects.count() == 0
+
+    def test_delete_with_nonexistent_org(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_delete_with_nonexistent_project(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_delete_with_nonexistent_record(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'party_rel_id': 'some-rel'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "PartyRelationship not found."
+
+    def test_delete_with_unauthorized_user(self):
+        response = self.request(method='DELETE')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert PartyRelationship.objects.count() == 1
+
+    def test_delete_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 204
+        assert PartyRelationship.objects.count() == 0
+
+    def test_delete_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='DELETE')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert PartyRelationship.objects.count() == 1
+
+    def test_delete_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert PartyRelationship.objects.count() == 1
+
+    def test_delete_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org, user=user)
+
+        response = self.request(method='DELETE', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert PartyRelationship.objects.count() == 1
+
+    def test_delete_private_record_based_on_org_admin(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=user,
+                                        admin=True)
+
+        response = self.request(method='DELETE', user=user)
+        assert response.status_code == 204
+        assert PartyRelationship.objects.count() == 0

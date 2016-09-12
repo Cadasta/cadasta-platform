@@ -1,10 +1,11 @@
 import os
 import pytest
 from django.conf import settings
+from django.test import TestCase
 from buckets.test.storage import FakeS3Storage
 
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
 from ..forms import ResourceForm, AddResourceFromLibraryForm
@@ -16,7 +17,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class ResourceFormTest(UserTestCase):
+class ResourceFormTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         storage = FakeS3Storage()
@@ -59,7 +60,7 @@ class ResourceFormTest(UserTestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class AddResourceFromLibraryFormTest(UserTestCase):
+class AddResourceFromLibraryFormTest(UserTestCase, TestCase):
     def test_init(self):
         prj = ProjectFactory.create()
         ResourceFactory.create(project=prj, content_object=prj)

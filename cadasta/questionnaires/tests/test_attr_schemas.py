@@ -6,9 +6,10 @@ from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
@@ -29,7 +30,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
-class CreateAttributeSchemaTest(UserTestCase):
+class CreateAttributeSchemaTest(UserTestCase, TestCase):
     def test_create_attribute_schemas(self):
         storage = FakeS3Storage()
         file = open(
@@ -336,7 +337,7 @@ class CreateAttributeSchemaTest(UserTestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ConditionalAttributeSchemaTest(UserTestCase):
+class ConditionalAttributeSchemaTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         storage = FakeS3Storage()

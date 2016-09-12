@@ -1,6 +1,7 @@
 from django.http import HttpRequest
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
+from django.test import TestCase
 
 from tutelary.models import assign_user_policies
 
@@ -8,10 +9,10 @@ from organization.views import default as org_views
 from organization.tests.factories import ProjectFactory, OrganizationFactory
 from spatial.views.default import LocationsAdd
 from accounts.tests.factories import UserFactory
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 
 
-class PermissionRequiredMixinTest(UserTestCase):
+class PermissionRequiredMixinTest(UserTestCase, TestCase):
     def test_login_redirect_to_original_referer(self):
         user = UserFactory.create()
         project = ProjectFactory.create()

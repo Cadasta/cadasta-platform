@@ -1,159 +1,544 @@
-from django.utils.translation import ugettext as _
-from rest_framework import status as status_code
+import json
+from django.test import TestCase
+from rest_framework.exceptions import PermissionDenied
+from skivvy import APITestCase
 
-from organization.tests.factories import (ProjectFactory,
-                                          OrganizationFactory)
+from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import UserTestCase
+from organization.tests.factories import ProjectFactory, clause
+from organization.models import OrganizationRole
 from spatial.tests.factories import SpatialUnitFactory
-from party.tests.factories import (PartyFactory,
-                                   TenureRelationshipFactory)
-from spatial.tests.base_classes import (RecordCreateBaseTestCase,
-                                        RecordCreateAPITest,
-                                        RecordDetailBaseTestCase,
-                                        RecordDetailAPITest,
-                                        RecordUpdateAPITest,
-                                        RecordDeleteAPITest)
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from party.models import TenureRelationship
 from party.views import api
+from tutelary.models import Policy, assign_user_policies
 
 
-class TenureRelationshipCreateTestCase(RecordCreateBaseTestCase):
+def assign_policies(user):
+    clauses = {
+        'clause': [
+            {
+                'effect': 'allow',
+                'object': ['project/*/*',
+                           'spatial/*/*/*',
+                           'spatial_rel/*/*/*',
+                           'party/*/*/*',
+                           'party_rel/*/*/*',
+                           'tenure_rel/*/*/*'],
+                'action': ['project.*',
+                           'project.*.*',
+                           'spatial.*',
+                           'spatial_rel.*',
+                           'party.*',
+                           'party_rel.*',
+                           'tenure_rel.*']
+            }
+        ]
+    }
+    policy = Policy.objects.create(
+        name='basic-test',
+        body=json.dumps(clauses))
+    user.assign_policies(policy)
 
+
+class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
+    view_class = api.TenureRelationshipCreate
     record_model = TenureRelationship
 
-    def setUp(self):
-        super().setUp()
-        self.view = api.TenureRelationshipCreate.as_view()
-        self.url = (
-            '/v1/organizations/{org}/projects/{prj}/'
-            'relationships/tenure/'
-        )
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
 
-    def _test_objs(self, access='public'):
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='test-project', organization=org, access=access)
-        party1 = PartyFactory.create(project=prj, name='Landowner')
-        party2 = PartyFactory.create(project=prj, name='Family')
-        su1 = SpatialUnitFactory.create(project=prj, type='PA')
-        su2 = SpatialUnitFactory.create(project=prj, type='PA')
-        TR = TenureRelationshipFactory
-        rel1 = TR.create(project=prj, party=party1, spatial_unit=su1)
-        TR.create(project=prj, party=party1, spatial_unit=su2)
-        TR.create(project=prj, party=party2, spatial_unit=su1)
-        self.party1 = party1
-        self.party2 = party2
-        self.su2 = su2
-        self.tenure_type = rel1.tenure_type
-        self.num_records = 3
-        return (org, prj)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
+        self.su2 = SpatialUnitFactory.create(project=self.prj, type='PA')
 
-
-class TenureRelationshipCreateAPITest(TenureRelationshipCreateTestCase,
-                                      RecordCreateAPITest):
-
-    @property
-    def default_create_data(self):
+    def setup_url_kwargs(self):
         return {
-            'party': self.party2.id,
-            'spatial_unit': self.su2.id,
-            'tenure_type': self.tenure_type.id
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug
         }
 
-    # Additional tests
+    def setup_post_data(self):
+        return {
+            'party': self.party1.id,
+            'spatial_unit': self.su2.id,
+            'tenure_type': 'WR'
+        }
+
+    def test_create_valid_record(self):
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 201
+        assert TenureRelationship.objects.count() == 1
+
+    def test_create_record_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == "Project not found."
+
+    def test_create_record_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == "Project not found."
+
+    def test_create_record_with_unauthorized_user(self):
+        response = self.request(method='POST')
+        assert response.status_code == 403
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 201
+        assert TenureRelationship.objects.count() == 1
+
+    def test_create_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='POST')
+        assert response.status_code == 403
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project.list'],
+                    'action': ['organization/*']
+                },
+                {
+                    'effect': 'allow',
+                    'object': ['project.view'],
+                    'action': ['project/*/*']
+                }
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        assign_user_policies(self.user, restricted_policy)
+
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 403
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_create_private_record_based_on_org_membership(self):
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 403
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_create_invalid_record_with_different_project(self):
-        org, prj = self._test_objs()
-        other_prj = ProjectFactory.create(slug='other', organization=org)
-        other_party = PartyFactory.create(project=other_prj, name="Other")
+        other_party = PartyFactory.create(name="Other")
         invalid_data = {
             'party': other_party.id,
             'spatial_unit': self.su2.id,
-            'tenure_type': self.tenure_type.id
+            'type': 'C'
         }
-        content = self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=invalid_data, status=status_code.HTTP_400_BAD_REQUEST)
-        err_msg = _(
-            "'party' project ({}) should be equal to "
-            "'spatial_unit' project ({})")
-        assert content['non_field_errors'][0] == (
-            err_msg.format(other_prj.slug, prj.slug))
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data=invalid_data)
+        assert response.status_code == 400
+        assert TenureRelationship.objects.count() == 0
+
+        err_msg = ("'party' project ({}) should be equal to "
+                   "'spatial_unit' project ({})")
+        assert response.content['non_field_errors'][0] == (
+            err_msg.format(other_party.project.slug, self.prj.slug))
 
 
-class TenureRelationshipDetailTestCase(RecordDetailBaseTestCase):
+class TenureRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.TenureRelationshipDetail
 
-    model_name = 'TenureRelationship'
-    record_factory = TenureRelationshipFactory
-    record_id_url_var_name = 'tenure_rel_id'
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
 
-    def setUp(self):
-        super().setUp()
-        self.view = api.TenureRelationshipDetail.as_view()
-        self.url = (
-            '/v1/organizations/{org}/projects/{prj}/'
-            'relationships/tenure/{record}/'
-        )
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        party = PartyFactory.create(project=self.prj, name='Landowner')
+        spatial_unit = SpatialUnitFactory.create(project=self.prj, type='PA')
+        self.rel = TenureRelationshipFactory.create(
+            project=self.prj, party=party, spatial_unit=spatial_unit)
 
-    def _test_objs(self, access='public'):
-        org = OrganizationFactory.create(slug='namati')
-        prj = ProjectFactory.create(
-            slug='test-project', organization=org, access=access)
-        party = PartyFactory.create(project=prj, name='Landowner')
-        party2 = PartyFactory.create(project=prj, name='Family')
-        spatial_unit = SpatialUnitFactory.create(project=prj, type='PA')
-        spatial_unit2 = SpatialUnitFactory.create(project=prj, type='PA')
-        rel = TenureRelationshipFactory.create(
-            project=prj, party=party, spatial_unit=spatial_unit)
-        self.party2 = party2
-        self.spatial_unit = spatial_unit
-        self.spatial_unit2 = spatial_unit2
-        return (rel, org)
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'tenure_rel_id': self.rel.id
+        }
+
+    def test_get_public_record_with_valid_user(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.rel.id
+
+    def test_get_public_nonexistent_record(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'tenure_rel_id': 'notanid'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "TenureRelationship not found."
+
+    def test_get_public_record_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_public_record_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_public_record_with_unauthorized_user(self):
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.rel.id
+
+    def test_get_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.rel.id
 
 
-class TenureRelationshipDetailAPITest(TenureRelationshipDetailTestCase,
-                                      RecordDetailAPITest):
+class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.TenureRelationshipDetail
 
-    def is_id_in_content(self, content, record_id):
-        return content['id'] == record_id
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
 
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.party = PartyFactory.create(project=self.prj)
+        self.spatial_unit = SpatialUnitFactory.create(project=self.prj)
+        self.rel = TenureRelationshipFactory.create(
+            project=self.prj, party=self.party, spatial_unit=self.spatial_unit)
+        self.party2 = PartyFactory.create(project=self.prj)
+        self.spatial_unit2 = SpatialUnitFactory.create(project=self.prj)
 
-class TenureRelationshipUpdateAPITest(TenureRelationshipDetailTestCase,
-                                      RecordUpdateAPITest):
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'tenure_rel_id': self.rel.id
+        }
 
-    def get_valid_updated_data(self):
+    def setup_post_data(self):
         return {
             'party': self.party2.id,
             'spatial_unit': self.spatial_unit2.id,
         }
 
-    def check_for_updated(self, content):
-        assert content['party'] == self.party2.id
-        assert content['spatial_unit'] == self.spatial_unit2.id
+    def test_update_with_valid_data(self):
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party2
+        assert self.rel.spatial_unit == self.spatial_unit2
 
-    def check_for_unchanged(self, content):
-        assert content['party']['name'] == "Landowner"
-        assert content['spatial_unit']['properties']['type'] == "PA"
+    def test_update_with_nonexistent_org(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
 
-    # Additional tests
+    def test_update_with_nonexistent_project(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'project': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_update_with_nonexistent_record(self):
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                url_kwargs={'tenure_rel_id': 'some-rel'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "TenureRelationship not found."
+
+    def test_update_with_unauthorized_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_update_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 200
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party2
+        assert self.rel.spatial_unit == self.spatial_unit2
+
+    def test_update_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_update_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_update_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+
+        response = self.request(user=user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_update_private_record_based_on_org_admin(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user,
+                                        admin=True)
+
+        response = self.request(user=user, method='PATCH')
+        assert response.status_code == 200
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party2
+        assert self.rel.spatial_unit == self.spatial_unit2
 
     def test_update_invalid_record_with_different_project(self):
-
-        other_org = OrganizationFactory.create(slug='other')
-        other_prj = ProjectFactory.create(slug='other', organization=other_org)
-        other_party = PartyFactory.create(project=other_prj, name="Other")
-
-        def get_invalid_data():
-            return {'party': other_party.id}
-
-        content = self._test_patch_public_record(
-            get_invalid_data, status_code.HTTP_400_BAD_REQUEST)
-        err_msg = _(
+        other_party = PartyFactory.create()
+        response = self.request(user=self.user,
+                                method='PATCH',
+                                post_data={'party': other_party.id})
+        assert response.status_code == 400
+        err_msg = (
             "'party' project ({}) should be equal to "
             "'spatial_unit' project ({})")
-        assert content['non_field_errors'][0] == (
-            err_msg.format(other_prj.slug, self.spatial_unit.project.slug))
+        assert response.content['non_field_errors'][0] == (
+            err_msg.format(other_party.project.slug,
+                           self.spatial_unit.project.slug))
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
 
 
-class TenureRelationshipDeleteAPITest(TenureRelationshipDetailTestCase,
-                                      RecordDeleteAPITest):
-    pass
+class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
+    view_class = api.TenureRelationshipDetail
+
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.party = PartyFactory.create(project=self.prj)
+        self.spatial_unit = SpatialUnitFactory.create(project=self.prj)
+        self.rel = TenureRelationshipFactory.create(
+            project=self.prj, party=self.party, spatial_unit=self.spatial_unit)
+        self.party2 = PartyFactory.create(project=self.prj)
+        self.spatial_unit2 = SpatialUnitFactory.create(project=self.prj)
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'tenure_rel_id': self.rel.id
+        }
+
+    def test_delete_record(self):
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 204
+        assert TenureRelationship.objects.count() == 0
+
+    def test_delete_with_nonexistent_org(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'organization': 'evil-corp'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_delete_with_nonexistent_project(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'project': 'world-domination'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_delete_with_nonexistent_record(self):
+        response = self.request(method='DELETE',
+                                user=self.user,
+                                url_kwargs={'tenure_rel_id': 'some-rel'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "TenureRelationship not found."
+
+    def test_delete_with_unauthorized_user(self):
+        response = self.request(method='DELETE')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert TenureRelationship.objects.count() == 1
+
+    def test_delete_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 204
+        assert TenureRelationship.objects.count() == 0
+
+    def test_delete_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request(method='DELETE')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert TenureRelationship.objects.count() == 1
+
+    def test_delete_private_record_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert TenureRelationship.objects.count() == 1
+
+    def test_delete_private_record_based_on_org_membership(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+
+        response = self.request(method='DELETE', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert TenureRelationship.objects.count() == 1
+
+    def test_delete_private_record_based_on_org_admin(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user,
+                                        admin=True)
+
+        response = self.request(method='DELETE', user=user)
+        assert response.status_code == 204
+        assert TenureRelationship.objects.count() == 0

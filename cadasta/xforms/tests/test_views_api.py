@@ -4,15 +4,16 @@ import os
 import pytest
 from lxml import etree
 
-from accounts.tests.factories import UserFactory
-from buckets.test.storage import FakeS3Storage
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from django.test import TestCase
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from skivvy import APITestCase
+
+from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from organization.models import OrganizationRole
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from party.models import Party
@@ -20,8 +21,8 @@ from questionnaires.managers import create_attrs_schema
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import (QuestionFactory,
                                             QuestionnaireFactory)
+from questionnaires.tests.utils import get_form
 from resources.models import Resource
-from rest_framework.test import APIRequestFactory, force_authenticate
 from spatial.models import SpatialUnit
 from tutelary.models import Role
 from xforms.tests.files.test_resources import responses
@@ -35,112 +36,90 @@ path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
-class XFormListTest(UserTestCase):
+class XFormListTest(APITestCase, UserTestCase, TestCase):
+    view_class = api.XFormListView
+    viewset_actions = {'get': 'list'}
 
-    def setUp(self):
-        super().setUp()
+    def setup_models(self):
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create()
         self.prj = ProjectFactory.create(organization=self.org)
-        OrganizationRole.objects.create(
-            organization=self.org, user=self.user, admin=True)
-        self.url = '/v1/collect/'
         self.superuser_role = Role.objects.get(name='superuser')
 
-    def _get_form(self, form_name):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb'
-        ).read()
-        form = storage.save('{}.xlsx'.format(form_name), file)
-        return form
+    def _get_questionnaire(self, id=None, version=None):
+        form = get_form('xls-form')
 
-    def _get(self, user=None, status=None, project=None):
-        if user is None:
-            user = self.user
+        kwargs = {'project': self.prj, 'xls_form': form}
+        if id:
+            kwargs.update({'id_string': id})
+        if version:
+            kwargs.update({'version': version})
 
-        request = APIRequestFactory().get(self.url)
-        force_authenticate(request, user=user)
-        response = api.XFormListView.as_view({'get': 'list'})(
-            request).render()
-        content = response.content.decode('utf-8')
-
-        if status is not None:
-            assert response.status_code == status
-
-        return content
+        return QuestionnaireFactory.create(**kwargs)
 
     def test_get_xforms(self):
-        questionnaire = QuestionnaireFactory.create(
-            project=self.prj, xls_form=self._get_form('xls-form'))
-        content = self._get(status=200)
-        assert questionnaire.md5_hash in content
-        assert str(questionnaire.version) in content
-        assert questionnaire.xml_form.url in content
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, admin=True)
+        questionnaire = self._get_questionnaire()
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert questionnaire.md5_hash in response.content
+        assert questionnaire.xml_form.url in response.content
+        assert str(questionnaire.version) in response.content
 
     def test_get_xforms_with_unauthroized_user(self):
-        user = UserFactory.create()
-        questionnaire = QuestionnaireFactory.create(
-            project=self.prj, xls_form=self._get_form('xls-form'))
-        content = self._get(user=user, status=200)
+        questionnaire = self._get_questionnaire()
+        response = self.request(user=self.user)
 
-        assert questionnaire.md5_hash not in content
-        assert questionnaire.xml_form.url not in content
+        assert response.status_code == 200
+        assert questionnaire.md5_hash not in response.content
+        assert questionnaire.xml_form.url not in response.content
 
     def test_get_xforms_with_superuser(self):
-        superuser = UserFactory.create()
-        superuser.assign_policies(self.superuser_role)
-        questionnaire = QuestionnaireFactory.create(
-            project=self.prj, xls_form=self._get_form('xls-form'))
-        content = self._get(user=superuser, status=200)
+        self.user.assign_policies(self.superuser_role)
+        questionnaire = self._get_questionnaire()
+        response = self.request(user=self.user)
 
-        assert questionnaire.md5_hash in content
-        assert questionnaire.xml_form.url in content
+        assert response.status_code == 200
+        assert questionnaire.md5_hash in response.content
+        assert questionnaire.xml_form.url in response.content
 
     def test_get_xforms_with_no_superuser(self):
-        user = UserFactory.create()
         OrganizationRole.objects.create(
-            organization=self.org, user=user, admin=False)
-        version = 2016072516330112
-        q1 = QuestionnaireFactory.create(
-            project=self.prj, xls_form=self._get_form('xls-form'),
-            version=version, id_string='test_form_1'
-        )
-        q2 = QuestionnaireFactory.create(
-            project=self.prj, xls_form=self._get_form('xls-form'),
-            version=version + 1, id_string='test_form_2'
-        )
+            organization=self.org, user=self.user, admin=False)
+        q1 = self._get_questionnaire(id='form_1', version=2016072516330112)
+        q2 = self._get_questionnaire(id='form_2', version=2016072516330113)
         assert Questionnaire.objects.all().count() == 2
         assert q1.version != q2.version
 
-        content = self._get(user=user, status=200)
-        xml = etree.fromstring(content.encode('utf-8'))
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        print(response.content)
+
+        xml = etree.fromstring(response.content.encode('utf-8'))
         ns = {'xf': 'http://openrosa.org/xforms/xformsList'}
         # expect one xform element in response
         assert len(xml.xpath('.//xf:xform', namespaces=ns)) == 1
         assert xml.find(
-            './/xf:xform/xf:version', namespaces=ns
-        ).text == str(version + 1)
+            './/xf:xform/xf:version', namespaces=ns).text == '2016072516330113'
         assert xml.find(
-            './/xf:xform/xf:formID', namespaces=ns
-        ).text == 'test_form_2'
+            './/xf:xform/xf:formID', namespaces=ns).text == 'form_2'
 
     def test_get_without_data(self):
-        request = APIRequestFactory().get(self.url)
-        force_authenticate(request, user=self.user)
-        response = api.XFormListView.as_view({'get': 'list'})(request).render()
-        content = response.content.decode('utf-8')
-        assert 'formID' not in content
-        assert 'downloadUrl' not in content
-        assert 'hash' not in content
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, admin=True)
+        response = self.request(user=self.user)
+        assert 'formID' not in response
+        assert 'downloadUrl' not in response
+        assert 'hash' not in response
 
 
-@pytest.mark.usefixtures('make_dirs')
-class XFormSubmissionTest(UserTestCase):
+class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
+    view_class = api.XFormSubmissionViewSet
+    viewset_actions = {'post': 'create', 'head': 'create'}
 
-    def setUp(self):
-        super().setUp()
+    def setup_models(self):
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create()
         self.prj = ProjectFactory.create(organization=self.org)
@@ -152,14 +131,14 @@ class XFormSubmissionTest(UserTestCase):
 
         QuestionnaireFactory.create(
             project=self.prj,
-            xls_form=self._get_form('test_standard_questionnaire'),
+            xls_form=get_form('test_standard_questionnaire'),
             filename='test_standard_questionnaire',
             id_string='test_standard_questionnaire',
             version=20160727122110)
 
         questionnaire = QuestionnaireFactory.create(
             project=self.prj_2,
-            xls_form=self._get_form('test_standard_questionnaire_2'),
+            xls_form=get_form('test_standard_questionnaire_2'),
             filename='test_standard_questionnaire_2',
             id_string='test_standard_questionnaire_2',
             version=20160727122111)
@@ -172,12 +151,10 @@ class XFormSubmissionTest(UserTestCase):
 
         QuestionnaireFactory.create(
             project=self.prj_3,
-            xls_form=self._get_form('test_standard_questionnaire_bad'),
+            xls_form=get_form('test_standard_questionnaire_bad'),
             filename='test_standard_questionnaire_bad',
             id_string='test_standard_questionnaire_bad',
             version=20160727122112)
-
-        self.url = '/collect/submission/'
 
         # project 1
         create_attrs_schema(
@@ -215,15 +192,6 @@ class XFormSubmissionTest(UserTestCase):
             content_type=ContentType.objects.get(
                 app_label='party', model='tenurerelationship'), errors=[])
 
-    def _get_form(self, form_name):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb'
-        ).read()
-        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
-        return form
-
     def _get_resource(self, file_name, file_type):
         file = open(
             path + '/xforms/tests/files/{}.{}'.format(file_name, file_type),
@@ -231,7 +199,19 @@ class XFormSubmissionTest(UserTestCase):
         ).read()
         return file
 
+    def _make_form_file(self, content):
+        return InMemoryUploadedFile(
+            io.StringIO(content),
+            field_name='test_standard_questionnaire',
+            name='test_standard_questionnaire.xml',
+            content_type='text/xml',
+            size=len(content),
+            charset='utf-8',
+        )
+
     def _submission(self, form, image=[], file=False):
+        form_content = str.encode(responses[form]).decode('ascii')
+
         data = {}
         for image_name in image:
             img = self._get_resource(file_name=image_name, file_type='png')
@@ -256,65 +236,29 @@ class XFormSubmissionTest(UserTestCase):
             )
             data[file.name] = file
 
-        form = InMemoryUploadedFile(
-            io.StringIO(form),
-            field_name='test_standard_questionnaire',
-            name='test_standard_questionnaire.xml',
-            content_type='text/xml',
-            size=len(form),
-            charset='utf-8',
-        )
-        data['xml_submission_file'] = form
+        form_file = self._make_form_file(form_content)
+        data['xml_submission_file'] = form_file
         return data
 
     def _invalid_submission(self, form=None):
-        data = {}
-        file = InMemoryUploadedFile(
-            io.StringIO(form),
-            field_name='test_standard_questionnaire',
-            name='test_standard_questionnaire.xml',
-            content_type='text/xml',
-            size=len(form),
-            charset='utf-8',
-        )
-        data = {file.name: file}
-        return data
-
-    def _post(self, status=None, form=None, user=None,
-              image=[], valid=True, file=False):
-        if user is None:
-            user = self.user
-        if valid:
-            form = str.encode(responses[form]).decode('ascii')
-            data = self._submission(form=form, image=image, file=file)
-        else:
-            data = self._invalid_submission(form=form)
-
-        request = APIRequestFactory().post(self.url, data)
-        force_authenticate(request, user=user)
-        response = api.XFormSubmissionViewSet.as_view({'post': 'create'})(
-            request).render()
-
-        if status is not None:
-            assert response.status_code == status
-
-        return response
+        form = self._make_form_file(form)
+        return {form.name: form}
 
     def _getResponseMessage(self, response):
-        xml = etree.fromstring(response.data)
+        xml = etree.fromstring(response.content)
         ns = {'or': 'http://openrosa.org/http/response'}
-        return xml.find(
-            './/or:message', namespaces=ns
-        ).text
+        return xml.find('.//or:message', namespaces=ns).text
 
     def test_submission_upload(self):
-        self._post(form='form',
-                   image=['test_image_one', 'test_image_two'],
-                   status=201)
+        data = self._submission(form='form',
+                                image=['test_image_one', 'test_image_two'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
 
         party = Party.objects.get(name='Bilbo Baggins')
         location = SpatialUnit.objects.get(attributes={'name': 'Middle Earth'})
-
         assert location in party.tenure_relationships.all()
         assert len(location.resources) == 1
         assert location.resources[0] == Resource.objects.get(
@@ -323,38 +267,69 @@ class XFormSubmissionTest(UserTestCase):
         assert party.resources[0] == Resource.objects.get(
             name__contains='test_image_two')
 
-    def test_geometry_field_choices(self):
-        self._post(form='line_form', status=201)
-        self._post(form='poly_form', status=201)
-        self._post(form='missing_semi_form', status=201)
-        self._post(form='geoshape_form', status=201)
-        polygon = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
-        line = SpatialUnit.objects.get(attributes={'name': 'Line'})
-        point = SpatialUnit.objects.get(attributes={'name': 'Missing Semi'})
-        geoshape = SpatialUnit.objects.get(attributes={'name': 'Geoshape'})
+    def test_line_upload(self):
+        data = self._submission(form='line_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
 
-        assert polygon.geometry.geom_type == 'Polygon'
-        assert line.geometry.geom_type == 'LineString'
-        assert point.geometry.geom_type == 'Point'
-        assert geoshape.geometry.geom_type == 'Polygon'
+        geom = SpatialUnit.objects.get(attributes={'name': 'Line'})
+        assert response.status_code == 201
+        assert geom.geometry.geom_type == 'LineString'
+
+    def test_polygon_upload(self):
+        data = self._submission(form='poly_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+
+        geom = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
+        assert response.status_code == 201
+        assert geom.geometry.geom_type == 'Polygon'
+
+    def test_point_upload(self):
+        data = self._submission(form='missing_semi_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+
+        geom = SpatialUnit.objects.get(attributes={'name': 'Missing Semi'})
+        assert response.status_code == 201
+        assert geom.geometry.geom_type == 'Point'
+
+    def test_geoshape_upload(self):
+        data = self._submission(form='geoshape_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+
+        geom = SpatialUnit.objects.get(attributes={'name': 'Geoshape'})
+        assert response.status_code == 201
+        assert geom.geometry.geom_type == 'Polygon'
 
     def test_invalid_submission_upload(self):
         # testing submitting with a missing xml_submission_file
-        response = self._post(
-            form='This is not an xml form!', status=400, valid=False
-        )
+        data = self._invalid_submission(form='This is not an xml form!')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "XML submission not found"
 
-        response = self._post(form='bad_location_form')
+        data = self._submission(form='bad_location_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "Location error: 'location_type'"
 
-        response = self._post(form='bad_party_form')
+        data = self._submission(form='bad_party_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "Party error: 'party_name'"
 
-        response = self._post(form='bad_tenure_form')
+        data = self._submission(form='bad_tenure_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "Tenure relationship error: 'tenure_type'"
 
@@ -364,9 +339,12 @@ class XFormSubmissionTest(UserTestCase):
         ).read()
         bad_file = bad_file.decode('utf-8')
 
-        response = self._post(form='bad_resource_form',
-                              image=['test_image_one'],
-                              file=bad_file)
+        data = self._submission(form='bad_resource_form',
+                                image=['test_image_one'],
+                                file=bad_file)
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
         msg = self._getResponseMessage(response)
         exp = "{'mime_type': ['Files of type text/html are not accepted.']}"
         assert msg == exp
@@ -376,30 +354,36 @@ class XFormSubmissionTest(UserTestCase):
         assert len(Resource.objects.all()) == 0
 
     def test_anonymous_user(self):
-        self._post(form='form', user=AnonymousUser(), status=403)
+        data = self._submission(form='form')
+        response = self.request(method='POST', post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 403
 
     def test_questionnaire_not_found(self):
         with pytest.raises(ValidationError):
-            self._post(form='bad_questionnaire',
-                       status=400)
+            data = self._submission(form='bad_questionnaire')
+            response = self.request(method='POST',
+                                    post_data=data,
+                                    user=self.user,
+                                    content_type='multipart/form-data')
+            assert response.status_code == 400
 
     def test_no_content_head(self):
-        request = APIRequestFactory().head(self.url)
-        force_authenticate(request, user=self.user)
-        response = api.XFormSubmissionViewSet.as_view({'head': 'create'})(
-            request).render()
-
+        response = self.request(method='HEAD', user=self.user)
         assert response.status_code == 204
 
     def test_form_not_current_questionnaire(self):
         # update the default form to a new version
         QuestionnaireFactory.create(
             project=self.prj,
-            xls_form=self._get_form('test_standard_questionnaire'),
+            xls_form=get_form('test_standard_questionnaire'),
             filename='test_standard_questionnaire_updated',
             id_string='test_standard_questionnaire',
             version=20160727122111
         )
-        response = self._post(form='form', status=400)
+        data = self._submission(form='form')
+        response = self.request(method='POST', post_data=data,
+                                user=self.user,
+                                content_type='multipart/form-data')
         msg = self._getResponseMessage(response)
         assert msg == 'Form out of date'

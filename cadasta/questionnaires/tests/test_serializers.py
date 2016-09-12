@@ -7,7 +7,7 @@ from buckets.test.storage import FakeS3Storage
 
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.files import make_dirs  # noqa
 
 from . import factories
 from .. import serializers

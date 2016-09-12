@@ -2,9 +2,10 @@ import os
 import pytest
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 
@@ -15,7 +16,7 @@ path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ResourceModelTest(UserTestCase):
+class ResourceModelTest(UserTestCase, TestCase):
     def test_project_resource(self):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()

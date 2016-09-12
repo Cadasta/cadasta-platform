@@ -2,10 +2,11 @@ import random
 import pytest
 from datetime import datetime
 from django.utils.translation import gettext as _
+from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
 
-from core.tests.base_test_case import UserTestCase
+from core.tests.utils.cases import UserTestCase
 from ..serializers import (
     RegistrationSerializer, UserSerializer, AccountLoginSerializer
 )
@@ -23,7 +24,7 @@ BASIC_TEST_DATA = {
 }
 
 
-class RegistrationSerializerTest(UserTestCase):
+class RegistrationSerializerTest(UserTestCase, TestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = RegistrationSerializer(user)
@@ -90,7 +91,7 @@ class RegistrationSerializerTest(UserTestCase):
                 in serializer._errors['username'])
 
 
-class UserSerializerTest(UserTestCase):
+class UserSerializerTest(UserTestCase, TestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = UserSerializer(user)
@@ -160,7 +161,7 @@ class UserSerializerTest(UserTestCase):
             _("Username cannot be “add” or “new”.")]
 
 
-class AccountLoginSerializerTest(UserTestCase):
+class AccountLoginSerializerTest(UserTestCase, TestCase):
     def test_unverified_account(self):
         """Serializer should raise EmailNotVerifiedError exeception when the
            user has not verified their email address within 48 hours"""

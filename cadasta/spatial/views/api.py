@@ -55,6 +55,9 @@ class SpatialRelationshipCreate(APIPermissionRequiredMixin,
     permission_required = 'spatial_rel.create'
     serializer_class = serializers.SpatialRelationshipWriteSerializer
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
 
 class SpatialRelationshipDetail(APIPermissionRequiredMixin,
                                 mixins.SpatialRelationshipQuerySetMixin,

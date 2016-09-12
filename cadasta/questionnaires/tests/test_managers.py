@@ -4,12 +4,12 @@ import pytest
 from lxml import etree
 
 from buckets.test.storage import FakeS3Storage
-from core.tests.util import make_dirs  # noqa
 from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
+from core.tests.utils.files import make_dirs  # noqa
 
 from . import factories
 from .. import models

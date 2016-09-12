@@ -36,6 +36,10 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
         if old_email != new_email:
             self.send_email(**self.get_send_email_kwargs(user))
 
+    def put(self, *args, **kwargs):
+        print(self.request.method)
+        return super().put(*args, **kwargs)
+
 
 class AccountRegister(djoser_views.RegistrationView):
     token_generator = cadastaTokenGenerator

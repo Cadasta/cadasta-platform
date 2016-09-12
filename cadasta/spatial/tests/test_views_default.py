@@ -3,16 +3,18 @@ import pytest
 import json
 from django.http import Http404
 from django.conf import settings
-from django.template.loader import render_to_string
-from django.contrib.messages.api import get_messages
 from django.contrib.contenttypes.models import ContentType
+from django.test import TestCase
 
 from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
+from skivvy import ViewTestCase
 
+from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
-from core.tests.util import TestCase, make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
@@ -52,20 +54,17 @@ def assign_policies(user):
     assign_user_policies(user, policy)
 
 
-class LocationsListTest(TestCase):
-    view = default.LocationsList
+class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationsList
     template = 'spatial/location_map.html'
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.locations = SpatialUnitFactory.create_batch(
             2, project=self.project)
         SpatialUnitFactory.create()
 
-    def get_template_context(self):
+    def setup_template_context(self):
         geojson = json.dumps(
             SpatialUnitGeoJsonSerializer(self.locations, many=True).data)
         return {
@@ -74,35 +73,39 @@ class LocationsListTest(TestCase):
             'geojson': geojson
         }
 
-    def get_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response, content = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
 
-class LocationAddTest(TestCase):
-    view = default.LocationsAdd
+class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationsAdd
     template = 'spatial/location_add.html'
     success_url_name = 'locations:detail'
     post_data = {
@@ -115,7 +118,7 @@ class LocationAddTest(TestCase):
         'attributes::fname': 'Test text'
     }
 
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create(current_questionnaire='a1')
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
@@ -130,10 +133,7 @@ class LocationAddTest(TestCase):
             required=False, omit=False
         )
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def get_template_context(self):
+    def setup_template_context(self):
         return {
             'object': self.project,
             'form': forms.LocationForm(
@@ -152,13 +152,13 @@ class LocationAddTest(TestCase):
             'geojson': '{"type": "FeatureCollection", "features": []}'
         }
 
-    def get_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug
         }
 
-    def get_success_url_kwargs(self):
+    def setup_success_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
@@ -166,55 +166,61 @@ class LocationAddTest(TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to add "
-                "locations to this project."
-                in [str(m) for m in get_messages(self.request)])
+                "locations to this project." in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        response = self.request(method='POST', user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user)
+
         assert SpatialUnit.objects.count() == 1
         self.location_created = SpatialUnit.objects.first()
         assert self.location_created.attributes.get('fname') == 'Test text'
         assert response.status_code == 302
-        assert response['location'] == self.expected_success_url
+        assert response.location == self.expected_success_url
 
     def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(method='POST', user=user)
         assert SpatialUnit.objects.count() == 0
         assert response.status_code == 302
         assert ("You don't have permission to add "
-                "locations to this project."
-                in [str(m) for m in get_messages(self.request)])
+                "locations to this project." in response.messages)
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert SpatialUnit.objects.count() == 0
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
 
-class LocationDetailTest(TestCase):
-    view = default.LocationDetail
+class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationDetail
     template = 'spatial/location_detail.html'
 
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create()
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
@@ -231,10 +237,7 @@ class LocationDetailTest(TestCase):
         self.location = SpatialUnitFactory.create(
             project=self.project, attributes={'fname': 'test'})
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def get_template_context(self):
+    def setup_template_context(self):
         return {
             'object': self.project,
             'location': self.location,
@@ -242,7 +245,7 @@ class LocationDetailTest(TestCase):
             'attributes': (('Test field', 'test', ), )
         }
 
-    def get_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
@@ -250,34 +253,39 @@ class LocationDetailTest(TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_non_existend_location(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'location': 'abc123'})
+            self.request(user=user, url_kwargs={'location': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to view this location."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
 
-class LocationEditTest(TestCase):
-    view = default.LocationEdit
+class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationEdit
     template = 'spatial/location_edit.html'
     success_url_name = 'locations:detail'
     post_data = {
@@ -290,7 +298,7 @@ class LocationEditTest(TestCase):
         'attributes::fname': 'New text'
     }
 
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create()
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
@@ -307,23 +315,13 @@ class LocationEditTest(TestCase):
         self.location = SpatialUnitFactory.create(
             project=self.project, attributes={'fname': 'test'})
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def get_template_context(self):
+    def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
                 'form': forms.LocationForm(instance=self.location),
                 'geojson': '{"type": "FeatureCollection", "features": []}'}
 
-    def get_url_kwargs(self):
-        return {
-            'organization': self.project.organization.slug,
-            'project': self.project.slug,
-            'location': self.location.id
-        }
-
-    def get_success_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
@@ -331,156 +329,165 @@ class LocationEditTest(TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_non_existend_location(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'location': 'abc123'})
+            self.request(user=user, url_kwargs={'location': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to update this location."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        response = self.request(method='POST', user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert response['location'] == self.expected_success_url
+        assert response.location == self.expected_success_url
 
         self.location.refresh_from_db()
         assert self.location.type == self.post_data['type']
         assert self.location.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert ("You don't have permission to update this location."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         self.location.refresh_from_db()
         assert self.location.type != self.post_data['type']
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
         self.location.refresh_from_db()
         assert self.location.type != self.post_data['type']
 
 
-class LocationDelete(TestCase):
-    view = default.LocationDelete
+class LocationDelete(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationDelete
     template = 'spatial/location_delete.html'
     success_url_name = 'locations:list'
-    post_data = {}
 
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.location = SpatialUnitFactory.create(project=self.project)
         TenureRelationshipFactory.create(
             project=self.project, spatial_unit=self.location)
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def get_template_context(self):
+    def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
                 'geojson': '{"type": "FeatureCollection", "features": []}'}
 
-    def get_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.location.id
         }
 
-    def get_success_url_kwargs(self):
+    def setup_success_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_non_existend_location(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'location': 'abc123'})
+            self.request(user=user, url_kwargs={'location': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to remove this location."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        response = self.request(method='POST', user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert response['location'] == self.expected_success_url
+        assert response.location == self.expected_success_url
 
         assert SpatialUnit.objects.count() == 0
         assert TenureRelationship.objects.count() == 0
 
     def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert ("You don't have permission to remove this location."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         assert SpatialUnit.objects.count() == 1
         assert TenureRelationship.objects.count() == 1
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
         assert SpatialUnit.objects.count() == 1
         assert TenureRelationship.objects.count() == 1
 
 
 @pytest.mark.usefixtures('make_dirs')
-class LocationResourceAddTest(TestCase):
-    view = default.LocationResourceAdd
+class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationResourceAdd
     template = 'spatial/resources_add.html'
     success_url_name = 'locations:detail'
 
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.location = SpatialUnitFactory.create(project=self.project)
         self.attached = ResourceFactory.create(project=self.project,
                                                content_object=self.location)
         self.unattached = ResourceFactory.create(project=self.project)
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def get_template_context(self):
+    def setup_template_context(self):
         form = AddResourceFromLibraryForm(content_object=self.location,
                                           project_id=self.project.id)
         return {'object': self.project,
@@ -488,53 +495,56 @@ class LocationResourceAddTest(TestCase):
                 'form': form,
                 'geojson': '{"type": "FeatureCollection", "features": []}'}
 
-    def get_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.location.id
         }
 
-    def get_success_url_kwargs(self):
-        return self.get_url_kwargs()
-
-    def get_post_data(self):
+    def setup_post_data(self):
         return {
             self.attached.id: False,
             self.unattached.id: True,
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_non_existend_location(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'location': 'abc123'})
+            self.request(user=user, url_kwargs={'location': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to "
-                "add resources to this location."
-                in [str(m) for m in get_messages(self.request)])
+                "add resources to this location." in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        response = self.request(method='POST', user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert response['location'] == self.expected_success_url + '#resources'
+        assert response.location == self.expected_success_url + '#resources'
 
         location_resources = self.location.resources.all()
         assert len(location_resources) == 2
@@ -542,47 +552,41 @@ class LocationResourceAddTest(TestCase):
         assert self.unattached in location_resources
 
     def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert ("You don't have permission to "
-                "add resources to this location."
-                in [str(m) for m in get_messages(self.request)])
+                "add resources to this location." in response.messages)
         assert self.location.resources.count() == 1
         assert self.location.resources.first() == self.attached
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
         assert self.location.resources.count() == 1
         assert self.location.resources.first() == self.attached
 
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class LocationResourceNewTest(TestCase):
-    view = default.LocationResourceNew
+class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.LocationResourceNew
     template = 'spatial/resources_new.html'
     success_url_name = 'locations:detail'
 
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create()
         self.location = SpatialUnitFactory.create(project=self.project)
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def get_url_kwargs(self):
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.location.id
         }
 
-    def get_success_url_kwargs(self):
-        return self.get_url_kwargs()
-
-    def get_template_context(self):
+    def setup_template_context(self):
         form = ResourceForm(content_object=self.location,
                             project_id=self.project.id)
         return {'object': self.project,
@@ -590,7 +594,7 @@ class LocationResourceNewTest(TestCase):
                 'form': form,
                 'geojson': '{"type": "FeatureCollection", "features": []}'}
 
-    def get_post_data(self):
+    def setup_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
@@ -605,63 +609,75 @@ class LocationResourceNewTest(TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_non_existend_location(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'location': 'abc123'})
+            self.request(user=user, url_kwargs={'location': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to "
-                "add resources to this location."
-                in [str(m) for m in get_messages(self.request)])
+                "add resources to this location." in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        response = self.request(method='POST', user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert response['location'] == self.expected_success_url + '#resources'
+        assert response.location == self.expected_success_url + '#resources'
 
         assert self.location.resources.count() == 1
 
     def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert ("You don't have permission to "
-                "add resources to this location."
-                in [str(m) for m in get_messages(self.request)])
+                "add resources to this location." in response.messages)
         assert self.location.resources.count() == 0
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
         assert self.location.resources.count() == 0
 
 
-class TenureRelationshipAddTest(TestCase):
-    view = default.TenureRelationshipAdd
+class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.TenureRelationshipAdd
     template = 'spatial/relationship_add.html'
     success_url_name = 'locations:detail'
+    post_data = {
+        'new_entity': 'on',
+        'id': '',
+        'name': 'The Beatles',
+        'party_type': 'GR',
+        'tenure_type': 'CU',
+        'party::p_name': 'Party Name',
+        'relationship::r_name': 'Rel Name'
+    }
 
-    def assign_policies(self):
-        assign_policies(self.authorized_user)
-
-    def set_up_models(self):
+    def setup_models(self):
         self.project = ProjectFactory.create(current_questionnaire='a1')
         self.spatial_unit = SpatialUnitFactory(project=self.project)
         content_type = ContentType.objects.get(
@@ -690,83 +706,96 @@ class TenureRelationshipAddTest(TestCase):
             required=False, omit=False
         )
 
-    def get_url_kwargs(self):
+    def setup_template_context(self):
+        return {
+            'object': self.project,
+            'location': self.spatial_unit,
+            'form': forms.TenureRelationshipForm(
+                project=self.project,
+                spatial_unit=self.spatial_unit,
+                schema_selectors=(
+                    {'name': 'organization',
+                     'value': self.project.organization,
+                     'selector': self.project.organization.id},
+                    {'name': 'project',
+                     'value': self.project,
+                     'selector': self.project.id},
+                    {'name': 'questionnaire',
+                     'value': self.project.current_questionnaire,
+                     'selector': self.project.current_questionnaire}
+                ),
+                initial={
+                    'new_entity': not self.project.parties.exists(),
+                },
+            ),
+            'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
+                [self.spatial_unit], many=True).data),
+        }
+        # return {
+        #     'object': self.project,
+        #     'location': self.spatial_unit,
+        #     'form': forms.TenureRelationshipForm(
+        #         project=self.project,
+        #         spatial_unit=self.spatial_unit,
+        #         schema_selectors=(
+        #             {'name': 'organization',
+        #              'value': self.project.organization,
+        #              'selector': self.project.organization.id},
+        #             {'name': 'project',
+        #              'value': self.project,
+        #              'selector': self.project.id},
+        #             {'name': 'questionnaire',
+        #              'value': self.project.current_questionnaire,
+        #              'selector': self.project.current_questionnaire}
+        #         )),
+        #     'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
+        #         [self.spatial_unit], many=True).data)
+        # }
+
+    def setup_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.spatial_unit.id
         }
 
-    def get_success_url_kwargs(self):
-        return self.get_url_kwargs()
-
-    def get_post_data(self):
-        return {
-            'new_entity': 'on',
-            'id': '',
-            'name': 'The Beatles',
-            'party_type': 'GR',
-            'tenure_type': 'CU',
-            'party::p_name': 'Party Name',
-            'relationship::r_name': 'Rel Name'
-        }
-
-    def get_template_context(self):
-        return {'object': self.project,
-                'location': self.spatial_unit,
-                'form': forms.TenureRelationshipForm(
-                    project=self.project,
-                    spatial_unit=self.spatial_unit,
-                    schema_selectors=(
-                        {'name': 'organization',
-                         'value': self.project.organization,
-                         'selector': self.project.organization.id},
-                        {'name': 'project',
-                         'value': self.project,
-                         'selector': self.project.id},
-                        {'name': 'questionnaire',
-                         'value': self.project.current_questionnaire,
-                         'selector': self.project.current_questionnaire}
-                    ),
-                    initial={
-                        'new_entity': not self.project.parties.exists(),
-                    },
-                ),
-                'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
-                    [self.spatial_unit], many=True).data),
-                }
-
     def test_get_with_authorized_user(self):
-        response, content = self.request(user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert content == self.expected_content()
+        assert response.content == self.expected_content
 
     def test_get_from_non_existent_project(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'project': 'abc123'})
+            self.request(user=user, url_kwargs={'project': 'abc123'})
 
     def test_get_non_existent_location(self):
+        user = UserFactory.create()
+        assign_policies(user)
         with pytest.raises(Http404):
-            self.request(user=self.authorized_user,
-                         url_kwargs={'location': 'abc123'})
+            self.request(user=user, url_kwargs={'location': 'abc123'})
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to add tenure relationships to "
-                "this project."
-                in [str(m) for m in get_messages(self.request)])
+                "this project." in response.messages)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
 
     def test_post_new_party_with_authorized(self):
-        response = self.request(method='POST', user=self.authorized_user)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert (response['location'] ==
+        assert (response.location ==
                 self.expected_success_url + '#relationships')
 
         assert TenureRelationship.objects.count() == 1
@@ -777,11 +806,13 @@ class TenureRelationshipAddTest(TestCase):
         assert party.attributes.get('p_name') == 'Party Name'
 
     def test_post_existing_party_with_authorized(self):
+        user = UserFactory.create()
+        assign_policies(user)
         party = PartyFactory.create(project=self.project)
-        response = self.request(method='POST', user=self.authorized_user,
-                                data={'new_entity': '', 'id': party.id})
+        response = self.request(method='POST', user=user,
+                                post_data={'new_entity': '', 'id': party.id})
         assert response.status_code == 302
-        assert (response['location'] ==
+        assert (response.location ==
                 self.expected_success_url + '#relationships')
 
         assert TenureRelationship.objects.count() == 1
@@ -791,16 +822,15 @@ class TenureRelationshipAddTest(TestCase):
         assert Party.objects.first().name == party.name
 
     def test_post_with_authorized_invalid_new_party_data(self):
-        response, content = self.request(method='POST',
-                                         user=self.authorized_user,
-                                         data={'name': '',
-                                               'party_type': ''})
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST',
+                                user=user,
+                                post_data={'name': '', 'party_type': ''})
         assert response.status_code == 200
-        context = self.get_template_context()
-        data = self.get_post_data()
-        data['name'] = ''
-        data['party_type'] = ''
-        context['form'] = forms.TenureRelationshipForm(
+        data = self.post_data.copy()
+        data.update({'name': '', 'party_type': ''})
+        form = forms.TenureRelationshipForm(
             project=self.project,
             spatial_unit=self.spatial_unit,
             data=data,
@@ -815,23 +845,24 @@ class TenureRelationshipAddTest(TestCase):
                  'value': self.project.current_questionnaire,
                  'selector': self.project.current_questionnaire}
             ))
-        expected = render_to_string(
-            self.template, context, request=self.request)
-        assert content == expected
+        expected = self.render_content(form=form)
+        assert response.content == expected
 
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 0
 
     def test_post_with_authorized_invalid_existing_party_data(self):
+        user = UserFactory.create()
+        assign_policies(user)
+
         party = PartyFactory.create(project=self.project)
-        response, content = self.request(method='POST',
-                                         user=self.authorized_user,
-                                         data={'new_entity': ''})
-        assert response.status_code == 200
-        context = self.get_template_context()
-        data = self.get_post_data()
+        response = self.request(method='POST',
+                                user=user,
+                                post_data={'new_entity': ''})
+
+        data = self.post_data.copy()
         data['new_entity'] = ''
-        context['form'] = forms.TenureRelationshipForm(
+        form = forms.TenureRelationshipForm(
             project=self.project,
             spatial_unit=self.spatial_unit,
             data=data,
@@ -845,27 +876,27 @@ class TenureRelationshipAddTest(TestCase):
                 {'name': 'questionnaire',
                  'value': self.project.current_questionnaire,
                  'selector': self.project.current_questionnaire}
-            ))
-        expected = render_to_string(
-            self.template, context, request=self.request)
-        assert content == expected
-
+            )
+        )
+        assert response.status_code == 200
+        assert response.content == self.render_content(form=form)
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 1
         assert Party.objects.first().name == party.name
 
     def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=self.unauthorized_user)
+        user = UserFactory.create()
+        response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert ("You don't have permission to add tenure relationships to "
                 "this project."
-                in [str(m) for m in get_messages(self.request)])
+                in response.messages)
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 0
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
-        assert '/account/login/' in response['location']
+        assert '/account/login/' in response.location
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 0
