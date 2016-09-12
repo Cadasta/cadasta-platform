@@ -461,6 +461,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
         access = form_data[1].get('access')
         url = form_data[1]['url']
         questionnaire = form_data[1].get('questionnaire')
+        original_file = form_data[1].get('original_file')
         contacts = form_data[1].get('contacts')
 
         org = Organization.objects.get(slug=organization)
@@ -485,6 +486,7 @@ class ProjectAddWizard(SuperUserCheckMixin,
                 if questionnaire:
                     Questionnaire.objects.create_from_form(
                         project=project,
+                        original_file=original_file,
                         xls_form=questionnaire
                     )
         except InvalidXLSForm as e:
@@ -561,6 +563,7 @@ class ProjectEditDetails(ProjectEdit, generic.UpdateView):
             questionnaire = Questionnaire.objects.get(
                 id=self.object.current_questionnaire)
             initial['questionnaire'] = questionnaire.xls_form.url
+            initial['original_file'] = questionnaire.original_file
         except Questionnaire.DoesNotExist:
             pass
 

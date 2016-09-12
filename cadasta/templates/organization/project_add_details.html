@@ -115,6 +115,7 @@
                   <div class="well file-well">
                     {% render_field wizard.form.questionnaire class+="form-control" %}
                     <p class="help-block">Accepted file types: xls, xlsx</p>
+                    {{ wizard.form.original_file }}
                   </div>
                   <div class="alert alert-info alert-full clearfix row" role="alert">
                     <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>

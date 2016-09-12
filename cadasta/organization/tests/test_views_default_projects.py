@@ -502,6 +502,7 @@ class ProjectAddTest(UserTestCase):
         assert extents_response.status_code == 200
         self.DETAILS_POST_DATA['details-questionnaire'] = self._get_xls_form(
             'xls-form')
+        self.DETAILS_POST_DATA['details-original_file'] = 'original.xls'
         details_response = self.client.post(
             reverse('project:add'), self.DETAILS_POST_DATA
         )
@@ -530,8 +531,8 @@ class ProjectAddTest(UserTestCase):
             else:
                 assert False
 
-        assert Questionnaire.objects.filter(project=proj).exists() is True
-        # assert proj.public
+        questionnaire = Questionnaire.objects.get(project=proj)
+        assert questionnaire.original_file == 'original.xls'
 
     def test_wizard_previous(self):
         self.client.force_login(self.users[0])

@@ -403,6 +403,7 @@ class ProjectEditDetailsTest(UserTestCase):
         data = {
             'name': 'New name',
             'questionnaire': self._get_form('xls-form'),
+            'original_file': 'original.xls',
             'access': project.access,
             'contacts-TOTAL_FORMS': 1,
             'contacts-INITIAL_FORMS': 0,
@@ -416,9 +417,10 @@ class ProjectEditDetailsTest(UserTestCase):
 
         project.refresh_from_db()
         assert project.name == data['name']
-        assert (project.questionnaires.get(
-                    id=project.current_questionnaire
-                ).xls_form.url == data['questionnaire'])
+        questionnaire = project.questionnaires.get(
+            id=project.current_questionnaire)
+        assert questionnaire.xls_form.url == data['questionnaire']
+        assert questionnaire.original_file == data['original_file']
 
     def test_add_invalid_questionnaire(self):
         project = ProjectFactory.create()
