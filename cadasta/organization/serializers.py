@@ -101,6 +101,19 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
         )
 
 
+class NestedProjectSerializer(DetailSerializer, FieldSelectorSerializer,
+                              serializers.ModelSerializer):
+    organization = OrganizationSerializer(
+        read_only=True, fields=('id', 'name', 'slug')
+    )
+
+    class Meta:
+        model = Project
+        fields = ('id', 'organization', 'name', 'slug')
+        read_only_fields = ('id', 'slug')
+        detail_only_fields = ('organization',)
+
+
 class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
     org = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()

@@ -33,12 +33,12 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
     def get_project(self):
         if not hasattr(self, 'project_object'):
             org_slug = self.kwargs['organization']
-            prj_id = self.kwargs['project_id']
+            prj_slug = self.kwargs['project']
 
             self.project_object = get_object_or_404(
                 Project,
                 organization__slug=org_slug,
-                pk=prj_id
+                slug=prj_slug
             )
 
         return self.project_object

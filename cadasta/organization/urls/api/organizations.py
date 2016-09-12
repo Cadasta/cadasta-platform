@@ -8,19 +8,19 @@ urlpatterns = [
         api.OrganizationList.as_view(),
         name='list'),
     url(
-        r'^(?P<slug>[-\w]+)/$',
+        r'^(?P<organization>[-\w]+)/$',
         api.OrganizationDetail.as_view(),
         name='detail'),
     url(
-        r'^(?P<slug>[-\w]+)/users/$',
+        r'^(?P<organization>[-\w]+)/users/$',
         api.OrganizationUsers.as_view(),
         name='users'),
     url(
-        r'^(?P<slug>[-\w]+)/users/(?P<username>[-@+.\w]+)/$',
+        r'^(?P<organization>[-\w]+)/users/(?P<username>[-@+.\w]+)/$',
         api.OrganizationUsersDetail.as_view(),
         name='users_detail'),
     url(
-        r'^(?P<slug>[-\w]+)/projects/$',
+        r'^(?P<organization>[-\w]+)/projects/$',
         api.OrganizationProjectList.as_view(),
         name='project_list'),
     url(

@@ -293,8 +293,8 @@ class OrganizationProjectListAPITest(UserTestCase):
         if query is not None:
             setattr(request, 'GET', QueryDict(query))
         force_authenticate(request, user=user)
-        response = api.OrganizationProjectList.as_view()(request,
-                                                         slug=org).render()
+        response = api.OrganizationProjectList.as_view()(
+            request, organization=org).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:
             assert response.status_code == status
@@ -583,7 +583,7 @@ class ProjectCreateAPITest(UserTestCase):
         request = APIRequestFactory().post(url.format(org=org), data)
         force_authenticate(request, user=user)
         response = api.OrganizationProjectList.as_view()(
-            request, slug=org
+            request, organization=org
         ).render()
         content = json.loads(response.content.decode('utf-8'))
         if status is not None:

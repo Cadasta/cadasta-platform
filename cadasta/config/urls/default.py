@@ -33,7 +33,7 @@ api_v1 = [
         include('organization.urls.api.users',
                 namespace='user')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'
-        '(?P<project_id>[-\w]+)/',
+        '(?P<project>[-\w]+)/',
         include('questionnaires.urls.api',
                 namespace='questionnaires')),
     url(r'^organizations/(?P<organization>[-\w]+)/projects/'

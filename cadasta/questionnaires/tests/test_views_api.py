@@ -60,7 +60,7 @@ class QuestionnaireDetailTest(UserTestCase):
         response = api.QuestionnaireDetail.as_view()(
             request,
             organization=self.org.slug,
-            project_id=(project or self.prj.id)).render()
+            project=(project or self.prj.slug)).render()
         content = json.loads(response.content.decode('utf-8'))
 
         if status is not None:
@@ -76,7 +76,7 @@ class QuestionnaireDetailTest(UserTestCase):
         response = api.QuestionnaireDetail.as_view()(
             request,
             organization=self.org.slug,
-            project_id=self.prj.id).render()
+            project=self.prj.slug).render()
         content = json.loads(response.content.decode('utf-8'))
 
         if status is not None:

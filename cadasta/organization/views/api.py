@@ -11,6 +11,8 @@ from . import mixins
 
 
 class OrganizationList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
+    lookup_url_kwarg = 'organization'
+    lookup_field = 'slug'
     queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -38,6 +40,8 @@ class OrganizationDetail(APIPermissionRequiredMixin,
                 return ('org.update', 'org.unarchive')
         return 'org.update'
 
+    lookup_url_kwarg = 'organization'
+    lookup_field = 'slug'
     queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
     lookup_field = 'slug'
@@ -50,6 +54,9 @@ class OrganizationDetail(APIPermissionRequiredMixin,
 class OrganizationUsers(APIPermissionRequiredMixin,
                         mixins.OrganizationRoles,
                         generics.ListCreateAPIView):
+
+    lookup_url_kwarg = 'organization'
+    lookup_field = 'slug'
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = {
         'GET': 'org.users.list',
@@ -60,6 +67,7 @@ class OrganizationUsers(APIPermissionRequiredMixin,
 class OrganizationUsersDetail(APIPermissionRequiredMixin,
                               mixins.OrganizationRoles,
                               generics.RetrieveUpdateDestroyAPIView):
+
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = 'org.users.remove'
 
@@ -101,6 +109,7 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
                               mixins.OrganizationMixin,
                               mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
+    org_lookup = 'organization'
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
@@ -123,7 +132,7 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            organization__slug=self.kwargs['slug']
+            organization__slug=self.kwargs['organization']
         )
 
 
