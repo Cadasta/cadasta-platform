@@ -374,6 +374,38 @@ class ProjectResourcesNewTest(UserTestCase):
         if expected_redirect:
             assert expected_redirect in response['location']
 
+    def _post_invalid(self, user=None, status=None, expected_redirect=None):
+        storage = FakeS3Storage()
+        file = open(path + '/resources/tests/files/mp3.xml', 'rb').read()
+        file_name = storage.save('resources/mp3.xml', file)
+
+        self.data = {
+            'name': 'Some name',
+            'description': '',
+            'file': file_name,
+            'original_file': 'image.png',
+            'mime_type': 'text/xml'
+        }
+
+        if user is None:
+            user = self.user
+
+        setattr(self.request, 'method', 'POST')
+        setattr(self.request, 'POST', self.data)
+        setattr(self.request, 'user', user)
+        setattr(self.request, 'session', 'session')
+        self.messages = FallbackStorage(self.request)
+        setattr(self.request, '_messages', self.messages)
+
+        response = self.view(self.request,
+                             organization=self.project.organization.slug,
+                             project=self.project.slug)
+
+        if status is not None:
+            assert response.status_code == status
+        if expected_redirect:
+            assert expected_redirect in response['location']
+
     def test_get_form(self):
         self._get(status=200)
 
@@ -403,6 +435,10 @@ class ProjectResourcesNewTest(UserTestCase):
         self._post(status=302, expected_redirect=redirect_url)
         assert self.project.resources.count() == 1
         assert self.project.resources.first().name == self.data['name']
+
+    def test_create_invalid_gpx(self):
+        self._post_invalid()
+        assert self.project.resources.count() == 0
 
     def test_create_with_custom_redirect(self):
         setattr(self.request, 'GET', {'next': '/organizations/'})

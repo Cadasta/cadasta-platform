@@ -169,7 +169,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
         default="public", choices=ACCESS_CHOICES, max_length=8
     )
     current_questionnaire = models.CharField(
-      max_length=24, null=True, blank=True
+        max_length=24, null=True, blank=True
     )
 
     history = HistoricalRecords()

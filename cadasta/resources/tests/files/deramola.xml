@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<gpx
+    xmlns="http://www.topografix.com/GPX/1/1"
+    xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+    xmlns:wptx1="http://www.garmin.com/xmlschemas/WaypointExtension/v1"
+    xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+    creator="GPSMAP 64s"
+    version="1.1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd http://www.garmin.com/xmlschemas/TrackStatsExtension/v1 http://www8.garmin.com/xmlschemas/TrackStatsExtension.xsd http://www.garmin.com/xmlschemas/WaypointExtension/v1 http://www8.garmin.com/xmlschemas/WaypointExtensionv1.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd">
+    <metadata>
+        <link href="http://www.garmin.com">
+            <text>Garmin International</text>
+        </link>
+        <time>2015-11-26T13:41:27Z</time>
+    </metadata>
+    <wpt lat="6.464177" lon="3.356520">
+        <ele>13.622299</ele>
+        <time>2015-11-26T13:41:27Z</time>
+        <name>195</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.462206" lon="3.356425">
+        <ele>7.829525</ele>
+        <time>2015-11-26T13:51:15Z</time>
+        <name>DAR001</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.462160" lon="3.356270">
+        <ele>7.996679</ele>
+        <time>2015-11-26T13:56:36Z</time>
+        <name>DAR001</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.463082" lon="3.356254">
+        <ele>10.461362</ele>
+        <time>2015-11-26T14:25:41Z</time>
+        <name>DAR002</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.463735" lon="3.356248">
+        <ele>10.939612</ele>
+        <time>2015-11-26T14:30:11Z</time>
+        <name>DAR003</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.464090" lon="3.356078">
+        <ele>10.251385</ele>
+        <time>2015-11-26T14:32:26Z</time>
+        <name>DAR004</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.464386" lon="3.355974">
+        <ele>9.324635</ele>
+        <time>2015-11-26T14:33:55Z</time>
+        <name>DAR005</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.464852" lon="3.355757">
+        <ele>9.622248</ele>
+        <time>2015-11-26T14:35:42Z</time>
+        <name>DAR006</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.465294" lon="3.355995">
+        <ele>9.543171</ele>
+        <time>2015-11-26T14:37:37Z</time>
+        <name>DAR007</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.466202" lon="3.356234">
+        <ele>12.279270</ele>
+        <time>2015-11-26T14:39:52Z</time>
+        <name>DAR008</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.466017" lon="3.357177">
+        <ele>10.576761</ele>
+        <time>2015-11-26T14:42:10Z</time>
+        <name>DAR009</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.465443" lon="3.357153">
+        <ele>9.989592</ele>
+        <time>2015-11-26T14:44:12Z</time>
+        <name>DAR010</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.464070" lon="3.356506">
+        <ele>9.716374</ele>
+        <time>2015-11-26T14:49:55Z</time>
+        <name>DAR011</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.463657" lon="3.356352">
+        <ele>8.712508</ele>
+        <time>2015-11-26T14:52:02Z</time>
+        <name>DAR012</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.462649" lon="3.356375">
+        <ele>9.852453</ele>
+        <time>2015-11-26T14:55:31Z</time>
+        <name>DAR013</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.462436" lon="3.356389">
+        <ele>9.734131</ele>
+        <time>2015-11-26T14:56:37Z</time>
+        <name>DAR014</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.462434" lon="3.356569">
+        <ele>9.198241</ele>
+        <time>2015-11-26T14:57:35Z</time>
+        <name>DAR014</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+    <wpt lat="6.462282" lon="3.356593">
+        <ele>8.587943</ele>
+        <time>2015-11-26T14:58:34Z</time>
+        <name>DAR015</name>
+        <sym>Flag, Blue</sym>
+    </wpt>
+</gpx>

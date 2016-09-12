@@ -1,8 +1,9 @@
-from .models import Resource, ContentObject
-from rest_framework import serializers
-from django.utils.translation import ugettext as _
-
+import json
 from buckets.serializers import S3Field
+from django.utils.translation import ugettext as _
+from rest_framework import serializers
+
+from .models import ContentObject, Resource, SpatialResource
 
 
 class ResourceSerializer(serializers.ModelSerializer):
@@ -44,3 +45,24 @@ class ResourceSerializer(serializers.ModelSerializer):
                 project_id=self.context['project_id'],
                 **validated_data
             )
+
+
+class SpatialResourceSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+    geom = serializers.SerializerMethodField()
+
+    class Meta:
+        model = SpatialResource
+        fields = ('id', 'name', 'time', 'geom')
+
+    def get_geom(self, obj):
+        return json.loads(obj.geom.geojson)
+
+
+class ReadOnlyResourceSerializer(serializers.Serializer):
+    id = serializers.CharField()
+    name = serializers.CharField()
+    description = serializers.CharField()
+    original_file = serializers.CharField()
+    archived = serializers.BooleanField()
+    spatial_resources = SpatialResourceSerializer(many=True)

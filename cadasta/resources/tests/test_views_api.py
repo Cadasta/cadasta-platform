@@ -1,20 +1,23 @@
 import copy
-import pytest
-import os
 import json
-from django.http import QueryDict
+import os
+
+import pytest
+
+from accounts.tests.factories import UserFactory
+from buckets.test.storage import FakeS3Storage
+from core.tests.base_test_case import UserTestCase
+from core.tests.util import make_dirs  # noqa
 from django.conf import settings
+from django.http import QueryDict
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+# from resources.tests.utils import clear_temp  # noqa
 from rest_framework.test import APIRequestFactory, force_authenticate
 from tutelary.models import Policy
 
-from core.tests.base_test_case import UserTestCase
-from core.tests.util import make_dirs  # noqa
-from accounts.tests.factories import UserFactory
-from organization.tests.factories import OrganizationFactory, ProjectFactory
-from .factories import ResourceFactory
 from ..views import api
+from .factories import ResourceFactory
 
-from buckets.test.storage import FakeS3Storage
 path = os.path.dirname(settings.BASE_DIR)
 
 clauses = {
@@ -35,6 +38,7 @@ clauses = {
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
 
@@ -273,6 +277,7 @@ class ProjectResourcesTest(UserTestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectResourcesDetailTest(UserTestCase):
+
     def setUp(self):
         super().setUp()
 
@@ -459,3 +464,117 @@ class ProjectResourcesDetailTest(UserTestCase):
                     self.resource.id,
                     data,
                     status=404)
+
+
+@pytest.mark.usefixtures('make_dirs')
+class ProjectSpatialResourcesTest(UserTestCase):
+
+    def setUp(self):
+        super().setUp()
+
+        self.storage = FakeS3Storage()
+        tracks = open(
+            path + '/resources/tests/files/tracks.gpx', 'rb').read()
+        self.tracks_file = self.storage.save('resources/tracks.gpx', tracks)
+
+        self.storage = FakeS3Storage()
+        routes = open(
+            path + '/resources/tests/files/routes.gpx', 'rb').read()
+        self.routes_file = self.storage.save('resources/routes.gpx', routes)
+
+        self.storage = FakeS3Storage()
+        waypoints = open(
+            path + '/resources/tests/files/waypoints.gpx', 'rb').read()
+        self.waypoints_file = self.storage.save(
+            'resources/waypoints.gpx', waypoints)
+
+        self.project = ProjectFactory.create()
+        self.view = api.ProjectSpatialResources.as_view()
+        self.url = '/v1/organizations/{org}/projects/{prj}/spatialresources/'
+
+        # create non-spatial resources
+        ResourceFactory.create_batch(
+            2, content_object=self.project, project=self.project)
+
+        # create attached spatial resource
+        self.resource = ResourceFactory.create(
+            content_object=self.project,
+            project=self.project, file=self.tracks_file,
+            original_file='tracks.gpx', mime_type='text/xml'
+        )
+
+        # unauthorized
+        self.denied = ResourceFactory.create(
+            content_object=self.project,
+            project=self.project, file=self.routes_file,
+            original_file='routes.gpx', mime_type='text/xml'
+        )
+
+        # create archived spatial resource
+        ResourceFactory.create(
+            content_object=self.project, archived=True,
+            project=self.project, file=self.routes_file,
+            original_file='routes.gpx', mime_type='text/xml'
+        )
+
+        # create unattached spatial resource
+        ResourceFactory.create(
+            content_object=None,
+            project=self.project, file=self.waypoints_file,
+            original_file='waypoints.gpx', mime_type='text/xml'
+        )
+
+        additional_clauses = copy.deepcopy(clauses)
+        additional_clauses['clause'] += [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/' + self.denied.id],
+                'action': ['resource.*'],
+            }
+        ]
+
+        self.policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(additional_clauses))
+        self.user = UserFactory.create()
+        self.user.assign_policies(self.policy)
+
+    def _get(self, org, prj, query=None, user=None, status=None, count=None):
+        if user is None:
+            user = self.user
+
+        url = self.url.format(org=org, prj=prj)
+        if query is not None:
+            url += '?' + query
+        request = APIRequestFactory().get(url)
+        if query is not None:
+            setattr(request, 'GET', QueryDict(query))
+        force_authenticate(request, user=user)
+        response = self.view(request, organization=org, project=prj).render()
+        content = json.loads(response.content.decode('utf-8'))
+        if status is not None:
+            assert response.status_code == status
+        if count is not None:
+            assert len(content) == count
+        return content
+
+    def test_list_spatial_resources(self):
+        content = self._get(self.project.organization.slug,
+                            self.project.slug,
+                            status=200,
+                            count=1)
+        assert content[0]['id'] == self.resource.id
+        assert content[0]['spatial_resources'] is not None
+        assert content[0]['spatial_resources'][0]['name'] == 'tracks'
+        assert content[0]['spatial_resources'][0][
+            'geom']['type'] == 'GeometryCollection'
+        assert content[0]['spatial_resources'][0]['geom'][
+            'geometries'][0]['type'] == 'MultiLineString'
+
+    def test_list_spatial_resources_with_unauthorized_user(self):
+        content = self._get(self.project.organization.slug,
+                            self.project.slug,
+                            status=200,
+                            user=UserFactory.create(),
+                            count=0)
+        assert content == []

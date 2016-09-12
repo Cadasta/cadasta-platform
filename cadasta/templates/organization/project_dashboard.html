@@ -5,13 +5,13 @@
 {% load staticfiles %}
 
 {% block extra_head %}
-{% leaflet_css %}
+{% leaflet_css plugins="groupedlayercontrol"%}
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-{% leaflet_js %}
+{% leaflet_js plugins="groupedlayercontrol"%}
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
@@ -22,6 +22,8 @@
       open: "{% trans 'Open location' %}"
     };
 
+    switch_layer_controls(map, options);
+
     {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};
     {% else %}
@@ -30,6 +32,12 @@
     var spatialUnits = {{ geojson|safe }};
 
     renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
+
+    var orgSlug = '{{ project.organization.slug }}';
+    var projectSlug = '{{ project.slug }}';
+    var url = '/api/v1/organizations/'
+            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+    add_spatial_resources(map, url);
   }
 </script>
 {% endblock %}
@@ -95,7 +103,7 @@
           </ul>
         {% else %}
           <!-- Starter text -->
-          <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3> 
+          <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
           <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
         {% endif %}
         <div class="btn-full">

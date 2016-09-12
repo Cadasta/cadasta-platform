@@ -12,4 +12,8 @@ urlpatterns = [
         r'^resources/(?P<resource>[-\w]+)/$',
         api.ProjectResourcesDetail.as_view(),
         name='project_detail'),
+    url(
+        r'^spatialresources/$',
+        api.ProjectSpatialResources.as_view(),
+        name='project_spatial_resource_list'),
 ]

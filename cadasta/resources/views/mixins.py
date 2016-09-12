@@ -1,12 +1,11 @@
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.http import Http404
-
 from organization.views.mixins import ProjectMixin
 
-from ..models import Resource, ContentObject
-from ..serializers import ResourceSerializer
 from ..forms import ResourceForm
+from ..models import Resource, ContentObject
+from ..serializers import ReadOnlyResourceSerializer, ResourceSerializer
 
 
 class ResourceViewMixin:
@@ -40,6 +39,7 @@ class ResourceViewMixin:
 
 
 class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):
+
     def get_content_object(self):
         return self.get_project()
 
@@ -69,6 +69,7 @@ class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):
 
 
 class ResourceObjectMixin(ProjectResourceMixin):
+
     def get_object(self):
         if hasattr(self, 'resource'):
             return self.resource
@@ -172,3 +173,20 @@ class DetachableResourcesListMixin(ProjectMixin):
 
         context['resource_list'] = resource_list
         return context
+
+
+class SpatialResourceViewMixin():
+    serializer_class = ReadOnlyResourceSerializer
+
+    def get_queryset(self):
+        # only return unarchived, attached Resources which have
+        # associated spatial resources
+        project = self.get_content_object()
+        return Resource.objects.filter(
+            project=project.id, archived=False).exclude(
+                content_objects=None).exclude(spatial_resources=None)
+
+
+class ProjectSpatialResourceMixin(ProjectMixin, SpatialResourceViewMixin):
+    def get_content_object(self):
+        return self.get_project()
