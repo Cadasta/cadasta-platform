@@ -1,0 +1,14 @@
+{
+    "extends": "airbnb",
+    "globals": {
+        "describe": true,
+        "it": true,
+        "expect": true,
+        "sinon": true,
+        "assert": true,
+        "beforeEach": true,
+        "afterEach": true
+    }   
+}
+
+﻿

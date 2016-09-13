@@ -260,6 +260,8 @@ ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-platformprod'
 MIME_LOOKUPS = {
     'application/pdf': 'pdf',
     'audio/mpeg3': 'mp3',
+    'audio/mpeg': 'mp3',
+    'audio/mp3': 'mp3',
     'audio/x-mpeg-3': 'mp3',
     'video/mpeg': 'mp3',
     'video/x-mpeg': 'mp3',
@@ -272,6 +274,7 @@ MIME_LOOKUPS = {
     'application/vnd.openxmlformats-'
     'officedocument.spreadsheetml.sheet': 'xlsx',
     'text/xml': 'xml',
+    'application/xml': 'xml',
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/gif': 'gif',
