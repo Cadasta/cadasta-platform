@@ -312,6 +312,18 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_full_list_with_unauthorized_user(self):
         """
+        It should return projects without member information.
+        """
+        ProjectFactory.create_batch(2, organization=self.organization)
+        ProjectFactory.create_batch(2)
+        response = self.request()
+        assert response.status_code == 200
+        assert len(response.content) == 4
+        assert all(['users' not in proj['organization']
+                    for proj in response.content])
+
+    def test_empty_list_with_unauthorized_user(self):
+        """
         It should 403 "You do not have permission to perform this action."
         """
         response = self.request()
