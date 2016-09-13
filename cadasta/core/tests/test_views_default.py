@@ -61,14 +61,13 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         response = self.request(user=user)
         assert response.status_code == 200
-        self._test_projects_rendered(response)
 
     def test_private_projects_rendered_when_org_member_is_signed_in(self):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org, user=user)
         response = self.request(user=user)
 
-        gj = self._render_geojson(Project.objects.all())
+        gj = self._render_geojson(Project.objects.filter(archived=False))
         expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
         assert response.content == expected_content
@@ -77,7 +76,8 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         response = self.request(user=user)
 
-        gj = self._render_geojson(Project.objects.filter(access='public'))
+        gj = self._render_geojson(Project.objects.filter(access='public',
+                                                         archived=False))
         expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
         assert response.content == expected_content

@@ -106,8 +106,9 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self.browser.find_element_by_xpath(
          "//h1[contains(@class, '{}')]".format(f))
 
-    def page_title(self):
-        return self.page_header("//div[contains(@class, 'page-title')]//h1")
+    def page_title(self, xpath=''):
+        return self.page_header("//div[contains(@class, 'page-title')]//h1" +
+                                xpath)
 
     def wait_for(self, function_with_assertion, timeout=DEFAULT_WAIT):
         """Wait for an assertion to become true."""

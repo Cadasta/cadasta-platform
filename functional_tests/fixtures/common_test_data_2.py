@@ -44,8 +44,8 @@ def get_test_data():
                        '-5.1031494140625000 8.1299292850467957))')
         },
         {
-            'name': 'Archived Project',
-            'slug': 'archived-project',
+            'name': 'Another Project',
+            'slug': 'another-project',
             'description': """This is a test project.  This is a test project.
             This is a test project.  This is a test project.  This is a test
             project.  This is a test project.  This is a test project.  This

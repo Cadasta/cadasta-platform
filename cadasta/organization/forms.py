@@ -266,7 +266,7 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
                 (o.slug, o.name) for o in Organization.objects.order_by('name')
             ]
         else:
-            qs = self.user.organizations.all()
+            qs = self.user.organizations.all().filter(archived=False)
             self.fields['organization'].choices = [
                 (o.slug, o.name) for o in qs.order_by('name')
                 if check_perms(self.user, ('project.create',), (o,))

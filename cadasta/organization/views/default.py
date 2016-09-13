@@ -29,27 +29,8 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     template_name = 'organization/organization_list.html'
     permission_required = 'org.list'
     permission_filter_queryset = (lambda self, view, o: ('org.view',)
-                                  if o.archived == 'False'
+                                  if o.archived is False
                                   else ('org.view_archived',))
-
-    def get(self, request, *args, **kwargs):
-        if (hasattr(self.request.user, 'assigned_policies') and
-           self.is_superuser):
-                organizations = Organization.objects.all()
-        else:
-            organizations = []
-            organizations.extend(Organization.objects.filter(archived=False))
-            if hasattr(self.request.user, 'organizations'):
-                for org in Organization.objects.filter(archived=True):
-                    if org in self.request.user.organizations.all():
-                        if OrganizationRole.objects.get(organization=org,
-                                                        user=self.request.user
-                                                        ).admin is True:
-                                organizations.append(org)
-        self.object_list = sorted(
-            organizations, key=lambda o: o.slug)
-        context = self.get_context_data()
-        return super(generic.ListView, self).render_to_response(context)
 
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
@@ -321,12 +302,12 @@ class ProjectList(PermissionRequiredMixin,
                   mixins.ProjectCreateCheckMixin,
                   generic.ListView):
     def permission_filter(self, view, p):
-        if p.access == 'public' and p.archived is False:
-            return ('project.view',)
-        elif p.archived is True:
+        if p.archived is True:
             return ('project.view_archived',)
-        else:
+        elif p.access == 'private':
             return ('project.view_private',)
+        else:
+            return ('project.view',)
 
     model = Project
     template_name = 'organization/project_list.html'
@@ -346,13 +327,13 @@ class ProjectList(PermissionRequiredMixin,
             if hasattr(user, 'organizations'):
                 for org in Organization.objects.all():
                     if org in user.organizations.all():
-                        projects.extend(org.projects.filter(access='private'))
+                        projects.extend(org.projects.filter(access='private',
+                                                            archived=False))
                         if OrganizationRole.objects.get(organization=org,
                                                         user=user
                                                         ).admin is True:
                             projects.extend(
-                                org.projects.filter(archived=True,
-                                                    access='public'))
+                                org.projects.filter(archived=True))
         self.object_list = sorted(
             projects, key=lambda p: p.organization.slug + ':' + p.slug)
         context = self.get_context_data()
@@ -418,10 +399,6 @@ def add_wizard_permission_required(self, view, request):
     session = request.session.get('wizard_project_add_wizard', None)
     if session is None or 'details' not in session['step_data']:
         return ()
-    elif 'details' in session['step_data'] and Organization.objects.get(
-                slug=session['step_data']['details']['details-organization'][0]
-                ).archived:
-            return False
     else:
         return 'project.create'
 

@@ -174,19 +174,28 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
 
     def test_archived_filter_with_unauthorized_user(self):
-        org, prj = self._test_objs(archived=True)
-        self._get(
-            org_slug=org.slug, prj_slug=prj.slug, user=self.restricted_user,
-            status=status_code.HTTP_403_FORBIDDEN)
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_archived_filter_with_org_admin(self):
-        org, prj = self._test_objs(archived=True)
-        extra_record = SpatialUnitFactory.create()
-        content = self._get(
-            org_slug=org.slug, prj_slug=prj.slug,
-            status=status_code.HTTP_200_OK, length=self.num_records)
-        assert extra_record.id not in (
-            [u['properties']['id'] for u in content['features']])
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user, admin=True)
+
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(user=user)
+        assert response.status_code == 200
 
 
 class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
@@ -328,14 +337,12 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
 
     def test_create_archived_project(self):
-        org, prj = self._test_objs()
-        prj.archived = True
-        prj.save()
-        prj.refresh_from_db()
-        self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=self.default_create_data,
-            status=status_code.HTTP_403_FORBIDDEN)
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 403
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -593,14 +600,12 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
 
     def test_update_with_archived_project(self):
-        su, org = self._test_objs()
-        su.project.archived = True
-        su.project.save()
-        su.project.refresh_from_db()
+        self.su.project.archived = True
+        self.su.project.save()
 
-        self._test_patch_public_record(
-            self.get_valid_updated_data, status_code.HTTP_403_FORBIDDEN,
-            org_slug=org.slug, prj_slug=su.project.slug, record=su)
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
@@ -713,3 +718,11 @@ class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert SpatialUnit.objects.count() == 0
+
+    def test_delete_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialUnit.objects.count() == 1

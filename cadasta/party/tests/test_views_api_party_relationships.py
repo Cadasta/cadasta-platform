@@ -182,15 +182,13 @@ class PartyRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
             err_msg.format(self.prj.slug, other_party.project.slug))
 
     def test_create_valid_record_with_archived_project(self):
-        assert False
-        org, prj = self._test_objs()
-        prj.archived = True
-        prj.save()
-        prj.refresh_from_db()
-        self._post(
-            org_slug=org.slug, prj_slug=prj.slug,
-            data=self.default_create_data,
-            status=status_code.HTTP_403_FORBIDDEN)
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 403
+        assert PartyRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class PartyRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -456,15 +454,16 @@ class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
             err_msg.format(self.party1.project.slug, other_party.project.slug))
 
     def test_update_valid_record_with_archived_project(self):
-        assert False
-        rel, org = self._test_objs()
-        rel.project.archived = True
-        rel.project.save()
-        rel.project.refresh_from_db()
+        self.prj.archived = True
+        self.prj.save()
 
-        self._test_patch_public_record(
-            self.get_valid_updated_data, status_code.HTTP_403_FORBIDDEN,
-            org_slug=org.slug, prj_slug=rel.project.slug, record=rel)
+        response = self.request(method='PATCH', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
 
 
 class PartyRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
@@ -582,3 +581,12 @@ class PartyRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert PartyRelationship.objects.count() == 0
+
+    def test_delete_record_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert PartyRelationship.objects.count() == 1

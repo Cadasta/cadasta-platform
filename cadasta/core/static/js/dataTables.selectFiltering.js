@@ -14,7 +14,9 @@
         }
 
         var table = $('#DataTables_Table_0').DataTable();
-        table.order([1, 'asc']).draw()
+        if ($(".unarchived").length ){
+            table.order([1, 'asc']).draw()
+        }
 
         if ($(".archived").length ){
             dtSettings.nTableWrapper.childNodes[0].childNodes[0].innerHTML += addSelectOptions()

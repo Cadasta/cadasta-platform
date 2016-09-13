@@ -36,7 +36,6 @@ class OrganizationList(PermissionsFilterMixin,
 
 
 class OrganizationDetail(APIPermissionRequiredMixin,
-                         mixins.OrganizationMixin,
                          generics.RetrieveUpdateAPIView):
     def view_actions(self, request):
         if self.get_object().archived:
@@ -122,7 +121,6 @@ class UserAdminDetail(APIPermissionRequiredMixin,
 
 class OrganizationProjectList(PermissionsFilterMixin,
                               APIPermissionRequiredMixin,
-                              mixins.OrganizationMixin,
                               mixins.OrgAdminCheckMixin,
                               mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
@@ -173,12 +171,12 @@ class ProjectList(PermissionsFilterMixin,
                   mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
     def permission_filter(self, view, p):
-        if p.access == 'public' and p.archived is False:
-            return ('project.view',)
-        elif p.archived is True:
+        if p.archived is True:
             return ('project.view_archived',)
-        else:
+        elif p.access == 'private':
             return ('project.view_private',)
+        else:
+            return ('project.view',)
 
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,

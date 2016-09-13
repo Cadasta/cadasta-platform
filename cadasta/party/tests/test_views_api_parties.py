@@ -159,17 +159,15 @@ class PartyCreateAPITest(APITestCase, UserTestCase, TestCase):
     def test_add_party_to_archived_project(self):
         self.prj.archived = True
         self.prj.save()
-        self.prj.refresh_from_db()
+
         data = {
             'name': 'TestParty',
             'description': 'Some description',
             'project': self.prj.id
         }
-        self._post(self.org.slug,
-                   self.prj.slug,
-                   data,
-                   status=403,
-                   count=0)
+        response = self.request(user=self.user, method='POST', post_data=data)
+        assert response.status_code == 403
+        assert self.prj.parties.count() == 0
 
 
 class PartyDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -201,12 +199,12 @@ class PartyDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert self.prj.parties.count() == 0
 
     def test_delete_party_in_archived_project(self):
-        party = PartyFactory.create(name='Test Party', project=self.prj)
         self.prj.archived = True
         self.prj.save()
-        self.prj.refresh_from_db()
-        self._delete(
-            self.org.slug, self.prj.slug, party.id, status=403)
+
+        response = self.request(user=self.user, method='DELETE')
+        assert response.status_code == 403
+        assert self.prj.parties.count() == 1
 
     def test_update_party(self):
         data = {'name': 'Test Party Patched'}
@@ -216,15 +214,11 @@ class PartyDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert self.party.name == response.content['name']
 
     def test_update_party_in_archived_project(self):
-        assert False
-        party = PartyFactory.create(name='Test Party', project=self.prj)
         self.prj.archived = True
         self.prj.save()
-        self.prj.refresh_from_db()
-        data = {
-            'name': 'Test Party Patched'
-        }
-        self._patch(self.org.slug, self.prj.slug,
-                    party.id, data, status=403)
-        party.refresh_from_db()
-        assert party.name != 'Test Party Patched'
+
+        data = {'name': 'Test Party Patched'}
+        response = self.request(user=self.user, method='PATCH', post_data=data)
+        assert response.status_code == 403
+        self.party.refresh_from_db()
+        assert self.party.name != 'Test Party Patched'

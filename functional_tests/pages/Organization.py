@@ -62,7 +62,7 @@ class OrganizationPage(Page):
         if success:
             self.test.click_through(edit, self.BY_MODAL_BACKDROP)
         else:
-            self.click_through(edit, (By.CLASS_NAME, 'alert-warning'))
+            self.click_through(edit, self.test.BY_ALERT)
 
     def get_edit_modal_form(self, xpath):
         return self.test.form_field('edit-org', xpath)
@@ -128,17 +128,18 @@ class OrganizationPage(Page):
 
     def click_on_close_alert_button(self):
         close = self.browser.find_element_by_xpath("//div[contains(@class, 'alert')]//button[contains(@class, 'close')]")
-        self.click_through_close(close, (By.CLASS_NAME, 'alert-warning'))
+        self.click_through_close(close, self.test.BY_ALERT)
 
     def get_add_project_button(self):
-        return self.browser.find_element_by_xpath("//a[contains(@href, '/projects/new/')]")
+        return self.browser.find_element_by_xpath(
+            "//a[contains(@href, '/projects/new/')]")
 
     def click_on_add_project_button(self, success=False):
         button = self.get_add_project_button()
         if success:
             self.test.click_through(button, self.BY_MODAL_BACKDROP)
         else:
-            self.click_through(button, (By.CLASS_NAME, 'alert-warning'))
+            self.click_through(button, self.test.BY_ALERT)
 
     def try_cancel_and_close_archive(self):
         close_buttons = ["cancel", "close"]
