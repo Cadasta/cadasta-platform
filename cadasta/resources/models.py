@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db.models import GeometryCollectionField
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.dispatch import receiver
@@ -24,6 +25,8 @@ from .utils import io, thumbnail
 from .validators import ACCEPTED_TYPES, validate_file_type
 
 content_types = models.Q(app_label='organization', model='project')
+
+GPX_MIME_TYPES = ('application/xml', 'text/xml', 'application/gpx+xml')
 
 
 @permissioned_model
@@ -145,7 +148,7 @@ def create_thumbnails(sender, instance, created, **kwargs):
 @receiver(models.signals.post_save, sender=Resource)
 def create_spatial_resource(sender, instance, created, **kwargs):
     if created or instance._original_url != instance.file.url:
-        if 'xml' in instance.mime_type:
+        if instance.mime_type in GPX_MIME_TYPES:
             io.ensure_dirs()
             file_name = instance.file.url.split('/')[-1]
             write_path = os.path.join(settings.MEDIA_ROOT,
@@ -157,9 +160,14 @@ def create_spatial_resource(sender, instance, created, **kwargs):
             # of gpx mime type is not reliable
             mime = magic.Magic(mime=True)
             mime_type = str(mime.from_file(write_path), 'utf-8')
-            if mime_type in ('application/xml', 'text/xml'):
-                processor = GPXProcessor(write_path)
-                layers = processor.get_layers()
+            if mime_type in GPX_MIME_TYPES:
+                try:
+                    processor = GPXProcessor(write_path)
+                    layers = processor.get_layers()
+                except GDALException:
+                    raise InvalidGPXFile(
+                        _('Invalid GPX file')
+                    )
                 for layer in layers.keys():
                     if len(layers[layer]) > 0:
                         SpatialResource.objects.create(

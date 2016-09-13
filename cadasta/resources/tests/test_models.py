@@ -1,16 +1,17 @@
 import os
+
 import pytest
 
 from buckets.test.storage import FakeS3Storage
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from django.conf import settings
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 from ..exceptions import InvalidGPXFile
 from ..models import (ContentObject, Resource, create_spatial_resource,
                       create_thumbnails)
-
-from core.tests.utils.cases import UserTestCase
-from core.tests.utils.files import make_dirs  # noqa
 from .factories import ResourceFactory, SpatialResourceFactory
 from .utils import clear_temp  # noqa
 
@@ -20,6 +21,7 @@ path = os.path.dirname(settings.BASE_DIR)
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
 class ResourceTest(UserTestCase, TestCase):
+
     def test_file_name_property(self):
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_name == 'filename.txt'
@@ -208,7 +210,23 @@ class ResourceTest(UserTestCase, TestCase):
         )
         with pytest.raises(InvalidGPXFile) as e:
             create_spatial_resource(Resource, resource, True)
-            assert str(e) == 'Invalid GPX mime type: audio/mpeg'
+
+        assert str(e.value) == _('Invalid GPX mime type: audio/mpeg')
+
+    def test_invalid_gpx_file(self):
+        storage = FakeS3Storage()
+        file = open(path +
+                    '/resources/tests/files/invalidgpx.xml', 'rb').read()
+        file_name = storage.save('resources/invalidgpx.xml', file)
+        resource = ResourceFactory.build(
+            file=file_name, mime_type='application/xml')
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/invalidgpx.xml')
+        )
+        with pytest.raises(InvalidGPXFile)as e:
+            create_spatial_resource(Resource, resource, True)
+        assert str(e.value) == _('Invalid GPX file')
+        assert Resource.objects.all().count() == 0
 
 
 class SpatialResourceTest(UserTestCase, TestCase):
