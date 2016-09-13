@@ -48,7 +48,7 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
 
 class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
-    organization = OrganizationSerializer(read_only=True)
+    organization = OrganizationSerializer(hide_detail=True, read_only=True)
     country = CountryField(required=False)
 
     def validate_name(self, value):

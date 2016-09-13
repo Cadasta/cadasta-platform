@@ -145,7 +145,7 @@ class ProjectList(APIPermissionRequiredMixin, mixins.ProjectQuerySetMixin,
     filter_fields = ('archived',)
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
-    permission_required = {'project.list'}
+    permission_required = 'project.list'
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
