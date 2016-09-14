@@ -14,6 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf.urls import include, url, handler500
+from django.views.i18n import javascript_catalog
+
 
 server_error_handler = handler500
 
@@ -98,4 +100,5 @@ urlpatterns = [
 
     url(r'^i18n/',
         include('django.conf.urls.i18n')),
+    url(r'^jsi18n/', javascript_catalog, {}, name='javascript-catalog'),
 ]

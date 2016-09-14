@@ -4,7 +4,7 @@
 {% load leaflet_tags %}
 {% load i18n %}
 
-{% block page_title %}| Draw map{% endblock %}
+{% block page_title %}| {% trans "Draw map" %}{% endblock %}
 {% block body-class %} map{% endblock %}
 
 {% block extra_head %}
@@ -47,7 +47,7 @@
 
     <!-- Wizard detail  -->
     <div class="col-md-4 detail detail-edit">
-    
+
 {% endblock %}
 
 {% block step_title %}{% trans "Draw project on map" %}{% endblock %}

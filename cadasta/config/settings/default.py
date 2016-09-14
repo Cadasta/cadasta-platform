@@ -163,10 +163,10 @@ LEAFLET_CONFIG = {
     'TILES': [('OpenStreetMap',
                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
                {'attribution':
-                'Map data &copy; <a href="http://openstreetmap.org">'
-                'OpenStreetMap</a> contributors, '
-                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">'
-                'CC-BY-SA</a>',
+                _('Map data &copy; <a href="http://openstreetmap.org">'
+                  'OpenStreetMap</a> contributors, '
+                  '<a href="http://creativecommons.org/licenses/by-sa/2.0/">'
+                  'CC-BY-SA</a>'),
                 'maxZoom': 19}),
               ('DigitalGlobe Satellite',
                'https://{s}.tiles.mapbox.com/v4/digitalglobe.nal0g75k'
@@ -221,7 +221,6 @@ SASS_PROCESSOR_INCLUDE_DIRS = (
     os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
 )
 
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
 STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = (

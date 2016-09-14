@@ -1,7 +1,7 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
 
-{% block page_title %}Resource detail: {{ resource.name }} | {% endblock %}
+{% block page_title %}{% trans "Resource detail:" %} {{ resource.name }} | {% endblock %}
 {% block left-nav %}resources{% endblock %}
 
 {% block content %}
