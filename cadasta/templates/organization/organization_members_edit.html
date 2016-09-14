@@ -13,7 +13,7 @@
   <div class="row">
     <!-- Main text  -->
     <div class="col-md-12 main-text">
-      <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_full_name }}</span></h2>
+      <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_display_name }}</span></h2>
       <form method="POST" action="" class="org-member-edit" novalidate>
       {% csrf_token %}
         <div class="row">
