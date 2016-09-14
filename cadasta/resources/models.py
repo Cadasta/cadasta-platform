@@ -92,7 +92,7 @@ class Resource(RandomIDModel):
     def thumbnail(self):
         if not hasattr(self, '_thumbnail'):
             icon = settings.MIME_LOOKUPS.get(self.mime_type, None)
-            if 'image' in self.mime_type:
+            if 'image' in self.mime_type and 'tif' not in self.mime_type:
                 ext = self.file_name.split('.')[-1]
                 base_url = self.file.url[:self.file.url.rfind('.')]
                 self._thumbnail = base_url + '-128x128.' + ext

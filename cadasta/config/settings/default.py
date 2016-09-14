@@ -278,5 +278,6 @@ MIME_LOOKUPS = {
     'image/jpeg': 'jpg',
     'image/png': 'png',
     'image/gif': 'gif',
+    'image/tif': 'tiff',
     'image/tiff': 'tiff'
 }
