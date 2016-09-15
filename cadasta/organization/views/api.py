@@ -1,7 +1,9 @@
+from django.shortcuts import get_object_or_404
+
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics, filters, status
-from tutelary.mixins import APIPermissionRequiredMixin
+from tutelary.mixins import APIPermissionRequiredMixin, PermissionsFilterMixin
 
 from accounts.models import User
 
@@ -10,7 +12,9 @@ from .. import serializers
 from . import mixins
 
 
-class OrganizationList(APIPermissionRequiredMixin, generics.ListCreateAPIView):
+class OrganizationList(PermissionsFilterMixin,
+                       APIPermissionRequiredMixin,
+                       generics.ListCreateAPIView):
     lookup_url_kwarg = 'organization'
     lookup_field = 'slug'
     queryset = Organization.objects.all()
@@ -105,8 +109,8 @@ class UserAdminDetail(APIPermissionRequiredMixin,
     }
 
 
-class OrganizationProjectList(APIPermissionRequiredMixin,
-                              mixins.OrganizationMixin,
+class OrganizationProjectList(PermissionsFilterMixin,
+                              APIPermissionRequiredMixin,
                               mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
     org_lookup = 'organization'
@@ -122,6 +126,12 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
         'POST': 'project.create'
     }
 
+    def get_organization(self):
+        if not hasattr(self, 'org'):
+            self.org = get_object_or_404(Organization,
+                                         slug=self.kwargs['organization'])
+        return self.org
+
     def get_serializer_context(self, *args, **kwargs):
         org = self.get_organization()
         context = super(OrganizationProjectList,
@@ -131,12 +141,17 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
         return context
 
     def get_queryset(self):
+        if self.request.method == 'POST':
+            return [self.get_organization()]
+
         return super().get_queryset().filter(
             organization__slug=self.kwargs['organization']
         )
 
 
-class ProjectList(APIPermissionRequiredMixin, mixins.ProjectQuerySetMixin,
+class ProjectList(PermissionsFilterMixin,
+                  APIPermissionRequiredMixin,
+                  mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,

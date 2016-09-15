@@ -117,6 +117,27 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         names = [org['name'] for org in response.content]
         assert(names == sorted(names, reverse=True))
 
+    def test_permission_filter(self):
+        clauses = {
+            'clause': [
+                clause('allow', ['org.list']),
+                clause('allow', ['org.view', 'project.create'],
+                                ['organization/*']),
+                clause('deny', ['project.create'],
+                               ['organization/unauthorized'])
+            ]
+        }
+        policy = Policy.objects.create(name='deny', body=json.dumps(clauses))
+        assign_user_policies(self.user, policy)
+
+        OrganizationFactory.create_from_kwargs([{}, {'slug': 'unauthorized'}])
+
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'project.create'})
+        assert response.status_code == 200
+        assert len(response.content) == 1
+        assert response.content[0]['slug'] != 'unauthorized'
+
 
 class OrganizationCreateAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.OrganizationList
@@ -180,12 +201,6 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
                 clause('allow', ['org.*'], ['organization/*'])
             ]
         }
-        # clauses = {
-        #     'clause': [
-        #         clause('allow', ['org.update'], ['organization/*']),
-        #         clause('deny', ['org.archive'], ['organization/*'])
-        #     ]
-        # }
         policy = Policy.objects.create(name='test-policy-1',
                                        body=json.dumps(clauses))
         self.user = UserFactory.create()

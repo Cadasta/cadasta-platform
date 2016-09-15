@@ -14,7 +14,7 @@ from ..views import api
 from tutelary.models import Role
 
 
-def assign_policies(user):
+def assign_policies(user, add_clauses=None):
     clause = {
         'clause': [
             {
@@ -29,9 +29,13 @@ def assign_policies(user):
                 'effect': 'allow',
                 'object': ['project/*/*'],
                 'action': ['project.*', 'project.*.*']
-            }
-        ]
+            },
+        ],
     }
+
+    if add_clauses:
+        clause['clause'] += add_clauses
+
     policy = Policy.objects.create(
         name='test-policy',
         body=json.dumps(clause))
@@ -277,6 +281,30 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         names = [proj['name'] for proj in response.content]
         assert names == sorted(names, reverse=True)
 
+    def test_permission_filter(self):
+        addtional_clause = [{
+            'effect': 'allow',
+            'object': ['project/*/*'],
+            'action': ['party.create']
+        }, {
+            'effect': 'deny',
+            'object': ['project/*/unauthorized'],
+            'action': ['party.create']
+        }]
+
+        ProjectFactory.create_from_kwargs([
+            {'slug': 'unauthorized', 'organization': self.organization},
+            {'organization': self.organization}
+        ])
+
+        assign_policies(self.user, add_clauses=addtional_clause)
+
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'party.create'})
+        assert response.status_code == 200
+        assert len(response.content) == 1
+        assert response.content[0]['slug'] != 'unauthorized'
+
 
 class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.ProjectList
@@ -370,6 +398,30 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         assert len(response.content) == 3
         names = [proj['name'] for proj in response.content]
         assert names == sorted(names, reverse=True)
+
+    def test_permission_filter(self):
+        addtional_clause = [{
+            'effect': 'allow',
+            'object': ['project/*/*'],
+            'action': ['party.create']
+        }, {
+            'effect': 'deny',
+            'object': ['project/*/unauthorized'],
+            'action': ['party.create']
+        }]
+
+        ProjectFactory.create_from_kwargs([
+            {'slug': 'unauthorized', 'organization': self.organization},
+            {'organization': self.organization}
+        ])
+
+        assign_policies(self.user, add_clauses=addtional_clause)
+
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'party.create'})
+        assert response.status_code == 200
+        assert len(response.content) == 1
+        assert response.content[0]['slug'] != 'unauthorized'
 
     # CONDITIONS:
     #
