@@ -32,6 +32,7 @@ class LocationFormTest(UserTestCase, TestCase):
         form.is_valid()
         form.save()
 
+        assert all([c[0] != 'PX' for c in form.fields['type'].choices])
         assert SpatialUnit.objects.filter(project=project).count() == 1
 
     def test_create_location_with_attributes(self):

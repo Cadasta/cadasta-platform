@@ -9,7 +9,7 @@ from jsonattrs.forms import form_field_from_name, AttributeModelForm
 from leaflet.forms.widgets import LeafletWidget
 from core.util import ID_FIELD_LENGTH
 from party.models import Party, TenureRelationship, TenureRelationshipType
-from .models import SpatialUnit
+from .models import SpatialUnit, TYPE_CHOICES
 from .widgets import SelectPartyWidget, NewEntityWidget
 
 
@@ -20,6 +20,9 @@ class LocationForm(AttributeModelForm):
             'required': _('No map location was provided. Please use the tools '
                           'provided on the left side of the map to mark your '
                           'new location.')}
+    )
+    type = forms.ChoiceField(
+        choices=filter(lambda c: c[0] != 'PX', TYPE_CHOICES)
     )
     attributes_field = 'attributes'
 
