@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-14 21:08+0000\n"
-"PO-Revision-Date: 2016-09-14 21:13+0000\n"
+"PO-Revision-Date: 2016-09-15 10:02+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
 "Language-Team: Portuguese (http://www.transifex.com/cadasta/cadasta-platform/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -2119,7 +2119,7 @@ msgid_plural ""
 "              <div class=\"num\">%(counter)s</div> locations\n"
 "              "
 msgstr[0] "\n<div class = \"num\"> %(counter)s </ div> localizacao"
-msgstr[1] "\n<div class = \"num\"> %(counter)s </ div> localizacaoes"
+msgstr[1] "\n<div class = \"num\"> %(counter)s </div> localizacaoes"
 
 #: templates/organization/project_dashboard.html:90
 #, python-format
