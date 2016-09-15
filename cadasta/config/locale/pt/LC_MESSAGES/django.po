@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-14 21:08+0000\n"
-"PO-Revision-Date: 2016-09-15 10:02+0000\n"
+"PO-Revision-Date: 2016-09-15 14:29+0000\n"
 "Last-Translator: Ian Ross <iross@cadasta.org>\n"
 "Language-Team: Portuguese (http://www.transifex.com/cadasta/cadasta-platform/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -1556,7 +1556,7 @@ msgstr "Lamentamos, mas o registo está actualmente fechado."
 #: templates/allauth/account/snippets/already_logged_in.html:5
 #, python-format
 msgid "You are currently logged in as <strong>%(user_display)s</strong>."
-msgstr "Está registado como <strong>%(user_display)s</ strong>."
+msgstr "Está registado como <strong>%(user_display)s</strong>."
 
 #: templates/allauth/account/verification_sent.html:5
 #: templates/allauth/account/verification_sent.html:8
@@ -2118,7 +2118,7 @@ msgid_plural ""
 "\n"
 "              <div class=\"num\">%(counter)s</div> locations\n"
 "              "
-msgstr[0] "\n<div class = \"num\"> %(counter)s </ div> localizacao"
+msgstr[0] "\n<div class = \"num\"> %(counter)s </div> localizacao"
 msgstr[1] "\n<div class = \"num\"> %(counter)s </div> localizacaoes"
 
 #: templates/organization/project_dashboard.html:90
