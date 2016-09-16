@@ -328,6 +328,15 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
         assert geom.geometry.geom_type == 'Polygon'
 
+    def test_geoshape_as_location_geometry_upload(self):
+        data = self._submission(form='location_geoshape_form')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+
+        geom = SpatialUnit.objects.get(attributes={'name': 'Geoshape'})
+        assert response.status_code == 201
+        assert geom.geometry.geom_type == 'Polygon'
+
     def test_invalid_submission_upload(self):
         # testing submitting with a missing xml_submission_file
         data = self._invalid_submission(form='This is not an xml form!')
