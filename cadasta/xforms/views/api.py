@@ -17,7 +17,8 @@ from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
 
 from ..exceptions import InvalidXMLSubmission
 
-logger = logging.getLogger('xform.submissions')
+logger = logging
+# logger = logging.getLogger('xform.submissions')
 
 OPEN_ROSA_ENVELOPE = """
     <OpenRosaResponse xmlns="http://openrosa.org/http/response">
@@ -46,9 +47,10 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
                             status=status.HTTP_204_NO_CONTENT,)
         try:
             instance = ModelHelper(
-            ).upload_submission_data(request)
+                ).upload_submission_data(request)
         except InvalidXMLSubmission as e:
-            logger.debug(str(e))
+            # logger.debug(str(e))
+            logger.error(str(e))
             return self._sendErrorResponse(request, e)
 
         serializer = XFormSubmissionSerializer(instance)
@@ -93,11 +95,11 @@ class XFormListView(OpenRosaHeadersMixin,
     def get_user_forms(self):
         forms = []
         policies = self.request.user.assigned_policies()
-        orgs = self.request.user.organizations.all()
+        orgs = self.request.user.organizations.filter(archived=False)
         if Role.objects.get(name='superuser') in policies:
-            return Questionnaire.objects.all()
+            return Questionnaire.objects.filter(project__archived=False)
         for org in orgs:
-            projects = org.projects.all()
+            projects = org.projects.filter(archived=False)
             for project in projects:
                 try:
                     questionnaire = Questionnaire.objects.get(

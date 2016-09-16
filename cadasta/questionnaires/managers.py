@@ -43,7 +43,9 @@ ATTRIBUTE_GROUPS = {
 def create_children(children, errors=[], project=None, kwargs={}):
     if children:
         for c in children:
-            if c.get('type') == 'group':
+            if c.get('type') == 'repeat':
+                create_children(c['children'], errors, project, kwargs)
+            elif c.get('type') == 'group':
                 model_name = 'QuestionGroup'
 
                 # parse attribute group
@@ -61,8 +63,9 @@ def create_children(children, errors=[], project=None, kwargs={}):
             else:
                 model_name = 'Question'
 
-            model = apps.get_model('questionnaires', model_name)
-            model.objects.create_from_dict(dict=c, errors=errors, **kwargs)
+            if c.get('type') != 'repeat':
+                model = apps.get_model('questionnaires', model_name)
+                model.objects.create_from_dict(dict=c, errors=errors, **kwargs)
 
 
 def create_options(options, question, errors=[]):
@@ -234,7 +237,6 @@ class QuestionManager(models.Manager):
     def create_from_dict(self, errors=[], **kwargs):
         dict = kwargs.pop('dict')
         instance = self.model(**kwargs)
-
         type_dict = {name: code for code, name in instance.TYPE_CHOICES}
 
         instance.type = type_dict[dict.get('type')]
