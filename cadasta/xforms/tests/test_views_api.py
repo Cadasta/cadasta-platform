@@ -16,7 +16,7 @@ from core.tests.utils.cases import UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from organization.models import OrganizationRole
 from organization.tests.factories import OrganizationFactory, ProjectFactory
-from party.models import Party
+from party.models import Party, TenureRelationship
 from questionnaires.managers import create_attrs_schema
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import (QuestionFactory,
@@ -209,12 +209,14 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
             charset='utf-8',
         )
 
-    def _submission(self, form, image=[], file=False):
+    def _submission(self, form, image=[], audio=[], file=False):
         form_content = str.encode(responses[form]).decode('ascii')
 
         data = {}
         for image_name in image:
-            img = self._get_resource(file_name=image_name, file_type='png')
+            img = self._get_resource(
+                file_name=image_name,
+                file_type='png')
             img = InMemoryUploadedFile(
                 file=io.BytesIO(img),
                 field_name=image_name,
@@ -224,6 +226,20 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
                 charset='utf-8',
             )
             data[img.name] = img
+
+        for audio_name in audio:
+            audio_file = self._get_resource(
+                file_name=audio_name,
+                file_type='mp3')
+            audio_file = InMemoryUploadedFile(
+                file=io.BytesIO(audio_file),
+                field_name=audio_name,
+                name='{}.mp3'.format(audio_name),
+                content_type='audio/mp3',
+                size=len(audio_file),
+                charset='utf-8',
+            )
+            data[audio_file.name] = audio_file
 
         if file:
             file = InMemoryUploadedFile(
@@ -251,7 +267,8 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
 
     def test_submission_upload(self):
         data = self._submission(form='form',
-                                image=['test_image_one', 'test_image_two'])
+                                image=['test_image_one', 'test_image_two'],
+                                audio=['test_audio_one'])
 
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
@@ -263,9 +280,11 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert len(location.resources) == 1
         assert location.resources[0] == Resource.objects.get(
             name__contains='test_image_one')
-        assert len(party.resources) == 1
-        assert party.resources[0] == Resource.objects.get(
-            name__contains='test_image_two')
+        assert len(party.resources) == 2
+        assert Resource.objects.get(
+            name__contains='test_image_two') in party.resources
+        assert Resource.objects.get(
+            name__contains='test_audio_one') in party.resources
 
     def test_line_upload(self):
         data = self._submission(form='line_form')
@@ -277,13 +296,19 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'LineString'
 
     def test_polygon_upload(self):
-        data = self._submission(form='poly_form')
+        data = self._submission(form='poly_form',
+                                audio=['test_audio_one'])
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
 
-        geom = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
         assert response.status_code == 201
+
+        geom = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
         assert geom.geometry.geom_type == 'Polygon'
+
+        tenure = TenureRelationship.objects.get(tenure_type='LH')
+        assert Resource.objects.get(
+            name__contains='test_audio_one') in tenure.resources
 
     def test_point_upload(self):
         data = self._submission(form='missing_semi_form')
