@@ -47,6 +47,7 @@
         </ul>
       </div>
       {% endif %}
+      {% if is_allowed_add_resource %}
 
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
@@ -78,6 +79,7 @@
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
         </ul>
       </div>
+      {% endif %}
     </div>
   </div>
 </div>
