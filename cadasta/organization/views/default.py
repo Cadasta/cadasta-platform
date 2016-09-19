@@ -333,7 +333,6 @@ class ProjectDashboard(PermissionRequiredMixin,
             SpatialUnitGeoJsonSerializer(
                 self.object.spatial_units.all(), many=True).data
         )
-
         return context
 
     def get_object(self, queryset=None):

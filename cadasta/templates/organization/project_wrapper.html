@@ -48,35 +48,49 @@
       </div>
       {% endif %}
 
+
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
+        {% if is_allowed_add_location %}
         <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
         </a>
+        {% endif %}
+        {% if is_allowed_add_resource %}
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <span class="caret"></span>
           <span class="sr-only">{%trans "Toggle add" %}</span>
         </button>
+
         <ul class="dropdown-menu">
           <!--<li><a href="#">{% trans "Add party" %}</a></li>
           <li><a href="#">{% trans "Add relationship" %}</a></li>-->
+
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
+
           <!-- <li role="separator" class="divider"></li> -->
           <!-- <li><a class="edit" href="#">{% trans "Import data" %}</a></li> -->
         </ul>
+        {% endif %}
       </div>
       <!-- Single add button for smaller screens-->
       <div class="dropdown pull-right visible-xs-inline">
+        {% if is_allowed_add_location or is_allowed_add_resource %}
         <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
           <span class="glyphicon glyphicon-plus"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
+          {% if is_allowed_add_location %}
           <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
+          {% endif %}
           <!--<li><a href="#">{% trans "Add party" %}</a></li>
           <li><a href="#">{% trans "Add relationship" %}</a></li>-->
+          {% if is_allowed_add_resource %}
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
+          {% endif %}
           <!--<li role="separator" class="divider"></li>
           <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
         </ul>
+        {% endif %}
       </div>
     </div>
   </div>
