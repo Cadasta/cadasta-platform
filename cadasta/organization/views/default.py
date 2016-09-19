@@ -333,8 +333,6 @@ class ProjectDashboard(PermissionRequiredMixin,
             SpatialUnitGeoJsonSerializer(
                 self.object.spatial_units.all(), many=True).data
         )
-        context['allow_add_resource'] = self.is_allowed_add_resource
-
         return context
 
     def get_object(self, queryset=None):

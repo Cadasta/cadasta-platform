@@ -76,7 +76,7 @@
           </dl>
         {% endif %}
         <div class="divider-thick"></div>
-        {% if has_content or not allow_add_resource %}
+        {% if has_content or not is_allowed_add_resource %}
           <h4>{% trans "Project stats" %}</h4>
           <ul class="list-inline stats">
             <li>
@@ -106,7 +106,7 @@
           <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
           <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
         {% endif %}
-        {% if allow_add_resource %}
+        {% if is_allowed_add_resource %}
         <div class="btn-full">
           <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}

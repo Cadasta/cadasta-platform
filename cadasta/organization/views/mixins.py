@@ -121,28 +121,11 @@ class ProjectAdminCheckMixin:
                 self.is_admin = True
         return self.is_admin
 
-    @property
-    def is_allowed_add_resource(self):
-        is_admin = self.is_administrator
-        if is_admin:
-            is_allowed_add_resource = True
-        else:
-            data_collectors = [
-                role.user for role in ProjectRole.objects.filter(
-                    project=self.get_project(),
-                    role='DC'
-                )
-            ]
-
-            is_allowed_add_resource = False
-            if self.request.user in data_collectors:
-                is_allowed_add_resource = True
-        return is_allowed_add_resource
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['is_administrator'] = self.is_administrator
-        context['is_allowed_add_resource'] = self.is_allowed_add_resource
+        context['is_allowed_add_location'] = self.request.user.has_perm('spatial.create', self.get_project())
+        context['is_allowed_add_resource'] = self.request.user.has_perm('resource.add', self.get_project())
         return context
 
 
