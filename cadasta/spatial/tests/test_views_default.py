@@ -845,7 +845,8 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                  'value': self.project.current_questionnaire,
                  'selector': self.project.current_questionnaire}
             ))
-        expected = self.render_content(form=form)
+        expected = self.render_content(form=form,
+                                       is_allowed_add_location=True)
         assert response.content == expected
 
         assert TenureRelationship.objects.count() == 0
