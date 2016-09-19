@@ -84,7 +84,8 @@ class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -170,7 +171,8 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -257,7 +259,8 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -333,7 +336,8 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -421,7 +425,8 @@ class LocationDelete(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -513,7 +518,8 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -613,7 +619,8 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -764,7 +771,8 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_allowed_add_location=True)
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
@@ -880,7 +888,8 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             )
         )
         assert response.status_code == 200
-        assert response.content == self.render_content(form=form)
+        assert response.content == self.render_content(form=form,
+                                        is_allowed_add_location=True)
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 1
         assert Party.objects.first().name == party.name
