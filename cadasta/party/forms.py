@@ -1,8 +1,9 @@
 from jsonattrs.forms import AttributeModelForm
 from .models import Party, TenureRelationshipType, TenureRelationship
+from questionnaires.forms import OptionLabelsFix
 
 
-class PartyForm(AttributeModelForm):
+class PartyForm(OptionLabelsFix, AttributeModelForm):
     attributes_field = 'attributes'
 
     class Meta:
@@ -10,8 +11,8 @@ class PartyForm(AttributeModelForm):
         fields = ['name', 'type']
 
     def __init__(self, project_id=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.project_id = project_id
+        super().__init__(*args, **kwargs)
 
     def save(self):
         instance = super().save(commit=False)
@@ -20,7 +21,7 @@ class PartyForm(AttributeModelForm):
         return instance
 
 
-class TenureRelationshipEditForm(AttributeModelForm):
+class TenureRelationshipEditForm(OptionLabelsFix, AttributeModelForm):
     attributes_field = 'attributes'
 
     class Meta:
@@ -28,6 +29,7 @@ class TenureRelationshipEditForm(AttributeModelForm):
         fields = ['tenure_type']
 
     def __init__(self, *args, **kwargs):
+        self.project_id = kwargs.pop('project_id', None)
         super().__init__(*args, **kwargs)
         tenuretypes = sorted(
             TenureRelationshipType.objects.values_list('id', 'label')

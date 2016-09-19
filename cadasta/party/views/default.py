@@ -1,7 +1,7 @@
 from core.views import generic
 import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
-from jsonattrs.mixins import JsonAttrsMixin
+from questionnaires.views.mixins import JsonAttrsMixin
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 
 from organization.views import mixins as organization_mixins
@@ -127,6 +127,12 @@ class PartyRelationshipEdit(LoginPermissionRequiredMixin,
 
     def get_success_url(self):
         return reverse('parties:relationship_detail', kwargs=self.kwargs)
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        project = self.get_project()
+        form_kwargs['project_id'] = project.id
+        return form_kwargs
 
 
 class PartyRelationshipDelete(LoginPermissionRequiredMixin,

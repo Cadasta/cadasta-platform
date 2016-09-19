@@ -65,7 +65,9 @@ class PartyFormTest(UserTestCase, TestCase):
 
 class TenureRelationshipEditFormTest(UserTestCase, TestCase):
     def test_init(self):
-        form = forms.TenureRelationshipEditForm(schema_selectors=())
+        project = ProjectFactory.create()
+        form = forms.TenureRelationshipEditForm(schema_selectors=(),
+                                                project_id=project.id)
         tenuretypes = sorted(
             TenureRelationshipType.objects.values_list('id', 'label')
         )

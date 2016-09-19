@@ -1,5 +1,5 @@
 import json
-from jsonattrs.mixins import JsonAttrsMixin
+from questionnaires.views.mixins import JsonAttrsMixin
 import django.views.generic as base_generic
 from core.views import generic
 from django.core.urlresolvers import reverse

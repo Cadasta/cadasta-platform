@@ -111,7 +111,8 @@ class PartiesAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {
             'object': self.project,
-            'form': forms.PartyForm(schema_selectors=())
+            'form': forms.PartyForm(schema_selectors=(),
+                                    project_id=self.project.id)
         }
 
     def setup_url_kwargs(self):
@@ -296,7 +297,8 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'party': self.party,
-                'form': forms.PartyForm(instance=self.party)}
+                'form': forms.PartyForm(instance=self.party,
+                                        project_id=self.project.id)}
 
     def setup_url_kwargs(self):
         return {
@@ -849,7 +851,8 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         )
 
     def setup_template_context(self):
-        form = forms.TenureRelationshipEditForm(instance=self.relationship)
+        form = forms.TenureRelationshipEditForm(instance=self.relationship,
+                                                project_id=self.project.id)
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
