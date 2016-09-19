@@ -889,7 +889,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         )
         assert response.status_code == 200
         assert response.content == self.render_content(form=form,
-                                        is_allowed_add_location=True)
+                                            is_allowed_add_location=True)
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 1
         assert Party.objects.first().name == party.name
