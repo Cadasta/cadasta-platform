@@ -12,7 +12,8 @@ class SelectPartyWidgetTest(TestCase):
 
         widget = SelectPartyWidget(project=project)
         rendered = widget.render(name='name', value='value')
-        assert ('<select id="party-select" name="name">' in rendered)
+        assert ('<select id="party-select" name="name" class="form-control" '
+                '       data-parsley-required="true">' in rendered)
         assert ('<option value="' + party_1.id + '" data-type="'
                 '' + party_1.get_type_display() + '">' + party_1.name + ''
                 '</option>' in rendered)

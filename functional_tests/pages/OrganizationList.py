@@ -1,7 +1,6 @@
 from .base import Page
 from .Organization import OrganizationPage
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import ElementNotVisibleException
 
 
 class OrganizationListPage(Page):
@@ -119,21 +118,18 @@ class OrganizationListPage(Page):
             self.check_inputboxes
         )
 
-    def try_submit(self, err=None, ok=None):
-        fields = self.get_fields()
+    def try_submit(self, err=None, ok=None, message=None):
+        BY_ORG_DASHBOARD = (By.CLASS_NAME, 'organization-dashboard')
 
-        try:
-            fields['add'].click()
-        except ElementNotVisibleException:
-            self.browser.execute_script(
-                "return arguments[0].scrollIntoView();", fields['add'])
-            fields['add'].click()
+        fields = self.get_fields()
+        sel = BY_ORG_DASHBOARD if err is None else self.test.BY_FIELD_ERROR
+        self.test.click_through(fields['add'], sel, screenshot='tst')
 
         fields = self.get_fields()
         if err is not None:
             for f in err:
                 try:
-                    assert self.test.assert_has_error_list()
+                    self.test.assert_field_has_error(fields[f], message)
                 except:
                     raise AssertionError(
                         'Field "' + f + '" should have error, but does not'

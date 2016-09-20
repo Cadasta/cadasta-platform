@@ -2,7 +2,7 @@
 
 <h1>{% trans "Register" %}</h1>
 
-<form method="POST" action="/site/account/register/" novalidate>
+<form method="POST" action="/site/account/register/">
     {% csrf_token %}
     {{ form.non_field_errors }}
     <div class="fieldWrapper">

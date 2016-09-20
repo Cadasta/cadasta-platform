@@ -136,7 +136,7 @@
             {% now 'Y' as copydate %}
             {% blocktrans %}Copyright {{ copydate }} Cadasta. <span>All Rights Reserved.</span> {% endblocktrans %}
           </p>
-          <form action="{% url 'set_language' %}" method="post" class="language" novalidate>
+          <form action="{% url 'set_language' %}" method="post" class="language">
           {% csrf_token %}
             <select id="language" name="language">
               {% get_current_language as LANGUAGE_CODE %}
@@ -188,6 +188,9 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/parsleyConfig.js' %}"></script>
+    <script src="{% static 'js/parsley.min.js' %}"></script>
+    <script src="{% static "js/i18n/"|add:LANGUAGE_CODE|add:".js" %}"></script>
     <script type="text/javascript"
             src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js">
     </script>
@@ -224,6 +227,10 @@
       });
       $('.dropdown-toggle').dropdown();
       $('#language').change(function() { this.form.submit(); });
+      $('[data-parsley-required="true"]')
+        .closest('.form-group')
+          .children('label.control-label')
+            .addClass('required');
     });
     window.setTimeout(function() {
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });

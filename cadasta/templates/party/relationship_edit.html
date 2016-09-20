@@ -34,25 +34,25 @@
 <div class="col-md-4 detail detail-edit">
   <h2>{% trans "Edit Relationship" %}</h2>
   <div class="panel panel-default">
-    <form method="POST">
+    <form method="POST" data-parsley-validate>
     {% csrf_token %}
       <div class="panel-body">
         <h3>{% trans "Details" %}</h3>
         <div class="clearfix form-group{% if form.tenure_type.errors %} has-error{% endif %}">
-          <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship type" %}</label>
-          <label class="pull-right control-label">{{ form.tenure_type.errors }}</label>
-          {% render_field form.tenure_type class+="form-control" %}
+          <label class="control-label" for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship type" %}</label>
+          {% render_field form.tenure_type class+="form-control" data-parsley-required="true" %}
+          <div class="error-block">{{ form.tenure_type.errors }}</div>
         </div>
         {% for field in form %}
           {% if "attributes" in field.name %}
           <div class="clearfix form-group{% if field.errors %} has-error{% endif %}">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            <label class="pull-right control-label">{{ field.errors }}</label>
+            <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
             {% if field|field_type == "datefield" %}
-            {% render_field field class+="form-control datepicker" %}
+              {% render_field field class+="form-control datepicker" %}
             {% else %}
-            {% render_field field class+="form-control" %}
+              {% render_field field class+="form-control" %}
             {% endif %}
+            <div class="error-block">{{ field.errors }}</div>
           </div>
           {% endif %}
         {% endfor %}

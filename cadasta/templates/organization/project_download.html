@@ -4,7 +4,7 @@
 
 
 {% block content %}
-<form method="POST" class="col-md-12 content-single" novalidate>
+<form method="POST" class="col-md-12 content-single" data-parsley-validate>
   {% csrf_token %}
   <div class="row">
     <!-- Main text  -->
@@ -13,31 +13,32 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <h3>{% trans "Select your desired file format" %}</h3>
+          <div class="error-block"></div>
           <ul class="list-unstyled spacing-lg">
             <li class="radio">
               <label>
-                <input type="radio" name="type" id="data_shp" value="shp" {% if form.type.value == 'shp' %}checked{% endif%}>
+                <input type="radio" name="type" id="data_shp" value="shp" data-parsley-errors-container=".error-block" required="" {% if form.type.value == 'shp' %}checked{% endif%}>
                 {% trans "SHP" %}
                 <small>{% trans "A ZIP containing shape files for project locations, relationships, and parties." %}</small>
               </label>
             </li>
             <li class="radio">
               <label>
-                <input type="radio" name="type" id="data_xls" value="xls" {% if form.type.value == 'xls' %}checked{% endif%}>
+                <input type="radio" name="type" id="data_xls" value="xls" required="" {% if form.type.value == 'xls' %}checked{% endif%}>
                 {% trans "XLS" %}
                 <small>{% trans "A single XLS spreadsheet containing project locations, relationships, and parties." %}</small>
               </label>
             </li>
             <li class="radio">
               <label>
-                <input type="radio" name="type" id="data_res" value="res" {% if form.type.value == 'res' %}checked{% endif%}>
+                <input type="radio" name="type" id="data_res" value="res" required="" {% if form.type.value == 'res' %}checked{% endif%}>
                 {% trans "Resources" %}
                 <small>{% trans "A zip file containing all resources." %}</small>
               </label>
             </li>
             <li class="radio">
               <label>
-                <input type="radio" name="type" id="data_all" value="all" {% if form.type.value == 'all' %}checked{% endif%}>
+                <input type="radio" name="type" id="data_all" value="all" required="" {% if form.type.value == 'all' %}checked{% endif%}>
                 {% trans "All data" %}
                 <small>{% trans "A zip file containing all project data XLS and SHP files and all resources." %}</small>
               </label>

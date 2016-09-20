@@ -33,19 +33,20 @@ class RegistrationTest(FunctionalTest):
         fields = page.get_fields()
         fields['username'].send_keys('user3')
         page.try_submit(err=['email', 'password1', 'password2'],
-                        ok=['username'])
+                        ok=['username'],)
         fields = page.get_fields()
         fields['email'].send_keys('user3@example.net')
         page.try_submit(err=['password1', 'password2'],
-                        ok=['username', 'email'])
+                        ok=['username', 'email'],)
         fields = page.get_fields()
         fields['password1'].send_keys('very_secret')
-        page.try_submit(err=['password1', 'password2'],
-                        ok=['username', 'email'])
+        page.try_submit(err=['password2'],
+                        ok=['username', 'email', 'password1'],)
         fields = page.get_fields()
         fields['password2'].send_keys('not_very_secret')
-        page.try_submit(err=['password1'],
-                        ok=['username', 'email', 'password2'])
+        page.try_submit(err=['password2'],
+                        ok=['username', 'email', 'password1'],
+                        message='This value should be the same.')
 
         # Fill in extra fields, fill in final required form and submit
         fields = page.get_fields()
@@ -84,5 +85,6 @@ class RegistrationTest(FunctionalTest):
         fields['full_name'].send_keys('Jane Doe')
         page.try_submit(err=['username'],
                         ok=['email', 'password1', 'password2',
-                            'full_name'])
+                            'full_name'],
+                        message='A user with that username already exists.')
         assert page.is_on_page()

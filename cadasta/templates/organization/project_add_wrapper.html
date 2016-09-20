@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<form action="" method="post" novalidate>
+<form action="" method="post" data-parsley-validate data-parsley-excluded=":hidden">
 {% csrf_token %}
   <div class="row">
     {% block step_content_1 %}{% endblock %}

@@ -1,0 +1,129 @@
+/* =Forms
+-------------------------------------------------------------- */
+
+/* =Contacts form styling
+-------------------------------------------------------------- */
+
+tr.contacts-error {
+  background: $alert-warning-bg;
+  li {
+    padding: 0;
+  }
+  +tr td {
+    border-top: none;
+    padding-top: 0;
+    background: $alert-warning-bg;
+  }
+}
+
+/* =Party selection widget
+-------------------------------------------------------------- */
+
+#select-party {
+  #party-select {
+    width: 100%;
+  }
+  .select2 {
+    display: block;
+    margin: 0.5em 0;
+    width: 100% !important;
+  }
+  #add-party {
+    padding: 6px 18px;
+    .glyphicon {
+      opacity: 0.5;
+      padding-right: 8px;
+    }
+  }
+}
+
+.select2-container {
+  .party-name {
+    display: block;
+  }
+  .party-type {
+    display: block;
+    font-size: 0.85em;
+    opacity: 0.75;
+  }
+}
+
+/* =Required field label
+-------------------------------------------------------------- */
+
+label.required:after { // show asterisk
+  content: "*";
+  color: $brand-danger;
+  font-style: normal;
+  padding: 0 3px;
+}
+
+/* =Parsley client-side validation
+-------------------------------------------------------------- */
+
+.form-group.has-error {
+  background-color: $alert-warning-bg;
+  padding: 10px;
+}
+
+.has-success input,
+.has-success select,
+.has-success textarea {
+  //color: #468847;
+  //border: 1px solid #D6E9C6;
+  background: url('/static/img/checkmark.png') calc(100% - 8px) 50% no-repeat;
+  padding-right: 36px;
+}
+
+.has-error input,
+.has-error select,
+.has-error textarea {
+  border: 1px solid $brand-danger;
+  background: #fff url('/static/img/cross.png')  calc(100% - 8px) 50% no-repeat;
+  padding-right: 36px;
+}
+
+.has-success select,
+.has-error select {
+  background-position: calc(100% - 20px) 50%;
+}
+
+.has-error #select2-party-select-container { // select party
+  background: #fff url('/static/img/cross.png')  right 50% no-repeat;
+  padding-right: 36px;
+}
+
+.parsley-errors-list {
+  opacity: 0;
+  transition: all .3s ease-in;
+  -o-transition: all .3s ease-in;
+  -moz-transition: all .3s ease-in;
+  -webkit-transition: all .3s ease-in;
+}
+
+.parsley-errors-list.filled {
+  opacity: 1;
+}
+
+.parsley-errors-list, .errorlist {
+  margin: 2px 0 3px;
+  padding: 0;
+}
+
+ul.parsley-errors-list, ul.errorlist {
+  margin-bottom: 0;
+  padding-left: 0;
+  list-style: none !important;
+  li {
+    background-color: $alert-warning-bg;
+    color: $alert-danger-text;
+    padding: 2px 8px;
+    display: list-item;
+    list-style-type: disc;
+    list-style-position: inside;
+  }
+}
+
+.well ul.parsley-errors-list li, .well ul.errorlist li {
+  background-color: transparent
+}

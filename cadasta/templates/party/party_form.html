@@ -3,27 +3,27 @@
 
 {% csrf_token %}
 <div class="form-group{% if form.name.errors %} has-error{% endif %}">
-  <label for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-  <label class="pull-right control-label">{{ form.name.errors }}</label>
-  {% render_field form.name class+="form-control" %}
+  <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
+  {% render_field form.name class+="form-control" data-parsley-required="true" %}
+  <div class="error-block">{{ form.name.errors }}</div>
 </div>
 
 <div class="form-group{% if form.type.errors %} has-error{% endif %}">
-  <label for="{{ form.type.id_for_label }}">{% trans "Type" %}</label>
-  <label class="pull-right control-label">{{ form.type.errors }}</label>
-  {% render_field form.type class+="form-control" %}
+  <label class="control-label" for="{{ form.type.id_for_label }}">{% trans "Type" %}</label>
+  {% render_field form.type class+="form-control" data-parsley-required="true" %}
+  <div class="error-block">{{ form.type.errors }}</div>
 </div>
 
 {% for field in form %}
   {% if "attributes" in field.name %}
   <div class="form-group{% if field.errors %} has-error{% endif %}">
-    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-    <label class="pull-right control-label">{{ field.errors }}</label>
+    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
     {% if field|field_type == "datefield" %}
-    {% render_field field class+="form-control datepicker" %}
+      {% render_field field class+="form-control datepicker" %}
     {% else %}
-    {% render_field field class+="form-control" %}
+      {% render_field field class+="form-control" %}
     {% endif %}
+    <div class="error-block">{{ field.errors }}</div>
   </div>
   {% endif %}
 {% endfor %}

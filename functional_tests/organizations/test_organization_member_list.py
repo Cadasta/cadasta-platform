@@ -51,35 +51,40 @@ class OrganizationMemberListTest(FunctionalTest):
         page.click_on_add_button()
         page.try_cancel_and_close()
 
-        input_box = page.click_on_input()
-        error_list = page.click_submit_button(success=False)
-        assert error_list == 'This field is required.'
+        fields = page.get_fields()
+        page.try_submit(err=['member'])
 
-        input_box = page.click_on_input()
-        input_box.send_keys("darthvader")
-        error_list = page.click_submit_button(success=False)
-        error_message = 'User with username or email darthvader does not exist'
-        assert error_list == error_message
+        fields = page.get_fields()
+        fields['member'].send_keys("darthvader")
+        page.try_submit(
+            err=['member'],
+            message='User with username or email darthvader does not exist')
 
-        input_box = page.click_on_input()
-        input_box.clear()
-        input_box.send_keys("admin_user")
-        error_list = page.click_submit_button(success=False)
-        error_message = 'User is already a member of the organization.'
-        assert error_list == error_message
+        fields = page.get_fields()
+        fields['member'].clear()
+        fields['member'].send_keys("admin_user")
+        page.try_submit(
+            err=['member'],
+            message='User is already a member of the organization.')
 
-        input_box = page.click_on_input()
-        input_box.clear()
-        input_box.send_keys("hansolo")
-        member = page.click_submit_button()
+        fields = page.get_fields()
+        fields['member'].clear()
+        fields['member'].send_keys("hansolo")
+        page.try_submit()
+
+        member = page.get_member_name()
         assert member == "MEMBER: Han Solo"
 
         OrganizationMemberPage(self).click_remove_member_and_confirm_buttons()
 
         page.click_on_add_button()
-        input_box = page.click_on_input()
-        input_box.send_keys("millenniumfalcon@example.com")
-        member = page.click_submit_button()
+
+        fields = page.get_fields()
+        fields['member'].clear()
+        fields['member'].send_keys("millenniumfalcon@example.com")
+        page.try_submit()
+
+        member = page.get_member_name()
         assert member == "MEMBER: Han Solo"
 
     def test_adding_members_to_archived_organization(self):

@@ -17,7 +17,7 @@
       <div class="page-title">
         <h2>{% trans "Resources: Edit" %}</h2>
       </div>
-      <form method="POST">
+      <form method="POST" data-parsley-validate>
       {% csrf_token %}
         <div class="panel panel-default">
           <div class="panel-body">

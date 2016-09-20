@@ -11,7 +11,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <form method="POST"
-              action="{% url 'organization:add' %}" class="modal-organization-add" novalidate>
+              action="{% url 'organization:add' %}" class="modal-organization-add" data-parsley-validate>
           <div class="modal-header">
             <a class="close" href="{% url 'organization:list' %}">
               <span aria-hidden="true">&times;</span>

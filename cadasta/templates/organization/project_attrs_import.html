@@ -1,6 +1,6 @@
 {% extends "organization/project_wrapper.html" %} {% load widget_tweaks %} {% load i18n %} {% block content %}
 
-<form method="POST" enctype="multipart/form-data" class="col-md-12 content-single" novalidate>
+<form method="POST" enctype="multipart/form-data" class="col-md-12 content-single" data-parsley-validate>
     {% csrf_token %}
     <div class="row">
         {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form }} {% for form in wizard.form.forms %} {{ form }} {% endfor %} {% else %}

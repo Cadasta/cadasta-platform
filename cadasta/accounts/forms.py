@@ -5,8 +5,10 @@ from django.utils.translation import ugettext as _
 from allauth.account.utils import send_email_confirmation
 
 from .models import User
+from parsley.decorators import parsleyfy
 
 
+@parsleyfy
 class RegisterForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     password1 = forms.CharField(widget=forms.PasswordInput())

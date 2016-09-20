@@ -18,7 +18,8 @@ class SelectPartyWidget(Widget):
         ]
 
         return (
-            '<select id="party-select" name="{name}">'
+            '<select id="party-select" name="{name}" class="form-control" '
+            '       data-parsley-required="true">'
             '<option value="" data-type="">' +
             _("Please select a party") + '</option>'
             '{parties}'

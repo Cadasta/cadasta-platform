@@ -275,18 +275,29 @@ class ProjectAddPage(Page):
         set details and verify that an error is issued."""
         assert self.is_on_subpage('details')
         submit_button = self.BY_CLASS('btn-primary')
-        error_wait = (By.CLASS_NAME, 'errorlist')
+        error_wait = (By.CLASS_NAME, 'error-block')
         self.test.click_through(submit_button, error_wait)
         assert self.is_on_subpage('details')
+
+    def get_error_list(self, id, message, field='input'):
+        field = self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'has-error')]/" +
+            "{field}[@id='{id}']".format(field=field, id=id))
+        error = field.find_element_by_xpath(
+            "..//div[contains(@class, 'error-block')]")
+        if error.text == '':
+            error = field.find_element_by_xpath(
+                "..//ul[contains(@class, 'parsley-errors-list')]")
+        print("<error.text> " + error.text + " != <message> " + message)
+        assert error.text == message
 
     def check_missing_org_error(self):
         # Assert that there is a missing org error message
         assert self.is_on_subpage('details')
-        assert self.BY_XPATH(
-            "//div[@class='form-group has-error']/" +
-            "select[@id='id_details-organization']/../" +
-            "label[contains(@class, 'control-label')]/" +
-            "ul[@class='errorlist']").text == "This field is required."
+        self.get_error_list(
+            id='id_details-organization',
+            message='This field is required.',
+            field='select')
 
     def check_no_missing_org_error(self):
         # Assert that there is NO missing org error message
@@ -300,11 +311,9 @@ class ProjectAddPage(Page):
     def check_missing_name_error(self):
         # Assert that there is a missing project name error message
         assert self.is_on_subpage('details')
-        assert self.BY_XPATH(
-            "//div[@class='form-group has-error']/" +
-            "input[@id='id_details-name']/../" +
-            "label[contains(@class, 'control-label')]/" +
-            "ul[@class='errorlist']").text == "This field is required."
+        self.get_error_list(
+            id='id_details-name',
+            message='This field is required.')
 
     def check_no_missing_name_error(self):
         # Assert that there is NO missing project name error message
@@ -318,12 +327,10 @@ class ProjectAddPage(Page):
     def check_duplicate_name_error(self):
         # Assert that there is a duplicate project name error message
         assert self.is_on_subpage('details')
-        assert self.BY_XPATH(
-            "//div[@class='form-group has-error']/" +
-            "input[@id='id_details-name']/../" +
-            "label[contains(@class, 'control-label')]/" +
-            "ul[@class='errorlist']").text == (
-                "Project with this name already exists in this organization.")
+        message = "Project with this name already exists in this organization."
+        self.get_error_list(
+            id='id_details-name',
+            message=message)
 
     def check_no_duplicate_name_error(self):
         # Assert that there is NO duplicate project name error message
@@ -337,12 +344,9 @@ class ProjectAddPage(Page):
     def check_invalid_url_error(self):
         # Assert that there is an invalid URL error message
         assert self.is_on_subpage('details')
-        assert self.BY_XPATH(
-            "//div[@class='form-group has-error']/" +
-            "input[@id='id_details-url']/../" +
-            "label[contains(@class, 'control-label')]/" +
-            "ul[@class='errorlist']").text == (
-                "Enter a valid URL.")
+        self.get_error_list(
+            id='id_details-url',
+            message="This value should be a valid url.")
 
     def check_no_invalid_url_error(self):
         # Assert that there is NO invalid URL error message
