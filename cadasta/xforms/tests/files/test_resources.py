@@ -10,45 +10,9 @@ FORM = '''<?xml version=\'1.0\' ?>
         <party_name>Bilbo Baggins</party_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0;</location_geometry>
         <location_type>MI</location_type>
-        <location_photo>test_image_one.png</location_photo>
-        <party_photo>test_image_two.png</party_photo>
-        <tenure_type>LH</tenure_type>
-        <location_attributes>
-            <name>Middle Earth</name>
-        </location_attributes>
-        <party_attributes_default>
-            <notes>Party attribute default notes.</notes>
-        </party_attributes_default>
-        <party_attributes_individual>
-            <gender>f</gender>
-            <homeowner>no</homeowner>
-            <dob>2016-07-07</dob>
-        </party_attributes_individual>
-        <party_relationship_attributes>
-            <notes>Party relationship notes.</notes>
-        </party_relationship_attributes>
-        <tenure_relationship_attributes>
-            <notes>Tenure relationship notes.</notes>
-        </tenure_relationship_attributes>
-        <meta>
-            <instanceID>uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad</instanceID>
-        </meta>
-    </test_standard_questionnaire>'''.strip()
-
-FORM_2_RESOURCES = '''<?xml version=\'1.0\' ?>
-    <test_standard_questionnaire
-        id="test_standard_questionnaire" version="20160727122110">
-        <start>2016-07-07T16:38:20.310-04</start>
-        <end>2016-07-07T16:39:23.673-04</end>
-        <today>2016-07-07</today>
-        <deviceid>00:bb:3a:44:d0:fb</deviceid>
-        <title />
-        <party_type>IN</party_type>
-        <party_name>Bilbo Baggins</party_name>
-        <location_geometry />
-        <location_type>MI</location_type>
-        <location_photo>test_image_one.png</location_photo>
-        <party_photo>test_image_two.png</party_photo>
+        <location_resource_photo>test_image_one.png</location_resource_photo>
+        <party_resource_photo>test_image_two.png</party_resource_photo>
+        <party_resource_audio>test_audio_one.mp3</party_resource_audio>
         <tenure_type>LH</tenure_type>
         <location_attributes>
             <name>Middle Earth</name>
@@ -84,8 +48,8 @@ INVALID_FORM = '''<?xml version=\'1.0\' ?>
         <party_name></party_name>
         <location_geometry>40.6890612 -73.9925067 0.0 0.0;</location_geometry>
         <location_type>MI</location_type>
-        <location_photo>test_image.png</location_photo>
-        <party_photo />
+        <location_resource_photo>test_image.png</location_resource_photo>
+        <party_resource_photo />
         <tenure_type>LH</tenure_type>
         <location_attributes>
             <name>Null Island</name>
@@ -125,6 +89,7 @@ POLY_FORM = '''<?xml version=\'1.0\' ?>
         </location_geometry>
         <location_type>MI</location_type>
         <tenure_type>LH</tenure_type>
+        <tenure_resource_audio>test_audio_one.mp3</tenure_resource_audio>
         <location_attributes>
             <name>Polygon</name>
         </location_attributes>

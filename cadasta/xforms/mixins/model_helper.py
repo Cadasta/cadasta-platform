@@ -44,14 +44,14 @@ class ModelHelper():
             party=party
         )
 
-        self.create_tenure_relationship(
+        tenure = self.create_tenure_relationship(
             data=data,
             project=project,
             party=party,
             location=location
         )
 
-        return questionnaire, party.id, location.id
+        return questionnaire, party.id, location.id, tenure.id
 
     def create_party(self, data, project):
         try:
@@ -90,7 +90,7 @@ class ModelHelper():
 
     def create_tenure_relationship(self, data, party, location, project):
         try:
-            TenureRelationship.objects.create(
+            tenure = TenureRelationship.objects.create(
                 project=project,
                 party=party,
                 spatial_unit=location,
@@ -101,6 +101,7 @@ class ModelHelper():
         except Exception as e:
             raise InvalidXMLSubmission(_(
                 "Tenure relationship error: {}".format(e)))
+        return tenure
 
     def add_file_to_resource(self, data, user, project, content_object=None):
         Storage = get_storage_class()
@@ -183,16 +184,31 @@ class ModelHelper():
         submission = full_submission[list(full_submission.keys())[0]]
 
         with transaction.atomic():
-            questionnaire, party, location = self.create_models(submission)
-            location_photo = submission.get('location_photo', None)
-            party_photo = submission.get('party_photo', None)
+            questionnaire, party, location, tenure = self.create_models(
+                                                                    submission)
+            party_resources = []
+            location_resources = []
+            tenure_resources = []
+            for file_name in submission.keys():
+                if ("party_resource" in file_name or
+                   "party_photo" in file_name):
+                    party_resources.append(submission[file_name])
+
+                if ("location_resource" in file_name or
+                   "location_photo" in file_name):
+                    location_resources.append(submission[file_name])
+
+                if ("tenure_resource" in file_name):
+                    tenure_resources.append(submission[file_name])
 
             resource_data = {
                 'project': questionnaire.project,
-                'location_photo': location_photo,
+                'location_resources': location_resources,
                 'location': location,
-                'party_photo': party_photo,
-                'party_id': party
+                'party_resources': party_resources,
+                'party_id': party,
+                'tenure_resources': tenure_resources,
+                'tenure_id': tenure,
             }
             self.upload_files(request, resource_data)
 
@@ -208,12 +224,15 @@ class ModelHelper():
         project = data['project']
         for file_name in files:
             content_object = None
-            if file_name == data['location_photo']:
+            if file_name in data['location_resources']:
                 content_object = SpatialUnit.objects.get(
                     id=data['location'])
-            elif file_name == data['party_photo']:
+            elif file_name in data['party_resources']:
                 content_object = Party.objects.get(
                     id=data['party_id'])
+            elif file_name in data['tenure_resources']:
+                content_object = TenureRelationship.objects.get(
+                    id=data['tenure_id'])
 
             self.add_file_to_resource(data=files[file_name],
                                       user=user,
