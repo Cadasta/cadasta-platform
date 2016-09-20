@@ -46,6 +46,9 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         ProjectFactory.create(
             name='Private Project',
             access='private', organization=self.org, extent=extent)
+        ProjectFactory.create(
+            name='Archived Project', archived=True,
+            organization=self.org, extent=extent)
 
     def _render_geojson(self, projects):
         return json.dumps(ProjectGeometrySerializer(projects, many=True).data)
@@ -64,7 +67,7 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(organization=self.org, user=user)
         response = self.request(user=user)
 
-        gj = self._render_geojson(Project.objects.all())
+        gj = self._render_geojson(Project.objects.filter(archived=False))
         expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
         assert response.content == expected_content
@@ -73,7 +76,8 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         response = self.request(user=user)
 
-        gj = self._render_geojson(Project.objects.filter(access='public'))
+        gj = self._render_geojson(Project.objects.filter(access='public',
+                                                         archived=False))
         expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
         assert response.content == expected_content

@@ -214,6 +214,15 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
                          url_kwargs={'organization': 'some-org',
                                      'project': 'some-project'})
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add resources."
+                in response.messages)
+
     def test_update(self):
         project_resources = self.project.resources.all()
         response = self.request(method='POST', user=self.user)
@@ -244,6 +253,17 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first() == self.attached
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add resources."
+                in response.messages)
         assert self.project.resources.count() == 1
         assert self.project.resources.first() == self.attached
 
@@ -305,6 +325,15 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add resources."
+                in response.messages)
+
     def test_create(self):
         response = self.request(method='POST', user=self.user)
         assert response.status_code == 302
@@ -347,6 +376,16 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert self.project.resources.count() == 0
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to add resources."
+                in response.messages)
         assert self.project.resources.count() == 0
 
 
@@ -532,6 +571,15 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to edit this resource."
+                in response.messages)
+
     def test_update(self):
         response = self.request(method='POST', user=self.user)
         assert response.status_code == 302
@@ -559,6 +607,17 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert self.project.resources.count() == 1
+        assert self.project.resources.first().name != 'Some name'
+
+    def test_post_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to edit this resource."
+                in response.messages)
         assert self.project.resources.count() == 1
         assert self.project.resources.first().name != 'Some name'
 
@@ -653,6 +712,18 @@ class ResourceArchiveTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request()
         assert response.status_code == 302
         assert '/account/login/' in response.location
+
+        self.resource.refresh_from_db()
+        assert self.resource.archived is False
+
+    def test_archive_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to delete this resource."
+                in response.messages)
 
         self.resource.refresh_from_db()
         assert self.resource.archived is False
@@ -850,6 +921,19 @@ class ResourceDetachTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        self.refresh_objects_from_db()
+        assert self.resource.num_entities == 2
+        assert self.project.resources.count() == 1
+        assert self.location.resources.count() == 1
+
+    def test_detach_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 302
+        assert ("You don't have permission to edit this resource."
+                in response.messages)
         self.refresh_objects_from_db()
         assert self.resource.num_entities == 2
         assert self.project.resources.count() == 1

@@ -156,6 +156,19 @@ class PartyCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
         assert self.prj.parties.count() == 1
 
+    def test_add_party_to_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        data = {
+            'name': 'TestParty',
+            'description': 'Some description',
+            'project': self.prj.id
+        }
+        response = self.request(user=self.user, method='POST', post_data=data)
+        assert response.status_code == 403
+        assert self.prj.parties.count() == 0
+
 
 class PartyDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.PartyDetail
@@ -185,9 +198,27 @@ class PartyDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 204
         assert self.prj.parties.count() == 0
 
+    def test_delete_party_in_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(user=self.user, method='DELETE')
+        assert response.status_code == 403
+        assert self.prj.parties.count() == 1
+
     def test_update_party(self):
         data = {'name': 'Test Party Patched'}
         response = self.request(user=self.user, method='PATCH', post_data=data)
         assert response.status_code == 200
         self.party.refresh_from_db()
         assert self.party.name == response.content['name']
+
+    def test_update_party_in_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        data = {'name': 'Test Party Patched'}
+        response = self.request(user=self.user, method='PATCH', post_data=data)
+        assert response.status_code == 403
+        self.party.refresh_from_db()
+        assert self.party.name != 'Test Party Patched'

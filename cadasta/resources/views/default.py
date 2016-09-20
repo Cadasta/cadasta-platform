@@ -1,5 +1,5 @@
 import django.views.generic as base_generic
-from core.mixins import LoginPermissionRequiredMixin
+from core.mixins import LoginPermissionRequiredMixin, update_permissions
 from core.views import generic
 from core.views.mixins import ArchiveMixin
 from django.core.urlresolvers import reverse
@@ -44,7 +44,7 @@ class ProjectResourcesAdd(LoginPermissionRequiredMixin,
                           generic.DetailView):
     template_name = 'resources/project_add_existing.html'
     form_class = AddResourceFromLibraryForm
-    permission_required = 'resource.add'
+    permission_required = update_permissions('resource.add')
     permission_denied_message = error_messages.RESOURCE_ADD
 
     def get_object(self):
@@ -64,7 +64,7 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
                           organization_mixins.ProjectAdminCheckMixin,
                           generic.CreateView):
     template_name = 'resources/project_add_new.html'
-    permission_required = 'resource.add'
+    permission_required = update_permissions('resource.add')
     permission_denied_message = error_messages.RESOURCE_ADD
 
     def get_perms_objects(self):
@@ -110,7 +110,7 @@ class ProjectResourcesEdit(LoginPermissionRequiredMixin,
                            organization_mixins.ProjectAdminCheckMixin,
                            generic.UpdateView):
     template_name = 'resources/edit.html'
-    permission_required = 'resource.edit'
+    permission_required = update_permissions('resource.edit')
     permission_denied_message = error_messages.RESOURCE_EDIT
 
     def get_context_data(self, *args, **kwargs):
@@ -124,7 +124,7 @@ class ResourceArchive(LoginPermissionRequiredMixin,
                       mixins.ResourceObjectMixin,
                       generic.UpdateView):
     do_archive = True
-    permission_required = 'resource.archive'
+    permission_required = update_permissions('resource.archive')
     permission_denied_message = error_messages.RESOURCE_ARCHIVE
 
     def get_success_url(self):
@@ -158,7 +158,7 @@ class ResourceUnarchive(LoginPermissionRequiredMixin,
                         mixins.ResourceObjectMixin,
                         generic.UpdateView):
     do_archive = False
-    permission_required = 'resource.unarchive'
+    permission_required = update_permissions('resource.unarchive')
     permission_denied_message = error_messages.RESOURCE_UNARCHIVE
 
 
@@ -168,7 +168,7 @@ class ResourceDetach(LoginPermissionRequiredMixin,
     http_method_names = ('post',)
     model = ContentObject
     pk_url_kwarg = 'attachment'
-    permission_required = 'resource.edit'
+    permission_required = update_permissions('resource.edit')
     permission_denied_message = error_messages.RESOURCE_EDIT
 
     def get_object(self):

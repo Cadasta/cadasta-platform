@@ -193,12 +193,14 @@
     </script>
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}">
     </script>
+    <script type="text/javascript" src="{% static 'js/dataTables.selectFiltering.js' %}">
+    </script>
     {% block extra_script %}{% endblock %}
     <script>
     $(document).ready(function () {
       $('.datatable').DataTable({
         conditionalPaging: true,
-        "dom": '<"table-search"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
+        "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
         "language": {
           "info": 'Showing _START_ - _END_ of _TOTAL_',
           "lengthMenu": "Show _MENU_ rows",

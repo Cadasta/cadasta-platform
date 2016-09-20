@@ -20,6 +20,7 @@
             <table class="table table-hover datatable" data-paging-type="simple">
               <thead>
                 <tr>
+                  <th class="unarchived"><div>Archived</div></th>
                   <th class="col-md-6">{% trans "Project" %}</th>
                   <th class="col-md-2">{% trans "Country" %}</th>
                   <th class="col-md-2">{% trans "Last updated" %}</th>
@@ -28,7 +29,16 @@
               <tbody>
                 {% for prj in projects %}
                 <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
-                  <td>{{ prj.name }}</td>
+                  {% if prj.archived %}
+                    <td class="archived"><div>True</div></td>
+                  {% else %}
+                    <td class="unarchived"><div>False</div></td>
+                  {% endif %}
+                  <td>{{ prj.name }}{% if prj.archived %}
+                  <span class="label label-danger">
+                    Archived
+                  </span>
+                  {% endif %}</td>
                   <td>{{ prj.country }}</td>
                   <td>{{ prj.last_updated }}</td>
                 </tr>
@@ -108,59 +118,5 @@
   <div>
 </div>
 <!-- /.main -->
-
-{% endblock %}
-
-{% block modals %}
-
-<div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h3 class="modal-title">{% trans "Archive organization" %}</h3>
-      </div>
-      <div class="modal-body">
-        <p>{% trans "Are you sure you want to archive this organization?" %}</p>
-      </div>
-      <div class="modal-footer">
-        <a href="{% url 'organization:archive' organization.slug %}" class="btn btn-danger archive-final pull-right" role="button">
-          {% trans "Yes, archive this organization" %}
-        </a>
-        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
-          {% trans "Cancel" %}
-        </button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div class="modal fade" id="unarchive_confirm" tabindex="-1" role="dialog">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        <h3 class="modal-title">{% trans "Unarchive organization" %}</h3>
-      </div>
-      <div class="modal-body">
-        <p>
-          {% trans "Are you sure you want to unarchive this organization?" %}
-        </p>
-      </div>
-      <div class="modal-footer">
-        <a href="{% url 'organization:unarchive' organization.slug %}" class="btn btn-primary unarchive-final pull-right" role="button">
-          {% trans "Yes, unarchive this organization" %}
-        </a>
-        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
-          {% trans "Cancel" %}
-        </button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 {% endblock %}

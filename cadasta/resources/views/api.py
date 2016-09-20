@@ -1,5 +1,6 @@
 from rest_framework import filters, generics
 from tutelary.mixins import APIPermissionRequiredMixin
+from core.mixins import update_permissions
 from . import mixins
 
 
@@ -14,7 +15,7 @@ class ProjectResources(APIPermissionRequiredMixin,
     ordering_fields = ('name', 'description', 'file',)
     permission_required = {
         'GET': 'resource.list',
-        'POST': 'resource.add'
+        'POST': update_permissions('resource.add')
     }
 
     def filter_archived_resources(self, view, obj):
@@ -33,6 +34,8 @@ class ProjectResourcesDetail(APIPermissionRequiredMixin,
 
     def patch_actions(self, request):
         if hasattr(request, 'data'):
+            if self.get_object().project.archived:
+                return False
             is_archived = self.get_object().archived
             new_archived = request.data.get('archived', is_archived)
             if not is_archived and (is_archived != new_archived):

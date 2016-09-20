@@ -28,21 +28,20 @@ class ProjectListContentsTest(FunctionalTest):
         # Collect projects that are visible to the target user
         visible_projects = []
         for project in projects:
-            if (
-                user_type == 'superuser' or
-                project['access'] == 'public' or (
-                    user_type == 'affiliated' and
-                    project['_org'] in parent_org_idxs
-                )
-            ):
-                project_copy = project.copy()
-                org = orgs[project['_org']]
-                project_copy['_org_slug'] = org['slug']
-                project_copy['_org_name'] = org['name']
-                project_copy['_org_logo'] = (
-                    org['logo'] if 'logo' in org else ''
-                )
-                visible_projects.append(project_copy)
+            if project['archived'] is False:
+                if (user_type == 'superuser' or
+                    project['access'] == 'public' or (
+                        user_type == 'affiliated' and
+                        project['_org'] in parent_org_idxs
+                        )):
+                    project_copy = project.copy()
+                    org = orgs[project['_org']]
+                    project_copy['_org_slug'] = org['slug']
+                    project_copy['_org_name'] = org['name']
+                    project_copy['_org_logo'] = (
+                        org['logo'] if 'logo' in org else ''
+                    )
+                    visible_projects.append(project_copy)
 
         # Check that visible projects are present with correct details
         page.check_project_list(visible_projects)
@@ -112,3 +111,36 @@ class ProjectListContentsTest(FunctionalTest):
         """Verify that a superuser can see all projects,
         and that project details are correct."""
         self.generic_test_for_user('superuser')
+
+    def test_archived_projects_appear_for_admin_user(self):
+        """The option to filter active/archived projects is available to
+        organization administrators."""
+
+        LoginPage(self).login('default5', 'password1')
+        page = ProjectListPage(self)
+        page.go_to_and_check_on_page()
+
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Linux Kernel'
+
+        page.click_archive_filter("Archived")
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Archived Project Archived'
+
+        first_org = page.sort_table_by("descending")
+        assert first_org == 'Archived Project Archived'
+        first_org = page.sort_table_by("ascending")
+
+        page.click_archive_filter("All")
+        project_title = page.get_project_title_in_table()
+        assert first_org == 'Archived Project Archived'
+
+        first_org = page.sort_table_by("descending")
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Project Gutenberg'
+        first_org = page.sort_table_by("ascending")
+
+        page.click_archive_filter("Archived")
+        page.click_archive_filter("Active")
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Linux Kernel'

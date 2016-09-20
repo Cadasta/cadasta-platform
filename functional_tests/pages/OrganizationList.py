@@ -38,8 +38,7 @@ class OrganizationListPage(Page):
 
     def sort_table_by(self, order, col):
         order = "asc" if order == "ascending" else "desc"
-        col = "[1]" if col == "organization" else "[2]"
-
+        col = "[2]" if col == "organization" else "[3]"
         self.click_through(
             self.get_table_headers(col),
             (By.CLASS_NAME, 'sorting_{}'.format(order))
@@ -49,6 +48,18 @@ class OrganizationListPage(Page):
 
     def get_search_box(self):
         return self.test.search_box("DataTables_Table_0")
+
+    def get_archive_filter(self, xpath):
+        return self.browser.find_element_by_xpath(
+            "//select[contains(@id, 'archive-filter')]" + xpath)
+
+    def get_archive_option(self, option):
+        return self.get_archive_filter(
+            "//option[contains(@value, '{}')]".format(option))
+
+    def click_archive_filter(self, option):
+        option = self.get_archive_option(option)
+        self.click_through(option, (By.CLASS_NAME, 'sorting_asc'))
 
     def click_add_button(self):
         add_button = self.test.link("add-org")

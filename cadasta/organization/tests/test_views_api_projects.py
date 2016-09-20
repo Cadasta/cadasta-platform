@@ -7,6 +7,7 @@ from skivvy import APITestCase
 
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
+from accounts.models import User
 from .factories import OrganizationFactory, ProjectFactory, clause
 from ..models import Project, ProjectRole, OrganizationRole
 from ..views import api
@@ -72,6 +73,7 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         self.project = ProjectFactory.create()
         response = self.request()
         assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_get_full_list_organization_does_not_exist(self):
         self.project = ProjectFactory.create()
@@ -105,6 +107,7 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
                                 method='POST')
         assert response.status_code == 403
         assert self.project.users.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_add_user_with_invalid_data(self):
         self.project = ProjectFactory.create()
@@ -115,6 +118,20 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         assert self.project.users.count() == 0
         assert ('User with username or email some-user does not exist'
                 in response.content['username'])
+
+    def test_add_user_to_archived_project(self):
+        user_to_add = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user_to_add])
+        self.project = ProjectFactory.create(organization=org)
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(post_data={'username': user_to_add.username},
+                                method='POST',
+                                user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert self.project.users.count() == 0
 
 
 class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -184,6 +201,19 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.project = ProjectFactory.create(add_users=[self.test_user])
         response = self.request(method='PATCH')
         assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        role = ProjectRole.objects.get(project=self.project,
+                                       user=self.test_user)
+        assert role.role == 'PU'
+
+    def test_update_user_with_archived_project(self):
+        self.test_user = UserFactory.create()
+        self.project = ProjectFactory.create(add_users=[self.test_user])
+        self.project.archived = True
+        self.project.save()
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
         role = ProjectRole.objects.get(project=self.project,
                                        user=self.test_user)
         assert role.role == 'PU'
@@ -194,12 +224,23 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='DELETE', user=self.user)
         assert response.status_code == 204
         assert self.project.users.count() == 0
+        assert User.objects.filter(username=self.test_user.username).exists()
 
     def test_delete_user_with_unauthorized_user(self):
         self.test_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=[self.test_user])
         response = self.request(method='DELETE')
         assert response.status_code == 403
+        assert self.project.users.count() == 1
+
+    def test_delete_user_in_archived_project(self):
+        self.test_user = UserFactory.create()
+        self.project = ProjectFactory.create(add_users=[self.test_user])
+        self.project.archived = True
+        self.project.save()
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
         assert self.project.users.count() == 1
 
 
@@ -236,13 +277,26 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         assert all([proj.get('organization').get('id') == self.organization.id
                     for proj in response.content])
 
-    def test_filter_active(self):
+    def test_filter_archived_without_authorization(self):
         """
-        It should return only one active project.
+        It should return zero archived project.
         """
         ProjectFactory.create(organization=self.organization, archived=True)
         ProjectFactory.create(organization=self.organization, archived=False)
         response = self.request(user=self.user, get_data={'archived': True})
+        assert response.status_code == 200
+        assert len(response.content) == 0
+
+    def test_fitler_archived_with_org_admin(self):
+        """
+        It should return one archived project.
+        """
+        user = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=self.organization, user=user, admin=True)
+        ProjectFactory.create(organization=self.organization, archived=True)
+        ProjectFactory.create(organization=self.organization, archived=False)
+        response = self.request(user=user, get_data={'archived': True})
         assert response.status_code == 200
         assert len(response.content) == 1
 
@@ -355,8 +409,8 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         It should 403 "You do not have permission to perform this action."
         """
         response = self.request()
-        assert response.status_code == 403
-        assert response.content['detail'] == PermissionDenied.default_detail
+        assert response.status_code == 200
+        assert len(response.content) == 0
 
     def test_filter_active(self):
         """
@@ -364,7 +418,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         """
         ProjectFactory.create(archived=True)
         ProjectFactory.create(archived=False)
-        response = self.request(user=self.user, get_data={'archived': True})
+        response = self.request(user=self.user, get_data={'archived': False})
         assert response.status_code == 200
         assert len(response.content) == 1
 
@@ -542,6 +596,18 @@ class ProjectCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert Project.objects.count() == 0
         assert response.content['name'][0] == 'This field is required.'
 
+    def test_create_project_in_archived_organization(self):
+        data = {
+            'name': 'Project',
+            'description': 'Project description',
+        }
+        self.org.archived = True
+        self.org.save()
+        response = self.request(method='POST', user=self.user, post_data=data)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert Project.objects.count() == 0
+
 
 class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.ProjectDetail
@@ -580,6 +646,21 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(url_kwargs={'project': 'some-project'})
         assert response.status_code == 404
         assert response.content['detail'] == "Project not found."
+
+    def test_get_archived_project_with_unauthorized_user(self):
+        self.project.archived = True
+        self.project.save()
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_archived_project_with_admin_user(self):
+        self.project.archived = True
+        self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.project.id
+        assert 'users' in response.content
 
     def test_get_private_project(self):
         self.project.access = 'private'
@@ -668,6 +749,12 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.project.refresh_from_db()
         assert self.project.archived is True
 
+        response = self.request(method='PATCH', user=self.user,
+                                post_data={'description': 'Blah blah blah'})
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert self.project.description != 'Blah blah blah'
+
     def test_unarchive(self):
         self.project.archived = True
         self.project.save()
@@ -755,9 +842,6 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
 
     def test_invalid_visibility_patching(self):
-        self.project.archived = True
-        self.project.save()
-
         response = self.request(method='PATCH', user=self.user,
                                 post_data={'access': 'something'})
         assert response.status_code == 400
