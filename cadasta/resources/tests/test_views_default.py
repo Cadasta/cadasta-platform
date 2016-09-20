@@ -117,13 +117,15 @@ class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
     def test_get_list(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_allowed_add_resource=True)
+        assert response.content == self.render_content(
+            is_allowed_add_resource=True)
 
     def test_get_list_with_archived_resource(self):
         ResourceFactory.create(project=self.project, archived=True)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_allowed_add_resource=True)
+        assert response.content == self.render_content(
+            is_allowed_add_resource=True)
 
     def test_get_list_with_unattached_resource_using_nonunarchiver(self):
         ResourceFactory.create(project=self.project)
