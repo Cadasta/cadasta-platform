@@ -1082,11 +1082,11 @@ msgid "Account"
 msgstr ""
 
 #: templates/allauth/account/email.html:8
-msgid "E-mail Addresses"
+msgid "Email Addresses"
 msgstr ""
 
 #: templates/allauth/account/email.html:10
-msgid "The following e-mail addresses are associated with your account:"
+msgid "The following email addresses are associated with your account:"
 msgstr ""
 
 #: templates/allauth/account/email.html:24
@@ -1120,21 +1120,21 @@ msgstr ""
 
 #: templates/allauth/account/email.html:43
 msgid ""
-"You currently do not have any e-mail address set up. You should really add "
-"an e-mail address so you can receive notifications, reset your password, "
+"You currently do not have an email address set up. You should really add "
+"an email address so you can receive notifications, reset your password, "
 "etc."
 msgstr ""
 
 #: templates/allauth/account/email.html:48
-msgid "Add E-mail Address"
+msgid "Add Email Address"
 msgstr ""
 
 #: templates/allauth/account/email.html:53
-msgid "Add E-mail"
+msgid "Add Email"
 msgstr ""
 
 #: templates/allauth/account/email.html:62
-msgid "Do you really want to remove the selected e-mail address?"
+msgid "Do you really want to remove the selected email address?"
 msgstr ""
 
 #: templates/allauth/account/email/email_confirmation_message.txt:1
@@ -1142,7 +1142,7 @@ msgstr ""
 msgid ""
 "\n"
 "\n"
-"You're receiving this e-mail because user %(user_display)s at Cadasta Platform has given yours as an e-mail address to connect their account.\n"
+"You're receiving this email because user %(user_display)s at Cadasta Platform has given yours as an email address to connect their account.\n"
 "\n"
 "To confirm this is correct, go to %(activate_url)s\n"
 msgstr ""
@@ -1152,14 +1152,14 @@ msgid "Thank you from Cadasta."
 msgstr ""
 
 #: templates/allauth/account/email/email_confirmation_subject.txt:3
-msgid "Please Confirm Your E-mail Address"
+msgid "Please Confirm Your Email Address"
 msgstr ""
 
 #: templates/allauth/account/email/password_reset_key_message.txt:1
 msgid ""
 "\n"
 "\n"
-"You're receiving this e-mail because you or someone else has requested a password for your user account at Cadasta Platform.\n"
+"You're receiving this email because you or someone else has requested a password for your user account at Cadasta Platform.\n"
 "It can be safely ignored if you did not request a password reset. Click the link below to reset your password."
 msgstr ""
 
@@ -1173,18 +1173,18 @@ msgid "Thank you for using Cadasta Platform!\n"
 msgstr ""
 
 #: templates/allauth/account/email/password_reset_key_subject.txt:3
-msgid "Password Reset E-mail"
+msgid "Password Reset Email"
 msgstr ""
 
 #: templates/allauth/account/email_confirm.html:6
 #: templates/allauth/account/email_confirm.html:10
-msgid "Confirm E-mail Address"
+msgid "Confirm Email Address"
 msgstr ""
 
 #: templates/allauth/account/email_confirm.html:16
 #, python-format
 msgid ""
-"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email "
 "address for user %(user_display)s."
 msgstr ""
 
@@ -1195,8 +1195,8 @@ msgstr ""
 #: templates/allauth/account/email_confirm.html:27
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a "
-"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This email confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new email confirmation request</a>."
 msgstr ""
 
 #: templates/allauth/account/login.html:10
@@ -1224,12 +1224,12 @@ msgstr ""
 
 #: templates/allauth/account/messages/cannot_delete_primary_email.txt:2
 #, python-format
-msgid "You cannot remove your primary e-mail address (%(email)s)."
+msgid "You cannot remove your primary email address (%(email)s)."
 msgstr ""
 
 #: templates/allauth/account/messages/email_confirmation_sent.txt:2
 #, python-format
-msgid "Confirmation e-mail sent to %(email)s."
+msgid "Confirmation email sent to %(email)s."
 msgstr ""
 
 #: templates/allauth/account/messages/email_confirmed.txt:2
@@ -1239,7 +1239,7 @@ msgstr ""
 
 #: templates/allauth/account/messages/email_deleted.txt:2
 #, python-format
-msgid "Removed e-mail address %(email)s."
+msgid "Removed email address %(email)s."
 msgstr ""
 
 #: templates/allauth/account/messages/logged_in.txt:4
@@ -1260,11 +1260,11 @@ msgid "Password successfully set."
 msgstr ""
 
 #: templates/allauth/account/messages/primary_email_set.txt:2
-msgid "Primary e-mail address set."
+msgid "Primary email address set."
 msgstr ""
 
 #: templates/allauth/account/messages/unverified_primary_email.txt:2
-msgid "Your primary e-mail address must be verified."
+msgid "Your primary email address must be verified."
 msgstr ""
 
 #: templates/allauth/account/password_change.html:6
@@ -1307,7 +1307,7 @@ msgstr ""
 
 #: templates/allauth/account/password_reset_done.html:15
 msgid ""
-"We have sent you an e-mail. Please contact us if you do not receive it "
+"We have sent you an email. Please contact us if you do not receive it "
 "within a few minutes."
 msgstr ""
 
@@ -1365,12 +1365,12 @@ msgstr ""
 #: templates/allauth/account/verification_sent.html:8
 #: templates/allauth/account/verified_email_required.html:5
 #: templates/allauth/account/verified_email_required.html:8
-msgid "Verify Your E-mail Address"
+msgid "Verify Your Email Address"
 msgstr ""
 
 #: templates/allauth/account/verification_sent.html:10
 msgid ""
-"We have sent an e-mail to you for verification. Follow the link provided to "
+"We have sent an email to you for verification. Follow the link provided to "
 "finalize the signup process. Please contact us if you do not receive it "
 "within a few minutes."
 msgstr ""
@@ -1379,13 +1379,13 @@ msgstr ""
 msgid ""
 "This part of the site requires us to verify that\n"
 "you are who you claim to be. For this purpose, we require that you\n"
-"verify ownership of your e-mail address. "
+"verify ownership of your email address. "
 msgstr ""
 
 #: templates/allauth/account/verified_email_required.html:16
 msgid ""
-"We have sent an e-mail to you for\n"
-"verification. Please click on the link inside this e-mail. Please\n"
+"We have sent an email to you for\n"
+"verification. Please click on the link inside this email. Please\n"
 "contact us if you do not receive it within a few minutes."
 msgstr ""
 
@@ -1393,7 +1393,7 @@ msgstr ""
 #, python-format
 msgid ""
 "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your "
-"e-mail address</a>."
+"email address</a>."
 msgstr ""
 
 #: templates/allauth/openid/login.html:9

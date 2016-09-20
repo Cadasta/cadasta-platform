@@ -1083,11 +1083,11 @@ msgid "Account"
 msgstr "Conta"
 
 #: templates/allauth/account/email.html:8
-msgid "E-mail Addresses"
+msgid "Email Addresses"
 msgstr "Endereços de e-mail"
 
 #: templates/allauth/account/email.html:10
-msgid "The following e-mail addresses are associated with your account:"
+msgid "The following email addresses are associated with your account:"
 msgstr "Os seguintes endereços de e-mail são associados à sua conta:"
 
 #: templates/allauth/account/email.html:24
@@ -1121,21 +1121,21 @@ msgstr "Atenção:"
 
 #: templates/allauth/account/email.html:43
 msgid ""
-"You currently do not have any e-mail address set up. You should really add "
-"an e-mail address so you can receive notifications, reset your password, "
+"You currently do not have an email address set up. You should really add "
+"an email address so you can receive notifications, reset your password, "
 "etc."
 msgstr "Actualmente não tem qualquer endereço de e-mail configurado. Devia adicionar um endereço de e-mail para que possa receber notificações, redefinir a sua senha, etc."
 
 #: templates/allauth/account/email.html:48
-msgid "Add E-mail Address"
+msgid "Add Email Address"
 msgstr "Adicionar endereço de e-mail"
 
 #: templates/allauth/account/email.html:53
-msgid "Add E-mail"
+msgid "Add Email"
 msgstr "Adicionar e-mail"
 
 #: templates/allauth/account/email.html:62
-msgid "Do you really want to remove the selected e-mail address?"
+msgid "Do you really want to remove the selected email address?"
 msgstr "Será que deseja remover o endereço de e-mail selecionado?"
 
 #: templates/allauth/account/email/email_confirmation_message.txt:1
@@ -1143,7 +1143,7 @@ msgstr "Será que deseja remover o endereço de e-mail selecionado?"
 msgid ""
 "\n"
 "\n"
-"You're receiving this e-mail because user %(user_display)s at Cadasta Platform has given yours as an e-mail address to connect their account.\n"
+"You're receiving this email because user %(user_display)s at Cadasta Platform has given yours as an email address to connect their account.\n"
 "\n"
 "To confirm this is correct, go to %(activate_url)s\n"
 msgstr "\nEstá a receber este e-mail porque o usuário %(user_display)s na Plataforma de Cadasta deu o seu como um endereço de e-mail para conectar a sua conta.\n\nPara confirmar que está correcto, vá para %(activate_url)s\n\n"
@@ -1153,14 +1153,14 @@ msgid "Thank you from Cadasta."
 msgstr "Obrigado de Cadasta."
 
 #: templates/allauth/account/email/email_confirmation_subject.txt:3
-msgid "Please Confirm Your E-mail Address"
+msgid "Please Confirm Your Email Address"
 msgstr "Por favor confirme o seu endereço de email"
 
 #: templates/allauth/account/email/password_reset_key_message.txt:1
 msgid ""
 "\n"
 "\n"
-"You're receiving this e-mail because you or someone else has requested a password for your user account at Cadasta Platform.\n"
+"You're receiving this email because you or someone else has requested a password for your user account at Cadasta Platform.\n"
 "It can be safely ignored if you did not request a password reset. Click the link below to reset your password."
 msgstr "\nEstá a receber este e-mail porque você, ou outra pessoa, tenha solicitado uma senha para a sua conta no Plataforma de Cadasta.\nPode ser ignorado se não solicitou uma nova senha. Clique no link abaixo para redefinir a sua senha."
 
@@ -1174,18 +1174,18 @@ msgid "Thank you for using Cadasta Platform!\n"
 msgstr "Obrigado por usar o Plataforma de Cadasta!\n\n"
 
 #: templates/allauth/account/email/password_reset_key_subject.txt:3
-msgid "Password Reset E-mail"
+msgid "Password Reset Email"
 msgstr "Endereço de e-mail reiniciar a senha"
 
 #: templates/allauth/account/email_confirm.html:6
 #: templates/allauth/account/email_confirm.html:10
-msgid "Confirm E-mail Address"
+msgid "Confirm Email Address"
 msgstr "Confirmar o endereço de e-mail"
 
 #: templates/allauth/account/email_confirm.html:16
 #, python-format
 msgid ""
-"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an e-mail "
+"Please confirm that <a href=\"mailto:%(email)s\">%(email)s</a> is an email "
 "address for user %(user_display)s."
 msgstr "Por favor, confirme que <a href=\"mailto:%(email)s\"> %(email)s</a> é um endereço de e-mail para o usuário %(user_display)s."
 
@@ -1196,8 +1196,8 @@ msgstr "Confirmar"
 #: templates/allauth/account/email_confirm.html:27
 #, python-format
 msgid ""
-"This e-mail confirmation link expired or is invalid. Please <a "
-"href=\"%(email_url)s\">issue a new e-mail confirmation request</a>."
+"This email confirmation link expired or is invalid. Please <a "
+"href=\"%(email_url)s\">issue a new email confirmation request</a>."
 msgstr "Este link de confirmação de e-mail expirou ou é inválido. Por favor <a Href=\"%(email_url)s\">emitir um novo pedido de confirmação de e-mail</a>."
 
 #: templates/allauth/account/login.html:10
@@ -1225,12 +1225,12 @@ msgstr "Tem certeza que deseja sair?"
 
 #: templates/allauth/account/messages/cannot_delete_primary_email.txt:2
 #, python-format
-msgid "You cannot remove your primary e-mail address (%(email)s)."
+msgid "You cannot remove your primary email address (%(email)s)."
 msgstr "Não pode remover o seu endereço de e-mail principal (%(email)s)."
 
 #: templates/allauth/account/messages/email_confirmation_sent.txt:2
 #, python-format
-msgid "Confirmation e-mail sent to %(email)s."
+msgid "Confirmation email sent to %(email)s."
 msgstr "Confirmação de e-mail enviado para %(email)s."
 
 #: templates/allauth/account/messages/email_confirmed.txt:2
@@ -1240,7 +1240,7 @@ msgstr "Confirmou %(email)s."
 
 #: templates/allauth/account/messages/email_deleted.txt:2
 #, python-format
-msgid "Removed e-mail address %(email)s."
+msgid "Removed email address %(email)s."
 msgstr "Removido endereço de e-mail %(email)s."
 
 #: templates/allauth/account/messages/logged_in.txt:4
@@ -1261,11 +1261,11 @@ msgid "Password successfully set."
 msgstr "Senha definida com sucesso."
 
 #: templates/allauth/account/messages/primary_email_set.txt:2
-msgid "Primary e-mail address set."
+msgid "Primary email address set."
 msgstr "Endereço de e-mail primário definido."
 
 #: templates/allauth/account/messages/unverified_primary_email.txt:2
-msgid "Your primary e-mail address must be verified."
+msgid "Your primary email address must be verified."
 msgstr "O seu endereço de e-mail principal deve ser verificado."
 
 #: templates/allauth/account/password_change.html:6
@@ -1308,7 +1308,7 @@ msgstr "Digitar endereço de e-mail"
 
 #: templates/allauth/account/password_reset_done.html:15
 msgid ""
-"We have sent you an e-mail. Please contact us if you do not receive it "
+"We have sent you an email. Please contact us if you do not receive it "
 "within a few minutes."
 msgstr "Enviamos um e-mail. Por favor entrar em contacto connosco se não o receber dentro de alguns minutos."
 
@@ -1366,12 +1366,12 @@ msgstr "Está registado como <strong>%(user_display)s</ strong>."
 #: templates/allauth/account/verification_sent.html:8
 #: templates/allauth/account/verified_email_required.html:5
 #: templates/allauth/account/verified_email_required.html:8
-msgid "Verify Your E-mail Address"
+msgid "Verify Your Email Address"
 msgstr "Verificar o seu endereço de e-mail"
 
 #: templates/allauth/account/verification_sent.html:10
 msgid ""
-"We have sent an e-mail to you for verification. Follow the link provided to "
+"We have sent an email to you for verification. Follow the link provided to "
 "finalize the signup process. Please contact us if you do not receive it "
 "within a few minutes."
 msgstr "Enviamos um e-mail para a sua verificação. Siga o link fornecido para finalizar o processo de registo. Por favor, entre em contacto connosco se não o receber dentro de alguns minutos."
@@ -1380,13 +1380,13 @@ msgstr "Enviamos um e-mail para a sua verificação. Siga o link fornecido para 
 msgid ""
 "This part of the site requires us to verify that\n"
 "you are who you claim to be. For this purpose, we require that you\n"
-"verify ownership of your e-mail address. "
+"verify ownership of your email address. "
 msgstr "Esta parte do site nos obriga a verificar que\nvocê é quem você diz ser. Para este efeito, é necessário que você\n verifica a propriedade do seu endereço de e-mail."
 
 #: templates/allauth/account/verified_email_required.html:16
 msgid ""
-"We have sent an e-mail to you for\n"
-"verification. Please click on the link inside this e-mail. Please\n"
+"We have sent an email to you for\n"
+"verification. Please click on the link inside this email. Please\n"
 "contact us if you do not receive it within a few minutes."
 msgstr "Enviamos um e-mail para a sua\n verificação. Por favor, clique no link dentro deste e-mail. Por favor\n entre em contacto connosco se não o receber dentro de alguns minutos."
 
@@ -1394,7 +1394,7 @@ msgstr "Enviamos um e-mail para a sua\n verificação. Por favor, clique no link
 #, python-format
 msgid ""
 "<strong>Note:</strong> you can still <a href=\"%(email_url)s\">change your "
-"e-mail address</a>."
+"email address</a>."
 msgstr "<Strong>Nota: </strong> Ainda pode <a href=\"%(email_url)s\">mudar o seu endereço de e-mail</a>."
 
 #: templates/allauth/openid/login.html:9
