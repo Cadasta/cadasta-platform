@@ -174,6 +174,33 @@ GEOSHAPE_FORM = '''<?xml version=\'1.0\' ?>
         </meta>
     </test_standard_questionnaire_2>'''.strip()
 
+NEITHER_FORM = '''<?xml version=\'1.0\' ?>
+    <test_standard_questionnaire_2
+        id="test_standard_questionnaire_2" version="20160727122111">
+        <start>2016-07-07T16:38:20.310-04</start>
+        <end>2016-07-07T16:39:23.673-04</end>
+        <today>2016-07-07</today>
+        <deviceid>00:bb:3a:44:d0:fb</deviceid>
+        <title />
+        <party_type>IN</party_type>
+        <party_name>Natashia Romanoff</party_name>
+        <location_choice>neither</location_choice>
+        <location_geoshape>45.56342779158167 -122.67650283873081 0.0 0.0;
+        45.56176327330353 -122.67669159919024 0.0 0.0;
+        45.56151562182025 -122.67490658909082 0.0 0.0;
+        45.563479432877415 -122.67494414001703 0.0 0.0;
+        45.56176327330353 -122.67669159919024 0.0 0.0
+        </location_geoshape>
+        <location_type>MI</location_type>
+        <tenure_type>LH</tenure_type>
+        <location_attributes>
+            <name>Geoshape</name>
+        </location_attributes>
+        <meta>
+            <instanceID>uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad</instanceID>
+        </meta>
+    </test_standard_questionnaire_2>'''.strip()
+
 BAD_QUESTIONNAIRE = '''<?xml version=\'1.0\' ?>
     <tax_return id="tax_return" version="20160727122110">
         <start>2016-07-07T16:38:20.310-04</start>
@@ -273,6 +300,7 @@ responses = {
     'poly_form': POLY_FORM,
     'missing_semi_form': MISSING_SEMI_FORM,
     'geoshape_form': GEOSHAPE_FORM,
+    'location_geoshape_form': NEITHER_FORM,
     'bad_questionnaire': BAD_QUESTIONNAIRE,
     'bad_location_form': BAD_LOCATION_FORM,
     'bad_party_form': BAD_PARTY_FORM,
