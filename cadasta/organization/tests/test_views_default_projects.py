@@ -204,26 +204,32 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            is_allowed_add_location=True,
-            is_allowed_add_resource=True)
+            is_allowed_add_location=False,
+            has_content=False,
+            num_locations=0,
+            num_parties=0,
+            num_resources=0)
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
         assert response.content == self.render_content(
-            is_allowed_add_location=True,
-            is_allowed_add_resource=True)
+            is_allowed_add_location=False,
+            has_content=False,
+            num_locations=0,
+            num_parties=0,
+            num_resources=0)
 
     def test_get_with_superuser(self):
         superuser_role = Role.objects.get(name='superuser')
         self.user.assign_policies(superuser_role)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self\
-            .render_content(is_superuser=True,
-                                is_administrator=True,
-                                    is_allowed_add_location=True,
-                                        is_allowed_add_resource=True)
+        assert response.content == self.render_content(
+                            is_superuser=True,
+                            is_administrator=True,
+                            is_allowed_add_location=True,
+                            is_allowed_add_resource=True)
 
     def test_get_with_org_admin(self):
         OrganizationRole.objects.create(
@@ -235,7 +241,7 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(is_administrator=True,
                                             is_allowed_add_location=True,
-                                                is_allowed_add_resource=True)
+                                            is_allowed_add_resource=True)
 
     def test_get_non_existent_project(self):
         with pytest.raises(Http404):
@@ -255,7 +261,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            is_allowed_add_location=True)
+            is_allowed_add_location=False,
+            has_content=False,
+            num_locations=0,
+            num_parties=0,
+            num_resources=0)
 
     def test_get_private_project(self):
         self.project.access = 'private'
@@ -263,7 +273,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            is_allowed_add_location=True)
+            is_allowed_add_location=False,
+            has_content=False,
+            num_locations=0,
+            num_parties=0,
+            num_resources=0)
 
     def test_get_private_project_with_unauthenticated_user(self):
         self.project.access = 'private'
@@ -304,7 +318,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            is_allowed_add_location=True)
+            is_allowed_add_location=False,
+            has_content=False,
+            num_locations=0,
+            num_parties=0,
+            num_resources=0)
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
@@ -325,11 +343,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.user.assign_policies(self.superuser_role)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self\
-            .render_content(is_superuser=True,
-                               is_administrator=True,
-                                    is_allowed_add_location=True,
-                                        is_allowed_add_resource=True)
+        assert response.content == self.render_content(
+                            is_superuser=True,
+                            is_administrator=True,
+                            is_allowed_add_location=True,
+                            is_allowed_add_resource=True)
 
 
 @pytest.mark.usefixtures('make_dirs')
