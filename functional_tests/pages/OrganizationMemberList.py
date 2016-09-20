@@ -38,9 +38,12 @@ class OrganizationMemberListPage(Page):
         title = self.get_page_content("//h2").text
         return title
 
-    def click_on_add_button(self):
+    def click_on_add_button(self, success=True):
         add_button = self.get_page_content("//a[contains(@href, '/add/')]")
-        self.click_through(add_button, self.BY_MODAL_BACKDROP)
+        if success:
+            self.click_through(add_button, self.BY_MODAL_BACKDROP)
+        else:
+            self.click_through(add_button, (By.CLASS_NAME, 'alert-warning'))
 
     def get_modal(self, xpath):
         return self.browser.find_element_by_xpath(

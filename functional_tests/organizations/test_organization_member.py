@@ -161,3 +161,18 @@ class OrganizationMemberTest(FunctionalTest):
 
         roles = page.get_role_options()
         assert roles['selected'].text == "Administrator"
+
+    def test_editing_member_in_archived_organization(self):
+        """A user that can create a new organization and
+        is automatically made an admin."""
+
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationPage(self).get_archive_button()
+        OrganizationPage(self).click_on_archive_and_confirm()
+        OrganizationMemberListPage(self).go_to_member_list_page()
+
+        testuser_title = page.go_to_testuser_member_page(success=False)
+        assert "MEMBER: Test User" != testuser_title

@@ -167,10 +167,33 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_list_private_records_based_on_org_membership(self):
         SpatialUnitFactory.create(project=self.prj)
-
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
                                         user=user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+
+    def test_archived_filter_with_unauthorized_user(self):
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_archived_filter_with_org_admin(self):
+        SpatialUnitFactory.create(project=self.prj, type='AP')
+        SpatialUnitFactory.create(project=self.prj, type='BU')
+        SpatialUnitFactory.create(project=self.prj, type='RW')
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user, admin=True)
+
+        self.prj.archived = True
+        self.prj.save()
         response = self.request(user=user)
         assert response.status_code == 200
 
@@ -312,6 +335,14 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['geometry'][0] == (
             "Invalid format: string or unicode input"
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
+
+    def test_create_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 403
+        assert SpatialUnit.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -568,6 +599,14 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
             "Invalid format: string or unicode input"
             " unrecognized as GeoJSON, WKT EWKT or HEXEWKB.")
 
+    def test_update_with_archived_project(self):
+        self.su.project.archived = True
+        self.su.project.save()
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
 
 class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.SpatialUnitDetail
@@ -679,3 +718,11 @@ class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert SpatialUnit.objects.count() == 0
+
+    def test_delete_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialUnit.objects.count() == 1

@@ -16,6 +16,7 @@ def get_test_data():
         })
     test_data['users'] = users
     test_data['superuser'] = users[0]
+    test_data['adminuser'] = users[5]
 
     # Define 2 orgs and their members
     test_data['orgs'] = [
@@ -50,6 +51,7 @@ def get_test_data():
             'description': "Public project of UNESCO.",
             'country': 'DE',
             'access': 'public',
+            'archived': False,
             '_org': 0,
             '_managers': (2, 3),
         },
@@ -59,6 +61,7 @@ def get_test_data():
             'description': '',
             'country': 'AT',
             'access': 'private',
+            'archived': False,
             '_org': 0,
             '_managers': (4,),
         },
@@ -68,6 +71,7 @@ def get_test_data():
             'description': "Private project of UNICEF.",
             'country': '',
             'access': 'private',
+            'archived': False,
             '_org': 1,
             '_managers': (6, 7),
         },
@@ -77,6 +81,17 @@ def get_test_data():
             'description': "",
             'country': '',
             'access': 'public',
+            'archived': False,
+            '_org': 1,
+            '_managers': (8,),
+        },
+        {
+            'name': "Archived Project",
+            'slug': 'archived-project',
+            'description': "",
+            'country': '',
+            'access': 'public',
+            'archived': True,
             '_org': 1,
             '_managers': (8,),
         },

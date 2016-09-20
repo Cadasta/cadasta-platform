@@ -172,6 +172,14 @@ class SpatialRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['non_field_errors'][0] == (
             err_msg.format(self.prj.slug, other_su.project.slug))
 
+    def test_create_valid_record_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(method='POST', user=self.user)
+        assert response.status_code == 403
+        assert SpatialRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
 
 class SpatialRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.SpatialRelationshipDetail
@@ -425,6 +433,14 @@ class SpatialRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert self.rel.su1 == self.su1
         assert self.rel.su2 == self.su2
 
+    def test_update_valid_record_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(method='PATCH', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
     def test_update_invalid_record_with_different_project(self):
         other_su = SpatialUnitFactory.create()
         response = self.request(user=self.user,
@@ -551,3 +567,11 @@ class SpatialRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert SpatialRelationship.objects.count() == 0
+
+    def test_delete_record_from_archived_org(self):
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert SpatialRelationship.objects.count() == 1

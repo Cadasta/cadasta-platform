@@ -164,6 +164,15 @@ class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
         assert response.content['non_field_errors'][0] == (
             err_msg.format(other_party.project.slug, self.prj.slug))
 
+    def test_create_valid_record_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 403
+        assert TenureRelationship.objects.count() == 0
+        assert response.content['detail'] == PermissionDenied.default_detail
+
 
 class TenureRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.TenureRelationshipDetail
@@ -425,6 +434,18 @@ class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert self.rel.party == self.party
         assert self.rel.spatial_unit == self.spatial_unit
 
+    def test_update_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(user=self.user, method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
 
 class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.TenureRelationshipDetail
@@ -538,7 +559,15 @@ class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(organization=self.prj.organization,
                                         user=user,
                                         admin=True)
-
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert TenureRelationship.objects.count() == 0
+
+    def test_delete_record_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        assert TenureRelationship.objects.count() == 1

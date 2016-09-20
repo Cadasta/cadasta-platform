@@ -38,10 +38,12 @@ class Dashboard(TemplateView):
                         if org in user_orgs:
                             projects.extend(org.projects.filter(
                                 access='private',
-                                extent__isnull=False))
+                                extent__isnull=False,
+                                archived=False))
             projects.extend(Project.objects.filter(
                 access='public',
-                extent__isnull=False))
+                extent__isnull=False,
+                archived=False))
         context = self.get_context_data(projects=projects)
         return super(TemplateView, self).render_to_response(context)
 

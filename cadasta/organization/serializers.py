@@ -45,6 +45,16 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
 
         return org
 
+    def update(self, *args, **kwargs):
+        org = super(OrganizationSerializer, self).update(*args, **kwargs)
+        data = args[1]
+        if 'archived' in data.keys():
+            for project in org.projects.all():
+                project.archived = data['archived']
+                project.save()
+
+        return org
+
 
 class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)

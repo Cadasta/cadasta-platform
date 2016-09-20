@@ -81,3 +81,15 @@ class OrganizationMemberListTest(FunctionalTest):
         input_box.send_keys("millenniumfalcon@example.com")
         member = page.click_submit_button()
         assert member == "MEMBER: Han Solo"
+
+    def test_adding_members_to_archived_organization(self):
+        LoginPage(self).login('admin_user', 'password')
+        page = OrganizationMemberListPage(self)
+        page.go_to()
+        OrganizationPage(self).go_to_organization_page()
+        OrganizationPage(self).get_archive_button()
+        OrganizationPage(self).click_on_archive_and_confirm()
+
+        title = page.go_to_member_list_page()
+        assert title == "Members".upper()
+        page.click_on_add_button(success=False)

@@ -83,11 +83,17 @@ class OrganizationTest(FunctionalTest):
         page.try_cancel_and_close_archive()
         page.get_archive_button()
 
-        archive = page.click_on_archive_and_confirm()
+        archive = page.click_on_archive_and_confirm(final_check=True)
         assert archive == "Unarchive organization"
 
-        archive = page.click_on_archive_and_confirm(unarchive=True)
+        archive = page.click_on_archive_and_confirm(unarchive=True,
+                                                    final_check=True)
         assert archive == "Archive organization"
+
+        archive = page.click_on_archive_and_confirm()
+        page.click_on_edit_button(success=False)
+        page.click_on_close_alert_button()
+        page.click_on_add_project_button()
 
     def test_getting_to_the_user_list(self):
         """A registered admin user can view an organization's member list,
@@ -120,7 +126,6 @@ class OrganizationTest(FunctionalTest):
         page.go_to_organization_page()
 
         title = page.click_on_project()
-        print("Organization #0\nTest Project")
         assert title == "Organization #0\nTest Project".upper()
 
     def test_new_organization_view(self):

@@ -44,10 +44,10 @@ class ProjectAccessTest(FunctionalTest):
             project_page = ProjectPage(self, org['slug'], project['slug'])
             project_page.go_to()
 
-            if is_visible:
+            if is_visible and project['archived'] is False:
                 assert project_page.is_on_page()
                 project_page.check_page_contents(project_copy)
-            else:
+            elif project['archived'] is False:
                 assert DashboardPage(self).is_on_page()
                 self.assert_has_message('alert', "have permission")
 

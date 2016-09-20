@@ -5664,8 +5664,10 @@ textarea.form-control {
 -------------------------------------------------------------- */
 .dataTables_wrapper {
   clear: both; }
-  .dataTables_wrapper .table-search div.dataTables_filter {
-    text-align: left; }
+  .dataTables_wrapper .table-search label {
+    float: left;
+    text-align: left;
+    margin-right: 10px; }
   .dataTables_wrapper .table-search input {
     margin-left: 0 !important; }
   .dataTables_wrapper .table-entries {
@@ -5763,6 +5765,10 @@ textarea.form-control {
     min-width: 60px !important; }
   .table div.org-logo {
     padding: 4px 0; }
+  .table td.archived, .table td.unarchived {
+    display: none !important; }
+  .table th.archived, .table th.unarchived {
+    display: none !important; }
 
 table.table-location {
   border-top: none; }
@@ -5988,16 +5994,23 @@ div.add-btn-btm {
     color: #843534; }
 
 .label {
+  display: inline-block;
+  margin-left: 6px;
+  margin-right: 6px;
   font-size: 11px;
   font-weight: 500;
   vertical-align: middle; }
 
-h1.label {
-  font-size: 14px; }
+h1 .label {
+  font-size: 16px; }
 
 @media (max-width: 991px) {
   .alert {
     max-width: none; } }
+
+@media (max-width: 767px) {
+  h1 .label {
+    font-size: 12px; } }
 
 /* =Modals
 -------------------------------------------------------------- */

@@ -28,13 +28,16 @@ class OrganizationMemberPage(Page):
     def get_member_title(self):
         return self.test.page_content("//h2").text
 
-    def go_to_testuser_member_page(self):
+    def go_to_testuser_member_page(self, success=True):
         testuser_page = self.get_table_row(
             "[contains(@onclick, '/testuser/')]"
         )
-        self.click_through(testuser_page, (By.CLASS_NAME, 'page-title'))
-        testuser_title = self.get_member_title()
-        return testuser_title
+        if success:
+            self.click_through(testuser_page, (By.CLASS_NAME, 'page-title'))
+            testuser_title = self.get_member_title()
+            return testuser_title
+        else:
+            self.click_through(testuser_page, (By.CLASS_NAME, 'alert-warning'))
 
     def go_to_admin_member_page(self):
         testuser_page = self.get_table_row(
