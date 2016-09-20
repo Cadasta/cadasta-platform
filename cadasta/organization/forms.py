@@ -23,7 +23,7 @@ from .download.xls import XLSExporter
 from .fields import ContactsField, ProjectRoleField, PublicPrivateField
 from .models import Organization, OrganizationRole, Project, ProjectRole
 
-FORM_CHOICES = ROLE_CHOICES + (('Pb', _('Public User')),)
+FORM_CHOICES = (('Pb', _('Public User')),) + ROLE_CHOICES
 QUESTIONNAIRE_TYPES = [
     'application/msexcel',
     'application/vnd.ms-excel',
