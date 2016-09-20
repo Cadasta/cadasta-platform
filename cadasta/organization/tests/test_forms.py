@@ -373,6 +373,49 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
             'url': ["Enter a valid URL."]
         }
 
+    def test_add_new_project_with_archived_org(self):
+        self.org.archived = True
+        self.org.save()
+        form = forms.ProjectAddDetails(user=self.user)
+        choices = form.fields['organization'].choices
+        assert len(choices) == 0
+
+    def test_add_new_project_with_archived_org_with_superuser(self):
+        self.org.archived = True
+        self.org.save()
+        su_role = Role.objects.get(name='superuser')
+        self.user.assign_policies(su_role)
+        assert self.user.has_perm('project.create', self.org)
+        form = forms.ProjectAddDetails(user=self.user)
+        choices = form.fields['organization'].choices
+        assert len(choices) == 0
+
+    def test_add_new_project_with_blank_org_choice(self):
+        second_org = OrganizationFactory.create()
+        OrganizationRole.objects.create(
+            organization=second_org, user=self.user, admin=True
+        )
+        form = forms.ProjectAddDetails(user=self.user)
+        choices = form.fields['organization'].choices
+        assert len(choices) == 3
+        assert choices[0] == ('', "Please select an organization")
+
+    def test_add_new_project_without_blank_org_choice_with_chosen_org(self):
+        second_org = OrganizationFactory.create()
+        OrganizationRole.objects.create(
+            organization=second_org, user=self.user, admin=True
+        )
+        form = forms.ProjectAddDetails(user=self.user, org_is_chosen=True)
+        choices = form.fields['organization'].choices
+        assert len(choices) == 2
+        assert '' not in dict(choices)
+
+    def test_add_new_project_without_blank_org_choice_with_1_org(self):
+        form = forms.ProjectAddDetails(user=self.user)
+        choices = form.fields['organization'].choices
+        assert len(choices) == 1
+        assert choices[0] == (self.org.slug, self.org.name)
+
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectEditDetailsTest(UserTestCase, TestCase):

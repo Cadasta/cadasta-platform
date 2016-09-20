@@ -77,6 +77,23 @@ class LocationFormTest(UserTestCase, TestCase):
         unit = SpatialUnit.objects.filter(project=project).first()
         assert unit.attributes.get('fname') == 'test'
 
+    def test_create_location_with_blank_type(self):
+        data = {
+            'geometry': '{"type": "Polygon","coordinates":'
+                        '[[[0,51],[0,52],[1,52],[1,51]]]}',
+            'type': '',
+        }
+        project = ProjectFactory.create()
+        form = forms.LocationForm(project_id=project.id,
+                                  data=data,
+                                  schema_selectors=())
+        type_dict = dict(form.fields['type'].choices)
+        assert type_dict[''] == "Please select a location type"
+        assert not form.is_valid()
+        assert len(form.errors['type']) == 1
+        assert form.errors['type'][0] == "This field is required."
+        assert SpatialUnit.objects.filter(project=project).count() == 0
+
 
 class TenureRelationshipFormTest(UserTestCase, TestCase):
     def test_init(self):

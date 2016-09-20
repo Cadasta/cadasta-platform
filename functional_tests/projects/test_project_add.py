@@ -158,7 +158,7 @@ class ProjectAddTest(FunctionalTest):
         proj_add_page.submit_geometry()
 
         # Check that details are all blank/default
-        project['org'] = 'unesco'
+        project['org'] = ''
         project['name'] = ""
         project['access'] = 'public'
         project['description'] = ""
@@ -168,38 +168,65 @@ class ProjectAddTest(FunctionalTest):
         # TODO: Check that only valid orgs are provided
         # TODO: Vary org selection
 
-        # Check that an error occurs when no project name was set
+        # Check that errors occurs when no org was selected
+        # and no project name was set
         # Also toggle access and set description
         project['access'] = 'private'
         project['description'] = self.test_data['project_description']
         proj_add_page.set_access(project['access'])
         proj_add_page.set_description(project['description'])
         proj_add_page.try_submit_details()
+        proj_add_page.check_missing_org_error()
         proj_add_page.check_missing_name_error()
+        proj_add_page.check_no_duplicate_name_error()
+        proj_add_page.check_no_invalid_url_error()
         proj_add_page.check_details(project)
 
+        # Select the first valid org
         # Check that an error occurs when the project name is only whitespace
         # Also toggle access and set URL
+        project['org'] = 'unesco'
         project['name'] = "     "
         project['access'] = 'public'
         project['url'] = self.test_data['project_url']
+        proj_add_page.set_org(project['org'])
         proj_add_page.set_name(project['name'])
         proj_add_page.set_access(project['access'])
         proj_add_page.set_proj_url(project['url'])
         proj_add_page.try_submit_details()
+        proj_add_page.check_no_missing_org_error()
         proj_add_page.check_missing_name_error()
+        proj_add_page.check_no_duplicate_name_error()
+        proj_add_page.check_no_invalid_url_error()
         proj_add_page.check_details(project)
 
-        # Set project name, final access, and invalid URL
-        # Check that the page is not submitted due to the invalid URL
-        # (This is an HTML5 feature)
+        # Unset the org, and set a valid project name
+        # Check that an error occurs for the missing org
+        project['org'] = ''
         project['name'] = self.test_data['project_name']
+        proj_add_page.set_org(project['org'])
+        proj_add_page.set_name(project['name'])
+        proj_add_page.try_submit_details()
+        proj_add_page.check_missing_org_error()
+        proj_add_page.check_no_missing_name_error()
+        proj_add_page.check_no_duplicate_name_error()
+        proj_add_page.check_no_invalid_url_error()
+        proj_add_page.check_details(project)
+
+        # Set final org, final access, and invalid URL
+        # Check that the page is not submitted due to the invalid URL
+        project['org'] = 'unesco'
         project['access'] = access
         project['url'] = "DEADBEEF"
+        proj_add_page.set_org(project['org'])
         proj_add_page.set_name(project['name'])
         proj_add_page.set_access(project['access'])
         proj_add_page.set_proj_url(project['url'])
-        proj_add_page.click_submit_details()
+        proj_add_page.try_submit_details()
+        proj_add_page.check_no_missing_org_error()
+        proj_add_page.check_no_missing_name_error()
+        proj_add_page.check_no_duplicate_name_error()
+        proj_add_page.check_invalid_url_error()
         proj_add_page.check_details(project)
 
         # Correct the URL, press "Previous" then "Next" and ensure
