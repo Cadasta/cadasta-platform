@@ -394,7 +394,10 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.project.save()
         response = self.request(user=org_admin)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_administrator=True)
+        assert response.content == self.render_content(is_administrator=True,
+                                        is_allowed_add_location=True,
+                                        is_allowed_add_resource=True
+        )
 
 
 @pytest.mark.usefixtures('make_dirs')
