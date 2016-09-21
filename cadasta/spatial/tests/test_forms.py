@@ -9,6 +9,7 @@ from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import PartyFactory
 from party.models import TenureRelationship, Party, TENURE_RELATIONSHIP_TYPES
+from questionnaires.tests import factories as q_fact
 from .factories import SpatialUnitFactory
 from ..models import SpatialUnit
 from .. import forms
@@ -43,10 +44,16 @@ class LocationFormTest(UserTestCase, TestCase):
                         '0.1411271095275879,51.55254631651022],[-0.14181375503'
                         '54004,51.55240622205599]]]}',
             'type': 'CB',
-            'attributes::fname': 'test'
+            'attributes::fname': 'test',
+            'attributes::choice': 'IN'
         }
 
-        project = ProjectFactory.create()
+        question = q_fact.QuestionFactory.create(name='choice',
+                                                 label='Choice Label')
+        q_fact.QuestionOptionFactory.create(question=question, name='IN')
+
+        project = ProjectFactory.create(
+            current_questionnaire=question.questionnaire_id)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         schema = Schema.objects.create(
@@ -58,6 +65,14 @@ class LocationFormTest(UserTestCase, TestCase):
             name='fname', long_name='Test field',
             attr_type=attr_type, index=0,
             required=False, omit=False
+        )
+
+        attr_type = AttributeType.objects.get(name='select_one')
+        Attribute.objects.create(
+            schema=schema,
+            name='choice', long_name='Test field',
+            attr_type=attr_type, index=1,
+            required=False, omit=False, choices=['IN']
         )
 
         form = forms.LocationForm(project_id=project.id,

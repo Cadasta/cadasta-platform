@@ -12,8 +12,11 @@ from party.models import Party, TenureRelationship, TenureRelationshipType
 from .models import SpatialUnit, TYPE_CHOICES
 from .widgets import SelectPartyWidget, NewEntityWidget
 
+from questionnaires.models import QuestionOption
+from questionnaires.forms import OptionLabelsFix
 
-class LocationForm(AttributeModelForm):
+
+class LocationForm(OptionLabelsFix, AttributeModelForm):
     geometry = gisforms.GeometryField(
         widget=LeafletWidget(),
         error_messages={
@@ -31,15 +34,14 @@ class LocationForm(AttributeModelForm):
         fields = ['geometry', 'type']
 
     def __init__(self, project_id=None, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         self.project_id = project_id
+        super().__init__(*args, **kwargs)
 
     def save(self):
         instance = super().save(commit=False)
         instance.project_id = self.project_id
         instance.save()
         return instance
-
 
 REL_TYPE_CHOICES = (
     ('', 'Please select'),
@@ -118,7 +120,11 @@ class TenureRelationshipForm(forms.Form):
             #     args['max_length'] = 32
             if (atype.form_field == 'ChoiceField' or
                atype.form_field == 'MultipleChoiceField'):
-                args['choices'] = list(map(lambda c: (c, c), attr.choices))
+                q_id = self.project.current_questionnaire
+                options = QuestionOption.objects.filter(
+                    question__questionnaire_id=q_id,
+                    question__name=name)
+                args['choices'] = options.values_list('name', 'label')
             if atype.form_field == 'BooleanField':
                 args['required'] = False
                 if len(attr.default) > 0:

@@ -20,6 +20,7 @@ from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from party.models import Party, TenureRelationship
+from questionnaires.tests import factories as q_fact
 
 from .factories import SpatialUnitFactory
 from ..views import default
@@ -137,6 +138,7 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         return {
             'object': self.project,
             'form': forms.LocationForm(
+                project_id=self.project.id,
                 schema_selectors=(
                     {'name': 'organization',
                      'value': self.project.organization,
@@ -243,7 +245,12 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
     template = 'spatial/location_detail.html'
 
     def setup_models(self):
-        self.project = ProjectFactory.create()
+        question = q_fact.QuestionFactory.create(name='choice',
+                                                 label='Choice label')
+        q_fact.QuestionOptionFactory.create(question=question, name='IN',
+                                            label='IN label')
+        self.project = ProjectFactory.create(
+            current_questionnaire=question.questionnaire_id)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         schema = Schema.objects.create(
@@ -256,15 +263,24 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             attr_type=attr_type, index=0,
             required=False, omit=False
         )
+        attr_type = AttributeType.objects.get(name='select_one')
+        Attribute.objects.create(
+            schema=schema,
+            name='choice', long_name='Choice label',
+            attr_type=attr_type, index=1,
+            required=False, omit=False, choices=['IN']
+        )
         self.location = SpatialUnitFactory.create(
-            project=self.project, attributes={'fname': 'test'})
+            project=self.project,
+            attributes={'fname': 'test', 'choice': 'IN'})
 
     def setup_template_context(self):
         return {
             'object': self.project,
             'location': self.location,
             'geojson': '{"type": "FeatureCollection", "features": []}',
-            'attributes': (('Test field', 'test', ), )
+            'attributes': (('Test field', 'test', ),
+                           ('Choice label', 'IN label', ), )
         }
 
     def setup_url_kwargs(self):
@@ -340,7 +356,8 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
-                'form': forms.LocationForm(instance=self.location),
+                'form': forms.LocationForm(instance=self.location,
+                                           project_id=self.project.id,),
                 'geojson': '{"type": "FeatureCollection", "features": []}'}
 
     def setup_url_kwargs(self):
