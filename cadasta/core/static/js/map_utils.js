@@ -5,6 +5,12 @@ function geoLocate(map) {
 }
 
 function add_map_controls(map) {
+  map.removeControl(map.zoomControl);
+  map.addControl(L.control.zoom({
+    zoomInTitle: gettext("Zoom in"),
+    zoomOutTitle: gettext("Zoom out")
+  }));
+
   var geocoder = L.control.geocoder('search-QctWfva', {
     markers: false
   }).addTo(map);
@@ -21,7 +27,7 @@ function add_map_controls(map) {
       var controlDiv = L.DomUtil.create(
         'div', 'leaflet-bar leaflet-control leaflet-control-geolocate'
       );
-      controlDiv.title = 'Go to my location';
+      controlDiv.title = gettext('Go to my location');
       L.DomEvent
        .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
        .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
@@ -34,6 +40,7 @@ function add_map_controls(map) {
   });
 
   map.addControl(new Geolocate());
+
   return map
 }
 

@@ -202,14 +202,24 @@
         conditionalPaging: true,
         "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
         "language": {
-          "info": 'Showing _START_ - _END_ of _TOTAL_',
-          "lengthMenu": "Show _MENU_ rows",
+          "emptyTable":     "{% trans "No data available in table" %}",
+          "info":           "{% trans "Showing _START_ - _END_ of _TOTAL_" %}",
+          "infoEmpty":      "{% trans "Showing 0 - 0 of 0" %}",
+          "infoFiltered":   "{% trans "(filtered from _MAX_ total rows)" %}",
+          "lengthMenu":     "{% trans "Show _MENU_ rows" %}",
           "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
-          "searchPlaceholder": 'Search',
+          "searchPlaceholder": '{% trans "Search" %}',
+          "zeroRecords":    "{% trans "No matching records found" %}",
           "paginate": {
-              "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
-              "previous": '<span class="glyphicon glyphicon-triangle-left"></span>'
+            "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
+            "previous": '<span class="glyphicon glyphicon-triangle-left"></span>',
+            "first":      "{% trans "First" %}",
+            "last":       "{% trans "Last" %}"
           },
+          "aria": {
+            "sortAscending":  ": {% trans "activate to sort column ascending" %}",
+            "sortDescending": ": {% trans "activate to sort column descending" %}"
+          }
         }
       });
       $('.dropdown-toggle').dropdown();
@@ -221,10 +231,11 @@
     </script>
     <script>
       window.inlineManualTracking = {
-        uid: "{{ user.id }}", 
+        uid: "{{ user.id }}",
         username: "{{ user.username }}"
       }
     </script>
-    <script type="text/javascript" src="/static/js/inline-manual-player.js"></script>
+    <script type="text/javascript" src="{% static 'js/inline-manual-player.js' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
   </body>
 </html>

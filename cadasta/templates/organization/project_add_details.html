@@ -3,7 +3,7 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-{% block page_title %}| Add details{% endblock %}
+{% block page_title %}| {% trans "Add details" %}{% endblock %}
 
 {% block extra_script %}
 {{ form.media }}
@@ -114,13 +114,13 @@
                   <label class="pull-right control-label">{{ wizard.form.questionnaire.errors }}</label>
                   <div class="well file-well">
                     {% render_field wizard.form.questionnaire class+="form-control" %}
-                    <p class="help-block">Accepted file types: xls, xlsx</p>
+                    <p class="help-block">{% trans "Accepted file types: xls, xlsx" %}</p>
                     {{ wizard.form.original_file }}
                   </div>
                   <div class="alert alert-info alert-full clearfix row" role="alert">
                     <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
                     <div>
-                        For assistance with questionnaires view our <a href="http://docs.cadasta.org/en/08-XLSForms.html" class="alert-link" target="_blank">user guide</a>.  To help you get started two samples have been provided: <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/minimum_cadasta_questionnaire.xlsx" class="alert-link">a minimal</a> and <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx" class="alert-link">a standard questionnaire</a>.
+                        {% blocktrans %}For assistance with questionnaires view our <a href="http://docs.cadasta.org/en/08-XLSForms.html" class="alert-link" target="_blank">user guide</a>.  To help you get started two samples have been provided: <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/minimum_cadasta_questionnaire.xlsx" class="alert-link">a minimal</a> and <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx" class="alert-link">a standard questionnaire</a>.{% endblocktrans %}
                     </div>
                   </div>
                 </div>

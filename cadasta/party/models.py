@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 
 from jsonattrs.decorators import fix_model_for_attributes
 from jsonattrs.fields import JSONAttributeField
@@ -323,24 +324,24 @@ class TenureRelationshipType(models.Model):
 
 
 TENURE_RELATIONSHIP_TYPES = (
-    ('CR', 'Carbon Rights'),
-    ('CO', 'Concessionary Rights'),
-    ('CU', 'Customary Rights'),
-    ('EA', 'Easement'),
-    ('ES', 'Equitable Servitude'),
-    ('FH', 'Freehold'),
-    ('GR', 'Grazing Rights'),
-    ('HR', 'Hunting/Fishing/Harvest Rights'),
-    ('IN', 'Indigenous Land Rights'),
-    ('JT', 'Joint Tenancy'),
-    ('LH', 'Leasehold'),
-    ('LL', 'Longterm Leasehold'),
-    ('MR', 'Mineral Rights'),
-    ('OC', 'Occupancy (No Documented Rights)'),
-    ('TN', 'Tenancy (Documented Sub-lease)'),
-    ('TC', 'Tenancy In Common'),
-    ('UC', 'Undivided Co-ownership'),
-    ('WR', 'Water Rights')
+    ('CR', ugettext_lazy('Carbon Rights')),
+    ('CO', ugettext_lazy('Concessionary Rights')),
+    ('CU', ugettext_lazy('Customary Rights')),
+    ('EA', ugettext_lazy('Easement')),
+    ('ES', ugettext_lazy('Equitable Servitude')),
+    ('FH', ugettext_lazy('Freehold')),
+    ('GR', ugettext_lazy('Grazing Rights')),
+    ('HR', ugettext_lazy('Hunting/Fishing/Harvest Rights')),
+    ('IN', ugettext_lazy('Indigenous Land Rights')),
+    ('JT', ugettext_lazy('Joint Tenancy')),
+    ('LH', ugettext_lazy('Leasehold')),
+    ('LL', ugettext_lazy('Longterm Leasehold')),
+    ('MR', ugettext_lazy('Mineral Rights')),
+    ('OC', ugettext_lazy('Occupancy (No Documented Rights)')),
+    ('TN', ugettext_lazy('Tenancy (Documented Sub-lease)')),
+    ('TC', ugettext_lazy('Tenancy In Common')),
+    ('UC', ugettext_lazy('Undivided Co-ownership')),
+    ('WR', ugettext_lazy('Water Rights'))
 )
 
 

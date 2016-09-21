@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-06 16:41+0000\n"
+"POT-Creation-Date: 2016-09-14 21:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,17 +18,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: accounts/forms.py:22 accounts/forms.py:58 accounts/serializers.py:39
-#: accounts/serializers.py:75 accounts/tests/test_forms.py:72
-#: accounts/tests/test_serializers.py:89
-#: accounts/tests/test_serializers.py:160
+#: accounts/serializers.py:75 accounts/tests/test_forms.py:73
+#: accounts/tests/test_serializers.py:90
+#: accounts/tests/test_serializers.py:161
 msgid "Username cannot be “add” or “new”."
 msgstr ""
 
-#: accounts/forms.py:28 accounts/tests/test_forms.py:41
+#: accounts/forms.py:28 accounts/tests/test_forms.py:42
 msgid "Passwords do not match"
 msgstr ""
 
-#: accounts/forms.py:35 accounts/forms.py:66 accounts/tests/test_forms.py:56
+#: accounts/forms.py:35 accounts/forms.py:66 accounts/tests/test_forms.py:57
 msgid "Another user with this email already exists"
 msgstr ""
 
@@ -36,11 +36,11 @@ msgstr ""
 msgid "Another user with this username already exists"
 msgstr ""
 
-#: accounts/manager.py:16 organization/serializers.py:145
+#: accounts/manager.py:16 organization/serializers.py:158
 msgid "User with username or email {} does not exist"
 msgstr ""
 
-#: accounts/manager.py:21 organization/serializers.py:147
+#: accounts/manager.py:21 organization/serializers.py:160
 msgid "More than one user found for username or email {}"
 msgstr ""
 
@@ -65,11 +65,11 @@ msgid "You don't have permission to update user details"
 msgstr ""
 
 #: accounts/serializers.py:17 accounts/serializers.py:47
-#: accounts/tests/test_serializers.py:74
+#: accounts/tests/test_serializers.py:75
 msgid "Another user is already registered with this email address"
 msgstr ""
 
-#: accounts/views/api.py:70
+#: accounts/views/api.py:74
 msgid "The email has not been verified."
 msgstr ""
 
@@ -81,24 +81,19 @@ msgstr ""
 msgid "Failed to update profile information"
 msgstr ""
 
-#: config/settings/default.py:199
+#: config/settings/default.py:166
+msgid ""
+"Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> "
+"contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-"
+"BY-SA</a>"
+msgstr ""
+
+#: config/settings/default.py:204
 msgid "English"
 msgstr ""
 
-#: config/settings/default.py:200
-msgid "French"
-msgstr ""
-
-#: config/settings/default.py:201
-msgid "German"
-msgstr ""
-
-#: config/settings/default.py:202
-msgid "Spanish"
-msgstr ""
-
-#: config/settings/default.py:203
-msgid "Swahili"
+#: config/settings/default.py:208
+msgid "Portuguese"
 msgstr ""
 
 #: core/mixins.py:14
@@ -115,8 +110,7 @@ msgstr ""
 
 #: core/tests/test_validators.py:55 core/validators.py:24
 #: organization/tests/test_validators.py:29
-#: organization/tests/test_validators.py:62
-#: organization/tests/test_views_api_projects.py:609 spatial/forms.py:78
+#: organization/tests/test_validators.py:62 spatial/forms.py:78
 #: spatial/forms.py:86 spatial/forms.py:94
 msgid "This field is required."
 msgstr ""
@@ -124,6 +118,161 @@ msgstr ""
 #: core/tests/test_validators.py:70
 #, python-brace-format
 msgid "'{value}' is not a '{type}'"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:6
+msgid "Cancel drawing"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:7
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:68
+#: templates/organization/organization_add.html:29
+#: templates/organization/organization_dashboard.html:133
+#: templates/organization/organization_dashboard.html:159
+#: templates/organization/organization_edit.html:31
+#: templates/organization/project_add_wrapper.html:57
+#: templates/organization/project_edit_details.html:89
+#: templates/organization/project_edit_geometry.html:59
+#: templates/organization/project_edit_permissions.html:41
+#: templates/organization/project_wrapper.html:150
+#: templates/organization/project_wrapper.html:176
+#: templates/party/party_delete.html:23 templates/party/party_edit.html:28
+#: templates/party/relationship_delete.html:20
+#: templates/resources/edit.html:28 templates/resources/modal_add_lib.html:28
+#: templates/resources/modal_archive.html:26
+#: templates/resources/modal_unarchive.html:22
+#: templates/resources/modal_upload.html:30
+#: templates/spatial/location_delete.html:24
+#: templates/spatial/location_form.html:40
+#: templates/spatial/relationship_add.html:119
+msgid "Cancel"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:10
+msgid "Delete last point drawn"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:11
+msgid "Delete last point"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:14
+msgid "Draw a polyline"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:15
+msgid "Draw a polygon"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:16
+msgid "Draw a rectangle"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:17
+msgid "Draw a circle"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:18
+msgid "Draw a marker"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:24
+msgid "Click and drag to draw circle."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:29
+msgid "Click map to place marker."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:34
+msgid "Click to start drawing shape."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:35
+msgid "Click to continue drawing shape."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:36
+msgid "Click first point to close this shape."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:40
+msgid "<strong>Error:</strong> shape edges cannot cross!"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:42
+msgid "Click to start drawing line."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:43
+msgid "Click to continue drawing line."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:44
+msgid "Click last point to finish line."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:49
+msgid "Click and drag to draw rectangle."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:54
+msgid "Release mouse to finish drawing."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:63
+msgid "Save changes."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:64
+#: templates/organization/organization_add.html:26
+#: templates/organization/organization_edit.html:27
+#: templates/organization/project_edit_details.html:88
+#: templates/organization/project_edit_geometry.html:58
+#: templates/organization/project_edit_permissions.html:40
+#: templates/party/party_add.html:19 templates/party/party_edit.html:24
+#: templates/resources/edit.html:27 templates/resources/modal_add_lib.html:25
+#: templates/resources/modal_upload.html:27
+#: templates/spatial/location_form.html:39
+#: templates/spatial/relationship_add.html:115
+msgid "Save"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:67
+msgid "Cancel editing, discards all changes."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:72
+msgid "Edit layers"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:73
+msgid "No layers to edit."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:74
+msgid "Delete layers"
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:75
+msgid "No layers to delete."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:81
+msgid "Drag handles, or marker to edit feature."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:82
+msgid "Click cancel to undo changes."
+msgstr ""
+
+#: core/translation-links/leaflet/_leaflet_draw_i18n.js:87
+msgid "Click on a feature to remove"
+msgstr ""
+
+#: core/translation-links/leaflet/admin/widget.html:24
+#: core/translation-links/leaflet/js.html:21
+msgid "Reset view"
 msgstr ""
 
 #: core/validators.py:19
@@ -145,7 +294,7 @@ msgstr ""
 
 #: organization/choices.py:5
 #: templates/organization/organization_members_edit.html:16
-#: templates/organization/project_add_permissions.html:39
+#: templates/organization/project_add_permissions.html:41
 #: templates/organization/project_edit_permissions.html:29
 #: templates/organization/user_list.html:30
 msgid "Member"
@@ -200,12 +349,12 @@ msgid ""
 "Organization administrators cannot change their own role in the organization."
 msgstr ""
 
-#: organization/forms.py:276 organization/forms.py:333
+#: organization/forms.py:282 organization/forms.py:347
 #: organization/serializers.py:60
 msgid "Project name cannot be “Add” or “New”."
 msgstr ""
 
-#: organization/forms.py:287 organization/forms.py:344
+#: organization/forms.py:293 organization/forms.py:358
 #: organization/serializers.py:79
 msgid "Project with this name already exists in this organization."
 msgstr ""
@@ -278,106 +427,112 @@ msgstr ""
 msgid "You don't have permission to download data from this project"
 msgstr ""
 
-#: organization/models.py:61
+#: organization/models.py:62
 msgid "List existing organizations"
 msgstr ""
 
-#: organization/models.py:64
+#: organization/models.py:65
 msgid "Create organizations"
 msgstr ""
 
-#: organization/models.py:67
+#: organization/models.py:68
 msgid "View existing organizations"
 msgstr ""
 
-#: organization/models.py:70
+#: organization/models.py:71
 msgid "Update an existing organization"
 msgstr ""
 
-#: organization/models.py:73
+#: organization/models.py:74
 msgid "Archive an existing organization"
 msgstr ""
 
-#: organization/models.py:76
+#: organization/models.py:77
 msgid "Unarchive an existing organization"
 msgstr ""
 
-#: organization/models.py:79
+#: organization/models.py:80
 msgid "List members of an organization"
 msgstr ""
 
-#: organization/models.py:82
+#: organization/models.py:83
 msgid "Add a member to an organization"
 msgstr ""
 
-#: organization/models.py:85
+#: organization/models.py:86
 msgid "Edit a member of an organization"
 msgstr ""
 
-#: organization/models.py:88
+#: organization/models.py:89
 msgid "Remove a member from an organization"
 msgstr ""
 
-#: organization/models.py:185
+#: organization/models.py:186
 msgid "List existing projects in an organization"
 msgstr ""
 
-#: organization/models.py:188
+#: organization/models.py:189
 msgid "Create projects in an organization"
 msgstr ""
 
-#: organization/models.py:191
+#: organization/models.py:192
 msgid "View existing projects"
 msgstr ""
 
-#: organization/models.py:194
+#: organization/models.py:195
 msgid "View private projects"
 msgstr ""
 
-#: organization/models.py:197
+#: organization/models.py:198
 msgid "Update an existing project"
 msgstr ""
 
-#: organization/models.py:200
+#: organization/models.py:201
 msgid "Archive an existing project"
 msgstr ""
 
-#: organization/models.py:203
+#: organization/models.py:204
 msgid "Unarchive an existing project"
 msgstr ""
 
-#: organization/models.py:206
+#: organization/models.py:207
 msgid "List users within a project"
 msgstr ""
 
-#: organization/models.py:209
+#: organization/models.py:210
 msgid "Add user to a project"
 msgstr ""
 
-#: organization/models.py:212
+#: organization/models.py:213
 msgid "Edit roles of user in a project"
 msgstr ""
 
-#: organization/models.py:215
+#: organization/models.py:216
 msgid "Remove user from a project"
 msgstr ""
 
-#: organization/models.py:218
+#: organization/models.py:219
 msgid "Download data from a project"
 msgstr ""
 
-#: organization/serializers.py:159
+#: organization/models.py:231
+#: templates/organization/organization_dashboard.html:23
+#: templates/organization/project_list.html:36
+msgid "Project"
+msgstr ""
+
+#: organization/serializers.py:172
 msgid ""
 "Organization administrators cannot change their own permissions within the "
 "organization"
 msgstr ""
 
-#: organization/serializers.py:236
+#: organization/serializers.py:249
 #, python-brace-format
 msgid "You have been added to organization {organization}"
 msgstr ""
 
-#: organization/serializers.py:257 organization/tests/test_serializers.py:501
+#: organization/serializers.py:270 organization/tests/test_serializers.py:501
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
 msgstr ""
@@ -393,45 +548,13 @@ msgstr ""
 msgid "More than one user found for username or email {email}"
 msgstr ""
 
-#: organization/tests/test_views_api_organizations.py:389
-msgid "User with username or email some_username does not exist"
-msgstr ""
-
-#: organization/tests/test_views_api_organizations.py:396
-msgid "Organization not found."
-msgstr ""
-
-#: organization/tests/test_views_api_projects.py:103
-#: organization/tests/test_views_api_projects.py:230
-#: organization/tests/test_views_api_projects.py:237
-#: organization/tests/test_views_api_projects.py:697
-#: spatial/tests/base_classes.py:353 spatial/tests/base_classes.py:465
-#: spatial/tests/base_classes.py:618
-msgid "Project not found."
-msgstr ""
-
-#: organization/tests/test_views_api_projects.py:123
-msgid "User with username or email some-user does not exist"
-msgstr ""
-
-#: organization/tests/test_views_api_projects.py:223
-msgid "User not found."
-msgstr ""
-
-#: organization/tests/test_views_api_projects.py:780
-msgid "This field may not be blank."
-msgstr ""
-
-#: organization/tests/test_views_api_users.py:201
-msgid "Cannot update last_login"
-msgstr ""
-
 #: organization/widgets.py:71
 msgid "Project visibility"
 msgstr ""
 
-#: organization/widgets.py:132 templates/party/party_form.html:6
-#: templates/party/party_list.html:17 templates/resources/form.html:17
+#: organization/widgets.py:132 templates/party/party_detail.html:37
+#: templates/party/party_form.html:6 templates/party/party_list.html:17
+#: templates/resources/form.html:17
 msgid "Name"
 msgstr ""
 
@@ -525,161 +648,223 @@ msgstr ""
 msgid "You don't have permission to add resources to this tenure relationship."
 msgstr ""
 
-#: party/models.py:42
+#: party/models.py:44
 msgid "Individual"
 msgstr ""
 
-#: party/models.py:43
+#: party/models.py:45
 msgid "Corporation"
 msgstr ""
 
-#: party/models.py:44
+#: party/models.py:46
 msgid "Group"
 msgstr ""
 
-#: party/models.py:91
+#: party/models.py:93
 msgid "List existing parties of a project"
 msgstr ""
 
-#: party/models.py:95
+#: party/models.py:97
 msgid "Add a party to a project"
 msgstr ""
 
-#: party/models.py:99
+#: party/models.py:101
 msgid "View an existing party"
 msgstr ""
 
-#: party/models.py:102
+#: party/models.py:104
 msgid "Update an existing party"
 msgstr ""
 
-#: party/models.py:105
+#: party/models.py:107
 msgid "Delete an existing party"
 msgstr ""
 
-#: party/models.py:108
+#: party/models.py:110
 msgid "Add resources to the party"
 msgstr ""
 
-#: party/models.py:163
+#: party/models.py:122 templates/party/relationship_detail.html:33
+#: templates/spatial/location_detail.html:67
+msgid "Party"
+msgstr ""
+
+#: party/models.py:180
 msgid "List existing party relationships of a project"
 msgstr ""
 
-#: party/models.py:168
+#: party/models.py:185
 msgid "Add a party relationship to a project"
 msgstr ""
 
-#: party/models.py:172
+#: party/models.py:189
 msgid "View an existing party relationship"
 msgstr ""
 
-#: party/models.py:175
+#: party/models.py:192
 msgid "Update an existing party relationship"
 msgstr ""
 
-#: party/models.py:178
+#: party/models.py:195
 msgid "Delete an existing party relationship"
 msgstr ""
 
-#: party/models.py:210
+#: party/models.py:227
 msgid "Contractual/Share Crop"
 msgstr ""
 
-#: party/models.py:211
+#: party/models.py:228
 msgid "Customary Arrangement"
 msgstr ""
 
-#: party/models.py:212
+#: party/models.py:229
 msgid "Gift"
 msgstr ""
 
-#: party/models.py:213
+#: party/models.py:230
 msgid "Homestead"
 msgstr ""
 
-#: party/models.py:214
+#: party/models.py:231
 msgid "Informal Occupant"
 msgstr ""
 
-#: party/models.py:215
+#: party/models.py:232
 msgid "Inheritance"
 msgstr ""
 
-#: party/models.py:216
+#: party/models.py:233 party/models.py:337
 msgid "Leasehold"
 msgstr ""
 
-#: party/models.py:217
+#: party/models.py:234
 msgid "Purchased Freehold"
 msgstr ""
 
-#: party/models.py:218
+#: party/models.py:235
 msgid "Rental"
 msgstr ""
 
-#: party/models.py:219
+#: party/models.py:236
 msgid "Other"
 msgstr ""
 
-#: party/models.py:248
+#: party/models.py:265
 msgid "List existing tenure relationships of a project"
 msgstr ""
 
-#: party/models.py:253
+#: party/models.py:270
 msgid "Add a tenure relationship to a project"
 msgstr ""
 
-#: party/models.py:257
+#: party/models.py:274
 msgid "View an existing tenure relationship"
 msgstr ""
 
-#: party/models.py:260
+#: party/models.py:277
 msgid "Update an existing tenure relationship"
 msgstr ""
 
-#: party/models.py:263
+#: party/models.py:280
 msgid "Delete an existing tenure relationship"
 msgstr ""
 
-#: party/models.py:266
+#: party/models.py:283
 msgid "Add a resource to a tenure relationship"
 msgstr ""
 
-#: party/serializers.py:53
-#: party/tests/test_views_api_party_relationships.py:72
-#: party/tests/test_views_api_party_relationships.py:155
+#: party/models.py:303 templates/party/relationship_detail.html:9
+#: templates/spatial/location_detail.html:66
+msgid "Relationship"
+msgstr ""
+
+#: party/models.py:327
+msgid "Carbon Rights"
+msgstr ""
+
+#: party/models.py:328
+msgid "Concessionary Rights"
+msgstr ""
+
+#: party/models.py:329
+msgid "Customary Rights"
+msgstr ""
+
+#: party/models.py:330
+msgid "Easement"
+msgstr ""
+
+#: party/models.py:331
+msgid "Equitable Servitude"
+msgstr ""
+
+#: party/models.py:332
+msgid "Freehold"
+msgstr ""
+
+#: party/models.py:333
+msgid "Grazing Rights"
+msgstr ""
+
+#: party/models.py:334
+msgid "Hunting/Fishing/Harvest Rights"
+msgstr ""
+
+#: party/models.py:335
+msgid "Indigenous Land Rights"
+msgstr ""
+
+#: party/models.py:336
+msgid "Joint Tenancy"
+msgstr ""
+
+#: party/models.py:338
+msgid "Longterm Leasehold"
+msgstr ""
+
+#: party/models.py:339
+msgid "Mineral Rights"
+msgstr ""
+
+#: party/models.py:340
+msgid "Occupancy (No Documented Rights)"
+msgstr ""
+
+#: party/models.py:341
+msgid "Tenancy (Documented Sub-lease)"
+msgstr ""
+
+#: party/models.py:342
+msgid "Tenancy In Common"
+msgstr ""
+
+#: party/models.py:343
+msgid "Undivided Co-ownership"
+msgstr ""
+
+#: party/models.py:344
+msgid "Water Rights"
+msgstr ""
+
+#: party/serializers.py:59
 msgid "The parties must be different"
 msgstr ""
 
-#: party/serializers.py:56
-#: party/tests/test_views_api_party_relationships.py:87
-#: party/tests/test_views_api_party_relationships.py:169
+#: party/serializers.py:62
 msgid "'party1' project ({}) should be equal to 'party2' project ({})"
 msgstr ""
 
-#: party/serializers.py:101
-#: party/tests/test_views_api_tenure_relationships.py:77
-#: party/tests/test_views_api_tenure_relationships.py:151
+#: party/serializers.py:107
 msgid "'party' project ({}) should be equal to 'spatial_unit' project ({})"
 msgstr ""
 
-#: party/tests/test_views_api_relationship_list.py:106 party/views/api.py:66
+#: party/views/api.py:66
 msgid "Relationship class is unknown"
 msgstr ""
 
 #: questionnaires/managers.py:74
 #, python-brace-format
 msgid "Please provide at least one option for field '{field_name}'"
-msgstr ""
-
-#: questionnaires/managers.py:166
-#, python-brace-format
-msgid "{error}"
-msgstr ""
-
-#: questionnaires/managers.py:240
-#, python-brace-format
-msgid "{type} is not an accepted question type"
 msgstr ""
 
 #: questionnaires/messages.py:3
@@ -694,15 +879,15 @@ msgstr ""
 msgid "You don't have permission to edit the questionnaire of this project"
 msgstr ""
 
-#: questionnaires/models.py:34
+#: questionnaires/models.py:35
 msgid "View the questionnaire of the project"
 msgstr ""
 
-#: questionnaires/models.py:38
+#: questionnaires/models.py:39
 msgid "Add a questionnaire to the project"
 msgstr ""
 
-#: questionnaires/models.py:42
+#: questionnaires/models.py:43
 msgid "Edit an existing questionnaire"
 msgstr ""
 
@@ -723,44 +908,71 @@ msgid "You don't have permission to edit this resource."
 msgstr ""
 
 #: resources/messages.py:7
-msgid "You don't have permission to archive this resource."
+msgid "You don't have permission to delete this resource."
 msgstr ""
 
 #: resources/messages.py:8
-msgid "You don't have permission to unarchive this resource."
+msgid "You don't have permission to restore this resource."
 msgstr ""
 
-#: resources/models.py:47
+#: resources/models.py:55 resources/models.py:210
 msgid "List resources"
 msgstr ""
 
-#: resources/models.py:51
+#: resources/models.py:59
 msgid "Add new resources"
 msgstr ""
 
-#: resources/models.py:55
+#: resources/models.py:63 resources/models.py:214
 msgid "View resource"
 msgstr ""
 
-#: resources/models.py:58
+#: resources/models.py:66 templates/resources/edit.html:4
+#: templates/resources/project_detail.html:30
 msgid "Edit resource"
 msgstr ""
 
-#: resources/models.py:61 templates/resources/project_detail.html:56
+#: resources/models.py:69 resources/models.py:217
 msgid "Archive resource"
 msgstr ""
 
-#: resources/models.py:64 templates/resources/project_detail.html:80
+#: resources/models.py:72 resources/models.py:220
 msgid "Unarchive resource"
 msgstr ""
 
-#: resources/serializers.py:26
+#: resources/models.py:169 resources/tests/test_models.py:228
+msgid "Invalid GPX file"
+msgstr ""
+
+#: resources/models.py:178
+#, python-brace-format
+msgid "Invalid GPX mime type: {error}"
+msgstr ""
+
+#: resources/serializers.py:27
 msgid "Resource not found"
+msgstr ""
+
+#: resources/tests/test_models.py:214
+msgid "Invalid GPX mime type: audio/mpeg"
 msgstr ""
 
 #: resources/validators.py:11
 #, python-brace-format
 msgid "Files of type {mime} are not accepted."
+msgstr ""
+
+#: resources/widgets.py:34 templates/resources/table.html:43
+msgid "Unattached"
+msgstr ""
+
+#: resources/widgets.py:36
+msgid "Attached to 1 other entity"
+msgstr ""
+
+#: resources/widgets.py:38
+#, python-brace-format
+msgid "Attached to {number} other entities"
 msgstr ""
 
 #: spatial/choices.py:4
@@ -809,7 +1021,7 @@ msgstr ""
 msgid "Please select a party type"
 msgstr ""
 
-#: spatial/forms.py:67 spatial/tests/test_forms.py:145
+#: spatial/forms.py:67 spatial/tests/test_forms.py:146
 msgid "Please select a relationship type"
 msgstr ""
 
@@ -859,77 +1071,60 @@ msgstr ""
 msgid "You don't have permission to remove this location relationship."
 msgstr ""
 
-#: spatial/models.py:65
+#: spatial/models.py:66
 msgid "List existing spatial units of a project"
 msgstr ""
 
-#: spatial/models.py:69
+#: spatial/models.py:70
 msgid "Add a spatial unit to a project"
 msgstr ""
 
-#: spatial/models.py:73
+#: spatial/models.py:74
 msgid "View an existing spatial unit"
 msgstr ""
 
-#: spatial/models.py:76
+#: spatial/models.py:77
 msgid "Update an existing spatial unit"
 msgstr ""
 
-#: spatial/models.py:79
+#: spatial/models.py:80
 msgid "Delete an existing spatial unit"
 msgstr ""
 
-#: spatial/models.py:82
+#: spatial/models.py:83
 msgid "Add resources to this spatial unit"
 msgstr ""
 
-#: spatial/models.py:204
+#: spatial/models.py:99 templates/spatial/location_detail.html:12
+msgid "Location"
+msgstr ""
+
+#: spatial/models.py:224
 msgid "List existing spatial relationships of a project"
 msgstr ""
 
-#: spatial/models.py:209
+#: spatial/models.py:229
 msgid "Add a spatial relationship to a project"
 msgstr ""
 
-#: spatial/models.py:213
+#: spatial/models.py:233
 msgid "View an existing spatial relationship"
 msgstr ""
 
-#: spatial/models.py:216
+#: spatial/models.py:236
 msgid "Update an existing spatial relationship"
 msgstr ""
 
-#: spatial/models.py:219
+#: spatial/models.py:239
 msgid "Delete an existing spatial relationship"
 msgstr ""
 
-#: spatial/serializers.py:98
-#: spatial/tests/test_views_api_spatial_relationships.py:75
-#: spatial/tests/test_views_api_spatial_relationships.py:157
+#: spatial/serializers.py:82
 msgid "The spatial units must be different"
 msgstr ""
 
-#: spatial/serializers.py:101
-#: spatial/tests/test_views_api_spatial_relationships.py:89
-#: spatial/tests/test_views_api_spatial_relationships.py:170
+#: spatial/serializers.py:85
 msgid "'su1' project ({}) should be equal to 'su2' project ({})"
-msgstr ""
-
-#: spatial/tests/base_classes.py:350 spatial/tests/base_classes.py:462
-#: spatial/tests/base_classes.py:615
-msgid "{} not found."
-msgstr ""
-
-#: spatial/tests/test_views_api_spatial_units.py:127
-#: spatial/tests/test_views_api_spatial_units.py:194
-msgid "\"\" is not a valid choice."
-msgstr ""
-
-#: spatial/tests/test_views_api_spatial_units.py:142
-#: spatial/tests/test_views_api_spatial_units.py:209
-msgid ""
-"Invalid format: string or unicode input unrecognized as GeoJSON, WKT EWKT or "
-"HEXEWKB."
 msgstr ""
 
 #: spatial/widgets.py:40 templates/organization/project_wrapper.html:60
@@ -1022,7 +1217,7 @@ msgstr ""
 
 #: templates/accounts/profile.html:19
 #: templates/accounts/snippets/registration_form.html:11
-#: templates/organization/organization_dashboard.html:93
+#: templates/organization/organization_dashboard.html:94
 msgid "Username"
 msgstr ""
 
@@ -1304,8 +1499,8 @@ msgstr ""
 
 #: templates/allauth/account/password_reset_done.html:15
 msgid ""
-"We have sent you an e-mail. Please contact us if you do not receive it "
-"within a few minutes."
+"We have sent you an e-mail. Please <a href=\"mailto:support@cadasta.org"
+"\">contact us</a> if you do not receive it within a few minutes."
 msgstr ""
 
 #: templates/allauth/account/password_reset_from_key.html:7
@@ -1368,8 +1563,8 @@ msgstr ""
 #: templates/allauth/account/verification_sent.html:10
 msgid ""
 "We have sent an e-mail to you for verification. Follow the link provided to "
-"finalize the signup process. Please contact us if you do not receive it "
-"within a few minutes."
+"finalize the signup process. Please <a href=\"mailto:support@cadasta.org"
+"\">contact us</a> if you do not receive it within a few minutes."
 msgstr ""
 
 #: templates/allauth/account/verified_email_required.html:12
@@ -1383,7 +1578,8 @@ msgstr ""
 msgid ""
 "We have sent an e-mail to you for\n"
 "verification. Please click on the link inside this e-mail. Please\n"
-"contact us if you do not receive it within a few minutes."
+"<a href=\"mailto:support@cadasta.org\">contact us</a> if you do not receive "
+"it within a few minutes."
 msgstr ""
 
 #: templates/allauth/account/verified_email_required.html:20
@@ -1510,32 +1706,73 @@ msgstr ""
 msgid "Information"
 msgstr ""
 
-#: templates/core/base.html:136
-msgid "Copyright"
+#: templates/core/base.html:137
+#, python-format
+msgid "Copyright %(copydate)s Cadasta. <span>All Rights Reserved.</span> "
 msgstr ""
 
-#: templates/core/base.html:136
-msgid "Cadasta. All Rights Reserved."
-msgstr ""
-
-#: templates/core/base.html:156
+#: templates/core/base.html:157
 msgid "About Us"
 msgstr ""
 
-#: templates/core/base.html:161
+#: templates/core/base.html:162
 msgid "Privacy"
 msgstr ""
 
-#: templates/core/base.html:166
+#: templates/core/base.html:167
 msgid "Terms of Use"
 msgstr ""
 
-#: templates/core/base.html:171
+#: templates/core/base.html:172
 msgid "Code of Conduct"
 msgstr ""
 
-#: templates/core/base.html:176
+#: templates/core/base.html:177
 msgid "Visit us on Github"
+msgstr ""
+
+#: templates/core/base.html:203
+msgid "No data available in table"
+msgstr ""
+
+#: templates/core/base.html:204
+msgid "Showing _START_ - _END_ of _TOTAL_"
+msgstr ""
+
+#: templates/core/base.html:205
+msgid "Showing 0 - 0 of 0"
+msgstr ""
+
+#: templates/core/base.html:206
+msgid "(filtered from _MAX_ total rows)"
+msgstr ""
+
+#: templates/core/base.html:207
+msgid "Show _MENU_ rows"
+msgstr ""
+
+#: templates/core/base.html:209
+msgid "Search"
+msgstr ""
+
+#: templates/core/base.html:210
+msgid "No matching records found"
+msgstr ""
+
+#: templates/core/base.html:214
+msgid "First"
+msgstr ""
+
+#: templates/core/base.html:215
+msgid "Last"
+msgstr ""
+
+#: templates/core/base.html:218
+msgid "activate to sort column ascending"
+msgstr ""
+
+#: templates/core/base.html:219
+msgid "activate to sort column descending"
 msgstr ""
 
 #: templates/core/dashboard.html:38
@@ -1561,48 +1798,17 @@ msgstr ""
 msgid "Add organization"
 msgstr ""
 
-#: templates/organization/organization_add.html:26
-#: templates/organization/organization_edit.html:27
-#: templates/organization/project_edit_details.html:79
-#: templates/organization/project_edit_geometry.html:58
-#: templates/organization/project_edit_permissions.html:40
-#: templates/party/party_add.html:19 templates/party/party_edit.html:24
-#: templates/resources/edit.html:28 templates/resources/modal_add_lib.html:25
-#: templates/resources/modal_upload.html:27
-#: templates/spatial/location_form.html:39
-#: templates/spatial/relationship_add.html:115
-msgid "Save"
-msgstr ""
-
-#: templates/organization/organization_add.html:29
-#: templates/organization/organization_dashboard.html:131
-#: templates/organization/organization_dashboard.html:157
-#: templates/organization/organization_edit.html:31
-#: templates/organization/project_add_wrapper.html:57
-#: templates/organization/project_edit_details.html:80
-#: templates/organization/project_edit_geometry.html:59
-#: templates/organization/project_edit_permissions.html:41
-#: templates/organization/project_wrapper.html:150
-#: templates/organization/project_wrapper.html:176
-#: templates/party/party_delete.html:23 templates/party/party_edit.html:28
-#: templates/party/relationship_delete.html:20
-#: templates/resources/edit.html:29 templates/resources/modal_add_lib.html:28
-#: templates/resources/modal_upload.html:30
-#: templates/resources/project_detail.html:66
-#: templates/resources/project_detail.html:92
-#: templates/spatial/location_delete.html:24
-#: templates/spatial/location_form.html:40
-#: templates/spatial/relationship_add.html:119
-msgid "Cancel"
+#: templates/organization/organization_dashboard.html:5
+#: templates/organization/organization_wrapper.html:88
+#: templates/organization/project_dashboard.html:45
+#: templates/organization/project_wrapper.html:95
+#: templates/party/resources_list.html:16
+#: templates/spatial/location_detail.html:29
+msgid "Overview"
 msgstr ""
 
 #: templates/organization/organization_dashboard.html:15
 msgid "Organization Overview"
-msgstr ""
-
-#: templates/organization/organization_dashboard.html:23
-#: templates/organization/project_list.html:36
-msgid "Project"
 msgstr ""
 
 #: templates/organization/organization_dashboard.html:24
@@ -1612,7 +1818,7 @@ msgstr ""
 
 #: templates/organization/organization_dashboard.html:25
 #: templates/organization/project_list.html:39
-#: templates/resources/table.html:11 templates/resources/table_add_lib.html:13
+#: templates/resources/table.html:10 templates/resources/table_add_lib.html:11
 msgid "Last updated"
 msgstr ""
 
@@ -1638,39 +1844,40 @@ msgstr ""
 msgid "This organization does not have any public projects."
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:89
+#: templates/organization/organization_dashboard.html:90
+#: templates/organization/organization_members.html:4
 #: templates/organization/organization_members.html:15
 #: templates/organization/organization_wrapper.html:100
 msgid "Members"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:99
+#: templates/organization/organization_dashboard.html:100
 msgid "View all"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:121
+#: templates/organization/organization_dashboard.html:123
 #: templates/organization/organization_wrapper.html:37
 msgid "Archive organization"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:124
+#: templates/organization/organization_dashboard.html:126
 msgid "Are you sure you want to archive this organization?"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:128
+#: templates/organization/organization_dashboard.html:130
 msgid "Yes, archive this organization"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:145
+#: templates/organization/organization_dashboard.html:147
 #: templates/organization/organization_wrapper.html:35
 msgid "Unarchive organization"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:149
+#: templates/organization/organization_dashboard.html:151
 msgid "Are you sure you want to unarchive this organization?"
 msgstr ""
 
-#: templates/organization/organization_dashboard.html:154
+#: templates/organization/organization_dashboard.html:156
 msgid "Yes, unarchive this organization"
 msgstr ""
 
@@ -1702,18 +1909,21 @@ msgstr ""
 #: templates/organization/organization_list.html:19
 #: templates/organization/organization_members.html:18
 #: templates/organization/project_list.html:19
-#: templates/party/party_detail.html:60 templates/party/party_detail.html:72
-#: templates/party/relationship_detail.html:50
-#: templates/party/relationship_detail.html:62
-#: templates/resources/project_list.html:24
 #: templates/spatial/location_detail.html:60
-#: templates/spatial/location_detail.html:98
 msgid "Add"
 msgstr ""
 
 #: templates/organization/organization_list.html:35
 #: templates/organization/project_list.html:37
 msgid "Organization"
+msgstr ""
+
+#: templates/organization/organization_members_add.html:6
+msgid "Add member"
+msgstr ""
+
+#: templates/organization/organization_members_edit.html:6
+msgid "Edit member"
 msgstr ""
 
 #: templates/organization/organization_wrapper.html:48
@@ -1726,13 +1936,6 @@ msgstr ""
 msgid "Add org member"
 msgstr ""
 
-#: templates/organization/organization_wrapper.html:88
-#: templates/organization/project_wrapper.html:95
-#: templates/party/resources_list.html:16
-#: templates/spatial/location_detail.html:29
-msgid "Overview"
-msgstr ""
-
 #: templates/organization/organization_wrapper.html:106
 #: templates/organization/project_wrapper.html:113
 msgid "Reports"
@@ -1743,42 +1946,68 @@ msgstr ""
 msgid "Activity"
 msgstr ""
 
-#: templates/organization/project_add_details.html:34
+#: templates/organization/project_add_details.html:6
+msgid "Add details"
+msgstr ""
+
+#: templates/organization/project_add_details.html:36
 msgid "1. General Information"
 msgstr ""
 
-#: templates/organization/project_add_details.html:57
+#: templates/organization/project_add_details.html:59
 msgid "Select organization"
 msgstr ""
 
-#: templates/organization/project_add_details.html:78
+#: templates/organization/project_add_details.html:80
 #: templates/organization/project_edit_details.html:36
 msgid "Project name"
 msgstr ""
 
-#: templates/organization/project_add_details.html:94
+#: templates/organization/project_add_details.html:96
 #: templates/organization/project_edit_details.html:46
 msgid "Project description"
 msgstr ""
 
-#: templates/organization/project_add_details.html:100
+#: templates/organization/project_add_details.html:102
 #: templates/organization/project_edit_details.html:52
 msgid "Project URL"
 msgstr ""
 
-#: templates/organization/project_add_details.html:111
+#: templates/organization/project_add_details.html:113
 #: templates/organization/project_edit_details.html:63
 msgid "Select the questionnaire file to use for this project"
 msgstr ""
 
-#: templates/organization/project_add_details.html:133
+#: templates/organization/project_add_details.html:117
+#: templates/organization/project_edit_details.html:67
+msgid "Accepted file types: xls, xlsx"
+msgstr ""
+
+#: templates/organization/project_add_details.html:123
+#: templates/organization/project_edit_details.html:73
+msgid ""
+"For assistance with questionnaires view our <a href=\"http://docs.cadasta."
+"org/en/08-XLSForms.html\" class=\"alert-link\" target=\"_blank\">user guide</"
+"a>.  To help you get started two samples have been provided: <a href="
+"\"https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/"
+"minimum_cadasta_questionnaire.xlsx\" class=\"alert-link\">a minimal</a> and "
+"<a href=\"https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/"
+"standard_cadasta_questionnaire.xlsx\" class=\"alert-link\">a standard "
+"questionnaire</a>."
+msgstr ""
+
+#: templates/organization/project_add_details.html:144
 #: templates/organization/project_add_extents.html:67
 msgid "Next"
 msgstr ""
 
-#: templates/organization/project_add_details.html:138
-#: templates/organization/project_add_permissions.html:63
+#: templates/organization/project_add_details.html:149
+#: templates/organization/project_add_permissions.html:65
 msgid "Previous"
+msgstr ""
+
+#: templates/organization/project_add_extents.html:7
+msgid "Draw map"
 msgstr ""
 
 #: templates/organization/project_add_extents.html:53
@@ -1799,11 +2028,15 @@ msgid ""
 "and also helps other users to find your project."
 msgstr ""
 
-#: templates/organization/project_add_permissions.html:15
+#: templates/organization/project_add_permissions.html:6
+msgid "Assign team"
+msgstr ""
+
+#: templates/organization/project_add_permissions.html:17
 msgid "Assign permissions to members"
 msgstr ""
 
-#: templates/organization/project_add_permissions.html:19
+#: templates/organization/project_add_permissions.html:21
 msgid ""
 "\n"
 "      Not able to find a member?  Organization administrators must first\n"
@@ -1812,18 +2045,23 @@ msgid ""
 "      "
 msgstr ""
 
-#: templates/organization/project_add_permissions.html:40
+#: templates/organization/project_add_permissions.html:42
 #: templates/organization/project_edit_permissions.html:30
 msgid "Email address"
 msgstr ""
 
-#: templates/organization/project_add_permissions.html:41
+#: templates/organization/project_add_permissions.html:43
 #: templates/organization/project_edit_permissions.html:31
 msgid "Permissions"
 msgstr ""
 
-#: templates/organization/project_add_permissions.html:58
+#: templates/organization/project_add_permissions.html:60
 msgid "Finish"
+msgstr ""
+
+#: templates/organization/project_add_wrapper.html:5
+#: templates/organization/project_add_wrapper.html:47
+msgid "Add new project"
 msgstr ""
 
 #: templates/organization/project_add_wrapper.html:22
@@ -1850,23 +2088,23 @@ msgstr ""
 msgid "Assign permissions"
 msgstr ""
 
-#: templates/organization/project_add_wrapper.html:47
-msgid "Add new project"
-msgstr ""
-
 #: templates/organization/project_dashboard.html:22
-#: templates/spatial/location_add.html:36
-#: templates/spatial/location_edit.html:37
+#: templates/spatial/location_add.html:39
+#: templates/spatial/location_edit.html:46
 #: templates/spatial/location_map.html:23
 #: templates/spatial/location_wrapper.html:26
 msgid "Open location"
 msgstr ""
 
-#: templates/organization/project_dashboard.html:72
+#: templates/organization/project_dashboard.html:61
+msgid "Project Overview"
+msgstr ""
+
+#: templates/organization/project_dashboard.html:80
 msgid "Project stats"
 msgstr ""
 
-#: templates/organization/project_dashboard.html:75
+#: templates/organization/project_dashboard.html:83
 #, python-format
 msgid ""
 "\n"
@@ -1879,7 +2117,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/organization/project_dashboard.html:82
+#: templates/organization/project_dashboard.html:90
 #, python-format
 msgid ""
 "\n"
@@ -1892,7 +2130,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/organization/project_dashboard.html:89
+#: templates/organization/project_dashboard.html:97
 #, python-format
 msgid ""
 "\n"
@@ -1905,17 +2143,17 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/organization/project_dashboard.html:98
+#: templates/organization/project_dashboard.html:106
 msgid "Congratulations!"
 msgstr ""
 
-#: templates/organization/project_dashboard.html:99
+#: templates/organization/project_dashboard.html:107
 msgid ""
 "You have successfully created your project.  You're now ready to add your "
 "first location."
 msgstr ""
 
-#: templates/organization/project_dashboard.html:103
+#: templates/organization/project_dashboard.html:111
 msgid "Add a location"
 msgstr ""
 
@@ -1948,6 +2186,7 @@ msgstr ""
 #: templates/party/party_detail.html:56
 #: templates/party/relationship_detail.html:46
 #: templates/party/resources_list.html:18
+#: templates/resources/project_list.html:4
 #: templates/resources/project_list.html:14
 #: templates/spatial/location_detail.html:31
 msgid "Resources"
@@ -1967,9 +2206,11 @@ msgid ""
 msgstr ""
 
 #: templates/organization/project_download.html:49
+#: templates/resources/project_detail.html:47
 msgid "Download"
 msgstr ""
 
+#: templates/organization/project_edit_details.html:11
 #: templates/organization/project_edit_details.html:22
 #: templates/organization/project_wrapper.html:33
 msgid "Edit project details"
@@ -1983,10 +2224,11 @@ msgstr ""
 msgid "2. Questionnaire"
 msgstr ""
 
-#: templates/organization/project_edit_details.html:71
+#: templates/organization/project_edit_details.html:80
 msgid "3. Contacts"
 msgstr ""
 
+#: templates/organization/project_edit_geometry.html:7
 #: templates/organization/project_edit_geometry.html:44
 #: templates/organization/project_wrapper.html:32
 msgid "Edit project boundary"
@@ -1998,6 +2240,7 @@ msgid ""
 "boundary. Once complete, select the save button below."
 msgstr ""
 
+#: templates/organization/project_edit_permissions.html:7
 #: templates/organization/project_edit_permissions.html:23
 #: templates/organization/project_wrapper.html:34
 msgid "Edit member permissions"
@@ -2034,7 +2277,6 @@ msgstr ""
 
 #: templates/organization/project_wrapper.html:62
 #: templates/organization/project_wrapper.html:76
-#: templates/spatial/location_detail.html:110
 msgid "Add resource"
 msgstr ""
 
@@ -2104,15 +2346,24 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
-#: templates/party/party_detail.html:65
+#: templates/party/party_detail.html:64 templates/party/party_detail.html:76
+#: templates/party/relationship_detail.html:54
+#: templates/party/relationship_detail.html:66
+#: templates/resources/project_list.html:24
+#: templates/spatial/location_detail.html:102
+#: templates/spatial/location_detail.html:114
+msgid "Attach"
+msgstr ""
+
+#: templates/party/party_detail.html:69
 msgid ""
-"This party does not have any connected resources. To add a resource, select "
-"the button below."
+"This party does not have any attached resources. To attach a resource, "
+"select the button below."
 msgstr ""
 
 #: templates/party/party_form.html:12 templates/party/party_list.html:18
 #: templates/party/relationship_detail.html:29
-#: templates/resources/table.html:8 templates/resources/table_add_lib.html:10
+#: templates/resources/table.html:8 templates/resources/table_add_lib.html:9
 msgid "Type"
 msgstr ""
 
@@ -2133,24 +2384,14 @@ msgstr ""
 msgid "Yes, delete this relationship"
 msgstr ""
 
-#: templates/party/relationship_detail.html:9
-#: templates/spatial/location_detail.html:66
-msgid "Relationship"
-msgstr ""
-
 #: templates/party/relationship_detail.html:17
 msgid "Edit relationship"
 msgstr ""
 
-#: templates/party/relationship_detail.html:33
-#: templates/spatial/location_detail.html:67
-msgid "Party"
-msgstr ""
-
-#: templates/party/relationship_detail.html:55
+#: templates/party/relationship_detail.html:59
 msgid ""
-"This relationship does not have any connected resources. To add a resource, "
-"select the button below."
+"This relationship does not have any attached resources. To attach a "
+"resource, select the button below."
 msgstr ""
 
 #: templates/party/relationship_edit.html:8
@@ -2159,6 +2400,18 @@ msgstr ""
 
 #: templates/party/relationship_edit.html:15
 msgid "Relationship type"
+msgstr ""
+
+#: templates/party/relationship_resources_add.html:4
+msgid "Add new resource for relationship"
+msgstr ""
+
+#: templates/party/relationship_resources_new.html:4
+msgid "Upload new resource for relationship"
+msgstr ""
+
+#: templates/party/resources_add.html:4
+msgid "Add new resource for party"
 msgstr ""
 
 #: templates/party/resources_list.html:10
@@ -2171,8 +2424,6 @@ msgid "Relationships"
 msgstr ""
 
 #: templates/party/resources_list.html:23
-#: templates/resources/modal_add_lib.html:14
-#: templates/resources/modal_upload.html:15
 msgid "Add from library"
 msgstr ""
 
@@ -2181,7 +2432,11 @@ msgstr ""
 msgid "Upload new resource"
 msgstr ""
 
-#: templates/resources/edit.html:19
+#: templates/party/resources_new.html:4
+msgid "Upload new resource for party"
+msgstr ""
+
+#: templates/resources/edit.html:18
 msgid "Resources: Edit"
 msgstr ""
 
@@ -2189,12 +2444,18 @@ msgstr ""
 msgid "Select the file to upload"
 msgstr ""
 
+#: templates/resources/form.html:12
+msgid "Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png, xml (gpx)"
+msgstr ""
+
 #: templates/resources/form.html:22
 msgid "Description"
 msgstr ""
 
 #: templates/resources/modal_add_lib.html:12
-msgid "Add resource from library"
+#: templates/resources/modal_add_lib.html:14
+#: templates/resources/modal_upload.html:15
+msgid "Attach from library"
 msgstr ""
 
 #: templates/resources/modal_add_lib.html:15
@@ -2202,45 +2463,115 @@ msgstr ""
 msgid "Upload new"
 msgstr ""
 
+#: templates/resources/modal_archive.html:10
+#: templates/resources/project_detail.html:40
+msgid "Delete resource"
+msgstr ""
+
+#: templates/resources/modal_archive.html:14
+msgid ""
+"\n"
+"          Are you sure you want to delete this resource?\n"
+"          Once deleted, the resource can only be restored by a system "
+"administrator.\n"
+"          Deleting will also detach the resource from everything it is "
+"attached to.\n"
+"          "
+msgstr ""
+
+#: templates/resources/modal_archive.html:23
+msgid "Yes, delete this resource"
+msgstr ""
+
+#: templates/resources/modal_unarchive.html:10
+#: templates/resources/project_detail.html:35
+msgid "Restore deleted resource"
+msgstr ""
+
+#: templates/resources/modal_unarchive.html:14
+msgid "Are you sure you want to restore this deleted resource?"
+msgstr ""
+
+#: templates/resources/modal_unarchive.html:19
+msgid "Yes, restore this resource"
+msgstr ""
+
+#: templates/resources/project_add_existing.html:4
+msgid "Add new resource for project"
+msgstr ""
+
+#: templates/resources/project_add_new.html:4
+msgid "Upload new resource for project"
+msgstr ""
+
+#: templates/resources/project_detail.html:4
+msgid "Resource detail:"
+msgstr ""
+
 #: templates/resources/project_detail.html:14
 msgid "Resource detail"
 msgstr ""
 
-#: templates/resources/project_detail.html:21
+#: templates/resources/project_detail.html:22
+#: templates/resources/table.html:25
+msgid "Deleted"
+msgstr ""
+
+#: templates/resources/project_detail.html:26
 #, python-format
 msgid "Added on %(date)s by %(user)s"
 msgstr ""
 
-#: templates/resources/project_detail.html:59
-msgid "Are you sure you want to archive this resource?"
+#: templates/resources/project_detail.html:55
+#: templates/resources/table.html:11
+msgid "Attached to"
 msgstr ""
 
-#: templates/resources/project_detail.html:63
-msgid "Yes, archive this resource"
+#: templates/resources/project_detail.html:60
+msgid "Entity Class"
 msgstr ""
 
-#: templates/resources/project_detail.html:84
-msgid "Are you sure you want to unarchive this resource?"
+#: templates/resources/project_detail.html:61
+msgid "Entity Name or Description"
 msgstr ""
 
-#: templates/resources/project_detail.html:89
-msgid "Yes, unarchive this resource"
+#: templates/resources/project_detail.html:62
+#: templates/resources/project_detail.html:74
+#: templates/resources/table.html:52 templates/resources/table_sm.html:27
+msgid "Detach"
 msgstr ""
 
-#: templates/resources/table.html:7 templates/resources/table_add_lib.html:9
+#: templates/resources/project_detail.html:83
+msgid "This resource is currently not attached to anything."
+msgstr ""
+
+#: templates/resources/table.html:7 templates/resources/table_add_lib.html:8
 #: templates/resources/table_sm.html:7
 msgid "Resource"
 msgstr ""
 
-#: templates/resources/table.html:9 templates/resources/table_add_lib.html:11
-#: templates/resources/table_sm.html:8
-msgid "Connections"
-msgstr ""
-
-#: templates/resources/table.html:10 templates/resources/table_add_lib.html:12
+#: templates/resources/table.html:9 templates/resources/table_add_lib.html:10
 msgid "Contributor"
 msgstr ""
 
+#: templates/resources/table.html:37
+#, python-format
+msgid "%(amount)s other"
+msgstr ""
+
+#: templates/resources/table.html:57
+msgid "Restore"
+msgstr ""
+
+#: templates/resources/table_add_lib.html:12
+msgid "Attachments"
+msgstr ""
+
+#: templates/spatial/location_add.html:11
+msgid "Add new location"
+msgstr ""
+
+#: templates/spatial/location_delete.html:4
 #: templates/spatial/location_delete.html:16
 #: templates/spatial/location_detail.html:22
 msgid "Delete location"
@@ -2254,11 +2585,12 @@ msgstr ""
 msgid "Yes, delete this location"
 msgstr ""
 
-#: templates/spatial/location_detail.html:12
-msgid "Location"
+#: templates/spatial/location_detail.html:5
+msgid "Location detail"
 msgstr ""
 
 #: templates/spatial/location_detail.html:20
+#: templates/spatial/location_edit.html:7
 msgid "Edit location"
 msgstr ""
 
@@ -2268,10 +2600,14 @@ msgid ""
 "parties. To add your first relationship, select the button below."
 msgstr ""
 
-#: templates/spatial/location_detail.html:103
+#: templates/spatial/location_detail.html:107
 msgid ""
-"This location does not have any connected resources. To add a resource, "
+"This location does not have any attached resources. To attach a resource, "
 "select the button below."
+msgstr ""
+
+#: templates/spatial/location_form.html:18
+msgid "Draw location on map"
 msgstr ""
 
 #: templates/spatial/location_form.html:20
@@ -2284,10 +2620,15 @@ msgstr ""
 msgid "2. What type of location is this?"
 msgstr ""
 
-#: templates/spatial/location_wrapper.html:44
+#: templates/spatial/location_map.html:4
+msgid "Project Map"
+msgstr ""
+
+#: templates/spatial/location_wrapper.html:53
 msgid "Currently viewing"
 msgstr ""
 
+#: templates/spatial/relationship_add.html:5
 #: templates/spatial/relationship_add.html:48
 msgid "Add new relationship"
 msgstr ""
@@ -2320,6 +2661,14 @@ msgstr ""
 msgid "Tenure Type"
 msgstr ""
 
+#: templates/spatial/resources_add.html:4
+msgid "Add new resource for location"
+msgstr ""
+
+#: templates/spatial/resources_new.html:4
+msgid "Upload new resource for location"
+msgstr ""
+
 #: xforms/mixins/model_helper.py:33
 msgid "Form out of date"
 msgstr ""
@@ -2328,22 +2677,22 @@ msgstr ""
 msgid "Party error: {}"
 msgstr ""
 
-#: xforms/mixins/model_helper.py:89
+#: xforms/mixins/model_helper.py:88
 msgid "Location error: {}"
 msgstr ""
 
-#: xforms/mixins/model_helper.py:104
+#: xforms/mixins/model_helper.py:103
 msgid "Tenure relationship error: {}"
 msgstr ""
 
-#: xforms/mixins/model_helper.py:122
+#: xforms/mixins/model_helper.py:121
 msgid "{}"
 msgstr ""
 
-#: xforms/mixins/model_helper.py:161
+#: xforms/mixins/model_helper.py:160
 msgid "Questionnaire not found."
 msgstr ""
 
-#: xforms/mixins/model_helper.py:177
+#: xforms/mixins/model_helper.py:176
 msgid "XML submission not found"
 msgstr ""

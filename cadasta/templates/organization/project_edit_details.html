@@ -8,7 +8,7 @@
   {{ form.media }}
 {% endblock %}
 
-{% block page_title %}Edit project details | {% endblock %}
+{% block page_title %}{% trans "Edit project details" %} | {% endblock %}
 {% block left-nav %}overview{% endblock %}
 
 {% block content %}
@@ -47,7 +47,7 @@
                   <label class="pull-right control-label">{{ form.description.errors }}</label>
                   {% render_field form.description class+="form-control" %}
                 </div>
-  
+
                 <div class="form-group{% if form.urls.errors %} has-error{% endif %}">
                   <label for="{{ form.urls.id_for_label }}">{% trans "Project URL" %}</label>
                   <label class="pull-right control-label">{{ form.urls.errors }}</label>
@@ -55,7 +55,7 @@
                 </div>
               </div>
             </div>
-  
+
             <h3>{% trans "2. Questionnaire" %}</h3>
             <div class="row">
               <div class="col-md-9">
@@ -64,19 +64,19 @@
                   <label class="pull-right control-label">{{ form.questionnaire.errors }}</label>
                   <div class="well file-well">
                     {{ form.questionnaire }}
-                    <p class="help-block">Accepted file types: xls, xlsx</p>
+                    <p class="help-block">{% trans "Accepted file types: xls, xlsx" %}</p>
                     {{ form.original_file }}
                   </div>
                   <div class="alert alert-info alert-full clearfix row" role="alert">
                     <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
                     <div>
-                        For assistance with questionnaires view our <a href="http://docs.cadasta.org/en/08-XLSForms.html" class="alert-link" target="_blank">user guide</a>.  To help you get started two samples have been provided: <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/minimum_cadasta_questionnaire.xlsx" class="alert-link">a minimal</a> and <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx" class="alert-link">a standard questionnaire</a>.
+                        {% blocktrans %}For assistance with questionnaires view our <a href="http://docs.cadasta.org/en/08-XLSForms.html" class="alert-link" target="_blank">user guide</a>.  To help you get started two samples have been provided: <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/minimum_cadasta_questionnaire.xlsx" class="alert-link">a minimal</a> and <a href="https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx" class="alert-link">a standard questionnaire</a>.{% endblocktrans %}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-  
+
             <h3>{% trans "3. Contacts" %}</h3>
             <div class="row">
               <div class="col-md-9">

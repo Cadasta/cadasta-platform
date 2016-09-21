@@ -42,7 +42,7 @@
 </script>
 {% endblock %}
 
-{% block page_title %}Overview | {% endblock %}
+{% block page_title %}{% trans "Overview" %} | {% endblock %}
 {% block body-class %} map{% endblock %}
 {% block left-nav %}overview{% endblock %}
 
@@ -58,7 +58,7 @@
     <!-- Overview detail  -->
     <div class="col-md-4 detail">
       <section>
-        <h2>Project Overview</h2>
+        <h2>{% trans "Project Overview" %}</h2>
         <p>{{ object.description }}</p>
         {% if object.urls.0 %}
           <p><a href="{{ object.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ object.urls.0 }}</a></p>
