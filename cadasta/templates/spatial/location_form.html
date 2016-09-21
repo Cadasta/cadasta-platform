@@ -12,10 +12,10 @@
     <!-- / end overview map -->
     <!-- Overview detail  -->
     <div class="col-md-4 detail detail-edit">
-      <h2>{{ title }}</h2>
+      <h2>{% trans title %}</h2>
       <div class="panel panel-default">
         <div class="panel-body">
-          <h3>Draw location on map</h3>
+          <h3>{% trans "Draw location on map" %}</h3>
           <div class="clearfix form-group{% if form.geometry.errors %} has-error{% endif %}">
             <p>{% blocktrans %}1. Use the tools provided on the left side of the map to mark your new location.{% endblocktrans %}</p>
             <label class="control-label">{{ form.geometry.errors }}</label>
