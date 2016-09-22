@@ -3,9 +3,10 @@ import re
 from .base import Page
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.select import Select
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 
 
 class ProjectAddPage(Page):
@@ -157,11 +158,17 @@ class ProjectAddPage(Page):
     # -----------------------
     # Details subpage methods
 
-    def select_org(self, slug):
-        assert self.is_on_subpage('details')
-
     def get_org(self):
         assert self.is_on_subpage('details')
+        select = Select(self.BY_ID('id_details-organization'))
+        return select.first_selected_option.get_attribute('value')
+
+    def set_org(self, slug):
+        assert self.is_on_subpage('details')
+        select_elem = self.BY_ID('id_details-organization')
+        select = Select(select_elem)
+        select.select_by_value(slug)
+        select_elem.location_once_scrolled_into_view
 
     def set_name(self, name):
         assert self.is_on_subpage('details')
@@ -247,6 +254,7 @@ class ProjectAddPage(Page):
 
     def check_details(self, details):
         """Checks whether the details form shows the expected data."""
+        assert self.get_org() == details['org']
         assert self.get_name() == details['name']
         assert self.get_access() == details['access']
         assert self.get_description() == details['description']
@@ -265,30 +273,85 @@ class ProjectAddPage(Page):
         """This method should be called when the details form has at
         least one error. The method will attempt to submit the already
         set details and verify that an error is issued."""
-
         assert self.is_on_subpage('details')
-
         submit_button = self.BY_CLASS('btn-primary')
         error_wait = (By.CLASS_NAME, 'errorlist')
         self.test.click_through(submit_button, error_wait)
         assert self.is_on_subpage('details')
 
+    def check_missing_org_error(self):
+        # Assert that there is a missing org error message
+        assert self.is_on_subpage('details')
+        assert self.BY_XPATH(
+            "//div[@class='form-group has-error']/" +
+            "select[@id='id_details-organization']/../" +
+            "label[contains(@class, 'control-label')]/" +
+            "ul[@class='errorlist']").text == "This field is required."
+
+    def check_no_missing_org_error(self):
+        # Assert that there is NO missing org error message
+        try:
+            self.check_missing_org_error()
+            raise AssertionError(
+                "There should be no missing org error message.")
+        except NoSuchElementException:
+            pass
+
     def check_missing_name_error(self):
         # Assert that there is a missing project name error message
+        assert self.is_on_subpage('details')
         assert self.BY_XPATH(
             "//div[@class='form-group has-error']/" +
             "input[@id='id_details-name']/../" +
             "label[contains(@class, 'control-label')]/" +
             "ul[@class='errorlist']").text == "This field is required."
 
+    def check_no_missing_name_error(self):
+        # Assert that there is NO missing project name error message
+        try:
+            self.check_missing_name_error()
+            raise AssertionError(
+                "There should be no missing project name error message.")
+        except (NoSuchElementException, AssertionError):
+            pass
+
     def check_duplicate_name_error(self):
-        # Assert that there is a missing project name error message
+        # Assert that there is a duplicate project name error message
+        assert self.is_on_subpage('details')
         assert self.BY_XPATH(
             "//div[@class='form-group has-error']/" +
             "input[@id='id_details-name']/../" +
             "label[contains(@class, 'control-label')]/" +
             "ul[@class='errorlist']").text == (
                 "Project with this name already exists in this organization.")
+
+    def check_no_duplicate_name_error(self):
+        # Assert that there is NO duplicate project name error message
+        try:
+            self.check_duplicate_name_error()
+            raise AssertionError(
+                "There should be no duplicate project name error message.")
+        except (NoSuchElementException, AssertionError):
+            pass
+
+    def check_invalid_url_error(self):
+        # Assert that there is an invalid URL error message
+        assert self.is_on_subpage('details')
+        assert self.BY_XPATH(
+            "//div[@class='form-group has-error']/" +
+            "input[@id='id_details-url']/../" +
+            "label[contains(@class, 'control-label')]/" +
+            "ul[@class='errorlist']").text == (
+                "Enter a valid URL.")
+
+    def check_no_invalid_url_error(self):
+        # Assert that there is NO invalid URL error message
+        try:
+            self.check_invalid_url_error()
+            raise AssertionError(
+                "There should be no invalid URL error message.")
+        except NoSuchElementException:
+            pass
 
     def submit_details(self):
         assert self.is_on_subpage('details')

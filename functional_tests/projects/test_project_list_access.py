@@ -23,7 +23,7 @@ class ProjectListAccessTest(FunctionalTest):
                 'username': 'default' + str(uid),
                 'password': 'password1',
             })
-        self.test_data = { 'users': users }
+        self.test_data = {'users': users}
         self.superuser = users[0]
 
         # Define 2 orgs and their members

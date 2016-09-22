@@ -6,7 +6,6 @@ from django.contrib.gis.geos import GEOSGeometry
 from core.tests.factories import PolicyFactory
 from organization.models import OrganizationRole
 from accounts.tests.factories import UserFactory
-from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
 from spatial.tests.factories import SpatialUnitFactory
 from party.tests.factories import PartyFactory, TenureRelationshipFactory

@@ -22,7 +22,10 @@ class LocationForm(AttributeModelForm):
                           'new location.')}
     )
     type = forms.ChoiceField(
-        choices=filter(lambda c: c[0] != 'PX', TYPE_CHOICES)
+        choices=filter(lambda c: c[0] != 'PX', (
+            [('', _('Please select a location type'))] +
+            list(TYPE_CHOICES)
+        ))
     )
     attributes_field = 'attributes'
 

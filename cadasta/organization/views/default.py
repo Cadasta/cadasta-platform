@@ -435,28 +435,25 @@ class ProjectAddWizard(SuperUserCheckMixin,
     def get_template_names(self):
         return [PROJECT_ADD_TEMPLATES[self.steps.current]]
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        orgs = Organization.objects.order_by('name')
-        context['org_logos'] = {o.slug: o.logo for o in orgs}
-        logo = orgs.first().logo if orgs.first() is not None else ''
-        context['init_org_logo'] = logo
-        context['init_org_hidden'] = 'org-logo-hidden' if logo is None else ''
-        context['display_org'] = self.kwargs.get('organization')
-        form = context['wizard']['form']
-        if isinstance(form, forms.ProjectAddExtents):
+    def get_context_data(self, form, **kwargs):
+        context = super().get_context_data(form, **kwargs)
+        if self.steps.current == 'extents':
             context['wizard_step_classes'] = {
                 'extent': 'active enabled',
                 'details': '',
                 'permissions': ''
             }
-        elif isinstance(form, forms.ProjectAddDetails):
+        elif self.steps.current == 'details':
             context['wizard_step_classes'] = {
                 'extent': 'enabled complete',
                 'details': 'active enabled',
                 'permissions': ''
             }
-        elif isinstance(form, forms.ProjectAddPermissions):
+            context['org_logos'] = {
+                o.slug: o.logo for o in form.orgs if o.logo
+            }
+            context['display_org'] = self.kwargs.get('organization')
+        elif self.steps.current == 'permissions':
             context['wizard_step_classes'] = {
                 'extent': 'enabled complete',
                 'details': 'enabled complete',
@@ -465,12 +462,13 @@ class ProjectAddWizard(SuperUserCheckMixin,
         return context
 
     def process_step(self, form):
-        result = self.get_form_step_data(form)
+        if self.steps.current == 'details':
+            self.storage.extra_data['org_is_chosen'] = True
 
+        result = self.get_form_step_data(form)
         if 'details-organization' in result:
             self.storage.extra_data['organization'] = (
                 result['details-organization'])
-
         return result
 
     def render_goto_step(self, goto_step, **kwargs):
@@ -485,7 +483,8 @@ class ProjectAddWizard(SuperUserCheckMixin,
     def get_form_kwargs(self, step=None):
         if step == 'details':
             return {
-                'user': self.request.user
+                'user': self.request.user,
+                'org_is_chosen': self.storage.extra_data.get('org_is_chosen'),
             }
         elif step == 'permissions':
             return {

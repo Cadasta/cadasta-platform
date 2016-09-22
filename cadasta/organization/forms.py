@@ -259,18 +259,23 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
+        org_is_chosen = kwargs.pop('org_is_chosen', None)
         super().__init__(*args, **kwargs)
 
         if self.is_superuser(self.user):
-            self.fields['organization'].choices = [
-                (o.slug, o.name) for o in Organization.objects.order_by('name')
-            ]
+            self.orgs = Organization.objects.filter(
+                archived=False).order_by('name')
         else:
-            qs = self.user.organizations.all().filter(archived=False)
-            self.fields['organization'].choices = [
-                (o.slug, o.name) for o in qs.order_by('name')
+            qs = self.user.organizations.filter(
+                archived=False).order_by('name')
+            self.orgs = [
+                o for o in qs
                 if check_perms(self.user, ('project.create',), (o,))
             ]
+        choices = [(o.slug, o.name) for o in self.orgs]
+        if not org_is_chosen and len(choices) > 1:
+            choices = [('', _("Please select an organization"))] + choices
+        self.fields['organization'].choices = choices
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -284,14 +289,15 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
         # Check that name is unique org-wide
         # (Explicit validation because we are using a wizard and the
         # unique_together validation cannot occur in the proper page)
-        not_unique = Project.objects.filter(
-            organization__slug=self.cleaned_data['organization'],
-            name=name,
-        ).exists()
-        if not_unique:
-            raise forms.ValidationError(
-                _("Project with this name already exists "
-                  "in this organization."))
+        if self.cleaned_data.get('organization'):
+            not_unique = Project.objects.filter(
+                organization__slug=self.cleaned_data['organization'],
+                name=name,
+            ).exists()
+            if not_unique:
+                raise forms.ValidationError(
+                    _("Project with this name already exists "
+                      "in this organization."))
 
         return name
 
