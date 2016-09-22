@@ -12,6 +12,24 @@ class QuestionnaireTest(TestCase):
         assert repr(questionnaire) == ('<Questionnaire id=abc123 '
                                        'title=Questions project=prj>')
 
+    def test_save(self):
+        questionnaire = factories.QuestionnaireFactory.build()
+        questionnaire.version = None
+        questionnaire.md5_hash = None
+
+        questionnaire.save()
+        assert questionnaire.version is not None
+        assert questionnaire.md5_hash is not None
+
+        questionnaire = factories.QuestionnaireFactory.build(
+            version=129839021903,
+            md5_hash='sakohjd89su90us9a0jd90sau90d'
+        )
+
+        questionnaire.save()
+        assert questionnaire.version == 129839021903
+        assert questionnaire.md5_hash == 'sakohjd89su90us9a0jd90sau90d'
+
 
 class QuestionGroupTest(TestCase):
     def test_repr(self):

@@ -6,6 +6,7 @@ from tutelary.models import Policy
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
 from geography import load as load_countries
+from spatial.tests.factories import SpatialUnitFactory
 from .factories import OrganizationFactory, ProjectFactory
 from ..models import OrganizationRole, ProjectRole
 
@@ -162,6 +163,14 @@ class ProjectTest(TestCase):
             '/organizations/{org}/projects/{prj}/'.format(
                 org=project.organization.slug,
                 prj=project.slug))
+
+    def test_has_records(self):
+        project = ProjectFactory.create()
+        assert project.has_records is False
+
+        project = ProjectFactory.create()
+        SpatialUnitFactory.create(project=project)
+        assert project.has_records is True
 
 
 class ProjectRoleTest(UserTestCase, TestCase):

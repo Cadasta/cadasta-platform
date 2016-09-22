@@ -651,13 +651,16 @@ class ProjectEditDetails(ProjectEdit, generic.UpdateView):
         return initial
 
     def post(self, *args, **kwargs):
-        try:
-            return super().post(*args, **kwargs)
-        except InvalidXLSForm as e:
-            form = self.get_form()
-            for err in e.errors:
-                form.add_error('questionnaire', err)
-            return self.form_invalid(form)
+        if self.get_project().has_records:
+            return self.get(*args, **kwargs)
+        else:
+            try:
+                return super().post(*args, **kwargs)
+            except InvalidXLSForm as e:
+                form = self.get_form()
+                for err in e.errors:
+                    form.add_error('questionnaire', err)
+                return self.form_invalid(form)
 
 
 class ProjectEditPermissions(ProjectEdit, generic.UpdateView):

@@ -1,3 +1,4 @@
+from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
@@ -266,6 +267,11 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
                 'project': self.slug,
             },
         )
+
+    @cached_property
+    def has_records(self):
+        check_records = ['parties', 'tenure_relationships', 'spatial_units']
+        return any([getattr(self, r).exists() for r in check_records])
 
     def save(self, *args, **kwargs):
         if ((self.country is None or self.country == '') and

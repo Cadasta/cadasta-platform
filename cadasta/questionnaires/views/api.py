@@ -3,21 +3,26 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
+from rest_framework.permissions import IsAuthenticated
 from tutelary.mixins import APIPermissionRequiredMixin
 
 from organization.models import Project
 from ..models import Questionnaire
 from ..serializers import QuestionnaireSerializer
 from ..exceptions import InvalidXLSForm
+from ..renderer.xform import XFormRenderer
 
 
 class QuestionnaireDetail(APIPermissionRequiredMixin,
                           mixins.CreateModelMixin,
                           generics.RetrieveUpdateAPIView):
+    renderer_classes = (JSONRenderer, BrowsableAPIRenderer, XFormRenderer, )
+    permission_classes = (IsAuthenticated,)
+
     def patch_actions(self, request):
         try:
             self.get_object()
-            # return ('questionnaire.edit')
         except Questionnaire.DoesNotExist:
             return ('questionnaire.add')
 
@@ -70,4 +75,10 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
             raise Http404('No Questionnaire matches the given query.')
 
     def put(self, request, *args, **kwargs):
+        if self.get_project().has_records:
+            return Response(
+                {'xls_form': "Data has already been contributed to this "
+                             "project. To ensure data integrity, uploading a "
+                             "new questionnaire is diabled for this project."},
+                status=status.HTTP_400_BAD_REQUEST)
         return self.create(request)

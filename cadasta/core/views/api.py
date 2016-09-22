@@ -31,7 +31,7 @@ def eval_json(response_data):
             for e in response_data[key]:
                 try:
                     errors.append(json.loads(e))
-                except ValueError:
+                except (ValueError, TypeError):
                     errors.append(e)
             response_data[key] = errors
 

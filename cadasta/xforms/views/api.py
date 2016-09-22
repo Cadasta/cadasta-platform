@@ -41,10 +41,15 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
     parser_classes = (FormParser, MultiPartParser,)
     serializer_class = XFormSubmissionSerializer
 
+    def dispatch(self, *args, **kwargs):
+        print(args[0].__dict__)
+        return super().dispatch(*args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         if request.method.upper() == 'HEAD':
             return Response(headers=self.get_openrosa_headers(request),
                             status=status.HTTP_204_NO_CONTENT,)
+        print('REQUEST')
         try:
             instance = ModelHelper(
             ).upload_submission_data(request)
@@ -104,6 +109,11 @@ class XFormListView(OpenRosaHeadersMixin,
     permission_classes = (IsAuthenticated,)
     renderer_classes = (XFormListRenderer,)
     serializer_class = XFormListSerializer
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super().get_serializer_context(*args, **kwargs)
+        context['request'] = self.request
+        return context
 
     def get_user_forms(self):
         forms = []
