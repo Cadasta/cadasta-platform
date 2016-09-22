@@ -617,9 +617,10 @@ class ProjectAddTest(UserTestCase, TestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['wizard_goto_step'] = 'extents'
+        post_data = self.DETAILS_POST_DATA.copy()
+        post_data['wizard_goto_step'] = 'extents'
         details_response = self.client.post(
-            reverse('project:add'), self.DETAILS_POST_DATA
+            reverse('project:add'), post_data
         )
         assert details_response.status_code == 200
 
@@ -635,10 +636,15 @@ class ProjectAddTest(UserTestCase, TestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        with pytest.raises(KeyError):
-            self.client.post(
-                reverse('project:add'), self.DETAILS_POST_DATA
-            )
+        details_response = self.client.post(
+            reverse('project:add'), self.DETAILS_POST_DATA
+        )
+        assert details_response.status_code == 200
+        assert details_response.context_data['form'].is_valid() is False
+        assert details_response.context_data['form'].errors == {
+            'organization': ["Select a valid choice. test-org is "
+                             "not one of the available choices."],
+        }
 
     def test_full_flow_invalid_xlsform(self):
         self.client.force_login(self.users[0])
@@ -663,6 +669,42 @@ class ProjectAddTest(UserTestCase, TestCase):
             Project.objects.get(
                 organization=self.org, slug='test-project')
             assert e.message == 'Project matching query does not exist.'
+
+    def test_flow_with_org_is_chosen_function(self):
+        second_org = OrganizationFactory.create(name="Second Org")
+        OrganizationRole.objects.create(organization=second_org,
+                                        user=self.users[0],
+                                        admin=True)
+        self.client.force_login(self.users[0])
+        extents_response = self.client.post(
+            reverse('project:add'), self.EXTENTS_POST_DATA
+        )
+        assert extents_response.status_code == 200
+        form = extents_response.context_data['form']
+        print(str(form.fields))
+        assert len(form.fields['organization'].choices) == 3
+        assert form.fields['organization'].choices[0] == (
+            '', "Please select an organization")
+        assert form.fields['organization'].choices[1][1] == "Second Org"
+        assert form.fields['organization'].choices[2][1] == "Test Org"
+        details_response = self.client.post(
+            reverse('project:add'), self.DETAILS_POST_DATA
+        )
+        assert details_response.status_code == 200
+        post_data = self.PERMISSIONS_POST_DATA.copy()
+        post_data['wizard_goto_step'] = 'details'
+        permissions_response = self.client.post(
+            reverse('project:add'), post_data
+        )
+        assert permissions_response.status_code == 200
+        form = permissions_response.context_data['form']
+        assert len(form.fields['organization'].choices) == 2
+        assert form.fields['organization'].choices[0][1] == "Second Org"
+        assert form.fields['organization'].choices[1][1] == "Test Org"
+        details_response = self.client.post(
+            reverse('project:add'), self.DETAILS_POST_DATA
+        )
+        assert details_response.status_code == 200
 
     def test_full_flow_long_slug(self):
         project_name = (

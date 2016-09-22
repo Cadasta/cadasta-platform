@@ -14,10 +14,10 @@
    var img = $('#org-logo');
    select.change(function() {
      if (logos[select[0].value]) {
-       img.removeClass('org-logo-hidden');
+       img.css('display', 'inline-block');
        img.attr('src', logos[select[0].value]);
      } else {
-       img.hadClass('org-logo-hidden');
+       img.css('display', 'none');
      }
    });
  });
@@ -62,11 +62,9 @@
                     </div>
                   </div>
                   <div class="col-sm-4 hidden-xs">
-                    {% if init_org_logo %}
                     <div id="org-wrapper">
-                      <img class="org-logo {{ init_org_hidden }}" id="org-logo" src="{{ init_org_logo }}" />
+                      <img class="org-logo" id="org-logo" style="display:none;" src="/" />
                     </div>
-                    {% endif %}
                   </div>
                 </div>
               </div>

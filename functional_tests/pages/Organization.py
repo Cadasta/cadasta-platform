@@ -127,7 +127,9 @@ class OrganizationPage(Page):
             return self.get_archive_button().text
 
     def click_on_close_alert_button(self):
-        close = self.browser.find_element_by_xpath("//div[contains(@class, 'alert')]//button[contains(@class, 'close')]")
+        close = self.browser.find_element_by_xpath(
+            "//div[contains(@class, 'alert')]"
+            "//button[contains(@class, 'close')]")
         self.click_through_close(close, self.test.BY_ALERT)
 
     def get_add_project_button(self):
@@ -188,7 +190,7 @@ class OrganizationPage(Page):
         back_button = self.test.link('index-link')
         self.click_through(back_button, (By.CLASS_NAME, 'add-org'))
 
-    def get_archived_project_filter(self):
+    def get_archived_project_filter(self, xpath):
         return self.browser.find_element_by_xpath(
             "//select[contains(@id, 'archive-filter')]" + xpath)
 
