@@ -206,22 +206,12 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.user.assign_policies(self.policy)
 
     def setup_template_context(self):
-        num_locations = self.project.spatial_units.count()
-        num_parties = self.project.parties.count()
-        num_resources = self.project.resource_set.filter(
-            archived=False).count()
         return {
             'object': self.project,
             'project': self.project,
-            'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
-                    self.project.spatial_units.all(), many=True).data),
+            'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_superuser': False,
             'is_administrator': False,
-            'has_content': (
-                num_locations > 0 or num_parties > 0 or num_resources > 0),
-            'num_locations': num_locations,
-            'num_parties': num_parties,
-            'num_resources': num_resources,
         }
 
     def setup_url_kwargs(self):
@@ -378,18 +368,21 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.render_content(is_administrator=True)
 
     def test_get_with_overview_stats(self):
-        SpatialUnitFactory.create(project=self.project)
-        SpatialUnitFactory.create(project=self.project)
-        PartyFactory.create(project=self.project)
-        PartyFactory.create(project=self.project)
+        su = SpatialUnitFactory.create(project=self.project)
         PartyFactory.create(project=self.project)
         ResourceFactory.create(project=self.project)
         ResourceFactory.create(project=self.project, archived=True)
+        geojson = json.dumps(
+            SpatialUnitGeoJsonSerializer([su], many=True).data)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
-        assert "<div class=\"num\">2</div> locations" in response.content
-        assert "<div class=\"num\">3</div> parties" in response.content
+        assert response.content == self.render_content(geojson=geojson,
+                                                       has_content=True,
+                                                       num_locations=1,
+                                                       num_parties=1,
+                                                       num_resources=1)
+        assert "<div class=\"num\">1</div> location" in response.content
+        assert "<div class=\"num\">1</div> party" in response.content
         assert "<div class=\"num\">1</div> resource" in response.content
 
 
