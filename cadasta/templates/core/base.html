@@ -66,9 +66,9 @@
             </div>
             {% endif %}
           </div>
-          <!-- Info -->
-          <a class="btn btn-info pull-right visible-md-inline visible-lg-inline" aria-label="Info" id="info-link">
-            <span class="glyphicon glyphicon-info-sign"></span>
+          <!-- Help -->
+          <a class="btn btn-help pull-right visible-md-inline visible-lg-inline" aria-label="Help" id="help-link" href="#">
+            <span class="glyphicon glyphicon-question-sign"></span>
           </a>
           <nav class="nav" role="navigation">
             <ul class="list-inline visible-md-block visible-lg-block">
@@ -100,7 +100,7 @@
                 <li class="organizations"><a href="{% url 'organization:list' %}">{% trans "Organizations" %}</a></li>
                 {% if is_superuser %}<li class="users"><a href="{% url 'user:list' %}">{% trans "Users" %}</a></li>{% endif %}
                 <li role="separator" class="divider"></li>
-                <li><a href="http://cadasta.org/platform/"><span class="glyphicon glyphicon-info-sign"></span> {% trans "Information" %}</a></li>
+                <li><a id="help-link" href="#"><span class="glyphicon glyphicon-question-sign"></span> {% trans "Information" %}</a></li>
               </ul>
             </div>
           </nav>
@@ -229,13 +229,7 @@
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
     }, 5000);
     </script>
-    <script>
-      window.inlineManualTracking = {
-        uid: "{{ user.id }}",
-        username: "{{ user.username }}"
-      }
-    </script>
-    <script type="text/javascript" src="{% static 'js/inline-manual-player.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/inline-manual.js' %}"></script>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
   </body>
 </html>
