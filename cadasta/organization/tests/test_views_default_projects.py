@@ -22,8 +22,12 @@ from organization.models import OrganizationRole, Project, ProjectRole
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.tests.utils import get_form
 from questionnaires.models import Questionnaire
+from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
+from spatial.serializers import SpatialUnitGeoJsonSerializer
+from spatial.tests.factories import SpatialUnitFactory
+from party.tests.factories import PartyFactory
 
 from .. import forms
 from ..views import default
@@ -202,12 +206,22 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.user.assign_policies(self.policy)
 
     def setup_template_context(self):
+        num_locations = self.project.spatial_units.count()
+        num_parties = self.project.parties.count()
+        num_resources = self.project.resource_set.filter(
+            archived=False).count()
         return {
             'object': self.project,
             'project': self.project,
-            'geojson': '{"type": "FeatureCollection", "features": []}',
+            'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
+                    self.project.spatial_units.all(), many=True).data),
             'is_superuser': False,
-            'is_administrator': False
+            'is_administrator': False,
+            'has_content': (
+                num_locations > 0 or num_parties > 0 or num_resources > 0),
+            'num_locations': num_locations,
+            'num_parties': num_parties,
+            'num_resources': num_resources,
         }
 
     def setup_url_kwargs(self):
@@ -362,6 +376,21 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=org_admin)
         assert response.status_code == 200
         assert response.content == self.render_content(is_administrator=True)
+
+    def test_get_with_overview_stats(self):
+        SpatialUnitFactory.create(project=self.project)
+        SpatialUnitFactory.create(project=self.project)
+        PartyFactory.create(project=self.project)
+        PartyFactory.create(project=self.project)
+        PartyFactory.create(project=self.project)
+        ResourceFactory.create(project=self.project)
+        ResourceFactory.create(project=self.project, archived=True)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+        assert "<div class=\"num\">2</div> locations" in response.content
+        assert "<div class=\"num\">3</div> parties" in response.content
+        assert "<div class=\"num\">1</div> resource" in response.content
 
 
 @pytest.mark.usefixtures('make_dirs')
