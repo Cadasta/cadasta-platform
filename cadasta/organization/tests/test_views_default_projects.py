@@ -22,8 +22,12 @@ from organization.models import OrganizationRole, Project, ProjectRole
 from questionnaires.tests.factories import QuestionnaireFactory
 from questionnaires.tests.utils import get_form
 from questionnaires.models import Questionnaire
+from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
+from spatial.serializers import SpatialUnitGeoJsonSerializer
+from spatial.tests.factories import SpatialUnitFactory
+from party.tests.factories import PartyFactory
 
 from .. import forms
 from ..views import default
@@ -207,7 +211,7 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
             'project': self.project,
             'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_superuser': False,
-            'is_administrator': False
+            'is_administrator': False,
         }
 
     def setup_url_kwargs(self):
@@ -399,6 +403,24 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True)
         assert response.content == expected
+
+    def test_get_with_overview_stats(self):
+        su = SpatialUnitFactory.create(project=self.project)
+        PartyFactory.create(project=self.project)
+        ResourceFactory.create(project=self.project)
+        ResourceFactory.create(project=self.project, archived=True)
+        geojson = json.dumps(
+            SpatialUnitGeoJsonSerializer([su], many=True).data)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(geojson=geojson,
+                                                       has_content=True,
+                                                       num_locations=1,
+                                                       num_parties=1,
+                                                       num_resources=1)
+        assert "<div class=\"num\">1</div> location" in response.content
+        assert "<div class=\"num\">1</div> party" in response.content
+        assert "<div class=\"num\">1</div> resource" in response.content
 
 
 @pytest.mark.usefixtures('make_dirs')
