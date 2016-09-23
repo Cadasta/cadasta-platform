@@ -249,7 +249,9 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
 
         party = Party.objects.get(name='Bilbo Baggins')
-        location = SpatialUnit.objects.get(attributes={'name': 'Middle Earth'})
+        location = SpatialUnit.objects.get(
+            attributes={'name': 'Middle Earth',
+                        'infrastructure': ['water', 'food', 'electricity']})
         tenure = TenureRelationship.objects.get(party=party)
         assert tenure.spatial_unit == location
         self._test_resource('test_image_one', location)

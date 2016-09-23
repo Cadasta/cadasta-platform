@@ -104,7 +104,8 @@ class CreateAttributeSchemaTest(UserTestCase, TestCase):
         spatial_unit = SpatialUnitFactory.create(
             project=project,
             attributes={
-                'quality': 'polygon_high'
+                'quality': 'polygon_high',
+                'infrastructure': ['water', 'food']
             }
         )
         assert 1 == Schema.objects.all().count()
@@ -114,6 +115,8 @@ class CreateAttributeSchemaTest(UserTestCase, TestCase):
             project.organization.pk, project.pk, project.current_questionnaire]
         assert 'quality' in spatial_unit.attributes.attributes
         assert 'polygon_high' == spatial_unit.attributes['quality']
+        assert 'infrastructure' in spatial_unit.attributes.attributes
+        assert 'water' in spatial_unit.attributes['infrastructure']
         # notes field is omitted in xform
         assert 'notes' not in spatial_unit.attributes.attributes
 

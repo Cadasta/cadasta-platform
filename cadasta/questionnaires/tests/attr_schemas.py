@@ -124,6 +124,25 @@ location_xform_group = {
             "type": "text",
             "omit": "yes",
             "hint": "Additional Notes"
+        },
+        {
+            "label": "Infrastructure",
+            "name": "infrastructure",
+            "type": "select all that apply",
+            "choices": [
+                {
+                    "name": "water",
+                    "label": "Water",
+                },
+                {
+                    "name": "food",
+                    "label": "Food",
+                },
+                {
+                    "name": "electricity",
+                    "label": "Electricity",
+                },
+            ]
         }
     ]
 }

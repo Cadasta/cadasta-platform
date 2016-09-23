@@ -19,6 +19,7 @@ STANDARD = '''<?xml version=\'1.0\' ?>
         <tenure_type>LH</tenure_type>
         <location_attributes>
             <name>Middle Earth</name>
+            <infrastructure>water food electricity</infrastructure>
         </location_attributes>
         <party_attributes_default>
             <notes>Party attribute default notes.</notes>

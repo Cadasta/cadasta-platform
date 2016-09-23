@@ -101,8 +101,12 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
         field = {}
         field['name'] = c.get('name')
         field['long_name'] = c.get('label')
-        # HACK: pyxform strips underscores from xform field names
-        field['attr_type'] = c.get('type').replace(' ', '_')
+        # HACK: pyxform renames select_multiple to select all that apply
+        if c.get('type') == 'select all that apply':
+            field['attr_type'] = 'select_multiple'
+        else:
+            # HACK: pyxform strips underscores from xform field names
+            field['attr_type'] = c.get('type').replace(' ', '_')
         if c.get('default'):
             field['default'] = c.get('default', '')
         if c.get('omit'):
