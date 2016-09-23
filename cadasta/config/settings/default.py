@@ -159,22 +159,52 @@ ACCOUNT_FORMS = {
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 
+OSM_ATTRIBUTION = _(
+    "Base map data &copy; <a href=\"http://openstreetmap.org\">"
+    "OpenStreetMap</a> contributors under "
+    "<a href=\"http://opendatacommons.org/licenses/odbl/\">ODbL</a>"
+)
+DIGITALGLOBE_ATTRIBUTION = _("Imagery &copy; DigitalGlobe")
+DIGITALGLOBE_TILESET_URL_FORMAT = (
+    'https://{{s}}.tiles.mapbox.com/v4/digitalglobe.{}'
+    '/{{z}}/{{x}}/{{y}}.png?access_token='
+    'pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW1'
+    '1a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw'
+)
+
 LEAFLET_CONFIG = {
-    'TILES': [('OpenStreetMap',
-               'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-               {'attribution':
-                _('Map data &copy; <a href="http://openstreetmap.org">'
-                  'OpenStreetMap</a> contributors, '
-                  '<a href="http://creativecommons.org/licenses/by-sa/2.0/">'
-                  'CC-BY-SA</a>'),
-                'maxZoom': 19}),
-              ('DigitalGlobe Satellite',
-               'https://{s}.tiles.mapbox.com/v4/digitalglobe.nal0g75k'
-               '/{z}/{x}/{y}.png?access_token='
-               'pk.eyJ1IjoiZGlnaXRhbGdsb2JlIiwiYSI6ImNpaHhtenBmZjAzYW1'
-               '1a2tvY2p3MnpjcGcifQ.vF1gH0mGgK31yeHC1k1Tqw',
-               {'attribution': 'DigitalGlobe',
-                'maxZoom': 22})],
+    'TILES': [
+        (
+            _("OpenStreetMap"),
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            {'attribution': OSM_ATTRIBUTION,
+             'maxZoom': 19}
+        ),
+        (
+            _("+Vivid imagery"),
+            DIGITALGLOBE_TILESET_URL_FORMAT.format('n6ngnadl'),
+            {'attribution': DIGITALGLOBE_ATTRIBUTION,
+             'maxZoom': 22}
+        ),
+        (
+            _("Recent imagery"),
+            DIGITALGLOBE_TILESET_URL_FORMAT.format('nal0g75k'),
+            {'attribution': DIGITALGLOBE_ATTRIBUTION,
+             'maxZoom': 22}
+        ),
+        (
+            _("+Vivid imagery with OpenStreetMap"),
+            DIGITALGLOBE_TILESET_URL_FORMAT.format('n6nhclo2'),
+            {'attribution': (OSM_ATTRIBUTION, DIGITALGLOBE_ATTRIBUTION),
+             'maxZoom': 22}
+        ),
+        (
+            _("Recent imagery with OpenStreetMap"),
+            DIGITALGLOBE_TILESET_URL_FORMAT.format('nal0mpda'),
+            {'attribution': (OSM_ATTRIBUTION, DIGITALGLOBE_ATTRIBUTION),
+             'maxZoom': 22}
+        ),
+    ],
     'RESET_VIEW': False,
     'PLUGINS': {
         'draw': {
