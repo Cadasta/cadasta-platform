@@ -361,7 +361,7 @@ class ProjectDashboard(PermissionRequiredMixin,
         context = super(ProjectDashboard, self).get_context_data(**kwargs)
         num_locations = self.object.spatial_units.count()
         num_parties = self.object.parties.count()
-        num_resources = self.object.resource_set.count()
+        num_resources = self.object.resource_set.filter(archived=False).count()
         context['has_content'] = (
             num_locations > 0 or num_parties > 0 or num_resources > 0)
         context['num_locations'] = num_locations
