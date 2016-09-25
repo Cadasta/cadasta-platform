@@ -16,12 +16,13 @@ class ProjectRoleWidget(Select):
         '</tr>'
     )
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, role, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.role = role
 
     def render(self, name, value, attrs=None, choices=()):
-        if value == 'A':
+        if value == 'A' or self.role == 'A':
             select = _("Administrator")
         else:
             select = super().render(name, value, attrs=attrs, choices=choices)
