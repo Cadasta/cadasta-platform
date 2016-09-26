@@ -58,6 +58,7 @@ ROOT_URLCONF = 'config.urls.dev'
 DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 MEDIA_URL = '/media/'
+SASS_PROCESSOR_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
 
 # Use HTTP for OSM for testing only, to make caching tiles for
 # functional tests a bit simpler.
