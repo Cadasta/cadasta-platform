@@ -7,7 +7,8 @@ class ProjectRoleField(forms.ChoiceField):
         super().__init__(*args, **kwargs)
         self.user = user
         choices = kwargs.get('choices', ())
-        self.widget = ProjectRoleWidget(user=user, choices=choices)
+        role = kwargs.get('initial', ())
+        self.widget = ProjectRoleWidget(user=user, role=role, choices=choices)
 
 
 class PublicPrivateField(forms.CharField):

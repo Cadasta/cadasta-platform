@@ -15,7 +15,9 @@ class ProjectRoleWidgetTest(TestCase):
             email='me@example.com',
             full_name='Bob Smith'
         )
-        self.widget = ProjectRoleWidget(user=self.user, choices=FORM_CHOICES)
+        self.widget = ProjectRoleWidget(user=self.user,
+                                        role='A',
+                                        choices=FORM_CHOICES)
 
     def test_render_with_admin(self):
         html = self.widget.render(self.user.username, 'A')
@@ -34,7 +36,36 @@ class ProjectRoleWidgetTest(TestCase):
         )
         assert expected == html
 
+    def test_render_with_admin_next_page_submission(self):
+        """
+            When admin user submit member permission page when clicking
+            previous and come back again to member permission page,
+            widget gets None as value for admin user. So additional
+            role parameter added to widget to check user is a Administrative
+            user or not
+        """
+        html = self.widget.render(self.user.username, None)
+
+        expected = (
+            '<tr>'
+            '  <td>'
+            '    <p>Bob Smith</p>'
+            '    <p>bob</p>'
+            '  </td>'
+            '  <td class="hidden-xs hidden-sm">me@example.com</td>'
+            '  <td>'
+            '    Administrator'
+            '  </td>'
+            '</tr>'
+        )
+        assert expected == html
+
     def test_render_with_manager(self):
+        """
+         Setting widget role attribute to empty as it's initialize
+         as a Administrative user
+        """
+        self.widget.role = ''
         html = self.widget.render(self.user.username, 'PM')
 
         expected = (
