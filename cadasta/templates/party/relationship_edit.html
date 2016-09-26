@@ -1,6 +1,29 @@
 {% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
 {% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+{% endblock %}
+
+{% block extra_script %}
+{{ block.super }}
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script>
+  $(document).ready(function () {
+    $('.datepicker').datepicker({
+      yearRange: "c-200:c+200",
+      changeMonth: true,
+      changeYear: true,
+    });
+  });
+</script>
+{% endblock %}
+
 
 {% block location_panel %}
 
@@ -21,7 +44,11 @@
           <div class="clearfix form-group{% if field.errors %} has-error{% endif %}">
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
             <label class="pull-right control-label">{{ field.errors }}</label>
+            {% if field|field_type == "datefield" %}
+            {% render_field field class+="form-control datepicker" %}
+            {% else %}
             {% render_field field class+="form-control" %}
+            {% endif %}
           </div>
           {% endif %}
         {% endfor %}
