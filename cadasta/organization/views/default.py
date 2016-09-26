@@ -87,7 +87,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
                                 archived=False)
 
             if not self.request.user.is_anonymous():
-                show_members = OrganizationRole.objects.get(
+                show_members = OrganizationRole.objects.filter(
                     user=self.request.user,
                     organization=context['organization']).exists()
             else:
