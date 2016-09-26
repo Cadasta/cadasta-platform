@@ -20,7 +20,7 @@
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
         <div class="resource-text">
-          <p><strong>{{ resource.name }}</strong>
+          <p><strong><a href="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}">{{ resource.name }}</a></strong>
             {% if resource.archived %}
               <span class="label label-danger">{% trans "Deleted" %}</span>
             {% endif %}

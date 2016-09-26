@@ -34,7 +34,8 @@
             <tbody>
             {% for user in organization.users.all %}
               <tr class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
-                <td>{{ user.get_display_name }}
+                <td>
+                  <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">{{ user.get_display_name }}</a>
                   <div class="hidden-sm hidden-md hidden-lg">
                     {{ user.username }}<br />
                     {{ user.email }}

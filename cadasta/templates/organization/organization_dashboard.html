@@ -34,11 +34,14 @@
                   {% else %}
                     <td class="unarchived"><div>False</div></td>
                   {% endif %}
-                  <td>{{ prj.name }}{% if prj.archived %}
-                  <span class="label label-danger">
-                    Archived
-                  </span>
-                  {% endif %}</td>
+                  <td>
+                      <a href="{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}">{{ prj.name }}</a>
+                      {% if prj.archived %}
+                      <span class="label label-danger">
+                        Archived
+                      </span>
+                      {% endif %}
+                  </td>
                   <td>{{ prj.country }}</td>
                   <td>{{ prj.last_updated }}</td>
                 </tr>
