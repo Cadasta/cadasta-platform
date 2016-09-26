@@ -7,7 +7,6 @@ import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
-from django.contrib.auth.models import AnonymousUser
 from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
 from core.views.mixins import ArchiveMixin, SuperUserCheckMixin
@@ -87,14 +86,10 @@ class OrganizationDashboard(PermissionRequiredMixin,
                             projects = self.object.all_projects().filter(
                                 archived=False)
 
-            if not isinstance(self.request.user, AnonymousUser):
-                try:
-                    show_members = isinstance(OrganizationRole.objects.get(
-                        user=self.request.user,
-                        organization=context['organization']),
-                                              OrganizationRole)
-                except(OrganizationRole.DoesNotExist):
-                    show_members = False
+            if not self.request.user.is_anonymous():
+                show_members = OrganizationRole.objects.get(
+                    user=self.request.user,
+                    organization=context['organization']).exists()
             else:
                 show_members = False
         context['projects'] = projects
