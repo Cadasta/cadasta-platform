@@ -48,11 +48,10 @@
       <td class="unarchived"><div>False</div></td>
     {% endif %}
     <td>
-      <h4>
-          <a href="{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}">{{ proj.name }}</a>
-          {% if proj.archived %}
+      <h4>{{ proj.name }}
+      {% if proj.archived %}
           <span class="label label-danger">{% trans "Archived" %}</span>
-          {% endif %}
+        {% endif %}
         </h4>
       </h4>
       <p>{{ proj.description }}</p>

@@ -52,7 +52,7 @@
       </div>
       {% endif %}
       <div class="org-text">
-        <h4><a href="{% url 'organization:dashboard' slug=org.slug %}">{{ org.name }}</a>
+        <h4>{{ org.name }}
         {% if org.archived %}
           <span class="label label-danger">Archived</span>
         {% endif %}

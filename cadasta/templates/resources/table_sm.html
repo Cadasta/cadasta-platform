@@ -10,14 +10,13 @@
   </thead>
   <tbody>
   {% for resource in resource_list %}
-    {% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id as resource_url %}
-    <tr class="linked" onclick="window.document.location='{{ resource_url }}';">
+    <tr class="linked" onclick="window.document.location='{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}';">
       <td>
         <div class="resource-60">
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
         <div class="resource-text">
-          <p><a href="{{ resource_url }}"><strong>{{ resource.name }}</strong></a></p>
+          <p><strong>{{ resource.name }}</strong></p>
           <p class="small">{{ resource.original_file }}</p>
         </div>
       </td>
