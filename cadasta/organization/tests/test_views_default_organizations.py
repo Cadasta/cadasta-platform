@@ -201,7 +201,8 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            projects=Project.objects.all())
+            projects=Project.objects.all(),
+            show_members=True)
 
     def test_get_org_with_new_org(self):
         new_org = OrganizationFactory.create()
@@ -223,6 +224,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=True,
             is_administrator=True,
             add_allowed=True,
+            show_members=True,
             projects=self.all_projects)
 
     def test_get_org_with_org_admin(self):
@@ -239,6 +241,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=False,
             is_administrator=True,
             add_allowed=True,
+            show_members=True,
             projects=self.all_projects)
 
     def test_get_archived_org_with_unauthorized_user(self):
@@ -273,6 +276,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=False,
             is_administrator=True,
             add_allowed=True,
+            show_members=True,
             projects=self.all_projects)
 
 
