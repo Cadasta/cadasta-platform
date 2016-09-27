@@ -73,7 +73,6 @@ class OrganizationDashboard(PermissionRequiredMixin,
         context = self.get_context_data()
         if self.is_superuser:
             projects = self.object.all_projects()
-            show_members = True
         else:
             projects = self.object.public_projects()
             if hasattr(self.request.user, 'organizations'):
@@ -85,15 +84,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
                         else:
                             projects = self.object.all_projects().filter(
                                 archived=False)
-
-            if not self.request.user.is_anonymous():
-                show_members = OrganizationRole.objects.filter(
-                    user=self.request.user,
-                    organization=context['organization']).exists()
-            else:
-                show_members = False
         context['projects'] = projects
-        context['show_members'] = show_members
         return super(generic.DetailView, self).render_to_response(context)
 
 
