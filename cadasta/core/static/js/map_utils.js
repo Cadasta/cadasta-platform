@@ -49,15 +49,16 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
 
   if (projectExtent) {
     var boundary = L.geoJson(
-      projectExtent, {
+      projectExtent,
+      {
         style: {
-          stroke: true,
-          color: "#0e305e",
-          weight: 2,
-          dashArray: "5, 5",
-          opacity: 1,
-          fill: false,
-          clickable: false,
+            stroke: true,
+            color: "#0e305e",
+            weight: 2,
+            dashArray: "5, 5",
+            opacity: 1,
+            fill: false,
+            clickable: false,
         }
       }
     );
@@ -95,63 +96,45 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
 }
 
 function switch_layer_controls(map, options){
-  // swap out default layer switcher
-  var layers = options.djoptions.layers;
-  var baseLayers = {};
-  for (var l in layers){
-    var layer = layers[l];
-    var baseLayer = L.tileLayer(layer[1], layer[2]);
-    baseLayers[layer[0]] = baseLayer;
-  }
-  // select first layer by default
-  for (var l in baseLayers){
-    map.addLayer(baseLayers[l]);
-    break;
-  }
-  var groupedOptions = {
-    groupCheckboxes: false
-  };
-  map.removeControl(map.layerscontrol);
-  map.layerscontrol = L.control.groupedLayers(
-    baseLayers, groupedOptions).addTo(map);
+    // swap out default layer switcher
+    var layers = options.djoptions.layers;
+    var baseLayers = {};
+    for (var l in layers){
+        var layer = layers[l];
+        var baseLayer = L.tileLayer(layer[1], layer[2]);
+        baseLayers[layer[0]] = baseLayer;
+    }
+    // select first layer by default
+    for (var l in baseLayers){
+        map.addLayer(baseLayers[l]);
+        break;
+    }
+    var groupedOptions = {
+      groupCheckboxes: false
+    };
+    map.removeControl(map.layerscontrol);
+    map.layerscontrol = L.control.groupedLayers(
+        baseLayers, groupedOptions).addTo(map);
 }
 
 function add_spatial_resources(map, url){
-  $.ajax(url).done(function(data){
-    if (data.length == 0) return;
-    var spatialResources = {};
-    $.each(data, function(idx, resource){
-      var name = resource.name;
-      var layers = {};
-      var group = new L.LayerGroup();
-      $.each(resource.spatial_resources, function(i, spatial_resource){
-        var layer = L.geoJson(spatial_resource.geom).addTo(group);
-        layers['name'] = spatial_resource.name;
-        layers['group'] = group;
-      });
-      spatialResources[name] = layers;
+    $.ajax(url).done(function(data){
+        if (data.length == 0) return;
+        var spatialResources = {};
+        $.each(data, function(idx, resource){
+            var name = resource.name;
+            var layers = {};
+            var group = new L.LayerGroup();
+            $.each(resource.spatial_resources, function(i, spatial_resource){
+                var layer = L.geoJson(spatial_resource.geom).addTo(group);
+                layers['name'] = spatial_resource.name;
+                layers['group'] = group;
+            });
+            spatialResources[name] = layers;
+        });
+        $.each(spatialResources, function(sr){
+            var layer = spatialResources[sr];
+            map.layerscontrol.addOverlay(layer['group'], layer['name'], sr);
+        })
     });
-    $.each(spatialResources, function(sr){
-      var layer = spatialResources[sr];
-      map.layerscontrol.addOverlay(layer['group'], layer['name'], sr);
-    })
-  });
-}
-
-function enableMapEditMode() {
-  var editButton = $('.leaflet-draw-edit-edit')[0];
-  if (!editButton) {
-    setTimeout(enableMapEditMode, 500);
-  } else {
-    var clickEvent = new MouseEvent('click');
-    editButton.dispatchEvent(clickEvent);
-  }
-}
-
-function saveOnMapEditMode() {
-  var saveButton = $('.leaflet-draw-actions-top li:first-child a')[0];
-  if (saveButton) {
-    var clickEvent = new MouseEvent('click');
-    saveButton.dispatchEvent(clickEvent);
-  }
 }

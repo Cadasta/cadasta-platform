@@ -21,10 +21,6 @@
  $(document).ready(function () {
    $(window).on('map:init', function(e) {
       add_map_controls(e.originalEvent.detail.map);
-
-      // Enable edit mode on map load and save the geometry on page save
-      setTimeout(enableMapEditMode, 500);
-      $('button.btn-primary[type=submit]')[0].addEventListener('click', saveOnMapEditMode);
    });
  });
 </script>
