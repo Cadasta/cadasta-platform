@@ -55,4 +55,5 @@ class QuestionOptionFactory(ExtendedFactory):
 
     name = factory.Sequence(lambda n: "question_option_%s" % n)
     label = factory.Sequence(lambda n: "Question Option #%s" % n)
+    index = factory.Sequence(lambda n: n)
     question = factory.SubFactory(QuestionFactory)

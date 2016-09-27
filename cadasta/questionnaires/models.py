@@ -106,8 +106,12 @@ class Question(RandomIDModel):
 
 
 class QuestionOption(RandomIDModel):
+    class Meta:
+        ordering = ('index',)
+
     name = models.CharField(max_length=100)
     label = models.CharField(max_length=200)
+    index = models.IntegerField(null=False)
     question = models.ForeignKey(Question, related_name='options')
 
     history = HistoricalRecords()

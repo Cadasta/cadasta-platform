@@ -67,9 +67,10 @@ def create_children(children, errors=[], project=None, kwargs={}):
 
 def create_options(options, question, errors=[]):
     if options:
-        for o in options:
+        for o, idx in zip(options, itertools.count()):
             QuestionOption = apps.get_model('questionnaires', 'QuestionOption')
-            QuestionOption.objects.create(question=question, **o)
+
+            QuestionOption.objects.create(question=question, index=idx+1, **o)
     else:
         errors.append(_("Please provide at least one option for field"
                         " '{field_name}'".format(field_name=question.name)))
@@ -110,12 +111,15 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
         if c.get('choices'):
             field['choices'] = [choice.get('name')
                                 for choice in c.get('choices')]
+            field['choice_labels'] = [choice.get('label')
+                                      for choice in c.get('choices')]
         fields.append(field)
 
     for field, index in zip(fields, itertools.count(1)):
         long_name = field.get('long_name', field['name'])
         attr_type = AttributeType.objects.get(name=field['attr_type'])
         choices = field.get('choices', [])
+        choice_labels = field.get('choice_labels', None)
         default = field.get('default', '')
         required = field.get('required', False)
         omit = True if field.get('omit', '') == 'yes' else False
@@ -123,8 +127,8 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
             schema=schema_obj,
             name=field['name'], long_name=long_name,
             attr_type=attr_type, index=index,
-            choices=choices, default=default,
-            required=required, omit=omit
+            choices=choices, choice_labels=choice_labels,
+            default=default, required=required, omit=omit
         )
 
 
