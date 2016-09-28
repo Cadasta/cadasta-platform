@@ -112,6 +112,7 @@ class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
                 resource_count != self.project.resources.count()
             ),
             'resource_list': resource_list,
+            'is_allowed_add_resource': True
         }
 
     def test_get_list(self):
@@ -132,7 +133,8 @@ class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         context = self.setup_template_context(resources=resources)
-        assert response.content == self.render_content(**context)
+        expected = self.render_content(**context)
+        assert response.content == expected
 
     def test_get_list_with_archived_resource_using_unarchiver(self):
         assign_permissions(self.user)
@@ -140,12 +142,14 @@ class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
         resources = Resource.objects.filter(project=self.project)
         response = self.request(user=self.user)
         context = self.setup_template_context(resources=resources)
-        assert response.content == self.render_content(**context)
+        expected = self.render_content(**context)
+        assert response.content == expected
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
         context = self.setup_template_context(resources=[])
+        context['is_allowed_add_resource'] = False
         assert response.content == self.render_content(**context)
 
     def test_get_with_unauthenticated_user(self):
@@ -184,7 +188,9 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         form = AddResourceFromLibraryForm(content_object=self.project,
                                           project_id=self.project.id)
-        return {'object': self.project, 'form': form}
+        return {'object': self.project,
+                'form': form,
+                'is_allowed_add_resource': True}
 
     def setup_post_data(self):
         return {
@@ -288,7 +294,9 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_template_context(self):
         form = ResourceForm()
-        return {'object': self.project, 'form': form}
+        return {'object': self.project,
+                'form': form,
+                'is_allowed_add_resource': True}
 
     def setup_post_data(self):
         storage = FakeS3Storage()
@@ -445,6 +453,7 @@ class ProjectResourcesDetailTest(ViewTestCase, UserTestCase, TestCase):
                     'id': self.tenurerel_attachment.id,
                 },
             ],
+            'is_allowed_add_resource': True
         }
 
     def setup_url_kwargs(self):
@@ -514,7 +523,8 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
                     'project': self.project.slug,
                     'resource': self.resource.id,
                 }
-            )
+            ),
+            'is_allowed_add_resource': True
         }
 
     def setup_post_data(self):
@@ -538,8 +548,8 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'next': '/organizations/'})
         assert response.status_code == 200
-        assert response.content == self.render_content(
-            cancel_url='/organizations/#resources')
+        expected = self.render_content(cancel_url='/organizations/#resources')
+        assert response.content == expected
 
     def test_get_form_with_location_next_query_parameter(self):
         url = ('https://example.com/organizations/sample-org/'
@@ -547,8 +557,8 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
                'locations/jvzsiszjzrbpecm69549u2z5/')
         response = self.request(user=self.user, get_data={'next': url})
         assert response.status_code == 200
-        assert response.content == self.render_content(
-            cancel_url=url + '#resources')
+        expected = self.render_content(cancel_url=url + '#resources')
+        assert response.content == expected
 
     def test_get_non_existent_project(self):
         with pytest.raises(Http404):

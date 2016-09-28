@@ -212,6 +212,12 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
             'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_superuser': False,
             'is_administrator': False,
+            'has_content': False,
+            'num_locations': 0,
+            'num_parties': 0,
+            'num_resources': 0,
+            'is_allowed_add_location': False,
+            'is_allowed_add_resource': False
         }
 
     def setup_url_kwargs(self):
@@ -235,8 +241,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.user.assign_policies(superuser_role)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_superuser=True,
-                                                       is_administrator=True)
+        expected = self.render_content(is_superuser=True,
+                                       is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True)
+        assert response.content == expected
 
     def test_get_with_org_admin(self):
         OrganizationRole.objects.create(
@@ -246,7 +255,10 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         )
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_administrator=True)
+        expected = self.render_content(is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True)
+        assert response.content == expected
 
     def test_get_non_existent_project(self):
         with pytest.raises(Http404):
@@ -333,8 +345,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.user.assign_policies(self.superuser_role)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_superuser=True,
-                                                       is_administrator=True)
+        expected = self.render_content(is_superuser=True,
+                                       is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True)
+        assert response.content == expected
 
     def test_get_archived_project_with_unauthorized_user(self):
         self.project.archived = True
@@ -365,7 +380,10 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.project.save()
         response = self.request(user=org_admin)
         assert response.status_code == 200
-        assert response.content == self.render_content(is_administrator=True)
+        expected = self.render_content(is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True)
+        assert response.content == expected
 
     def test_get_with_overview_stats(self):
         su = SpatialUnitFactory.create(project=self.project)
