@@ -70,7 +70,8 @@ class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
         return {
             'object': self.project,
             'object_list': self.locations,
-            'geojson': geojson
+            'geojson': geojson,
+            'is_allowed_add_location': True
         }
 
     def setup_url_kwargs(self):
@@ -84,8 +85,7 @@ class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -97,7 +97,8 @@ class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected = self.render_content(is_allowed_add_location=False)
+        assert response.content == expected
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
@@ -150,7 +151,8 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
                      'selector': self.project.current_questionnaire}
                 )
             ),
-            'geojson': '{"type": "FeatureCollection", "features": []}'
+            'geojson': '{"type": "FeatureCollection", "features": []}',
+            'is_allowed_add_location': True
         }
 
     def setup_url_kwargs(self):
@@ -171,8 +173,7 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -266,7 +267,8 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             'object': self.project,
             'location': self.location,
             'geojson': '{"type": "FeatureCollection", "features": []}',
-            'attributes': (('Test field', 'test', ), )
+            'attributes': (('Test field', 'test', ), ),
+            'is_allowed_add_location': True
         }
 
     def setup_url_kwargs(self):
@@ -281,8 +283,7 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -344,7 +345,8 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': forms.LocationForm(instance=self.location),
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'geojson': '{"type": "FeatureCollection", "features": []}',
+                'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
         return {
@@ -358,8 +360,7 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -449,7 +450,8 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'geojson': '{"type": "FeatureCollection", "features": []}',
+                'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
         return {
@@ -469,8 +471,7 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -564,7 +565,8 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'geojson': '{"type": "FeatureCollection", "features": []}',
+                'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
         return {
@@ -584,8 +586,7 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -686,7 +687,8 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'geojson': '{"type": "FeatureCollection", "features": []}',
+                'is_allowed_add_location': True}
 
     def setup_post_data(self):
         path = os.path.dirname(settings.BASE_DIR)
@@ -707,8 +709,7 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -846,27 +847,8 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             ),
             'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
                 [self.spatial_unit], many=True).data),
+            'is_allowed_add_location': True
         }
-        # return {
-        #     'object': self.project,
-        #     'location': self.spatial_unit,
-        #     'form': forms.TenureRelationshipForm(
-        #         project=self.project,
-        #         spatial_unit=self.spatial_unit,
-        #         schema_selectors=(
-        #             {'name': 'organization',
-        #              'value': self.project.organization,
-        #              'selector': self.project.organization.id},
-        #             {'name': 'project',
-        #              'value': self.project,
-        #              'selector': self.project.id},
-        #             {'name': 'questionnaire',
-        #              'value': self.project.current_questionnaire,
-        #              'selector': self.project.current_questionnaire}
-        #         )),
-        #     'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
-        #         [self.spatial_unit], many=True).data)
-        # }
 
     def setup_url_kwargs(self):
         return {
@@ -880,8 +862,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        expected = self.render_content(is_allowed_add_location=True)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
@@ -972,8 +953,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                  'value': self.project.current_questionnaire,
                  'selector': self.project.current_questionnaire}
             ))
-        expected = self.render_content(form=form,
-                                       is_allowed_add_location=True)
+        expected = self.render_content(form=form)
         assert response.content == expected
 
         assert TenureRelationship.objects.count() == 0
@@ -1007,8 +987,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             )
         )
         assert response.status_code == 200
-        expected = self.render_content(form=form,
-                                       is_allowed_add_location=True)
+        expected = self.render_content(form=form)
         assert response.content == expected
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 1

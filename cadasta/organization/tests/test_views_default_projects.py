@@ -212,6 +212,12 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
             'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_superuser': False,
             'is_administrator': False,
+            'has_content': False,
+            'num_locations': 0,
+            'num_parties': 0,
+            'num_resources': 0,
+            'is_allowed_add_location': False,
+            'is_allowed_add_resource': False
         }
 
     def setup_url_kwargs(self):
@@ -223,22 +229,12 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
     def test_get_with_authorized_user(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        expected = self.render_content(has_content=False,
-                                       num_locations=0,
-                                       num_parties=0,
-                                       num_resources=0,
-                                       is_allowed_add_location=False)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
-        expected = self.render_content(has_content=False,
-                                       num_locations=0,
-                                       num_parties=0,
-                                       num_resources=0,
-                                       is_allowed_add_location=False)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_with_superuser(self):
         superuser_role = Role.objects.get(name='superuser')
@@ -281,24 +277,14 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        expected = self.render_content(has_content=False,
-                                       num_locations=0,
-                                       num_parties=0,
-                                       num_resources=0,
-                                       is_allowed_add_location=False)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_private_project(self):
         self.project.access = 'private'
         self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        expected = self.render_content(has_content=False,
-                                       num_locations=0,
-                                       num_parties=0,
-                                       num_resources=0,
-                                       is_allowed_add_location=False)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_private_project_with_unauthenticated_user(self):
         self.project.access = 'private'
@@ -338,12 +324,7 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
         response = self.request(user=self.user)
         assert response.status_code == 200
-        expected = self.render_content(has_content=False,
-                                       num_locations=0,
-                                       num_parties=0,
-                                       num_resources=0,
-                                       is_allowed_add_location=False)
-        assert response.content == expected
+        assert response.content == self.expected_content
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
