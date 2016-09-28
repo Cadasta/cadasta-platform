@@ -198,16 +198,22 @@ class EditOrganizationMemberForm(forms.Form):
             organization=self.organization)
 
         self.initial['org_role'] = 'A' if self.org_role_instance.admin else 'M'
-
         project_roles = ProjectRole.objects.filter(
             project__organization=org).values('project__id', 'role')
         project_roles = {r['project__id']: r['role'] for r in project_roles}
+        user_choices = FORM_CHOICES
+
+        if self.initial['org_role'] == 'A':
+            user_choices = (('A', _('Administrator')),)
 
         for p in self.organization.projects.values_list('id', 'name'):
-            role = project_roles.get(p[0], 'Pb')
+            if self.initial['org_role'] != 'A':
+                role = project_roles.get(p[0], 'Pb')
+            else:
+                role = 'A'
 
             self.fields[p[0]] = forms.ChoiceField(
-                choices=FORM_CHOICES,
+                choices=user_choices,
                 label=p[1],
                 required=False,
                 initial=role
