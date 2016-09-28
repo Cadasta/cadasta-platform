@@ -68,6 +68,12 @@ LEAFLET_CONFIG['TILES'][0] = (
     LEAFLET_CONFIG['TILES'][0][2]
 )
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 # Debug logging...
 LOGGING = {
     'version': 1,
