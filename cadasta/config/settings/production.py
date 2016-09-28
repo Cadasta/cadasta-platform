@@ -48,6 +48,12 @@ STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/opt/cadasta/cadasta-platform/cadasta/media/'
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+    }
+}
+
 # Debug logging...
 LOGGING = {
     'version': 1,
