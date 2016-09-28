@@ -69,8 +69,12 @@
                     {% for field in form %}
                     {% if field.name != 'org_role' %}
                     <tr>
-                      <td><label for="{{ field.id_for_label }}">{{field.label}}</label></td>
-                      <td>{% render_field field class+="form-control" %}</td>
+                      <td><label for="{{ field.id_for_label }}">{{field.label}}</label>{{field.value}}</td>
+                      {% if field.value != 'A' %}
+                        <td>{% render_field field class+="form-control" %}</td>
+                      {% else %}
+                        <td>Administrator</td>
+                      {% endif %}
                     </tr>
                     {% endif %}
                     {% endfor %}
