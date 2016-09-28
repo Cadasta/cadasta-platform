@@ -241,8 +241,10 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
         org = OrganizationFactory.create()
         user = UserFactory.create()
         current_user = UserFactory.create()
+        prj_1 = ProjectFactory.create(organization=org)
 
-        data = {'org_role': 'A'}
+        data = {'org_role': 'A',
+                prj_1.id: 'A'}
 
         org_role = OrganizationRole.objects.create(organization=org, user=user)
         OrganizationRole.objects.create(
