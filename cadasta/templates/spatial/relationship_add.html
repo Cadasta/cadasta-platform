@@ -112,7 +112,7 @@ $(document).ready(function() {
             <h4 class="step">{% trans "2. Relationship details" %}</h4>
 
             <div class="form-group{% if form.tenure_type.errors %} has-error{% endif %}">
-              <label for="{{ form.tenure_type.id_for_label }}">{% trans "Tenure Type" %}</label>
+              <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>
               <label class="pull-right control-label">{{ form.tenure_type.errors }}</label>
               {% render_field form.tenure_type class+="form-control" %}
             </div>
