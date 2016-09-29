@@ -232,7 +232,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         return xml.find('.//or:message', namespaces=ns).text
 
     def _test_resource(self, resource, model):
-        return Resource.objects.get(
+        assert Resource.objects.get(
             name__contains=resource) in model.resources
 
     def test_submission_upload(self):
@@ -251,10 +251,10 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         location = SpatialUnit.objects.get(attributes={'name': 'Middle Earth'})
         tenure = TenureRelationship.objects.get(party=party)
         assert tenure.spatial_unit == location
-        assert self._test_resource('test_image_one', location)
-        assert self._test_resource('test_image_two', party)
-        assert self._test_resource('test_audio_one', party)
-        assert self._test_resource('test_image_three', tenure)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party)
+        self._test_resource('test_audio_one', party)
+        self._test_resource('test_image_three', tenure)
 
     def test_line_upload(self):
         self._create_questionnaire('t_questionnaire', 0)
@@ -279,7 +279,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'Polygon'
 
         tenure = TenureRelationship.objects.get(tenure_type='LH')
-        assert self._test_resource('test_audio_one', tenure)
+        self._test_resource('test_audio_one', tenure)
 
     def test_point_upload(self):
         self._create_questionnaire('t_questionnaire', 0)
@@ -428,12 +428,12 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         location = SpatialUnit.objects.get(type='MI')
         tenure = TenureRelationship.objects.get(party=party_one)
         assert tenure.spatial_unit == location
-        assert self._test_resource('test_audio_one', location)
-        assert self._test_resource('test_image_one', location)
-        assert self._test_resource('test_image_two', party_one)
-        assert self._test_resource('test_image_three', party_one)
-        assert self._test_resource('test_image_four', tenure)
-        assert self._test_resource('test_image_five', party_two)
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party_one)
+        self._test_resource('test_image_three', party_one)
+        self._test_resource('test_image_four', tenure)
+        self._test_resource('test_image_five', party_two)
 
     def test_form_repeat_with_one_party(self):
         self._create_questionnaire('t_questionnaire_repeat_party', 3)
@@ -453,11 +453,11 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         tenure = TenureRelationship.objects.get(
             party=party)
         assert tenure.spatial_unit == location
-        assert self._test_resource('test_audio_one', location)
-        assert self._test_resource('test_image_one', location)
-        assert self._test_resource('test_image_two', party)
-        assert self._test_resource('test_image_three', party)
-        assert self._test_resource('test_image_four', tenure)
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party)
+        self._test_resource('test_image_three', party)
+        self._test_resource('test_image_four', tenure)
 
     def test_form_with_repeat_location(self):
         self._create_questionnaire('t_questionnaire_repeat_location', 4)
@@ -483,12 +483,12 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
             spatial_unit=location_two)
 
         assert tenure.party == party
-        assert self._test_resource('test_audio_one', location_one)
-        assert self._test_resource('test_image_one', location_one)
-        assert self._test_resource('test_image_two', tenure_one)
-        assert self._test_resource('test_image_three', location_two)
-        assert self._test_resource('test_image_four', party)
-        assert self._test_resource('test_image_five', party)
+        self._test_resource('test_audio_one', location_one)
+        self._test_resource('test_image_one', location_one)
+        self._test_resource('test_image_two', tenure_one)
+        self._test_resource('test_image_three', location_two)
+        self._test_resource('test_image_four', party)
+        self._test_resource('test_image_five', party)
 
     def test_form_repeat_with_one_location(self):
         self._create_questionnaire('t_questionnaire_repeat_location', 4)
@@ -509,11 +509,11 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
             spatial_unit=location)
 
         assert tenure.party == party
-        assert self._test_resource('test_audio_one', location)
-        assert self._test_resource('test_image_one', location)
-        assert self._test_resource('test_image_two', tenure)
-        assert self._test_resource('test_image_four', party)
-        assert self._test_resource('test_image_five', party)
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', tenure)
+        self._test_resource('test_image_four', party)
+        self._test_resource('test_image_five', party)
 
     def test_form_repeat_minus_tenure(self):
         self._create_questionnaire('t_questionnaire_repeat_minus_tenure', 5)
@@ -538,13 +538,13 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
             spatial_unit=location_two)
         assert tenure_one.party == party and tenure_two.party == party
 
-        assert self._test_resource('test_audio_one', location_one)
-        assert self._test_resource('test_image_one', location_one)
-        assert self._test_resource('test_image_two', tenure_one)
-        assert self._test_resource('test_image_two', tenure_two)
-        assert self._test_resource('test_image_three', location_two)
-        assert self._test_resource('test_image_four', party)
-        assert self._test_resource('test_image_five', party)
+        self._test_resource('test_audio_one', location_one)
+        self._test_resource('test_image_one', location_one)
+        self._test_resource('test_image_two', tenure_one)
+        self._test_resource('test_image_two', tenure_two)
+        self._test_resource('test_image_three', location_two)
+        self._test_resource('test_image_four', party)
+        self._test_resource('test_image_five', party)
 
     def test_form_repeat_party_minus_tenure(self):
         self._create_questionnaire(
@@ -569,10 +569,10 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert tenure_one.spatial_unit == location
         assert tenure_two.spatial_unit == location
 
-        assert self._test_resource('test_audio_one', location)
-        assert self._test_resource('test_image_one', location)
-        assert self._test_resource('test_image_two', tenure_one)
-        assert self._test_resource('test_image_two', tenure_two)
-        assert self._test_resource('test_image_three', party_one)
-        assert self._test_resource('test_image_four', party_one)
-        assert self._test_resource('test_image_five', party_two)
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', tenure_one)
+        self._test_resource('test_image_two', tenure_two)
+        self._test_resource('test_image_three', party_one)
+        self._test_resource('test_image_four', party_one)
+        self._test_resource('test_image_five', party_two)
