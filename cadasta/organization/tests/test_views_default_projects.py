@@ -996,11 +996,6 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase, TestCase):
         form.is_valid()
         form.add_error('questionnaire',
                        "Unknown question type 'interger'.")
-        # form.add_error('questionnaire',
-        #                "'interger' is not an accepted question type")
-        # form.add_error('questionnaire',
-        #                "'select multiple list' is not an accepted question "
-        #                "type")
 
         assert response.status_code == 200
         assert response.content == self.render_content(form=form)
