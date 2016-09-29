@@ -126,14 +126,19 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
             index=0, required=True, default='John'
         )
         Attribute.objects.create(
-            schema=schema, name='p_choice', long_name='Party field',
+            schema=schema, name='p_choice1', long_name='Party field',
             attr_type=AttributeType.objects.get(name='select_one'),
             index=1, choices=['1', '2']
         )
         Attribute.objects.create(
+            schema=schema, name='p_choice2', long_name='Party field',
+            attr_type=AttributeType.objects.get(name='select_one'),
+            index=2, choices=['1', '2'], choice_labels=['Choice 1', 'Choice 2']
+        )
+        Attribute.objects.create(
             schema=schema, name='p_bool', long_name='Party field',
             attr_type=AttributeType.objects.get(name='boolean'),
-            index=2, default='False'
+            index=3, default='False'
         )
 
         form = forms.TenureRelationshipForm(
@@ -155,7 +160,8 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         assert isinstance(form.fields['party::p_name'], CharField)
         assert form.fields['party::p_name'].initial == 'John'
         assert form.fields['party::p_name'].required is True
-        assert isinstance(form.fields['party::p_choice'], ChoiceField)
+        assert isinstance(form.fields['party::p_choice1'], ChoiceField)
+        assert isinstance(form.fields['party::p_choice2'], ChoiceField)
         assert isinstance(form.fields['party::p_bool'], BooleanField)
         assert form.fields['party::p_bool'].initial is False
         assert isinstance(form.fields['relationship::r_name'], CharField)
