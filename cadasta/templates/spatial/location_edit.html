@@ -12,6 +12,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
 {% endblock %}
 
 {% block extra_script %}
@@ -20,6 +23,11 @@
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+{% if get_current_language != "en-us" %}
+{% get_current_language as LANGUAGE_CODE %}
+<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
+{% endif %}
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
   $(document).ready(function () {
@@ -59,6 +67,12 @@
       // Enable edit mode on map load and save the geometry on page save
       setTimeout(enableMapEditMode, 500);
       $('input.btn-primary')[0].addEventListener('click', saveOnMapEditMode);
+    });
+
+    $('.datepicker').datepicker({
+      yearRange: "c-200:c+200",
+      changeMonth: true,
+      changeYear: true,
     });
   });
 </script>

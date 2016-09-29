@@ -1,5 +1,31 @@
 {% extends "party/party_detail.html" %}
 {% load i18n %}
+{% load staticfiles %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+{% endblock %}
+
+{% block extra_script %}
+{{ block.super }}
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+{% if get_current_language != "en-us" %}
+{% get_current_language as LANGUAGE_CODE %}
+<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
+{% endif %}
+<script>
+  $(document).ready(function () {
+    $('.datepicker').datepicker({
+      yearRange: "c-200:c+200",
+      changeMonth: true,
+      changeYear: true,
+    });
+  });
+</script>
+{% endblock %}
 
 {% block modals %}
 <div class="modal-backdrop">

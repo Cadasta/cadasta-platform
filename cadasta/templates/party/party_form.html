@@ -19,7 +19,11 @@
   <div class="form-group{% if field.errors %} has-error{% endif %}">
     <label for="{{ field.id_for_label }}">{{ field.label }}</label>
     <label class="pull-right control-label">{{ field.errors }}</label>
-    {% render_field field class="form-control" %}
+    {% if field|field_type == "datefield" %}
+    {% render_field field class+="form-control datepicker" %}
+    {% else %}
+    {% render_field field class+="form-control" %}
+    {% endif %}
   </div>
   {% endif %}
 {% endfor %}

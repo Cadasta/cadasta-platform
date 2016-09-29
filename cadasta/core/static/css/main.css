@@ -3781,6 +3781,9 @@ table th[class*="col-"] {
   .public-private-widget > div {
     top: 0; } }
 
+.ui-datepicker {
+  z-index: 2000 !important; }
+
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
 body.tinted-bg {
