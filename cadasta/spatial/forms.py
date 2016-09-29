@@ -121,7 +121,11 @@ class TenureRelationshipForm(forms.Form):
             #     args['max_length'] = 32
             if (atype.form_field == 'ChoiceField' or
                atype.form_field == 'MultipleChoiceField'):
-                args['choices'] = list(map(lambda c: (c, c), attr.choices))
+                if attr.choice_labels is not None and attr.choice_labels != []:
+                    chs = list(zip(attr.choices, attr.choice_labels))
+                else:
+                    chs = list(map(lambda c: (c, c), attr.choices))
+                args['choices'] = chs
             if atype.form_field == 'BooleanField':
                 args['required'] = False
                 if len(attr.default) > 0:
