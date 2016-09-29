@@ -5,7 +5,10 @@
 {% block head_title %}{% trans "Account Inactive" %}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Account Inactive" %}</h1>
 
-<p>{% trans "This account is inactive." %}</p>
+<div class="narrow">
+	<h1>{% trans "Account inactive" %}</h1>
+	<p>{% blocktrans %}This account is inactive. Please <a href="mailto:support@cadasta.org">contact us</a> if you need assistance.{% endblocktrans %}</p>
+</div>
+
 {% endblock %}
