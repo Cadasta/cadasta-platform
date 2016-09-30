@@ -5,9 +5,6 @@ python:
   - '3.5'
 addons:
   postgresql: '9.4'
-  apt:
-    packages:
-      - postgresql-9.4-postgis-2.1
 
 before_install:
   - export DEBIAN_FRONTEND=noninteractive

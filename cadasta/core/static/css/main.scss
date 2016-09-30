@@ -104,7 +104,7 @@ label {
 }
 
 a {
-  color: #337ab7;
+  color: $link-color;
   &:hover, 
   &:focus {
    color: $brand-darkblue;
@@ -297,10 +297,20 @@ header {
     border-radius: 0;
     min-width: 224px;
     min-width: 160px; // beta
+    max-width: 300px;
     height: $header-height;
     border: none;
     font-size: 13px;
     @include button-variant($gray-lighter, transparent, $btn-blue-bg);
+    .username {
+      display: inline-block !important;
+      position: relative;
+      top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
     &:hover,
     &:focus {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
@@ -346,6 +356,9 @@ header {
     }
     .btn-user { // user profile links
       min-width: 90px;
+      .username {
+        display: none !important;
+      }
       .thumbnail {
         margin-right: 4px;
       }
@@ -1152,8 +1165,13 @@ div.org-logo {
   margin: 30px 0;
 }
 
-#projects-permissions .form-control {
-  min-width: 70%;
+#projects-permissions, .form-inline {
+  .form-group {
+    display: block;
+  }
+  .form-control {
+    min-width: 70%;
+  }
 }
 
 /* =Dashboard map
@@ -1256,7 +1274,7 @@ img.org-logo, img#org-logo {
   clear: both;
   margin: 20px 0;
   .btn {
-    min-width: 200px;
+    min-width: 160px;
   }
   .btn-group .btn {
     margin: 0;
@@ -1339,6 +1357,12 @@ div.add-btn-btm { // add party link at bottom of table
     display: table-cell;
     vertical-align: top;
     padding: 4px;
+  }
+}
+
+.form-narrow, .narrow {
+  .alert-full {
+    margin-bottom: 20px;
   }
 }
 

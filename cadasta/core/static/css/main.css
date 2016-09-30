@@ -3781,6 +3781,9 @@ table th[class*="col-"] {
   .public-private-widget > div {
     top: 0; } }
 
+.ui-datepicker {
+  z-index: 2000 !important; }
+
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
 body.tinted-bg {
@@ -3790,7 +3793,7 @@ body.tinted-bg {
   -o-background-size: cover;
   -webkit-background-size: cover; }
 
-.form-narrow {
+.form-narrow, .narrow {
   margin: 0 auto;
   max-width: 500px;
   background: #fff;
@@ -3805,16 +3808,27 @@ body.tinted-bg {
   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05); }
-  .form-narrow h1 {
+  .form-narrow h1, .narrow h1 {
     text-align: center;
     margin: 4px auto 24px; }
-  .form-narrow h5 {
+  .form-narrow h5, .narrow h5 {
     border-top: 1px dashed #ddd;
     padding-top: 20px; }
-  .form-narrow .btn-block {
+  .form-narrow .btn-block, .narrow .btn-block {
     margin-bottom: 20px; }
-  .form-narrow .checkbox.pull-left {
+  .form-narrow .checkbox.pull-left, .narrow .checkbox.pull-left {
     margin-top: 0; }
+  .form-narrow .btn-full, .narrow .btn-full {
+    background: transparent;
+    border-top: 1px solid #e7e8ea;
+    text-align: center;
+    padding: 20px;
+    clear: both;
+    margin: 20px 0; }
+    .form-narrow .btn-full .btn, .narrow .btn-full .btn {
+      min-width: 100px; }
+    .form-narrow .btn-full .btn-group .btn, .narrow .btn-full .btn-group .btn {
+      margin: 0; }
 
 @media (max-width: 1199px) {
   .form-narrow {
@@ -4414,7 +4428,7 @@ label {
   font-weight: 400; }
 
 a {
-  color: #337ab7; }
+  color: #2e51a3; }
   a:hover, a:focus {
     color: #0e305e;
     outline: none; }
@@ -4812,6 +4826,7 @@ header {
   border-radius: 0;
   min-width: 224px;
   min-width: 160px;
+  max-width: 300px;
   height: 70px;
   border: none;
   font-size: 13px;
@@ -4850,6 +4865,14 @@ header {
   .reg-links .btn-user .badge {
     color: transparent;
     background-color: #eeeeee; }
+  .reg-links .btn-user .username {
+    display: inline-block !important;
+    position: relative;
+    top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px; }
   .reg-links .btn-user:hover, .reg-links .btn-user:focus {
     color: #fff;
     background-color: #28478f;
@@ -5028,6 +5051,8 @@ header {
     margin-left: 4px; }
   .reg-links .btn-user {
     min-width: 90px; }
+    .reg-links .btn-user .username {
+      display: none !important; }
     .reg-links .btn-user .thumbnail {
       margin-right: 4px; }
   .reg-links .btn-reg {
@@ -5827,7 +5852,10 @@ div.org-logo {
   clear: both;
   margin: 30px 0; }
 
-#projects-permissions .form-control {
+#projects-permissions .form-group, .form-inline .form-group {
+  display: block; }
+
+#projects-permissions .form-control, .form-inline .form-control {
   min-width: 70%; }
 
 /* =Dashboard map
@@ -5910,7 +5938,7 @@ img.org-logo, img#org-logo {
   clear: both;
   margin: 20px 0; }
   .btn-full .btn {
-    min-width: 200px; }
+    min-width: 160px; }
   .btn-full .btn-group .btn {
     margin: 0; }
 
@@ -5974,6 +6002,9 @@ div.add-btn-btm {
     display: table-cell;
     vertical-align: top;
     padding: 4px; }
+
+.form-narrow .alert-full, .narrow .alert-full {
+  margin-bottom: 20px; }
 
 .translation-wrapper {
   background-color: fuchsia; }

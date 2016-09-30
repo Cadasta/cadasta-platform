@@ -61,12 +61,6 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                     {'error_message':
                      _("You don't have permission to update user details")})]
 
-    def get_full_name(self):
-        """
-        Returns the full_name.
-        """
-        return self.full_name
-
     def get_display_name(self):
         """
         Returns the display name.

@@ -9,7 +9,7 @@ body.tinted-bg { // photo for login and register forms
   -webkit-background-size: cover;
 }
 
-.form-narrow {
+.form-narrow, .narrow {
   margin: 0 auto;
   max-width: 500px;
   background: #fff;
@@ -37,6 +37,20 @@ body.tinted-bg { // photo for login and register forms
   }
   .checkbox.pull-left {
     margin-top: 0;
+  }
+  .btn-full {
+    background: transparent;
+    border-top: 1px solid $table-border-color;
+    text-align: center;
+    padding: 20px;
+    clear: both;
+    margin: 20px 0;
+    .btn {
+      min-width: 100px;
+    }
+    .btn-group .btn {
+      margin: 0;
+    }
   }
 }
 
