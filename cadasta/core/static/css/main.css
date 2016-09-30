@@ -3906,7 +3906,7 @@ div.org-logo {
   padding: 10px; }
 
 .org-text {
-  margin-left: 160px; }
+  margin-left: 0; }
 
 /* =Single member permissions
 -------------------------------------------------------------- */
@@ -3927,16 +3927,19 @@ div.org-logo {
     margin: 0 0 4px 0; }
 
 .member-info .member-role {
-  padding: 30px 0;
+  padding: 20px 0;
   border-top: solid 1px #e7e8ea;
   border-bottom: solid 1px #e7e8ea;
   clear: both;
-  margin: 30px 0; }
+  margin: 10px 0; }
 
 .member-info .btn-full {
   padding: 20px 0; }
 
-#projects-permissions .form-control {
+#projects-permissions .form-group, .form-inline .form-group {
+  display: block; }
+
+#projects-permissions .form-control, .form-inline .form-control {
   min-width: 70%; }
 
 @media (max-width: 991px) {
@@ -5626,7 +5629,14 @@ main.container-fluid {
     .content-single .panel .panel-buttons {
       padding: 20px 15px; }
       .content-single .panel .panel-buttons .btn {
-        min-width: 110px; }
+        min-width: 110px;
+        margin-right: 20px; }
+        .content-single .panel .panel-buttons .btn:last-child {
+          margin-right: 0; }
+  .content-single .member-panel {
+    border: 0;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important; }
   .content-single .nav-tabs {
     margin-bottom: 20px; }
 
@@ -5820,44 +5830,6 @@ table#select-list {
   .form-control {
     padding: 6px; } }
 
-/* =Organizations
--------------------------------------------------------------- */
-div.org-logo {
-  float: left;
-  padding: 10px; }
-
-.org-text {
-  margin-left: 0; }
-
-.member-pic {
-  padding-bottom: 12px; }
-  .member-pic img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto; }
-
-.member-detail {
-  min-height: 100px;
-  display: inline-block;
-  padding: 0 0 20px 0; }
-  .member-detail h5 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 4px 0; }
-
-.member-role {
-  padding: 30px 0;
-  border-top: solid 1px #e7e8ea;
-  border-bottom: solid 1px #e7e8ea;
-  clear: both;
-  margin: 30px 0; }
-
-#projects-permissions .form-group, .form-inline .form-group {
-  display: block; }
-
-#projects-permissions .form-control, .form-inline .form-control {
-  min-width: 70%; }
-
 /* =Dashboard map
 -------------------------------------------------------------- */
 #dashboard-map {
@@ -6002,6 +5974,9 @@ div.add-btn-btm {
     display: table-cell;
     vertical-align: top;
     padding: 4px; }
+
+.form-narrow .alert-full, .narrow .alert-full {
+  margin-bottom: 20px; }
 
 .form-narrow .alert-full, .narrow .alert-full {
   margin-bottom: 20px; }

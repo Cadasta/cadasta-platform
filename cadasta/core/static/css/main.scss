@@ -849,8 +849,17 @@ main.container-fluid {
       padding: 20px 15px;
       .btn {
         min-width: 110px;
+        margin-right: 20px;
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
+  }
+  .member-panel { // member edit page 
+    border: 0;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
   }
   .nav-tabs {
     margin-bottom: 20px;
@@ -1124,56 +1133,6 @@ table#select-list {
  }
 }
 
-/* =Organizations
--------------------------------------------------------------- */
-
-div.org-logo {
-  float: left;
-  padding: 10px;
-}
-
-.org-text {
-  // margin-left: 160px; adjusted until upload field is added
-  margin-left: 0;
-}
-
-.member-pic {
-  padding-bottom: 12px;
-  img {
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-   }
-}
-
-.member-detail {
-  min-height: 100px;
-  display: inline-block;
-  padding: 0 0 20px 0;
-  h5 {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 4px 0;
-  }
-}
-
-.member-role {
-  padding: 30px 0;
-  border-top: solid 1px $table-border-color;
-  border-bottom: solid 1px $table-border-color;
-  clear: both;
-  margin: 30px 0;
-}
-
-#projects-permissions, .form-inline {
-  .form-group {
-    display: block;
-  }
-  .form-control {
-    min-width: 70%;
-  }
-}
-
 /* =Dashboard map
 -------------------------------------------------------------- */
 
@@ -1357,6 +1316,11 @@ div.add-btn-btm { // add party link at bottom of table
     display: table-cell;
     vertical-align: top;
     padding: 4px;
+  }
+}
+.form-narrow, .narrow {
+  .alert-full {
+    margin-bottom: 20px;
   }
 }
 
