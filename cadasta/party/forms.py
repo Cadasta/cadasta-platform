@@ -1,8 +1,8 @@
-from jsonattrs.forms import AttributeModelForm
+from questionnaires.forms import AttributeMultiLangModelForm
 from .models import Party, TenureRelationshipType, TenureRelationship
 
 
-class PartyForm(AttributeModelForm):
+class PartyForm(AttributeMultiLangModelForm):
     attributes_field = 'attributes'
 
     class Meta:
@@ -20,7 +20,7 @@ class PartyForm(AttributeModelForm):
         return instance
 
 
-class TenureRelationshipEditForm(AttributeModelForm):
+class TenureRelationshipEditForm(AttributeMultiLangModelForm):
     attributes_field = 'attributes'
 
     class Meta:

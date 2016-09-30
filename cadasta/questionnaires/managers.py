@@ -2,6 +2,7 @@ import hashlib
 import itertools
 import os
 import re
+import json
 from datetime import datetime
 
 from lxml import etree
@@ -97,7 +98,10 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
     for c in dict.get('children'):
         field = {}
         field['name'] = c.get('name')
-        field['long_name'] = c.get('label')
+        label = c.get('label')
+        if 'dict' in str(type(label)):
+            label = json.dumps(label)
+        field['long_name'] = label
         # HACK: pyxform strips underscores from xform field names
         field['attr_type'] = c.get('type').replace(' ', '_')
         if c.get('default'):
@@ -144,10 +148,10 @@ class QuestionnaireManager(models.Manager):
                     original_file=original_file,
                     project=project
                 )
-                json = parse_file_to_json(instance.xls_form.file.name)
-                instance.filename = json.get('name')
-                instance.title = json.get('title')
-                instance.id_string = json.get('id_string')
+                json_data = parse_file_to_json(instance.xls_form.file.name)
+                instance.filename = json_data.get('name')
+                instance.title = json_data.get('title')
+                instance.id_string = json_data.get('id_string')
                 instance.version = int(
                     datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4]
                 )
@@ -155,7 +159,7 @@ class QuestionnaireManager(models.Manager):
                     instance.filename, instance.id_string, instance.version
                 )
 
-                survey = create_survey_element_from_dict(json)
+                survey = create_survey_element_from_dict(json_data)
                 xml_form = survey.xml().toxml()
                 # insert version attr into the xform instance root node
                 xml = self.insert_version_attribute(
@@ -173,7 +177,7 @@ class QuestionnaireManager(models.Manager):
                 project.save()
 
                 create_children(
-                    children=json.get('children'),
+                    children=json_data.get('children'),
                     errors=errors,
                     project=project,
                     kwargs={'questionnaire': instance}

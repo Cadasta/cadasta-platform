@@ -4,16 +4,18 @@ from django.utils.translation import ugettext as _
 from django.contrib.contenttypes.models import ContentType
 
 from jsonattrs.models import Schema, compose_schemas
-from jsonattrs.forms import form_field_from_name, AttributeModelForm
+from jsonattrs.forms import form_field_from_name
 
 from leaflet.forms.widgets import LeafletWidget
 from core.util import ID_FIELD_LENGTH
 from party.models import Party, TenureRelationship, TenureRelationshipType
+from questionnaires.forms import AttributeMultiLangModelForm
+from questionnaires.functions import select_multilang_field_label
 from .models import SpatialUnit, TYPE_CHOICES
 from .widgets import SelectPartyWidget, NewEntityWidget
 
 
-class LocationForm(AttributeModelForm):
+class LocationForm(AttributeMultiLangModelForm):
     geometry = gisforms.GeometryField(
         widget=LeafletWidget(),
         error_messages={
@@ -112,7 +114,7 @@ class TenureRelationshipForm(forms.Form):
             atype = attr.attr_type
             initial = self.data.get(fieldname, '')
             args = {
-                'label': attr.long_name,
+                'label': select_multilang_field_label(attr.long_name),
                 'required': False,
                 'initial': initial
             }
