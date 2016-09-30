@@ -49,6 +49,7 @@ server {
         uwsgi_pass  django;
         include     {{ application_path }}uwsgi_params;
         uwsgi_read_timeout 30;
+        add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
         add_header 'Access-Control-Allow-Methods' 'GET, PUT, PATCH, POST, DELETE, OPTIONS';
         add_header 'Access-Control-Allow-Origin' '*' always;
         add_header 'Access-Control-Allow-Headers' 'Authorization,Access-Control-Allow-Origin,Content-Type';
@@ -79,5 +80,6 @@ server {
     location / {
         uwsgi_pass  django;
         include {{ application_path }}uwsgi_params;
+        add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
     }
 }
