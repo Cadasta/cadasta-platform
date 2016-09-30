@@ -47,8 +47,26 @@
   become: yes
   become_user: root
   copy: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root mode=664
-  notify:
-    - Restart nginx
+
+- name: Create lists and security directories
+  become: yes
+  become_user: root
+  file: path=/etc/nginx/{{ item }} state=directory
+    owner=root
+    group=root
+    mode=775
+  with_items:
+    - lists
+    - security
+
+- name: Copy files for blocking bots and scanners
+  copy: src={{ item }} dest=/etc/nginx/{{ item }}
+    owner=root
+    group=root
+    mode=664
+  with_items:
+    - lists/
+    - security/
 
 - name: Write Cadasta site configuration to sites-available
   become: yes
