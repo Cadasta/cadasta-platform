@@ -1,5 +1,4 @@
 import json
-from jsonattrs.mixins import JsonAttrsMixin
 import django.views.generic as base_generic
 from core.views import generic
 from django.core.urlresolvers import reverse
@@ -8,6 +7,7 @@ from core.mixins import LoginPermissionRequiredMixin, update_permissions
 
 from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
+from questionnaires.views.mixins import JsonAttrsMultiLangMixin
 from party.messages import TENURE_REL_CREATE
 from . import mixins
 from organization.views import mixins as organization_mixins
@@ -59,7 +59,7 @@ class LocationsAdd(LoginPermissionRequiredMixin,
 
 
 class LocationDetail(LoginPermissionRequiredMixin,
-                     JsonAttrsMixin,
+                     JsonAttrsMultiLangMixin,
                      mixins.SpatialUnitObjectMixin,
                      organization_mixins.ProjectAdminCheckMixin,
                      resource_mixins.HasUnattachedResourcesMixin,

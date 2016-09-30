@@ -1,10 +1,10 @@
 from core.views import generic
 import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
-from jsonattrs.mixins import JsonAttrsMixin
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 
 from organization.views import mixins as organization_mixins
+from questionnaires.views.mixins import JsonAttrsMultiLangMixin
 from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
 from . import mixins
@@ -39,7 +39,7 @@ class PartiesAdd(LoginPermissionRequiredMixin,
 
 
 class PartiesDetail(LoginPermissionRequiredMixin,
-                    JsonAttrsMixin,
+                    JsonAttrsMultiLangMixin,
                     mixins.PartyObjectMixin,
                     organization_mixins.ProjectAdminCheckMixin,
                     resource_mixins.HasUnattachedResourcesMixin,
@@ -104,7 +104,7 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
 
 
 class PartyRelationshipDetail(LoginPermissionRequiredMixin,
-                              JsonAttrsMixin,
+                              JsonAttrsMultiLangMixin,
                               mixins.PartyRelationshipObjectMixin,
                               organization_mixins.ProjectAdminCheckMixin,
                               resource_mixins.HasUnattachedResourcesMixin,

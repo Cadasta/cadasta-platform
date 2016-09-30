@@ -1,4 +1,5 @@
 import os
+import json
 
 import pytest
 from lxml import etree
@@ -7,6 +8,7 @@ from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
+from jsonattrs.models import Attribute, create_attribute_types
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
 from core.tests.utils.files import make_dirs  # noqa
@@ -57,6 +59,42 @@ class CreateChildrenTest(TestCase):
         assert models.Question.objects.filter(
             questionnaire=questionnaire,
             question_group__isnull=False).count() == 1
+
+    def test_create_children_with_multilang_attr_label(self):
+        create_attribute_types()
+        project = ProjectFactory.create()
+        questionnaire = factories.QuestionnaireFactory.create()
+        children = [
+            {
+                'label': "Text question type",
+                'name': 'location_attributes',
+                'type': 'group',
+                'children': [
+                    {
+                        'hint': "Can be short or long",
+                        'label': {
+                            'default': "Label",
+                            "Français": "Étiquette",
+                            "Deutsch": "Etikett",
+                        },
+                        'name': 'my_string',
+                        'type': 'text'
+                    },
+                ],
+            },
+        ]
+        create_children(children, project=project,
+                        kwargs={'questionnaire': questionnaire})
+
+        assert models.QuestionGroup.objects.filter(
+            questionnaire=questionnaire).count() == 1
+        assert models.Question.objects.filter(
+            questionnaire=questionnaire).count() == 1
+
+        attrs = Attribute.objects.all()
+        assert len(attrs) == 1
+        dict_data = children[0]['children'][0]['label']
+        assert json.loads(attrs[0].long_name) == dict_data
 
 
 class CreateOptionsTest(TestCase):
