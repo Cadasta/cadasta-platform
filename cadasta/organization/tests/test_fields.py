@@ -3,8 +3,10 @@ from django.test import TestCase
 from django.forms import formset_factory, ValidationError
 
 from accounts.tests.factories import UserFactory
+from .factories import ProjectFactory
 
 from ..fields import ProjectRoleField, PublicPrivateField, ContactsField
+from ..fields import OrganizationRoleField
 from ..forms import ContactsForm
 
 
@@ -14,6 +16,15 @@ class ProjectRoleFieldTest(TestCase):
         choices = (('Ab', 'Ahh Bee',),)
         field = ProjectRoleField(user, choices=choices)
         assert field.widget.user == user
+        assert field.widget.choices == [choices[0]]
+
+
+class OrganizationRoleFieldTest(TestCase):
+    def test_init(self):
+        project = ProjectFactory.build()
+        choices = (('A', 'Administrator',),)
+        field = OrganizationRoleField(project, choices=choices)
+        assert field.widget.project == project
         assert field.widget.choices == [choices[0]]
 
 
