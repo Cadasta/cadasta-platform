@@ -154,19 +154,19 @@ class ModelHelper():
     def create_resource(self, data, user, project, content_object=None):
         Storage = get_storage_class()
         file = data.file.read()
-        if file == b'':
-            Resource.objects.get(
-                name=data.name,
-                contributor=user,
-                mime_type=data.content_type,
-                project=project,
-                original_file=data.name
-            ).content_objects.create(
-                content_object=content_object
-            )
-        else:
-            url = Storage().save('resources/' + data.name, file)
-            try:
+        try:
+            if file == b'':
+                Resource.objects.get(
+                    name=data.name,
+                    contributor=user,
+                    mime_type=data.content_type,
+                    project=project,
+                    original_file=data.name
+                ).content_objects.create(
+                    content_object=content_object
+                )
+            else:
+                url = Storage().save('resources/' + data.name, file)
                 Resource.objects.create(
                     name=data.name,
                     file=url,
@@ -176,8 +176,8 @@ class ModelHelper():
                     project=project,
                     original_file=data.name
                 ).full_clean()
-            except Exception as e:
-                raise InvalidXMLSubmission(_("{}".format(e)))
+        except Exception as e:
+            raise InvalidXMLSubmission(_("{}".format(e)))
 
     def upload_submission_data(self, request):
         if 'xml_submission_file' not in request.data.keys():

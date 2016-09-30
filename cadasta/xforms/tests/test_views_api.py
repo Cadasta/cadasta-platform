@@ -26,6 +26,7 @@ from resources.models import Resource
 from spatial.models import SpatialUnit
 from tutelary.models import Role
 from xforms.tests.files.test_resources import responses
+from xforms.models import XFormSubmission
 
 from ..views import api
 from .attr_schemas import (default_party_xform_group,
@@ -236,7 +237,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
             name__contains=resource) in model.resources
 
     def test_submission_upload(self):
-        self._create_questionnaire('t_questionnaire', 0)
+        questionnaire = self._create_questionnaire('t_questionnaire', 0)
         data = self._submission(form='submission',
                                 image=['test_image_one',
                                        'test_image_two',
@@ -255,6 +256,11 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         self._test_resource('test_image_two', party)
         self._test_resource('test_audio_one', party)
         self._test_resource('test_image_three', tenure)
+
+        response = XFormSubmission.objects.get(user=self.user)
+        assert response.questionnaire == questionnaire
+        assert ('Bilbo Baggins' in
+                response.json_submission['t_questionnaire']['party_name'])
 
     def test_line_upload(self):
         self._create_questionnaire('t_questionnaire', 0)
