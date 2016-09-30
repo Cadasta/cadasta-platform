@@ -43,6 +43,13 @@
   become_user: root
   service: name=uwsgi state=restarted enabled=yes
 
+- name: Write nginx configuration
+  become: yes
+  become_user: root
+  copy: src=nginx.conf dest=/etc/nginx/nginx.conf owner=root mode=664
+  notify:
+    - Restart nginx
+
 - name: Write Cadasta site configuration to sites-available
   become: yes
   become_user: root
