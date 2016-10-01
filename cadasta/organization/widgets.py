@@ -39,10 +39,12 @@ class OrganizationRoleWidget(Select):
     html = (
         '<tr>'
         '  <td>'
-        '    <p>{project}</p>'
+        '    <label class="control-label">{project}</label>'
         '  </td>'
         '  <td>'
-        '    {select}'
+        '    <div class="form-group">'
+        '       {select}'
+        '    </div>'
         '  </td>'
         '</tr>'
     )

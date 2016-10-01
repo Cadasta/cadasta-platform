@@ -95,8 +95,8 @@ class OrganizationRoleWidgetTest(TestCase):
         self.project = ProjectFactory.build(id='1',
                                             name='Test-Project')
         self.widget = OrganizationRoleWidget(project=self.project,
-                                        role='A',
-                                        choices=FORM_CHOICES)
+                                             role='A',
+                                             choices=FORM_CHOICES)
 
     def test_render_with_admin(self):
         html = self.widget.render(self.project.name, 'A')
@@ -104,10 +104,12 @@ class OrganizationRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
-            '    <p><Project: Test-Project></p>'
+            '    <label class="control-label"><Project: Test-Project></label>'
             '  </td>'
             '  <td>'
-            '    Administrator'
+            '    <div class="form-group">'
+            '       Administrator'
+            '    </div>'
             '  </td>'
             '</tr>'
         )
@@ -119,10 +121,12 @@ class OrganizationRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
-            '    <p><Project: Test-Project></p>'
+            '    <label class="control-label"><Project: Test-Project></label>'
             '  </td>'
             '  <td>'
-            '    Administrator'
+            '    <div class="form-group">'
+            '       Administrator'
+            '    </div>'
             '  </td>'
             '</tr>'
         )
@@ -135,15 +139,17 @@ class OrganizationRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
-            '    <p><Project: Test-Project></p>'
+            '    <label class="control-label"><Project: Test-Project></label>'
             '  </td>'
             '  <td>'
-            '    <select name="Test-Project">\n'
+            '    <div class="form-group">'
+            '       <select name="Test-Project">\n'
             '<option value="Pb">Public User</option>\n'
             '<option value="PU">Project User</option>\n'
             '<option value="DC">Data Collector</option>\n'
             '<option value="PM" selected="selected">Project Manager</option>\n'
             '</select>'
+            '    </div>'
             '  </td>'
             '</tr>'
         )
