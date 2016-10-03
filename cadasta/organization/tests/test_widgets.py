@@ -4,8 +4,10 @@ from django.forms import formset_factory
 
 from ..forms import FORM_CHOICES, ContactsForm
 from ..widgets import ProjectRoleWidget, PublicPrivateToggle, ContactsWidget
+from ..widgets import OrganizationRoleWidget
 
 from accounts.tests.factories import UserFactory
+from .factories import ProjectFactory
 
 
 class ProjectRoleWidgetTest(TestCase):
@@ -82,6 +84,72 @@ class ProjectRoleWidgetTest(TestCase):
             '<option value="DC">Data Collector</option>\n'
             '<option value="PM" selected="selected">Project Manager</option>\n'
             '</select>'
+            '  </td>'
+            '</tr>'
+        )
+        assert expected == html
+
+
+class OrganizationRoleWidgetTest(TestCase):
+    def setUp(self):
+        self.project = ProjectFactory.build(id='1',
+                                            name='Test-Project')
+        self.widget = OrganizationRoleWidget(project=self.project,
+                                             role='A',
+                                             choices=FORM_CHOICES)
+
+    def test_render_with_admin(self):
+        html = self.widget.render(self.project.name, 'A')
+
+        expected = (
+            '<tr>'
+            '  <td>'
+            '    <label class="control-label"><Project: Test-Project></label>'
+            '  </td>'
+            '  <td>'
+            '    <div class="form-group">'
+            '       Administrator'
+            '    </div>'
+            '  </td>'
+            '</tr>'
+        )
+        assert expected == html
+
+    def test_render_with_admin_next_page_submission(self):
+        html = self.widget.render(self.project.name, None)
+
+        expected = (
+            '<tr>'
+            '  <td>'
+            '    <label class="control-label"><Project: Test-Project></label>'
+            '  </td>'
+            '  <td>'
+            '    <div class="form-group">'
+            '       Administrator'
+            '    </div>'
+            '  </td>'
+            '</tr>'
+        )
+        assert expected == html
+
+    def test_render_with_manager(self):
+        self.widget.role = ''
+        html = self.widget.render(self.project.name, 'PM')
+
+        expected = (
+            '<tr>'
+            '  <td>'
+            '    <label class="control-label"><Project: Test-Project></label>'
+            '  </td>'
+            '  <td>'
+            '    <div class="form-group">'
+            '       <select name="Test-Project">\n'
+            '<option value="Pb">Public User</option>\n'
+            '<option value="PU">Project User</option>\n'
+            '<option value="DC">Data Collector</option>\n'
+            '<option value="PM" selected="selected">Project Manager</option>\n'
+            '</select>'
+            '    </div>'
             '  </td>'
             '</tr>'
         )

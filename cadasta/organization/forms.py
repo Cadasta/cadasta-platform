@@ -21,6 +21,7 @@ from .download.resources import ResourceExporter
 from .download.shape import ShapeExporter
 from .download.xls import XLSExporter
 from .fields import ContactsField, ProjectRoleField, PublicPrivateField
+from .fields import OrganizationRoleField
 from .models import Organization, OrganizationRole, Project, ProjectRole
 
 FORM_CHOICES = (('Pb', _('Public User')),) + ROLE_CHOICES
@@ -204,13 +205,17 @@ class EditOrganizationMemberForm(forms.Form):
         project_roles = {r['project__id']: r['role'] for r in project_roles}
 
         for p in self.organization.projects.values_list('id', 'name'):
-            role = project_roles.get(p[0], 'Pb')
+            if self.org_role_instance.admin:
+                role = 'A'
+            else:
+                role = project_roles.get(p[0], 'Pb')
 
-            self.fields[p[0]] = forms.ChoiceField(
+            self.fields[p[0]] = OrganizationRoleField(
                 choices=FORM_CHOICES,
                 label=p[1],
-                required=False,
-                initial=role
+                required=(role != 'A'),
+                initial=role,
+                project=p[1]
             )
 
     def clean_org_role(self):
@@ -227,8 +232,9 @@ class EditOrganizationMemberForm(forms.Form):
         self.org_role_instance.save()
 
         for f in [field for field in self.fields if field != 'org_role']:
-            role = self.data.get(f)
-            create_update_or_delete_project_role(f, self.user, role)
+            if not self.org_role_instance.admin:
+                role = self.data.get(f)
+                create_update_or_delete_project_role(f, self.user, role)
 
 
 class ProjectAddExtents(forms.ModelForm):

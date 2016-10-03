@@ -67,28 +67,15 @@
                     <table class="table table-hover datatable" id="projects-permissions">
                       <thead>
                         <tr>
-                          <th>Project</th>
-                          <th>Permissions</th>
+                          <th class="col-md-8">{% trans "Project" %}</th>
+                          <th class="col-md-4">{% trans "Permissions" %}</th>
                         </tr>
                       </thead>
-                      <tbody>
                         {% for field in form %}
-                          {% if field.name != 'org_role' %}
-                          <tr>
-                            <td>
-                              <label class="control-label" for="{{ field.id_for_label }}">
-                                {{field.label}}
-                              </label>
-                            </td>
-                            <td>
-                              <div class="form-group">
+                            {% if field.name != 'org_role' %}
                                 {% render_field field class+="form-control" data-parsley-required="true" %}
-                              </div>
-                            </td>
-                          </tr>
-                          {% endif %}
+                            {% endif %}
                         {% endfor %}
-                      </tbody>
                     </table>
                   </div>
                 </div>

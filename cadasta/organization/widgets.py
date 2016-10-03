@@ -35,6 +35,39 @@ class ProjectRoleWidget(Select):
         )
 
 
+class OrganizationRoleWidget(Select):
+    html = (
+        '<tr>'
+        '  <td>'
+        '    <label class="control-label">{project}</label>'
+        '  </td>'
+        '  <td>'
+        '    <div class="form-group">'
+        '       {select}'
+        '    </div>'
+        '  </td>'
+        '</tr>'
+    )
+
+    def __init__(self, project, role, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = project
+        self.role = role
+
+    def render(self, project, value, attrs=None, choices=()):
+        if value == 'A' or self.role == 'A':
+            select = _("Administrator")
+        else:
+            select = super().render(project, value,
+                                    attrs=attrs,
+                                    choices=choices)
+
+        return self.html.format(
+            project=self.project,
+            select=select
+        )
+
+
 class PublicPrivateToggle(Widget):
     html = (
         '<div class="public-private-widget">'
