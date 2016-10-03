@@ -361,7 +361,7 @@ class ProjectDashboard(PermissionRequiredMixin,
                        generic.DetailView):
     def get_actions(self, view):
         if self.prj.archived:
-            return "project.view_archived"
+            return 'project.view_archived'
         if self.prj.public():
             return 'project.view'
         else:

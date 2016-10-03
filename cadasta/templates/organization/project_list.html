@@ -43,9 +43,9 @@
   {% for proj in object_list %}
   <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}';">
     {% if proj.archived %}
-      <td class="archived"><div>True</div></td>
+      <td class="archived"><div>{% trans "True" %}</div></td>
     {% else %}
-      <td class="unarchived"><div>False</div></td>
+      <td class="unarchived"><div>{% trans "False" %}</div></td>
     {% endif %}
     <td>
       <h4>

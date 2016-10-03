@@ -19,7 +19,8 @@ class SelectPartyWidget(Widget):
 
         return (
             '<select id="party-select" name="{name}">'
-            '<option value="" data-type="">Please select a party</option>'
+            '<option value="" data-type="">' +
+            ("Please select a party") + '</option>'
             '{parties}'
             '</select>'
         ).format(parties=''.join(parties), name=name)

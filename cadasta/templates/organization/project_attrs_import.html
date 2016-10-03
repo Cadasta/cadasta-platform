@@ -19,11 +19,11 @@
                     <h4>{% trans "The following fields can be imported" %}</h4>
                     <table id='import-mapping' width="50%" class="table">
                         <tr>
-                            <th>CSV Column</th>
-                            <th>Schema Attribute</th>
-                            <th>Content Type</th>
-                            <th>Required</th>
-                            <th>Import</th>
+                            <th>{% trans "CSV Column" %}</th>
+                            <th>{% trans "Schema Attribute" %}</th>
+                            <th>{% trans "Content Type" %}</th>
+                            <th>{% trans "Required" %}</th>
+                            <th>{% trans "Import" %}</th>
                         </tr>
                         {% for header, attr in attr_map.items %}
                         <tr>

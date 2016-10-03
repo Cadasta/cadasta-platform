@@ -32,31 +32,31 @@
   {% csrf_token %}
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
-    <label for="id_username">Choose your username</label>
+    <label for="id_username">{% trans "Choose your username" %}</label>
     <label class="pull-right control-label">{{ form.username.errors }}</label>
     {% render_field form.username class+="form-control input-lg" %}
   </div>
 
   <div class="form-group{% if form.email.errors %} has-error{% endif %}">
-    <label for="id_email">Email</label>
+    <label for="id_email">{% trans "Email" %}</label>
     <label class="pull-right control-label">{{ form.email.errors }}</label>
     {% render_field form.email class+="form-control input-lg" %}
   </div>
 
   <div class="form-group{% if form.password1.errors %} has-error{% endif %}">
-    <label for="id_password1">Password</label>
+    <label for="id_password1">{% trans "Password" %}</label>
     <label class="pull-right control-label">{{ form.password1.errors }}</label>
     {% render_field form.password1 class+="form-control input-lg" %}
   </div>
 
   <div class="form-group{% if form.password2.errors %} has-error{% endif %}">
-    <label for="id_password2">Confirm password</label>
+    <label for="id_password2">{% trans "Confirm password" %}</label>
     <label class="pull-right control-label">{{ form.password2.errors }}</label>
     {% render_field form.password2 class+="form-control input-lg" %}
   </div>
 
   <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
-    <label for="id_full_name">Full name</label>
+    <label for="id_full_name">{% trans "Full name" %}</label>
     <label class="pull-right control-label">{{ form.full_name.errors }}</label>
     {% render_field form.full_name class+="form-control input-lg" %}
   </div>

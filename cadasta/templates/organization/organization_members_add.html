@@ -15,22 +15,22 @@
               action="{% url 'organization:members_add' organization.slug %}" novalidate>
           <div class="modal-header">
             <a class="close" href="{% url 'organization:members' organization.slug %}"><span aria-hidden="true">&times;</span></a>
-            <h3 class="modal-title">Add member</h3>
+            <h3 class="modal-title">{% trans "Add member" %}</h3>
           </div>
           <div class="modal-body">
             <div class="form-group{% if form.identifier.errors %} has-error{% endif %}">
               {% csrf_token %}
               {{ form.non_field_errors }}
               <label for="{{ form.identifier.id_for_label }}">
-                Enter new member's username or email address
+                {% trans "Enter new member's username or email address" %}
               </label>
               <label class="pull-right control-label">{{ form.identifier.errors }}</label>
               {% render_field form.identifier class+="form-control input-lg" %}
             </div>
           </div>
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary pull-right">Save</button>
-            <a class="btn btn-link" href="{% url 'organization:members' organization.slug %}">Cancel</a>
+            <button type="submit" class="btn btn-primary pull-right">{% trans "Save" %}</button>
+            <a class="btn btn-link" href="{% url 'organization:members' organization.slug %}">{% trans "Cancel" %}</a>
           </div>
         </form>
       </div>

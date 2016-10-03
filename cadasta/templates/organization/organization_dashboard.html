@@ -20,7 +20,7 @@
             <table class="table table-hover datatable" data-paging-type="simple">
               <thead>
                 <tr>
-                  <th class="unarchived"><div>Archived</div></th>
+                  <th class="unarchived"><div>{% trans "Archived" %}</div></th>
                   <th class="col-md-6">{% trans "Project" %}</th>
                   <th class="col-md-2">{% trans "Country" %}</th>
                   <th class="col-md-2">{% trans "Last updated" %}</th>
@@ -30,15 +30,15 @@
                 {% for prj in projects %}
                 <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
                   {% if prj.archived %}
-                    <td class="archived"><div>True</div></td>
+                    <td class="archived"><div>{% trans "True" %}</div></td>
                   {% else %}
-                    <td class="unarchived"><div>False</div></td>
+                    <td class="unarchived"><div>{% trans "False" %}</div></td>
                   {% endif %}
                   <td>
                       <a href="{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}">{{ prj.name }}</a>
                       {% if prj.archived %}
                       <span class="label label-danger">
-                        Archived
+                        {% trans "Archived" %}
                       </span>
                       {% endif %}
                   </td>

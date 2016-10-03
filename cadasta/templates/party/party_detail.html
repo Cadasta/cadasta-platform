@@ -38,7 +38,7 @@
                     <td class="col-md-8">{{ party.name }}</td>
                   </tr>
                   <tr>
-                    <td><label>Type</label></td>
+                    <td><label>{% trans "Type" %}</label></td>
                     <td>{{ party.get_type_display }}</td>
                   </tr>
                   {% for attr in attributes %}

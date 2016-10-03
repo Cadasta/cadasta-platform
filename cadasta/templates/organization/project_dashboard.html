@@ -64,7 +64,7 @@
           <p><a href="{{ object.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ object.urls.0 }}</a></p>
         {% endif %}
         {% if object.contacts %}
-          <h4>Contact information</h4>
+          <h4>{% trans "Contact information" %}</h4>
           <dl class="contacts">
           {% for contact in object.contacts %}
             <dt>{{ contact.name }}</dt>

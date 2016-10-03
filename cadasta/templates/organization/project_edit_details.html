@@ -22,7 +22,7 @@
         <h2>{% trans "Edit project details" %}</h2>
         <div class="panel panel-default">
           <div class="panel-body">
-            <h3>{% trans "1. General information" %}</h3>
+            <h3>1. {% trans "General information" %}</h3>
             <div class="row">
               <div class="col-md-9">
                 {{ form.non_field_errors }}
@@ -56,7 +56,7 @@
               </div>
             </div>
 
-            <h3>{% trans "2. Questionnaire" %}</h3>
+            <h3>2. {% trans "Questionnaire" %}</h3>
             <div class="row">
               <div class="col-md-9">
                 <div class="form-group{% if form.questionnaire.errors %} has-error{% endif %}">
@@ -77,7 +77,7 @@
               </div>
             </div>
 
-            <h3>{% trans "3. Contacts" %}</h3>
+            <h3>3. {% trans "Contacts" %}</h3>
             <div class="row">
               <div class="col-md-9">
                 {% render_field form.contacts class+="form-control" %}
