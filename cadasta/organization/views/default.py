@@ -10,6 +10,8 @@ from accounts.models import User
 from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
 from core.views.mixins import ArchiveMixin, SuperUserCheckMixin
+from django.conf import settings
+from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponse
@@ -18,9 +20,13 @@ from questionnaires.exceptions import InvalidXLSForm
 from questionnaires.models import Questionnaire
 from spatial.serializers import SpatialUnitGeoJsonSerializer
 
+from resources.models import ContentObject, Resource
+
 from . import mixins
 from .. import messages as error_messages
 from .. import forms
+from ..importers import csv
+from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
@@ -680,3 +686,169 @@ class ProjectDataDownload(mixins.ProjectMixin,
             response['Content-Disposition'] = ('attachment; filename=' +
                                                self.object.slug + ext)
             return response
+
+
+DATA_IMPORT_FORMS = [('select_file', forms.SelectImportForm),
+                     ('map_attributes', forms.MapAttributesForm),
+                     ('select_defaults', forms.SelectDefaultsForm)]
+
+DATA_IMPORT_TEMPLATES = {
+    'select_file': 'organization/project_select_import.html',
+    'map_attributes': 'organization/project_attrs_import.html',
+    'select_defaults': 'organization/project_defaults_import.html'
+}
+
+
+class ProjectDataImportWizard(mixins.ProjectMixin,
+                              LoginPermissionRequiredMixin,
+                              mixins.ProjectAdminCheckMixin,
+                              wizard.SessionWizardView):
+    permission_required = 'project.import'
+    permission_denied_message = error_messages.PROJ_IMPORT
+    form_list = DATA_IMPORT_FORMS
+    file_storage = FileSystemStorage(
+        location=os.path.join(settings.MEDIA_ROOT, 'temp'))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['object'] = self.get_object()
+        return context
+
+    def get_object(self):
+        return self.get_project()
+
+    def get_form_kwargs(self, step=None):
+        return {
+            'user': self.request.user,
+            'project': self.get_project()
+        }
+
+    def get_template_names(self):
+        return [DATA_IMPORT_TEMPLATES[self.steps.current]]
+
+    def render_goto_step(self, goto_step, **kwargs):
+        self.storage.current_step = goto_step
+        form = self.get_form(
+            data=self.storage.get_step_data(self.steps.current),
+            files=self.storage.get_step_files(self.steps.current))
+        if goto_step == 'map_attributes':
+            file = self.storage.get_step_files(
+                'select_file')['select_file-file']
+            path = self.file_storage.path(file.name)
+            importer = csv.CSVImporter(
+                project=self.get_project(), path=path
+            )
+            (attr_map,
+                extra_attrs, extra_headers) = importer.get_attribute_map()
+            return self.render(
+                form, attr_map=attr_map,
+                extra_attrs=extra_attrs, extra_headers=extra_headers, **kwargs
+            )
+        return self.render(form)
+
+    def render_next_step(self, form, **kwargs):
+        next_step = self.steps.next
+        new_form = self.get_form(
+            next_step,
+            data=self.storage.get_step_data(next_step),
+            files=self.storage.get_step_files(next_step),
+        )
+        self.storage.current_step = next_step
+        if next_step == 'map_attributes':
+            file = self.request.FILES.get('select_file-file')
+            path = self.file_storage.path(file.name)
+            importer = csv.CSVImporter(
+                project=self.get_project(), path=path
+            )
+            (attr_map,
+                extra_attrs, extra_headers) = importer.get_attribute_map()
+            return self.render(
+                form, attr_map=attr_map,
+                extra_attrs=extra_attrs, extra_headers=extra_headers, **kwargs
+            )
+        if next_step == 'select_defaults':
+            heads = self.request.POST.get('extra_headers', None)
+            available_headers = heads.split(',')
+            return self.render(
+                new_form, available_headers=available_headers, **kwargs
+            )
+
+    def done(self, form_list, **kwargs):
+        form_data = [form.cleaned_data for form in form_list]
+
+        name = form_data[0]['name']
+        description = form_data[0]['description']
+        is_resource = form_data[0]['is_resource']
+        type = form_data[0]['type']
+        original_file = form_data[0]['original_file']
+        file = form_data[0]['file']
+
+        path = self.file_storage.path(file.name)
+        map_attrs_data = self.storage.get_step_data('map_attributes')
+        project = self.get_project()
+        org = project.organization
+        config_dict = {
+            'project': project,
+            'file': path,
+            'party_name_field': form_data[2]['party_name_field'],
+            'party_type': form_data[2]['party_type'],
+            'location_type': form_data[2]['location_type'],
+            'geometry_type_field': form_data[2]['geometry_type_field'],
+            'geometry_field': form_data[2]['geometry_field'],
+            'attributes': map_attrs_data.getlist('attributes', None),
+        }
+
+        importer = csv.CSVImporter(
+            project=self.get_project(), path=path
+        )
+        importer.import_data(config_dict)
+
+        if is_resource:
+            default_storage = DefaultStorage()
+            url = default_storage.save(file.name, file.read())
+            resource = Resource(
+                name=name, description=description, file=url,
+                original_file=original_file, mime_type=type,
+                contributor=self.request.user, project=self.get_project())
+            resource.save()
+            ContentObject.objects.create(resource=resource,
+                                         content_object=resource.project)
+        return redirect('organization:project-dashboard',
+                        organization=org.slug,
+                        project=project.slug)
+
+    def render_done(self, form, **kwargs):
+        final_forms = OrderedDict()
+        # walk through the form list and try to validate the data again.
+        for form_key in self.get_form_list():
+            form_obj = self.get_form(
+                step=form_key,
+                data=self.storage.get_step_data(form_key),
+                files=self.storage.get_step_files(form_key)
+            )
+            if not form_obj.is_valid():  # pragma:  no cover
+                return self.render_revalidation_failure(
+                    form_key, form_obj, **kwargs
+                )
+            final_forms[form_key] = form_obj
+
+        # catch bad import here
+        try:
+            done_response = self.done(
+                final_forms.values(), form_dict=final_forms, **kwargs
+            )
+        except DataImportError as e:
+            form_key = 'select_file'
+            form_obj = self.get_form(
+                step=form_key,
+                data=self.storage.get_step_data(form_key),
+                files=self.storage.get_step_files(form_key)
+            )
+            form_obj.add_error('file', str(e))
+            file = form_obj.files['select_file-file']
+            self.file_storage.delete(file.name)
+            return self.render_revalidation_failure(
+                'select_file', form_obj, **kwargs
+            )
+        self.storage.reset()
+        return done_response

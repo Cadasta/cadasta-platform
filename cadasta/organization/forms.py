@@ -1,6 +1,7 @@
 import time
 from zipfile import ZipFile
 
+import magic
 from accounts.models import User
 from buckets.widgets import S3FileUploadWidget
 from core.form_mixins import SuperUserCheck
@@ -10,10 +11,13 @@ from django.conf import settings
 from django.contrib.gis import forms as gisforms
 from django.contrib.postgres import forms as pg_forms
 from django.db import transaction
+from django.forms import ValidationError
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
 from leaflet.forms.widgets import LeafletWidget
+from party.models import Party
 from questionnaires.models import Questionnaire
+from spatial.choices import TYPE_CHOICES as LOCATION_TYPE_CHOICES
 from tutelary.models import check_perms
 
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
@@ -28,6 +32,9 @@ QUESTIONNAIRE_TYPES = [
     'application/msexcel',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+]
+DATA_IMPORT_TYPES = [
+    'text/csv'
 ]
 
 
@@ -240,6 +247,7 @@ class ProjectAddExtents(forms.ModelForm):
 
 
 class ProjectAddDetails(SuperUserCheck, forms.Form):
+
     class Media:
         js = ('js/file-upload.js',)
 
@@ -470,3 +478,65 @@ class DownloadForm(forms.Form):
                 myzip.close()
 
         return path, mime
+
+
+class SelectImportForm(forms.Form):
+    VALID_IMPORT_MIME_TYPES = ['text/plain', 'text/csv']
+
+    class Media:
+        js = ('js/import.js',)
+
+    CHOICES = (('xls', 'XLS'), ('shp', 'SHP'),
+               ('csv', 'CSV'))
+    name = forms.CharField(required=True, max_length=200)
+    type = forms.ChoiceField(
+        choices=CHOICES, initial='csv', widget=forms.RadioSelect)
+    file = forms.FileField(required=True)
+    description = forms.CharField(
+        required=False, max_length=2500, widget=forms.Textarea)
+    mime_type = forms.CharField(required=False,
+                                max_length=200,
+                                widget=forms.HiddenInput)
+    original_file = forms.CharField(required=False,
+                                    max_length=200,
+                                    widget=forms.HiddenInput)
+    is_resource = forms.BooleanField(
+        required=False, initial=True, widget=forms.CheckboxInput)
+
+    def __init__(self, project, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = project
+        self.user = user
+
+    def clean_file(self):
+        file = self.cleaned_data.get("file", False)
+        mime = magic.Magic(mime=True)
+        mime_type = str(mime.from_buffer(file.read(1024)), 'utf-8')
+        if mime_type not in self.VALID_IMPORT_MIME_TYPES:
+            raise ValidationError(_("Invalid file type"))
+        return file
+
+
+class MapAttributesForm(forms.Form):
+    attributes = forms.MultipleChoiceField(required=False)
+    extra_headers = forms.CharField(required=False)
+
+    def __init__(self, project, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = project
+        self.user = user
+
+
+class SelectDefaultsForm(forms.Form):
+    party_type = forms.ChoiceField(choices=Party.TYPE_CHOICES, required=True)
+    party_name_field = forms.CharField(required=True)
+    location_type = forms.ChoiceField(
+        choices=LOCATION_TYPE_CHOICES, required=True
+    )
+    geometry_field = forms.CharField(required=False)
+    geometry_type_field = forms.CharField(required=False)
+
+    def __init__(self, project, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = project
+        self.user = user

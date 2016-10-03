@@ -7,6 +7,7 @@ from datetime import datetime
 from lxml import etree
 
 from django.apps import apps
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.translation import ugettext as _
@@ -16,28 +17,7 @@ from pyxform.errors import PyXFormError
 from pyxform.xls2json import parse_file_to_json
 from questionnaires.exceptions import InvalidXLSForm
 
-ATTRIBUTE_GROUPS = {
-    'location_attributes': {
-        'app_label': 'spatial',
-        'model': 'spatialunit'
-    },
-    'party_attributes': {
-        'app_label': 'party',
-        'model': 'party'
-    },
-    'location_relationship_attributes': {
-        'app_label': 'spatial',
-        'model': 'spatialrelationship'
-    },
-    'party_relationship_attributes': {
-        'app_label': 'party',
-        'model': 'partyrelationship'
-    },
-    'tenure_relationship_attributes': {
-        'app_label': 'party',
-        'model': 'tenurerelationship'
-    }
-}
+ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
 
 def create_children(children, errors=[], project=None, kwargs={}):
@@ -193,7 +173,7 @@ class QuestionnaireManager(models.Manager):
                 return instance
 
         except PyXFormError as e:
-                raise InvalidXLSForm([str(e)])
+            raise InvalidXLSForm([str(e)])
 
     def get_hash(self, filename, id_string, version):
         string = str(filename) + str(id_string) + str(version)

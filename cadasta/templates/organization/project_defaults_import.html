@@ -1,0 +1,93 @@
+{% extends "organization/project_wrapper.html" %}
+
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block content %}
+
+<form method="POST" enctype="multipart/form-data" class="col-md-12 content-single" novalidate>
+    {% csrf_token %}
+    <div class="row">
+        {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form }} {% for form in wizard.form.forms %} {{ form }} {% endfor %} {% else %}
+
+        <div class="row">
+            <div class="col-md-9">
+                {{ wizard.form.non_field_errors }}
+            </div>
+        </div>
+        <!-- Main text  -->
+        <div id="configure-defaults-wizard" class="col-md-12 main-text">
+            <h2>{% trans "Configure default fields" %}</h2>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <h3>{% trans "Party Defaults" %}</h3>
+                    <div class="form-group{% if wizard.form.party_name_field.errors %} has-error{% endif %} pull-left">
+                        <label class="control-label" for="{{ wizard.form.party_name_field.id_for_label }}">
+                            {% trans "Select the Party name field: " %}
+                            <select id="party_name_field" class="form-control" name="select_defaults-party_name_field">
+                                {% for header in available_headers %}
+                                <option value="{{ header }}" {% if 'name' in header %} selected="selected" {% endif %}>
+                                    {{ header }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-group{% if wizard.form.party_type.errors %} has-error{% endif %}">
+                        <label class="control-label padded" for="{{ wizard.form.party_type.id_for_label }}">
+                            {% trans "Select the Party type: " %}
+                            {% render_field wizard.form.party_type class+="form-control" %}
+                        </label>
+                    </div>
+                    <h3>{% trans "Location Defaults" %}</h3>
+                    <div class="form-group{% if wizard.form.location_type.errors %} has-error{% endif %} pull-left">
+                        <label class="control-label" for="{{ wizard.form.location_type.id_for_label }}">
+                            {% trans "Select the 'Location type': " %}
+                            {% render_field wizard.form.location_type class+="form-control" %}
+                        </label>
+                    </div>
+                    <div class="form-group{% if wizard.form.geometry_field.errors %} has-error{% endif %} pull-left">
+                        <label class="control-label padded" for="{{ wizard.form.geometry_field.id_for_label }}">
+                            {% trans "Select the Geometry field: " %}
+                            <select id="geometry_field" class="form-control" name="select_defaults-geometry_field">
+                                {% for header in available_headers %}
+                                <option value="{{ header }}" {% if 'geo' in header %} selected="selected" {% endif %}>
+                                    {{ header }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="form-group{% if wizard.form.geometry_type_field.errors %} has-error{% endif %}">
+                        <label class="control-label padded" for="{{ wizard.form.geometry_type_field.id_for_label }}">
+                            {% trans "Select the Geometry Type field: " %}
+                            <select id="geometry_type_field" class="form-control" name="select_defaults-geometry_type_field">
+                                {% for header in available_headers %}
+                                <option value="{{ header }}" {% if 'geo' in header %} selected="selected" {% endif %}>
+                                    {{ header }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div class="panel-footer panel-buttons clearfix">
+                    {% block step_content_buttons %}
+                    <div class="btn-group btn-reverse pull-right" role="group">
+                        <button class="btn btn-primary pull-right" type="submit">
+                            {% trans 'Import Data' %}
+                            <span class="glyphicon glyphicon-import"></span>
+                        </button>
+                        <button class="btn btn-default" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
+                            <span class="glyphicon glyphicon-triangle-left"></span> {% trans "Previous" %}
+                        </button>
+                    </div>
+                    {% endblock %}
+                    <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</form>
+{% endblock %}
