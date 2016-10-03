@@ -86,7 +86,7 @@ def get_test_data():
             '_managers': (8,),
         },
         {
-            'name': "Archived Project",
+            'name': "Zealous Archived Project",
             'slug': 'archived-project',
             'description': "",
             'country': '',

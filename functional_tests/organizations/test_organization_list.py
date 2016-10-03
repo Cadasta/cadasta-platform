@@ -7,6 +7,7 @@ from pages.Login import LoginPage
 from tutelary.models import assign_user_policies, Policy
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory
+from organization.tests.factories import OrganizationFactory
 
 
 class OrganizationListTest(FunctionalTest):
@@ -114,27 +115,58 @@ class OrganizationListTest(FunctionalTest):
         page = OrganizationListPage(self)
         page.go_to()
 
-        organization_title = page.get_organization_title_in_table()
-        assert organization_title == 'Organization #0'
+        first_org = page.get_organization_title_in_table()
+        assert first_org == 'Organization #0'
 
         page.click_archive_filter("Archived")
-        organization_title = page.get_organization_title_in_table()
-        assert organization_title == 'Archived Organization Archived'
+        first_org = page.get_organization_title_in_table()
+        assert first_org == 'Zealous Archived Organization Archived'
 
         first_org = page.sort_table_by("descending", col="organization")
-        assert first_org == 'Archived Organization Archived'
-        first_org = page.sort_table_by("ascending", col="organization")
+        assert first_org == 'Zealous Archived Organization Archived'
 
+        page.sort_table_by("ascending", col="organization")
         page.click_archive_filter("All")
-        organization_title = page.get_organization_title_in_table()
-        assert first_org == 'Archived Organization Archived'
-
         first_org = page.sort_table_by("descending", col="organization")
-        organization_title = page.get_organization_title_in_table()
-        assert organization_title == 'Organization #1'
+        assert first_org == 'Zealous Archived Organization Archived'
+
         first_org = page.sort_table_by("ascending", col="organization")
+        assert first_org == 'Organization #0'
 
         page.click_archive_filter("Archived")
         page.click_archive_filter("Active")
-        organization_title = page.get_organization_title_in_table()
-        assert organization_title == 'Organization #0'
+        first_org = page.get_organization_title_in_table()
+        assert first_org == 'Organization #0'
+
+    def test_archived_orgs_filter_appears_in_long_list(self):
+        """If the organization list spans two pages, and an archived
+        organization appears on the second page, the archive filter option
+        should still appear"""
+        OrganizationFactory.create_batch(10)
+
+        LoginPage(self).login('testadmin', 'password')
+        page = OrganizationListPage(self)
+        page.go_to()
+
+        first_org = page.get_organization_title_in_table()
+        assert first_org == 'Organization #0'
+
+        page.click_archive_filter("Archived")
+        first_org = page.get_organization_title_in_table()
+        assert first_org == 'Zealous Archived Organization Archived'
+
+        first_org = page.sort_table_by("descending", col="organization")
+        assert first_org == 'Zealous Archived Organization Archived'
+
+        page.sort_table_by("ascending", col="organization")
+        page.click_archive_filter("All")
+        first_org = page.sort_table_by("descending", col="organization")
+        assert first_org == 'Zealous Archived Organization Archived'
+
+        first_org = page.sort_table_by("ascending", col="organization")
+        assert first_org == 'Organization #0'
+
+        page.click_archive_filter("Archived")
+        page.click_archive_filter("Active")
+        first_org = page.get_organization_title_in_table()
+        assert first_org == 'Organization #0'

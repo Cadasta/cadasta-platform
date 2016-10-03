@@ -32,7 +32,11 @@
 <table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
+      {% if any_archived %}
+      <th class="archived">{% trans Archived %}</th>
+      {% else %}
       <th class="unarchived">{% trans Archived %}</th>
+      {% endif %}
       <th class="col-md-10">{% trans "Organization" %}</th>
       <th class="col-md-2 hidden-xs">{% trans "Projects" %}</th>
     </tr>
