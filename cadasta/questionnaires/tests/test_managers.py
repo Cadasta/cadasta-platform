@@ -58,6 +58,51 @@ class CreateChildrenTest(TestCase):
             questionnaire=questionnaire,
             question_group__isnull=False).count() == 1
 
+    def test_create_children_with_repeat_group(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        children = [{
+            'label': 'This form showcases the different question',
+            'name': 'intro',
+            'type': 'note'
+        }, {
+            'label': 'Text question type',
+            'name': 'text_questions',
+            'type': 'repeat',
+            'children': [
+                {
+                    'hint': 'Can be short or long but '
+                            'always one line (type = '
+                            'text)',
+                    'label': 'Text',
+                    'name': 'my_string',
+                    'type': 'text'
+                },
+                {
+                    'hint': 'Nested group',
+                    'label': 'Group',
+                    'name': 'my_group',
+                    'type': 'group',
+                    'children': [
+                        {
+                            'hint': 'More text',
+                            'label': 'Text',
+                            'name': 'my_group_string',
+                            'type': 'text'
+                        },
+                    ]
+                }
+            ],
+        }]
+        create_children(children, kwargs={'questionnaire': questionnaire})
+
+        assert models.QuestionGroup.objects.filter(
+            questionnaire=questionnaire).count() == 1
+        assert models.Question.objects.filter(
+            questionnaire=questionnaire).count() == 3
+        assert models.Question.objects.filter(
+            questionnaire=questionnaire,
+            question_group__isnull=False).count() == 1
+
 
 class CreateOptionsTest(TestCase):
 

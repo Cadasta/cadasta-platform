@@ -26,6 +26,7 @@ from resources.models import Resource
 from spatial.models import SpatialUnit
 from tutelary.models import Role
 from xforms.tests.files.test_resources import responses
+from xforms.models import XFormSubmission
 
 from ..views import api
 from .attr_schemas import (default_party_xform_group,
@@ -95,7 +96,6 @@ class XFormListTest(APITestCase, UserTestCase, TestCase):
 
         response = self.request(user=self.user)
         assert response.status_code == 200
-        print(response.content)
 
         xml = etree.fromstring(response.content.encode('utf-8'))
         ns = {'xf': 'http://openrosa.org/xforms/xformsList'}
@@ -123,72 +123,39 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create()
         self.prj = ProjectFactory.create(organization=self.org)
-        self.prj_2 = ProjectFactory.create(organization=self.org)
-        self.prj_3 = ProjectFactory.create(organization=self.org)
 
         OrganizationRole.objects.create(
             organization=self.org, user=self.user, admin=True)
 
-        QuestionnaireFactory.create(
-            project=self.prj,
-            xls_form=get_form('test_standard_questionnaire'),
-            filename='test_standard_questionnaire',
-            id_string='test_standard_questionnaire',
-            version=20160727122110)
-
+    def _create_questionnaire(self, questionnaire_name, version,
+                              schema=True):
         questionnaire = QuestionnaireFactory.create(
-            project=self.prj_2,
-            xls_form=get_form('test_standard_questionnaire_2'),
-            filename='test_standard_questionnaire_2',
-            id_string='test_standard_questionnaire_2',
-            version=20160727122111)
+            project=self.prj,
+            xls_form=get_form(questionnaire_name),
+            filename=questionnaire_name,
+            id_string=questionnaire_name,
+            version=(20160727122110 + version))
 
-        QuestionFactory.create(
-            name='location_geometry',
-            label='Location of Parcel',
-            type='GS',
-            questionnaire=questionnaire)
+        if schema:
+            self._create_attrs_schema(self.prj)
 
-        QuestionnaireFactory.create(
-            project=self.prj_3,
-            xls_form=get_form('test_standard_questionnaire_bad'),
-            filename='test_standard_questionnaire_bad',
-            id_string='test_standard_questionnaire_bad',
-            version=20160727122112)
+        return questionnaire
 
-        # project 1
+    def _create_attrs_schema(self, prj):
         create_attrs_schema(
-            project=self.prj, dict=default_party_xform_group,
+            project=prj, dict=default_party_xform_group,
             content_type=ContentType.objects.get(
                 app_label='party', model='party'), errors=[])
         create_attrs_schema(
-            project=self.prj, dict=individual_party_xform_group,
+            project=prj, dict=individual_party_xform_group,
             content_type=ContentType.objects.get(
                 app_label='party', model='party'), errors=[])
         create_attrs_schema(
-            project=self.prj, dict=location_xform_group,
+            project=prj, dict=location_xform_group,
             content_type=ContentType.objects.get(
                 app_label='spatial', model='spatialunit'), errors=[])
         create_attrs_schema(
-            project=self.prj, dict=tenure_relationship_xform_group,
-            content_type=ContentType.objects.get(
-                app_label='party', model='tenurerelationship'), errors=[])
-
-        # project 2
-        create_attrs_schema(
-            project=self.prj_2, dict=default_party_xform_group,
-            content_type=ContentType.objects.get(
-                app_label='party', model='party'), errors=[])
-        create_attrs_schema(
-            project=self.prj_2, dict=individual_party_xform_group,
-            content_type=ContentType.objects.get(
-                app_label='party', model='party'), errors=[])
-        create_attrs_schema(
-            project=self.prj_2, dict=location_xform_group,
-            content_type=ContentType.objects.get(
-                app_label='spatial', model='spatialunit'), errors=[])
-        create_attrs_schema(
-            project=self.prj_2, dict=tenure_relationship_xform_group,
+            project=prj, dict=tenure_relationship_xform_group,
             content_type=ContentType.objects.get(
                 app_label='party', model='tenurerelationship'), errors=[])
 
@@ -265,9 +232,16 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         ns = {'or': 'http://openrosa.org/http/response'}
         return xml.find('.//or:message', namespaces=ns).text
 
+    def _test_resource(self, resource, model):
+        assert Resource.objects.get(
+            name__contains=resource) in model.resources
+
     def test_submission_upload(self):
-        data = self._submission(form='form',
-                                image=['test_image_one', 'test_image_two'],
+        questionnaire = self._create_questionnaire('t_questionnaire', 0)
+        data = self._submission(form='submission',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three'],
                                 audio=['test_audio_one'])
 
         response = self.request(method='POST', user=self.user, post_data=data,
@@ -276,18 +250,21 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
 
         party = Party.objects.get(name='Bilbo Baggins')
         location = SpatialUnit.objects.get(attributes={'name': 'Middle Earth'})
-        assert location in party.tenure_relationships.all()
-        assert len(location.resources) == 1
-        assert location.resources[0] == Resource.objects.get(
-            name__contains='test_image_one')
-        assert len(party.resources) == 2
-        assert Resource.objects.get(
-            name__contains='test_image_two') in party.resources
-        assert Resource.objects.get(
-            name__contains='test_audio_one') in party.resources
+        tenure = TenureRelationship.objects.get(party=party)
+        assert tenure.spatial_unit == location
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party)
+        self._test_resource('test_audio_one', party)
+        self._test_resource('test_image_three', tenure)
+
+        response = XFormSubmission.objects.get(user=self.user)
+        assert response.questionnaire == questionnaire
+        assert ('Bilbo Baggins' in
+                response.json_submission['t_questionnaire']['party_name'])
 
     def test_line_upload(self):
-        data = self._submission(form='line_form')
+        self._create_questionnaire('t_questionnaire', 0)
+        data = self._submission(form='submission_line')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
 
@@ -296,7 +273,8 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'LineString'
 
     def test_polygon_upload(self):
-        data = self._submission(form='poly_form',
+        self._create_questionnaire('t_questionnaire', 0)
+        data = self._submission(form='submission_poly',
                                 audio=['test_audio_one'])
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
@@ -307,11 +285,11 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'Polygon'
 
         tenure = TenureRelationship.objects.get(tenure_type='LH')
-        assert Resource.objects.get(
-            name__contains='test_audio_one') in tenure.resources
+        self._test_resource('test_audio_one', tenure)
 
     def test_point_upload(self):
-        data = self._submission(form='missing_semi_form')
+        self._create_questionnaire('t_questionnaire', 0)
+        data = self._submission(form='submission_missing_semi')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
 
@@ -320,7 +298,15 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'Point'
 
     def test_geoshape_upload(self):
-        data = self._submission(form='geoshape_form')
+        questionnaire = self._create_questionnaire(
+            't_questionnaire_geotype_select', 1)
+        QuestionFactory.create(
+            name='location_geometry',
+            label='Location of Parcel',
+            type='GS',
+            questionnaire=questionnaire)
+
+        data = self._submission(form='submission_geotype_select')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
 
@@ -329,7 +315,15 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'Polygon'
 
     def test_geoshape_as_location_geometry_upload(self):
-        data = self._submission(form='location_geoshape_form')
+        questionnaire = self._create_questionnaire(
+            't_questionnaire_geotype_select', 1)
+        QuestionFactory.create(
+            name='location_geometry',
+            label='Location of Parcel',
+            type='GS',
+            questionnaire=questionnaire)
+
+        data = self._submission(form='submission_geotype_neither')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
 
@@ -338,6 +332,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert geom.geometry.geom_type == 'Polygon'
 
     def test_invalid_submission_upload(self):
+        self._create_questionnaire('t_questionnaire', 0)
         # testing submitting with a missing xml_submission_file
         data = self._invalid_submission(form='This is not an xml form!')
         response = self.request(method='POST', user=self.user, post_data=data,
@@ -346,21 +341,21 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         msg = self._getResponseMessage(response)
         assert msg == "XML submission not found"
 
-        data = self._submission(form='bad_location_form')
+        data = self._submission(form='submission_bad_location')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
         assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "Location error: 'location_type'"
 
-        data = self._submission(form='bad_party_form')
+        data = self._submission(form='submission_bad_party')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
         assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "Party error: 'party_name'"
 
-        data = self._submission(form='bad_tenure_form')
+        data = self._submission(form='submission_bad_tenure')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
         assert response.status_code == 400
@@ -373,7 +368,8 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         ).read()
         bad_file = bad_file.decode('utf-8')
 
-        data = self._submission(form='bad_resource_form',
+        self._create_questionnaire('t_questionnaire_bad', 2, False)
+        data = self._submission(form='submission_bad_resource',
                                 image=['test_image_one'],
                                 file=bad_file)
         response = self.request(method='POST', user=self.user, post_data=data,
@@ -388,14 +384,15 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert len(Resource.objects.all()) == 0
 
     def test_anonymous_user(self):
-        data = self._submission(form='form')
+        self._create_questionnaire('t_questionnaire', 0)
+        data = self._submission(form='submission')
         response = self.request(method='POST', post_data=data,
                                 content_type='multipart/form-data')
         assert response.status_code == 403
 
     def test_questionnaire_not_found(self):
         with pytest.raises(ValidationError):
-            data = self._submission(form='bad_questionnaire')
+            data = self._submission(form='submission_bad_questionnaire')
             response = self.request(method='POST',
                                     post_data=data,
                                     user=self.user,
@@ -408,16 +405,180 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
 
     def test_form_not_current_questionnaire(self):
         # update the default form to a new version
-        QuestionnaireFactory.create(
-            project=self.prj,
-            xls_form=get_form('test_standard_questionnaire'),
-            filename='test_standard_questionnaire_updated',
-            id_string='test_standard_questionnaire',
-            version=20160727122111
-        )
-        data = self._submission(form='form')
+        self._create_questionnaire('t_questionnaire', 0)
+        self._create_questionnaire('t_questionnaire', 1)
+
+        data = self._submission(form='submission')
         response = self.request(method='POST', post_data=data,
                                 user=self.user,
                                 content_type='multipart/form-data')
         msg = self._getResponseMessage(response)
         assert msg == 'Form out of date'
+
+    def test_form_with_repeat_party(self):
+        self._create_questionnaire('t_questionnaire_repeat_party', 3)
+        data = self._submission(form='submission_party_repeat',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three',
+                                       'test_image_four',
+                                       'test_image_five'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
+
+        party_one = Party.objects.get(name='Bilbo Baggins')
+        party_two = Party.objects.get(name='Samwise Gamgee')
+        location = SpatialUnit.objects.get(type='MI')
+        tenure = TenureRelationship.objects.get(party=party_one)
+        assert tenure.spatial_unit == location
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party_one)
+        self._test_resource('test_image_three', party_one)
+        self._test_resource('test_image_four', tenure)
+        self._test_resource('test_image_five', party_two)
+
+    def test_form_repeat_with_one_party(self):
+        self._create_questionnaire('t_questionnaire_repeat_party', 3)
+        data = self._submission(form='submission_party_one_repeat',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three',
+                                       'test_image_four'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
+
+        party = Party.objects.get(name='Bilbo Baggins')
+        location = SpatialUnit.objects.get(type='MI')
+        tenure = TenureRelationship.objects.get(
+            party=party)
+        assert tenure.spatial_unit == location
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party)
+        self._test_resource('test_image_three', party)
+        self._test_resource('test_image_four', tenure)
+
+    def test_form_with_repeat_location(self):
+        self._create_questionnaire('t_questionnaire_repeat_location', 4)
+        data = self._submission(form='submission_location_repeat',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three',
+                                       'test_image_four',
+                                       'test_image_five'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
+
+        party = Party.objects.get(name='Bilbo Baggins')
+        location_one = SpatialUnit.objects.get(type='MI')
+        location_two = SpatialUnit.objects.get(type='CB')
+        tenure_one = TenureRelationship.objects.get(
+            spatial_unit=location_one)
+        assert tenure_one.party == party
+        tenure = TenureRelationship.objects.get(
+            spatial_unit=location_two)
+
+        assert tenure.party == party
+        self._test_resource('test_audio_one', location_one)
+        self._test_resource('test_image_one', location_one)
+        self._test_resource('test_image_two', tenure_one)
+        self._test_resource('test_image_three', location_two)
+        self._test_resource('test_image_four', party)
+        self._test_resource('test_image_five', party)
+
+    def test_form_repeat_with_one_location(self):
+        self._create_questionnaire('t_questionnaire_repeat_location', 4)
+        data = self._submission(form='submission_location_one_repeat',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_four',
+                                       'test_image_five'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
+
+        party = Party.objects.get(name='Bilbo Baggins')
+        location = SpatialUnit.objects.get(type='MI')
+        tenure = TenureRelationship.objects.get(
+            spatial_unit=location)
+
+        assert tenure.party == party
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', tenure)
+        self._test_resource('test_image_four', party)
+        self._test_resource('test_image_five', party)
+
+    def test_form_repeat_minus_tenure(self):
+        self._create_questionnaire('t_questionnaire_repeat_minus_tenure', 5)
+        data = self._submission(form='submission_repeat_minus_tenure',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three',
+                                       'test_image_four',
+                                       'test_image_five'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
+
+        party = Party.objects.get(name='Bilbo Baggins')
+        location_one = SpatialUnit.objects.get(type='MI')
+        location_two = SpatialUnit.objects.get(type='CB')
+        tenure_one = TenureRelationship.objects.get(
+            spatial_unit=location_one)
+        tenure_two = TenureRelationship.objects.get(
+            spatial_unit=location_two)
+        assert tenure_one.party == party and tenure_two.party == party
+
+        self._test_resource('test_audio_one', location_one)
+        self._test_resource('test_image_one', location_one)
+        self._test_resource('test_image_two', tenure_one)
+        self._test_resource('test_image_two', tenure_two)
+        self._test_resource('test_image_three', location_two)
+        self._test_resource('test_image_four', party)
+        self._test_resource('test_image_five', party)
+
+    def test_form_repeat_party_minus_tenure(self):
+        self._create_questionnaire(
+            't_questionnaire_repeat_party_minus_tenure', 6)
+        data = self._submission(form='submission_repeat_party_minus_tenure',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three',
+                                       'test_image_four',
+                                       'test_image_five'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 201
+
+        party_one = Party.objects.get(name='Bilbo Baggins')
+        party_two = Party.objects.get(name='Samwise Gamgee')
+        location = SpatialUnit.objects.get(type='MI')
+        tenure_one = TenureRelationship.objects.get(party=party_one)
+        tenure_two = TenureRelationship.objects.get(party=party_two)
+        assert tenure_one.spatial_unit == location
+        assert tenure_two.spatial_unit == location
+
+        self._test_resource('test_audio_one', location)
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', tenure_one)
+        self._test_resource('test_image_two', tenure_two)
+        self._test_resource('test_image_three', party_one)
+        self._test_resource('test_image_four', party_one)
+        self._test_resource('test_image_five', party_two)
