@@ -32,13 +32,13 @@
   {% csrf_token %}
 
   <div class="form-group{% if form.login.errors %} has-error{% endif %}">
-    <label for="id_login">Username</label>
+    <label for="id_login">{% trans "Username" %}</label>
     <label class="pull-right control-label">{{ form.login.errors }}</label>
     {% render_field form.login class+="form-control input-lg" placeholder="" %}
   </div>
 
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
-    <label for="id_password">Password</label>
+    <label for="id_password">{% trans "Password" %}</label>
     <label class="pull-right control-label">{{ form.password.errors }}</label>
     {% render_field form.password class+="form-control input-lg" placeholder="" %}
   </div>
@@ -51,9 +51,9 @@
 
   <div class="checkbox pull-left">
     <label>
-      <input id="id_remember" label="Remember me"
+      <input id="id_remember" label="{% trans 'Remember me' %}"
              name="remember" type="checkbox" />
-      Remember me
+      {% trans "Remember me" %}
     </label>
   </div>
 
@@ -66,8 +66,8 @@
   </button>
 
   <p class="text-center">
-    Don't have an account?
-    <a href="{% url 'account_signup' %}">Register here</a>
+    {% trans "Don't have an account?" %}
+    <a href="{% url 'account_signup' %}">{% trans "Register here" %}</a>
   </p>
 </form>
 

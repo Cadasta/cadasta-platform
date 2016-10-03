@@ -1,13 +1,13 @@
 {% extends "core/base.html" %}
 
-{% block top-nav %}dashboard{% endblock %}
-{% block body-class %} map{% endblock %}
-
-{% block title %} | Dashboard{% endblock %}
-
 {% load staticfiles %}
 {% load i18n %}
 {% load leaflet_tags %}
+
+{% block top-nav %}dashboard{% endblock %}
+{% block body-class %} map{% endblock %}
+
+{% block title %} | {% trans "Dashboard" %}{% endblock %}
 
 {% block extra_head %}
 {% leaflet_css %}

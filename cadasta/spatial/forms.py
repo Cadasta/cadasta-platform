@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.gis import forms as gisforms
 from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy
 from django.contrib.contenttypes.models import ContentType
 
 from jsonattrs.models import Schema, compose_schemas
@@ -45,9 +46,9 @@ class LocationForm(AttributeModelForm):
 
 
 REL_TYPE_CHOICES = (
-    ('', 'Please select'),
-    ('L', 'Location'),
-    ('P', 'Party')
+    ('', ugettext_lazy('Please select')),
+    ('L', ugettext_lazy('Location')),
+    ('P', ugettext_lazy('Party'))
 )
 
 

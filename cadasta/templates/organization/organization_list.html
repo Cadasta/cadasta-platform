@@ -40,9 +40,9 @@
   {% for org in object_list %}
   <tr class="linked" onclick="window.document.location='{% url 'organization:dashboard' slug=org.slug %}';">
   {% if org.archived %}
-    <td class="archived"><div>True</div></td>
+    <td class="archived"><div>{% trans "True" %}</div></td>
   {% else %}
-    <td class="unarchived"><div>False</div></td>
+    <td class="unarchived"><div>{% trans "False" %}</div></td>
   {% endif %}
     <td>
       {% if org.logo %}
@@ -54,7 +54,7 @@
       <div class="org-text">
         <h4><a href="{% url 'organization:dashboard' slug=org.slug %}">{{ org.name }}</a>
         {% if org.archived %}
-          <span class="label label-danger">Archived</span>
+          <span class="label label-danger">{% trans "Archived" %}</span>
         {% endif %}
         </h4>
         {% if org.description %}

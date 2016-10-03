@@ -32,7 +32,7 @@
                       <h4>{{ object.username }}</h4>
                       {{ object.full_name }}<br>
                       {{ object.email }}<br>
-                      Last login: {{ object.last_login }}<br>
+                      {% trans "Last login:" %} {{ object.last_login }}<br>
                     </div>
                     <div class="form-group member-role{% if form.org_role.errors %} has-error{% endif %}">
                       <label class="control-label" for="{{ form.org_role.id_for_label }}">{% trans "Role" %}</label>
@@ -45,11 +45,11 @@
                     </div>
                     <div class="btn-full">
                       <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin %} disabled{% endif %}>
-                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove member</button>
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Remove member" %}</button>
                         {% if org_admin %}
                           <div class="alert alert-full" role="alert">
                             <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
-                            <div>An organization administrator cannot remove themself.</div>
+                            <div>{% trans "An organization administrator cannot remove themself." %}</div>
                           </div>
                         {% endif %}
                     </div>
@@ -61,14 +61,14 @@
                 <!-- Members index -->
                 <div class="panel panel-default">
                   <div class="panel-heading">
-                    <h3>Member Permissions</h3>
+                    <h3>{% trans "Member Permissions" %}</h3>
                   </div>
                   <div class="panel-body">
                     <table class="table table-hover datatable" id="projects-permissions">
                       <thead>
                         <tr>
-                          <th>Project</th>
-                          <th>Permissions</th>
+                          <th>{% trans "Project" %}</th>
+                          <th>{% trans "Permissions" %}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -97,8 +97,8 @@
             </div>
           </div>
           <div class="panel-footer panel-buttons text-center">
-            <button type="submit" class="btn btn-primary" name="submit">Save</button>
-            <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">Cancel</a>
+            <button type="submit" class="btn btn-primary" name="submit">{% trans "Save" %}</button>
+            <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
           </div>
         </form>
       </div>
@@ -116,15 +116,15 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" name="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h3 class="modal-title">Remove Member</h3>
+        <h3 class="modal-title">{% trans "Remove Member" %}</h3>
       </div>
       <div class="modal-body">
-        <p>Removing this member will remove the member's project permissions for this organization.</p>
-        <p>Are you sure you want to remove this member?</p>
+        <p>{% trans "Removing this member will remove the member's project permissions for this organization." %}</p>
+        <p>{% trans "Are you sure you want to remove this member?" %}</p>
       </div>
       <div class="modal-footer">
-        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-danger confirm pull-right">Yes, remove this member</a>
-        <button type="button" class="btn btn-link" name="cancel" data-dismiss="modal">Cancel</button>
+        <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-danger confirm pull-right">{% trans "Yes, remove this member" %}</a>
+        <button type="button" class="btn btn-link" name="cancel" data-dismiss="modal">{% trans "Cancel" %}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->

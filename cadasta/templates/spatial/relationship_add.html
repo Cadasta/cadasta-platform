@@ -65,7 +65,7 @@ $(document).ready(function() {
 
           <div class="modal-body">
             {% csrf_token %}
-            <h4 class="step">{% trans "1. Connected party" %}</h4>
+            <h4 class="step">1. {% trans "Connected party" %}</h4>
             <div id="select-party" class="clearfix{% if form.new_entity.value %} hidden{% endif %}">
               <div class="form-group{% if form.id.errors %} has-error{% endif %}">
                 <label for="{{ form.id.id_for_label }}">{% trans "Choose an existing party to connect to this location" %}</label>
@@ -109,7 +109,7 @@ $(document).ready(function() {
 
             </div>
 
-            <h4 class="step">{% trans "2. Relationship details" %}</h4>
+            <h4 class="step">2. {% trans "Relationship details" %}</h4>
 
             <div class="form-group{% if form.tenure_type.errors %} has-error{% endif %}">
               <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>

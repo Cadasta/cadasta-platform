@@ -182,8 +182,8 @@ class AddOrganizationMemberForm(forms.Form):
     def save(self):
         if self.errors:
             raise ValueError(
-                "The role could not be assigned because the data didn't "
-                "validate."
+                _("The role could not be assigned because the data didn't "
+                  "validate.")
             )
 
         self.instance = OrganizationRole.objects.create(
