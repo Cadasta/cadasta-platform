@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import get_storage_class
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from jsonattrs.models import Attribute, AttributeType
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from pyxform.xform2json import XFormToDict
 from questionnaires.models import Questionnaire, Question
@@ -346,7 +347,14 @@ class ModelHelper():
         for attr_group in data:
             if '{model}_attributes'.format(model=model_type) in attr_group:
                 for item in data[attr_group]:
-                    attributes[item] = data[attr_group][item]
+                    if Attribute.objects.filter(
+                        name=item,
+                        attr_type=AttributeType.objects.get(
+                                    name='select_multiple')).exists():
+                        answers = data[attr_group][item].split(' ')
+                        attributes[item] = answers
+                    else:
+                        attributes[item] = data[attr_group][item]
         return attributes
 
     def _get_resource_files(self, data, model_type):

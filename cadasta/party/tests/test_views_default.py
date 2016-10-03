@@ -218,13 +218,37 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             attr_type=attr_type, index=0,
             required=False, omit=False
         )
+        Attribute.objects.create(
+            schema=schema,
+            name='fname_2', long_name='Test field 2',
+            attr_type=AttributeType.objects.get(name='select_one'),
+            choices=['-', 'one', 'two', 'three'],
+            choice_labels=['None', 'Choice 1', 'Choice 2', 'Choice 3'],
+            index=1,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='fname_3', long_name='Test field 3',
+            attr_type=AttributeType.objects.get(name='select_multiple'),
+            choices=['-', 'one', 'two', 'three'],
+            choice_labels=['None', 'Choice 1', 'Choice 2', 'Choice 3'],
+            index=2,
+            required=False, omit=False
+        )
         self.party = PartyFactory.create(project=self.project,
-                                         attributes={'fname': 'test'})
+                                         attributes={
+                                            'fname': 'test',
+                                            'fname_2': 'two',
+                                            'fname_3': ['one', 'three']
+                                         })
 
     def setup_template_context(self):
         return {'object': self.project,
                 'party': self.party,
-                'attributes': (('Test field', 'test', ), )}
+                'attributes': (('Test field', 'test', ),
+                               ('Test field 2', 'Choice 2', ),
+                               ('Test field 3', 'Choice 1, Choice 3', ))}
 
     def setup_url_kwargs(self):
         return {
@@ -773,15 +797,39 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
             attr_type=attr_type, index=0,
             required=False, omit=False
         )
+        Attribute.objects.create(
+            schema=schema,
+            name='fname_2', long_name='Test field 2',
+            attr_type=AttributeType.objects.get(name='select_one'),
+            choices=['-', 'one', 'two', 'three'],
+            choice_labels=['None', 'Choice 1', 'Choice 2', 'Choice 3'],
+            index=1,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='fname_3', long_name='Test field 3',
+            attr_type=AttributeType.objects.get(name='select_multiple'),
+            choices=['-', 'one', 'two', 'three'],
+            choice_labels=['None', 'Choice 1', 'Choice 2', 'Choice 3'],
+            index=2,
+            required=False, omit=False
+        )
         self.relationship = TenureRelationshipFactory.create(
-            project=self.project, attributes={'fname': 'test'})
+            project=self.project, attributes={
+                'fname': 'test',
+                'fname_2': 'two',
+                'fname_3': ['one', 'three']
+            })
 
     def setup_template_context(self):
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
                 'geojson': '{"type": "FeatureCollection", "features": []}',
-                'attributes': (('Test field', 'test', ), )}
+                'attributes': (('Test field', 'test', ),
+                               ('Test field 2', 'Choice 2', ),
+                               ('Test field 3', 'Choice 1, Choice 3', ))}
 
     def setup_url_kwargs(self):
         return {

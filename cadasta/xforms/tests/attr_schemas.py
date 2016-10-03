@@ -94,6 +94,25 @@ location_xform_group = {
             "name": "name",
             "type": "text",
             "hint": "Name of the location"
+        },
+        {
+            "label": "Infrastructure",
+            "name": "infrastructure",
+            "type": "select all that apply",
+            "choices": [
+                {
+                    "name": "water",
+                    "label": "Water",
+                },
+                {
+                    "name": "food",
+                    "label": "Food",
+                },
+                {
+                    "name": "electricity",
+                    "label": "Electricity",
+                },
+            ]
         }
     ]
 }
@@ -105,7 +124,7 @@ location_relationship_xform_group = {
             "name": "notes",
             "label": "Notes",
             "type": "text"
-        }
+        },
     ],
     "label": "Location relationship attributes",
     "type": "group"
