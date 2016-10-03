@@ -4,6 +4,7 @@ from pages.ProjectList import ProjectListPage
 from pages.Login import LoginPage
 from fixtures.common_test_data_1 import get_test_data
 from core.tests.factories import PolicyFactory
+from organization.tests.factories import ProjectFactory
 
 # from accounts.models import User
 
@@ -123,23 +124,65 @@ class ProjectListContentsTest(FunctionalTest):
         project_title = page.get_project_title_in_table()
         assert project_title == 'Linux Kernel'
 
+        project_title = page.sort_table_by("descending")
+        assert project_title == 'Project Gutenberg'
+
+        page.sort_table_by("ascending")
         page.click_archive_filter("Archived")
         project_title = page.get_project_title_in_table()
-        assert project_title == 'Archived Project Archived'
+        assert project_title == 'Zealous Archived Project Archived'
 
-        first_org = page.sort_table_by("descending")
-        assert first_org == 'Archived Project Archived'
-        first_org = page.sort_table_by("ascending")
+        project_title = page.sort_table_by("descending")
+        assert project_title == 'Zealous Archived Project Archived'
 
+        page.sort_table_by("ascending")
         page.click_archive_filter("All")
         project_title = page.get_project_title_in_table()
-        assert first_org == 'Archived Project Archived'
+        assert project_title == 'Linux Kernel'
 
-        first_org = page.sort_table_by("descending")
+        project_title = page.sort_table_by("descending")
+        assert project_title == 'Zealous Archived Project Archived'
+
+        page.sort_table_by("ascending")
+        page.click_archive_filter("Archived")
+        page.click_archive_filter("Active")
         project_title = page.get_project_title_in_table()
-        assert project_title == 'Project Gutenberg'
-        first_org = page.sort_table_by("ascending")
+        assert project_title == 'Linux Kernel'
 
+    def test_archived_projects_appear_in_long_lists(self):
+        """If the project list spans two pages, and an archived
+        project appears on the second page, the archive filter option
+        should still appear"""
+
+        ProjectFactory.create_batch(10)
+
+        LoginPage(self).login('default5', 'password1')
+        page = ProjectListPage(self)
+        page.go_to_and_check_on_page()
+
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Linux Kernel'
+
+        project_title = page.sort_table_by("descending")
+        assert project_title == 'Project Gutenberg'
+
+        page.sort_table_by("ascending")
+        page.click_archive_filter("Archived")
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Zealous Archived Project Archived'
+
+        project_title = page.sort_table_by("descending")
+        assert project_title == 'Zealous Archived Project Archived'
+
+        page.sort_table_by("ascending")
+        page.click_archive_filter("All")
+        project_title = page.get_project_title_in_table()
+        assert project_title == 'Linux Kernel'
+
+        project_title = page.sort_table_by("descending")
+        assert project_title == 'Zealous Archived Project Archived'
+
+        page.sort_table_by("ascending")
         page.click_archive_filter("Archived")
         page.click_archive_filter("Active")
         project_title = page.get_project_title_in_table()

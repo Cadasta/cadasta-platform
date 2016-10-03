@@ -38,6 +38,12 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
                                   if o.archived is False
                                   else ('org.view_archived',))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['any_archived'] = self.get_queryset().filter(
+                                                        archived=True).exists()
+        return context
+
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
     model = Organization
@@ -329,6 +335,12 @@ class ProjectList(PermissionRequiredMixin,
     permission_required = 'project.list'
     permission_filter_queryset = permission_filter
     project_create_check_multiple = True
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['any_archived'] = self.get_queryset().filter(
+                                                        archived=True).exists()
+        return context
 
     def get(self, request, *args, **kwargs):
         user = self.request.user

@@ -20,7 +20,8 @@ def get_test_data():
          '_members': (1, 2)},
         {'name': "Organization #1", 'description': "This is a test.",
          '_members': (1,), '_admins': (1,)},
-        {'name': "Archived Organization", 'description': "This is archived.",
+        {'name': "Zealous Archived Organization",
+         'description': "This is archived.",
          "archived": True, '_members': (1, 2), '_admins': (2,)},
     ]
 
