@@ -5,10 +5,10 @@ import itertools
 
 from django.db import migrations
 
-from questionnaires.models import Question
-
 
 def populate_index_fields(apps, schema_editor):
+    Question = apps.get_model('questionnaires', 'Question')
+
     for question in Question.objects.filter(type__in=['S1', 'SM']):
         for opt, idx in zip(question.options.order_by('index'),
                             itertools.count()):

@@ -5,12 +5,14 @@ import re
 from datetime import datetime
 
 from lxml import etree
+from xml.dom.minidom import Element
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language_info
 from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
@@ -20,11 +22,13 @@ from questionnaires.exceptions import InvalidXLSForm
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
 
-def create_children(children, errors=[], project=None, kwargs={}):
+def create_children(children, errors=[], project=None,
+                    default_language='', kwargs={}):
     if children:
         for c in children:
             if c.get('type') == 'repeat':
-                create_children(c['children'], errors, project, kwargs)
+                create_children(c['children'], errors, project,
+                                default_language, kwargs)
             elif c.get('type') == 'group':
                 model_name = 'QuestionGroup'
 
@@ -38,7 +42,9 @@ def create_children(children, errors=[], project=None, kwargs={}):
                             app_label=app_label, model=model)
                         create_attrs_schema(
                             project=project, dict=c,
-                            content_type=content_type, errors=errors
+                            content_type=content_type,
+                            default_language=default_language,
+                            errors=errors
                         )
             else:
                 model_name = 'Question'
@@ -53,13 +59,17 @@ def create_options(options, question, errors=[]):
         for o, idx in zip(options, itertools.count()):
             QuestionOption = apps.get_model('questionnaires', 'QuestionOption')
 
+            if 'label' in o:
+                o['label_xlat'] = o['label']
+                del o['label']
             QuestionOption.objects.create(question=question, index=idx+1, **o)
     else:
         errors.append(_("Please provide at least one option for field"
                         " '{field_name}'".format(field_name=question.name)))
 
 
-def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
+def create_attrs_schema(project=None, dict=None, content_type=None,
+                        default_language='', errors=[]):
     fields = []
     selectors = (project.organization.pk, project.pk,
                  project.current_questionnaire)
@@ -75,7 +85,8 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
             selectors += (selector,)
 
     schema_obj = Schema.objects.create(content_type=content_type,
-                                       selectors=selectors)
+                                       selectors=selectors,
+                                       default_language=default_language)
 
     for c in dict.get('children'):
         field = {}
@@ -119,6 +130,50 @@ def create_attrs_schema(project=None, dict=None, content_type=None, errors=[]):
         )
 
 
+# Python's builtin check_for_language does weird transformations of
+# locale names...
+
+def check_for_language(lang):
+    try:
+        get_language_info(lang)
+        return True
+    except:
+        return False
+
+
+def multilingual_label_check(children):
+    has_multi = False
+    for c in children:
+        if 'label' in c and isinstance(c['label'], dict):
+            has_multi = True
+            for lang in c['label'].keys():
+                if lang != 'default' and not check_for_language(lang):
+                    raise InvalidXLSForm(
+                        ["Label language code '{}' unknown".format(lang)]
+                    )
+        # Note the order of the short-cut "or" in the following two
+        # statements: it's like this to force the recursive call to
+        # multilingual_label_check to make sure we check the language
+        # codes everywhere, rather than dropping out as soon as we
+        # find that the form is multilingual.
+        if 'children' in c:
+            has_multi = multilingual_label_check(c['children']) or has_multi
+        if 'choices' in c:
+            has_multi = multilingual_label_check(c['choices']) or has_multi
+    return has_multi
+
+
+def fix_languages(node):
+    if (isinstance(node, Element) and
+       node.tagName == 'translation' and node.hasAttribute('lang')):
+        iso_lang = node.getAttribute('lang')
+        local_lang = get_language_info(iso_lang)['name_local']
+        node.setAttribute('lang', local_lang)
+    else:
+        for child in node.childNodes:
+            fix_languages(child)
+
+
 class QuestionnaireManager(models.Manager):
 
     def create_from_form(self, xls_form=None, original_file=None,
@@ -132,6 +187,24 @@ class QuestionnaireManager(models.Manager):
                     project=project
                 )
                 json = parse_file_to_json(instance.xls_form.file.name)
+                has_default_language = (
+                    'default_language' in json and
+                    json['default_language'] != 'default'
+                )
+                if (has_default_language and
+                   not check_for_language(json['default_language'])):
+                    raise InvalidXLSForm(
+                        ["Default language code '{}' unknown".format(
+                            json['default_language']
+                        )]
+                    )
+                is_multilingual = multilingual_label_check(json['children'])
+                if is_multilingual and not has_default_language:
+                    raise InvalidXLSForm(["Multilingual XLS forms must have "
+                                          "a default_language setting"])
+                instance.default_language = json['default_language']
+                if instance.default_language == 'default':
+                    instance.default_language = ''
                 instance.filename = json.get('name')
                 instance.title = json.get('title')
                 instance.id_string = json.get('id_string')
@@ -143,7 +216,9 @@ class QuestionnaireManager(models.Manager):
                 )
 
                 survey = create_survey_element_from_dict(json)
-                xml_form = survey.xml().toxml()
+                xml_form = survey.xml()
+                fix_languages(xml_form)
+                xml_form = xml_form.toxml()
                 # insert version attr into the xform instance root node
                 xml = self.insert_version_attribute(
                     xml_form, instance.filename, instance.version
@@ -163,6 +238,7 @@ class QuestionnaireManager(models.Manager):
                     children=json.get('children'),
                     errors=errors,
                     project=project,
+                    default_language=instance.default_language,
                     kwargs={'questionnaire': instance}
                 )
 
@@ -200,7 +276,7 @@ class QuestionGroupManager(models.Manager):
         instance = self.model(questionnaire=questionnaire)
 
         instance.name = dict.get('name')
-        instance.label = dict.get('label')
+        instance.label_xlat = dict.get('label', {})
         instance.save()
 
         create_children(
@@ -233,7 +309,7 @@ class QuestionManager(models.Manager):
         #     )
 
         instance.name = dict.get('name')
-        instance.label = dict.get('label')
+        instance.label_xlat = dict.get('label', {})
         instance.required = dict.get('required', False)
         instance.constraint = dict.get('constraint')
         instance.save()

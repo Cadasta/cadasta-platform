@@ -2,10 +2,38 @@ from buckets.fields import S3FileField
 from core.models import RandomIDModel
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
+from django.contrib.postgres.fields import JSONField
 from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
 
 from . import managers, messages
+
+
+class MultilingualLabelsMixin:
+    @property
+    def default_language(self):
+        if not hasattr(self, '_default_language'):
+            if hasattr(self, 'questionnaire'):
+                q = self.questionnaire
+            else:
+                q = self.get_questionnaire()
+            self._default_language = q.default_language
+        return self._default_language
+
+    @property
+    def label(self):
+        if isinstance(self.label_xlat, dict):
+            return self.label_xlat.get(
+                get_language(),
+                self.label_xlat[self.default_language]
+            )
+        else:
+            return self.label_xlat
+
+    @label.setter
+    def label(self, value):
+        self.label_xlat = value
 
 
 @permissioned_model
@@ -13,6 +41,7 @@ class Questionnaire(RandomIDModel):
     filename = models.CharField(max_length=100)
     title = models.CharField(max_length=500)
     id_string = models.CharField(max_length=50)
+    default_language = models.CharField(max_length=3, null=True)
     xls_form = S3FileField(upload_to='xls-forms')
     xml_form = S3FileField(upload_to='xml-forms', default=False)
     original_file = models.CharField(max_length=200, null=True)
@@ -46,9 +75,9 @@ class Questionnaire(RandomIDModel):
         )
 
 
-class QuestionGroup(RandomIDModel):
+class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
     name = models.CharField(max_length=100)
-    label = models.CharField(max_length=2500, null=True, blank=True)
+    label_xlat = JSONField(default={})
     questionnaire = models.ForeignKey(Questionnaire,
                                       related_name='question_groups')
 
@@ -57,7 +86,7 @@ class QuestionGroup(RandomIDModel):
     history = HistoricalRecords()
 
 
-class Question(RandomIDModel):
+class Question(MultilingualLabelsMixin, RandomIDModel):
     TYPE_CHOICES = (('IN', 'integer'),
                     ('DE', 'decimal'),
                     ('TX', 'text'),
@@ -87,7 +116,7 @@ class Question(RandomIDModel):
                     ('PN', 'phonenumber'))
 
     name = models.CharField(max_length=100)
-    label = models.CharField(max_length=2500, null=True, blank=True)
+    label_xlat = JSONField(default={})
     type = models.CharField(max_length=2, choices=TYPE_CHOICES)
     required = models.BooleanField(default=False)
     constraint = models.CharField(max_length=50, null=True, blank=True)
@@ -105,12 +134,15 @@ class Question(RandomIDModel):
         return self.type in ['S1', 'SM']
 
 
-class QuestionOption(RandomIDModel):
+class QuestionOption(MultilingualLabelsMixin, RandomIDModel):
     class Meta:
         ordering = ('index',)
 
+    def get_questionnaire(self):
+        return self.question.questionnaire
+
     name = models.CharField(max_length=100)
-    label = models.CharField(max_length=200)
+    label_xlat = JSONField(default={})
     index = models.IntegerField(null=False)
     question = models.ForeignKey(Question, related_name='options')
 

@@ -7,9 +7,12 @@ from buckets.test.storage import FakeS3Storage
 from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
+from django.utils.translation import activate, get_language
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
 from core.tests.utils.files import make_dirs  # noqa
+from core.tests.utils.cases import UserTestCase
+from jsonattrs.models import Attribute
 
 from . import factories
 from .. import models
@@ -281,3 +284,61 @@ class QuestionManagerTest(TestCase):
         assert model.label == question_dict['label']
         assert model.name == question_dict['name']
         assert model.type == 'IN'
+
+
+class MultilingualQuestionnaireTest(UserTestCase, TestCase):
+
+    def _run(self, xlsxfile):
+        storage = FakeS3Storage()
+        file = open(
+            path + '/questionnaires/tests/files/' + xlsxfile, 'rb'
+        ).read()
+        form = storage.save('xls-forms/' + xlsxfile, file)
+        return models.Questionnaire.objects.create_from_form(
+            xls_form=form,
+            original_file='original.xls',
+            project=ProjectFactory.create()
+        )
+
+    def test_no_default_language(self):
+        with pytest.raises(InvalidXLSForm) as e:
+            self._run('bad-no-default-language.xlsx')
+        assert str(e.value) == ("Multilingual XLS forms must have "
+                                "a default_language setting")
+
+    def test_bad_default_language(self):
+        with pytest.raises(InvalidXLSForm) as e:
+            self._run('bad-bad-default-language.xlsx')
+        assert str(e.value) == "Default language code 'Bengali' unknown"
+
+    def test_bad_label_language(self):
+        with pytest.raises(InvalidXLSForm) as e:
+            self._run('bad-bad-label-language.xlsx')
+        assert str(e.value) == "Label language code 'English' unknown"
+
+    def test_multilingual_labels_and_choices(self):
+        quest = self._run('ok-multilingual.xlsx')
+        assert quest.default_language == 'en'
+        q = quest.questions.get(name='gender')
+        assert q.label == 'Gender'
+        assert (sorted([(o.name, o.label) for o in q.options.all()]) ==
+                [('female', 'Female'), ('male', 'Male')])
+        a = Attribute.objects.get(name='gender')
+        assert a.long_name == 'Gender'
+        cd = a.choice_dict
+        assert cd['female'] == 'Female'
+        assert cd['male'] == 'Male'
+        assert len(cd) == 2
+        cur_language = get_language()
+        try:
+            activate('fr')
+            assert q.label == 'Sexe'
+            assert (sorted([(o.name, o.label) for o in q.options.all()]) ==
+                    [('female', 'Femme'), ('male', 'Homme')])
+            assert a.long_name == 'Sexe'
+            cd = a.choice_dict
+            assert cd['female'] == 'Femme'
+            assert cd['male'] == 'Homme'
+            assert len(cd) == 2
+        finally:
+            activate(cur_language)
