@@ -33,7 +33,7 @@
 
 {% endblock %}
 
-{% block step_title %}1. {% trans "General Information" %}{% endblock %}
+{% block step_title %}{% trans "1. General Information" %}{% endblock %}
 
 {% block step_content_2 %}
 
@@ -104,7 +104,7 @@
               </div>
             </div>
 
-            <h3>2. {% trans "Questionnaire" %}</h3>
+            <h3>{% trans "2. Questionnaire" %}</h3>
             <div class="row">
               <div class="col-md-9">
                 <div class="form-group{% if wizard.form.questionnaire.errors %} has-error{% endif %}">
@@ -125,7 +125,7 @@
               </div>
             </div>
 
-            <h3>3. {% trans "Contacts" %}</h3>
+            <h3>{% trans "3. Contacts" %}</h3>
             <div class="row">
               <div class="col-md-12">
                 {% render_field wizard.form.contacts class+="form-control" %}

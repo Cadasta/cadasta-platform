@@ -37,7 +37,7 @@
     <form method="POST">
     {% csrf_token %}
       <div class="panel-body">
-        <h3>Details</h3>
+        <h3>{% trans "Details" %}</h3>
         <div class="clearfix form-group{% if form.tenure_type.errors %} has-error{% endif %}">
           <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship type" %}</label>
           <label class="pull-right control-label">{{ form.tenure_type.errors }}</label>

@@ -17,11 +17,11 @@
         <div class="panel-body">
           <h3>{% trans "Draw location on map" %}</h3>
           <div class="clearfix form-group{% if form.geometry.errors %} has-error{% endif %}">
-            <p>1. {% blocktrans %}Use the tools provided on the left side of the map to mark your new location.{% endblocktrans %}</p>
+            <p>{% blocktrans %}1. Use the tools provided on the left side of the map to mark your new location.{% endblocktrans %}</p>
             <label class="control-label">{{ form.geometry.errors }}</label>
           </div>
           <div class="form-group{% if form.type.errors %} has-error{% endif %}">
-            <label for="{{ form.type.id_for_label }}">2. {% trans "What type of location is this?" %}</label>
+            <label for="{{ form.type.id_for_label }}">{% trans "2. What type of location is this?" %}</label>
             <label class="pull-right control-label">{{ form.type.errors }}</label>
             {% render_field form.type class+="form-control" %}
           </div>
