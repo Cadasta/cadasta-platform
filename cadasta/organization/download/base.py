@@ -44,6 +44,9 @@ class Exporter():
                 values.append(getattr(item, attr))
 
         for attr in schema_attrs:
-            values.append(item.attributes.get(attr.name, ''))
+            attr_value = item.attributes.get(attr.name, '')
+            if type(attr_value) == list:
+                attr_value = (', ').join(attr_value)
+            values.append(attr_value)
 
         return values

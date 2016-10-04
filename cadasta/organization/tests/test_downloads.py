@@ -50,6 +50,7 @@ class BaseExporterTest(UserTestCase, TestCase):
             content_type=content_type,
             selectors=(project.organization.id, project.id, '123abc', ))
         text_type = AttributeType.objects.get(name='text')
+        select_m_type = AttributeType.objects.get(name='select_multiple')
         Attribute.objects.create(
             schema=schema,
             name='key', long_name='Test field',
@@ -60,13 +61,15 @@ class BaseExporterTest(UserTestCase, TestCase):
             schema=schema,
             name='key_2', long_name='Test field',
             attr_type=text_type, index=1,
-            required=False, omit=False
+            required=False, omit=True
         )
         Attribute.objects.create(
             schema=schema,
-            name='key_3', long_name='Test field',
-            attr_type=text_type, index=2,
-            required=False, omit=True
+            name='key_3', long_name='Test select multiple field',
+            attr_type=select_m_type, index=2,
+            choices=['choice_1', 'choice_2', 'choice_3'],
+            choice_labels=['Choice 1', 'Choice 2', 'Choice 3'],
+            required=False, omit=False
         )
 
         exporter = Exporter(project)
@@ -82,23 +85,35 @@ class BaseExporterTest(UserTestCase, TestCase):
             content_type=content_type,
             selectors=(project.organization.id, project.id, '123abc', ))
         text_type = AttributeType.objects.get(name='text')
+        select_m_type = AttributeType.objects.get(name='select_multiple')
         attr = Attribute.objects.create(
             schema=schema,
             name='key', long_name='Test field',
             attr_type=text_type, index=0,
             required=False, omit=False
         )
+        attr2 = Attribute.objects.create(
+            schema=schema,
+            name='key_2', long_name='Test select multiple field',
+            attr_type=select_m_type, index=1,
+            choices=['choice_1', 'choice_2', 'choice_3'],
+            choice_labels=['Choice 1', 'Choice 2', 'Choice 3'],
+            required=False, omit=False
+        )
 
         ttype = TenureRelationshipType.objects.get(id='LH')
         item = TenureRelationshipFactory.create(project=project,
                                                 tenure_type=ttype,
-                                                attributes={'key': 'text'})
+                                                attributes={
+                                                    'key': 'text',
+                                                    'key_2': ['choice_1',
+                                                              'choice_2']})
         model_attrs = ('id', 'party_id', 'spatial_unit_id',
                        'tenure_type.label')
-        schema_attrs = [attr]
+        schema_attrs = [attr, attr2]
         values = exporter.get_values(item, model_attrs, schema_attrs)
         assert values == [item.id, item.party_id, item.spatial_unit_id,
-                          'Leasehold', 'text']
+                          'Leasehold', 'text', 'choice_1, choice_2']
 
 
 @pytest.mark.usefixtures('clear_temp')
