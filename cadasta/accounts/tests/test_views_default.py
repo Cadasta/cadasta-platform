@@ -1,9 +1,14 @@
+import datetime
 from django.test import TestCase
+from django.core import mail
 from skivvy import ViewTestCase
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
-from ..views.default import AccountProfile
+
+from allauth.account.models import EmailConfirmation, EmailAddress
+
+from ..views.default import AccountProfile, AccountLogin, ConfirmEmail
 from ..forms import ProfileForm
 
 
@@ -58,3 +63,72 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
 
         response = self.request(method='POST', user=user2, post_data=post_data)
         assert 'Failed to update profile information' in response.messages
+
+
+class LoginTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = AccountLogin
+
+    def setup_models(self):
+        self.user = UserFactory.create(username='imagine71',
+                                       email='john@beatles.uk',
+                                       password='iloveyoko79')
+
+    def test_successful_login(self):
+        data = {'login': 'imagine71', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+    def test_successful_login_with_unverified_user(self):
+        self.user.verify_email_by = datetime.datetime.now()
+        self.user.save()
+
+        data = {'login': 'imagine71', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'account/inactive' in response.location
+        assert len(mail.outbox) == 1
+        self.user.refresh_from_db()
+        assert self.user.is_active is False
+
+
+class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = ConfirmEmail
+    url_kwargs = {'key': '123'}
+
+    def setup_models(self):
+        self.user = UserFactory.create(email='john@example.com')
+        self.email_address = EmailAddress.objects.create(
+            user=self.user,
+            email='john@example.com',
+            verified=False,
+            primary=True
+        )
+        self.confirmation = EmailConfirmation.objects.create(
+            email_address=self.email_address,
+            sent=datetime.datetime.now(),
+            key='123'
+        )
+
+    def test_activate(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.email_verified is True
+        assert self.user.is_active is True
+
+        self.email_address.refresh_from_db()
+        assert self.email_address.verified is True
+
+    def test_activate_with_invalid_token(self):
+        response = self.request(user=self.user, url_kwargs={'key': 'abc'})
+        assert response.status_code == 200
+
+        self.user.refresh_from_db()
+        assert self.user.email_verified is False
+        assert self.user.is_active is True
+
+        self.email_address.refresh_from_db()
+        assert self.email_address.verified is False

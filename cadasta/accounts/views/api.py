@@ -37,7 +37,6 @@ class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
             self.send_email(**self.get_send_email_kwargs(user))
 
     def put(self, *args, **kwargs):
-        print(self.request.method)
         return super().put(*args, **kwargs)
 
 

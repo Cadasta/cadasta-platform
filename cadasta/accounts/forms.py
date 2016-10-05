@@ -1,6 +1,8 @@
+from datetime import datetime, timezone, timedelta
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from allauth.account.utils import send_email_confirmation
 
 from .models import User
 
@@ -47,6 +49,11 @@ class ProfileForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'full_name']
 
+    def __init__(self, *args, **kwargs):
+        self._send_confirmation = False
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
     def clean_username(self):
         username = self.data.get('username')
         if (self.instance.username != username and
@@ -60,8 +67,23 @@ class ProfileForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.data.get('email')
-        if (self.instance.email != email and
-                User.objects.filter(email=email).exists()):
-            raise forms.ValidationError(
-                _("Another user with this email already exists"))
+        if self.instance.email != email:
+            self._send_confirmation = True
+
+            if User.objects.filter(email=email).exists():
+                raise forms.ValidationError(
+                    _("Another user with this email already exists"))
         return email
+
+    def save(self, *args, **kwargs):
+        user = super().save(commit=False, *args, **kwargs)
+
+        if self._send_confirmation:
+            send_email_confirmation(self.request, user)
+            self._send_confirmation = False
+            user.email_verified = False
+            user.verify_email_by = (datetime.now(tz=timezone.utc) +
+                                    timedelta(hours=48))
+
+        user.save()
+        return user
