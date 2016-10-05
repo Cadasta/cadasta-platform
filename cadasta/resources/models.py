@@ -107,6 +107,10 @@ class Resource(RandomIDModel):
     def num_entities(self):
         return ContentObject.objects.filter(resource=self).count()
 
+    def save(self, *args, **kwargs):
+        create_thumbnails(self, (not self.id))
+        super().save(*args, **kwargs)
+
 
 @receiver(models.signals.pre_save, sender=Resource)
 def archive_file(sender, instance, **kwargs):
@@ -122,8 +126,7 @@ def archive_file(sender, instance, **kwargs):
         ContentObject.objects.filter(resource=instance).delete()
 
 
-@receiver(models.signals.post_save, sender=Resource)
-def create_thumbnails(sender, instance, created, **kwargs):
+def create_thumbnails(instance, created):
     if created or instance._original_url != instance.file.url:
         if 'image' in instance.mime_type:
             io.ensure_dirs()
