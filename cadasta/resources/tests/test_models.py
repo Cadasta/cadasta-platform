@@ -9,9 +9,9 @@ from django.conf import settings
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
+from accounts.tests.factories import UserFactory
 from ..exceptions import InvalidGPXFile
-from ..models import (ContentObject, Resource, create_spatial_resource,
-                      create_thumbnails)
+from ..models import ContentObject, Resource, create_spatial_resource
 from .factories import ResourceFactory, SpatialResourceFactory
 from .utils import clear_temp  # noqa
 
@@ -174,10 +174,11 @@ class ResourceTest(UserTestCase, TestCase):
         storage = FakeS3Storage()
         file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
         file_name = storage.save('resources/thumb_test.jpg', file)
+        contributor = UserFactory.create()
         resource = ResourceFactory.build(file=file_name,
-                                         mime_type='image/jpeg')
-
-        create_thumbnails(Resource, resource, True)
+                                         mime_type='image/jpeg',
+                                         contributor=contributor)
+        resource.save()
         assert os.path.isfile(os.path.join(
             settings.MEDIA_ROOT, 's3/uploads/resources/thumb_test-128x128.jpg')
         )
