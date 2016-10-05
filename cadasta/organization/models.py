@@ -226,7 +226,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
               'error_message': messages.PROJ_DOWNLOAD}),
             ('project.import',
              {'description': _("Import data to a project"),
-              'error_message': messages.PROJ_DOWNLOAD}),
+              'error_message': messages.PROJ_IMPORT}),
         )
 
     def __str__(self):

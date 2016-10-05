@@ -1022,6 +1022,7 @@ class SelectImportFormTest(UserTestCase, TestCase):
             name='Test Project', organization=self.org)
         self.user = UserFactory.create()
         self.invalid_file_type = '/organization/tests/files/test_invalid.kml'
+        self.valid_file_type = '/organization/tests/files/test.csv'
         self.path = os.path.dirname(settings.BASE_DIR)
         self.data = {
             'name': 'Test Imports',
@@ -1039,3 +1040,14 @@ class SelectImportFormTest(UserTestCase, TestCase):
             project=self.project, user=self.user)
         assert form.is_valid() is False
         assert form.errors['file'][0] == 'Invalid file type'
+
+    def test_set_mime_type(self):
+        valid_file = open(self.path + self.valid_file_type, 'rb').read()
+        file = SimpleUploadedFile(
+            'test.csv', valid_file, 'text/csv')
+        file_dict = {'file': file}
+        form = forms.SelectImportForm(
+            files=file_dict, data=self.data,
+            project=self.project, user=self.user)
+        assert form.is_valid() is True
+        assert form.cleaned_data['mime_type'] == 'text/plain'
