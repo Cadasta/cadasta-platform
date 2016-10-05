@@ -73,5 +73,5 @@
 {% endblock %}
 
 {% block content %}
-  {% include "spatial/location_form.html" with title="Add new location" cancel_url=request.META.HTTP_REFERER %}
+  {% include "spatial/location_form.html" with title=_("Add new location") cancel_url=request.META.HTTP_REFERER %}
 {% endblock %}
