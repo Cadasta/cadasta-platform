@@ -1013,7 +1013,7 @@ class DownloadFormTest(UserTestCase, TestCase):
             assert 'data-shp.zip' in testzip.namelist()
 
 
-class SelectImportFormTest(UserTestCase):
+class SelectImportFormTest(UserTestCase, TestCase):
 
     def setUp(self):
         super().setUp()
