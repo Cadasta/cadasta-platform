@@ -132,9 +132,11 @@ class OrganizationMemberTest(FunctionalTest):
         OrganizationMemberListPage(self).go_to_member_list_page()
         page.go_to_testuser_member_page()
 
+        first_project = page.get_project_title_in_table()
+        assert first_project == 'Test Project'
         options = page.get_permission_options()
         assert options['selected'].text == options['pb'].text
-        options["pm"].click()
+        options['pm'].click()
 
         page.click_submit_button()
         page.go_to_testuser_member_page()

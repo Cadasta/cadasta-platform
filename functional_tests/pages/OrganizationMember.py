@@ -106,6 +106,13 @@ class OrganizationMemberPage(Page):
             self.click_remove_button
         )
 
+    def get_table_data(self, xpath, row):
+        return self.test.table_body(
+            "projects-permissions", "//tr{}//td".format(row) + xpath)
+
+    def get_project_title_in_table(self, row="[1]"):
+        return self.get_table_data("//label", row).text
+
     def get_project_permission(self, xpath):
         return self.test.table_body("projects-permissions", '//select' + xpath)
 
