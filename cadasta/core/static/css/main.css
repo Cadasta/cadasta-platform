@@ -4534,7 +4534,7 @@ header {
             color: #fff;
             text-decoration: none;
             background: #0e305e; }
-  header .btn-info {
+  header .btn-help {
     border-radius: 0;
     padding-top: 28px;
     min-width: 70px;
@@ -4545,84 +4545,84 @@ header {
     background-color: transparent;
     border-color: #2e51a3;
     border-left: solid 1px #345bb7; }
-    header .btn-info:focus, header .btn-info.focus {
+    header .btn-help:focus, header .btn-help.focus {
       color: #eeeeee;
       background-color: transparent;
       border-color: #122040; }
-    header .btn-info:hover {
+    header .btn-help:hover {
       color: #eeeeee;
       background-color: transparent;
       border-color: #213973; }
-    header .btn-info:active, header .btn-info.active,
-    .open > header .btn-info.dropdown-toggle {
+    header .btn-help:active, header .btn-help.active,
+    .open > header .btn-help.dropdown-toggle {
       color: #eeeeee;
       background-color: transparent;
       border-color: #213973; }
-      header .btn-info:active:hover, header .btn-info:active:focus, header .btn-info:active.focus, header .btn-info.active:hover, header .btn-info.active:focus, header .btn-info.active.focus,
-      .open > header .btn-info.dropdown-toggle:hover,
-      .open > header .btn-info.dropdown-toggle:focus,
-      .open > header .btn-info.dropdown-toggle.focus {
+      header .btn-help:active:hover, header .btn-help:active:focus, header .btn-help:active.focus, header .btn-help.active:hover, header .btn-help.active:focus, header .btn-help.active.focus,
+      .open > header .btn-help.dropdown-toggle:hover,
+      .open > header .btn-help.dropdown-toggle:focus,
+      .open > header .btn-help.dropdown-toggle.focus {
         color: #eeeeee;
         background-color: transparent;
         border-color: #122040; }
-    header .btn-info:active, header .btn-info.active,
-    .open > header .btn-info.dropdown-toggle {
+    header .btn-help:active, header .btn-help.active,
+    .open > header .btn-help.dropdown-toggle {
       background-image: none; }
-    header .btn-info.disabled:hover, header .btn-info.disabled:focus, header .btn-info.disabled.focus, header .btn-info[disabled]:hover, header .btn-info[disabled]:focus, header .btn-info[disabled].focus,
-    fieldset[disabled] header .btn-info:hover,
-    fieldset[disabled] header .btn-info:focus,
-    fieldset[disabled] header .btn-info.focus {
+    header .btn-help.disabled:hover, header .btn-help.disabled:focus, header .btn-help.disabled.focus, header .btn-help[disabled]:hover, header .btn-help[disabled]:focus, header .btn-help[disabled].focus,
+    fieldset[disabled] header .btn-help:hover,
+    fieldset[disabled] header .btn-help:focus,
+    fieldset[disabled] header .btn-help.focus {
       background-color: transparent;
       border-color: #2e51a3; }
-    header .btn-info .badge {
+    header .btn-help .badge {
       color: transparent;
       background-color: #eeeeee; }
-    header .btn-info:hover, header .btn-info:focus {
+    header .btn-help:hover, header .btn-help:focus {
       color: #fff;
       background-color: #28478f;
       border-color: #2e51a3;
       transition: all 0.3s ease 0s; }
-      header .btn-info:hover:focus, header .btn-info:hover.focus, header .btn-info:focus:focus, header .btn-info:focus.focus {
+      header .btn-help:hover:focus, header .btn-help:hover.focus, header .btn-help:focus:focus, header .btn-help:focus.focus {
         color: #fff;
         background-color: #1d3367;
         border-color: #122040; }
-      header .btn-info:hover:hover, header .btn-info:focus:hover {
+      header .btn-help:hover:hover, header .btn-help:focus:hover {
         color: #fff;
         background-color: #1d3367;
         border-color: #213973; }
-      header .btn-info:hover:active, header .btn-info:hover.active,
-      .open > header .btn-info:hover.dropdown-toggle, header .btn-info:focus:active, header .btn-info:focus.active,
-      .open > header .btn-info:focus.dropdown-toggle {
+      header .btn-help:hover:active, header .btn-help:hover.active,
+      .open > header .btn-help:hover.dropdown-toggle, header .btn-help:focus:active, header .btn-help:focus.active,
+      .open > header .btn-help:focus.dropdown-toggle {
         color: #fff;
         background-color: #1d3367;
         border-color: #213973; }
-        header .btn-info:hover:active:hover, header .btn-info:hover:active:focus, header .btn-info:hover:active.focus, header .btn-info:hover.active:hover, header .btn-info:hover.active:focus, header .btn-info:hover.active.focus,
-        .open > header .btn-info:hover.dropdown-toggle:hover,
-        .open > header .btn-info:hover.dropdown-toggle:focus,
-        .open > header .btn-info:hover.dropdown-toggle.focus, header .btn-info:focus:active:hover, header .btn-info:focus:active:focus, header .btn-info:focus:active.focus, header .btn-info:focus.active:hover, header .btn-info:focus.active:focus, header .btn-info:focus.active.focus,
-        .open > header .btn-info:focus.dropdown-toggle:hover,
-        .open > header .btn-info:focus.dropdown-toggle:focus,
-        .open > header .btn-info:focus.dropdown-toggle.focus {
+        header .btn-help:hover:active:hover, header .btn-help:hover:active:focus, header .btn-help:hover:active.focus, header .btn-help:hover.active:hover, header .btn-help:hover.active:focus, header .btn-help:hover.active.focus,
+        .open > header .btn-help:hover.dropdown-toggle:hover,
+        .open > header .btn-help:hover.dropdown-toggle:focus,
+        .open > header .btn-help:hover.dropdown-toggle.focus, header .btn-help:focus:active:hover, header .btn-help:focus:active:focus, header .btn-help:focus:active.focus, header .btn-help:focus.active:hover, header .btn-help:focus.active:focus, header .btn-help:focus.active.focus,
+        .open > header .btn-help:focus.dropdown-toggle:hover,
+        .open > header .btn-help:focus.dropdown-toggle:focus,
+        .open > header .btn-help:focus.dropdown-toggle.focus {
           color: #fff;
           background-color: #15264b;
           border-color: #122040; }
-      header .btn-info:hover:active, header .btn-info:hover.active,
-      .open > header .btn-info:hover.dropdown-toggle, header .btn-info:focus:active, header .btn-info:focus.active,
-      .open > header .btn-info:focus.dropdown-toggle {
+      header .btn-help:hover:active, header .btn-help:hover.active,
+      .open > header .btn-help:hover.dropdown-toggle, header .btn-help:focus:active, header .btn-help:focus.active,
+      .open > header .btn-help:focus.dropdown-toggle {
         background-image: none; }
-      header .btn-info:hover.disabled:hover, header .btn-info:hover.disabled:focus, header .btn-info:hover.disabled.focus, header .btn-info:hover[disabled]:hover, header .btn-info:hover[disabled]:focus, header .btn-info:hover[disabled].focus,
-      fieldset[disabled] header .btn-info:hover:hover,
-      fieldset[disabled] header .btn-info:hover:focus,
-      fieldset[disabled] header .btn-info:hover.focus, header .btn-info:focus.disabled:hover, header .btn-info:focus.disabled:focus, header .btn-info:focus.disabled.focus, header .btn-info:focus[disabled]:hover, header .btn-info:focus[disabled]:focus, header .btn-info:focus[disabled].focus,
-      fieldset[disabled] header .btn-info:focus:hover,
-      fieldset[disabled] header .btn-info:focus:focus,
-      fieldset[disabled] header .btn-info:focus.focus {
+      header .btn-help:hover.disabled:hover, header .btn-help:hover.disabled:focus, header .btn-help:hover.disabled.focus, header .btn-help:hover[disabled]:hover, header .btn-help:hover[disabled]:focus, header .btn-help:hover[disabled].focus,
+      fieldset[disabled] header .btn-help:hover:hover,
+      fieldset[disabled] header .btn-help:hover:focus,
+      fieldset[disabled] header .btn-help:hover.focus, header .btn-help:focus.disabled:hover, header .btn-help:focus.disabled:focus, header .btn-help:focus.disabled.focus, header .btn-help:focus[disabled]:hover, header .btn-help:focus[disabled]:focus, header .btn-help:focus[disabled].focus,
+      fieldset[disabled] header .btn-help:focus:hover,
+      fieldset[disabled] header .btn-help:focus:focus,
+      fieldset[disabled] header .btn-help:focus.focus {
         background-color: #28478f;
         border-color: #2e51a3; }
-      header .btn-info:hover .badge, header .btn-info:focus .badge {
+      header .btn-help:hover .badge, header .btn-help:focus .badge {
         color: #28478f;
         background-color: #fff; }
-    header .btn-info .glyphicon-info-sign {
+    header .btn-help .glyphicon-question-sign {
       font-size: 18px;
       width: 48px;
       height: 32px; }

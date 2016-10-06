@@ -168,7 +168,7 @@ header {
       }
     }
   }
-  .btn-info { // info button
+  .btn-help { // help button
     border-radius: 0;
     padding-top: 28px;
     min-width: $header-height;
@@ -182,7 +182,7 @@ header {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
       transition: all 0.3s ease 0s;
     }
-    .glyphicon-info-sign {
+    .glyphicon-question-sign {
       font-size: 18px;
       width: 48px;
       height: 32px;
