@@ -210,7 +210,8 @@ class EditOrganizationMemberForm(forms.Form):
             project__organization=org).values('project__id', 'role')
         project_roles = {r['project__id']: r['role'] for r in project_roles}
 
-        for p in self.organization.projects.values_list('id', 'name'):
+        active_projects = self.organization.projects.filter(archived=False)
+        for p in active_projects.values_list('id', 'name'):
             role = project_roles.get(p[0], 'Pb')
 
             self.fields[p[0]] = forms.ChoiceField(
