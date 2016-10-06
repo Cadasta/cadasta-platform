@@ -124,6 +124,11 @@ class CSVImportTest(UserTestCase, TestCase):
             if su.geometry is not None:
                 assert type(su.geometry) is Point
 
+        # test attribute creation
+        su = SpatialUnit.objects.first()
+        assert 'how_aquire_landwh' not in su.attributes.keys()
+        assert 'how_aquire_landw' in su.attributes.keys()
+
     def test_import_with_geoshape(self):
         importer = csv.CSVImporter(
             project=self.project, path=self.path + self.geoshape_csv)

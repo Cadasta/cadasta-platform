@@ -33,7 +33,7 @@ class CSVImporter(base.Importer):
 
     def get_headers(self):
         headers = []
-        with open(self.path, newline='') as csvfile:
+        with open(self.path, 'r', newline='') as csvfile:
             reader = csv.reader(
                 csvfile, delimiter=self.delimiter, quotechar=self.quotechar
             )
@@ -84,7 +84,7 @@ class CSVImporter(base.Importer):
         path = config_dict['file']
         try:
             with transaction.atomic():
-                with open(path) as csvfile:
+                with open(path, 'r', newline='') as csvfile:
                     reader = csv.reader(
                         csvfile, delimiter=self.delimiter,
                         quotechar=self.quotechar
@@ -130,8 +130,11 @@ class CSVImporter(base.Importer):
                             attribute, content_type, name = attr_map.get(attr)
                             if (attribute is not None):
                                 val = row[csv_headers.index(attr)]
+                                if (not attribute.required and val == ""):
+                                    continue
                                 content_types[content_type][
-                                    'attributes'][attribute.name] = val
+                                    'attributes'][
+                                        attribute.name] = val
                         party = Party.objects.create(
                             **content_types['party.party']
                         )

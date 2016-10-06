@@ -337,5 +337,5 @@ MIME_LOOKUPS = {
 }
 
 FILE_UPLOAD_HANDLERS = [
-    'organization.views.handlers.S3FileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
