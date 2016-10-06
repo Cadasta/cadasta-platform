@@ -41,7 +41,7 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['any_archived'] = self.get_queryset().filter(
-                                                        archived=True).exists()
+            archived=True).exists()
         return context
 
 
@@ -735,6 +735,9 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             'project': self.get_project()
         }
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
     def get_template_names(self):
         return [DATA_IMPORT_TEMPLATES[self.steps.current]]
 
@@ -790,8 +793,8 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
 
         name = form_data[0]['name']
         description = form_data[0]['description']
+        mime_type = form_data[0]['mime_type']
         is_resource = form_data[0]['is_resource']
-        type = form_data[0]['type']
         original_file = form_data[0]['original_file']
         file = form_data[0]['file']
 
@@ -820,7 +823,7 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             url = default_storage.save(file.name, file.read())
             resource = Resource(
                 name=name, description=description, file=url,
-                original_file=original_file, mime_type=type,
+                original_file=original_file, mime_type=mime_type,
                 contributor=self.request.user, project=self.get_project())
             resource.save()
             ContentObject.objects.create(resource=resource,

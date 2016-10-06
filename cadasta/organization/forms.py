@@ -515,6 +515,7 @@ class SelectImportForm(forms.Form):
         mime_type = str(mime.from_buffer(file.read(1024)), 'utf-8')
         if mime_type not in self.VALID_IMPORT_MIME_TYPES:
             raise ValidationError(_("Invalid file type"))
+        self.data['mime_type'] = mime_type
         return file
 
 
