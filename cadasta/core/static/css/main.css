@@ -3786,6 +3786,37 @@ table th[class*="col-"] {
 
 .ui-datepicker {
   z-index: 2000 !important; }
+  .ui-datepicker .ui-widget-content {
+    font-family: "Roboto", Helvetica, Arial, "Noto Sans Bengali", sans-serif !important;
+    color: #595a5c !important;
+    border-color: #e7e8ea !important;
+    -webkit-box-shadow: 10px 10px 6px -8px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 10px 10px 6px -8px rgba(0, 0, 0, 0.5);
+    box-shadow: 10px 10px 6px -8px rgba(0, 0, 0, 0.5); }
+  .ui-datepicker .ui-datepicker-title select {
+    font-family: "Roboto", Helvetica, Arial, "Noto Sans Bengali", sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important; }
+  .ui-datepicker th {
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important; }
+  .ui-datepicker .ui-state-default, .ui-datepicker .ui-widget-content .ui-state-default, .ui-datepicker .ui-widget-header .ui-state-default, .ui-datepicker .ui-button, .ui-datepicker html .ui-button.ui-state-disabled:hover, .ui-datepicker html .ui-button.ui-state-disabled:active {
+    border-color: #fff !important;
+    background: #fff !important;
+    color: #595a5c !important; }
+  .ui-datepicker .ui-state-hover, .ui-datepicker .ui-widget-content .ui-state-hover, .ui-datepicker .ui-widget-header .ui-state-hover, .ui-datepicker .ui-button:focus {
+    background: #d9dadb !important;
+    border-color: #d9dadb !important; }
+  .ui-datepicker .ui-state-highlight, .ui-datepicker .ui-widget-content .ui-state-highlight, .ui-datepicker .ui-widget-header .ui-state-highlight {
+    border-color: #ffdd87 !important;
+    background: #ffdd87 !important;
+    color: #595a5c !important; }
+  .ui-datepicker .ui-state-active, .ui-datepicker .ui-widget-content .ui-state-active, .ui-datepicker .ui-widget-header .ui-state-active, .ui-datepicker a.ui-button:active, .ui-datepicker .ui-button:active, .ui-datepicker .ui-button.ui-state-active:hover {
+    border: 1px solid #00b288 !important;
+    background: #00b288 !important;
+    color: #fff !important; }
 
 /* =Registration area & profile pages
 -------------------------------------------------------------- */
