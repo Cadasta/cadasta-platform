@@ -1,10 +1,12 @@
 {% extends "resources/project_list.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Add new resource for project" %} | {% endblock %}
 
 {% block extra_script %}
-  {% include 'resources/script_add_lib.html' %}
+<script src="{% static 'js/dataTables.forms.js' %}"></script>
+{% include 'resources/script_add_lib.html' %}
 {% endblock %}
 
 {% block modals %}
