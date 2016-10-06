@@ -105,11 +105,10 @@
             <ul class="list-unstyled list-divider">
             {% for user in organization.users.all %}
               <li>
-                <strong>
-                    {{ user.get_display_name }}
-                </strong>
-                <br />
-                {% trans "Username" %}: {{ user.username }}
+                <strong>{{ user.username }}</strong>
+                {% if user.full_name %}
+                  <br />{{ user.full_name }}
+                {% endif %}
               </li>
             {% endfor %}
             </ul>

@@ -33,7 +33,7 @@ class OrganizationTest(FunctionalTest):
         info = page.get_org_description_and_members()
         assert "This is a test." in info
         assert "Test User" in info
-        assert "Username: testuser" in info
+        assert "testuser" in info
         self.logout()
 
         LoginPage(self).login('testuser', 'password')
@@ -44,7 +44,7 @@ class OrganizationTest(FunctionalTest):
         info = page.get_org_description_and_members()
         assert "This is a test." in info
         assert "Test User" in info
-        assert "Username: testuser" in info
+        assert "testuser" in info
 
     def test_edit_organization(self):
         """A registered admin user can edit an organization's information."""
