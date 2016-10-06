@@ -2,13 +2,13 @@
 
 {% load i18n %}
 {% load widget_tweaks %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Edit member" %} | {% endblock %}
 
 {% block left-nav %}members{% endblock %}
 
 {% block content %}
-
 <div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
@@ -109,20 +109,11 @@
 {% endblock %}
 
 {% block extra_script %}
+<script src="{% static 'js/dataTables.forms.js' %}"></script>
 <script>
   'use strict';
   $(function() {
-    var form = $('.org-member-edit');
-    form.submit(function() {
-      var cells = $('.panel-body .datatable').DataTable().column(1).nodes();
-      for (var i = 0; i < cells.length; i++) {
-        if (!document.body.contains(cells[i])) {
-          var select = $(cells[i]).find('select');
-          form.append('<input type="hidden" name="' + select[0].name + '" value="' + select.val() + '" />');
-        }
-      }
-      return true;
-    });
+    activateFormFieldsInDataTable('.org-member-edit', 1, 'select');
   });
 </script>
 {% endblock %}

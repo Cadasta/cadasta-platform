@@ -1,8 +1,8 @@
 {% extends "organization/project_wrapper.html" %}
 
-{% load staticfiles %}
 {% load i18n %}
 {% load widget_tweaks %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Edit member permissions" %} | {% endblock %}
 
@@ -13,7 +13,6 @@
 {% block left-nav %}overview{% endblock %}
 
 {% block content %}
-
 <form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}" novalidate>
 {% csrf_token %}
   <div class="col-md-12 content-single">
@@ -45,5 +44,14 @@
     </div>
   </div>
 </form>
+{% endblock %}
 
+{% block extra_script %}
+<script src="{% static 'js/dataTables.forms.js' %}"></script>
+<script>
+  'use strict';
+  $(function() {
+    activateFormFieldsInDataTable('.container-fluid form', 2, 'select');
+  });
+</script>
 {% endblock %}

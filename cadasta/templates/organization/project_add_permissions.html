@@ -1,7 +1,8 @@
 {% extends "organization/project_add_wrapper.html" %}
 
-{% load widget_tweaks %}
 {% load i18n %}
+{% load widget_tweaks %}
+{% load staticfiles %}
 
 {% block page_title %}| {% trans "Assign team" %}{% endblock %}
 
@@ -73,4 +74,14 @@
     </div>
     <!-- / main wizard  -->
 
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/dataTables.forms.js' %}"></script>
+<script>
+  'use strict';
+  $(function() {
+    activateFormFieldsInDataTable('.container-fluid form', 2, 'select');
+  });
+</script>
 {% endblock %}
