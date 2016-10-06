@@ -124,7 +124,7 @@ class LocationResourceNew(LoginPermissionRequiredMixin,
                           resource_mixins.HasUnattachedResourcesMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
-    permission_required = update_permissions('spatial.resource.add')
+    permission_required = update_permissions('spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
 
     def get_context_data(self, *args, **kwargs):

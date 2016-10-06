@@ -39,7 +39,7 @@ def assign_policies(user):
             {
                 'effect': 'allow',
                 'object': ['spatial/*/*/*'],
-                'action': ['spatial.*', 'spatial.*.*']
+                'action': ['spatial.*', 'spatial.resources.*']
             },
             {
                 'effect': 'allow',
@@ -775,7 +775,6 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert response.location == self.expected_success_url + '#resources'
-
         assert self.location.resources.count() == 1
 
     def test_post_with_unauthorized_user(self):
