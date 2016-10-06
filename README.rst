@@ -15,15 +15,6 @@ Install:
 
 Clone the `repository <https://github.com/cadasta/cadasta-platform>`_.
 
-AWS Deployment::
-
-  vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
-  vagrant plugin install vagrant-aws
-  ...
-
-  vagrant up --provider=aws ...
-
-
 Provision the VM::
 
   vagrant up --provision
@@ -52,6 +43,17 @@ To get coverage reports run::
   py.test cadasta --cov=cadasta  --cov-report=html
 
 This creates a HTML report under ``htmlcov``. See `pytest-cov docs <http://pytest-cov.readthedocs.org/en/latest/readme.html#reporting>`_ for other report formats.
+
+AWS Deployment
+--------------
+
+Do this::
+
+  vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+  vagrant plugin install vagrant-aws
+  ...
+
+  vagrant up --provider=aws ...
 
 
 .. |build-status-image| image:: https://secure.travis-ci.org/Cadasta/cadasta-platform.svg?branch=master
