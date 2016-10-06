@@ -106,7 +106,25 @@
     <!-- /.main-text -->
   </div>
 </div>
+{% endblock %}
 
+{% block extra_script %}
+<script>
+  'use strict';
+  $(function() {
+    var form = $('.org-member-edit');
+    form.submit(function() {
+      var cells = $('.panel-body .datatable').DataTable().column(1).nodes();
+      for (var i = 0; i < cells.length; i++) {
+        if (!document.body.contains(cells[i])) {
+          var select = $(cells[i]).find('select');
+          form.append('<input type="hidden" name="' + select[0].name + '" value="' + select.val() + '" />');
+        }
+      }
+      return true;
+    });
+  });
+</script>
 {% endblock %}
 
 {% block modals %}
