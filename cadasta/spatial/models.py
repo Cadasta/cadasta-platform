@@ -14,7 +14,7 @@ from shapely.wkt import dumps
 from . import messages
 from .choices import TYPE_CHOICES
 from .exceptions import SpatialRelationshipError
-from resources.mixins import ResourceModelMixin
+from resources.mixins import ResourceModelMixin, detach_object_resources
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
 
@@ -144,6 +144,8 @@ def reassign_spatial_geometry(instance):
 def check_extent(sender, instance, **kwargs):
     if instance.geometry:
         reassign_spatial_geometry(instance)
+
+models.signals.pre_delete.connect(detach_object_resources, sender=SpatialUnit)
 
 
 class SpatialRelationshipManager(managers.BaseRelationshipManager):

@@ -91,7 +91,7 @@ class ProjectTest(FunctionalTest):
         page.click_on_location_resource_tab()
         page.click_on_add_button('active', success=False)
         page.click_on_location_resource_tab()
-        page.click_on_detatch_resource_button('detail', success=False)
+        page.click_on_detach_resource_button('detail', success=False)
 
         # Test spatial unit relationship tab
         page.click_on_location_relationship_tab()
@@ -103,19 +103,19 @@ class ProjectTest(FunctionalTest):
         page.click_on_edit_button(success=False)
         page.click_on_delete_button(success=False)
         page.click_on_add_button('detail', success=False)
-        page.click_on_detatch_resource_button('detail', success=False)
+        page.click_on_detach_resource_button('detail', success=False)
 
         # Test party page
         page.click_on_party_in_table()
         page.click_on_edit_button(success=False)
         page.click_on_delete_button(success=False)
         page.click_on_add_button('panel-body', success=False)
-        page.click_on_detatch_resource_button('panel-body', success=False)
+        page.click_on_detach_resource_button('panel-body', success=False)
 
         # Test project resource page
         page.click_on_resources_tab()
         page.click_on_add_button('panel-body', success=False)
-        page.click_on_detatch_resource_button('panel-body', success=False)
+        page.click_on_detach_resource_button('panel-body', success=False)
 
         page.click_on_resource_in_table()
         page.click_on_edit_resource_button(success=False)

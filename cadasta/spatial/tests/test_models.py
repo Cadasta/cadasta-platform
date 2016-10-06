@@ -5,6 +5,8 @@ from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
+from resources.tests.factories import ResourceFactory
+from resources.models import ContentObject
 from party import exceptions
 from spatial.tests.factories import (SpatialUnitFactory,
                                      SpatialRelationshipFactory)
@@ -95,6 +97,21 @@ class SpatialUnitTest(UserTestCase, TestCase):
                 org=su.project.organization.slug,
                 prj=su.project.slug,
                 id=su.id))
+
+    def test_detach_spatial_unit_resources(self):
+        project = ProjectFactory.create()
+        su = SpatialUnitFactory.create(project=project)
+        resource = ResourceFactory.create(project=project)
+        resource.content_objects.create(
+          content_object=su)
+        assert ContentObject.objects.filter(
+            object_id=su.id,
+            resource=resource,).exists()
+        assert resource in su.resources
+
+        su.delete()
+        assert not ContentObject.objects.filter(
+            object_id=su.id, resource=resource).exists()
 
 
 class SpatialRelationshipTest(UserTestCase, TestCase):

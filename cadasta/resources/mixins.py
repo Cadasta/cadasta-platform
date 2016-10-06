@@ -22,3 +22,11 @@ class ResourceModelMixin:
     def reload_resources(self):
         if hasattr(self, '_resources'):
             del self._resources
+
+
+def detach_object_resources(sender, instance, **kwargs):
+    for resource in instance.resources:
+        content_object = resource.content_objects.get(
+            object_id=instance.id,
+            resource__project__slug=instance.project.slug)
+        content_object.delete()
