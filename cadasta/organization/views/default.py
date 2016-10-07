@@ -728,6 +728,24 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['object'] = self.get_object()
+        if self.steps.current == 'select_file':
+            context['wizard_step_classes'] = {
+                'select_file': 'active enabled',
+                'map_attributes': '',
+                'select_defaults': ''
+            }
+        elif self.steps.current == 'map_attributes':
+            context['wizard_step_classes'] = {
+                'select_file': 'enabled complete',
+                'map_attributes': 'active enabled',
+                'select_defaults': ''
+            }
+        elif self.steps.current == 'select_defaults':
+            context['wizard_step_classes'] = {
+                'select_file': 'enabled complete',
+                'map_attributes': 'enabled complete',
+                'select_defaults': 'active enabled'
+            }
         return context
 
     def get_object(self):

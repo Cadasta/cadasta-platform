@@ -100,6 +100,17 @@ h3, h4, h5 {
   letter-spacing: -0.3px;
 }
 
+h4.div {
+  border-top: 1px solid $table-border-color;
+  border-bottom: 2px solid $table-border-color;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 14px;
+  opacity: 0.7;
+  padding: 8px;
+  background: $body-bg;
+}
+
 label {
   font-weight: 400;
 }
@@ -431,7 +442,7 @@ header {
     }
   }
   h2 {
-    width: 80%;
+    width: 60%;
   }
 }
 
@@ -886,12 +897,15 @@ body.map .content-single {
 
 @media (max-width: $screen-xs-max) {
   .content-single {
-    .panel-buttons .btn {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .panel .panel-body {
-      font-size: 12px;
+    .panel {
+      .panel-buttons .btn {
+        width: 100%;
+        margin-bottom: 10px;
+        margin-right: 0;
+      }
+      .panel-body {
+        font-size: 12px;
+      }
     }
     .detail {
       .btn {
@@ -918,7 +932,7 @@ textarea.form-control {
   padding: 10px 20px;
 }
 
-.file-input { // browse for file
+.file-input, #id_select_file-file { // browse for file
   margin: 14px 0;
   height: 34px;
   padding: 0;
@@ -944,6 +958,10 @@ textarea.form-control {
 
 .input-group-addon {
   background: $body-bg;
+}
+
+.well {
+  margin-bottom: 10px;
 }
 
 /* =Table for sort and filter
@@ -1126,7 +1144,7 @@ table#select-list {
     padding: 8px;
     font-size: 12px;
  }
- .form-group, .form-control, .public-private-widget, .s3-buckets .file-input {
+ .form-group, .form-control, .public-private-widget, .s3-buckets .file-input, #id_select_file-file {
    font-size: 12px;
  }
  .form-control {
@@ -1289,7 +1307,7 @@ div.add-btn-btm { // add party link at bottom of table
   }
 }
 
-/* =Alerts and labels
+/* =Alerts, labels, text
 -------------------------------------------------------------- */
 
 .alert {
@@ -1307,8 +1325,10 @@ div.add-btn-btm { // add party link at bottom of table
 }
 
 .alert-full {
+  width: 100%;
   max-width: 100%;
   text-align: left;
+  margin-bottom: 20px;
   display: table;
   box-shadow: none;
   -moz-box-shadow: none;
@@ -1316,7 +1336,7 @@ div.add-btn-btm { // add party link at bottom of table
   > div {
     display: table-cell;
     vertical-align: top;
-    padding: 4px;
+    padding: 2px;
   }
 }
 .form-narrow, .narrow {
@@ -1357,6 +1377,11 @@ div.add-btn-btm { // add party link at bottom of table
 
 h1 .label {
   font-size: 16px;
+}
+
+.highlight { // for emphasis for inline text
+  font-weight: 600;
+  color: #000;
 }
 
 @media (max-width: $screen-sm-max) {
