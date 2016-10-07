@@ -151,17 +151,6 @@ class PartyRelationshipTest(UserTestCase, TestCase):
                 party2__project=project2
             )
 
-    # def test_detach_party_relationship_resources(self):
-    #     relationship = PartyRelationshipFactory()
-    #     resource = ResourceFactory.create()
-    #     ContentObject.objects.create(
-    #         object_id=relationship.id,
-    #         resource=resource,)
-
-    #     relationship.delete()
-    #     assert not ContentObject.objects.filter(
-    #         object_id=relationship.id, resource=resource).exists()
-
 
 class TenureRelationshipTest(UserTestCase, TestCase):
 
