@@ -1,6 +1,3 @@
-from shapely.geometry import LineString, Point, Polygon
-from shapely.wkt import dumps
-
 from django.core.exceptions import ValidationError
 from django.core.files.storage import get_storage_class
 from django.db import transaction
@@ -8,19 +5,15 @@ from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from pyxform.xform2json import XFormToDict
-from questionnaires.models import Questionnaire, Question
+from questionnaires.models import Questionnaire
 from resources.models import Resource
 from spatial.models import SpatialUnit
 from xforms.exceptions import InvalidXMLSubmission
 from xforms.models import XFormSubmission
+from xforms.utils import odk_geom_to_wkt
 
 
 class ModelHelper():
-    """
-    todo:
-    Update storage after upgrading to latest django-buckets
-    """
-
     def __init__(self, *arg):
         self.arg = arg
 
@@ -87,22 +80,16 @@ class ModelHelper():
             for group in location_group:
                 if 'location_geotrace' in group.keys():
                     location_geometry = group['location_geotrace']
-                    geoshape = False
                 elif 'location_geoshape' in group.keys():
                     location_geometry = group['location_geoshape']
-                    geoshape = True
                 else:
                     location_geometry = group['location_geometry']
-                    geoshape = Question.objects.filter(
-                        questionnaire=questionnaire, type='GS').exists()
 
+                geom = odk_geom_to_wkt(location_geometry)
                 location = SpatialUnit.objects.create(
                     project=project,
                     type=group['location_type'],
-                    geometry=self._format_geometry(
-                        location_geometry,
-                        geoshape
-                    ),
+                    geometry=geom,
                     attributes=self._get_attributes(group, 'location')
                 )
 
@@ -141,7 +128,7 @@ class ModelHelper():
                         attributes=self._get_attributes(
                             tenure_group[t],
                             'tenure_relationship')
-                        )
+                    )
                     tenure_resources.append(
                         self._get_resource_names(
                             tenure_group[t], tenure, 'tenure')
@@ -191,8 +178,8 @@ class ModelHelper():
         submission = full_submission[list(full_submission.keys())[0]]
 
         with transaction.atomic():
-            questionnaire, party, location, tenure = self.create_models(
-                                                                    submission)
+            (questionnaire, party,
+                location, tenure) = self.create_models(submission)
 
             party_submission = [submission]
             location_submission = [submission]
@@ -205,7 +192,8 @@ class ModelHelper():
 
             elif 'location_repeat' in submission:
                 location_submission = self._format_repeat(
-                                                    submission, ['location'])
+                    submission, ['location']
+                )
                 if 'tenure_type' in location_submission[0]:
                     tenure_submission = location_submission
 
@@ -292,37 +280,6 @@ class ModelHelper():
                                      content_object=None
                                      )
 
-    def _format_geometry(self, coords, geoshape=False):
-        if coords == '':
-            return ''
-        if '\n' in coords:
-            coords = coords.replace('\n', '')
-        coords = coords.split(';')
-        if (coords[-1] == ''):
-            coords.pop()
-        # fixes bug in geoshape:
-        # Geoshape copies the second point, not the first.
-        if geoshape:
-            coords.pop()
-            coords.append(coords[0])
-
-        if len(coords) > 1:
-            points = []
-            for coord in coords:
-                coord = coord.split(' ')
-                coord = [x for x in coord if x]
-                latlng = [float(coord[1]),
-                          float(coord[0])]
-                points.append(tuple(latlng))
-            if (coords[0] != coords[-1] or len(coords) == 2):
-                return dumps(LineString(points))
-            else:
-                return dumps(Polygon(points))
-        else:
-            latlng = coords[0].split(' ')
-            latlng = [x for x in latlng if x]
-            return dumps(Point(float(latlng[1]), float(latlng[0])))
-
     def _format_repeat(self, data, model_type):
         repeat_group = [data]
         for model in model_type:
@@ -350,7 +307,7 @@ class ModelHelper():
                     if Attribute.objects.filter(
                         name=item,
                         attr_type=AttributeType.objects.get(
-                                    name='select_multiple')).exists():
+                            name='select_multiple')).exists():
                         answers = data[attr_group][item].split(' ')
                         attributes[item] = answers
                     else:

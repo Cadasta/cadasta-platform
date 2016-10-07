@@ -621,47 +621,6 @@ class XFormModelHelperTest(TestCase):
                 self, data, self.user, self.project, content_object='ardvark')
         assert Resource.objects.count() == 2
 
-    # def test_upload_submission_data(self):
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # covered by the view tests
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    # def test_upload_resource_files(self):
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # covered by the view tests
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def test_format_geometry(self):
-        point = '40.6890612 -73.9925067 0.0 0.0;'
-        geometry = mh._format_geometry(self, point, False)
-        assert 'POINT' in geometry
-
-        point_minus_semi = '340.6890612 -373.9925067 0.0 0.0'
-        geometry = mh._format_geometry(self, point_minus_semi, False)
-        assert 'POINT' in geometry
-
-        polygon = ('40.6890612 -73.9925067 0.0 0.0;'
-                   '41.6890612 -73.9925067 0.0 0.0;'
-                   '41.6890612 -72.9925067 0.0 0.0;'
-                   '40.6890612 -72.9925067 0.0 0.0;'
-                   '40.6890612 -73.9925067 0.0 0.0;')
-        geometry = mh._format_geometry(self, polygon, False)
-        assert 'POLYGON' in geometry
-
-        line = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
-                '45.56176327330353 -122.67669159919024 0.0 0.0;'
-                '45.56151562182025 -122.67490658909082 0.0 0.0;')
-        geometry = mh._format_geometry(self, line, False)
-        assert 'LINESTRING' in geometry
-
-        geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
-                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
-                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
-                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
-                    '45.56176327330353 -122.67669159919024 0.0 0.0')
-        geometry = mh._format_geometry(self, geoshape, True)
-        assert 'POLYGON' in geometry
-
     def test_format_repeat(self):
         data = {
             'party_type': 'Not repeating',
