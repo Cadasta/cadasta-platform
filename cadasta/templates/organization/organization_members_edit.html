@@ -37,21 +37,21 @@
                     <div class="form-group member-role{% if form.org_role.errors %} has-error{% endif %}">
                       <label class="control-label" for="{{ form.org_role.id_for_label }}">{% trans "Role" %}</label>
                       {% if org_admin %}
-                        {% render_field form.org_role class+="form-control" data-parsley-required="true" %}
+                      {% render_field form.org_role class+="form-control" data-parsley-required="true" disabled="disabled" %}
                       {% else %}
-                        {% render_field form.org_role class+="form-control" data-parsley-required="true" %}
+                      {% render_field form.org_role class+="form-control" data-parsley-required="true" %}
                       {% endif %}
                       <div class="error-block">{{ form.org_role.errors }}</div>
                     </div>
                     <div class="btn-full">
                       <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin %} disabled{% endif %}>
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Remove member" %}</button>
-                        {% if org_admin %}
-                          <div class="alert alert-full" role="alert">
-                            <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
-                            <div>{% trans "An organization administrator cannot remove themself." %}</div>
-                          </div>
-                        {% endif %}
+                      {% if org_admin %}
+                      <div class="alert alert-full" role="alert">
+                        <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
+                        <div>{% trans "An organization administrator cannot remove themself." %}</div>
+                      </div>
+                      {% endif %}
                     </div>
                   </div>
                 </div>

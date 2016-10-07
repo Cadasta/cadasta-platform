@@ -239,15 +239,20 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
         context['organization'] = self.get_organization()
         context['form'] = self.get_form()
+        try:
+            org_admin = OrganizationRole.objects.get(
+                user=self.request.user,
+                organization=context['organization']).admin
+            context['org_admin'] = (org_admin and
+                                    not self.is_superuser and
+                                    context['org_member'] == self.request.user)
+        except OrganizationRole.DoesNotExist:
+            # Viewing user is a superuser who is not an org member
+            pass
 
-        org_admin = OrganizationRole.objects.get(
-            user=self.request.user,
-            organization=context['organization']).admin
-        context['org_admin'] = (org_admin and
-                                not self.is_superuser and
-                                context['org_member'] == self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):

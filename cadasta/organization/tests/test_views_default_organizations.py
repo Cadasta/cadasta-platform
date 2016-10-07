@@ -667,6 +667,16 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
+    def test_get_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_role = Role.objects.get(name='superuser')
+        superuser.assign_policies(superuser_role)
+        response = self.request(user=superuser)
+        assert response.status_code == 200
+        assert response.content == self.render_content(is_superuser=True,
+                                                       is_administrator=True,
+                                                       add_allowed=True)
+
     def test_get_with_archived_organization(self):
         OrganizationRole.objects.create(organization=self.org, user=self.user)
         assign_policies(self.user)
