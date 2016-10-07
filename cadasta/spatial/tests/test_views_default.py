@@ -1,7 +1,9 @@
 import os
 import pytest
 import json
-from django.http import Http404
+from importlib import import_module
+from django.http import HttpRequest, Http404
+from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
@@ -26,6 +28,8 @@ from ..views import default
 from .. import forms
 from ..models import SpatialUnit
 from ..serializers import SpatialUnitGeoJsonSerializer
+
+SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
 
 def assign_policies(user):
@@ -173,7 +177,59 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(cancel_url=reverse(
+            'organization:project-dashboard', kwargs=self.setup_url_kwargs()))
+
+    def test_get_with_authorized_user_with_referrer(self):
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user,
+                                request_meta={'HTTP_REFERER': '/help/'})
+        assert response.status_code == 200
+        assert response.content == self.render_content(cancel_url='/help/')
+
+    def test_get_with_authorized_user_with_same_referrer(self):
+        user = UserFactory.create()
+        assign_policies(user)
+        referer = reverse('locations:add', kwargs=self.setup_url_kwargs())
+        response = self.request(user=user,
+                                request_meta={'HTTP_REFERER': referer})
+        assert response.status_code == 200
+        assert response.content == self.render_content(cancel_url=reverse(
+            'organization:project-dashboard', kwargs=self.setup_url_kwargs()))
+
+    def test_get_with_authorized_user_with_same_referrer_with_session(self):
+        user = UserFactory.create()
+        assign_policies(user)
+
+        # Manually construct our request to enable session reuse
+        request = HttpRequest()
+        self._request = request
+        setattr(request, 'method', 'GET')
+        setattr(request, 'user', user)
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = '80'
+        setattr(request, 'session', SessionStore())
+        url_params = self._get_url_kwargs()
+        view = self.setup_view()
+        expected_content = self.render_content(cancel_url='/info/')
+
+        # First request that should set the session
+        request.META['HTTP_REFERER'] = '/info/'
+        response = view(request, **url_params)
+        content = response.render().content.decode('utf-8')
+        assert response.status_code == 200
+        assert content == expected_content
+        assert request.session['cancel_add_location_url'] == '/info/'
+
+        # Second request to check that the session is being used
+        request.META['HTTP_REFERER'] = reverse(
+            'locations:add', kwargs=self.setup_url_kwargs())
+        response = view(request, **url_params)
+        content = response.render().content.decode('utf-8')
+        assert response.status_code == 200
+        assert content == expected_content
+        assert request.session['cancel_add_location_url'] == '/info/'
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
