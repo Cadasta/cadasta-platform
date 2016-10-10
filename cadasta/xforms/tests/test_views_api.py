@@ -316,6 +316,23 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
         assert geom.geometry.geom_type == 'Polygon'
 
+    def test_geotrace_as_poly_upload(self):
+        questionnaire = self._create_questionnaire(
+            't_questionnaire_geotype_select', 1)
+        QuestionFactory.create(
+            name='location_geometry',
+            label='Location of Parcel',
+            type='GS',
+            questionnaire=questionnaire)
+
+        data = self._submission(form='submission_geotrace_as_poly')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+
+        geom = SpatialUnit.objects.get(attributes={'name': 'geotrace_poly'})
+        assert response.status_code == 201
+        assert geom.geometry.geom_type == 'Polygon'
+
     def test_geoshape_as_location_geometry_upload(self):
         questionnaire = self._create_questionnaire(
             't_questionnaire_geotype_select', 1)

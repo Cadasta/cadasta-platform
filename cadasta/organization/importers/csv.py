@@ -1,13 +1,11 @@
 import csv
 from collections import OrderedDict
 
-from shapely.geometry import LineString, Point, Polygon
-from shapely.wkt import dumps
-
 from django.db import transaction
 from django.utils.translation import ugettext as _
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from spatial.models import SpatialUnit
+from xforms.utils import odk_geom_to_wkt
 
 from . import base, exceptions
 
@@ -104,8 +102,7 @@ class CSVImporter(base.Importer):
                             raise ValueError(
                                 _("Invalid geometry type")
                             )
-                        geometry = self._format_geometry(
-                            coords, geom_type=geometry_type)
+                        geometry = odk_geom_to_wkt(coords)
                         try:
                             tenure_type = row[
                                 csv_headers.index(TENURE_TYPE)]
@@ -113,7 +110,6 @@ class CSVImporter(base.Importer):
                             raise ValueError(
                                 _("No 'tenure_type' column found")
                             )
-                        # get the geom here
                         content_types['party.party'] = {
                             'project': self.project,
                             'name': party_name,
@@ -149,34 +145,3 @@ class CSVImporter(base.Importer):
         except Exception as e:
             raise exceptions.DataImportError(
                 line_num=reader.line_num, error=e)
-
-    def _format_geometry(self, coords, geom_type=None):
-        if coords == '':
-            return None
-        # if '\n' in coords:
-        #     coords = coords.replace('\n', '')
-        coords = coords.split(';')
-        if (coords[-1] == ''):
-            coords.pop()
-        # fixes bug in geoshape:
-        # Geoshape copies the second point, not the first.
-        if geom_type == 'geoshape':
-            coords.pop()
-            coords.append(coords[0])
-
-        if len(coords) > 1:
-            points = []
-            for coord in coords:
-                coord = coord.split(' ')
-                coord = [x for x in coord if x]
-                latlng = [float(coord[1]),
-                          float(coord[0])]
-                points.append(tuple(latlng))
-            if (coords[0] != coords[-1] or len(coords) == 2):
-                return dumps(LineString(points))
-            else:
-                return dumps(Polygon(points))
-        else:
-            latlng = coords[0].split(' ')
-            latlng = [x for x in latlng if x]
-            return dumps(Point(float(latlng[1]), float(latlng[0])))
