@@ -93,7 +93,7 @@ class ProjectPage(Page):
             self.click_through(button, self.test.BY_ALERT)
             self.click_on_close_alert_button()
 
-    def click_on_detatch_resource_button(self, location, success=True):
+    def click_on_detach_resource_button(self, location, success=True):
         button = self.test.page_content(
             "//div[contains(@class, '{}')]".format(location) +
             "//button[contains(@class, 'btn-danger')]")

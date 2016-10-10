@@ -7,6 +7,8 @@ from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
 from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
+from resources.tests.factories import ResourceFactory
+from resources.models import ContentObject
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
@@ -64,11 +66,26 @@ class PartyTest(UserTestCase, TestCase):
                 prj=party.project.slug,
                 id=party.id))
 
+    def test_detach_party_resources(self):
+        project = ProjectFactory.create()
+        party = PartyFactory.create(project=project)
+        resource = ResourceFactory.create(project=project)
+        resource.content_objects.create(
+            content_object=party)
+
+        assert ContentObject.objects.filter(
+            object_id=party.id, resource=resource).exists()
+        assert resource in party.resources
+
+        party.delete()
+        assert not ContentObject.objects.filter(
+            object_id=party.id, resource=resource).exists()
+
 
 class PartyRelationshipTest(UserTestCase, TestCase):
 
     def test_str(self):
-        project = ProjectFactory(name='TestProject')
+        project = ProjectFactory.create(name='TestProject')
         relationship = PartyRelationshipFactory(
             project=project,
             party1__project=project,
@@ -208,6 +225,21 @@ class TenureRelationshipTest(UserTestCase, TestCase):
                 org=tenurerel.project.organization.slug,
                 prj=tenurerel.project.slug,
                 id=tenurerel.id))
+
+    def test_detach_tenure_relationship_resources(self):
+        project = ProjectFactory.create()
+        tenure = TenureRelationshipFactory.create(project=project)
+        resource = ResourceFactory.create(project=project)
+        resource.content_objects.create(
+            content_object=tenure)
+        assert ContentObject.objects.filter(
+            object_id=tenure.id,
+            resource=resource,).exists()
+        assert resource in tenure.resources
+
+        tenure.delete()
+        assert not ContentObject.objects.filter(
+            object_id=tenure.id, resource=resource).exists()
 
 
 class TenureRelationshipTypeTest(UserTestCase, TestCase):
