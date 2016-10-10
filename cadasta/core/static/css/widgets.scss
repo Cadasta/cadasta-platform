@@ -29,6 +29,51 @@
   }
 }
 
+/* =Date Picker
+-------------------------------------------------------------- */
+
+// marked !important because css comes after main in code
+
 .ui-datepicker {
   z-index: 2000 !important;
+  .ui-widget-content {
+    font-family: $font-family-sans-serif !important;
+    color: $text-color !important;
+    border-color: $table-border-color !important;
+    -webkit-box-shadow: 10px 10px 6px -8px rgba(0,0,0,.5);
+    -moz-box-shadow: 10px 10px 6px -8px rgba(0,0,0,.5);
+    box-shadow: 10px 10px 6px -8px rgba(0,0,0,.5);
+  }
+  .ui-datepicker-title select {
+    font-family: $font-family-sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+  }
+  th {
+    font-weight: 500 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+  }
+  .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default, .ui-button, html .ui-button.ui-state-disabled:hover, html .ui-button.ui-state-disabled:active {
+    border-color: #fff !important;
+    background: #fff !important;
+    color: $text-color !important;
+  }
+  .ui-state-hover, .ui-widget-content .ui-state-hover, .ui-widget-header .ui-state-hover, .ui-button:focus {
+    background: $gray-light !important;
+    border-color: $gray-light !important;
+  }
+  .ui-state-highlight, .ui-widget-content .ui-state-highlight, .ui-widget-header .ui-state-highlight {
+    border-color: $brand-lightgold !important;
+    background: $brand-lightgold !important;
+    color: $text-color !important;
+  }
+  .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active, a.ui-button:active, .ui-button:active, .ui-button.ui-state-active:hover {
+    border: 1px solid $btn-primary-bg !important;
+    background: $btn-primary-bg !important;
+    color: #fff !important;
+  }
 }
+
+

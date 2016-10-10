@@ -24,12 +24,11 @@
             {% if resource.archived %}
               <span class="label label-danger">{% trans "Deleted" %}</span>
             {% endif %}
-          </p>
-          <p class="small">{{ resource.original_file }}</p>
+          <br>{{ resource.original_file }}</p>
         </div>
       </td>
       <td class="hidden-xs hidden-sm">{{ resource.file_type }}</td>
-      <td class="hidden-xs hidden-sm">{{ resource.contributor.full_name }}<br>{{ resource.contributor.username }}</td>
+      <td class="hidden-xs hidden-sm">{{ resource.contributor.username }}<br>{{ resource.contributor.full_name }}</td>
       <td class="hidden-xs hidden-sm">{{ resource.last_updated }}</td>
       <td class="hidden-xs hidden-sm">
         {% if resource.attachment_id %}

@@ -11,6 +11,8 @@ $brand-lightblue:              lighten($brand-primary, 36%);  // Cadasta light b
 $brand-darkblue:               #0e305e;  // Cadasta dark blue
 $brand-darkerblue:             darken($brand-darkblue, 5%);  // Cadasta darker blue
 $brand-gold:                   #edaa00;  // Cadasta gold
+$brand-lightgold:              lighten($brand-gold, 30%);  // Cadasta light gold
+$brand-lightergold:            lighten($brand-gold, 40%);  // Cadasta light gold
 
 $brand-single-lightblue:       lighten($brand-primary, 10%);  // Cadasta single header light blue
 $brand-single-lighterblue:     lighten($brand-primary, 40%);  // Cadasta single header lighter blue
