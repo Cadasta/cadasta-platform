@@ -242,6 +242,30 @@ class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 
 class EditOrganizationMemberFormTest(UserTestCase, TestCase):
 
+    def test_init(self):
+        org = OrganizationFactory.create()
+        prj_1 = ProjectFactory.create(organization=org)
+        user = UserFactory.create()
+        current_user = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=org, user=current_user, admin=True)
+        OrganizationRole.objects.create(
+            organization=org, user=user, admin=True)
+
+        data = {
+            'org_role': 'A',
+            prj_1.id: 'PM'
+        }
+
+        OrganizationRole.objects.create(
+            organization=org, user=current_user, admin=True)
+        form = forms.EditOrganizationMemberForm(data, org, user, current_user)
+
+        for k, field in form.fields.items():
+            if field.initial:
+                assert field.initial == 'A'
+                assert field.required is False
+
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
         user = UserFactory.create()
