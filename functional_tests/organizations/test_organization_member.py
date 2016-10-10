@@ -75,18 +75,10 @@ class OrganizationMemberTest(FunctionalTest):
         OrganizationMemberListPage(self).go_to_member_list_page()
         page.go_to_admin_member_page()
 
+        role_select = page.get_member_role_select('')
+        assert role_select.get_attribute('disabled')
         roles = page.get_role_options()
         assert roles["admin"].text == roles["selected"].text
-
-        roles["member"].click()
-        page.click_submit_button()
-        self.get_screenshot()
-        # get error message
-        # assert you stayed on the same page.
-        roles = page.get_role_options()
-        errors = page.get_org_role_error()
-        assert errors.text == ("Organization administrators cannot change" +
-                               " their own role in the organization.")
 
     def test_removing_a_member_from_an_organization(self):
         """An admin member can remove a member from an organization."""
