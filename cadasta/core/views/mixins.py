@@ -36,3 +36,10 @@ class SuperUserCheckMixin:
         context = super().get_context_data(*args, **kwargs)
         context['is_superuser'] = self.is_superuser
         return context
+
+
+class CacheObjectMixin:
+    def get_object(self):
+        if not hasattr(self, '_object'):
+            self._object = super().get_object()
+        return self._object

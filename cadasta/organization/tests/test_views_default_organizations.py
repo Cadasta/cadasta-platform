@@ -38,6 +38,10 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         self.public_orgs = self.orgs + [unauthorized]
         self.all_orgs = self.orgs + [unauthorized] + [self.archived_org]
 
+        # Annotate each org with the number of projects
+        for org in self.all_orgs:
+            org.num_projects = 0
+
         clauses = {
             'clause': [
                 clause('allow', ['org.list']),

@@ -131,26 +131,12 @@ class ResourceArchive(LoginPermissionRequiredMixin,
         next_url = self.request.GET.get('next', None)
         if next_url:
             return next_url + '#resources'
-
-        project = self.get_project()
-        resource = self.get_object()
-        if self.request.user.has_perm('resource.unarchive', resource):
-            return reverse(
-                'resources:project_detail',
-                kwargs={
-                    'organization': project.organization.slug,
-                    'project': project.slug,
-                    'resource': resource.id,
-                }
-            )
+        if self.request.user.has_perm('resource.unarchive', self.get_object()):
+            return reverse('resources:project_detail', kwargs=self.kwargs)
         else:
-            return reverse(
-                'resources:project_list',
-                kwargs={
-                    'organization': project.organization.slug,
-                    'project': project.slug,
-                }
-            )
+            kwargs = self.kwargs.copy()
+            del kwargs['resource']
+            return reverse('resources:project_list', kwargs=kwargs)
 
 
 class ResourceUnarchive(LoginPermissionRequiredMixin,
@@ -191,12 +177,10 @@ class ResourceDetach(LoginPermissionRequiredMixin,
         next_url = self.request.GET.get('next', None)
         if next_url:
             return next_url + '#resources'
-
-        project = self.get_project()
         return reverse(
             'resources:project_list',
             kwargs={
-                'organization': project.organization.slug,
-                'project': project.slug,
+                'organization': self.kwargs['organization'],
+                'project': self.kwargs['project'],
             }
         )

@@ -483,9 +483,10 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert response.location == self.expected_success_url
 
-        self.location.refresh_from_db()
-        assert self.location.type == self.post_data['type']
-        assert self.location.attributes.get('fname') == 'New text'
+        # attributes field is deferred so we fetch a fresh instance
+        location = SpatialUnit.objects.defer(None).get(id=self.location.id)
+        assert location.type == self.post_data['type']
+        assert location.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -924,8 +925,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                     'new_entity': not self.project.parties.exists(),
                 },
             ),
-            'geojson': json.dumps(SpatialUnitGeoJsonSerializer(
-                [self.spatial_unit], many=True).data),
+            'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_allowed_add_location': True
         }
 

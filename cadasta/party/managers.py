@@ -5,6 +5,13 @@ from django.db import models
 from . import exceptions
 
 
+class PartyManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).defer('attributes')
+
+
 class BaseRelationshipManager(models.Manager):
     """
     Manager to provide project relationship checks.
@@ -37,6 +44,8 @@ class PartyRelationshipManager(BaseRelationshipManager):
 class TenureRelationshipManager(BaseRelationshipManager):
     """Manages TenureRelationships."""
 
+    use_for_related_fields = True
+
     def create(self, *args, **kwargs):
         """Check that related entities are in the same project."""
         project = kwargs['project']
@@ -46,3 +55,7 @@ class TenureRelationshipManager(BaseRelationshipManager):
         self.check_project_constraints(
             project=project, left=party, right=spatial_unit)
         return super().create(**kwargs)
+
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).defer(
+            'attributes').select_related('tenure_type')

@@ -93,7 +93,7 @@
 
       <!-- Resources tab -->
       <div role="tabpanel" class="tab-pane" id="resources">
-        {% if location.resources %}
+        {% if resource_list %}
           <div class="top-btn pull-right top-add">
             {% if has_unattached_resources %}
             <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">

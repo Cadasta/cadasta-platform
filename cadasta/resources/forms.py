@@ -38,8 +38,9 @@ class AddResourceFromLibraryForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.content_object = content_object
-        self.project_resources = Resource.objects.filter(project_id=project_id,
-                                                         archived=False)
+        self.project_resources = Resource.objects.filter(
+            project_id=project_id, archived=False
+        ).select_related('contributor')
 
         for resource in self.project_resources:
             if resource not in content_object.resources:
