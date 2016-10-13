@@ -133,7 +133,11 @@ def reprocess_multilingual_forms(apps, schema_editor):
     Questionnaire = apps.get_model('questionnaires', 'Questionnaire')
     for quest in Questionnaire.objects.all():
         # Parse XLS form and check multilingual settings.
-        json = parse_file_to_json(quest.xls_form.file.name)
+        try:
+            json = parse_file_to_json(quest.xls_form.file.name)
+        except:
+            # Skip bad forms.
+            continue
         has_default_language = (
             'default_language' in json and
             json['default_language'] != 'default'
