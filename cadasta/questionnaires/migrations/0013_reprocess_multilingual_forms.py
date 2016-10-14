@@ -158,6 +158,10 @@ def reprocess_multilingual_forms(apps, schema_editor):
         if not is_multilingual:
             continue
 
+        # Skip "left over" questionnaires.
+        if quest.project.current_questionnaire != quest:
+            continue
+
         # Set up default language: fix "default" where it crops up.
         quest.default_language = json['default_language']
         if quest.default_language == 'default':
