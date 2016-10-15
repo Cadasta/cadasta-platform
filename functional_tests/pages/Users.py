@@ -10,7 +10,7 @@ class UsersPage(Page):
     # the user with the specified username
     row_xpath = (
         "//table[@id='DataTables_Table_0']/tbody" +
-        "/tr[./td[1][text()='{0}' and not(*[2])]]"
+        "/tr[./td[1]/p[1][text()='{0}']]"
     )
 
     # XPath to unambiguously search for the form that
@@ -98,9 +98,12 @@ class UsersPage(Page):
     def get_user_cell_value(self, username, cell_pos):
         formatted_xpath = self.row_xpath.format(username)
         user_row = self.browser.find_element_by_xpath(formatted_xpath)
-        cell_xpath = "td[{}][not(*[2])]".format(cell_pos)
+        cell_xpath = "./td[{}]".format(cell_pos)
         cell = user_row.find_element_by_xpath(cell_xpath)
         return cell.text
+
+    def get_user_name(self, username):
+        return self.get_user_cell_value(username, 1)
 
     def get_user_email(self, username):
         return self.get_user_cell_value(username, 2)

@@ -20,6 +20,7 @@ class PageListTest(FunctionalTest):
         users.append({
             'username': 'superuser',
             'password': 'password3',
+            'full_name': 'Super User',
             'email': "superuser@example.com",
             'is_active': True,
             '_is_superuser': True,
@@ -85,6 +86,12 @@ class PageListTest(FunctionalTest):
         for user in users:
 
             username = user['username']
+
+            # Check full name is displayed correctly
+            full_name = user.get('full_name', '')
+            expected_name = '{}\n{}'.format(username, full_name).strip()
+            actual_name = users_page.get_user_name(username)
+            assert actual_name == expected_name
 
             # Check email is displayed correctly
             expected_email = user['email'] or '—'
