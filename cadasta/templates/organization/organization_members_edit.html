@@ -37,7 +37,7 @@
                     <div class="form-group member-role{% if form.org_role.errors %} has-error{% endif %}">
                       <label class="control-label" for="{{ form.org_role.id_for_label }}">{% trans "Role" %}</label>
                       {% if org_admin %}
-                      {% render_field form.org_role class+="form-control" data-parsley-required="true" disabled="disabled" %}
+                      {% render_field form.org_role class+="form-control" data-parsley-required="true" readonly="True" %}
                       {% else %}
                       {% render_field form.org_role class+="form-control" data-parsley-required="true" %}
                       {% endif %}
