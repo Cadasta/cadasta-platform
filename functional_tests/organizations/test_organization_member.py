@@ -76,7 +76,7 @@ class OrganizationMemberTest(FunctionalTest):
         page.go_to_admin_member_page()
 
         role_select = page.get_member_role_select('')
-        assert role_select.get_attribute('disabled')
+        assert role_select.get_attribute('readonly')
         roles = page.get_role_options()
         assert roles["admin"].text == roles["selected"].text
 
