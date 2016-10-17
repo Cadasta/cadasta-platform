@@ -69,13 +69,10 @@ def create_options(options, question, errors=[]):
 
 
 def fix_labels(labels):
-    if isinstance(labels, str):
-        res = labels
-    elif isinstance(labels, dict):
-        res = {k: str(v) for k, v in labels.items()}
+    if isinstance(labels, dict):
+        return {k: str(v) for k, v in labels.items()}
     else:
-        res = str(labels)
-    return res
+        return labels
 
 
 def create_attrs_schema(project=None, dict=None, content_type=None,
