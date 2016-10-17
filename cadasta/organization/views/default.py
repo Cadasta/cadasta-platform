@@ -140,9 +140,6 @@ class OrgArchiveView(LoginPermissionRequiredMixin,
         self.object = self.get_object()
         self.object.archived = self.do_archive
         self.object.save()
-        for project in self.object.projects.all():
-            project.archived = self.do_archive
-            project.save()
         return redirect(self.get_success_url())
 
 
@@ -366,6 +363,10 @@ class ProjectList(PermissionRequiredMixin,
                                                         ).admin is True:
                             projects.extend(
                                 org.projects.filter(archived=True))
+            for project in projects:
+                if project.organization.archived:
+                    project.archived = True
+
         self.object_list = sorted(
             projects, key=lambda p: p.organization.slug + ':' + p.slug)
         context = self.get_context_data()
