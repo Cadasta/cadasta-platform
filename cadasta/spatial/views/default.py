@@ -34,6 +34,25 @@ class LocationsAdd(LoginPermissionRequiredMixin,
     permission_required = update_permissions('spatial.add')
     permission_denied_message = error_messages.SPATIAL_CREATE
 
+    def get(self, request, *args, **kwargs):
+        referrer = request.META.get('HTTP_REFERER', None)
+        if referrer:
+            current_url = reverse('locations:add', kwargs=self.kwargs)
+            if current_url not in referrer:
+                request.session['cancel_add_location_url'] = referrer
+        else:
+            # In case the browser does not send any referrer
+            request.session['cancel_add_location_url'] = reverse(
+                'organization:project-dashboard', kwargs=self.kwargs)
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        cancel_url = self.request.session.get('cancel_add_location_url', None)
+        context['cancel_url'] = cancel_url or reverse(
+            'organization:project-dashboard', kwargs=self.kwargs)
+        return context
+
     def get_perms_objects(self):
         return [self.get_project()]
 
