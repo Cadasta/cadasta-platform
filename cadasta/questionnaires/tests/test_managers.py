@@ -342,3 +342,48 @@ class MultilingualQuestionnaireTest(UserTestCase, TestCase):
             assert len(cd) == 2
         finally:
             activate(cur_language)
+
+    def test_multilingual_numeric_labels_and_choices(self):
+        quest = self._run('ok-multilingual.xlsx')
+        q = quest.questions.get(name='num_children')
+        assert q.label == 'Number of children'
+        assert (sorted([(o.name, o.label) for o in q.options.all()]) ==
+                [('0', '0'), ('1', '1'), ('2', '2'), ('3', '3')])
+        a = Attribute.objects.get(name='num_children')
+        assert a.long_name == 'Number of children'
+        cd = a.choice_dict
+        assert cd['0'] == '0'
+        assert cd['1'] == '1'
+        assert cd['2'] == '2'
+        assert cd['3'] == '3'
+        assert len(cd) == 4
+        cur_language = get_language()
+        try:
+            activate('fr')
+            assert q.label == "Nombre d'enfants"
+            assert (sorted([(o.name, o.label) for o in q.options.all()]) ==
+                    [('0', '0'), ('1', '1'), ('2', '2'), ('3', '3')])
+            assert a.long_name == "Nombre d'enfants"
+            cd = a.choice_dict
+            assert cd['0'] == '0'
+            assert cd['1'] == '1'
+            assert cd['2'] == '2'
+            assert cd['3'] == '3'
+            assert len(cd) == 4
+        finally:
+            activate(cur_language)
+
+    def test_monolingual_numeric_labels_and_choices(self):
+        quest = self._run('ok-monolingual.xlsx')
+        q = quest.questions.get(name='num_children')
+        assert q.label == 'Number of children'
+        assert (sorted([(o.name, o.label) for o in q.options.all()]) ==
+                [('0', '0'), ('1', '1'), ('2', '2'), ('3', '3')])
+        a = Attribute.objects.get(name='num_children')
+        assert a.long_name == 'Number of children'
+        cd = a.choice_dict
+        assert cd['0'] == '0'
+        assert cd['1'] == '1'
+        assert cd['2'] == '2'
+        assert cd['3'] == '3'
+        assert len(cd) == 4
