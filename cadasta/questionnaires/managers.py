@@ -59,10 +59,10 @@ def create_options(options, question, errors=[]):
         for o, idx in zip(options, itertools.count()):
             QuestionOption = apps.get_model('questionnaires', 'QuestionOption')
 
-            if 'label' in o:
-                o['label_xlat'] = o['label']
-                del o['label']
-            QuestionOption.objects.create(question=question, index=idx+1, **o)
+            QuestionOption.objects.create(
+                question=question, index=idx+1, name=o['name'],
+                label_xlat=o.get('label_xlat', o.get('label', None))
+            )
     else:
         errors.append(_("Please provide at least one option for field"
                         " '{field_name}'".format(field_name=question.name)))
@@ -70,11 +70,12 @@ def create_options(options, question, errors=[]):
 
 def fix_labels(labels):
     if isinstance(labels, str):
-        return labels
+        res = labels
     elif isinstance(labels, dict):
-        return {k: str(v) for k, v in labels.items()}
+        res = {k: str(v) for k, v in labels.items()}
     else:
-        return str(labels)
+        res = str(labels)
+    return res
 
 
 def create_attrs_schema(project=None, dict=None, content_type=None,
