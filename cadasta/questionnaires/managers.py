@@ -68,6 +68,15 @@ def create_options(options, question, errors=[]):
                         " '{field_name}'".format(field_name=question.name)))
 
 
+def fix_labels(labels):
+    if isinstance(labels, str):
+        return labels
+    elif isinstance(labels, dict):
+        return {k: str(v) for k, v in labels.items()}
+    else:
+        return str(labels)
+
+
 def create_attrs_schema(project=None, dict=None, content_type=None,
                         default_language='', errors=[]):
     fields = []
@@ -109,7 +118,7 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
         if c.get('choices'):
             field['choices'] = [choice.get('name')
                                 for choice in c.get('choices')]
-            field['choice_labels'] = [choice.get('label')
+            field['choice_labels'] = [fix_labels(choice.get('label'))
                                       for choice in c.get('choices')]
         fields.append(field)
 
