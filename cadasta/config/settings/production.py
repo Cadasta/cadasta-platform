@@ -25,6 +25,16 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': [
+            os.environ['MEMCACHED_HOST'],
+        ],
+        'OPTIONS': {'distribution': 'consistent'}
+    }
+}
+
 DJOSER.update({  # NOQA
     'DOMAIN': os.environ['DOMAIN'],
 })
