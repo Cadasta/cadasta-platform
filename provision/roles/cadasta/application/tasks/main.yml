@@ -22,6 +22,7 @@
       - libxml2-dev
       - libjpeg-dev
       - libgdal1-dev
+      - libmemcached-dev
 
 - name: dev locale
   become: yes
