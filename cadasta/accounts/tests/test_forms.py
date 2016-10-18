@@ -2,6 +2,9 @@ import random
 
 from django.utils.translation import gettext as _
 from django.test import TestCase
+from django.core import mail
+from django.http import HttpRequest
+from django.contrib.messages.storage.fallback import FallbackStorage
 
 from ..models import User
 from ..forms import RegisterForm, ProfileForm
@@ -78,17 +81,28 @@ class RegisterFormTest(UserTestCase, TestCase):
 class ProfileFormTest(UserTestCase, TestCase):
     def test_update_user(self):
         user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk')
+                                  email='john@beatles.uk',
+                                  email_verified=True)
         data = {
             'username': 'imagine71',
-            'email': 'john@beatles.uk',
+            'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
         }
-        form = ProfileForm(data, instance=user)
+
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = '80'
+
+        form = ProfileForm(data, request=request, instance=user)
         form.save()
 
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
+        assert user.email_verified is False
+        assert len(mail.outbox) == 1
 
     def test_display_name(self):
         user = UserFactory.create(username='imagine71',
