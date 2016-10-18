@@ -14,8 +14,7 @@ from xforms.mixins.model_helper import ModelHelper
 from xforms.mixins.openrosa_headers_mixin import OpenRosaHeadersMixin
 from xforms.renderers import XFormListRenderer
 from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
-
-from ..exceptions import InvalidXMLSubmission
+from xforms.exceptions import InvalidXMLSubmission
 
 logger = logging.getLogger('xform.submissions')
 

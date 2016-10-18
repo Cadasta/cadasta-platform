@@ -1,3 +1,4 @@
+import ast
 from django.core.exceptions import ValidationError
 from django.core.files.storage import get_storage_class
 from django.db import transaction
@@ -21,6 +22,13 @@ class ModelHelper():
         questionnaire = self._get_questionnaire(
             id_string=data['id'], version=data['version']
         )
+
+        # If xform has already been submitted, check for additional resources
+        additional_resources = self.check_for_duplicate_submission(
+                        data, questionnaire)
+        if additional_resources:
+            return additional_resources
+
         project = questionnaire.project
 
         if project.current_questionnaire != questionnaire.id:
@@ -44,6 +52,29 @@ class ModelHelper():
             party=party,
             location=location
         )
+
+        return (questionnaire, party_resources, location_resources,
+                tenure_resources)
+
+    def check_for_duplicate_submission(self, data, questionnaire):
+        previous_submission = XFormSubmission.objects.filter(
+            instanceID=data['meta']['instanceID']
+        )
+        if not previous_submission:
+            return None
+
+        party_resources = []
+        location_resources = []
+        tenure_resources = []
+
+        for party in previous_submission[0].parties:
+            party_resources.append(ast.literal_eval(party))
+
+        for location in previous_submission[0].spatial_units:
+            location_resources.append(ast.literal_eval(location))
+
+        for tenure in previous_submission[0].tenures:
+            tenure_resources.append(ast.literal_eval(tenure))
 
         return (questionnaire, party_resources, location_resources,
                 tenure_resources)
@@ -230,7 +261,12 @@ class ModelHelper():
         return XFormSubmission(
             json_submission=full_submission,
             user=request.user,
-            questionnaire=questionnaire)
+            questionnaire=questionnaire,
+            instanceID=submission['meta']['instanceID'],
+            parties=party,
+            spatial_units=location,
+            tenures=tenure,
+            )
 
     def upload_resource_files(self, request, data):
         user = request.user

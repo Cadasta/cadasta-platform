@@ -1,6 +1,7 @@
 import json
+import uuid
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from core.models import RandomIDModel
 from questionnaires.models import Questionnaire
 from accounts.models import User
@@ -19,3 +20,14 @@ class XFormSubmission(RandomIDModel):
                        ' json_submission={json}>')
         return repr_string.format(obj=self,
                                   json=json.dumps(self.json_submission))
+    instanceID = models.UUIDField(
+        primary_key=False, default=uuid.uuid4, editable=False)
+
+    spatial_units = ArrayField(models.CharField(max_length=2500),
+                               default=[], null=False)
+
+    parties = ArrayField(models.CharField(max_length=2500),
+                         default=[], null=False)
+
+    tenures = ArrayField(models.CharField(max_length=2500),
+                         default=[], null=False)

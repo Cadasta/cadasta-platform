@@ -41,6 +41,10 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
         allow_null=True, queryset=User.objects.all(), required=False)
     questionnaire = serializers.PrimaryKeyRelatedField(
         allow_null=True, queryset=Questionnaire.objects.all(), required=False)
+    instanceID = serializers.UUIDField(format='hex_verbose')
+    parties = serializers.ListField(required=False)
+    tenures = serializers.ListField(required=False)
+    spatial_units = serializers.ListField(required=False)
 
     def create(self, validated_data):
         return XFormSubmission.objects.create(**validated_data)

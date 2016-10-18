@@ -23,6 +23,7 @@ from party.models import (Party, TenureRelationship,
 from organization.models import OrganizationRole
 from resources.models import Resource
 from spatial.models import SpatialUnit
+from xforms.models import XFormSubmission
 from xforms.mixins.model_helper import ModelHelper as mh
 from xforms.exceptions import InvalidXMLSubmission
 
@@ -88,6 +89,9 @@ class XFormModelHelperTest(TestCase):
                     '45.56176327330353 -122.67669159919024 0.0 0.0')
         data = {
             'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
             'version': str(self.questionnaire.version),
             'party_name': 'Party One',
             'party_type': 'IN',
@@ -132,6 +136,46 @@ class XFormModelHelperTest(TestCase):
         assert tenure.party == party
         assert tenure_resources[0]['id'] == tenure.id
         assert 'resource_three.png' in tenure_resources[0]['resources']
+
+    def test_check_for_duplicate_submission(self):
+        data = {
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            }
+        }
+        assert not mh.check_for_duplicate_submission(
+            mh(), data, self.questionnaire)
+
+        XFormSubmission.objects.create(
+            json_submission={},
+            user=self.user,
+            questionnaire=self.questionnaire,
+            instanceID='uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad',
+            parties=["{'id': '1234', 'resources': ['one.jpg', 'two.jpg']}",
+                     "{'id': '2345', 'resources': ['three.jpg']}"],
+            spatial_units=["{'id': '456', 'resources': ['four.jpg']}"],
+            tenures=["{'id': '6789', 'resources': ['five.jpg', 'six.jpg']}",
+                     "{'id': '1290', 'resources': []}"])
+
+        additional_resources = mh.check_for_duplicate_submission(
+            mh(), data, self.questionnaire)
+        (questionnaire, party_resources, location_resources,
+            tenure_resources) = additional_resources
+
+        assert questionnaire == self.questionnaire
+
+        assert party_resources[0]['id'] == '1234'
+        assert party_resources[0]['resources'] == ['one.jpg', 'two.jpg']
+        assert party_resources[1]['id'] == '2345'
+        assert party_resources[1]['resources'] == ['three.jpg']
+
+        assert location_resources[0]['id'] == '456'
+        assert location_resources[0]['resources'] == ['four.jpg']
+
+        assert tenure_resources[0]['id'] == '6789'
+        assert tenure_resources[0]['resources'] == ['five.jpg', 'six.jpg']
+        assert tenure_resources[1]['id'] == '1290'
+        assert tenure_resources[1]['resources'] == []
 
     def test_create_party(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
