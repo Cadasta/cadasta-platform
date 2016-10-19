@@ -1,3 +1,5 @@
+import random
+import json
 from datetime import datetime, timezone
 
 from accounts.models import User
@@ -11,6 +13,7 @@ from organization.tests.factories import OrganizationFactory, ProjectFactory
 from spatial.tests.factories import (
     SpatialUnitFactory, SpatialRelationshipFactory
 )
+from spatial.choices import TYPE_CHOICES
 
 from tutelary.models import Policy, Role
 
@@ -391,6 +394,51 @@ class FixturesData:
             project=Project.objects.get(name='Kibera Test Project'),
             type='MI',
             attributes={})
+
+    def add_huge_project(self):
+        project = Project.objects.get(slug='london-2')
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        attr_type = AttributeType.objects.get(name="text")
+        sch = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.pk, project.pk))
+        Attribute.objects.create(
+            schema=sch, name='name', long_name='Name',
+            required=False, index=1, attr_type=attr_type
+        )
+
+        spatial_units = []
+        for i in range(0, 4000):
+            row = i // 63
+            col = i - (row * 63)
+
+            north_west = [11.67 + (col * 0.025),
+                          50.88 + (row * 0.025)]
+            south_east = [11.67 + ((col + 1) * 0.025),
+                          50.88 + ((row + 1) * 0.025)]
+
+            geometry = {
+                'type': 'Polygon',
+                'coordinates': [[
+                    north_west,
+                    [north_west[0], south_east[1]],
+                    south_east,
+                    [south_east[0], north_west[1]],
+                    north_west
+                ]]
+            }
+            name = 'Spatial Unit #{}'.format(i)
+            type = random.choice([c[0] for c in TYPE_CHOICES])
+
+            spatial_units.append({
+                'geometry': GEOSGeometry(json.dumps(geometry)),
+                'type': type,
+                'project': project,
+                'attributes': {'name': name}
+            })
+
+        SpatialUnitFactory.create_from_kwargs(spatial_units)
 
     def delete_test_organizations(self):
         orgs = Organization.objects.filter(name__contains='Test')

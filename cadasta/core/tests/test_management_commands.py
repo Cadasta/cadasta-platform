@@ -27,12 +27,13 @@ class FixturesTest(TestCase):
         data.add_test_users_and_roles()
         data.add_test_projects()
         data.add_test_spatial_units()
+        data.add_huge_project()
 
         assert User.objects.count() == 20
         assert Policy.objects.count() == 7
         assert Organization.objects.count() == 2
         assert Project.objects.count() == 9
-        assert SpatialUnit.objects.count() == 7
+        assert SpatialUnit.objects.count() == 4007
         assert SpatialRelationship.objects.count() == 2
 
         data.delete_test_users()

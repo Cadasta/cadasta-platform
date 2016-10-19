@@ -45,7 +45,7 @@ class ProjectMixin:
     def get_project(self):
         if not hasattr(self, 'prj'):
             self.prj = get_object_or_404(
-                Project,
+                Project.objects.select_related('organization'),
                 organization__slug=self.kwargs['organization'],
                 slug=self.kwargs['project']
             )
