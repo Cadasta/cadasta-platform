@@ -57,6 +57,9 @@
       Defaults  env_keep += S3_ACCESS_KEY
       Defaults  env_keep += S3_SECRET_KEY
       Defaults  env_keep += MEMCACHED_HOST
+      Defaults  env_keep += OPBEAT_ORGID
+      Defaults  env_keep += OPBEAT_APPID
+      Defaults  env_keep += OPBEAT_TOKEN
 
 # This is VERY ugly.  The problem is that Ansible keeps SSH
 # connections open across tasks, so the environment variable changes
