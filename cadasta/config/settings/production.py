@@ -1,6 +1,14 @@
 import os
 from .default import *  # NOQA
 
+INSTALLED_APPS += (
+    'opbeat.contrib.django',
+)
+
+MIDDLEWARE_CLASSES = (
+    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
+    'opbeat.contrib.django.middleware.Opbeat404CatchMiddleware',
+) + MIDDLEWARE_CLASSES
 
 DEBUG = False
 
@@ -9,10 +17,10 @@ SECRET_KEY = os.environ['SECRET_KEY']
 DEFAULT_FILE_STORAGE = 'buckets.storage.S3Storage'
 
 AWS = {
-  'BUCKET': os.environ['S3_BUCKET'],
-  'ACCESS_KEY': os.environ['S3_ACCESS_KEY'],
-  'SECRET_KEY': os.environ['S3_SECRET_KEY'],
-  'REGION': 'us-west-2'
+    'BUCKET': os.environ['S3_BUCKET'],
+    'ACCESS_KEY': os.environ['S3_ACCESS_KEY'],
+    'SECRET_KEY': os.environ['S3_SECRET_KEY'],
+    'REGION': 'us-west-2'
 }
 
 DATABASES = {
@@ -33,6 +41,13 @@ CACHES = {
         ],
         'OPTIONS': {'distribution': 'consistent'}
     }
+}
+
+OPBEAT = {
+    'ORGANIZATION_ID': os.environ['OPBEAT_ORGID'],
+    'APP_ID': os.environ['OPBEAT_APPID'],
+    'SECRET_TOKEN': os.environ['OPBEAT_TOKEN'],
+    'ASYNC': True,
 }
 
 DJOSER.update({  # NOQA
@@ -84,17 +99,27 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
         },
+        'opbeat': {
+            'level': 'WARNING',
+            'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'email_admins'],
+            'handlers': ['file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'xform.submissions': {
-            'handlers': ['file', 'email_admins'],
+            'handlers': ['file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
             'propagate': True,
-        }
+        },
+        # Log errors from the Opbeat module to the console
+        'opbeat.errors': {
+            'level': 'ERROR',
+            'handlers': ['file', 'email_admins'],
+            'propagate': False,
+        },
     },
 }
