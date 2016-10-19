@@ -68,9 +68,11 @@ INSTALLED_APPS = (
     'sass_processor',
     'simple_history',
     'jsonattrs',
+    'opbeat.contrib.django',
 )
 
 MIDDLEWARE_CLASSES = (
+    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -83,6 +85,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware'
+    'opbeat.contrib.django.middleware.Opbeat404CatchMiddleware',
 )
 
 REST_FRAMEWORK = {
