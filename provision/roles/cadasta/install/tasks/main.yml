@@ -33,6 +33,9 @@
       S3_SECRET_KEY="{{ s3_secret_key }}"
       DJANGO_SETTINGS_MODULE="{{ django_settings }}"
       MEMCACHED_HOST="{{ memcached_host }}"
+      OPBEAT_ORGID="{{ opbeat_orgID }}"
+      OPBEAT_APPID="{{ opbeat_appID }}"
+      OPBEAT_TOKEN="{{ opbeat_token }}"
 
 - name: Enable environment variables for SSH
   become: yes
