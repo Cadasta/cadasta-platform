@@ -84,7 +84,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
-    'simple_history.middleware.HistoryRequestMiddleware'
+    'simple_history.middleware.HistoryRequestMiddleware',
     'opbeat.contrib.django.middleware.Opbeat404CatchMiddleware',
 )
 
