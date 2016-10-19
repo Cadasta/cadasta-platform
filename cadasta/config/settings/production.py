@@ -47,6 +47,7 @@ OPBEAT = {
     'ORGANIZATION_ID': os.environ['OPBEAT_ORGID'],
     'APP_ID': os.environ['OPBEAT_APPID'],
     'SECRET_TOKEN': os.environ['OPBEAT_TOKEN'],
+    'ASYNC': True,
 }
 
 DJOSER.update({  # NOQA
