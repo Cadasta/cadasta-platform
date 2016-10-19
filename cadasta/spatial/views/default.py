@@ -24,6 +24,9 @@ class LocationsList(LoginPermissionRequiredMixin,
     permission_required = 'spatial.list'
     permission_denied_message = error_messages.SPATIAL_LIST
 
+    def get_perms_objects(self):
+        return [self.get_project()]
+
 
 class LocationsAdd(LoginPermissionRequiredMixin,
                    mixins.SpatialQuerySetMixin,
