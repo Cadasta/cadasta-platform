@@ -32,7 +32,7 @@ class SpatialUrlTest(TestCase):
             kwargs={
                 'organization': 'habitat',
                 'project': '123abc',
-                'spatial_id': '123456123456123456123456',
+                'location': '123456123456123456123456',
             }
         )
         expected = version_url(
@@ -46,7 +46,7 @@ class SpatialUrlTest(TestCase):
         assert resolved.func.__name__ == api.SpatialUnitDetail.__name__
         assert resolved.kwargs['organization'] == 'habitat'
         assert resolved.kwargs['project'] == '123abc'
-        assert resolved.kwargs['spatial_id'] == '123456123456123456123456'
+        assert resolved.kwargs['location'] == '123456123456123456123456'
 
     def test_project_spatial_unit_relationships_list(self):
         actual = reverse(
@@ -54,7 +54,7 @@ class SpatialUrlTest(TestCase):
             kwargs={
                 'organization': 'habitat',
                 'project': '123abc',
-                'spatial_id': '123456123456123456123456',
+                'location': '123456123456123456123456',
             }
         )
         expected = version_url(
@@ -68,4 +68,53 @@ class SpatialUrlTest(TestCase):
         assert resolved.func.__name__ == RelationshipList.__name__
         assert resolved.kwargs['organization'] == 'habitat'
         assert resolved.kwargs['project'] == '123abc'
-        assert resolved.kwargs['spatial_id'] == '123456123456123456123456'
+        assert resolved.kwargs['location'] == '123456123456123456123456'
+
+    def test_spatial_unit_resource_list(self):
+        actual = reverse(
+            version_ns('spatial:resource_list'),
+            kwargs={
+                'organization': 'habitat',
+                'project': '123abc',
+                'location': '123456123456123456123456',
+            }
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/'
+            'spatial/123456123456123456123456/resources/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/spatial/'
+            '123456123456123456123456/resources/'))
+        assert resolved.func.__name__ == api.SpatialUnitResourceList.__name__
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['location'] == '123456123456123456123456'
+
+    def test_spatial_unit_resource_detail(self):
+        actual = reverse(
+            version_ns('spatial:resource_detail'),
+            kwargs={
+                'organization': 'habitat',
+                'project': '123abc',
+                'location': '123456123456123456123456',
+                'resource': '12340293170489127699348'
+            }
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/'
+            'spatial/123456123456123456123456/'
+            'resources/12340293170489127699348/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/'
+            'spatial/123456123456123456123456/'
+            'resources/12340293170489127699348/'))
+        assert (resolved.func.__name__ ==
+                api.SpatialUnitResourceDetail.__name__)
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['location'] == '123456123456123456123456'
+        assert resolved.kwargs['resource'] == '12340293170489127699348'

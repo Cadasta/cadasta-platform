@@ -1,8 +1,10 @@
 import json
 from django.http import Http404
 from django.core.urlresolvers import reverse
+from django.shortcuts import get_object_or_404
 from organization.views.mixins import ProjectMixin
 from resources.views.mixins import ResourceViewMixin
+from resources.models import Resource
 
 from ..serializers import SpatialUnitGeoJsonSerializer
 from ..models import SpatialUnit
@@ -68,14 +70,12 @@ class SpatialUnitObjectMixin(SpatialQuerySetMixin):
 
     def get_object(self):
         if not hasattr(self, '_obj'):
-            try:
-                self._obj = SpatialUnit.objects.get(
-                    project__organization__slug=self.kwargs['organization'],
-                    project__slug=self.kwargs['project'],
-                    id=self.kwargs['location']
+            self._obj = get_object_or_404(
+                SpatialUnit,
+                project__organization__slug=self.kwargs['organization'],
+                project__slug=self.kwargs['project'],
+                id=self.kwargs['location']
                 )
-            except SpatialUnit.DoesNotExist as e:
-                raise Http404(e)
         return self._obj
 
     def get_context_data(self, *args, **kwargs):
@@ -92,6 +92,30 @@ class SpatialUnitResourceMixin(ResourceViewMixin, SpatialUnitObjectMixin):
         kwargs = self.kwargs
         kwargs['location'] = self.get_object().id
         return reverse('locations:detail', kwargs=kwargs) + '#resources'
+
+    def get_model_context(self):
+        context = super().get_model_context()
+        context['project_id'] = self.get_project().id
+        return context
+
+    def get_spatial_unit(self):
+        if not hasattr(self, 'spatial_unit_object'):
+            self.spatial_unit_object = get_object_or_404(
+                    SpatialUnit,
+                    project__organization__slug=self.kwargs['organization'],
+                    project__slug=self.kwargs['project'],
+                    id=self.kwargs['location']
+                )
+        return self.spatial_unit_object
+
+    def get_resource(self):
+        if not hasattr(self, 'resource_object'):
+            try:
+                self.resource_object = self.get_spatial_unit().resources.get(
+                    id=self.kwargs['resource'])
+            except Resource.DoesNotExist as e:
+                raise Http404(e)
+        return self.resource_object
 
 
 class SpatialUnitRelationshipMixin(SpatialUnitObjectMixin):

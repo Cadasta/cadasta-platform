@@ -1,6 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.models import ContentType
 from django.http import Http404
+from rest_framework import status
+from rest_framework.response import Response
 from organization.views.mixins import ProjectMixin
 
 from ..forms import ResourceForm
@@ -38,6 +40,15 @@ class ResourceViewMixin:
 
     def get_content_object(self):
         raise NotImplementedError('You need to implement get_content_object.')
+
+    def detach_resource(self, object_id):
+        content_object = ContentObject.objects.get(
+                object_id=object_id,
+                resource__id=self.kwargs['resource'],
+                resource__project__slug=self.kwargs['project'],
+            )
+        content_object.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):

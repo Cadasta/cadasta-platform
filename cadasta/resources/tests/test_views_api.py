@@ -1,23 +1,19 @@
 import copy
 import json
-import os
 import pytest
 
-from django.conf import settings
 from django.test import TestCase
 from skivvy import APITestCase
 
-from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy
 
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from accounts.tests.factories import UserFactory
 from .factories import ResourceFactory
 from ..views import api
 
-path = os.path.dirname(settings.BASE_DIR)
 
 clauses = {
     'clause': [
@@ -47,7 +43,8 @@ def assign_policies(user, add_clauses=None):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesTest(APITestCase, UserTestCase, TestCase):
+class ProjectResourcesTest(APITestCase, UserTestCase,
+                           FileStorageTestCase, TestCase):
     view_class = api.ProjectResources
 
     def setup_models(self):
@@ -72,9 +69,9 @@ class ProjectResourcesTest(APITestCase, UserTestCase, TestCase):
             },
         ])
 
-        self.storage = FakeS3Storage()
-        self.file = open(
-            path + '/resources/tests/files/image.jpg', 'rb').read()
+        self.storage = self.get_storage()
+        self.file = self.get_file(
+            '/resources/tests/files/image.jpg', 'rb')
         self.file_name = self.storage.save('resources/image.jpg', self.file)
 
     def setup_url_kwargs(self):
@@ -379,7 +376,7 @@ class ProjectResourcesDetailTest(APITestCase, UserTestCase, TestCase):
         self.resource.archived = True
         self.resource.save()
         data = {'archived': False}
-        response = self.request(method='PATCH', user=self.user,
+        response = self.request(method='PATCH', user=UserFactory.create(),
                                 post_data=data)
         assert response.status_code == 404
         self.resource.refresh_from_db()
@@ -387,22 +384,19 @@ class ProjectResourcesDetailTest(APITestCase, UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectSpatialResourcesTest(APITestCase, UserTestCase, TestCase):
+class ProjectSpatialResourcesTest(APITestCase, UserTestCase,
+                                  FileStorageTestCase, TestCase):
     view_class = api.ProjectSpatialResources
 
     def setup_models(self):
-        storage = FakeS3Storage()
-        tracks = open(
-            path + '/resources/tests/files/tracks.gpx', 'rb').read()
-        self.tracks_file = storage.save('resources/tracks.gpx', tracks)
+        tracks = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
+        self.tracks_file = self.storage.save('resources/tracks.gpx', tracks)
 
-        routes = open(
-            path + '/resources/tests/files/routes.gpx', 'rb').read()
-        self.routes_file = storage.save('resources/routes.gpx', routes)
+        routes = self.get_file('/resources/tests/files/routes.gpx', 'rb')
+        self.routes_file = self.storage.save('resources/routes.gpx', routes)
 
-        waypoints = open(
-            path + '/resources/tests/files/waypoints.gpx', 'rb').read()
-        self.waypoints_file = storage.save(
+        waypoints = self.get_file('/resources/tests/files/waypoints.gpx', 'rb')
+        self.waypoints_file = self.storage.save(
             'resources/waypoints.gpx', waypoints)
 
         self.project = ProjectFactory.create()
@@ -472,3 +466,167 @@ class ProjectSpatialResourcesTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert len(response.content) == 0
         assert response.content == []
+
+
+@pytest.mark.usefixtures('make_dirs')
+class ProjectSpatialResourcesDetailTest(APITestCase, UserTestCase,
+                                        FileStorageTestCase, TestCase):
+    view_class = api.ProjectSpatialResourcesDetail
+    post_data = {'name': 'Updated'}
+
+    def setup_models(self):
+        tracks = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
+        self.tracks_file = self.storage.save('resources/tracks.gpx', tracks)
+
+        routes = self.get_file('/resources/tests/files/routes.gpx', 'rb')
+        self.routes_file = self.storage.save('resources/routes.gpx', routes)
+
+        waypoints = self.get_file('/resources/tests/files/waypoints.gpx', 'rb')
+        self.waypoints_file = self.storage.save(
+            'resources/waypoints.gpx', waypoints)
+
+        self.project = ProjectFactory.create()
+
+        # create non-spatial resources
+        ResourceFactory.create_batch(
+            2, content_object=self.project, project=self.project)
+
+        # create attached spatial resource
+        self.resource = ResourceFactory.create(
+            content_object=self.project,
+            project=self.project, file=self.tracks_file,
+            original_file='tracks.gpx', mime_type='text/xml'
+        )
+
+        # unauthorized
+        self.denied = ResourceFactory.create(
+            content_object=self.project,
+            project=self.project, file=self.routes_file,
+            original_file='routes.gpx', mime_type='text/xml'
+        )
+
+        # create archived spatial resource
+        ResourceFactory.create(
+            content_object=self.project, archived=True,
+            project=self.project, file=self.routes_file,
+            original_file='routes.gpx', mime_type='text/xml'
+        )
+
+        # create unattached spatial resource
+        ResourceFactory.create(
+            content_object=None,
+            project=self.project, file=self.waypoints_file,
+            original_file='waypoints.gpx', mime_type='text/xml'
+        )
+
+        self.user = UserFactory.create()
+        additional_clauses = [
+            {
+                'effect': 'deny',
+                'object': ['resource/*/*/' + self.denied.id],
+                'action': ['resource.*'],
+            }
+        ]
+        assign_policies(self.user, add_clauses=additional_clauses)
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+            'resource': self.resource.id
+        }
+
+    def test_get_resource(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.resource.id
+
+    def test_get_resource_with_unauthorized_user(self):
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 403
+        assert 'id' not in response.content
+
+    def test_get_resource_from_org_that_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'some-org'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Not found."
+
+    def test_get_resource_from_project_that_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'some-prj'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Not found."
+
+    def test_get_resource_that_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'resource': 'abc123'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Not found."
+
+    def test_update_resource(self):
+        response = self.request(method='PATCH', user=self.user)
+        assert response.status_code == 200
+        assert response.content['id'] == self.resource.id
+        self.resource.refresh_from_db()
+        assert self.resource.name == self.post_data['name']
+
+    def test_update_resource_with_unauthorized_user(self):
+        response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_update_invalid_resource(self):
+        data = {'name': ''}
+        response = self.request(method='PATCH', user=self.user, post_data=data)
+        assert response.status_code == 400
+        assert 'name' in response.content
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_update_with_archived_project(self):
+        self.project.archived = True
+        self.project.save()
+        response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_archive_resource(self):
+        data = {'archived': True}
+        response = self.request(method='PATCH', user=self.user, post_data=data)
+        assert response.status_code == 200
+        assert response.content['id'] == self.resource.id
+        self.resource.refresh_from_db()
+        assert self.resource.archived is True
+
+    def test_archive_resource_with_unauthorized_user(self):
+        data = {'archived': True}
+        response = self.request(method='PATCH', user=UserFactory.create(),
+                                post_data=data)
+        assert response.status_code == 403
+        assert 'id' not in response.content
+        self.resource.refresh_from_db()
+        assert self.resource.archived is False
+
+    def test_unarchive_resource(self):
+        self.resource.archived = True
+        self.resource.save()
+        data = {'archived': False}
+
+        response = self.request(method='PATCH', user=self.user, post_data=data)
+        assert response.status_code == 200
+        assert response.content['id'] == self.resource.id
+        self.resource.refresh_from_db()
+        assert self.resource.archived is False
+
+    def test_unarchive_resource_with_unauthorized_user(self):
+        self.resource.archived = True
+        self.resource.save()
+        data = {'archived': False}
+        response = self.request(method='PATCH', user=UserFactory.create(),
+                                post_data=data)
+        assert response.status_code == 404
+        self.resource.refresh_from_db()
+        assert self.resource.archived is True

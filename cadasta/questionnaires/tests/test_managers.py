@@ -1,24 +1,18 @@
-import os
-
 import pytest
 from lxml import etree
 
-from buckets.test.storage import FakeS3Storage
-from django.conf import settings
 from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import activate, get_language
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
 from core.tests.utils.files import make_dirs  # noqa
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from jsonattrs.models import Attribute
 
 from . import factories
 from .. import models
 from ..managers import create_children, create_options
-
-path = os.path.dirname(settings.BASE_DIR)
 
 
 class CreateChildrenTest(TestCase):
@@ -128,13 +122,11 @@ class CreateOptionsTest(TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class QuestionnaireManagerTest(TestCase):
+class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
 
     def test_create_from_form(self):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
-        form = storage.save('xls-forms/xls-form.xlsx', file)
+        file = self.get_file('/questionnaires/tests/files/xls-form.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form.xlsx', file)
         model = models.Questionnaire.objects.create_from_form(
             xls_form=form,
             original_file='original.xls',
@@ -146,10 +138,9 @@ class QuestionnaireManagerTest(TestCase):
         assert model.original_file == 'original.xls'
 
     def test_update_from_form(self):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/xls-form.xlsx', 'rb').read()
-        form = storage.save('xls-forms/xls-form.xlsx', file)
+        file = self.get_file(
+            '/questionnaires/tests/files/xls-form.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form.xlsx', file)
 
         project = ProjectFactory.create()
         m1 = models.Questionnaire.objects.create_from_form(
@@ -170,11 +161,9 @@ class QuestionnaireManagerTest(TestCase):
         assert project.current_questionnaire == model.id
 
     def test_create_from_invald_form(self):
-        storage = FakeS3Storage()
-        file = open(path + '/questionnaires/tests/files/'
-                           'xls-form-invalid.xlsx', 'rb').read()
-
-        form = storage.save('xls-forms/xls-form-invalid.xlsx', file)
+        file = self.get_file(
+            '/questionnaires/tests/files/xls-form-invalid.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form-invalid.xlsx', file)
         with pytest.raises(InvalidXLSForm) as e:
             models.Questionnaire.objects.create_from_form(
                 xls_form=form,
@@ -187,9 +176,9 @@ class QuestionnaireManagerTest(TestCase):
         assert models.Question.objects.exists() is False
 
     def test_insert_version_attr(self):
-        xform = open(
-            path + '/questionnaires/tests/files/ekcjvf464y5afks6b33qkct3.xml',
-            'r').read()
+        xform = self.get_file(
+            '/questionnaires/tests/files/ekcjvf464y5afks6b33qkct3.xml',
+            'r')
         id_string = 'jurassic_park_survey'
         version = '2016072518593012'
         filename = 'ekcjvf464y5afks6b33qkct3'
@@ -286,14 +275,13 @@ class QuestionManagerTest(TestCase):
         assert model.type == 'IN'
 
 
-class MultilingualQuestionnaireTest(UserTestCase, TestCase):
+class MultilingualQuestionnaireTest(UserTestCase, FileStorageTestCase,
+                                    TestCase):
 
     def _run(self, xlsxfile):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/' + xlsxfile, 'rb'
-        ).read()
-        form = storage.save('xls-forms/' + xlsxfile, file)
+        file = self.get_file(
+            '/questionnaires/tests/files/' + xlsxfile, 'rb')
+        form = self.storage.save('xls-forms/' + xlsxfile, file)
         return models.Questionnaire.objects.create_from_form(
             xls_form=form,
             original_file='original.xls',

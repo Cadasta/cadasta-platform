@@ -1,20 +1,16 @@
-import os
 import random
 from string import ascii_lowercase
 from zipfile import ZipFile
 
-from django.conf import settings
 from django.forms.utils import ErrorDict
 from django.test import TestCase
 import pytest
 from pytest import raises
 
 from accounts.tests.factories import UserFactory
-from buckets.test.storage import FakeS3Storage
 from tutelary.models import Role
 
-
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from questionnaires.tests.factories import QuestionnaireFactory
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -425,9 +421,10 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectEditDetailsTest(UserTestCase, TestCase):
+class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.project = ProjectFactory.create()
         self.data = {
             'name': self.project.name,
@@ -441,14 +438,10 @@ class ProjectEditDetailsTest(UserTestCase, TestCase):
         }
 
     def _get_form(self, form_name):
-        path = os.path.dirname(settings.BASE_DIR)
-
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb'
-        ).read()
-        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
+        file = self.get_file(
+            '/questionnaires/tests/files/{}.xlsx'.format(form_name),
+            'rb')
+        form = self.storage.save('xls-forms/{}.xlsx'.format(form_name), file)
         return form
 
     def test_add_new_questionnaire(self):
@@ -1014,7 +1007,7 @@ class DownloadFormTest(UserTestCase, TestCase):
             assert 'data-shp.zip' in testzip.namelist()
 
 
-class SelectImportFormTest(UserTestCase, TestCase):
+class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def setUp(self):
         super().setUp()
@@ -1024,7 +1017,6 @@ class SelectImportFormTest(UserTestCase, TestCase):
         self.user = UserFactory.create()
         self.invalid_file_type = '/organization/tests/files/test_invalid.kml'
         self.valid_file_type = '/organization/tests/files/test.csv'
-        self.path = os.path.dirname(settings.BASE_DIR)
         self.data = {
             'name': 'Test Imports',
             'description': 'A description of the import',
@@ -1032,7 +1024,7 @@ class SelectImportFormTest(UserTestCase, TestCase):
         }
 
     def test_invalid_file_type(self):
-        invalid_file = open(self.path + self.invalid_file_type, 'rb').read()
+        invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
             'test_invalid.kml', invalid_file, 'application/kml')
         file_dict = {'file': file}
@@ -1055,7 +1047,7 @@ class SelectImportFormTest(UserTestCase, TestCase):
         assert form.errors['file'][0] == 'File too large, max size 512kb'
 
     def test_set_mime_type(self):
-        valid_file = open(self.path + self.valid_file_type, 'rb').read()
+        valid_file = self.get_file(self.valid_file_type, 'rb')
         file = SimpleUploadedFile(
             'test.csv', valid_file, 'text/csv')
         file_dict = {'file': file}

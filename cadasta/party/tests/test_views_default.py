@@ -1,12 +1,9 @@
 import json
-import os
 import pytest
 from django.http import Http404
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
 from skivvy import ViewTestCase
@@ -16,7 +13,7 @@ from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from spatial.models import SpatialUnit
 
@@ -659,7 +656,8 @@ class PartyResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class PartyResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
+class PartyResourcesNewTest(ViewTestCase, UserTestCase, FileStorageTestCase,
+                            TestCase):
     view_class = default.PartyResourcesNew
     template = 'party/resources_new.html'
     success_url_name = 'parties:detail'
@@ -686,10 +684,8 @@ class PartyResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
                 'form': form}
 
     def setup_post_data(self):
-        path = os.path.dirname(settings.BASE_DIR)
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/image.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',
@@ -1248,7 +1244,8 @@ class PartyRelationshipResourceAddTest(ViewTestCase, UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase, TestCase):
+class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase,
+                                       FileStorageTestCase, TestCase):
     view_class = default.PartyRelationshipResourceNew
     template = 'party/relationship_resources_new.html'
     success_url_name = 'parties:relationship_detail'
@@ -1275,10 +1272,8 @@ class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase, TestCase):
                 'geojson': '{"type": "FeatureCollection", "features": []}'}
 
     def setup_post_data(self):
-        path = os.path.dirname(settings.BASE_DIR)
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/image.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',

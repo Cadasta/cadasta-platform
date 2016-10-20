@@ -1,14 +1,9 @@
 import json
-import os
-import os.path
-
 import pytest
 
 from accounts.tests.factories import UserFactory
-from buckets.test.storage import FakeS3Storage
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -23,7 +18,6 @@ from party.models import Party, TenureRelationship
 from party.tests.factories import PartyFactory
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
-from questionnaires.tests.utils import get_form
 from resources.models import Resource
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
@@ -431,7 +425,7 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectAddTest(UserTestCase, TestCase):
+class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def setUp(self):
         super().setUp()
@@ -543,12 +537,10 @@ class ProjectAddTest(UserTestCase, TestCase):
         assert 'organization' not in form_initial
 
     def _get_xls_form(self, form_name):
-        path = os.path.dirname(settings.BASE_DIR)
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb').read()
-        form = storage.save('xls-forms/' + form_name + '.xlsx', file)
+        file = self.get_file(
+            '/questionnaires/tests/files/{}.xlsx'.format(form_name),
+            'rb')
+        form = self.storage.save('xls-forms/' + form_name + '.xlsx', file)
         return form
 
     EXTENTS_POST_DATA = {
@@ -919,7 +911,8 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectEditDetailsTest(ViewTestCase, UserTestCase, TestCase):
+class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
+                             FileStorageTestCase, TestCase):
     view_class = default.ProjectEditDetails
     template = 'organization/project_edit_details.html'
     success_url_name = 'organization:project-dashboard'
@@ -1004,7 +997,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase, TestCase):
         assert self.project.description == self.post_data['description']
 
     def test_post_invalid_form(self):
-        question = get_form('xls-form-invalid')
+        question = self.get_form('xls-form-invalid')
         user = UserFactory.create()
         assign_policies(user)
 
@@ -1333,11 +1326,10 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class ProjectDataImportTest(UserTestCase, TestCase):
+class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def setUp(self):
         super().setUp()
-        path = os.path.dirname(settings.BASE_DIR)
         self.view = default.ProjectDataImportWizard.as_view()
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
@@ -1374,16 +1366,12 @@ class ProjectDataImportTest(UserTestCase, TestCase):
         self.invalid_file_type = '/organization/tests/files/test_invalid.kml'
         self.missing_attr_csv = '/organization/tests/files/missing_attr.csv'
 
-        self.path = os.path.dirname(settings.BASE_DIR)
-
         self.project = ProjectFactory.create(
             name='Test CSV Import',
             slug='test-csv-import', organization=self.org)
-        storage = FakeS3Storage()
-        xlscontent = open(
-            path + '/organization/tests/files/uttaran_test.xlsx', 'rb'
-        ).read()
-        form = storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+        xlscontent = self.get_file(
+            '/organization/tests/files/uttaran_test.xlsx', 'rb')
+        form = self.storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
         Questionnaire.objects.create_from_form(
             xls_form=form,
             project=self.project
@@ -1430,7 +1418,8 @@ class ProjectDataImportTest(UserTestCase, TestCase):
         self.SELECT_DEFAULTS_POST_DATA = {
             'project_data_import_wizard-current_step': 'select_defaults',
             'select_defaults-party_name_field': 'name_of_hh',
-            'select_defaults-file': path + '/core/media/test/temp/test.csv',
+            'select_defaults-file': (self.path +
+                                     '/core/media/test/temp/test.csv'),
             'select_defaults-party_type': 'IN',
             'select_defaults-location_type': 'PA',
             'select_defaults-geometry_field': 'location_geometry',
@@ -1470,7 +1459,7 @@ class ProjectDataImportTest(UserTestCase, TestCase):
 
     def test_full_flow_valid(self):
         self.client.force_login(self.user)
-        csvfile = open(self.path + self.valid_csv, 'rb').read()
+        csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
@@ -1522,7 +1511,7 @@ class ProjectDataImportTest(UserTestCase, TestCase):
 
     def test_full_flow_invalid_value(self):
         self.client.force_login(self.user)
-        csvfile = open(self.path + self.invalid_csv, 'rb').read()
+        csvfile = self.get_file(self.invalid_csv, 'rb')
         file = SimpleUploadedFile('test_invalid.csv', csvfile, 'text/csv')
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
@@ -1562,7 +1551,7 @@ class ProjectDataImportTest(UserTestCase, TestCase):
 
     def test_full_flow_invalid_file_type(self):
         self.client.force_login(self.user)
-        invalid_file = open(self.path + self.invalid_file_type, 'rb').read()
+        invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
             'test_invalid.kml', invalid_file, 'application/kml')
         post_data = self.SELECT_FILE_POST_DATA.copy()
@@ -1603,8 +1592,7 @@ class ProjectDataImportTest(UserTestCase, TestCase):
 
     def test_wizard_goto_step(self):
         self.client.force_login(self.user)
-
-        csvfile = open(self.path + self.valid_csv, 'rb').read()
+        csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
@@ -1649,7 +1637,7 @@ class ProjectDataImportTest(UserTestCase, TestCase):
 
     def test_full_flow_valid_no_resource(self):
         self.client.force_login(self.user)
-        csvfile = open(self.path + self.valid_csv, 'rb').read()
+        csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file

@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from tutelary.mixins import APIPermissionRequiredMixin
 from core.mixins import update_permissions
 
+from resources.serializers import ResourceSerializer
 from spatial import serializers
 from . import mixins
 
@@ -38,7 +39,7 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
                         generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = serializers.SpatialUnitSerializer
-    lookup_url_kwarg = 'spatial_id'
+    lookup_url_kwarg = 'location'
     lookup_field = 'id'
     permission_required = {
         'GET': 'spatial.view',
@@ -49,6 +50,57 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SpatialUnitResourceList(APIPermissionRequiredMixin,
+                              mixins.SpatialUnitResourceMixin,
+                              generics.ListCreateAPIView):
+    serializer_class = ResourceSerializer
+    filter_backends = (filters.DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,)
+    filter_fields = ('archived',)
+    search_fields = ('name', 'description', 'file',)
+    ordering_fields = ('name', 'description', 'file',)
+    permission_required = {
+        'GET': 'spatial.resources.list',
+        'POST': update_permissions('spatial.resources.add')
+    }
+
+    def get_perms_objects(self):
+        return [self.get_object()]
+
+
+class SpatialUnitResourceDetail(APIPermissionRequiredMixin,
+                                mixins.SpatialUnitResourceMixin,
+                                generics.RetrieveUpdateDestroyAPIView):
+    def patch_actions(self, request):
+        if hasattr(request, 'data'):
+            if self.get_object().project.archived:
+                return False
+            is_archived = self.get_object().archived
+            new_archived = request.data.get('archived', is_archived)
+            if not is_archived and (is_archived != new_archived):
+                return ('spatial.resources.edit', 'spatial.resources.archive')
+        return 'spatial.resources.edit'
+
+    serializer_class = ResourceSerializer
+    permission_required = {
+        'GET': 'spatial.resources.view',
+        'PATCH': patch_actions,
+        'DELETE': patch_actions,
+    }
+    lookup_url_kwarg = 'resource'
+    lookup_field = 'id'
+
+    def get_perms_objects(self):
+        return [self.get_spatial_unit()]
+
+    def get_object(self):
+        return self.get_resource()
+
+    def destroy(self, request, *args, **kwargs):
+        return self.detach_resource(self.kwargs['location'])
 
 
 class SpatialRelationshipCreate(APIPermissionRequiredMixin,

@@ -2,8 +2,7 @@ import os
 
 import pytest
 
-from buckets.test.storage import FakeS3Storage
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.conf import settings
 from django.test import TestCase
@@ -16,12 +15,10 @@ from ..models import ContentObject, Resource, create_spatial_resource
 from .factories import ResourceFactory, SpatialResourceFactory
 from .utils import clear_temp  # noqa
 
-path = os.path.dirname(settings.BASE_DIR)
-
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class ResourceTest(UserTestCase, TestCase):
+class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_repr(self):
         project = ProjectFactory.build(slug='prj')
@@ -169,9 +166,8 @@ class ResourceTest(UserTestCase, TestCase):
         assert resource.num_entities == 2
 
     def test_register_file_version(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/thumb_new.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/thumb_new.jpg', file)
         resource = ResourceFactory.create()
 
         resource.file = file_name
@@ -181,9 +177,8 @@ class ResourceTest(UserTestCase, TestCase):
         assert len(resource.file_versions) == 1
 
     def test_create_thumbnail(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/thumb_test.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/thumb_test.jpg', file)
         contributor = UserFactory.create()
         resource = ResourceFactory.build(file=file_name,
                                          mime_type='image/jpeg',
@@ -194,9 +189,8 @@ class ResourceTest(UserTestCase, TestCase):
         )
 
     def test_create_spatial_resource(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/deramola.xml', 'rb').read()
-        file_name = storage.save('resources/deramola.xml', file)
+        file = self.get_file('/resources/tests/files/deramola.xml', 'rb')
+        file_name = self.storage.save('resources/deramola.xml', file)
         resource = ResourceFactory.build(
             file=file_name, mime_type='text/xml')
         assert os.path.isfile(os.path.join(
@@ -211,9 +205,8 @@ class ResourceTest(UserTestCase, TestCase):
         assert spatial_resources[0].attributes == {}
 
     def test_invalid_gpx_mime_type(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/mp3.xml', 'rb').read()
-        file_name = storage.save('resources/mp3.xml', file)
+        file = self.get_file('/resources/tests/files/mp3.xml', 'rb')
+        file_name = self.storage.save('resources/mp3.xml', file)
         resource = ResourceFactory.build(
             file=file_name, mime_type='text/xml')
         assert os.path.isfile(os.path.join(
@@ -225,10 +218,8 @@ class ResourceTest(UserTestCase, TestCase):
         assert str(e.value) == _('Invalid GPX mime type: audio/mpeg')
 
     def test_invalid_gpx_file(self):
-        storage = FakeS3Storage()
-        file = open(path +
-                    '/resources/tests/files/invalidgpx.xml', 'rb').read()
-        file_name = storage.save('resources/invalidgpx.xml', file)
+        file = self.get_file('/resources/tests/files/invalidgpx.xml', 'rb')
+        file_name = self.storage.save('resources/invalidgpx.xml', file)
         resource = ResourceFactory.build(
             file=file_name, mime_type='application/xml')
         assert os.path.isfile(os.path.join(
@@ -240,16 +231,15 @@ class ResourceTest(UserTestCase, TestCase):
         assert Resource.objects.all().count() == 0
 
 
-class SpatialResourceTest(UserTestCase, TestCase):
+class SpatialResourceTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_repr(self):
         res = ResourceFactory.build(id='abc123')
         resource = SpatialResourceFactory.build(id='abc123', resource=res)
         assert repr(resource) == '<SpatialResource id=abc123 resource=abc123>'
 
     def test_spatial_resource(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/tracks.gpx', 'rb').read()
-        file_name = storage.save('resources/tracks_test.gpx', file)
+        file = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
+        file_name = self.storage.save('resources/tracks_test.gpx', file)
         resource = ResourceFactory.build(
             file=file_name, mime_type='text/xml')
         spatial_resource = SpatialResourceFactory.create(resource=resource)

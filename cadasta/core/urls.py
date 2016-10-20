@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .views import default
+from core.views import default
 
 urlpatterns = [
     url(r'^$', default.IndexPage.as_view(), name='index'),

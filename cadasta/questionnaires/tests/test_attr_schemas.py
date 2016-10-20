@@ -1,14 +1,10 @@
-import os
-
 import pytest
 
-from buckets.test.storage import FakeS3Storage
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
@@ -17,7 +13,6 @@ from spatial.tests.factories import (SpatialRelationshipFactory,
                                      SpatialUnitFactory)
 
 from .. import models
-# from ..exceptions import InvalidXLSForm
 from ..managers import create_attrs_schema
 from .attr_schemas import (location_relationship_xform_group,
                            location_xform_group,
@@ -26,17 +21,13 @@ from .attr_schemas import (location_relationship_xform_group,
                            tenure_relationship_xform_group)
 from .factories import QuestionnaireFactory
 
-path = os.path.dirname(settings.BASE_DIR)
-
 
 @pytest.mark.usefixtures('make_dirs')
-class CreateAttributeSchemaTest(UserTestCase, TestCase):
+class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_create_attribute_schemas(self):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
-        ).read()
-        form = storage.save('xls-forms/xls-form-attrs.xlsx', file)
+        file = self.get_file(
+            '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file)
         project = ProjectFactory.create()
         models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -303,11 +294,9 @@ class CreateAttributeSchemaTest(UserTestCase, TestCase):
             )
 
     def test_update_questionnaire_attribute_schema(self):
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
-        ).read()
-        form = storage.save('xls-forms/xls-form.xlsx', file)
+        file = self.get_file(
+            '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form.xlsx', file)
         project = ProjectFactory.create(name='TestProject')
         q1 = models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -340,14 +329,13 @@ class CreateAttributeSchemaTest(UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ConditionalAttributeSchemaTest(UserTestCase, TestCase):
+class ConditionalAttributeSchemaTest(UserTestCase, FileStorageTestCase,
+                                     TestCase):
     def setUp(self):
         super().setUp()
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb'
-        ).read()
-        form = storage.save('xls-forms/xls-form-attrs.xlsx', file)
+        file = self.get_file(
+            '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file)
         self.content_type = ContentType.objects.get(
             app_label='party', model='party')
         self.project = ProjectFactory.create(name='TestProject')
