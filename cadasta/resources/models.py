@@ -47,6 +47,9 @@ class Resource(RandomIDModel):
 
     history = HistoricalRecords()
 
+    class Meta:
+        ordering = ('name',)
+
     class TutelaryMeta:
         perm_type = 'resource'
         path_fields = ('project', 'pk')
