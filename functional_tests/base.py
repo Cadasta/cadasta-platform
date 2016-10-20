@@ -170,7 +170,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def assert_has_error_list(self):
         """Check for the presence of an error list containing given text."""
         error_list = self.browser.find_element_by_xpath(
-            "//ul[contains(@class, 'errorlist')]"
+            "//ul[contains(@class, 'error-block')]"
         )
         return error_list
 

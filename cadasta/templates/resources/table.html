@@ -20,11 +20,13 @@
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
         <div class="resource-text">
-          <p><strong><a href="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}">{{ resource.name }}</a></strong>
+          <p>
+            <a href="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}"><strong>{{ resource.name }}</strong></a>
             {% if resource.archived %}
               <span class="label label-danger">{% trans "Deleted" %}</span>
             {% endif %}
-          <br>{{ resource.original_file }}</p>
+            <br>{{ resource.original_file }}
+          </p>
         </div>
       </td>
       <td class="hidden-xs hidden-sm">{{ resource.file_type }}</td>

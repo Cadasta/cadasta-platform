@@ -56,7 +56,7 @@ class OrganizationMemberListPage(Page):
     def get_submit_button(self, success=True):
         return self.get_modal("//button[@type='submit']")
         # if not success:
-        #     self.click_through(submit_button, (By.CLASS_NAME, 'errorlist'))
+        #     self.click_through(submit_button, (By.CLASS_NAME, 'error-block'))
         #     error_list = self.test.assert_field_has_error()
         #     return error_list.text
         # else:

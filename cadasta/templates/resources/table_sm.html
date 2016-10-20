@@ -17,14 +17,16 @@
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
         <div class="resource-text">
-          <p><a href="{{ resource_url }}"><strong>{{ resource.name }}</strong></a></p>
-          <p class="small">{{ resource.original_file }}</p>
+          <p>
+            <a href="{{ resource_url }}"><strong>{{ resource.name }}</strong></a>
+            <br><span class="small">{{ resource.original_file }}</span>
+          </p>
         </div>
       </td>
       <td>
         <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}">
           {% csrf_token %}
-          <button type="submit" class="btn btn-danger btn-sm" role="button">
+          <button type="submit" class="btn btn-danger btn-sm pull-right" role="button">
             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
           </button>
         </form>
