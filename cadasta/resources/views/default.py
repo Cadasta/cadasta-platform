@@ -36,6 +36,11 @@ class ProjectResources(LoginPermissionRequiredMixin,
     def get_resource_list(self):
         return self.get_queryset()
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['success_url'] = None
+        return context
+
 
 class ProjectResourcesAdd(LoginPermissionRequiredMixin,
                           mixins.ProjectResourceMixin,
@@ -102,6 +107,7 @@ class ProjectResourcesDetail(LoginPermissionRequiredMixin,
         ]
 
         context['attachment_list'] = attachment_list
+        context['success_url'] = None
         return context
 
 
