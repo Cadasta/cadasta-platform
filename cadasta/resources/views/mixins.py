@@ -14,9 +14,11 @@ class ResourceViewMixin:
 
     def get_queryset(self):
         if hasattr(self, 'use_resource_library_queryset'):
-            return self.get_project().resource_set.all()
+            return self.get_project().resource_set.all().select_related(
+                'contributor')
         else:
-            return self.get_content_object().resources.all()
+            return self.get_content_object().resources.all().select_related(
+                'contributor')
 
     def get_model_context(self):
         return {
@@ -57,15 +59,7 @@ class ProjectResourceMixin(ProjectMixin, ResourceViewMixin):
         next_url = self.request.GET.get('next', None)
         if next_url:
             return next_url + '#resources'
-
-        project = self.get_project()
-        return reverse(
-            'resources:project_list',
-            kwargs={
-                'organization': project.organization.slug,
-                'project': project.slug,
-            }
-        )
+        return reverse('resources:project_list', kwargs=self.kwargs)
 
 
 class ResourceObjectMixin(ProjectResourceMixin):
@@ -106,16 +100,7 @@ class ResourceObjectMixin(ProjectResourceMixin):
         next_url = self.request.GET.get('next', None)
         if next_url:
             return next_url + '#resources'
-
-        project = self.get_project()
-        return reverse(
-            'resources:project_detail',
-            kwargs={
-                'organization': project.organization.slug,
-                'project': project.slug,
-                'resource': self.get_object().id,
-            }
-        )
+        return reverse('resources:project_detail', kwargs=self.kwargs)
 
 
 class HasUnattachedResourcesMixin(ProjectMixin):
@@ -157,13 +142,14 @@ class DetachableResourcesListMixin(ProjectMixin):
         if hasattr(self, 'get_resource_list'):
             resource_list = self.get_resource_list()
         else:
-            resource_list = content_object.resources.all()
+            resource_list = content_object.resources.all().select_related(
+                'contributor')
 
         # Get attachment IDs as a dictionary keyed on resource IDs
         attachments = ContentObject.objects.filter(
             content_type__pk=model_type.id,
             object_id=content_object.id,
-        )
+        ).select_related('resource')
         attachment_id_dict = {x.resource.id: x.id for x in attachments}
 
         # Update resource list with attachment IDs referring to the object

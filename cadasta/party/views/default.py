@@ -19,6 +19,7 @@ class PartiesList(LoginPermissionRequiredMixin,
     permission_required = 'party.list'
     permission_denied_message = error_messages.PARTY_LIST
     permission_filter_queryset = ('party.view',)
+    no_jsonattrs_in_queryset = True
 
 
 class PartiesAdd(LoginPermissionRequiredMixin,

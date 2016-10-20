@@ -11,11 +11,16 @@ from ..models import Party, TenureRelationship
 class PartyQuerySetMixin(ProjectMixin):
     def get_queryset(self):
         self.proj = self.get_project()
-        return self.proj.parties.all()
+        parties = self.proj.parties.all()
+        if (
+            hasattr(self, 'no_jsonattrs_in_queryset') and
+            self.no_jsonattrs_in_queryset
+        ):
+            parties = parties.only('id', 'name', 'type', 'project')
+        return parties
 
     def get_serializer_context(self, *args, **kwargs):
-        context = super(PartyQuerySetMixin, self).get_serializer_context(
-            *args, **kwargs)
+        context = super().get_serializer_context(*args, **kwargs)
         context['project'] = self.get_project()
         return context
 
@@ -32,7 +37,6 @@ class PartyQuerySetMixin(ProjectMixin):
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['party'] = self.object.id
-
         return reverse('parties:detail', kwargs=kwargs)
 
 
@@ -60,14 +64,16 @@ class TenureRelationshipQuerySetMixin(ProjectMixin):
 
 class PartyObjectMixin(PartyQuerySetMixin):
     def get_object(self):
-        try:
-            return Party.objects.get(
-                project__organization__slug=self.kwargs['organization'],
-                project__slug=self.kwargs['project'],
-                id=self.kwargs['party']
-            )
-        except Party.DoesNotExist as e:
-            raise Http404(e)
+        if not hasattr(self, '_obj'):
+            try:
+                self._obj = Party.objects.get(
+                    project__organization__slug=self.kwargs['organization'],
+                    project__slug=self.kwargs['project'],
+                    id=self.kwargs['party']
+                )
+            except Party.DoesNotExist as e:
+                raise Http404(e)
+        return self._obj
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -82,7 +88,6 @@ class PartyResourceMixin(ResourceViewMixin, PartyObjectMixin):
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['party'] = self.get_object().id
-
         return reverse('parties:detail', kwargs=kwargs)
 
 
@@ -94,7 +99,8 @@ class PartyRelationshipObjectMixin(ProjectMixin):
         context['location'] = self.get_object().spatial_unit
 
         locations = context['object'].spatial_units.exclude(
-            id=context['location'].id)
+            id=context['location'].id
+        ).only('id', 'type', 'geometry', 'project')
 
         context['geojson'] = json.dumps(
             SpatialUnitGeoJsonSerializer(locations, many=True).data
@@ -103,14 +109,16 @@ class PartyRelationshipObjectMixin(ProjectMixin):
         return context
 
     def get_object(self):
-        try:
-            return TenureRelationship.objects.get(
-                project__organization__slug=self.kwargs['organization'],
-                project__slug=self.kwargs['project'],
-                id=self.kwargs['relationship']
-            )
-        except TenureRelationship.DoesNotExist as e:
-            raise Http404(e)
+        if not hasattr(self, '_obj'):
+            try:
+                self._obj = TenureRelationship.objects.get(
+                    project__organization__slug=self.kwargs['organization'],
+                    project__slug=self.kwargs['project'],
+                    id=self.kwargs['relationship']
+                )
+            except TenureRelationship.DoesNotExist as e:
+                raise Http404(e)
+        return self._obj
 
 
 class PartyRelationshipResourceMixin(ResourceViewMixin,

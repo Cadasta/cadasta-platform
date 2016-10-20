@@ -48,8 +48,8 @@ class ResourceWidgetTest(TestCase):
             '  </td>'
             '  <td class="hidden-xs hidden-sm">txt</td>'
             '  <td class="hidden-xs hidden-sm">'
-            '      John Lennon<br>'
-            '      john</td>'
+            '      john<br>'
+            '      John Lennon</td>'
             '  <td class="hidden-xs hidden-sm">{updated}</td>'
             '  <td>Attached to 1 other entity</td>'
         )

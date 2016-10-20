@@ -105,7 +105,10 @@ class Resource(RandomIDModel):
 
     @property
     def num_entities(self):
-        return ContentObject.objects.filter(resource=self).count()
+        if not hasattr(self, '_num_entities'):
+            self._num_entities = ContentObject.objects.filter(
+                resource=self).count()
+        return self._num_entities
 
     def save(self, *args, **kwargs):
         create_thumbnails(self, (not self.id))

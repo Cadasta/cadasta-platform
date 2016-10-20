@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from tutelary.models import Role, check_perms
 
+from core.views.mixins import SuperUserCheckMixin
 from ..models import Organization, Project, OrganizationRole, ProjectRole
 
 
@@ -51,7 +52,9 @@ class ProjectMixin:
         return self.prj
 
     def get_organization(self):
-        return self.get_project().organization
+        if not hasattr(self, '_org'):
+            self._org = self.get_project().organization
+        return self._org
 
 
 class ProjectRoles(ProjectMixin):
@@ -92,37 +95,43 @@ class ProjectQuerySetMixin:
         return Project.objects.filter(access='public')
 
 
-class ProjectAdminCheckMixin:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_admin = None
-
+class ProjectAdminCheckMixin(SuperUserCheckMixin):
     @property
     def is_administrator(self):
-        if self.is_admin is None:
-            su_role = Role.objects.filter(name='superuser')
-            org_admins = [
-                role.user for role in OrganizationRole.objects.filter(
-                    organization=self.get_project().organization,
-                    admin=True
-                )
-            ]
-            proj_managers = [
-                role.user for role in ProjectRole.objects.filter(
-                    project=self.get_project(),
-                    role='PM'
-                )
+        if not hasattr(self, '_is_admin'):
+            self._is_admin = False
 
-            ]
-            self.is_admin = False
-            if len(su_role) > 0:
-                if hasattr(self.request.user, 'assigned_policies'):
-                    if su_role[0] in self.request.user.assigned_policies():
-                        self.is_admin = True
-            if (self.request.user in org_admins or
-               self.request.user in proj_managers):
-                self.is_admin = True
-        return self.is_admin
+            # Check if the user is anonymous: not an admin
+            if isinstance(self.request.user, AnonymousUser):
+                return False
+
+            # Check if the user is a superuser: is an admin
+            if self.is_superuser:
+                self._is_admin = True
+
+            # Check if the user has the organization admin role: is an admin
+            try:
+                OrganizationRole.objects.get(
+                    organization=self.get_project().organization,
+                    user=self.request.user,
+                    admin=True,
+                )
+                self._is_admin = True
+            except OrganizationRole.DoesNotExist:
+                pass
+
+            # Check if the user has the project manager role: is an admin
+            try:
+                ProjectRole.objects.get(
+                    project=self.get_project(),
+                    user=self.request.user,
+                    role='PM',
+                )
+                self._is_admin = True
+            except ProjectRole.DoesNotExist:
+                pass
+
+        return self._is_admin
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -172,33 +181,36 @@ class ProjectCreateCheckMixin:
         return context
 
 
-class OrgAdminCheckMixin:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_admin = None
-
+class OrgAdminCheckMixin(SuperUserCheckMixin):
     @property
     def is_administrator(self):
-        if self.is_admin is None:
-            su_role = Role.objects.filter(name='superuser')
+        if not hasattr(self, '_is_admin'):
+            self._is_admin = False
+
+            # Check if the user is anonymous: not an admin
+            if isinstance(self.request.user, AnonymousUser):
+                return False
+
+            # Check if the user is a superuser: is an admin
+            if self.is_superuser:
+                self._is_admin = True
+
+            # Check if the user has the organization admin role: is an admin
             if hasattr(self, 'get_organization'):
                 org = self.get_organization()
             else:
                 org = self.get_object()
-            org_admins = [
-                role.user for role in OrganizationRole.objects.filter(
+            try:
+                OrganizationRole.objects.get(
                     organization=org,
-                    admin=True
+                    user=self.request.user,
+                    admin=True,
                 )
-            ]
-            self.is_admin = False
-            if len(su_role) > 0:
-                if hasattr(self.request.user, 'assigned_policies'):
-                    if su_role[0] in self.request.user.assigned_policies():
-                        self.is_admin = True
-            if self.request.user in org_admins:
-                self.is_admin = True
-        return self.is_admin
+                self._is_admin = True
+            except OrganizationRole.DoesNotExist:
+                pass
+
+        return self._is_admin
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
