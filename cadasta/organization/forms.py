@@ -384,7 +384,7 @@ class PermissionsForm(SuperUserCheck):
                 role.user for role in OrganizationRole.objects.filter(
                     organization=self.organization,
                     admin=True
-                )
+                ).select_related('user')
             ]
 
         return self.is_superuser(user) or user in self.admins

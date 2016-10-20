@@ -54,7 +54,7 @@
           <!-- /party information -->
           <!-- Party resources -->
           <h3>{% trans "Resources" %}</h3>
-          {% if party.resources %}
+          {% if resource_list %}
             <div class="top-btn pull-right top-add">
               {% if has_unattached_resources %}
               <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">

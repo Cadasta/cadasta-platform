@@ -5,15 +5,13 @@ from django.db import models
 from django.utils.translation import ugettext as _
 from django.dispatch import receiver
 from organization.models import Project
-from party import managers
 from tutelary.decorators import permissioned_model
 from simple_history.models import HistoricalRecords
 from shapely.geometry import Point, Polygon, LineString
 from shapely.wkt import dumps
 
-from . import messages
+from . import messages, managers
 from .choices import TYPE_CHOICES
-from .exceptions import SpatialRelationshipError
 from resources.mixins import ResourceModelMixin, detach_object_resources
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
@@ -42,6 +40,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
+    objects = managers.SpatialUnitManager()
 
     # Spatial unit-spatial unit relationships: includes spatial
     # containment and split/merge relationships.
@@ -148,40 +147,6 @@ def check_extent(sender, instance, **kwargs):
 models.signals.pre_delete.connect(detach_object_resources, sender=SpatialUnit)
 
 
-class SpatialRelationshipManager(managers.BaseRelationshipManager):
-    """Check conditions based on spatial unit type before creating
-    object. If conditions aren't met, exceptions are raised.
-
-    """
-
-    def create(self, *args, **kwargs):
-        su1 = kwargs['su1']
-        su2 = kwargs['su2']
-        project = kwargs['project']
-        if (su1.geometry is not None and
-                su2.geometry is not None):
-
-            if (kwargs['type'] == 'C' and
-                    su1.geometry.geom_type == 'Polygon'):
-                result = SpatialUnit.objects.filter(
-                    id=su1.id
-                ).filter(
-                    geometry__contains=su2.geometry
-                )
-
-                if len(result) != 0:
-                    self.check_project_constraints(
-                        project=project, left=su1, right=su2)
-                    return super().create(**kwargs)
-                else:
-                    raise SpatialRelationshipError(
-                        """That selected location is not geographically
-                        contained within the parent location""")
-        self.check_project_constraints(
-            project=project, left=su1, right=su2)
-        return super().create(**kwargs)
-
-
 @fix_model_for_attributes
 @permissioned_model
 class SpatialRelationship(RandomIDModel):
@@ -214,7 +179,7 @@ class SpatialRelationship(RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
-    objects = SpatialRelationshipManager()
+    objects = managers.SpatialRelationshipManager()
 
     history = HistoricalRecords()
 

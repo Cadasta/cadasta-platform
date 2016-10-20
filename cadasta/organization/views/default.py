@@ -9,11 +9,12 @@ import formtools.wizard.views as wizard
 from accounts.models import User
 from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
-from core.views.mixins import ArchiveMixin, SuperUserCheckMixin
+from core.views import mixins as core_mixins
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from questionnaires.exceptions import InvalidXLSForm
@@ -37,6 +38,10 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     permission_filter_queryset = (lambda self, view, o: ('org.view',)
                                   if o.archived is False
                                   else ('org.view_archived',))
+
+    # This queryset annotation is needed to avoid generating a query for each
+    # organization in order to count the number of projects per org
+    queryset = Organization.objects.annotate(num_projects=Count('projects'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -69,6 +74,7 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
 class OrganizationDashboard(PermissionRequiredMixin,
                             mixins.OrgAdminCheckMixin,
                             mixins.ProjectCreateCheckMixin,
+                            core_mixins.CacheObjectMixin,
                             generic.DetailView):
     def get_actions(self, view, request):
         if self.get_object().archived:
@@ -110,6 +116,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
 
 
 class OrganizationEdit(LoginPermissionRequiredMixin,
+                       core_mixins.CacheObjectMixin,
                        generic.UpdateView):
     model = Organization
     form_class = forms.OrganizationForm
@@ -118,22 +125,16 @@ class OrganizationEdit(LoginPermissionRequiredMixin,
     permission_denied_message = error_messages.ORG_EDIT
 
     def get_success_url(self):
-        return reverse(
-            'organization:dashboard',
-            kwargs={'slug': self.object.slug}
-        )
+        return reverse('organization:dashboard', kwargs=self.kwargs)
 
 
 class OrgArchiveView(LoginPermissionRequiredMixin,
-                     ArchiveMixin,
+                     core_mixins.ArchiveMixin,
                      generic.DetailView):
     model = Organization
 
     def get_success_url(self):
-        return reverse(
-            'organization:dashboard',
-            kwargs={'slug': self.object.slug}
-        )
+        return reverse('organization:dashboard', kwargs=self.kwargs)
 
     def archive(self):
         assert hasattr(self, 'do_archive'), "Please set do_archive attribute"
@@ -161,6 +162,7 @@ class OrganizationUnarchive(OrgArchiveView):
 class OrganizationMembers(LoginPermissionRequiredMixin,
                           mixins.OrgAdminCheckMixin,
                           mixins.ProjectCreateCheckMixin,
+                          core_mixins.CacheObjectMixin,
                           generic.DetailView):
     model = Organization
     template_name = 'organization/organization_members.html'
@@ -202,8 +204,10 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
                               mixins.OrgAdminCheckMixin,
                               mixins.ProjectCreateCheckMixin,
+                              core_mixins.CacheObjectMixin,
                               base_generic.edit.FormMixin,
                               generic.DetailView):
+    model = User
     slug_field = 'username'
     slug_url_kwarg = 'username'
     template_name = 'organization/organization_members_edit.html'
@@ -214,11 +218,8 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     def get_success_url(self):
         return reverse(
             'organization:members',
-            kwargs={'slug': self.get_organization().slug}
+            kwargs={'slug': self.kwargs['slug']},
         )
-
-    def get_queryset(self):
-        return self.get_organization().users.all()
 
     def get_context_object_name(self, obj):
         # Dummy context so that the currently viewed user does not
@@ -226,33 +227,26 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         return 'org_member'
 
     def get_form(self):
-        if self.request.method == 'POST':
-            return self.form_class(self.request.POST,
-                                   self.get_organization(),
-                                   self.get_object(),
-                                   self.request.user)
-        else:
-            return self.form_class(None,
-                                   self.get_organization(),
-                                   self.get_object(),
-                                   self.request.user)
+        if not hasattr(self, 'form'):
+            if self.request.method == 'POST':
+                self.form = self.form_class(self.request.POST,
+                                            self.get_organization(),
+                                            self.get_object(),
+                                            self.request.user)
+            else:
+                self.form = self.form_class(None,
+                                            self.get_organization(),
+                                            self.get_object(),
+                                            self.request.user)
+        return self.form
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-
         context['organization'] = self.get_organization()
         context['form'] = self.get_form()
-        try:
-            org_admin = OrganizationRole.objects.get(
-                user=self.request.user,
-                organization=context['organization']).admin
-            context['org_admin'] = (org_admin and
-                                    not self.is_superuser and
-                                    context['org_member'] == self.request.user)
-        except OrganizationRole.DoesNotExist:
-            # Viewing user is a superuser who is not an org member
-            pass
-
+        context['org_admin'] = (self.is_administrator and
+                                not self.is_superuser and
+                                context['org_member'] == self.request.user)
         return context
 
     def post(self, request, *args, **kwargs):
@@ -283,7 +277,7 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
     def get_success_url(self):
         return reverse(
             'organization:members',
-            kwargs={'slug': self.get_organization().slug}
+            kwargs={'slug': self.kwargs['slug']},
         )
 
     def get(self, *args, **kwargs):
@@ -295,6 +289,12 @@ class UserList(LoginPermissionRequiredMixin, generic.ListView):
     template_name = 'organization/user_list.html'
     permission_required = 'user.list'
     permission_denied_message = error_messages.USERS_LIST
+
+    def get_queryset(self):
+        # Since we are querying on the organizations of each user, we should
+        # prefetch the organizations when querying for all users instead of
+        # doing a separate organizations query for every user
+        return User.objects.prefetch_related('organizations')
 
     def get_context_data(self, **kwargs):
         context = super(UserList, self).get_context_data(**kwargs)
@@ -344,32 +344,31 @@ class ProjectList(PermissionRequiredMixin,
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['any_archived'] = self.get_queryset().filter(
-                                                        archived=True).exists()
+            archived=True).exists()
         return context
 
     def get(self, request, *args, **kwargs):
         user = self.request.user
-        if (hasattr(user, 'assigned_policies') and
-           self.is_superuser):
-                projects = Project.objects.all()
+        if self.is_superuser:
+            projects = Project.objects.select_related('organization')
         else:
             projects = []
-            projects.extend(Project.objects.filter(access='public',
-                                                   archived=False))
+            projects.extend(Project.objects.filter(
+                access='public', archived=False).select_related(
+                    'organization'))
             if hasattr(user, 'organizations'):
-                for org in Organization.objects.all():
-                    if org in user.organizations.all():
-                        projects.extend(org.projects.filter(access='private',
-                                                            archived=False))
-                        if OrganizationRole.objects.get(organization=org,
-                                                        user=user
-                                                        ).admin is True:
-                            projects.extend(
-                                org.projects.filter(archived=True))
+                for org in user.organizations.all():
+                    projects.extend(org.projects.filter(
+                        access='private', archived=False).select_related(
+                            'organization'))
+                    if OrganizationRole.objects.get(organization=org,
+                                                    user=user).admin is True:
+                        projects.extend(org.projects.filter(
+                            archived=True).select_related('organization'))
         self.object_list = sorted(
             projects, key=lambda p: p.organization.slug + ':' + p.slug)
         context = self.get_context_data()
-        return super(generic.ListView, self).render_to_response(context)
+        return super().render_to_response(context)
 
 
 class ProjectDashboard(PermissionRequiredMixin,
@@ -390,7 +389,7 @@ class ProjectDashboard(PermissionRequiredMixin,
     permission_denied_message = error_messages.PROJ_VIEW
 
     def get_context_data(self, **kwargs):
-        context = super(ProjectDashboard, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         num_locations = self.object.spatial_units.count()
         num_parties = self.object.parties.count()
         num_resources = self.object.resource_set.filter(archived=False).count()
@@ -435,7 +434,7 @@ def add_wizard_permission_required(self, view, request):
         return 'project.create'
 
 
-class ProjectAddWizard(SuperUserCheckMixin,
+class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
                        LoginPermissionRequiredMixin,
                        wizard.SessionWizardView):
     permission_required = add_wizard_permission_required
@@ -609,13 +608,7 @@ class ProjectEdit(mixins.ProjectMixin,
         return self.get_project()
 
     def get_success_url(self):
-        return reverse(
-            'organization:project-dashboard',
-            kwargs={
-                'organization': self.object.organization.slug,
-                'project': self.object.slug
-            }
-        )
+        return reverse('organization:project-dashboard', kwargs=self.kwargs)
 
 
 class ProjectEditGeometry(ProjectEdit, generic.UpdateView):
@@ -658,13 +651,17 @@ class ProjectEditPermissions(ProjectEdit, generic.UpdateView):
     permission_denied_message = error_messages.PROJ_EDIT
 
 
-class ProjectArchive(ProjectEdit, ArchiveMixin, generic.DetailView):
+class ProjectArchive(ProjectEdit,
+                     core_mixins.ArchiveMixin,
+                     generic.DetailView):
     permission_required = 'project.archive'
     permission_denied_message = error_messages.PROJ_ARCHIVE
     do_archive = True
 
 
-class ProjectUnarchive(ProjectEdit, ArchiveMixin, generic.DetailView):
+class ProjectUnarchive(ProjectEdit,
+                       core_mixins.ArchiveMixin,
+                       generic.DetailView):
     def patch_actions(self, request, view=None):
         if self.get_organization().archived:
             return False

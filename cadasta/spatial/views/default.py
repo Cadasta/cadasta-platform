@@ -91,7 +91,8 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['relationships'] = self.object.tenurerelationship_set.all()
+        context['relationships'] = self.object.tenurerelationship_set.all(
+            ).select_related('party').defer('party__attributes')
         return context
 
 
@@ -148,7 +149,8 @@ class LocationResourceNew(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        project_locations = context['object'].spatial_units
+        project_locations = context['object'].spatial_units.only(
+            'id', 'type', 'geometry', 'project')
         context['geojson'] = json.dumps(
             SpatialUnitGeoJsonSerializer(
                 project_locations.exclude(id=context['location'].id),
@@ -168,15 +170,6 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
 
     def get_perms_objects(self):
         return [self.get_project()]
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-
-        context['geojson'] = json.dumps(
-            SpatialUnitGeoJsonSerializer(self.get_queryset(), many=True).data
-        )
-
-        return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

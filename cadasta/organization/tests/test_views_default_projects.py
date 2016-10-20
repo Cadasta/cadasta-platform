@@ -244,6 +244,11 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
+    def test_get_with_unauthenticated_user(self):
+        response = self.request()
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
     def test_get_with_superuser(self):
         superuser_role = Role.objects.get(name='superuser')
         self.user.assign_policies(superuser_role)
@@ -260,6 +265,19 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
             organization=self.project.organization,
             user=self.user,
             admin=True
+        )
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        expected = self.render_content(is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True)
+        assert response.content == expected
+
+    def test_get_with_project_manager(self):
+        ProjectRole.objects.create(
+            project=self.project,
+            user=self.user,
+            role='PM',
         )
         response = self.request(user=self.user)
         assert response.status_code == 200

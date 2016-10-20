@@ -78,7 +78,7 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -385,10 +385,11 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert response.location == self.expected_success_url
 
-        self.party.refresh_from_db()
-        assert self.party.name == self.post_data['name']
-        assert self.party.type == self.post_data['type']
-        assert self.party.attributes.get('fname') == 'New text'
+        # attributes field is deferred so we fetch a fresh instance
+        party = Party.objects.defer(None).get(id=self.party.id)
+        assert party.name == self.post_data['name']
+        assert party.type == self.post_data['type']
+        assert party.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -963,9 +964,11 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert response.location == self.expected_success_url
 
-        self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id == 'LH'
-        assert self.relationship.attributes.get('fname') == 'New text'
+        # attributes field is deferred so we fetch a fresh instance
+        relationship = TenureRelationship.objects.defer(None).get(
+            id=self.relationship.id)
+        assert relationship.tenure_type_id == 'LH'
+        assert relationship.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
