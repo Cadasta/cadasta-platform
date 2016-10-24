@@ -824,6 +824,7 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
 
         if is_resource:
             default_storage = DefaultStorage()
+            file.seek(0)
             url = default_storage.save(file.name, file.read())
             resource = Resource(
                 name=name, description=description, file=url,

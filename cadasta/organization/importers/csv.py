@@ -154,6 +154,9 @@ class CSVImporter(base.Importer):
                 val = row[self.csv_headers.index(attr)]
                 if (not attribute.required and val == ""):
                     continue
+                # handle select_multiple fields
+                if (attribute.attr_type.name == 'select_multiple'):
+                    val = val.split(' ')
                 content_types[content_type][
                     'attributes'][
                         attribute.name] = val

@@ -1393,7 +1393,7 @@ class ProjectDataImportTest(UserTestCase, TestCase):
         )
         # test for expected schema and attribute creation
         assert 3 == Schema.objects.all().count()
-        assert 41 == Attribute.objects.all().count()
+        assert 42 == Attribute.objects.all().count()
 
         self.ATTRIBUTES = [
             'deed_of_land', 'amount_othersland', 'educational_qualification',
@@ -1404,7 +1404,8 @@ class ProjectDataImportTest(UserTestCase, TestCase):
             'how_aquire_landp', 'how_aquire_landd', 'ownership_conflict',
             'occupation_hh', 'others_conflict', 'how_aquire_landm',
             'khatain_of_land', 'male_member', 'mobile_no', 'how_aquire_landw',
-            'everything', 'name_father_hus', 'tenure_name', 'tenure_notes'
+            'everything', 'name_father_hus', 'tenure_name', 'tenure_notes',
+            'location_problems'
         ]
         self.EXTRA_ATTRS = [
             'conflicts_resolution', 'current_address', 'data_collector_name',
