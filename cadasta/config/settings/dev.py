@@ -70,7 +70,11 @@ LEAFLET_CONFIG['TILES'][0] = (
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
+    },
+    'jsonattrs': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'jsonattrs'
     }
 }
 

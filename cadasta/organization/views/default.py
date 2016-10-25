@@ -398,9 +398,11 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
+
+        su = self.object.spatial_units.all().only(
+            'id', 'type', 'geometry', 'project')
         context['geojson'] = json.dumps(
-            SpatialUnitGeoJsonSerializer(
-                self.object.spatial_units.all(), many=True).data
+            SpatialUnitGeoJsonSerializer(su, many=True).data
         )
 
         return context

@@ -31,3 +31,13 @@ LEAFLET_CONFIG['TILES'][0] = (
     'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     LEAFLET_CONFIG['TILES'][0][2]
 )
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
+    },
+    'jsonattrs': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'jsonattrs'
+    }
+}
