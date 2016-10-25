@@ -43,7 +43,7 @@
   </thead>
   {% for user in object_list %}
   <tr class="{{ user.is_active|yesno:_("disabled,active") }}">
-    <td>{{ user.username }}</td>
+    <td><p>{{ user.username }}</p><p>{{ user.full_name }}</p></td>
     <td>{{ user.email }}</td>
     <td>{{ user.org_names|safe }}</td>
     <td>{{ user.last_login|default_if_none:"&mdash;" }}</td>

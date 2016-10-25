@@ -4,22 +4,8 @@ from organization.tests.factories import OrganizationFactory, ProjectFactory
 from organization.models import OrganizationRole
 
 
-def create_superuser(username='testsuperuser', password='password',
-                     email=None):
-    if email:
-        superuser = UserFactory.create(
-            username=username,
-            password=password,
-            email=email
-        )
-    else:
-        superuser = UserFactory.create(
-            username=username,
-            password=password
-        )
-
-    superuser.assign_policies(Role.objects.get(name='superuser'))
-    return superuser
+def assign_superuser_role(user):
+    user.assign_policies(Role.objects.get(name='superuser'))
 
 
 def load_test_data(data):
@@ -29,14 +15,11 @@ def load_test_data(data):
     if 'users' in data:
         user_objs = []  # For assigning members to orgs later
         for user in data['users']:
-            if '_is_superuser' in user and user['_is_superuser']:
-                user_objs.append(create_superuser(
-                    username=user['username'],
-                    password=user['password'],
-                    email=user['email'] if ('email' in user) else None
-                ))
-            else:
-                user_objs.append(UserFactory.create(**user))
+            # Drop all keys starting with an underscore for user creation
+            args = {k: v for k, v in user.items() if not k.startswith('_')}
+            user_objs.append(UserFactory.create(**args))
+            if user.get('_is_superuser'):
+                assign_superuser_role(user_objs[-1])
     retval['users'] = user_objs
 
     # Load orgs
