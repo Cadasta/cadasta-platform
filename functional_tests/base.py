@@ -202,8 +202,9 @@ class FunctionalTest(StaticLiveServerTestCase):
             message = 'This field is required.'
 
         self.get_screenshot()
-        print('<error: {error}> != <message: {message}>'.format(
-            error=error, message=message))
+        if error != message:
+            print('<error: {error}> != <message: {message}>'.format(
+                error=error, message=message))
         assert error == message
 
     def assert_field_has_no_error(self, field):
