@@ -63,7 +63,7 @@ class RegistrationPage(Page):
     def register(self, values):
         self.test.click_through(self.setup(values), self.test.BY_DASHBOARD)
 
-    def try_submit(self, err=None, ok=None):
+    def try_submit(self, err=None, ok=None, message=None):
         fields = self.get_fields()
         sel = self.test.BY_ALERT if err is None else self.test.BY_FIELD_ERROR
         self.test.click_through(fields['register'], sel, screenshot='tst')
@@ -71,7 +71,7 @@ class RegistrationPage(Page):
         if err is not None:
             for f in err:
                 try:
-                    self.test.assert_field_has_error(fields[f])
+                    self.test.assert_field_has_error(fields[f], message)
                 except:
                     raise AssertionError('Field "' + f +
                                          '" should have error, but does not')

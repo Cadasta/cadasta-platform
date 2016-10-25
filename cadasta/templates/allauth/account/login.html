@@ -26,21 +26,21 @@
 </div>
 {% endif %}
 
-<form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}" novalidate>
+<form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}" data-parsley-validate>
   <h1>{% trans "Sign in to your account" %}</h1>
 
   {% csrf_token %}
 
   <div class="form-group{% if form.login.errors %} has-error{% endif %}">
-    <label for="id_login">{% trans "Username" %}</label>
-    <label class="pull-right control-label">{{ form.login.errors }}</label>
-    {% render_field form.login class+="form-control input-lg" placeholder="" %}
+    <label class="control-label" for="id_login">{% trans "Username" %}</label>
+    {% render_field form.login class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
+    <div class="error-block">{{ form.login.errors }}</div>
   </div>
 
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
-    <label for="id_password">{% trans "Password" %}</label>
-    <label class="pull-right control-label">{{ form.password.errors }}</label>
-    {% render_field form.password class+="form-control input-lg" placeholder="" %}
+    <label class="control-label" for="id_password">{% trans "Password" %}</label>
+    {% render_field form.password class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
+    <div class="error-block">{{ form.password.errors }}</div>
   </div>
 
   <div class="small pull-right">

@@ -55,7 +55,7 @@ $(document).ready(function() {
   <div class="modal show" data-backdrop="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="POST">
+        <form method="POST" data-parsley-validate data-parsley-excluded=":hidden">
           <div class="modal-header">
             <a class="close" href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
               <span aria-hidden="true">&times;</span>
@@ -68,9 +68,9 @@ $(document).ready(function() {
             <h4 class="step">{% trans "1. Connected party" %}</h4>
             <div id="select-party" class="clearfix{% if form.new_entity.value %} hidden{% endif %}">
               <div class="form-group{% if form.id.errors %} has-error{% endif %}">
-                <label for="{{ form.id.id_for_label }}">{% trans "Choose an existing party to connect to this location" %}</label>
-                <label class="pull-right control-label">{{ form.id.errors }}</label>
+                <label class="control-label" for="{{ form.id.id_for_label }}">{% trans "Choose an existing party to connect to this location" %}</label>
                 {{ form.id }}
+                <div class="error-block">{{ form.id.errors }}</div>
               </div>
 
               <label>{% trans "Or add a new party" %}</label>
@@ -82,27 +82,27 @@ $(document).ready(function() {
             <div id="new-item" class="clearfix{% if not form.new_entity.value %} hidden{% endif %}">
 
               <div class="form-group{% if form.name.errors %} has-error{% endif %}">
-                <label for="{{ form.name.id_for_label }}">{% trans "Party name" %}</label>
-                <label class="pull-right control-label">{{ form.name.errors }}</label>
-                {% render_field form.name class+="form-control" %}
+                <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Party name" %}</label>
+                {% render_field form.name class+="form-control" data-parsley-required="true" %}
+                <div class="error-block">{{ form.name.errors }}</div>
               </div>
 
               <div class="form-group{% if form.party_type.errors %} has-error{% endif %}">
-                <label for="{{ form.party_type.id_for_label }}">{% trans "Party type" %}</label>
-                <label class="pull-right control-label">{{ form.party_type.errors }}</label>
-                {% render_field form.party_type class+="form-control" %}
+                <label class="control-label" for="{{ form.party_type.id_for_label }}">{% trans "Party type" %}</label>
+                {% render_field form.party_type class+="form-control" data-parsley-required="true" %}
+                <div class="error-block">{{ form.party_type.errors }}</div>
               </div>
 
               {% for field in form %}
                 {% if "party::" in field.name %}
                   <div class="form-group{% if field.errors %} has-error{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    <label class="pull-right control-label">{{ field.errors }}</label>
+                    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {% if field|field_type == "datefield" %}
-                    {% render_field field class+="form-control datepicker" %}
+                      {% render_field field class+="form-control datepicker" %}
                     {% else %}
-                    {% render_field field class+="form-control" %}
+                      {% render_field field class+="form-control" %}
                     {% endif %}
+                    <div class="error-block">{{ field.errors }}</div>
                   </div>
                 {% endif %}
               {% endfor %}
@@ -112,21 +112,21 @@ $(document).ready(function() {
             <h4 class="step">{% trans "2. Relationship details" %}</h4>
 
             <div class="form-group{% if form.tenure_type.errors %} has-error{% endif %}">
-              <label for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>
-              <label class="pull-right control-label">{{ form.tenure_type.errors }}</label>
-              {% render_field form.tenure_type class+="form-control" %}
+              <label class="control-label" for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship Type" %}</label>
+              {% render_field form.tenure_type class+="form-control" data-parsley-required="true" %}
+              <div class="error-block">{{ form.tenure_type.errors }}</div>
             </div>
 
             {% for field in form %}
               {% if "relationship::" in field.name %}
               <div class="form-group{% if field.errors %} has-error{% endif %}">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                <label class="pull-right control-label">{{ field.errors }}</label>
+                <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {% if field|field_type == "datefield" %}
-                {% render_field field class+="form-control datepicker" %}
+                  {% render_field field class+="form-control datepicker" %}
                 {% else %}
-                {% render_field field class+="form-control" %}
+                  {% render_field field class+="form-control" %}
                 {% endif %}
+                <div class="error-block">{{ field.errors }}</div>
               </div>
               {% endif %}
             {% endfor %}

@@ -170,7 +170,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def assert_has_error_list(self):
         """Check for the presence of an error list containing given text."""
         error_list = self.browser.find_element_by_xpath(
-            "//ul[contains(@class, 'errorlist')]"
+            "//ul[contains(@class, 'error-block')]"
         )
         return error_list
 
@@ -190,12 +190,22 @@ class FunctionalTest(StaticLiveServerTestCase):
             print("Messages: " + msgs.text)
             raise e
 
-    def assert_field_has_error(self, field):
+    def assert_field_has_error(self, field, message=None):
         """Check whether a form field has an error marker: this will be a
         ``has_error`` class on the field's immediate parent."""
-        cls = field.find_element_by_xpath('..').get_attribute('class')
-        print('cls =', cls)
-        assert re.search(r'\bhas-error\b', cls)
+        error = field.find_element_by_xpath(
+            '..//div[contains(@class, "error-block")]').text
+        if error == '':
+            error = field.find_element_by_xpath(
+                '..//ul[contains(@class, "parsley-errors-list")]').text
+        if not message:
+            message = 'This field is required.'
+
+        self.get_screenshot()
+        if error != message:
+            print('<error: {error}> != <message: {message}>'.format(
+                error=error, message=message))
+        assert error == message
 
     def assert_field_has_no_error(self, field):
         """Check that a form field has no error marker: this will be a

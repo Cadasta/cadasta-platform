@@ -10,15 +10,15 @@
       <div class="top-btn pull-right">
         <!-- More options menu -->
         <div class="dropdown pull-right btn-more">
-            <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-              <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="dLabel">
-              <li><a href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}">{% trans "Edit relationship" %}</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}">{% trans "Delete relationship" %}</a></li>
-            </ul>
-          </div>
+          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+            <span class="more-menu glyphicon glyphicon-option-vertical"></span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="dLabel">
+            <li><a href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}">{% trans "Edit relationship" %}</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}">{% trans "Delete relationship" %}</a></li>
+          </ul>
+        </div>
       </div>
     </div>
 

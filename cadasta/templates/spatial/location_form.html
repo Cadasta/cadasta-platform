@@ -2,7 +2,7 @@
 {% load leaflet_tags %}
 {% load widget_tweaks %}
 
-<form method="POST" id="location-wizard" class="col-sm-12 content-single">
+<form method="POST" id="location-wizard" class="col-sm-12 content-single" data-parsley-validate data-parsley-excluded=":hidden">
   {% csrf_token %}
   <div class="row">
     <!-- Start overview map  -->
@@ -17,24 +17,24 @@
         <div class="panel-body">
           <h3>{% trans "Draw location on map" %}</h3>
           <div class="clearfix form-group{% if form.geometry.errors %} has-error{% endif %}">
-            <p>{% blocktrans %}1. Use the tools provided on the left side of the map to mark your new location.{% endblocktrans %}</p>
-            <label class="control-label">{{ form.geometry.errors }}</label>
+            <label class="control-label required">1.{% trans "1. Use the tools provided on the left side of the map to mark your new location." %}</label>
+            <div class="error-block">{{ form.geometry.errors }}</div>
           </div>
           <div class="form-group{% if form.type.errors %} has-error{% endif %}">
-            <label for="{{ form.type.id_for_label }}">{% trans "2. What type of location is this?" %}</label>
-            <label class="pull-right control-label">{{ form.type.errors }}</label>
-            {% render_field form.type class+="form-control" %}
+            <label class="control-label" for="{{ form.type.id_for_label }}">{% trans "2. What type of location is this?" %}</label>
+            {% render_field form.type class+="form-control" data-parsley-required="true" %}
+            <div class="error-block">{{ form.type.errors }}</div>
           </div>
           {% for field in form %}
             {% if "attributes" in field.name %}
             <div class="form-group{% if field.errors %} has-error{% endif %}">
-              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-              <label class="pull-right control-label">{{ field.errors }}</label>
+              <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
               {% if field|field_type == "datefield" %}
-              {% render_field field class+="form-control datepicker" %}
+                {% render_field field class+="form-control datepicker" %}
               {% else %}
-              {% render_field field class+="form-control" %}
+                {% render_field field class+="form-control" %}
               {% endif %}
+              <div class="error-block">{{ field.errors }}</div>
             </div>
             {% endif %}
           {% endfor %}

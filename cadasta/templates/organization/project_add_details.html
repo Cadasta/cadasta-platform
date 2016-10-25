@@ -56,9 +56,9 @@
                 <div class="row">
                   <div class="col-sm-8">
                     <div class="form-group{% if wizard.form.organization.errors %} has-error{% endif %}">
-                      <label for="{{ wizard.form.organization.id_for_label }}">{% trans "Select organization" %}</label>
-                      <label class="pull-right control-label">{{ wizard.form.organization.errors }}</label>
-                      {% render_field wizard.form.organization class+="form-control" %}
+                      <label class="control-label" for="{{ wizard.form.organization.id_for_label }}">{% trans "Select organization" %}</label>
+                      {% render_field wizard.form.organization class+="form-control" data-parsley-required="true" %}
+                      <div class="error-block">{{ wizard.form.organization.errors }}</div>
                     </div>
                   </div>
                   <div class="col-sm-4 hidden-xs">
@@ -75,9 +75,9 @@
                 <div class="row">
                   <div class="col-sm-8">
                     <div class="form-group{% if wizard.form.name.errors %} has-error{% endif %}">
-                      <label for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
-                      <label class="pull-right control-label">{{ wizard.form.name.errors }}</label>
-                      {% render_field wizard.form.name class+="form-control" %}
+                      <label class="control-label" for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
+                      {% render_field wizard.form.name class+="form-control" data-parsley-required="true" %}
+                      <div class="error-block">{{ wizard.form.name.errors }}</div>
                     </div>
                   </div>
                   <div class="col-sm-4">
@@ -91,15 +91,15 @@
             <div class="row">
               <div class="col-md-9">
                 <div class="form-group{% if wizard.form.description.errors %} has-error{% endif %}">
-                  <label for="{{ wizard.form.description.id_for_label }}">{% trans "Project description" %}</label>
-                  <label class="pull-right control-label">{{ wizard.form.description.errors }}</label>
+                  <label class="control-label" for="{{ wizard.form.description.id_for_label }}">{% trans "Project description" %}</label>
                   {% render_field wizard.form.description class+="form-control" %}
+                  <div class="error-block">{{ wizard.form.description.errors }}</div>
                 </div>
 
                 <div class="form-group{% if wizard.form.url.errors %} has-error{% endif %}">
-                  <label for="{{ wizard.form.url.id_for_label }}">{% trans "Project URL" %}</label>
-                  <label class="pull-right control-label">{{ wizard.form.url.errors }}</label>
+                  <label class="control-label" for="{{ wizard.form.url.id_for_label }}">{% trans "Project URL" %}</label>
                   {% render_field wizard.form.url class+="form-control" placeholder="http://" %}
+                  <div class="error-block">{{ wizard.form.url.errors }}</div>
                 </div>
               </div>
             </div>
@@ -108,12 +108,12 @@
             <div class="row">
               <div class="col-md-9">
                 <div class="form-group{% if wizard.form.questionnaire.errors %} has-error{% endif %}">
-                  <label for="{{ wizard.form.questionnaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
-                  <label class="pull-right control-label">{{ wizard.form.questionnaire.errors }}</label>
+                  <label class="control-label" for="{{ wizard.form.questionnaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
                   <div class="well file-well">
                     {% render_field wizard.form.questionnaire class+="form-control" %}
                     <p class="help-block">{% trans "Accepted file types: xls, xlsx" %}</p>
                     {{ wizard.form.original_file }}
+                    <div class="error-block">{{ wizard.form.questionnaire.errors }}</div>
                   </div>
                   <div class="alert alert-info alert-full clearfix row" role="alert">
                     <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>

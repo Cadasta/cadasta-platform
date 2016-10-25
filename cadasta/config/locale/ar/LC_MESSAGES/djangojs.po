@@ -8,8 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-14 21:35+0000\n"
+"POT-Creation-Date: 2016-10-25 11:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Chandra Lash <clash@cadasta.org>, 2016\n"
 "Language-Team: Arabic (https://www.transifex.com/cadasta/teams/61422/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,3 +29,94 @@ msgstr ""
 #: core/static/js/map_utils.js:30
 msgid "Go to my location"
 msgstr ""
+
+#: core/static/js/parsley.js:2259
+msgid "This field seems to be invalid."
+msgstr "تأكد من صحة القيمة المدخل"
+
+#: core/static/js/parsley.js:2261
+msgid "This field should be a valid email."
+msgstr "تأكد من إدخال بريد الكتروني صحيح"
+
+#: core/static/js/parsley.js:2262
+msgid "This value should be a valid url."
+msgstr ""
+
+#: core/static/js/parsley.js:2263
+msgid "This value should be a valid number."
+msgstr "تأكد من إدخال رقم"
+
+#: core/static/js/parsley.js:2264
+msgid "This value should be a valid integer."
+msgstr "تأكد من إدخال عدد صحيح بدون كسور"
+
+#: core/static/js/parsley.js:2265
+msgid "This value should be digits."
+msgstr "تأكد من إدخال رقم"
+
+#: core/static/js/parsley.js:2266
+msgid "This value should be alphanumeric."
+msgstr "تأكد من إدخال حروف وأرقام فقط"
+
+#: core/static/js/parsley.js:2268
+msgid "This field should not be blank."
+msgstr "تأكد من تعبئة الحقل"
+
+#: core/static/js/parsley.js:2269
+msgid "This field is required."
+msgstr "هذه الخانة مطلوبه."
+
+#: core/static/js/parsley.js:2270
+msgid "This value seems to be invalid."
+msgstr "القيمة المدخلة غير صحيحة"
+
+#: core/static/js/parsley.js:2271
+#, javascript-format
+msgid "This value should be greater than or equal to %s."
+msgstr "القيمة المدخلة يجب أن تكون أكبر من %s."
+
+#: core/static/js/parsley.js:2272
+#, javascript-format
+msgid "This value should be lower than or equal to %s."
+msgstr "القيمة المدخلة يجب أن تكون أصغر من %s."
+
+#: core/static/js/parsley.js:2273
+#, javascript-format
+msgid "This value should be between %s and %s."
+msgstr "القيمة المدخلة يجب أن تكون بين %s و %s."
+
+#: core/static/js/parsley.js:2274
+#, javascript-format
+msgid "This field is too short. It should have %s characters or more."
+msgstr "القيمة المدخلة قصيرة جداً . تأكد من إدخال %s حرف أو أكثر"
+
+#: core/static/js/parsley.js:2275
+#, javascript-format
+msgid "This field is too long. It should have %s characters or fewer."
+msgstr "القيمة المدخلة طويلة . تأكد من إدخال %s حرف أو أقل"
+
+#: core/static/js/parsley.js:2276
+#, javascript-format
+msgid ""
+"This field length is invalid. It should be between %s and %s characters "
+"long."
+msgstr "القيمة المدخلة غير صحيحة. تأكد من إدخال بين  %s و %s خانة"
+
+#: core/static/js/parsley.js:2277
+#, javascript-format
+msgid "You must select at least %s choices."
+msgstr "يجب اختيار %s خيار على الأقل."
+
+#: core/static/js/parsley.js:2278
+#, javascript-format
+msgid "You must select %s choices or fewer."
+msgstr "يجب اختيار%s خيار أو أقل"
+
+#: core/static/js/parsley.js:2279
+#, javascript-format
+msgid "You must select between %s and %s choices."
+msgstr "يجب اختيار بين %s و %s خيار."
+
+#: core/static/js/parsley.js:2280
+msgid "This value should be the same."
+msgstr "تأكد من تطابق القيمتين المدخلة."

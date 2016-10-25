@@ -67,7 +67,7 @@ class OrganizationMemberPage(Page):
 
     def get_org_role_error(self):
         return self.get_form_field("div[contains(@class, 'member-role')]" +
-                                   "//ul[contains(@class, 'errorlist')]")
+                                   "//ul[contains(@class, 'error-block')]")
 
     def get_selected_role(self):
         return self.get_member_role_select(

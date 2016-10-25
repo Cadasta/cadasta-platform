@@ -12,7 +12,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <form method="POST"
-              action="{% url 'organization:edit' form.instance.slug %}" class="edit-org" novalidate>
+              action="{% url 'organization:edit' form.instance.slug %}" class="edit-org" data-parsley-validate>
           <div class="modal-header">
             <a class="close" href="{% url 'organization:dashboard' form.instance.slug %}">
               <span aria-hidden="true">&times;</span>

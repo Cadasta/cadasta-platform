@@ -6,6 +6,7 @@ django-allauth==0.25.2
 django-cors-headers==1.1.0
 django-filter==0.12.0
 django-crispy-forms==1.6.0
+django-parsley==0.6
 django-formtools==1.0
 django-countries==3.4.1
 django-leaflet==0.18.0

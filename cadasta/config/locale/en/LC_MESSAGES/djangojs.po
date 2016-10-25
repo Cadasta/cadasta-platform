@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-14 21:35+0000\n"
+"POT-Creation-Date: 2016-10-25 11:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,4 +27,94 @@ msgstr ""
 
 #: core/static/js/map_utils.js:30
 msgid "Go to my location"
+msgstr ""
+
+#: core/static/js/parsley.js:2259
+msgid "This field seems to be invalid."
+msgstr ""
+
+#: core/static/js/parsley.js:2261
+msgid "This field should be a valid email."
+msgstr ""
+
+#: core/static/js/parsley.js:2262
+msgid "This value should be a valid url."
+msgstr ""
+
+#: core/static/js/parsley.js:2263
+msgid "This value should be a valid number."
+msgstr ""
+
+#: core/static/js/parsley.js:2264
+msgid "This value should be a valid integer."
+msgstr ""
+
+#: core/static/js/parsley.js:2265
+msgid "This value should be digits."
+msgstr ""
+
+#: core/static/js/parsley.js:2266
+msgid "This value should be alphanumeric."
+msgstr ""
+
+#: core/static/js/parsley.js:2268
+msgid "This field should not be blank."
+msgstr ""
+
+#: core/static/js/parsley.js:2269
+msgid "This field is required."
+msgstr ""
+
+#: core/static/js/parsley.js:2270
+msgid "This value seems to be invalid."
+msgstr ""
+
+#: core/static/js/parsley.js:2271
+#, javascript-format
+msgid "This value should be greater than or equal to %s."
+msgstr ""
+
+#: core/static/js/parsley.js:2272
+#, javascript-format
+msgid "This value should be lower than or equal to %s."
+msgstr ""
+
+#: core/static/js/parsley.js:2273
+#, javascript-format
+msgid "This value should be between %s and %s."
+msgstr ""
+
+#: core/static/js/parsley.js:2274
+#, javascript-format
+msgid "This field is too short. It should have %s characters or more."
+msgstr ""
+
+#: core/static/js/parsley.js:2275
+#, javascript-format
+msgid "This field is too long. It should have %s characters or fewer."
+msgstr ""
+
+#: core/static/js/parsley.js:2276
+#, javascript-format
+msgid ""
+"This field length is invalid. It should be between %s and %s characters long."
+msgstr ""
+
+#: core/static/js/parsley.js:2277
+#, javascript-format
+msgid "You must select at least %s choices."
+msgstr ""
+
+#: core/static/js/parsley.js:2278
+#, javascript-format
+msgid "You must select %s choices or fewer."
+msgstr ""
+
+#: core/static/js/parsley.js:2279
+#, javascript-format
+msgid "You must select between %s and %s choices."
+msgstr ""
+
+#: core/static/js/parsley.js:2280
+msgid "This value should be the same."
 msgstr ""

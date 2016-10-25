@@ -49,7 +49,7 @@
     <td>{{ user.last_login|default_if_none:"&mdash;" }}</td>
     <td>
       <form method="POST"
-            action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}" novalidate>
+            action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}">
         {% csrf_token %}
         <button type="submit" class="btn btn-sm {{ user.is_active|yesno:_("btn-danger,btn-default") }}">
           {{ user.is_active|yesno:_("Deactivate,Activate") }}

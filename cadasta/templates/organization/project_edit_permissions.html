@@ -13,7 +13,8 @@
 {% block left-nav %}overview{% endblock %}
 
 {% block content %}
-<form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}" novalidate>
+
+<form method="POST" action="{% url 'organization:project-edit-permissions' project.organization.slug project.slug %}" data-parsley-validate>
 {% csrf_token %}
   <div class="col-md-12 content-single">
     <div class="row">
@@ -31,7 +32,7 @@
                 </tr>
               </thead>
               {% for field in form %}
-                {% render_field field class+="form-control" %}
+                {% render_field field class+="form-control"  data-parsley-required="true" %}
               {% endfor %}
             </table>
           </div>

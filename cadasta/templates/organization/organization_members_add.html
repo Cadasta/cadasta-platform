@@ -12,7 +12,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST"
-              action="{% url 'organization:members_add' organization.slug %}" novalidate>
+              action="{% url 'organization:members_add' organization.slug %}" data-parsley-validate>
           <div class="modal-header">
             <a class="close" href="{% url 'organization:members' organization.slug %}"><span aria-hidden="true">&times;</span></a>
             <h3 class="modal-title">{% trans "Add member" %}</h3>
@@ -21,11 +21,11 @@
             <div class="form-group{% if form.identifier.errors %} has-error{% endif %}">
               {% csrf_token %}
               {{ form.non_field_errors }}
-              <label for="{{ form.identifier.id_for_label }}">
+              <label class="control-label" for="{{ form.identifier.id_for_label }}">
                 {% trans "Enter new member's username or email address" %}
               </label>
-              <label class="pull-right control-label">{{ form.identifier.errors }}</label>
-              {% render_field form.identifier class+="form-control input-lg" %}
+              {% render_field form.identifier class+="form-control input-lg" data-parsley-required="true" %}
+              <div class="error-block">{{ form.identifier.errors }}</div>
             </div>
           </div>
           <div class="modal-footer">

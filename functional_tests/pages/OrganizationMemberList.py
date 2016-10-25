@@ -50,30 +50,53 @@ class OrganizationMemberListPage(Page):
             "//div[contains(@class, 'modal-content')]" + xpath
         )
 
-    def click_on_input(self):
-        return self.get_modal(
-            "//input[@type='text']"
-        )
+    def get_member_input(self):
+        return self.get_modal("//input[@type='text']")
 
-    def click_submit_button(self, success=True):
-        submit_button = self.get_modal(
-                            "//button[@type='submit']")
-        if not success:
-            self.click_through(submit_button, (By.CLASS_NAME, 'errorlist'))
-            error_list = self.test.assert_has_error_list()
-            return error_list.text
-        else:
-            self.test.click_through_close(
-                submit_button, self.BY_MODAL_BACKDROP)
-            return self.get_page_content("//h2").text
+    def get_submit_button(self, success=True):
+        return self.get_modal("//button[@type='submit']")
+        # if not success:
+        #     self.click_through(submit_button, (By.CLASS_NAME, 'error-block'))
+        #     error_list = self.test.assert_field_has_error()
+        #     return error_list.text
+        # else:
+        #     self.test.click_through_close(
+        #         submit_button, self.BY_MODAL_BACKDROP)
+        #     return self.get_page_content("//h2").text
+
+    def get_fields(self):
+        return {
+            'member': self.get_member_input(),
+            'submit': self.get_submit_button(),
+        }
+
+    def try_submit(self, err=None, ok=None, message=None):
+        BY_MEMBER_PAGE = (By.CLASS_NAME, 'org-member-edit')
+
+        fields = self.get_fields()
+        sel = BY_MEMBER_PAGE if err is None else self.test.BY_FIELD_ERROR
+        self.test.click_through(fields['submit'], sel, screenshot='tst')
+
+        if err is not None:
+            fields = self.get_fields()
+            for f in err:
+                try:
+                    self.test.assert_field_has_error(fields[f], message)
+                except:
+                    raise AssertionError(
+                        'Field "' + f + '" should have error, but does not'
+                    )
+
+    def get_member_name(self):
+        return self.get_page_content("//h2").text
 
     def fill_form(self):
-        input_box = self.click_on_input()
-        input_box.send_keys("This should go away.")
+        fields = self.get_fields()
+        fields['member'].send_keys("This should go away.")
 
     def test_empty_form(self):
-        input_box = self.click_on_input()
-        assert input_box.text == ""
+        fields = self.get_fields()
+        assert fields['member'].text == ""
 
     def try_cancel_and_close(self):
         self.test.try_cancel_and_close(

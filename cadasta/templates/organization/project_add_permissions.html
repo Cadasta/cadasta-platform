@@ -46,7 +46,7 @@
               </thead>
               <tbody>
                 {% for field in form %}
-                  {% render_field field class+="form-control" %}
+                  {% render_field field class+="form-control" data-parsley-required="true" %}
                 {% endfor %}
               </tbody>
             </table>
