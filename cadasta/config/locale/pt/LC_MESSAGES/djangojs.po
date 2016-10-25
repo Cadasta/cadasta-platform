@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-14 21:35+0000\n"
+"POT-Creation-Date: 2016-10-25 11:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Ian Ross <iross@cadasta.org>, 2016\n"
+"Last-Translator: Chandra Lash <clash@cadasta.org>, 2016\n"
 "Language-Team: Portuguese (https://www.transifex.com/cadasta/teams/61422/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,3 +29,95 @@ msgstr "Reduzir"
 #: core/static/js/map_utils.js:30
 msgid "Go to my location"
 msgstr "Ir para a minha localização"
+
+#: core/static/js/parsley.js:2259
+msgid "This field seems to be invalid."
+msgstr "Este valor parece ser inválido."
+
+#: core/static/js/parsley.js:2261
+msgid "This field should be a valid email."
+msgstr "Este campo deve ser um email válido."
+
+#: core/static/js/parsley.js:2262
+msgid "This value should be a valid url."
+msgstr ""
+
+#: core/static/js/parsley.js:2263
+msgid "This value should be a valid number."
+msgstr "Este campo deve ser um número válido."
+
+#: core/static/js/parsley.js:2264
+msgid "This value should be a valid integer."
+msgstr "Este campo deve ser um inteiro válido."
+
+#: core/static/js/parsley.js:2265
+msgid "This value should be digits."
+msgstr "Este campo deve conter apenas dígitos."
+
+#: core/static/js/parsley.js:2266
+msgid "This value should be alphanumeric."
+msgstr "Este campo deve ser alfa numérico."
+
+#: core/static/js/parsley.js:2268
+msgid "This field should not be blank."
+msgstr "Este campo não pode ficar em branco."
+
+#: core/static/js/parsley.js:2269
+msgid "This field is required."
+msgstr "Este campo é obrigatório."
+
+#: core/static/js/parsley.js:2270
+msgid "This value seems to be invalid."
+msgstr "Este campo parece estar inválido."
+
+#: core/static/js/parsley.js:2271
+#, javascript-format
+msgid "This value should be greater than or equal to %s."
+msgstr "Este campo deve ser maior ou igual a %s."
+
+#: core/static/js/parsley.js:2272
+#, javascript-format
+msgid "This value should be lower than or equal to %s."
+msgstr "Este campo deve ser menor ou igual a %s."
+
+#: core/static/js/parsley.js:2273
+#, javascript-format
+msgid "This value should be between %s and %s."
+msgstr "Este campo deve estar entre %s e %s."
+
+#: core/static/js/parsley.js:2274
+#, javascript-format
+msgid "This field is too short. It should have %s characters or more."
+msgstr "Este campo é pequeno demais. Ele deveria ter %s caracteres ou mais."
+
+#: core/static/js/parsley.js:2275
+#, javascript-format
+msgid "This field is too long. It should have %s characters or fewer."
+msgstr "Este campo é grande demais. Ele deveria ter %s caracteres ou menos."
+
+#: core/static/js/parsley.js:2276
+#, javascript-format
+msgid ""
+"This field length is invalid. It should be between %s and %s characters "
+"long."
+msgstr ""
+"O tamanho deste campo é inválido. Ele deveria ter entre %s e %s caracteres."
+
+#: core/static/js/parsley.js:2277
+#, javascript-format
+msgid "You must select at least %s choices."
+msgstr "Você deve escolher pelo menos %s opções."
+
+#: core/static/js/parsley.js:2278
+#, javascript-format
+msgid "You must select %s choices or fewer."
+msgstr "Você deve escolher %s opções ou mais"
+
+#: core/static/js/parsley.js:2279
+#, javascript-format
+msgid "You must select between %s and %s choices."
+msgstr "Você deve escolher entre %s e %s opções."
+
+#: core/static/js/parsley.js:2280
+msgid "This value should be the same."
+msgstr "Este valor deveria ser igual."
