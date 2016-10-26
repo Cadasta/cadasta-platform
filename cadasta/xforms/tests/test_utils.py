@@ -1,6 +1,8 @@
-from ..utils import odk_geom_to_wkt
+import pytest
 
 from django.test import TestCase
+
+from ..utils import InvalidODKGeometryError, odk_geom_to_wkt
 
 
 class TestODKGeomToWKT(TestCase):
@@ -72,3 +74,11 @@ class TestODKGeomToWKT(TestCase):
         )
         geom = odk_geom_to_wkt(self.geotrace_as_poly)
         assert geom == poly
+
+    def test_bad_geom(self):
+        bad_geom = 'this is not a geometry'
+        with pytest.raises(InvalidODKGeometryError) as e:
+            odk_geom_to_wkt(bad_geom)
+        assert str(e.value) == (
+            "Invalid ODK Geometry: could not convert string to float: 'is'"
+        )

@@ -6,13 +6,12 @@ from buckets.test.storage import FakeS3Storage
 from core.tests.utils.cases import UserTestCase
 from django.conf import settings
 from django.contrib.gis.geos import LineString, Point, Polygon
+from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
 from party.models import Party, TenureRelationship
 from questionnaires.models import Questionnaire
 from resources.tests.utils import clear_temp  # noqa
 from spatial.models import SpatialUnit
-
-from django.test import TestCase
 
 from ..importers import csv, exceptions
 from ..importers.base import Importer
@@ -41,7 +40,7 @@ class BaseImporterTest(UserTestCase, TestCase):
             importer.import_data(config_dict=None)
 
 
-# @pytest.mark.usefixtures('clear_temp')
+@pytest.mark.usefixtures('clear_temp')
 class CSVImportTest(UserTestCase, TestCase):
 
     def setUp(self):
@@ -68,8 +67,8 @@ class CSVImportTest(UserTestCase, TestCase):
             project=self.project
         )
         # test for expected schema and attribute creation
-        assert 2 == Schema.objects.all().count()
-        assert 39 == Attribute.objects.all().count()
+        assert 3 == Schema.objects.all().count()
+        assert 42 == Attribute.objects.all().count()
 
         self.attributes = [
             'deed_of_land', 'amount_othersland', 'educational_qualification',
@@ -80,7 +79,8 @@ class CSVImportTest(UserTestCase, TestCase):
             'how_aquire_landp', 'how_aquire_landd', 'ownership_conflict',
             'occupation_hh', 'others_conflict', 'how_aquire_landm',
             'khatain_of_land', 'male_member', 'mobile_no', 'how_aquire_landw',
-            'everything', 'name_father_hus'
+            'everything', 'name_father_hus', 'tenure_name', 'tenure_notes',
+            'location_problems'
         ]
 
     def test_get_schema_attrs(self):
@@ -89,14 +89,14 @@ class CSVImportTest(UserTestCase, TestCase):
         attrs = importer.get_schema_attrs()
         su_attrs = attrs['spatial.spatialunit']
         pty_attrs = attrs['party.party']
-        assert len(su_attrs) == 28
+        assert len(su_attrs) == 29
         assert len(pty_attrs) == 11
 
     def test_get_attribute_map(self):
         importer = csv.CSVImporter(
             project=self.project, path=self.path + self.valid_csv)
         attr_map, extra_attrs, extra_headers = importer.get_attribute_map()
-        assert len(attr_map.keys()) == 28
+        assert len(attr_map.keys()) == 31
         assert len(extra_attrs) == 11
         assert len(extra_headers) == 10
         assert attr_map['class_hh'][1] == 'party.party'
@@ -124,10 +124,37 @@ class CSVImportTest(UserTestCase, TestCase):
             if su.geometry is not None:
                 assert type(su.geometry) is Point
 
-        # test attribute creation
-        su = SpatialUnit.objects.first()
+        # test spatial unit attribute creation
+        sus = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647224045'})
+        assert len(sus) == 1
+        su = sus[0]
+        assert len(su.attributes) == 20
         assert 'how_aquire_landwh' not in su.attributes.keys()
         assert 'how_aquire_landw' in su.attributes.keys()
+        assert su.attributes[
+            'others_conflict'] == ('কিছু বেখলে অাছে জোর করে দখল করে ভোগ করে '
+                                   'অন্য জমির মালক।')
+        assert su.attributes['female_member'] == '4'
+        assert su.attributes['location_problems'] == [
+            'conflict', 'risk_of_eviction'
+        ]
+
+        # test party attribute creation
+        parties = Party.objects.filter(
+            attributes__contains={'Mobile_No': '০১৭৭২৫৬০১৯১'})
+        assert len(parties) == 1
+        pty_attrs = parties[0].attributes
+        assert len(pty_attrs) == 8
+        assert pty_attrs['name_father_hus'] == 'মৃত কুব্বাত মন্ডল'
+
+        # test tenure relationship attribute creation
+        tenure_relationships = TenureRelationship.objects.filter(
+            party=parties[0])
+        tr_attrs = {'tenure_name': 'Customary', 'tenure_notes': 'a few notes'}
+        assert len(tenure_relationships) == 1
+        assert len(tenure_relationships[0].attributes) == 2
+        assert tenure_relationships[0].attributes == tr_attrs
 
     def test_import_with_geoshape(self):
         importer = csv.CSVImporter(

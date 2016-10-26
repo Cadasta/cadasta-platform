@@ -87,29 +87,16 @@ class CSVImporter(base.Importer):
                         csvfile, delimiter=self.delimiter,
                         quotechar=self.quotechar
                     )
-                    csv_headers = [h.lower() for h in next(reader)]
+                    self.csv_headers = [h.lower() for h in next(reader)]
                     for row in reader:
-                        if len(csv_headers) != len(row):
-                            raise ValueError(
-                                _("Number of headers and columns "
-                                  "do not match")
-                            )
-                        party_name = row[csv_headers.index(party_name_field)]
-                        coords = row[csv_headers.index(geometry_field)]
-                        geometry_type = row[csv_headers.index(
-                                            geometry_type_field)]
-                        if geometry_type not in GEOMETRY_TYPES:
-                            raise ValueError(
-                                _("Invalid geometry type")
-                            )
-                        geometry = odk_geom_to_wkt(coords)
-                        try:
-                            tenure_type = row[
-                                csv_headers.index(TENURE_TYPE)]
-                        except ValueError as e:
-                            raise ValueError(
-                                _("No 'tenure_type' column found")
-                            )
+                        #  validate the row
+                        (party_name, geometry,
+                            tenure_type) = self._validate_row(
+                                row, party_name_field, geometry_field,
+                                geometry_type_field
+                        )
+
+                        # create models
                         content_types['party.party'] = {
                             'project': self.project,
                             'name': party_name,
@@ -122,26 +109,73 @@ class CSVImporter(base.Importer):
                             'geometry': geometry,
                             'attributes': {}
                         }
-                        for attr in attributes:
-                            attribute, content_type, name = attr_map.get(attr)
-                            if (attribute is not None):
-                                val = row[csv_headers.index(attr)]
-                                if (not attribute.required and val == ""):
-                                    continue
-                                content_types[content_type][
-                                    'attributes'][
-                                        attribute.name] = val
-                        party = Party.objects.create(
-                            **content_types['party.party']
-                        )
-                        su = SpatialUnit.objects.create(
-                            **content_types['spatial.spatialunit']
-                        )
-                        tt = TenureRelationshipType.objects.get(id=tenure_type)
-                        TenureRelationship.objects.create(
-                            project=self.project, party=party,
-                            spatial_unit=su, tenure_type=tt
+                        content_types['party.tenurerelationship'] = {
+                            'project': self.project,
+                            'attributes': {}
+                        }
+                        self._create_models(
+                            row, content_types, attributes,
+                            attr_map, tenure_type
                         )
         except Exception as e:
             raise exceptions.DataImportError(
                 line_num=reader.line_num, error=e)
+
+    def _validate_row(self, row, party_name_field, geometry_field,
+                      geometry_type_field):
+        if len(self.csv_headers) != len(row):
+            raise ValueError(
+                _("Number of headers and columns "
+                  "do not match")
+            )
+        party_name = row[self.csv_headers.index(party_name_field)]
+        coords = row[self.csv_headers.index(geometry_field)]
+        geometry_type = row[self.csv_headers.index(
+                            geometry_type_field)]
+        if geometry_type not in GEOMETRY_TYPES:
+            raise ValueError(
+                _("Invalid geometry type")
+            )
+        geometry = odk_geom_to_wkt(coords)
+        try:
+            tenure_type = row[
+                self.csv_headers.index(TENURE_TYPE)]
+        except ValueError:
+            raise ValueError(
+                _("No 'tenure_type' column found")
+            )
+        return (party_name, geometry, tenure_type)
+
+    def _create_models(self, row, content_types,
+                       attributes, attr_map, tenure_type):
+        for attr in attributes:
+            attribute, content_type, name = attr_map.get(attr)
+            if (attribute is not None):
+                val = row[self.csv_headers.index(attr)]
+                if (not attribute.required and val == ""):
+                    continue
+                # handle select_multiple fields
+                if (attribute.attr_type.name == 'select_multiple'):
+                    val = val.split(' ')
+                content_types[content_type][
+                    'attributes'][
+                        attribute.name] = val
+        party = Party.objects.create(
+            **content_types['party.party']
+        )
+        su = SpatialUnit.objects.create(
+            **content_types['spatial.spatialunit']
+        )
+        tt = TenureRelationshipType.objects.get(
+            id=tenure_type)
+        content_types[
+            'party.tenurerelationship']['party'] = party
+        content_types[
+            'party.tenurerelationship'][
+                'spatial_unit'] = su
+        content_types[
+            'party.tenurerelationship'][
+                'tenure_type'] = tt
+        TenureRelationship.objects.create(
+            **content_types['party.tenurerelationship']
+        )
