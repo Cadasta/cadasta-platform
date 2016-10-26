@@ -657,9 +657,6 @@ class ProjectAddTest(UserTestCase, TestCase):
     def test_flow_with_archived_organization(self):
         self.org.archived = True
         self.org.save()
-        OrganizationRole.objects.create(organization=self.org,
-                                        user=self.users[0],
-                                        admin=True)
 
         self.client.force_login(self.users[0])
         extents_response = self.client.post(

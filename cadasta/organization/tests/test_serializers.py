@@ -4,7 +4,6 @@ from datetime import datetime
 from core.util import slugify
 from django.test import TestCase
 from django.utils.translation import gettext as _
-from django.core import mail
 from django.core.urlresolvers import reverse
 from rest_framework.serializers import ValidationError
 from rest_framework.test import APIRequestFactory
@@ -373,7 +372,6 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         role = OrganizationRole.objects.get(user=user, organization=org)
         assert role.admin is True
-        assert len(mail.outbox) == 1
 
     def test_set_roles_with_email(self):
         user = UserFactory.create()
@@ -392,7 +390,6 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         role = OrganizationRole.objects.get(user=user, organization=org)
         assert role.admin is True
-        assert len(mail.outbox) == 1
 
     def test_set_roles_for_user_that_does_not_exist(self):
         org = OrganizationFactory.create()
@@ -418,10 +415,21 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        print(serializer.errors)
         assert (_('More than one user found for username or email '
                   '{email}').format(email='some-user@some.com')
                 in serializer.errors['username'])
+
+    def test_set_role_when_role_exists(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        serializer = serializers.OrganizationUserSerializer(
+            data={'username': user.email, 'admin': 'True'},
+            partial=True,
+            context={'organization': org}
+        )
+        assert serializer.is_valid() is False
+        assert ("Not able to add member. The role already exists." in
+                serializer.errors['username'])
 
     def test_update_roles_for_user(self):
         user = UserFactory.create()
@@ -515,6 +523,20 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
         assert (_('User with username or email {username} '
                   'does not exist').format(username='some-user')
                 in serializer.errors['username'])
+
+    def test_set_role_when_role_exists(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        project = ProjectFactory.create(organization=org)
+        ProjectRole.objects.create(user=user, project=project)
+        serializer = serializers.ProjectUserSerializer(
+            data={'username': user.username, 'role': 'DC'},
+            partial=True,
+            context={'project': project}
+        )
+        assert serializer.is_valid() is False
+        assert ("Not able to add member. The role already exists." in
+                serializer.errors['username'])
 
     def test_update_roles_for_user(self):
         user = UserFactory.create()

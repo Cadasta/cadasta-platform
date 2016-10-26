@@ -100,6 +100,15 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
         assert self.project.users.count() == 1
 
+    def test_add_user_when_role_exists(self):
+        new_user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[new_user])
+        self.project = ProjectFactory.create(organization=org)
+        ProjectRole.objects.create(user=new_user, project=self.project)
+        response = self.request(user=self.user, method='POST',
+                                post_data={'username': new_user.username})
+        assert response.status_code == 400
+
     def test_add_user_with_unauthorized_user(self):
         user_to_add = UserFactory.create()
         self.project = ProjectFactory.create()
