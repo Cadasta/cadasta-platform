@@ -61,7 +61,7 @@ def create_options(options, question, errors=[]):
 
             QuestionOption.objects.create(
                 question=question, index=idx+1, name=o['name'],
-                label_xlat=o.get('label_xlat', o.get('label', None))
+                label_xlat=o.get('label_xlat', o.get('label', {}))
             )
     else:
         errors.append(_("Please provide at least one option for field"
