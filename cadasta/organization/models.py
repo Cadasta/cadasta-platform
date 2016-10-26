@@ -113,6 +113,9 @@ class OrganizationRole(RandomIDModel):
 
     history = HistoricalRecords()
 
+    class Meta:
+        unique_together = ('organization', 'user')
+
 
 def reassign_user_policies(instance, adding):
     assigned_policies = instance.user.assigned_policies()

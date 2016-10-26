@@ -377,6 +377,13 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
         r = OrganizationRole.objects.get(organization=self.org, user=new_user)
         assert not r.admin
 
+    def test_add_user_when_role_exists(self):
+        new_user = UserFactory.create()
+        OrganizationRole.objects.create(user=new_user, organization=self.org)
+        response = self.request(user=self.user, method='POST',
+                                post_data={'username': new_user.username})
+        assert response.status_code == 400
+
     def test_add_user_with_unauthorized_user(self):
         new_user = UserFactory.create()
         response = self.request(method='POST',

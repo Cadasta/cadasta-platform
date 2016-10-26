@@ -1,11 +1,8 @@
 from django.conf import settings
 from django.db.models import Q
-from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from core.util import slugify
 from django.utils.translation import ugettext as _
-from django.template.loader import get_template
-from django.template import Context
 from rest_framework import serializers
 from rest_framework_gis import serializers as geo_serializers
 from django_countries.serializer_fields import CountryField
@@ -174,6 +171,14 @@ class EntityUserSerializer(serializers.Serializer):
             if error:
                 raise serializers.ValidationError(error.format(value))
 
+            try:
+                self.get_roles_object(self.user)
+            except self.Meta.role_model.DoesNotExist:
+                pass
+            else:
+                raise serializers.ValidationError(
+                    _("Not able to add member. The role already exists."))
+
     def validate_admin(self, role_value):
         if 'request' in self.context:
             if self.context['request'].user == self.instance:
@@ -195,10 +200,6 @@ class EntityUserSerializer(serializers.Serializer):
         }
 
         self.role = self.Meta.role_model.objects.create(**create_kwargs)
-
-        if hasattr(self, 'send_invitaion_email'):
-            self.send_invitaion_email()
-
         return self.user
 
     def update(self, instance, validated_data):
@@ -242,26 +243,6 @@ class OrganizationUserSerializer(EntityUserSerializer):
             admin = data
 
         return admin
-
-    def send_invitaion_email(self):
-        template = get_template('organization/email/org_invite.txt')
-        organization = self.context['organization']
-        context = Context({
-            'site_name': self.context['sitename'],
-            'organization': organization.name,
-            'domain': self.context['domain'],
-            'url': 'organizations/{}/leave'.format(organization.slug),
-        })
-        message = template.render(context)
-        print(message)
-
-        subject = _(
-            "You have been added to organization {organization}"
-        ).format(
-            organization=self.context['organization'].name
-        )
-        from_email = getattr(settings, 'DEFAULT_FROM_EMAIL', None),
-        send_mail(subject, message, from_email, [self.user.email])
 
 
 class ProjectUserSerializer(EntityUserSerializer):
