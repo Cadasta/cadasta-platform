@@ -1517,6 +1517,9 @@ class ProjectDataImportTest(UserTestCase, TestCase):
             if su.geometry is not None:
                 assert type(su.geometry) is Point
 
+        resource = Resource.objects.filter(project_id=proj.pk).first()
+        assert resource.file.url == '/media/s3/uploads/resources/test.csv'
+
     def test_full_flow_invalid_value(self):
         self.client.force_login(self.user)
         csvfile = open(self.path + self.invalid_csv, 'rb').read()

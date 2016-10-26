@@ -483,6 +483,7 @@ class DownloadForm(forms.Form):
 
 class SelectImportForm(forms.Form):
     VALID_IMPORT_MIME_TYPES = ['text/plain', 'text/csv']
+    MAX_FILE_SIZE = 512000
 
     class Media:
         js = ('js/import.js',)
@@ -511,6 +512,9 @@ class SelectImportForm(forms.Form):
 
     def clean_file(self):
         file = self.cleaned_data.get("file", False)
+        if file.size > self.MAX_FILE_SIZE:
+            raise ValidationError(
+                _('File too large, max size 512kb'))
         mime = magic.Magic(mime=True)
         mime_type = str(mime.from_buffer(file.read(1024)), 'utf-8')
         if mime_type not in self.VALID_IMPORT_MIME_TYPES:

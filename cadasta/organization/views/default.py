@@ -843,11 +843,14 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         if is_resource:
             default_storage = DefaultStorage()
             file.seek(0)
-            url = default_storage.save(file.name, file.read())
             resource = Resource(
-                name=name, description=description, file=url,
+                name=name, description=description,
                 original_file=original_file, mime_type=mime_type,
                 contributor=self.request.user, project=self.get_project())
+            upload_to = getattr(resource.file.field, 'upload_to')
+            url = default_storage.save(
+                upload_to + '/' + file.name, file.read())
+            resource.file.url = url
             resource.save()
             ContentObject.objects.create(resource=resource,
                                          content_object=resource.project)
