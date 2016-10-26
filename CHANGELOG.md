@@ -1,5 +1,21 @@
 # Change Log
 
+## [v1.1.0](https://github.com/Cadasta/cadasta-platform/tree/v1.1.0) (2016-10-20)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.1.0-alpha.1...v1.1.0)
+
+## [v1.1.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.1.0-alpha.1) (2016-10-20)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.0.0...v1.1.0-alpha.1)
+
+**Closed issues:**
+
+- Weed out duplicate database requests in templates [\#494](https://github.com/Cadasta/cadasta-platform/issues/494)
+
+**Merged pull requests:**
+
+- Fix 502 errors on resources list page [\#855](https://github.com/Cadasta/cadasta-platform/pull/855) ([seav](https://github.com/seav))
+- Implement a changelog [\#854](https://github.com/Cadasta/cadasta-platform/pull/854) ([amplifi](https://github.com/amplifi))
+- Resolve \#494: Reduce duplicate and unnecessary database requests [\#853](https://github.com/Cadasta/cadasta-platform/pull/853) ([seav](https://github.com/seav))
+
 ## [v1.0.0](https://github.com/Cadasta/cadasta-platform/tree/v1.0.0) (2016-10-19)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v0.3.0-alpha.5...v1.0.0)
 
