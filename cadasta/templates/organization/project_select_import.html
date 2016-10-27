@@ -1,70 +1,82 @@
-{% extends "organization/project_wrapper.html" %} {% load widget_tweaks %} {% load i18n %} {% block extra_script %} {{ form.media }} {% endblock %} {% block content %}
+{% extends "organization/project_import_wrapper.html" %} 
 
-<form method="POST" action="" enctype="multipart/form-data" class="col-md-12 content-single" data-parsley-validate>
-    {% csrf_token %}
+{% load i18n %}
+{% load widget_tweaks %}
 
-    <div class="row">
-        {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form }} {% for form in wizard.form.forms %} {{ form }} {% endfor %} {% else %}
+{% block extra_script %} {{ form.media }} {% endblock %} 
 
-        <div class="row">
-            <div class="col-md-9">
-                {{ wizard.form.non_field_errors }}
-            </div>
+{% block step_content %}
+
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form }}
+    {% endfor %}
+{% else %}
+
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h3>{% trans "Import details" %}</h3>
+      <div class="row">
+        <div class="col-md-9">
+          {{ wizard.form.non_field_errors }}
+          <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Import name" %}</label>
+            {% render_field form.name class+="form-control" data-parsley-required="true" %}
+            <div class="error-block">{{ form.name.errors }}</div>
+          </div>
+          <div class="form-group{% if form.description.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.description.id_for_label }}">{% trans "Import description" %}</label>
+            {% render_field form.description class+="form-control" %}
+            <div class="error-block">{{ form.description.errors }}</div>
+          </div>
         </div>
-
-        <!-- Main text  -->
-        <div class="col-md-12 main-text">
-
-            <h2>{% trans "Import project data" %}</h2>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <div class="form-group{% if form.name.errors %} has-error{% endif %}">
-                        <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-                        {% render_field form.name class+="form-control" data-parsley-required="true" %}
-                        <div class="error-block">{{ form.name.errors }}</div>
-                    </div>
-                    <div class="form-group{% if form.description.errors %} has-error{% endif %}">
-                        <label class="control-label" for="{{ form.description.id_for_label }}">{% trans "Description" %}</label>
-                        {% render_field form.description class+="form-control" %}
-                        <div class="error-block">{{ form.description.errors }}</div>
-                    </div>
-                    <ul class="list-unstyled spacing-lg">
-                        <div class="form-group{% if wizard.form.type.errors %} has-error{% endif %}">
-                            <label class="control-label" for="{{ wizard.form.type.id_for_label }}">{% trans "Select the type of data to import" %}</label>
-                            <li class="radio">
-                                <label>
-                                    <input type="radio" name="select_file-type" id="import_csv" value="csv" {% if wizard.form.type.value == 'csv' %}checked{% endif %}> {% trans "CSV" %}
-                                    <small>{% trans "Only CSV imports are currently supported" %}</small>
-                                </label>
-                            </li>
-                        </div>
-                    </ul>
-                    <div>
-                        <div class="form-group{% if wizard.form.file.errors %} has-error{% endif %}">
-                            <label class="control-label required" for="{{ wizard.form.file.id_for_label }}">{% trans "Select the file to import" %}</label>
-                            <div class="well file-well">
-                                {{ form.file }}
-                                <p class="help-block">{% trans "Accepted file types: csv" %}</p>
-                            </div>
-                            <div class="error-block">{{ wizard.form.file.errors }}</div>
-                        </div>
-                    </div>
-                    {{ form.is_resource }}
-                    <label class="control-label" for="{{ wizard.form.is_resource.id_for_label }}">{% trans "Save this file as a project resource?" %}</label>
-                    {{ form.mime_type }}
-                </div>
-                    <div class="panel-footer panel-buttons clearfix">
-                        {% block step_content_buttons %}
-                        <button id="select_file-next" class="btn btn-primary pull-right" type="submit">
-                            {% trans 'Next' %}
-                            <span class="glyphicon glyphicon-triangle-right"></span>
-                        </button>
-                        {% endblock %}
-                        <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
-                    </div>
+      </div>
+      <h3>{% trans "Import file" %}</h3>
+      <div class="row">
+        <div class="col-md-9">
+          <ul class="list-unstyled spacing-lg hidden">
+            <div class="form-group{% if wizard.form.type.errors %} has-error{% endif %}">
+              <label for="{{ wizard.form.type.id_for_label }}">{% trans "Select the type of data to import" %}</label>
+              <li class="radio">
+                <label class="control-label">
+                  <input type="radio" name="select_file-type" id="import_csv" value="csv" {% if wizard.form.type.value == 'csv' %}checked{% endif %}> {% trans "CSV" %}
+                  <small>{% trans "Only CSV imports are currently supported" %}</small>
+                </label>
+              </li>
             </div>
-            {% endif %}
+          </ul>
+          <div class="form-group{% if wizard.form.file.errors %} has-error{% endif %}">
+            <label class="control-label required" for="{{ wizard.form.file.id_for_label }}">{% trans "Select the file to import" %}</label>
+            <div class="well file-well">
+              {{ form.file }}
+              <p class="help-block">{% trans "Accepted file types: csv" %}</p>
+            </div>
+            <div class="error-block">{{ wizard.form.file.errors }}</div>
+          </div>
+          <div class="form-group hidden">
+            <div class="checkbox">
+              <label class="control-label" for="{{ wizard.form.is_resource.id_for_label }}">
+                {{ form.is_resource }}
+                {% trans "Include import file in project resources" %}
+              </label>
+            </div>
+            {{ form.mime_type }}
+          </div>
         </div>
-</form>
+      </div>
+    </div>
+    <div class="panel-footer panel-buttons clearfix">
+      <button id="select_file-next" class="btn btn-primary pull-right" type="submit">
+        {% trans 'Next' %} <span class="glyphicon glyphicon-triangle-right"></span>
+      </button>
+      <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
+    </div>
+
+  </div>
+
+{% endif %}
+
 {% endblock %}
-</div>
+

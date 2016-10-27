@@ -1,73 +1,101 @@
-{% extends "organization/project_wrapper.html" %} {% load widget_tweaks %} {% load i18n %} {% block content %}
+{% extends "organization/project_import_wrapper.html" %} 
 
-<form method="POST" enctype="multipart/form-data" class="col-md-12 content-single" data-parsley-validate>
-    {% csrf_token %}
-    <div class="row">
-        {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form }} {% for form in wizard.form.forms %} {{ form }} {% endfor %} {% else %}
+{% load i18n %}
+{% load widget_tweaks %}
 
-        <div class="row">
-            <div class="col-md-9">
-                {{ wizard.form.non_field_errors }}
-            </div>
-        </div>
+{% block extra_script %} {{ form.media }} {% endblock %} 
 
-        <!-- Main text  -->
-        <div class="col-md-12 main-text">
-            <h2>{% trans "Select import fields" %}</h2>
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <h4>{% trans "The following fields can be imported" %}</h4>
-                    <table id='import-mapping' width="50%" class="table">
-                        <tr>
-                            <th>{% trans "CSV Column" %}</th>
-                            <th>{% trans "Schema Attribute" %}</th>
-                            <th>{% trans "Content Type" %}</th>
-                            <th>{% trans "Required" %}</th>
-                            <th>{% trans "Import" %}</th>
-                        </tr>
-                        {% for header, attr in attr_map.items %}
-                        <tr>
-                            {% if attr %}
-                            <td>{{ header }}</td>
-                            <td>{{ attr.0.name }}</td>
-                            <td>{{ attr.2 }}</td>
-                            <td>{{ attr.0.required }}</td>
-                            <td>
-                                <input type="checkbox" name="attributes" value="{{ header }}" {% if attr.0.required %} disabled {% endif %} checked /> {% if attr.0.required %}
-                                <input type=hidden name="attributes" value="{{header}}" /> {% endif %}
-                            </td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    <h4>{% trans "The following import fields have no corresponding attribute" %}</h4>
-                    <div class="well">
-                    {{ extra_headers|join:" / "}}
-                    </div>
-                    <h4>{% trans "These attributes exist in your schema but are not in the import" %}</h4>
-                    <div class="well">
-                    {{ extra_attrs|join:" / "}}
-                    </div>
-                    <input type="hidden" value="{{ extra_headers|join:',' }}" name="extra_headers" />
+{% block step_content %}
+
+{{ wizard.management_form }}
+{% if wizard.form.forms %}
+    {{ wizard.form.management_form }}
+    {% for form in wizard.form.forms %}
+        {{ form }}
+    {% endfor %}
+{% else %}
+
+  <div class="panel panel-default">
+
+    <div class="panel-body">
+      <h3>{% trans "Select import fields" %}</h3>
+      <div class="row">
+        <div class="col-md-12">
+          {{ wizard.form.non_field_errors }}
+          <p>{% trans "The following fields can be imported.  To prevent a field from being imported, deselect the checkbox in the right column." %}</p>
+          <table id="import-mapping" class="table table-hover">
+            <thead>
+              <tr>
+                <th>{% trans "CSV Column" %}</th>
+                <th>{% trans "Schema Attribute" %}</th>
+                <th>{% trans "Content Type" %}</th>
+                <th>{% trans "Required" %}</th>
+                <th>{% trans "Import" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for header, attr in attr_map.items %}
+              <tr>
+              {% if attr %}
+                <td>{{ header }}</td>
+                <td>{{ attr.0.name }}</td>
+                <td>{{ attr.2 }}</td>
+                <td>{{ attr.0.required }}</td>
+                <td>
+                    <input type="checkbox" name="attributes" value="{{ header }}" {% if attr.0.required %} disabled {% endif %} checked /> {% if attr.0.required %}
+                    <input type=hidden name="attributes" value="{{header}}" /> {% endif %}
+                </td>
+              {% endif %}
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+          {% if extra_headers %}
+            <div class="alert alert-warning alert-full clearfix row" role="alert">
+              <div class="text-center">
+                <span class="glyphicon glyphicon-warning-sign"></span>
+              </div>
+              <div>
+                <p>{% trans "The following fields have no corresponding attribute." %}</p>
+                <div class="well">
+                  {{ extra_headers|join:" / "}}
                 </div>
-                <div class="panel-footer panel-buttons clearfix">
-                    {% block step_content_buttons %}
-                    <div class="btn-group btn-reverse pull-right" role="group">
-                        <button id="map_attributes-next" class="btn btn-primary pull-right" type="submit">
-                            {% trans 'Next' %}
-                            <span class="glyphicon glyphicon-triangle-right"></span>
-                        </button>
-                        <button class="btn btn-default btn-details-previous" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
-                            <span class="glyphicon glyphicon-triangle-left"></span> {% trans "Previous" %}
-                        </button>
-                    </div>
-                    {% endblock %}
-                    <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
-                </div>
+              </div>
             </div>
-            {% endif %}
+          {% endif %}
+          {% if extra_attrs %}
+          <div class="alert alert-warning alert-full clearfix row" role="alert">
+            <div class="text-center">
+              <span class="glyphicon glyphicon-warning-sign"></span>
+            </div>
+            <div>
+              <p>{% trans "The following attributes exist in your schema but are not in the import." %}</p>
+              <div class="well">
+                {{ extra_attrs|join:" / "}}
+              </div>
+            </div>
+          </div>
+          {% endif %}
+          <input type="hidden" value="{{ extra_headers|join:',' }}" name="extra_headers" />
         </div>
+      </div>
     </div>
-</form>
+
+    <div class="panel-footer panel-buttons clearfix">
+      <div class="btn-group btn-reverse pull-right" role="group">
+        <button id="map_attributes-next" class="btn btn-primary pull-right" type="submit">
+          {% trans 'Next' %}
+          <span class="glyphicon glyphicon-triangle-right"></span>
+        </button>
+        <button class="btn btn-default btn-details-previous" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
+          <span class="glyphicon glyphicon-triangle-left"></span> {% trans "Previous" %}
+        </button>
+      </div>
+      <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
+    </div>
+
+  </div>
+
+{% endif %}
+
 {% endblock %}
-</div>
