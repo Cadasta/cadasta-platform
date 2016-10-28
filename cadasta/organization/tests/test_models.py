@@ -14,12 +14,16 @@ PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 class OrganizationTest(TestCase):
     def test_str(self):
-        org = OrganizationFactory.create(name='Org')
+        org = OrganizationFactory.build(name='Org')
         assert str(org) == '<Organization: Org>'
 
     def test_repr(self):
-        org = OrganizationFactory.create(name='Org')
-        assert repr(org) == '<Organization: Org>'
+        org = OrganizationFactory.build(id='abc123', name='Org', slug='slug',
+                                        archived=True, access='public')
+        assert repr(org) == ('<Organization id=abc123 name=Org'
+                             ' slug=slug'
+                             ' archived=True'
+                             ' access=public>')
 
     def test_has_random_id(self):
         org = OrganizationFactory.create()
@@ -33,6 +37,14 @@ class OrganizationRoleTest(UserTestCase, TestCase):
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create(add_users=[self.user])
         self.no_user_org = OrganizationFactory.create()
+
+    def test_repr(self):
+        user = UserFactory.build(username='john')
+        org = OrganizationFactory.build(slug='org')
+        role = OrganizationRole(id='abc123', user=user, organization=org,
+                                admin=True)
+        assert repr(role) == ('<OrganizationRole id=abc123 user=john'
+                              ' organization=org admin=True>')
 
     def _get_role(self):
         return OrganizationRole.objects.get(organization=self.org,
@@ -83,8 +95,13 @@ class ProjectTest(TestCase):
         assert str(project) == '<Project: Project>'
 
     def test_repr(self):
-        project = ProjectFactory.create(name='Project')
-        assert repr(project) == '<Project: Project>'
+        prj = ProjectFactory.build(id='abc123', name='PRJ', slug='prj',
+                                   archived=True, access='public')
+        assert repr(prj) == ('<Project id=abc123 name=PRJ'
+                             ' slug=prj'
+                             ' organization={}'
+                             ' archived=True'
+                             ' access=public>').format(prj.organization.slug)
 
     def test_has_random_id(self):
         project = ProjectFactory.create()
@@ -152,6 +169,13 @@ class ProjectRoleTest(UserTestCase, TestCase):
         super().setUp()
         self.project = ProjectFactory.create()
         self.user = UserFactory.create()
+
+    def test_repr(self):
+        user = UserFactory.build(username='john')
+        project = ProjectFactory.build(slug='prj')
+        role = ProjectRole(id='abc123', user=user, project=project, role='DC')
+        assert repr(role) == ('<ProjectRole id=abc123 user=john project=prj '
+                              'role=DC>')
 
     def _has(self, action, state):
         assert self.user.has_perm(action, self.project) is state

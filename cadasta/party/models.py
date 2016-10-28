@@ -116,7 +116,10 @@ class Party(ResourceModelMixin, RandomIDModel):
         return "<Party: {}>".format(self.name)
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<Party id={obj.id} name={obj.name}'
+                       ' project={obj.project.slug}'
+                       ' type={obj.type}>')
+        return repr_string.format(obj=self)
 
     @property
     def ui_class_name(self):
@@ -206,7 +209,12 @@ class PartyRelationship(RandomIDModel):
             type=dict(self.TYPE_CHOICES).get(self.type))
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<PartyRelationship id={obj.id}'
+                       ' party1={obj.party1.id}'
+                       ' party2={obj.party2.id}'
+                       ' project={obj.project.slug}'
+                       ' type={obj.type}>')
+        return repr_string.format(obj=self)
 
 
 @fix_model_for_attributes
@@ -292,7 +300,12 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
         return "<TenureRelationship: {}>".format(self.name)
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<TenureRelationship id={obj.id}'
+                       ' party={obj.party.id}'
+                       ' spatial_unit={obj.spatial_unit.id}'
+                       ' project={obj.project.slug}'
+                       ' tenure_type={obj.tenure_type.id}>')
+        return repr_string.format(obj=self)
 
     @property
     def name(self):
@@ -329,6 +342,10 @@ class TenureRelationshipType(models.Model):
     label = models.CharField(max_length=200)
 
     history = HistoricalRecords()
+
+    def __repr__(self):
+        repr_string = '<TenureRelationshipType id={obj.id} label={obj.label}>'
+        return repr_string.format(obj=self)
 
 
 TENURE_RELATIONSHIP_TYPES = (
