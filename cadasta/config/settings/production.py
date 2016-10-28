@@ -40,6 +40,13 @@ CACHES = {
             os.environ['MEMCACHED_HOST'],
         ],
         'OPTIONS': {'distribution': 'consistent'}
+    },
+    'jsonattrs': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': [
+            os.environ['MEMCACHED_HOST'],
+        ],
+        'OPTIONS': {'distribution': 'consistent'}
     }
 }
 
