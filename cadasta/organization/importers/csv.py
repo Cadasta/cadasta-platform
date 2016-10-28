@@ -1,6 +1,7 @@
 import csv
 from collections import OrderedDict
 
+from django.contrib.gis.geos import GEOSGeometry
 from django.db import transaction
 from django.utils.translation import ugettext as _
 from party.models import Party, TenureRelationship, TenureRelationshipType
@@ -16,7 +17,6 @@ CONTENT_TYPES = {
     'party.tenurerelationship': 'Tenure Relationship',
     'party.partyrelationship': 'Party Relationship'
 }
-GEOMETRY_TYPES = ['', 'geopoint', 'geotrace', 'geoshape']
 TENURE_TYPE = 'tenure_type'
 
 
@@ -27,7 +27,7 @@ class CSVImporter(base.Importer):
         super(CSVImporter, self).__init__(project=project)
         self.path = path
         self.delimiter = ',' if not delimiter else delimiter
-        self.quotechar = '|' if not quotechar else quotechar
+        self.quotechar = '"' if not quotechar else quotechar
 
     def get_headers(self):
         headers = []
@@ -77,7 +77,6 @@ class CSVImporter(base.Importer):
         party_name_field = config_dict['party_name_field']
         party_type = config_dict['party_type']
         location_type = config_dict['location_type']
-        geometry_type_field = config_dict['geometry_type_field']
         geometry_field = config_dict['geometry_field']
         path = config_dict['file']
         try:
@@ -92,10 +91,8 @@ class CSVImporter(base.Importer):
                         #  validate the row
                         (party_name, geometry,
                             tenure_type) = self._validate_row(
-                                row, party_name_field, geometry_field,
-                                geometry_type_field
+                                row, party_name_field, geometry_field
                         )
-
                         # create models
                         content_types['party.party'] = {
                             'project': self.project,
@@ -121,8 +118,7 @@ class CSVImporter(base.Importer):
             raise exceptions.DataImportError(
                 line_num=reader.line_num, error=e)
 
-    def _validate_row(self, row, party_name_field, geometry_field,
-                      geometry_type_field):
+    def _validate_row(self, row, party_name_field, geometry_field):
         if len(self.csv_headers) != len(row):
             raise ValueError(
                 _("Number of headers and columns "
@@ -130,13 +126,14 @@ class CSVImporter(base.Importer):
             )
         party_name = row[self.csv_headers.index(party_name_field)]
         coords = row[self.csv_headers.index(geometry_field)]
-        geometry_type = row[self.csv_headers.index(
-                            geometry_type_field)]
-        if geometry_type not in GEOMETRY_TYPES:
-            raise ValueError(
-                _("Invalid geometry type")
-            )
-        geometry = odk_geom_to_wkt(coords)
+
+        # try to parse coords as WKT first
+        # if that fails try to parse ODK geom string
+        try:
+            geometry = GEOSGeometry(coords)
+        except:
+            geometry = odk_geom_to_wkt(coords)
+
         try:
             tenure_type = row[
                 self.csv_headers.index(TENURE_TYPE)]

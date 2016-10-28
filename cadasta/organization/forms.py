@@ -540,7 +540,6 @@ class SelectDefaultsForm(forms.Form):
         choices=LOCATION_TYPE_CHOICES, required=True
     )
     geometry_field = forms.CharField(required=False)
-    geometry_type_field = forms.CharField(required=False)
 
     def __init__(self, project, user, *args, **kwargs):
         super().__init__(*args, **kwargs)

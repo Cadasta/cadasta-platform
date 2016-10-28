@@ -42,12 +42,11 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
         self.valid_csv = '/organization/tests/files/test.csv'
         self.invalid_csv = '/organization/tests/files/test_invalid.csv'
+        self.invalid_col_csv = '/organization/tests/files/invalid_col.csv'
         self.geoshape_csv = '/organization/tests/files/test_geoshape.csv'
         self.geotrace_csv = '/organization/tests/files/test_geotrace.csv'
-        self.invalid_col_csv = '/organization/tests/files/invalid_col.csv'
-        self.invalid_geom_type = (
-            '/organization/tests/files/invalid_geom_type.csv')
         self.no_tenure_type = '/organization/tests/files/no_tenure_type.csv'
+        self.test_wkt = '/organization/tests/files/test_wkt.csv'
 
         self.project = ProjectFactory.create(name='Test CSV Import')
         xlscontent = self.get_file(
@@ -102,7 +101,6 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'party_name_field': 'name_of_hh',
             'party_type': 'IN',
             'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
             'geometry_field': 'location_geometry',
             'attributes': self.attributes,
             'project': self.project
@@ -147,6 +145,29 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert len(tenure_relationships[0].attributes) == 2
         assert tenure_relationships[0].attributes == tr_attrs
 
+    def test_import_with_invalid_column(self):
+        importer = csv.CSVImporter(
+            project=self.project, path=self.path + self.invalid_col_csv)
+        config_dict = {
+            'file': self.path + self.invalid_col_csv,
+            'party_name_field': 'name_of_hh',
+            'party_type': 'IN',
+            'location_type': 'PA',
+            'geometry_field': 'location_geometry',
+            'attributes': self.attributes,
+            'project': self.project,
+        }
+        with pytest.raises(exceptions.DataImportError) as e:
+            importer.import_data(config_dict)
+        assert str(e.value) == (
+            "Error importing file at line 2: "
+            "Number of headers and columns "
+            "do not match"
+        )
+        assert Party.objects.all().count() == 0
+        assert SpatialUnit.objects.all().count() == 0
+        assert TenureRelationship.objects.all().count() == 0
+
     def test_import_with_geoshape(self):
         importer = csv.CSVImporter(
             project=self.project, path=self.path + self.geoshape_csv)
@@ -155,7 +176,6 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'party_name_field': 'name_of_hh',
             'party_type': 'IN',
             'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
             'geometry_field': 'location_geoshape',
             'attributes': self.attributes,
             'project': self.project
@@ -176,7 +196,6 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'party_name_field': 'name_of_hh',
             'party_type': 'IN',
             'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
             'geometry_field': 'location_geotrace',
             'attributes': self.attributes,
             'project': self.project
@@ -197,58 +216,12 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'party_name_field': 'bad_party_name_field',
             'party_type': 'IN',
             'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
             'geometry_field': 'location_geometry',
             'attributes': self.attributes,
             'project': self.project
         }
         with pytest.raises(exceptions.DataImportError):
             importer.import_data(config_dict)
-        assert Party.objects.all().count() == 0
-        assert SpatialUnit.objects.all().count() == 0
-        assert TenureRelationship.objects.all().count() == 0
-
-    def test_import_with_invalid_column(self):
-        importer = csv.CSVImporter(
-            project=self.project, path=self.path + self.invalid_col_csv)
-        config_dict = {
-            'file': self.path + self.invalid_col_csv,
-            'party_name_field': 'name_of_hh',
-            'party_type': 'IN',
-            'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
-            'geometry_field': 'location_geometry',
-            'attributes': self.attributes,
-            'project': self.project,
-        }
-        with pytest.raises(exceptions.DataImportError) as e:
-            importer.import_data(config_dict)
-        assert str(e.value) == (
-            "Error importing file at line 2: "
-            "Number of headers and columns "
-            "do not match"
-        )
-        assert Party.objects.all().count() == 0
-        assert SpatialUnit.objects.all().count() == 0
-        assert TenureRelationship.objects.all().count() == 0
-
-    def test_import_with_invalid_geom_type(self):
-        importer = csv.CSVImporter(
-            project=self.project, path=self.path + self.invalid_geom_type)
-        config_dict = {
-            'file': self.path + self.invalid_geom_type,
-            'party_name_field': 'name_of_hh',
-            'party_type': 'IN',
-            'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
-            'geometry_field': 'location_geotrace',
-            'attributes': self.attributes,
-            'project': self.project
-        }
-        with pytest.raises(exceptions.DataImportError) as e:
-            importer.import_data(config_dict)
-        assert str(e.value) == ("Error importing file at line 5: "
-                                "Invalid geometry type")
         assert Party.objects.all().count() == 0
         assert SpatialUnit.objects.all().count() == 0
         assert TenureRelationship.objects.all().count() == 0
@@ -261,7 +234,6 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'party_name_field': 'name_of_hh',
             'party_type': 'IN',
             'location_type': 'PA',
-            'geometry_type_field': 'geo_type',
             'geometry_field': 'location_geometry',
             'attributes': self.attributes,
             'project': self.project
@@ -273,3 +245,41 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert Party.objects.all().count() == 0
         assert SpatialUnit.objects.all().count() == 0
         assert TenureRelationship.objects.all().count() == 0
+
+    def test_import_with_wkt(self):
+        importer = csv.CSVImporter(
+            project=self.project, path=self.path + self.test_wkt)
+        config_dict = {
+            'file': self.path + self.test_wkt,
+            'party_name_field': 'name_of_hh',
+            'party_type': 'IN',
+            'location_type': 'PA',
+            'geometry_field': 'location_geometry',
+            'attributes': self.attributes,
+            'project': self.project
+        }
+        importer.import_data(config_dict)
+        assert Party.objects.all().count() == 10
+        assert SpatialUnit.objects.all().count() == 10
+        assert TenureRelationship.objects.all().count() == 10
+
+        # test wkt geom creation
+        su1 = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647224045'}).first()
+        su2 = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647224033'}).first()
+        su3 = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647225965'}).first()
+        su4 = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647224043'}).first()
+        su5 = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647224044'}).first()
+        su6 = SpatialUnit.objects.filter(
+            attributes__contains={'nid_number': '3913647224185'}).first()
+
+        assert su1.geometry.geom_type == 'Point'
+        assert su2.geometry.geom_type == 'LineString'
+        assert su3.geometry.geom_type == 'Polygon'
+        assert su4.geometry.geom_type == 'MultiPoint'
+        assert su5.geometry.geom_type == 'MultiLineString'
+        assert su6.geometry.geom_type == 'MultiPolygon'

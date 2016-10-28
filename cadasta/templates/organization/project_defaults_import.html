@@ -1,9 +1,9 @@
-{% extends "organization/project_import_wrapper.html" %} 
+{% extends "organization/project_import_wrapper.html" %}
 
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% block extra_script %} {{ form.media }} {% endblock %} 
+{% block extra_script %} {{ form.media }} {% endblock %}
 
 {% block step_content %}
 
@@ -20,7 +20,7 @@
       <h3>{% trans "Configure default fields" %}</h3>
       <p>{% trans "Match the fields and select the default values below." %}</p>
       <h4 class="div">{% trans "Party" %}</h4>
-      <div class="row"> 
+      <div class="row">
         <div class="form-group col-md-4{% if wizard.form.party_name_field.errors %} has-error{% endif %}">
           <label class="control-label" for="{{ wizard.form.party_name_field.id_for_label }}">
             {% blocktrans %}Select the <span class="highlight">Party name</span> field{% endblocktrans %}
@@ -41,30 +41,18 @@
         </div>
       </div>
       <h4 class="div">{% trans "Location" %}</h4>
-      <div class="row"> 
+      <div class="row">
         <div class="form-group col-md-4{% if wizard.form.location_type.errors %} has-error{% endif %}">
           <label class="control-label" for="{{ wizard.form.location_type.id_for_label }}">
             {% blocktrans %}Select the <span class="highlight">Location type</span> default value{% endblocktrans %}
           </label>
-          {% render_field wizard.form.location_type class+="form-control" %}   
+          {% render_field wizard.form.location_type class+="form-control" %}
         </div>
         <div class="form-group col-md-4{% if wizard.form.geometry_field.errors %} has-error{% endif %}">
           <label class="control-label padded" for="{{ wizard.form.geometry_field.id_for_label }}">
             {% blocktrans %}Select the <span class="highlight">Geometry</span> field{% endblocktrans %}
           </label>
           <select id="geometry_field" class="form-control" name="select_defaults-geometry_field">
-            {% for header in available_headers %}
-              <option value="{{ header }}" {% if 'geo' in header %} selected="selected" {% endif %}>
-                {{ header }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="form-group col-md-4{% if wizard.form.geometry_type_field.errors %} has-error{% endif %}">
-          <label class="control-label padded" for="{{ wizard.form.geometry_type_field.id_for_label }}">
-            {% blocktrans %}Select the <span class="highlight">Geometry type</span> field{% endblocktrans %}
-          </label>
-          <select id="geometry_type_field" class="form-control" name="select_defaults-geometry_type_field">
             {% for header in available_headers %}
               <option value="{{ header }}" {% if 'geo' in header %} selected="selected" {% endif %}>
                 {{ header }}

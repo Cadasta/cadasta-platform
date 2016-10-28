@@ -830,7 +830,6 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             'party_name_field': form_data[2]['party_name_field'],
             'party_type': form_data[2]['party_type'],
             'location_type': form_data[2]['location_type'],
-            'geometry_type_field': form_data[2]['geometry_type_field'],
             'geometry_field': form_data[2]['geometry_field'],
             'attributes': map_attrs_data.getlist('attributes', None),
         }
