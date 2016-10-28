@@ -74,6 +74,11 @@ class Questionnaire(RandomIDModel):
               'permissions_object': 'project'}),
         )
 
+    def __repr__(self):
+        repr_string = ('<Questionnaire id={obj.id} title={obj.title}'
+                       ' project={obj.project.slug}>')
+        return repr_string.format(obj=self)
+
 
 class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
     name = models.CharField(max_length=100)
@@ -84,6 +89,11 @@ class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
     objects = managers.QuestionGroupManager()
 
     history = HistoricalRecords()
+
+    def __repr__(self):
+        repr_string = ('<QuestionGroup id={obj.id} name={obj.name}'
+                       ' questionnaire={obj.questionnaire.id}>')
+        return repr_string.format(obj=self)
 
 
 class Question(MultilingualLabelsMixin, RandomIDModel):
@@ -129,6 +139,12 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
 
     history = HistoricalRecords()
 
+    def __repr__(self):
+        repr_string = ('<Question id={obj.id} name={obj.name}'
+                       ' questionnaire={obj.questionnaire.id}'
+                       ' question_group={obj.question_group.id}>')
+        return repr_string.format(obj=self)
+
     @property
     def has_options(self):
         return self.type in ['S1', 'SM']
@@ -147,3 +163,8 @@ class QuestionOption(MultilingualLabelsMixin, RandomIDModel):
     question = models.ForeignKey(Question, related_name='options')
 
     history = HistoricalRecords()
+
+    def __repr__(self):
+        repr_string = ('<QuestionOption id={obj.id} name={obj.name}'
+                       ' question={obj.question.id}>')
+        return repr_string.format(obj=self)

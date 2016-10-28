@@ -17,7 +17,13 @@ class SpatialUnitTest(UserTestCase, TestCase):
     def test_str(self):
         spatial_unit = SpatialUnitFactory.create(type='PA')
         assert str(spatial_unit) == '<SpatialUnit: Parcel>'
-        assert repr(spatial_unit) == '<SpatialUnit: Parcel>'
+
+    def test_repr(self):
+        project = ProjectFactory.build(slug='prj')
+        spatial_unit = SpatialUnitFactory.build(type='PA', id='abc123',
+                                                project=project)
+        assert repr(spatial_unit) == ('<SpatialUnit id=abc123 project=prj'
+                                      ' type=PA>')
 
     def test_has_random_id(self):
         spatial_unit = SpatialUnitFactory.create()
@@ -132,10 +138,20 @@ class SpatialRelationshipTest(UserTestCase, TestCase):
             "<SpatialRelationship: "
             "<Parcel> is-contained-in <Community boundary>>"
         )
-        assert repr(relationship) == (
-            "<SpatialRelationship: "
-            "<Parcel> is-contained-in <Community boundary>>"
-        )
+
+    def test_repr(self):
+        project = ProjectFactory.build(slug='prj')
+        su1 = SpatialUnitFactory.build(type='PA', id='abc123', project=project)
+        su2 = SpatialUnitFactory.build(type='PA', id='def456', project=project)
+        relationship = SpatialRelationshipFactory.build(
+            id='abc123',
+            project=project,
+            su1=su1,
+            su2=su2,
+            type='C')
+        assert repr(relationship) == ('<SpatialRelationship id=abc123'
+                                      ' project=prj su1=abc123 su2=def456'
+                                      ' type=C>')
 
     def test_relationships_creation(self):
         relationship = SpatialRelationshipFactory(

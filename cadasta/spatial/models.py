@@ -87,7 +87,10 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         return "<SpatialUnit: {}>".format(self.name)
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<SpatialUnit id={obj.id}'
+                       ' project={obj.project.slug}'
+                       ' type={obj.type}>')
+        return repr_string.format(obj=self)
 
     @property
     def name(self):
@@ -213,4 +216,9 @@ class SpatialRelationship(RandomIDModel):
             type=dict(self.TYPE_CHOICES).get(self.type))
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<SpatialRelationship id={obj.id}'
+                       ' project={obj.project.slug}'
+                       ' su1={obj.su1_id}'
+                       ' su2={obj.su2_id}'
+                       ' type={obj.type}>')
+        return repr_string.format(obj=self)

@@ -10,6 +10,7 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from accounts.tests.factories import UserFactory
+from organization.tests.factories import ProjectFactory
 from ..exceptions import InvalidGPXFile
 from ..models import ContentObject, Resource, create_spatial_resource
 from .factories import ResourceFactory, SpatialResourceFactory
@@ -21,6 +22,15 @@ path = os.path.dirname(settings.BASE_DIR)
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
 class ResourceTest(UserTestCase, TestCase):
+
+    def test_repr(self):
+        project = ProjectFactory.build(slug='prj')
+        resource = Resource(id='abc123', name='File',
+                            file='http://example.com/test.txt',
+                            project=project)
+        assert repr(resource) == ('<Resource id=abc123 name=File'
+                                  ' file=http://example.com/test.txt'
+                                  ' project=prj>')
 
     def test_file_name_property(self):
         resource = Resource(file='http://example.com/dir/filename.txt')
@@ -231,6 +241,10 @@ class ResourceTest(UserTestCase, TestCase):
 
 
 class SpatialResourceTest(UserTestCase, TestCase):
+    def test_repr(self):
+        res = ResourceFactory.build(id='abc123')
+        resource = SpatialResourceFactory.build(id='abc123', resource=res)
+        assert repr(resource) == '<SpatialResource id=abc123 resource=abc123>'
 
     def test_spatial_resource(self):
         storage = FakeS3Storage()

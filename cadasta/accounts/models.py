@@ -61,6 +61,14 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                     {'error_message':
                      _("You don't have permission to update user details")})]
 
+    def __repr__(self):
+        repr_string = ('<User username={obj.username}'
+                       ' full_name={obj.full_name}'
+                       ' email={obj.email}'
+                       ' email_verified={obj.email_verified}'
+                       ' verify_email_by={obj.verify_email_by}>')
+        return repr_string.format(obj=self)
+
     def get_display_name(self):
         """
         Returns the display name.

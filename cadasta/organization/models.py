@@ -97,7 +97,11 @@ class Organization(SlugModel, RandomIDModel):
         return "<Organization: {name}>".format(name=self.name)
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<Organization id={obj.id} name={obj.name}'
+                       ' slug={obj.slug}'
+                       ' archived={obj.archived}'
+                       ' access={obj.access}>')
+        return repr_string.format(obj=self)
 
     def public_projects(self):
         return self.projects.filter(access='public', archived=False)
@@ -115,6 +119,12 @@ class OrganizationRole(RandomIDModel):
 
     class Meta:
         unique_together = ('organization', 'user')
+
+    def __repr__(self):
+        repr_string = ('<OrganizationRole id={obj.id} user={obj.user.username}'
+                       ' organization={obj.organization.slug}'
+                       ' admin={obj.admin}>')
+        return repr_string.format(obj=self)
 
 
 def reassign_user_policies(instance, adding):
@@ -236,7 +246,12 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
         return "<Project: {name}>".format(name=self.name)
 
     def __repr__(self):
-        return str(self)
+        repr_string = ('<Project id={obj.id} name={obj.name}'
+                       ' slug={obj.slug}'
+                       ' organization={obj.organization.slug}'
+                       ' archived={obj.archived}'
+                       ' access={obj.access}>')
+        return repr_string.format(obj=self)
 
     @property
     def ui_class_name(self):
@@ -302,6 +317,12 @@ class ProjectRole(RandomIDModel):
 
     class Meta:
         unique_together = ('project', 'user')
+
+    def __repr__(self):
+        repr_string = ('<ProjectRole id={obj.id} user={obj.user.username}'
+                       ' project={obj.project.slug}'
+                       ' role={obj.role}>')
+        return repr_string.format(obj=self)
 
 
 @receiver(models.signals.post_save, sender=ProjectRole)

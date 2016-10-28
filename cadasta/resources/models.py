@@ -80,6 +80,11 @@ class Resource(RandomIDModel):
         super().__init__(*args, **kwargs)
         self._original_url = self.file.url
 
+    def __repr__(self):
+        repr_string = ('<Resource id={obj.id} name={obj.name}'
+                       ' file={obj.file.url} project={obj.project.slug}>')
+        return repr_string.format(obj=self)
+
     @property
     def file_name(self):
         if not hasattr(self, '_file_name'):
@@ -242,6 +247,11 @@ class SpatialResource(RandomIDModel):
         srid=4326, blank=True, null=True
     )
     attributes = JSONAttributeField(default={})
+
+    def __repr__(self):
+        repr_string = ('<SpatialResource id={obj.id}'
+                       ' resource={obj.resource.id}>')
+        return repr_string.format(obj=self)
 
     @property
     def archived(self):

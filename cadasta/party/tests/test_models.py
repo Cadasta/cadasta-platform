@@ -12,6 +12,7 @@ from resources.models import ContentObject
 from party.models import Party, TenureRelationshipType
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
+from spatial.tests.factories import SpatialUnitFactory
 
 from .. import exceptions
 
@@ -19,9 +20,15 @@ from .. import exceptions
 class PartyTest(UserTestCase, TestCase):
 
     def test_str(self):
-        party = PartyFactory.create(name='TeaParty')
+        party = PartyFactory.build(name='TeaParty')
         assert str(party) == '<Party: TeaParty>'
-        assert repr(party) == '<Party: TeaParty>'
+
+    def test_repr(self):
+        project = ProjectFactory.build(slug='prj')
+        party = PartyFactory.build(id='abc123', name='TeaParty',
+                                   project=project, type='IN')
+        assert repr(party) == ('<Party id=abc123 name=TeaParty project=prj'
+                               ' type=IN>')
 
     def test_has_random_id(self):
         party = PartyFactory.create(name='TeaParty')
@@ -85,8 +92,8 @@ class PartyTest(UserTestCase, TestCase):
 class PartyRelationshipTest(UserTestCase, TestCase):
 
     def test_str(self):
-        project = ProjectFactory.create(name='TestProject')
-        relationship = PartyRelationshipFactory(
+        project = ProjectFactory.build(name='TestProject')
+        relationship = PartyRelationshipFactory.build(
             project=project,
             party1__project=project,
             party1__name='Simba',
@@ -95,8 +102,20 @@ class PartyRelationshipTest(UserTestCase, TestCase):
             type='C')
         assert str(relationship) == (
             "<PartyRelationship: <Simba> is-child-of <Mufasa>>")
-        assert repr(relationship) == (
-            "<PartyRelationship: <Simba> is-child-of <Mufasa>>")
+
+    def test_repr(self):
+        project = ProjectFactory.build(slug='prj')
+        party1 = PartyFactory.build(id='abc123', project=project)
+        party2 = PartyFactory.build(id='def456', project=project)
+        relationship = PartyRelationshipFactory.build(
+            id='abc123',
+            project=project,
+            party1=party1,
+            party2=party2,
+            type='C')
+        assert repr(relationship) == ('<PartyRelationship id=abc123'
+                                      ' party1=abc123 party2=def456'
+                                      ' project=prj type=C>')
 
     def test_relationships_creation(self):
         relationship = PartyRelationshipFactory(
@@ -155,9 +174,9 @@ class PartyRelationshipTest(UserTestCase, TestCase):
 class TenureRelationshipTest(UserTestCase, TestCase):
 
     def test_str(self):
-        project = ProjectFactory(name='TestProject')
+        project = ProjectFactory.build(name='TestProject')
         tenure_type = TenureRelationshipType(id='LS', label="Leasehold")
-        relationship = TenureRelationshipFactory(
+        relationship = TenureRelationshipFactory.build(
             project=project,
             party__project=project,
             party__name='Family',
@@ -166,8 +185,20 @@ class TenureRelationshipTest(UserTestCase, TestCase):
             tenure_type=tenure_type)
         assert str(relationship) == (
             "<TenureRelationship: <Family> Leasehold <Parcel>>")
-        assert repr(relationship) == (
-            "<TenureRelationship: <Family> Leasehold <Parcel>>")
+
+    def test_repr(self):
+        project = ProjectFactory.build(slug='prj')
+        party = PartyFactory.build(id='abc123', project=project)
+        su = SpatialUnitFactory.build(id='def456', project=project)
+        relationship = TenureRelationshipFactory.build(
+            id='abc123',
+            project=project,
+            party=party,
+            spatial_unit=su,
+            tenure_type=TenureRelationshipType(id='CR'))
+        assert repr(relationship) == ('<TenureRelationship id=abc123'
+                                      ' party=abc123 spatial_unit=def456'
+                                      ' project=prj tenure_type=CR>')
 
     def test_tenure_relationship_creation(self):
         tenure_relationship = TenureRelationshipFactory.create()
@@ -244,6 +275,11 @@ class TenureRelationshipTest(UserTestCase, TestCase):
 
 class TenureRelationshipTypeTest(UserTestCase, TestCase):
     """Test TenureRelationshipType."""
+
+    def test_repr(self):
+        tenure_type = TenureRelationshipType(id='FH', label='Freehold')
+        assert repr(tenure_type) == ('<TenureRelationshipType id=FH'
+                                     ' label=Freehold>')
 
     def test_tenure_relationship_types(self):
         tenure_types = TenureRelationshipType.objects.all()
