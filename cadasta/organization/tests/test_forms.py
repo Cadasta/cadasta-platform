@@ -1,5 +1,6 @@
 import os
 import random
+from string import ascii_lowercase
 from zipfile import ZipFile
 
 from django.conf import settings
@@ -1040,6 +1041,18 @@ class SelectImportFormTest(UserTestCase, TestCase):
             project=self.project, user=self.user)
         assert form.is_valid() is False
         assert form.errors['file'][0] == 'Invalid file type'
+
+    def test_file_size_validation(self):
+        contents = "".join(
+            random.choice(ascii_lowercase) for i in range(520000))
+        file = SimpleUploadedFile(
+            'test_too_big.csv', bytes(contents, 'ascii'), 'text/csv')
+        file_dict = {'file': file}
+        form = forms.SelectImportForm(
+            files=file_dict, data=self.data,
+            project=self.project, user=self.user)
+        assert form.is_valid() is False
+        assert form.errors['file'][0] == 'File too large, max size 512kb'
 
     def test_set_mime_type(self):
         valid_file = open(self.path + self.valid_file_type, 'rb').read()
