@@ -99,3 +99,45 @@ class TestFixImportedResourceUrls(MigrationTestCase):
         )
         resource = Resource.objects.get(name='test-resource-0')
         assert resource.file.url == base_path + 'resources/test_0.csv'
+
+
+class TestRandomizeImportedFilenames(MigrationTestCase):
+    migrate_from = '0005_fix_import_resource_urls'
+    migrate_to = '0006_randomize_imported_filenames'
+
+    def setUpBeforeMigration(self, apps_before):
+        Resource = apps_before.get_model('resources', 'Resource')
+        User = apps_before.get_model('accounts', 'User')
+        Organization = apps_before.get_model('organization', 'Organization')
+        Project = apps_before.get_model('organization', 'Project')
+
+        user = User.objects.create(username='testuser')
+        org = Organization.objects.create(name='Test Org')
+        project = Project.objects.create(name='Test Proj', organization=org)
+
+        base_path = (
+            'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-bucket/'
+            'resources/'
+        )
+
+        for f in range(10):
+            file_name = base_path + 'test_' + str(f) + '.csv'
+            resource_name = 'test-resource-' + str(f)
+            Resource.objects.create(
+                id=random_id(), name=resource_name, file=file_name,
+                mime_type='text/csv', contributor=user, project=project
+            )
+        Resource.objects.create(
+            id=random_id(), file=base_path + 'test.jpg', mime_type='image/jpg',
+            contributor=user, project=project
+        )
+
+    def test_migration(self):
+        Resource = self.apps_after.get_model('resources', 'Resource')
+        resources = Resource.objects.filter(mime_type='text/csv')
+        assert len(resources) == 10
+        resource = Resource.objects.get(name='test-resource-0')
+        assert resource.original_file == 'test_0.csv'
+        random_filename = resource.file.url[resource.file.url.rfind('/'):]
+        assert random_filename.endswith('.csv')
+        assert len(random_filename.split('.')[0].strip('/')) == 24
