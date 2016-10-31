@@ -470,6 +470,8 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         self._test_resource('test_image_four', tenure)
         self._test_resource('test_image_five', party_two)
 
+        assert XFormSubmission.objects.filter(user=self.user).count() == 1
+
     def test_form_repeat_with_one_party(self):
         self._create_questionnaire('t_questionnaire_repeat_party', 3)
         data = self._submission(form='submission_party_one_repeat',
