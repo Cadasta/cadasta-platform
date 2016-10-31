@@ -1,5 +1,84 @@
 # Change Log
 
+## [v1.2.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0-alpha.3) (2016-10-28)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.2...v1.2.0-alpha.3)
+
+**Implemented enhancements:**
+
+- Make import data pages wizard-ized [\#793](https://github.com/Cadasta/cadasta-platform/issues/793)
+- Increase length of choices tab labels in questionnaires from 200 chars to 2500 chars [\#775](https://github.com/Cadasta/cadasta-platform/issues/775)
+
+**Fixed bugs:**
+
+- Uploading a XLSForm with empty labels throws IntegrityError [\#869](https://github.com/Cadasta/cadasta-platform/issues/869)
+- Internal server error 500 when trying to download data from a large project [\#857](https://github.com/Cadasta/cadasta-platform/issues/857)
+- Geometry editing: cancel prevents further editing [\#781](https://github.com/Cadasta/cadasta-platform/issues/781)
+
+**Closed issues:**
+
+- Data import: limit csv file size [\#834](https://github.com/Cadasta/cadasta-platform/issues/834)
+- Improve Performance django-jsonattrs [\#824](https://github.com/Cadasta/cadasta-platform/issues/824)
+
+**Merged pull requests:**
+
+- Add separate cache settings for jsonattrs [\#879](https://github.com/Cadasta/cadasta-platform/pull/879) ([amplifi](https://github.com/amplifi))
+- Add useful \_\_repr\_\_ methods to models [\#878](https://github.com/Cadasta/cadasta-platform/pull/878) ([oliverroick](https://github.com/oliverroick))
+- Fix \#857: Imported resources saved to wrong location [\#877](https://github.com/Cadasta/cadasta-platform/pull/877) ([bjohare](https://github.com/bjohare))
+- Design for data import [\#871](https://github.com/Cadasta/cadasta-platform/pull/871) ([clash99](https://github.com/clash99))
+- Fix None for translated labels [\#870](https://github.com/Cadasta/cadasta-platform/pull/870) ([ian-ross](https://github.com/ian-ross))
+
+## [v1.2.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0-alpha.2) (2016-10-26)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.1...v1.2.0-alpha.2)
+
+**Fixed bugs:**
+
+- Imported resources missing header row [\#860](https://github.com/Cadasta/cadasta-platform/issues/860)
+- Import tool fails to import tenure\_relationship\_attributes [\#812](https://github.com/Cadasta/cadasta-platform/issues/812)
+
+**Closed issues:**
+
+- API / Platform Errors when adding projects and users using API or Platform [\#866](https://github.com/Cadasta/cadasta-platform/issues/866)
+
+**Merged pull requests:**
+
+- Fix \#866 -- Makeing sure organizaiton roles are always unique [\#868](https://github.com/Cadasta/cadasta-platform/pull/868) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.2.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0-alpha.1) (2016-10-26)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.1.0...v1.2.0-alpha.1)
+
+**Implemented enhancements:**
+
+- Add support for select\_multiple attributes to data import [\#791](https://github.com/Cadasta/cadasta-platform/issues/791)
+- Add an indicator to indicate which fields are required in all of our HTML forms [\#357](https://github.com/Cadasta/cadasta-platform/issues/357)
+- Add client-side form validation where possible [\#322](https://github.com/Cadasta/cadasta-platform/issues/322)
+- User list page should also display the user's full name [\#316](https://github.com/Cadasta/cadasta-platform/issues/316)
+- uWSGI needs env vars [\#864](https://github.com/Cadasta/cadasta-platform/pull/864) ([amplifi](https://github.com/amplifi))
+
+**Fixed bugs:**
+
+- Standard questionnaire making platform error for new projects [\#862](https://github.com/Cadasta/cadasta-platform/issues/862)
+- Project resources view Attach button should not be visible to users who doesn't have permission to add resources [\#835](https://github.com/Cadasta/cadasta-platform/issues/835)
+- Page and permissions caching [\#714](https://github.com/Cadasta/cadasta-platform/issues/714)
+- Long xform errors break layout [\#678](https://github.com/Cadasta/cadasta-platform/issues/678)
+
+**Closed issues:**
+
+- Reset button ideally should not be present in the Edit Profile screen [\#844](https://github.com/Cadasta/cadasta-platform/issues/844)
+- Error running manage.py loadpolicies [\#836](https://github.com/Cadasta/cadasta-platform/issues/836)
+- Reverse full name and user name to be consistent with new pattern [\#818](https://github.com/Cadasta/cadasta-platform/issues/818)
+
+**Merged pull requests:**
+
+- Update changelog [\#867](https://github.com/Cadasta/cadasta-platform/pull/867) ([amplifi](https://github.com/amplifi))
+- Add import support for select\_multiple attribute types and tenure relationship attributes [\#865](https://github.com/Cadasta/cadasta-platform/pull/865) ([bjohare](https://github.com/bjohare))
+- Try to fix non-determinism in tests [\#856](https://github.com/Cadasta/cadasta-platform/pull/856) ([ian-ross](https://github.com/ian-ross))
+- Parsley integration [\#852](https://github.com/Cadasta/cadasta-platform/pull/852) ([clash99](https://github.com/clash99))
+- First round of performance improvements [\#850](https://github.com/Cadasta/cadasta-platform/pull/850) ([ian-ross](https://github.com/ian-ross))
+- Display username first then full name on projects permissions page [\#841](https://github.com/Cadasta/cadasta-platform/pull/841) ([karenc](https://github.com/karenc))
+- Allow accounts loadpolicies command to be run on its own [\#839](https://github.com/Cadasta/cadasta-platform/pull/839) ([karenc](https://github.com/karenc))
+- Project resource view 'Attach' button hiding from users who doesn't have permission [\#838](https://github.com/Cadasta/cadasta-platform/pull/838) ([manoramahp](https://github.com/manoramahp))
+- Display user's full name on user list page [\#837](https://github.com/Cadasta/cadasta-platform/pull/837) ([karenc](https://github.com/karenc))
+
 ## [v1.1.0](https://github.com/Cadasta/cadasta-platform/tree/v1.1.0) (2016-10-20)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.1.0-alpha.1...v1.1.0)
 
