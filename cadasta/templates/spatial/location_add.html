@@ -35,11 +35,15 @@
 <script>
   $(document).ready(function () {
     $(window).on('map:init', function(e) {
-      var map = e.originalEvent.detail.map;
-      var options = e.originalEvent.detail.options;
-      add_map_controls(map);
+      if (e.detail) {
+        var detail = e.detail;
+      } else {
+        var detail = e.originalEvent.detail;
+      }
+      var options = detail.options;
+      add_map_controls(detail.map);
 
-      switch_layer_controls(map, options);
+      switch_layer_controls(detail.map, options);
 
       // TODO: It seems Leaflet has a bug with L.geoJson()
       // not returning the correct bounds (see #377 for details)
@@ -54,13 +58,13 @@
       {% endif %}
       var spatialUnits = {{ geojson|safe }};
 
-      renderFeatures(map, projectExtent, spatialUnits, trans, 'project');
+      renderFeatures(detail.map, projectExtent, spatialUnits, trans, 'project');
 
       var orgSlug = '{{ object.organization.slug }}';
       var projectSlug = '{{ object.slug }}';
       var url = '/api/v1/organizations/'
               + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
-      add_spatial_resources(map, url);
+      add_spatial_resources(detail.map, url);
     });
 
     $('.datepicker').datepicker({

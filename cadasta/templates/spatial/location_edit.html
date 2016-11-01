@@ -32,8 +32,13 @@
 <script>
   $(document).ready(function () {
     $(window).on('map:init', function(e) {
-      var map = e.originalEvent.detail.map;
-      var options = e.originalEvent.detail.options;
+      if (e.detail) {
+        var detail = e.detail;
+      } else {
+        var detail = e.originalEvent.detail;
+      }
+      var map = detail.map;
+      var options = detail.options;
       switch_layer_controls(map, options);
 
       var orgSlug = '{{ object.organization.slug }}';
