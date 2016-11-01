@@ -15,9 +15,7 @@ from django.forms import ValidationError
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
 from leaflet.forms.widgets import LeafletWidget
-from party.models import Party
 from questionnaires.models import Questionnaire
-from spatial.choices import TYPE_CHOICES as LOCATION_TYPE_CHOICES
 from tutelary.models import check_perms
 
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
@@ -32,9 +30,6 @@ QUESTIONNAIRE_TYPES = [
     'application/msexcel',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-]
-DATA_IMPORT_TYPES = [
-    'text/csv'
 ]
 
 
@@ -506,15 +501,16 @@ class SelectImportForm(forms.Form):
         ]
     }
     MAX_FILE_SIZE = 512000
+    TYPE_CHOICES = (('xls', 'XLS'), ('shp', 'SHP'),
+                    ('csv', 'CSV'))
+    ENTITY_TYPE_CHOICES = (('SU', 'Locations'), ('PT', 'Parties'))
 
-    class Media:
-        js = ('js/import.js',)
-
-    CHOICES = (('xls', 'XLS'), ('shp', 'SHP'),
-               ('csv', 'CSV'))
     name = forms.CharField(required=True, max_length=200)
     type = forms.ChoiceField(
-        choices=CHOICES, initial='csv', widget=forms.RadioSelect)
+        choices=TYPE_CHOICES, initial='csv', widget=forms.RadioSelect)
+    entity_types = forms.MultipleChoiceField(
+        choices=ENTITY_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple(),
+        required=False, initial=[choice[0] for choice in ENTITY_TYPE_CHOICES])
     file = forms.FileField(required=True)
     description = forms.CharField(
         required=False, max_length=2500, widget=forms.Textarea)
@@ -554,6 +550,15 @@ class SelectImportForm(forms.Form):
         if file:
             return file.name
 
+    def clean_entity_types(self):
+        entity_types = self.cleaned_data.get('entity_types', None)
+        if entity_types is None or len(entity_types) == 0:
+            self.add_error(
+                'entity_types', _('Select at least one data type.')
+            )
+        else:
+            return entity_types
+
 
 class MapAttributesForm(forms.Form):
     attributes = forms.MultipleChoiceField(required=False)
@@ -566,11 +571,9 @@ class MapAttributesForm(forms.Form):
 
 
 class SelectDefaultsForm(forms.Form):
-    party_type = forms.ChoiceField(choices=Party.TYPE_CHOICES, required=True)
-    party_name_field = forms.CharField(required=True)
-    location_type = forms.ChoiceField(
-        choices=LOCATION_TYPE_CHOICES, required=True
-    )
+    party_type_field = forms.CharField(required=False)
+    party_name_field = forms.CharField(required=False)
+    location_type_field = forms.CharField(required=False)
     geometry_field = forms.CharField(required=False)
 
     def __init__(self, project, user, *args, **kwargs):

@@ -1,9 +1,12 @@
 import json
+import os
+
 import pytest
 
 from accounts.tests.factories import UserFactory
-from core.tests.utils.cases import UserTestCase, FileStorageTestCase
+from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -1271,6 +1274,8 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         ensure_dirs()
         self.project = ProjectFactory.create()
+        geometry = 'SRID=4326;POINT (30 10)'
+        SpatialUnitFactory.create(project=self.project, geometry=geometry)
         self.user = UserFactory.create()
 
     def setup_url_kwargs(self):
@@ -1365,14 +1370,16 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.geoshape_csv = '/organization/tests/files/test_geoshape.csv'
         self.geotrace_csv = '/organization/tests/files/test_geotrace.csv'
         self.invalid_file_type = '/organization/tests/files/test_invalid.kml'
-        self.missing_attr_csv = '/organization/tests/files/missing_attr.csv'
+        self.valid_xls = '/organization/tests/files/test_download.xlsx'
 
         self.project = ProjectFactory.create(
-            name='Test CSV Import',
-            slug='test-csv-import', organization=self.org)
+            name='Test Imports',
+            slug='test-imports', organization=self.org)
         xlscontent = self.get_file(
-            '/organization/tests/files/uttaran_test.xlsx', 'rb')
+            '/organization/tests/files/uttaran_test.xlsx', 'rb'
+        )
         form = self.storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+
         Questionnaire.objects.create_from_form(
             xls_form=form,
             project=self.project
@@ -1381,18 +1388,33 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert 3 == Schema.objects.all().count()
         assert 42 == Attribute.objects.all().count()
 
-        self.ATTRIBUTES = [
-            'deed_of_land', 'amount_othersland', 'educational_qualification',
-            'name_mouza', 'land_calculation', 'how_aquire_landwh',
-            'female_member', 'mutation_of_land', 'amount_agriland',
-            'nid_number', 'class_hh', 'j_l', 'how_aquire_landt',
-            'boundary_conflict', 'dakhal_on_land', 'village_name',
-            'how_aquire_landp', 'how_aquire_landd', 'ownership_conflict',
-            'occupation_hh', 'others_conflict', 'how_aquire_landm',
-            'khatain_of_land', 'male_member', 'mobile_no', 'how_aquire_landw',
-            'everything', 'name_father_hus', 'tenure_name', 'tenure_notes',
-            'location_problems'
+        self.party_attributes = [
+            'party::educational_qualification', 'party::name_mouza',
+            'party::j_l', 'party::name_father_hus', 'party::village_name',
+            'party::mobile_no', 'party::occupation_hh', 'party::class_hh'
         ]
+        self.location_attributes = [
+            'spatialunit::deed_of_land', 'spatialunit::amount_othersland',
+            'spatialunit::land_calculation', 'spatialunit::how_aquire_landwh',
+            'spatialunit::female_member', 'spaitalunit::mutation_of_land',
+            'spatialunit::amount_agriland', 'spatialunit::nid_number',
+            'spatialunit::how_aquire_landt', 'spatialunit::boundary_conflict',
+            'spatialunit::dakhal_on_land', 'spatialunit::how_aquire_landp',
+            'spatialunit::how_aquire_landd', 'spatialunit::ownership_conflict',
+            'spatialunit::others_conflict', 'spatialunit::how_aquire_landm',
+            'spatialunit::khatain_of_land', 'spatialunit::male_member',
+            'spatialunit::how_aquire_landw', 'spatialunit::everything',
+            'spatialunit::location_problems'
+        ]
+        self.tenure_attributes = [
+            'tenurerelationship::tenure_name',
+            'tenurerelationship::tenure_notes'
+        ]
+
+        self.ATTRIBUTES = (
+            self.party_attributes + self.location_attributes +
+            self.tenure_attributes
+        )
         self.EXTRA_ATTRS = [
             'conflicts_resolution', 'current_address', 'data_collector_name',
             'gender', 'howconflict_resolution', 'land_amount', 'land_class',
@@ -1408,7 +1430,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'project_data_import_wizard-current_step': 'select_file',
             'select_file-name': 'Test Imports',
             'select_file-description': 'A description of the import',
-            'select_file-type': 'csv'
+            'select_file-type': 'csv',
+            'select_file-entity_types': ['PT', 'SU']
         }
         self.MAP_ATTRIBUTES_POST_DATA = {
             'project_data_import_wizard-current_step': 'map_attributes',
@@ -1419,11 +1442,11 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.SELECT_DEFAULTS_POST_DATA = {
             'project_data_import_wizard-current_step': 'select_defaults',
             'select_defaults-party_name_field': 'name_of_hh',
-            'select_defaults-file': (self.path +
-                                     '/core/media/test/temp/test.csv'),
-            'select_defaults-party_type': 'IN',
-            'select_defaults-location_type': 'PA',
+            'select_defaults-file': (settings.MEDIA_ROOT +
+                                     '/temp/test.csv'),
+            'select_defaults-party_type_field': 'party_type',
             'select_defaults-geometry_field': 'location_geometry',
+            'select_defaults-location_type_field': 'location_type'
         }
 
     def _get(self, status=None, check_content=False, login_redirect=False):
@@ -1491,11 +1514,80 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         assert select_defaults_response.status_code == 302
 
-        assert ('/organizations/test-org/projects/test-csv-import/' in
+        assert ('/organizations/test-org/projects/test-imports/' in
                 select_defaults_response['location'])
 
         proj = Project.objects.get(
-            organization=self.org, name='Test CSV Import')
+            organization=self.org, name='Test Imports')
+        assert Party.objects.filter(project_id=proj.pk).count() == 10
+        assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 10
+        assert Resource.objects.filter(project_id=proj.pk).count() == 1
+        assert TenureRelationship.objects.filter(
+            project_id=proj.pk).count() == 10
+
+        for su in SpatialUnit.objects.filter(project_id=proj.pk).all():
+            if su.geometry is not None:
+                assert type(su.geometry) is Point
+
+        # test resource creation
+        resource = Resource.objects.filter(project_id=proj.pk).first()
+        assert resource.original_file == 'test.csv'
+        assert resource.mime_type == 'text/csv'
+        random_filename = resource.file.url[resource.file.url.rfind('/'):]
+        assert random_filename.endswith('.csv')
+        assert len(random_filename.split('.')[0].strip('/')) == 24
+
+    def test_full_flow_valid_xls(self):
+        mime = 'application/vnd.openxmlformats-'
+        'officedocument.spreadsheetml.sheet'
+        self.client.force_login(self.user)
+        xlsfile = self.get_file(self.valid_xls, 'rb')
+        file = SimpleUploadedFile('test_download.xlsx', xlsfile, mime)
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        post_data['select_file-is_resource'] = True
+        post_data['select_file-type'] = 'xls'
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+        defaults_post_data = self.SELECT_DEFAULTS_POST_DATA.copy()
+        defaults_post_data['select_defaults-file'] = (
+            settings.MEDIA_ROOT + '/temp/test_download.xlsx'
+        )
+        defaults_post_data['select_defaults-party_name_field'] = 'name'
+        defaults_post_data['select_defaults-party_type_field'] = 'type'
+        defaults_post_data[
+            'select_defaults-geometry_field'] = 'geometry.ewkt'
+        defaults_post_data[
+            'select_defaults-location_type_field'] = 'type'
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            defaults_post_data
+        )
+        assert select_defaults_response.status_code == 302
+
+        assert ('/organizations/test-org/projects/test-imports/' in
+                select_defaults_response['location'])
+
+        proj = Project.objects.get(
+            organization=self.org, name='Test Imports')
         assert Party.objects.filter(project_id=proj.pk).count() == 10
         assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 10
         assert Resource.objects.filter(project_id=proj.pk).count() == 1
@@ -1507,11 +1599,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
                 assert type(su.geometry) is Point
 
         resource = Resource.objects.filter(project_id=proj.pk).first()
-        assert resource.original_file == 'test.csv'
-        assert resource.mime_type == 'text/csv'
-        random_filename = resource.file.url[resource.file.url.rfind('/'):]
-        assert random_filename.endswith('.csv')
-        assert len(random_filename.split('.')[0].strip('/')) == 24
+        assert resource.original_file == 'test_download.xlsx'
 
     def test_full_flow_invalid_value(self):
         self.client.force_login(self.user)
@@ -1547,7 +1635,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert select_defaults_response.status_code == 200
 
         proj = Project.objects.get(
-            organization=self.org, name='Test CSV Import')
+            organization=self.org, name='Test Imports')
         assert Party.objects.filter(project_id=proj.pk).count() == 0
         assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 0
         assert TenureRelationship.objects.filter(
@@ -1588,7 +1676,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert select_defaults_response.status_code == 200
 
         proj = Project.objects.get(
-            organization=self.org, name='Test CSV Import')
+            organization=self.org, name='Test Imports')
         assert Party.objects.filter(project_id=proj.pk).count() == 0
         assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 0
         assert TenureRelationship.objects.filter(
@@ -1596,6 +1684,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_wizard_goto_step(self):
         self.client.force_login(self.user)
+
+        # post first page data
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
         post_data = self.SELECT_FILE_POST_DATA.copy()
@@ -1609,16 +1699,49 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         assert select_file_response.status_code == 200
 
-        map_attributes_response = self.client.post(
+        # test file upload saved to disk
+        assert os.path.exists(settings.MEDIA_ROOT + '/temp/test.csv')
+
+        # go to select defaults page
+        select_defaults_response = self.client.post(
             reverse('organization:project-import',
                     kwargs={
                         'organization': self.org.slug,
                         'project': self.project.slug}),
             self.MAP_ATTRIBUTES_POST_DATA
         )
-        assert map_attributes_response.status_code == 200
+        assert select_defaults_response.status_code == 200
+
+        # return to map attributes page
         post_data = self.SELECT_DEFAULTS_POST_DATA.copy()
         post_data['wizard_goto_step'] = 'map_attributes'
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert map_attributes_response.status_code == 200
+
+        # return to first page
+        post_data = {}
+        post_data['wizard_goto_step'] = 'select_file'
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        # test for uploaded file removal when navigating back to first page
+        assert not os.path.exists(settings.MEDIA_ROOT + '/temp/test.csv')
+
+        # test goto select_defaults
+        post_data = self.SELECT_DEFAULTS_POST_DATA.copy()
+        post_data['wizard_goto_step'] = 'select_defaults'
         select_defaults_response = self.client.post(
             reverse('organization:project-import',
                     kwargs={
@@ -1627,17 +1750,6 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             post_data
         )
         assert select_defaults_response.status_code == 200
-
-        post_data = self.MAP_ATTRIBUTES_POST_DATA.copy()
-        post_data['wizard_goto_step'] = 'select_file'
-        map_attributes_response = self.client.post(
-            reverse('organization:project-import',
-                    kwargs={
-                        'organization': self.org.slug,
-                        'project': self.project.slug}),
-            post_data
-        )
-        assert map_attributes_response.status_code == 200
 
     def test_full_flow_valid_no_resource(self):
         self.client.force_login(self.user)
@@ -1673,11 +1785,11 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         assert select_defaults_response.status_code == 302
 
-        assert ('/organizations/test-org/projects/test-csv-import/' in
+        assert ('/organizations/test-org/projects/test-imports/' in
                 select_defaults_response['location'])
 
         proj = Project.objects.get(
-            organization=self.org, name='Test CSV Import')
+            organization=self.org, name='Test Imports')
         assert Party.objects.filter(project_id=proj.pk).count() == 10
         assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 10
         assert Resource.objects.filter(project_id=proj.pk).count() == 0

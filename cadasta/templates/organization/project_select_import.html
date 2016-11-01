@@ -1,80 +1,108 @@
 {% extends "organization/project_import_wrapper.html" %}
-
 {% load i18n %}
 {% load widget_tweaks %}
-
-{% block extra_script %} {{ form.media }} {% endblock %}
-
+{% block extra_script %}
+{{ form.media }}
+{% endblock %}
 {% block step_content %}
-
 {{ wizard.management_form }}
 {% if wizard.form.forms %}
-    {{ wizard.form.management_form }}
-    {% for form in wizard.form.forms %}
-        {{ form }}
-    {% endfor %}
+{{ wizard.form.management_form }}
+{% for form in wizard.form.forms %}
+{{ form }}
+{% endfor %}
 {% else %}
 
-  <div class="panel panel-default">
+<div class="panel panel-default">
     <div class="panel-body">
-      <h3>{% trans "Import details" %}</h3>
-      <div class="row">
-        <div class="col-md-9">
-          {{ wizard.form.non_field_errors }}
-          <div class="form-group{% if form.name.errors %} has-error{% endif %}">
-            <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Import name" %}</label>
-            {% render_field form.name class+="form-control" data-parsley-required="true" %}
-            <div class="error-block">{{ form.name.errors }}</div>
-          </div>
-          <div class="form-group{% if form.description.errors %} has-error{% endif %}">
-            <label class="control-label" for="{{ form.description.id_for_label }}">{% trans "Import description" %}</label>
-            {% render_field form.description class+="form-control" %}
-            <div class="error-block">{{ form.description.errors }}</div>
-          </div>
+        <h3>{% trans "Import details" %}</h3>
+        <div class="row">
+            <div class="col-md-9">
+                {{ wizard.form.non_field_errors }}
+                <div class="form-group{% if form.name.errors %} has-error{% endif %}">
+                    <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Import name" %}</label>
+                    {% render_field form.name class+="form-control" data-parsley-required="true" %}
+                    <div class="error-block">{{ form.name.errors }}</div>
+                </div>
+                <div class="form-group{% if form.description.errors %} has-error{% endif %}">
+                    <label class="control-label" for="{{ form.description.id_for_label }}">{% trans "Import description" %}</label>
+                    {% render_field form.description class+="form-control" %}
+                    <div class="error-block">{{ form.description.errors }}</div>
+                </div>
+            </div>
         </div>
-      </div>
-      <h3>{% trans "Import file" %}</h3>
-      <div class="row">
-        <div class="col-md-9">
-          <ul class="list-unstyled spacing-lg hidden">
-            <div class="form-group{% if wizard.form.type.errors %} has-error{% endif %}">
-              <label for="{{ wizard.form.type.id_for_label }}">{% trans "Select the type of data to import" %}</label>
-              <li class="radio">
-                <label class="control-label">
-                  <input type="radio" name="select_file-type" id="import_csv" value="csv" {% if wizard.form.type.value == 'csv' %}checked{% endif %}> {% trans "CSV" %}
-                  <small>{% trans "Only CSV imports are currently supported" %}</small>
-                </label>
-              </li>
+        <h3>{% trans "Import data" %}</h3>
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="list-unstyled spacing-lg pull-left">
+                    <div class="form-group{% if wizard.form.type.errors %} has-error{% endif %}">
+                        <label class="control-label required" for="{{ wizard.form.type.id_for_label }}">{% trans "Select the import file format" %}</label>
+                        <li class="radio">
+                            <label class="control-label">
+                                <input type="radio" name="select_file-type" id="import_csv" value="csv" {% if wizard.form.type.value == 'csv' %}checked{% endif %}> {% trans "CSV" %}
+                                <small>{% trans "A file in CSV format." %}</small>
+                            </label>
+                        </li>
+                        <li class="radio">
+                            <label class="control-label">
+                                <input type="radio" name="select_file-type" id="import_xls" value="xls" {% if wizard.form.type.value == 'xls' %}checked{% endif%}> {% trans "XLSX" %}
+                                <small>{% trans "A file in XLSX spreadsheet format." %}</small>
+                            </label>
+                        </li>
+                    </div>
+                </ul>
             </div>
-          </ul>
-          <div class="form-group{% if wizard.form.file.errors %} has-error{% endif %}">
-            <label class="control-label required" for="{{ wizard.form.file.id_for_label }}">{% trans "Select the file to import" %}</label>
-            <div class="well file-well">
-              {{ form.file }}
-              <p class="help-block">{% trans "Accepted file types: csv" %}</p>
+            <div class="col-md-6">
+                <ul class="list-unstyled spacing-lg pull-left">
+                    <div class="form-group{% if wizard.form.entity_types.errors %} has-error{% endif %}">
+                        <label class="control-label required" for="{{ wizard.form.entity_types.id_for_label }}">{% trans "Select the type of data to import" %}</label>
+                        <div class="error-block">
+                            {{ form.entity_types.errors }}
+                        </div>
+                        <li class="checkbox">
+                            {{ wizard.form.entity_types.values_list }}
+                            <label class="control-label" for="id_select_file-entity_types_parties">
+                                <input type="checkbox" id="id_select_file-entity_types_parties" name="select_file-entity_types" type="checkbox" value="PT" data-parsley-multiple="select_file-entity_types" {% if 'PT' in wizard.form.entity_types.value %}checked{% endif %}> {% trans "Party" %}
+                                <small>{% trans "Import party data." %}</small>
+                            </label>
+                        </li>
+                        <li class="checkbox">
+                            <label class="control-label" for="id_select_file-entity_types_locations">
+                                <input type="checkbox" id="id_select_file-entity_types_locations" name="select_file-entity_types" type="checkbox" value="SU" data-parsley-multiple="select_file-entity_types" {% if 'SU' in wizard.form.entity_types.value %}checked{% endif %}> {% trans "Location" %}
+                                <small>{% trans "Import location data." %}</small>
+                            </label>
+                        </li>
+                    </div>
+                </ul>
             </div>
-            <div class="error-block">{{ wizard.form.file.errors }}</div>
-          </div>
-          <div class="form-group hidden">
-            <div class="checkbox">
-              <label class="control-label" for="{{ wizard.form.is_resource.id_for_label }}">
-                {{ form.is_resource }}
-                {% trans "Include import file in project resources" %}
-              </label>
-            </div>
-          </div>
         </div>
-      </div>
+        <div class="row">
+            <div class="col-md-9">
+                <div class="form-group{% if wizard.form.file.errors %} has-error{% endif %}">
+                    <label class="control-label required" for="{{ wizard.form.file.id_for_label }}">{% trans "Select the file to import" %}</label>
+                    <div class="well file-well">
+                        {{ form.file }}
+                        <p class="help-block">{% trans "Accepted file types: csv, xlsx"%}</p>
+                    </div>
+                    <div class="error-block">{{ wizard.form.file.errors }}</div>
+                </div>
+
+                <div class="form-group hidden">
+                    <div class="checkbox">
+                        <label class="control-label" for="{{ wizard.form.is_resource.id_for_label }}">
+                            {{ form.is_resource }} {% trans "Include import file in project resources" %}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="panel-footer panel-buttons clearfix">
-      <button id="select_file-next" class="btn btn-primary pull-right" type="submit">
-        {% trans 'Next' %} <span class="glyphicon glyphicon-triangle-right"></span>
-      </button>
-      <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
+        <button id="select_file-next" class="btn btn-primary pull-right" type="submit">
+            {% trans 'Next' %} <span class="glyphicon glyphicon-triangle-right"></span>
+        </button>
+        <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
     </div>
+</div>
 
-  </div>
-
-{% endif %}
-
-{% endblock %}
+{% endif %} {% endblock %}

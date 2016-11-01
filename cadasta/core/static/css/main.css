@@ -5946,6 +5946,19 @@ textarea.form-control {
       font-weight: 300;
       display: block; }
 
+.spacing-md {
+  margin-top: 15px; }
+  .spacing-md li {
+    margin-left: 15px;
+    margin-bottom: 15px; }
+    .spacing-md li label {
+      font-size: 16px;
+      font-weight: 600; }
+    .spacing-md li small {
+      margin-top: 6px;
+      font-weight: 300;
+      display: block; }
+
 .input-group-addon {
   background: #f2f4f7; }
 

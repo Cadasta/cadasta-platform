@@ -1,3 +1,4 @@
+import importlib
 import os
 from collections import OrderedDict
 
@@ -23,7 +24,6 @@ from resources.models import ContentObject, Resource
 from . import mixins
 from .. import messages as error_messages
 from .. import forms
-from ..importers import csv
 from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
@@ -785,16 +785,31 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         if goto_step == 'map_attributes':
             file = self.storage.get_step_files(
                 'select_file')['select_file-file']
-            path = self.file_storage.path(file.name)
-            importer = csv.CSVImporter(
-                project=self.get_project(), path=path
+            type = self.storage.get_step_data('select_file')[
+                'select_file-type']
+            entity_types = self.storage.get_step_data('select_file').getlist(
+                'select_file-entity_types'
             )
+            path = self.file_storage.path(file.name)
+            importer = self._get_importer(type, path)
             (attr_map,
-                extra_attrs, extra_headers) = importer.get_attribute_map()
+                extra_attrs, extra_headers) = importer.get_attribute_map(
+                    type, entity_types.copy())
             return self.render(
                 form, attr_map=attr_map,
                 extra_attrs=extra_attrs, extra_headers=extra_headers, **kwargs
             )
+        if goto_step == 'select_file':
+            # delete file if user navigates back to first page
+            form_key = 'select_file'
+            form_obj = self.get_form(
+                step=form_key,
+                data=self.storage.get_step_data(form_key),
+                files=self.storage.get_step_files(form_key)
+            )
+            file = form_obj.files['select_file-file']
+            self.file_storage.delete(file.name)
+            return self.render(form_obj, **kwargs)
         return self.render(form)
 
     def render_next_step(self, form, **kwargs):
@@ -807,12 +822,17 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         self.storage.current_step = next_step
         if next_step == 'map_attributes':
             file = self.request.FILES.get('select_file-file')
-            path = self.file_storage.path(file.name)
-            importer = csv.CSVImporter(
-                project=self.get_project(), path=path
+            type = self.storage.get_step_data(
+                'select_file').get('select_file-type')
+            entity_types = self.storage.get_step_data('select_file').getlist(
+                'select_file-entity_types'
             )
+            path = self.file_storage.path(file.name)
+            importer = self._get_importer(type, path)
             (attr_map,
-                extra_attrs, extra_headers) = importer.get_attribute_map()
+                extra_attrs, extra_headers) = importer.get_attribute_map(
+                    type, entity_types.copy()
+            )
             return self.render(
                 form, attr_map=attr_map,
                 extra_attrs=extra_attrs, extra_headers=extra_headers, **kwargs
@@ -820,8 +840,16 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         if next_step == 'select_defaults':
             heads = self.request.POST.get('extra_headers', None)
             available_headers = heads.split(',')
+            entity_types = self.storage.get_step_data('select_file').getlist(
+                'select_file-entity_types'
+            )
+            unique_headers = []
+            for header in available_headers:
+                if header not in unique_headers:
+                    unique_headers.append(header)
             return self.render(
-                new_form, available_headers=available_headers, **kwargs
+                new_form, available_headers=unique_headers,
+                entity_types=entity_types, **kwargs
             )
 
     def done(self, form_list, **kwargs):
@@ -832,7 +860,11 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         is_resource = form_data[0]['is_resource']
         original_file = form_data[0]['original_file']
         file = form_data[0]['file']
-
+        type = self.storage.get_step_data(
+            'select_file').get('select_file-type')
+        entity_types = self.storage.get_step_data('select_file').getlist(
+            'select_file-entity_types'
+        )
         path = self.file_storage.path(file.name)
         map_attrs_data = self.storage.get_step_data('map_attributes')
         project = self.get_project()
@@ -840,16 +872,16 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         config_dict = {
             'project': project,
             'file': path,
+            'type': type,
+            'entity_types': entity_types.copy(),
             'party_name_field': form_data[2]['party_name_field'],
-            'party_type': form_data[2]['party_type'],
-            'location_type': form_data[2]['location_type'],
+            'party_type_field': form_data[2]['party_type_field'],
+            'location_type_field': form_data[2]['location_type_field'],
             'geometry_field': form_data[2]['geometry_field'],
             'attributes': map_attrs_data.getlist('attributes', None),
         }
 
-        importer = csv.CSVImporter(
-            project=self.get_project(), path=path
-        )
+        importer = self._get_importer(type, path)
         importer.import_data(config_dict)
 
         if is_resource:
@@ -910,3 +942,11 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             )
         self.storage.reset()
         return done_response
+
+    def _get_importer(self, type, path):
+        fqn = settings.IMPORTERS.get(type)
+        parts = fqn.rpartition('.')
+        module = importlib.import_module(parts[0])
+        clazz = parts[-1]
+        importer = getattr(module, clazz)
+        return importer(project=self.get_project(), path=path)
