@@ -20,7 +20,12 @@
 <script>
  $(document).ready(function () {
    $(window).on('map:init', function(e) {
-      add_map_controls(e.originalEvent.detail.map);
+      if (e.detail) {
+        var map = e.detail.map;
+      } else {
+        var map = e.originalEvent.detail.map;
+      }
+      add_map_controls(map);
 
       // Enable edit mode on map load and save the geometry on page save
       setTimeout(enableMapEditMode, 500);
