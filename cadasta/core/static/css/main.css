@@ -4297,10 +4297,25 @@ ul.resource-actions > li {
   border-right: solid 1px #e7e8ea;
   text-align: center; }
   .stats li .num {
-    font-size: 48px;
-    font-weight: 600; }
+    font-size: 28px;
+    font-size: 2.4vw;
+    font-weight: 600;
+    font-family: "Roboto Condensed", "Roboto", Helvetica, "Noto Sans Bengali", sans-serif;
+    letter-spacing: -1px; }
   .stats li:last-child {
     border-right: none; }
+
+@media (max-width: 992px) {
+  .stats li .num {
+    font-size: 36px; } }
+
+@media (max-width: 768px) {
+  .stats li .num {
+    font-size: 28px; } }
+
+@media (max-width: 480px) {
+  .stats li .num {
+    font-size: 21px; } }
 
 /* =Map location details in right column
 -------------------------------------------------------------- */

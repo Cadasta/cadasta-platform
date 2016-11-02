@@ -204,12 +204,33 @@
     border-right: solid 1px $table-border-color;
     text-align: center;
     .num {
-      font-size: 48px;
+      font-size: 28px;
+      font-size: 2.4vw;
       font-weight: 600;
+      font-family: $font-family-sans-serif-alt;
+      letter-spacing: -1px;
     }
     &:last-child {
       border-right: none;
     }
+  }
+}
+
+@media (max-width: $screen-md-min) {
+ .stats li .num {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: $screen-sm-min) {
+ .stats li .num {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: $screen-xs-min) {
+ .stats li .num {
+    font-size: 21px;
   }
 }
 
