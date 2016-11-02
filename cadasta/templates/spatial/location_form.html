@@ -17,7 +17,7 @@
         <div class="panel-body">
           <h3>{% trans "Draw location on map" %}</h3>
           <div class="clearfix form-group{% if form.geometry.errors %} has-error{% endif %}">
-            <label class="control-label required">1.{% trans "1. Use the tools provided on the left side of the map to mark your new location." %}</label>
+            <label class="control-label required">{% trans "1. Use the tools provided on the left side of the map to mark your new location." %}</label>
             <div class="error-block">{{ form.geometry.errors }}</div>
           </div>
           <div class="form-group{% if form.type.errors %} has-error{% endif %}">
