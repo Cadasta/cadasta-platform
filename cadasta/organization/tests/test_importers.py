@@ -1,10 +1,6 @@
-import os
-
 import pytest
 
-from buckets.test.storage import FakeS3Storage
-from core.tests.utils.cases import UserTestCase
-from django.conf import settings
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from django.contrib.gis.geos import LineString, Point, Polygon
 from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
@@ -16,8 +12,6 @@ from spatial.models import SpatialUnit
 from ..importers import csv, exceptions
 from ..importers.base import Importer
 from ..tests.factories import ProjectFactory
-
-path = os.path.dirname(settings.BASE_DIR)
 
 
 class BaseImporterTest(UserTestCase, TestCase):
@@ -41,12 +35,11 @@ class BaseImporterTest(UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('clear_temp')
-class CSVImportTest(UserTestCase, TestCase):
+class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def setUp(self):
         super().setUp()
 
-        self.path = os.path.dirname(settings.BASE_DIR)
         self.valid_csv = '/organization/tests/files/test.csv'
         self.invalid_csv = '/organization/tests/files/test_invalid.csv'
         self.geoshape_csv = '/organization/tests/files/test_geoshape.csv'
@@ -57,11 +50,9 @@ class CSVImportTest(UserTestCase, TestCase):
         self.no_tenure_type = '/organization/tests/files/no_tenure_type.csv'
 
         self.project = ProjectFactory.create(name='Test CSV Import')
-        storage = FakeS3Storage()
-        xlscontent = open(
-            path + '/organization/tests/files/uttaran_test.xlsx', 'rb'
-        ).read()
-        form = storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+        xlscontent = self.get_file(
+            '/organization/tests/files/uttaran_test.xlsx', 'rb')
+        form = self.storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
         Questionnaire.objects.create_from_form(
             xls_form=form,
             project=self.project

@@ -1,30 +1,26 @@
-import os
 import json
 import pytest
-from django.conf import settings
 from django.test import TestCase
 
 from tutelary.models import Policy
 from skivvy import APITestCase
 
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from ..views import api
 from ..models import Questionnaire
 from .factories import QuestionnaireFactory
-from .utils import get_form
-
-path = os.path.dirname(settings.BASE_DIR)
 
 
 @pytest.mark.usefixtures('make_dirs')
-class QuestionnaireDetailTest(APITestCase, UserTestCase, TestCase):
+class QuestionnaireDetailTest(APITestCase, UserTestCase,
+                              FileStorageTestCase, TestCase):
     view_class = api.QuestionnaireDetail
 
     def setup_post_data(self):
-        form = get_form('xls-form')
+        form = self.get_form('xls-form')
         return {'xls_form': form}
 
     def setup_models(self):
@@ -88,7 +84,7 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase, TestCase):
         assert Questionnaire.objects.filter(project=self.prj).count() == 0
 
     def test_create_invalid_questionnaire(self):  #
-        data = {'xls_form': get_form('xls-form-invalid')}
+        data = {'xls_form': self.get_form('xls-form-invalid')}
         response = self.request(method='PUT', post_data=data, user=self.user)
 
         assert ("Unknown question type 'interger'." in

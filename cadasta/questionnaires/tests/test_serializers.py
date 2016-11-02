@@ -1,35 +1,20 @@
 import pytest
-import os
 from django.test import TestCase
-from django.conf import settings
-
-from buckets.test.storage import FakeS3Storage
 
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidXLSForm
 from core.tests.utils.files import make_dirs  # noqa
+from core.tests.utils.cases import FileStorageTestCase
 
 from . import factories
 from .. import serializers
 from ..models import Questionnaire
 
-path = os.path.dirname(settings.BASE_DIR)
-
 
 @pytest.mark.usefixtures('make_dirs')
-class QuestionnaireSerializerTest(TestCase):
-    def _get_form(self, form_name):
-
-        storage = FakeS3Storage()
-        file = open(
-            path + '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb'
-        ).read()
-        form = storage.save('xls-forms/{}.xlsx'.format(form_name), file)
-        return form
-
+class QuestionnaireSerializerTest(FileStorageTestCase, TestCase):
     def test_deserialize(self):
-        form = self._get_form('xls-form')
+        form = self.get_form('xls-form')
 
         project = ProjectFactory.create()
 
@@ -57,7 +42,7 @@ class QuestionnaireSerializerTest(TestCase):
         assert len(serializer.data['questions']) == 1
 
     def test_deserialize_invalid_form(self):
-        form = self._get_form('xls-form-invalid')
+        form = self.get_form('xls-form-invalid')
 
         project = ProjectFactory.create()
 

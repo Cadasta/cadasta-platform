@@ -12,6 +12,7 @@ from party.models import (PartyRelationship,
                           TenureRelationship)
 from spatial.models import SpatialRelationship
 from party import serializers
+from resources.serializers import ResourceSerializer
 from spatial.serializers import SpatialRelationshipReadSerializer
 from . import mixins
 from organization.views.mixins import ProjectMixin
@@ -31,7 +32,6 @@ class PartyList(APIPermissionRequiredMixin,
         'GET': 'party.list',
         'POST': update_permissions('party.create')
     }
-    # permission_filter_queryset = ('project.',)
 
     def get_perms_objects(self):
         return [self.get_project()]
@@ -52,6 +52,57 @@ class PartyDetail(APIPermissionRequiredMixin,
     }
 
 
+class PartyResourceList(APIPermissionRequiredMixin,
+                        mixins.PartyResourceMixin,
+                        generics.ListCreateAPIView):
+    serializer_class = ResourceSerializer
+    filter_backends = (filters.DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,)
+    filter_fields = ('archived',)
+    search_fields = ('name', 'description', 'file',)
+    ordering_fields = ('name', 'description', 'file',)
+    permission_required = {
+        'GET': 'party.resources.list',
+        'POST': update_permissions('party.resources.add')
+    }
+
+    def get_perms_objects(self):
+        return [self.get_object()]
+
+
+class PartyResourceDetail(APIPermissionRequiredMixin,
+                          mixins.PartyResourceMixin,
+                          generics.RetrieveUpdateDestroyAPIView):
+    def patch_actions(self, request):
+        if hasattr(request, 'data'):
+            if self.get_object().project.archived:
+                return False
+            is_archived = self.get_object().archived
+            new_archived = request.data.get('archived', is_archived)
+            if not is_archived and (is_archived != new_archived):
+                return ('party.resources.edit', 'party.resources.archive')
+        return 'party.resources.edit'
+
+    serializer_class = ResourceSerializer
+    permission_required = {
+        'GET': 'party.resources.view',
+        'PATCH': patch_actions,
+        'DELETE': patch_actions,
+    }
+    lookup_url_kwarg = 'resource'
+    lookup_field = 'id'
+
+    def get_perms_objects(self):
+        return [self.get_party()]
+
+    def get_object(self):
+        return self.get_resource()
+
+    def destroy(self, request, *args, **kwargs):
+        return self.detach_resource(self.kwargs['party'])
+
+
 class RelationshipList(APIPermissionRequiredMixin,
                        ProjectMixin,
                        APIView):
@@ -69,14 +120,14 @@ class RelationshipList(APIPermissionRequiredMixin,
 
         spatial_rels = []
         if (
-            'spatial_id' in kwargs and
+            'location' in kwargs and
             (rel_class is None or rel_class == 'spatial')
         ):
             manager = SpatialRelationship.objects
             spatial_rels = (
                 manager.filter(
-                    Q(su1=kwargs['spatial_id']) |
-                    Q(su2=kwargs['spatial_id'])
+                    Q(su1=kwargs['location']) |
+                    Q(su2=kwargs['location'])
                 )
             )
         serialized_spatial_rels = SpatialRelationshipReadSerializer(
@@ -100,9 +151,9 @@ class RelationshipList(APIPermissionRequiredMixin,
         tenure_rels = []
         if rel_class is None or rel_class == 'tenure':
             manager = TenureRelationship.objects
-            if 'spatial_id' in kwargs:
+            if 'location' in kwargs:
                 tenure_rels = (
-                    manager.filter(spatial_unit=kwargs['spatial_id'])
+                    manager.filter(spatial_unit=kwargs['location'])
                 )
             elif 'party_id' in kwargs:
                 tenure_rels = (
@@ -187,3 +238,55 @@ class TenureRelationshipDetail(APIPermissionRequiredMixin,
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TenureRelationshipResourceList(APIPermissionRequiredMixin,
+                                     mixins.TenureRelationshipResourceMixin,
+                                     generics.ListCreateAPIView):
+    serializer_class = ResourceSerializer
+    filter_backends = (filters.DjangoFilterBackend,
+                       filters.SearchFilter,
+                       filters.OrderingFilter,)
+    filter_fields = ('archived',)
+    search_fields = ('name', 'description', 'file',)
+    ordering_fields = ('name', 'description', 'file',)
+    permission_required = {
+        'GET': 'tenure_rel.resources.list',
+        'POST': update_permissions('tenure_rel.resources.add')
+    }
+
+    def get_perms_objects(self):
+        return [self.get_object()]
+
+
+class TenureRelationshipResourceDetail(APIPermissionRequiredMixin,
+                                       mixins.TenureRelationshipResourceMixin,
+                                       generics.RetrieveUpdateDestroyAPIView):
+    def patch_actions(self, request):
+        if hasattr(request, 'data'):
+            if self.get_object().project.archived:
+                return False
+            is_archived = self.get_object().archived
+            new_archived = request.data.get('archived', is_archived)
+            if not is_archived and (is_archived != new_archived):
+                return ('tenure_rel.resources.edit',
+                        'tenure_rel.resources.archive')
+        return 'tenure_rel.resources.edit'
+
+    serializer_class = ResourceSerializer
+    permission_required = {
+        'GET': 'tenure_rel.resources.view',
+        'PATCH': patch_actions,
+        'DELETE': patch_actions,
+    }
+    lookup_url_kwarg = 'resource'
+    lookup_field = 'id'
+
+    def get_perms_objects(self):
+        return [self.get_tenure_relationship()]
+
+    def get_object(self):
+        return self.get_resource()
+
+    def destroy(self, request, *args, **kwargs):
+        return self.detach_resource(self.kwargs['tenure_rel_id'])

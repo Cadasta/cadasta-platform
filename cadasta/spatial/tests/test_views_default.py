@@ -1,4 +1,3 @@
-import os
 import pytest
 import json
 from importlib import import_module
@@ -8,14 +7,13 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
-from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
 from skivvy import ViewTestCase
 
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
@@ -746,7 +744,8 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 @pytest.mark.usefixtures('clear_temp')
-class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
+class LocationResourceNewTest(ViewTestCase, UserTestCase,
+                              FileStorageTestCase, TestCase):
     view_class = default.LocationResourceNew
     template = 'spatial/resources_new.html'
     success_url_name = 'locations:detail'
@@ -772,10 +771,8 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase, TestCase):
                 'is_allowed_add_location': True}
 
     def setup_post_data(self):
-        path = os.path.dirname(settings.BASE_DIR)
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/image.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',

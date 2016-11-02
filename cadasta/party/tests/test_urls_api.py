@@ -48,6 +48,54 @@ class PartyUrlTest(TestCase):
         assert resolved.kwargs['project'] == '123abc'
         assert resolved.kwargs['party'] == '123456123456123456123456'
 
+    def test_project_party_resource_list(self):
+        actual = reverse(
+            version_ns('party:resource_list'),
+            kwargs={
+                'organization': 'habitat',
+                'project': '123abc',
+                'party': '123456123456123456123456',
+            }
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/'
+            'parties/123456123456123456123456/resources/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/'
+            'parties/123456123456123456123456/resources/'))
+        assert resolved.func.__name__ == api.PartyResourceList.__name__
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['party'] == '123456123456123456123456'
+
+    def test_project_party_resource_detail(self):
+        actual = reverse(
+            version_ns('party:resource_detail'),
+            kwargs={
+                'organization': 'habitat',
+                'project': '123abc',
+                'party': '123456123456123456123456',
+                'resource': '352091238623324256823'
+            }
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/'
+            'parties/123456123456123456123456/'
+            'resources/352091238623324256823/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/'
+            'parties/123456123456123456123456/'
+            'resources/352091238623324256823/'))
+        assert resolved.func.__name__ == api.PartyResourceDetail.__name__
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['party'] == '123456123456123456123456'
+        assert resolved.kwargs['resource'] == '352091238623324256823'
+
     def test_project_party_relationships_list(self):
         actual = reverse(
             version_ns('party:rel_list'),
@@ -139,3 +187,53 @@ class RelationshipUrlTest(TestCase):
     def test_project_tenure_relationship_detail(self):
         self.generic_test_project_relationship_detail(
             'tenure', api.TenureRelationshipDetail)
+
+    def test_project_party_resource_list(self):
+        actual = reverse(
+            version_ns('relationship:tenure_rel_resource_list'),
+            kwargs={
+                'organization': 'habitat',
+                'project': '123abc',
+                'tenure_rel_id': '123456123456123456123456',
+            }
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/relationships/'
+            'tenure/123456123456123456123456/resources/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/relationships/'
+            'tenure/123456123456123456123456/resources/'))
+        assert (resolved.func.__name__ ==
+                api.TenureRelationshipResourceList.__name__)
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['tenure_rel_id'] == '123456123456123456123456'
+
+    def test_project_party_resource_detail(self):
+        actual = reverse(
+            version_ns('relationship:tenure_rel_resource_detail'),
+            kwargs={
+                'organization': 'habitat',
+                'project': '123abc',
+                'tenure_rel_id': '123456123456123456123456',
+                'resource': '352091238623324256823'
+            }
+        )
+        expected = version_url(
+            '/organizations/habitat/projects/123abc/relationships/'
+            'tenure/123456123456123456123456/'
+            'resources/352091238623324256823/')
+        assert actual == expected
+
+        resolved = resolve(version_url(
+            '/organizations/habitat/projects/123abc/relationships/'
+            'tenure/123456123456123456123456/'
+            'resources/352091238623324256823/'))
+        assert (resolved.func.__name__ ==
+                api.TenureRelationshipResourceDetail.__name__)
+        assert resolved.kwargs['organization'] == 'habitat'
+        assert resolved.kwargs['project'] == '123abc'
+        assert resolved.kwargs['tenure_rel_id'] == '123456123456123456123456'
+        assert resolved.kwargs['resource'] == '352091238623324256823'

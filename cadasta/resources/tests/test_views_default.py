@@ -1,17 +1,14 @@
 import copy
 import json
-import os
 import pytest
 from django.http import Http404
-from django.conf import settings
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
-from buckets.test.storage import FakeS3Storage
 from tutelary.models import Policy, assign_user_policies
 from skivvy import ViewTestCase
 
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
@@ -24,7 +21,6 @@ from ..forms import ResourceForm, AddResourceFromLibraryForm
 from .factories import ResourceFactory
 from .utils import clear_temp  # noqa
 
-path = os.path.dirname(settings.BASE_DIR)
 clauses = {
     'clause': [
         {
@@ -276,7 +272,8 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('clear_temp')
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
+class ProjectResourcesNewTest(ViewTestCase, UserTestCase,
+                              FileStorageTestCase, TestCase):
     view_class = default.ProjectResourcesNew
     template = 'resources/project_add_new.html'
     success_url_name = 'resources:project_list'
@@ -299,9 +296,8 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
                 'is_allowed_add_resource': True}
 
     def setup_post_data(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/image.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',
@@ -350,9 +346,8 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase, TestCase):
         assert self.project.resources.first().name == 'Some name'
 
     def test_create_invalid_gpx(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/mp3.xml', 'rb').read()
-        file_name = storage.save('resources/mp3.xml', file)
+        file = self.get_file('/resources/tests/files/mp3.xml', 'rb')
+        file_name = self.storage.save('resources/mp3.xml', file)
 
         data = {
             'name': 'Some name',
@@ -491,7 +486,8 @@ class ProjectResourcesDetailTest(ViewTestCase, UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
+class ProjectResourcesEditTest(ViewTestCase, UserTestCase,
+                               FileStorageTestCase, TestCase):
     view_class = default.ProjectResourcesEdit
     template = 'resources/edit.html'
     success_url_name = 'resources:project_detail'
@@ -528,9 +524,8 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def setup_post_data(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/image.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/image.jpg', file)
         return {
             'name': 'Some name',
             'description': '',
@@ -797,7 +792,8 @@ class ResourceUnArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
 
 @pytest.mark.usefixtures('make_dirs')
-class ResourceDetachTest(ViewTestCase, UserTestCase, TestCase):
+class ResourceDetachTest(ViewTestCase, UserTestCase,
+                         FileStorageTestCase, TestCase):
     view_class = default.ResourceDetach
     success_url_name = 'resources:project_list'
 
@@ -818,9 +814,8 @@ class ResourceDetachTest(ViewTestCase, UserTestCase, TestCase):
         assign_permissions(self.user)
 
     def setup_post_data(self):
-        storage = FakeS3Storage()
-        file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-        file_name = storage.save('resources/image.jpg', file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        file_name = self.storage.save('resources/image.jpg', file)
 
         return {
             'name': 'Some name',

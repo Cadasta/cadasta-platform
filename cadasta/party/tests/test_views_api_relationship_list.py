@@ -63,7 +63,7 @@ class SpatialUnitsRelationshipListAPITest(APITestCase, UserTestCase, TestCase):
         self.TR.create(project=self.prj, spatial_unit=su2)
 
         response = self.request(user=self.user,
-                                url_kwargs={'spatial_id': su1.id})
+                                url_kwargs={'location': su1.id})
         assert response.status_code == 200
         assert len(response.content) == 2
         valid_ids = (sr1.id, sr2.id)

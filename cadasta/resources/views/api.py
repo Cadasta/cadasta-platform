@@ -4,6 +4,26 @@ from core.mixins import update_permissions
 from . import mixins
 
 
+def patch_actions(self, request):
+        if hasattr(request, 'data'):
+            if self.get_object().project.archived:
+                return False
+            is_archived = self.get_object().archived
+            new_archived = request.data.get('archived', is_archived)
+            if not is_archived and (is_archived != new_archived):
+                return ('resource.edit', 'resource.archive')
+            elif is_archived and (is_archived != new_archived):
+                return ('resource.edit', 'resource.unarchive')
+        return 'resource.edit'
+
+
+def filter_archived_resources(self, view, obj):
+        if obj.archived:
+            return ('resource.view', 'resource.unarchive')
+        else:
+            return ('resource.view',)
+
+
 class ProjectResources(APIPermissionRequiredMixin,
                        mixins.ProjectResourceMixin,
                        generics.ListCreateAPIView):
@@ -18,12 +38,6 @@ class ProjectResources(APIPermissionRequiredMixin,
         'POST': update_permissions('resource.add')
     }
 
-    def filter_archived_resources(self, view, obj):
-        if obj.archived:
-            return ('resource.view', 'resource.unarchive')
-        else:
-            return ('resource.view',)
-
     permission_filter_queryset = filter_archived_resources
     use_resource_library_queryset = True
 
@@ -31,18 +45,6 @@ class ProjectResources(APIPermissionRequiredMixin,
 class ProjectResourcesDetail(APIPermissionRequiredMixin,
                              mixins.ResourceObjectMixin,
                              generics.RetrieveUpdateAPIView):
-
-    def patch_actions(self, request):
-        if hasattr(request, 'data'):
-            if self.get_object().project.archived:
-                return False
-            is_archived = self.get_object().archived
-            new_archived = request.data.get('archived', is_archived)
-            if not is_archived and (is_archived != new_archived):
-                return ('resource.edit', 'resource.archive')
-            elif is_archived and (is_archived != new_archived):
-                return ('resource.edit', 'resource.unarchive')
-        return 'resource.edit'
 
     lookup_url_kwarg = 'resource'
     permission_required = {
@@ -65,4 +67,15 @@ class ProjectSpatialResources(APIPermissionRequiredMixin,
     permission_required = {
         'GET': 'resource.list'
     }
-    permission_filter_queryset = ('resource.view',)
+    permission_filter_queryset = filter_archived_resources
+
+
+class ProjectSpatialResourcesDetail(APIPermissionRequiredMixin,
+                                    mixins.ResourceObjectMixin,
+                                    generics.RetrieveUpdateAPIView):
+
+    lookup_url_kwarg = 'resource'
+    permission_required = {
+        'GET': 'resource.view',
+        'PATCH': patch_actions,
+    }

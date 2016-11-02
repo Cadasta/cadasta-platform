@@ -1,18 +1,16 @@
 import io
-import os
 
 import pytest
 from lxml import etree
 
 from django.test import TestCase
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from skivvy import APITestCase
 
 from accounts.tests.factories import UserFactory
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from organization.models import OrganizationRole
 from organization.tests.factories import OrganizationFactory, ProjectFactory
@@ -21,7 +19,6 @@ from questionnaires.managers import create_attrs_schema
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import (QuestionFactory,
                                             QuestionnaireFactory)
-from questionnaires.tests.utils import get_form
 from resources.models import Resource
 from spatial.models import SpatialUnit
 from tutelary.models import Role
@@ -33,11 +30,9 @@ from .attr_schemas import (default_party_xform_group,
                            individual_party_xform_group, location_xform_group,
                            tenure_relationship_xform_group)
 
-path = os.path.dirname(settings.BASE_DIR)
-
 
 @pytest.mark.usefixtures('make_dirs')
-class XFormListTest(APITestCase, UserTestCase, TestCase):
+class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
     view_class = api.XFormListView
     viewset_actions = {'get': 'list'}
 
@@ -48,7 +43,7 @@ class XFormListTest(APITestCase, UserTestCase, TestCase):
         self.superuser_role = Role.objects.get(name='superuser')
 
     def _get_questionnaire(self, id=None, version=None):
-        form = get_form('xls-form')
+        form = self.get_form('xls-form')
 
         kwargs = {'project': self.prj, 'xls_form': form}
         if id:
@@ -115,7 +110,8 @@ class XFormListTest(APITestCase, UserTestCase, TestCase):
         assert 'hash' not in response
 
 
-class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
+class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
+                          TestCase):
     view_class = api.XFormSubmissionViewSet
     viewset_actions = {'post': 'create', 'head': 'create'}
 
@@ -131,7 +127,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
                               schema=True):
         questionnaire = QuestionnaireFactory.create(
             project=self.prj,
-            xls_form=get_form(questionnaire_name),
+            xls_form=self.get_form(questionnaire_name),
             filename=questionnaire_name,
             id_string=questionnaire_name,
             version=(20160727122110 + version))
@@ -160,10 +156,8 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
                 app_label='party', model='tenurerelationship'), errors=[])
 
     def _get_resource(self, file_name, file_type):
-        file = open(
-            path + '/xforms/tests/files/{}.{}'.format(file_name, file_type),
-            'rb'
-        ).read()
+        file = self.get_file(
+            '/xforms/tests/files/{}.{}'.format(file_name, file_type), 'rb')
         return file
 
     def _make_form_file(self, content):
@@ -381,10 +375,8 @@ class XFormSubmissionTest(APITestCase, UserTestCase, TestCase):
         msg = self._getResponseMessage(response)
         assert msg == "Tenure relationship error: 'tenure_type'"
 
-        bad_file = open(
-            path + '/xforms/tests/files/test_bad_resource.html',
-            'rb'
-        ).read()
+        bad_file = self.get_file(
+            '/xforms/tests/files/test_bad_resource.html', 'rb')
         bad_file = bad_file.decode('utf-8')
 
         self._create_questionnaire('t_questionnaire_bad', 2, False)
