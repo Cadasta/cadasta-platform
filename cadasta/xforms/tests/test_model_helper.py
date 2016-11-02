@@ -12,17 +12,19 @@ from jsonattrs.models import create_attribute_types
 
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory
-from party.tests.factories import PartyFactory
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
 from questionnaires.tests.factories import (QuestionnaireFactory,
                                             QuestionFactory,)
 
 from party.models import (Party, TenureRelationship,
-                          load_tenure_relationship_types)
+                          load_tenure_relationship_types,
+                          TenureRelationshipType)
 from organization.models import OrganizationRole
 from resources.models import Resource
 from spatial.models import SpatialUnit
+from xforms.models import XFormSubmission
 from xforms.mixins.model_helper import ModelHelper as mh
 from xforms.exceptions import InvalidXMLSubmission
 
@@ -88,6 +90,9 @@ class XFormModelHelperTest(TestCase):
                     '45.56176327330353 -122.67669159919024 0.0 0.0')
         data = {
             'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
             'version': str(self.questionnaire.version),
             'party_name': 'Party One',
             'party_type': 'IN',
@@ -114,24 +119,166 @@ class XFormModelHelperTest(TestCase):
         }
 
         (questionnaire,
-         party_resources,
-         location_resources,
-         tenure_resources) = mh.create_models(mh(), data)
+         parties, party_resources,
+         locations, location_resources,
+         tenure_relationships, tenure_resources) = mh.create_models(mh(), data)
 
         assert questionnaire == self.questionnaire
         party = Party.objects.get(name='Party One')
+        assert parties == [party]
         assert party_resources[0]['id'] == party.id
         assert 'sad_birthday.png' in party_resources[0]['resources']
         assert 'invitation.pdf' in party_resources[0]['resources']
 
         location = SpatialUnit.objects.get(type='BU')
+        assert locations == [location]
         assert location_resources[0]['id'] == location.id
         assert 'resource_two.pdf' in location_resources[0]['resources']
 
         tenure = TenureRelationship.objects.get(spatial_unit=location)
+        assert tenure_relationships == [tenure]
         assert tenure.party == party
         assert tenure_resources[0]['id'] == tenure.id
         assert 'resource_three.png' in tenure_resources[0]['resources']
+
+    def test_check_for_duplicate_submission(self):
+        geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0')
+
+        data = {
+            'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
+            'version': str(self.questionnaire.version),
+            'party_repeat': [{
+                'party_name': 'Party One',
+                'party_type': 'IN',
+                'party_attributes_individual': {
+                    'fname': False,
+                    'fname_two': 'socks',
+                },
+                'party_photo': 'sad_birthday.png',
+                'party_resource_invite': 'invitation.pdf',
+
+            }, {
+                'party_name': 'Party Two',
+                'party_type': 'GR',
+                'party_attributes_group': {
+                    'fname': True,
+                    'fname_two': 'video games',
+                },
+                'party_photo': 'awesome_birthday.png',
+                'party_resource_invite': 'invitation_two.pdf',
+
+            }],
+            'location_type': 'BU',
+            'location_geometry': geoshape,
+            'location_attributes': {
+                'fname': False,
+                'fname_two': 'Location One',
+            },
+            'location_photo': 'resource_one.png',
+            'location_resource_invite': 'resource_two.pdf',
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure One'
+            },
+            'tenure_resource_photo': 'resource_three.png'
+        }
+
+        assert not mh.check_for_duplicate_submission(
+            mh(), data, self.questionnaire)
+
+        party1 = PartyFactory.create(
+            project=self.project,
+            name='Party One',
+            type='IN',
+            attributes={
+                'fname': False,
+                'fname_two': 'socks',
+            })
+
+        party2 = PartyFactory.create(
+            project=self.project,
+            name='Party Two',
+            type='GR',
+            attributes={
+                'fname': True,
+                'fname_two': 'video games',
+            })
+
+        su = SpatialUnitFactory.create(
+            project=self.project,
+            type='BU',
+            geometry=mh()._format_geometry(data),
+            attributes={
+                'fname': False,
+                'fname_two': 'Location One'
+            })
+
+        tenure1 = TenureRelationshipFactory.create(
+            project=self.project,
+            spatial_unit=su,
+            party=party1,
+            tenure_type=TenureRelationshipType.objects.get(id='CO'),
+            attributes={
+                'fname': False,
+                'fname_two': 'Tenure One'
+            })
+
+        tenure2 = TenureRelationshipFactory.create(
+            project=self.project,
+            spatial_unit=su,
+            party=party2,
+            tenure_type=TenureRelationshipType.objects.get(id='CO'),
+            attributes={
+                'fname': False,
+                'fname_two': 'Tenure One'
+            })
+
+        xform = XFormSubmission.objects.create(
+            json_submission={},
+            user=self.user,
+            questionnaire=self.questionnaire,
+            instanceID='uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad')
+        xform.parties.add(*[party1, party2])
+        xform.spatial_units.add(su)
+        xform.tenure_relationships.add(*[tenure1, tenure2])
+
+        additional_resources = mh.check_for_duplicate_submission(
+            mh(), data, self.questionnaire)
+
+        (questionnaire,
+         parties, party_resources,
+         locations, location_resources,
+         tenure_relationships, tenure_resources) = additional_resources
+
+        assert Party.objects.all().count() == 2
+        assert SpatialUnit.objects.all().count() == 1
+        assert TenureRelationship.objects.all().count() == 2
+
+        assert questionnaire == self.questionnaire
+
+        assert party_resources[0]['id'] == party1.id
+        assert party_resources[0]['resources'] == ['sad_birthday.png',
+                                                   'invitation.pdf']
+        assert party_resources[1]['id'] == party2.id
+        assert party_resources[1]['resources'] == ['awesome_birthday.png',
+                                                   'invitation_two.pdf']
+
+        assert location_resources[0]['id'] == su.id
+        assert location_resources[0]['resources'] == ['resource_one.png',
+                                                      'resource_two.pdf']
+
+        assert tenure_resources[0]['id'] == tenure1.id
+        assert tenure_resources[0]['resources'] == ['resource_three.png']
+        assert tenure_resources[1]['id'] == tenure2.id
+        assert tenure_resources[1]['resources'] == ['resource_three.png']
 
     def test_create_party(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -259,7 +406,7 @@ class XFormModelHelperTest(TestCase):
         }
 
         location_objects, location_resources = mh.create_spatial_unit(
-            mh(), data, self.project, self.questionnaire)
+            mh(), data, self.project)
         assert len(location_objects) == 1
         location = SpatialUnit.objects.get(type='BU')
         assert location.attributes == {
@@ -298,7 +445,7 @@ class XFormModelHelperTest(TestCase):
         }
 
         location_objects, location_resources = mh.create_spatial_unit(
-            mh(), data, self.project, self.questionnaire)
+            mh(), data, self.project)
 
         assert len(location_objects) == 2
         location = SpatialUnit.objects.get(type='PA')
@@ -339,7 +486,7 @@ class XFormModelHelperTest(TestCase):
 
         with pytest.raises(InvalidXMLSubmission):
             mh.create_spatial_unit(
-                mh(), data, self.project, self.questionnaire)
+                mh(), data, self.project)
         assert SpatialUnit.objects.count() == 3
 
     def test_create_tenure_relationship(self):
@@ -358,9 +505,10 @@ class XFormModelHelperTest(TestCase):
             'tenure_resource_photo': 'resource.png'
         }
 
-        tenure_resources = mh.create_tenure_relationship(
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
             mh(), data, [party], [location], self.project)
         tenure = TenureRelationship.objects.get(tenure_type='CO')
+        assert tenure_relationships == [tenure]
         assert tenure.party == party
         assert tenure.spatial_unit == location
         assert tenure.attributes == {'fname': False, 'fname_two': 'Tenure One'}
@@ -392,10 +540,11 @@ class XFormModelHelperTest(TestCase):
             }]
         }
 
-        tenure_resources = mh.create_tenure_relationship(
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
             mh(), data, [party2, party3], [location], self.project)
         tenure2 = TenureRelationship.objects.get(party=party2)
         tenure3 = TenureRelationship.objects.get(party=party3)
+        assert tenure_relationships == [tenure2, tenure3]
 
         assert tenure2.spatial_unit == location
         assert tenure2.tenure_type.id == 'WR'
@@ -438,11 +587,12 @@ class XFormModelHelperTest(TestCase):
             }]
         }
 
-        tenure_resources = mh.create_tenure_relationship(
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
             mh(), data, [party], [location2, location3], self.project)
 
         tenure4 = TenureRelationship.objects.get(spatial_unit=location2)
         tenure5 = TenureRelationship.objects.get(spatial_unit=location3)
+        assert tenure_relationships == [tenure4, tenure5]
 
         assert tenure4.party == party
         assert tenure4.tenure_type.id == 'WR'
@@ -477,11 +627,12 @@ class XFormModelHelperTest(TestCase):
             'tenure_resource_photo': 'resource_six.png'
             }
 
-        tenure_resources = mh.create_tenure_relationship(
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
             mh(), data, [party4, party5], [location], self.project)
         tenure6 = TenureRelationship.objects.get(party=party4)
         tenure7 = TenureRelationship.objects.get(party=party5)
 
+        assert tenure_relationships == [tenure6, tenure7]
         assert tenure6.spatial_unit == location
         assert tenure6.tenure_type.id == 'CO'
         assert tenure6.attributes == {
@@ -515,11 +666,12 @@ class XFormModelHelperTest(TestCase):
             'tenure_resource_photo': 'resource_seven.png'
         }
 
-        tenure_resources = mh.create_tenure_relationship(
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
             mh(), data, [party], [location4, location5], self.project)
 
         tenure8 = TenureRelationship.objects.get(spatial_unit=location4)
         tenure9 = TenureRelationship.objects.get(spatial_unit=location5)
+        assert tenure_relationships == [tenure8, tenure9]
 
         assert tenure8.party == party
         assert tenure8.tenure_type.id == 'WR'
@@ -666,6 +818,82 @@ class XFormModelHelperTest(TestCase):
         assert 'party_repeat' not in group
         assert 'party_type' not in group
         assert 'party_name' not in group
+
+    def test_format_geometry(self):
+        geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0')
+
+        geotrace = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56342779158167 -122.67650283873081 0.0 0.0;')
+
+        line = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+                '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                '45.56181562182025 -122.67500658909082 0.0 0.0;')
+
+        data = {
+            'location_geometry': geoshape,
+        }
+
+        geom = mh()._format_geometry(data)
+        assert 'POLYGON' in geom
+
+        data = {
+            'location_geoshape': geoshape,
+        }
+
+        geom = mh()._format_geometry(data)
+        assert 'POLYGON' in geom
+
+        data = {
+            'location_geotrace': line,
+        }
+
+        geom = mh()._format_geometry(data)
+        assert 'LINE' in geom
+
+        data = {
+            'location_geometry': geotrace,
+        }
+
+        geom = mh()._format_geometry(data)
+        assert 'POLYGON' in geom
+
+    def test_format_create_resource(self):
+        party = PartyFactory.create(project=self.project)
+        file_name = 'test_image_two.png'
+        file = open(
+            path + '/xforms/tests/files/test_image_two.png', 'rb'
+        ).read()
+        file_data = InMemoryUploadedFile(
+            file=io.BytesIO(file),
+            field_name='test_image_two',
+            name=file_name,
+            content_type='image/png',
+            size=len(file),
+            charset='utf-8',
+        )
+        files = {file_name: file_data}
+
+        data = {
+            'parties': [{'id': party.id, 'resources': [file_name]}],
+            'locations': [{'id': '1234', 'resources': ['not_created.png']}]
+        }
+
+        mh()._format_create_resource(data, self.user, self.project,
+                                     files, file_name,
+                                     'parties', Party)
+
+        assert Resource.objects.all().count() == 1
+        resource = Resource.objects.get(name='test_image_two.png')
+        assert resource in party.resources.all()
 
     def test_get_questionnaire(self):
         questionnaire = mh._get_questionnaire(

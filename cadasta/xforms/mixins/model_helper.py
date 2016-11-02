@@ -21,40 +21,87 @@ class ModelHelper():
         questionnaire = self._get_questionnaire(
             id_string=data['id'], version=data['version']
         )
+
+        # If xform has already been submitted, check for additional resources
+        additional_resources = self.check_for_duplicate_submission(
+                        data, questionnaire)
+        if additional_resources:
+            return additional_resources
+
         project = questionnaire.project
 
         if project.current_questionnaire != questionnaire.id:
             raise InvalidXMLSubmission(_('Form out of date'))
 
-        party, party_resources = self.create_party(
+        parties, party_resources = self.create_party(
             data=data,
             project=project
         )
 
-        location, location_resources = self.create_spatial_unit(
+        locations, location_resources = self.create_spatial_unit(
             data=data,
             project=project,
-            questionnaire=questionnaire,
-            party=party
+            party=parties
         )
 
-        tenure_resources = self.create_tenure_relationship(
+        (tenure_relationships,
+            tenure_resources) = self.create_tenure_relationship(
             data=data,
             project=project,
-            party=party,
-            location=location
+            parties=parties,
+            locations=locations
         )
 
-        return (questionnaire, party_resources, location_resources,
-                tenure_resources)
+        return (questionnaire,
+                parties, party_resources,
+                locations, location_resources,
+                tenure_relationships, tenure_resources)
 
-    def create_party(self, data, project):
+    def check_for_duplicate_submission(self, data, questionnaire):
+        previous_submission = XFormSubmission.objects.filter(
+            instanceID=data['meta']['instanceID']
+        )
+
+        if not previous_submission:
+            return None
+
+        previous_submission = previous_submission[0]
+
+        party_objects, party_resources = self.create_party(
+            data=data,
+            project=questionnaire.project,
+            duplicate=previous_submission)
+
+        location_objects, location_resources = self.create_spatial_unit(
+            data=data,
+            project=questionnaire.project,
+            duplicate=previous_submission)
+
+        tenure_objects, tenure_resources = self.create_tenure_relationship(
+            data=data,
+            project=questionnaire.project,
+            parties=party_objects,
+            locations=location_objects,
+            duplicate=previous_submission)
+
+        return (questionnaire,
+                party_objects, party_resources,
+                location_objects, location_resources,
+                tenure_objects, tenure_resources)
+
+    def create_party(self, data, project, duplicate=None):
         party_objects = []
         party_resources = []
+
+        if duplicate:
+            get_or_create_party = duplicate.parties.get
+        else:
+            get_or_create_party = Party.objects.create
+
         try:
             party_groups = self._format_repeat(data, ['party'])
             for group in party_groups:
-                party = Party.objects.create(
+                party = get_or_create_party(
                     project=project,
                     name=group['party_name'],
                     type=group['party_type'],
@@ -71,22 +118,22 @@ class ModelHelper():
                 "Party error: {}".format(e)))
         return party_objects, party_resources
 
-    def create_spatial_unit(self, data, project, questionnaire, party=None):
+    def create_spatial_unit(self, data, project,
+                            party=None, duplicate=None):
         location_resources = []
         location_objects = []
+
+        if duplicate:
+            get_or_create_spatial_units = duplicate.spatial_units.get
+        else:
+            get_or_create_spatial_units = SpatialUnit.objects.create
+
         try:
             location_group = self._format_repeat(data, ['location'])
 
             for group in location_group:
-                if 'location_geotrace' in group.keys():
-                    location_geometry = group['location_geotrace']
-                elif 'location_geoshape' in group.keys():
-                    location_geometry = group['location_geoshape']
-                else:
-                    location_geometry = group['location_geometry']
-
-                geom = odk_geom_to_wkt(location_geometry)
-                location = SpatialUnit.objects.create(
+                geom = self._format_geometry(group)
+                location = get_or_create_spatial_units(
                     project=project,
                     type=group['location_type'],
                     geometry=geom,
@@ -103,32 +150,41 @@ class ModelHelper():
                 'Location error: {}'.format(e)))
         return location_objects, location_resources
 
-    def create_tenure_relationship(self, data, party, location, project):
+    def create_tenure_relationship(self, data, parties, locations, project,
+                                   duplicate=None):
         tenure_resources = []
+        tenure_objects = []
+
+        if duplicate:
+            get_or_create_tenure_rels = duplicate.tenure_relationships.get
+        else:
+            get_or_create_tenure_rels = TenureRelationship.objects.create
+
         try:
             if data.get('tenure_type'):
                 tenure_group = [data]
             else:
                 tenure_group = self._format_repeat(data, ['party', 'location'])
 
-            for p in range(len(party)):
-                for l in range(len(location)):
+            for p, party in enumerate(parties):
+                for l, location in enumerate(locations):
                     t = 0
                     if len(tenure_group) > 1:
                         if p > l:
                             t = p
                         else:
                             t = l
-                    tenure = TenureRelationship.objects.create(
+                    tenure = get_or_create_tenure_rels(
                         project=project,
-                        party=party[p],
-                        spatial_unit=location[l],
+                        party=party,
+                        spatial_unit=location,
                         tenure_type=TenureRelationshipType.objects.get(
                             id=tenure_group[t]['tenure_type']),
                         attributes=self._get_attributes(
                             tenure_group[t],
                             'tenure_relationship')
                     )
+                    tenure_objects.append(tenure)
                     tenure_resources.append(
                         self._get_resource_names(
                             tenure_group[t], tenure, 'tenure')
@@ -137,7 +193,7 @@ class ModelHelper():
         except Exception as e:
             raise InvalidXMLSubmission(_(
                 "Tenure relationship error: {}".format(e)))
-        return tenure_resources
+        return tenure_objects, tenure_resources
 
     def create_resource(self, data, user, project, content_object=None):
         Storage = get_storage_class()
@@ -178,59 +234,70 @@ class ModelHelper():
         submission = full_submission[list(full_submission.keys())[0]]
 
         with transaction.atomic():
-            (questionnaire, party,
-                location, tenure) = self.create_models(submission)
+            (questionnaire,
+             parties, party_resources,
+             locations, location_resources,
+             tenure_relationships, tenure_resources
+             ) = self.create_models(submission)
 
-            party_submission = [submission]
-            location_submission = [submission]
-            tenure_submission = [submission]
+            party_submissions = [submission]
+            location_submissions = [submission]
+            tenure_submissions = [submission]
 
             if 'party_repeat' in submission:
-                party_submission = self._format_repeat(submission, ['party'])
-                if 'tenure_type' in party_submission[0]:
-                    tenure_submission = party_submission
+                party_submissions = self._format_repeat(submission, ['party'])
+                if 'tenure_type' in party_submissions[0]:
+                    tenure_submissions = party_submissions
 
             elif 'location_repeat' in submission:
-                location_submission = self._format_repeat(
+                location_submissions = self._format_repeat(
                     submission, ['location']
                 )
-                if 'tenure_type' in location_submission[0]:
-                    tenure_submission = location_submission
+                if 'tenure_type' in location_submissions[0]:
+                    tenure_submissions = location_submissions
 
-            party_resources = []
-            location_resources = []
-            tenure_resources = []
+            party_resource_files = []
+            location_resource_files = []
+            tenure_resource_files = []
 
-            for group in party_submission:
-                party_resources.extend(
+            for group in party_submissions:
+                party_resource_files.extend(
                     self._get_resource_files(group, 'party')
                 )
 
-            for group in location_submission:
-                location_resources.extend(
+            for group in location_submissions:
+                location_resource_files.extend(
                     self._get_resource_files(group, 'location')
                 )
 
-            for group in tenure_submission:
-                tenure_resources.extend(
+            for group in tenure_submissions:
+                tenure_resource_files.extend(
                     self._get_resource_files(group, 'tenure')
                 )
 
             resource_data = {
                 'project': questionnaire.project,
-                'location_resources': location_resources,
-                'locations': location,
-                'party_resources': party_resources,
-                'parties': party,
-                'tenure_resources': tenure_resources,
-                'tenures': tenure,
+                'location_resources': location_resource_files,
+                'locations': location_resources,
+                'party_resources': party_resource_files,
+                'parties': party_resources,
+                'tenure_resources': tenure_resource_files,
+                'tenures': tenure_resources,
             }
             self.upload_resource_files(request, resource_data)
 
-        return XFormSubmission(
+        if XFormSubmission.objects.filter(
+                instanceID=submission['meta']['instanceID']).exists():
+            return XFormSubmission.objects.get(
+                instanceID=submission['meta']['instanceID'])
+
+        xform_submission = XFormSubmission(
             json_submission=full_submission,
             user=request.user,
-            questionnaire=questionnaire)
+            questionnaire=questionnaire,
+            instanceID=submission['meta']['instanceID']
+            )
+        return xform_submission, parties, locations, tenure_relationships
 
     def upload_resource_files(self, request, data):
         user = request.user
@@ -238,41 +305,20 @@ class ModelHelper():
         files.pop('xml_submission_file')
         project = data['project']
         for file_name in files:
-            if file_name in data['location_resources']:
-                for location in data['locations']:
-                    if file_name in location['resources']:
-                        content_object = SpatialUnit.objects.get(
-                            id=location['id'])
+            args = [data, user, project, files, file_name]
 
-                        self.create_resource(data=files[file_name],
-                                             user=user,
-                                             project=project,
-                                             content_object=content_object
-                                             )
+            if file_name in data['location_resources']:
+                self._format_create_resource(
+                   *args, 'locations', SpatialUnit)
 
             elif file_name in data['party_resources']:
-                for party in data['parties']:
-                    if file_name in party['resources']:
-                        content_object = Party.objects.get(
-                            id=party['id'])
-
-                        self.create_resource(data=files[file_name],
-                                             user=user,
-                                             project=project,
-                                             content_object=content_object
-                                             )
+                self._format_create_resource(
+                    *args, 'parties', Party)
 
             elif file_name in data['tenure_resources']:
-                for tenure in data['tenures']:
-                    if file_name in tenure['resources']:
-                        content_object = TenureRelationship.objects.get(
-                            id=tenure['id'])
+                self._format_create_resource(
+                    *args, 'tenures', TenureRelationship)
 
-                        self.create_resource(data=files[file_name],
-                                             user=user,
-                                             project=project,
-                                             content_object=content_object
-                                             )
             else:
                 self.create_resource(data=files[file_name],
                                      user=user,
@@ -290,6 +336,27 @@ class ModelHelper():
             repeat_group = [repeat_group]
 
         return repeat_group
+
+    def _format_geometry(self, data):
+        if 'location_geotrace' in data:
+            geom = data['location_geotrace']
+        elif 'location_geoshape' in data:
+            geom = data['location_geoshape']
+        else:
+            geom = data['location_geometry']
+        return odk_geom_to_wkt(geom)
+
+    def _format_create_resource(self, data, user,  project, files, file_name,
+                                model_type, model):
+        for obj in data[model_type]:
+            if file_name in obj['resources']:
+                content_object = model.objects.get(
+                    id=obj['id'])
+                self.create_resource(data=files[file_name],
+                                     user=user,
+                                     project=project,
+                                     content_object=content_object
+                                     )
 
     def _get_questionnaire(self, id_string, version):
         try:

@@ -10,12 +10,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from tutelary.models import Role
+from xforms.models import XFormSubmission
 from xforms.mixins.model_helper import ModelHelper
 from xforms.mixins.openrosa_headers_mixin import OpenRosaHeadersMixin
 from xforms.renderers import XFormListRenderer
 from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
-
-from ..exceptions import InvalidXMLSubmission
+from xforms.exceptions import InvalidXMLSubmission
 
 logger = logging.getLogger('xform.submissions')
 
@@ -52,17 +52,31 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
             logger.debug(str(e))
             return self._sendErrorResponse(request, e)
 
+        # If an already existing XFormSummission is sent back
+        # don't create another.
+        if type(instance) == XFormSubmission:
+            return Response(
+                headers=self.get_openrosa_headers(request),
+                status=status.HTTP_201_CREATED,
+                content_type='application/xml'
+            )
+
+        instance, parties, locations, tenure_relationships = instance
         serializer = XFormSubmissionSerializer(instance)
 
         json = JSONRenderer().render(serializer.data)
         stream = BytesIO(json)
         data = JSONParser().parse(stream)
-
         serializer = XFormSubmissionSerializer(data=data)
+
         # Every possible error that would make the serializer not valid
         # has already been checked for, so no failsafe is necessary.
         if serializer.is_valid():
             data = serializer.save()
+            data.parties.add(*parties)
+            data.spatial_units.add(*locations)
+            data.tenure_relationships.add(*tenure_relationships)
+
             return Response(
                 headers=self.get_openrosa_headers(request),
                 status=status.HTTP_201_CREATED,

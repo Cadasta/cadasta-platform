@@ -3,6 +3,8 @@ from core.serializers import FieldSelectorSerializer
 from xforms.models import XFormSubmission
 from accounts.models import User
 from questionnaires.models import Questionnaire
+from spatial.serializers import SpatialUnitSerializer
+from party import serializers as party_serializer
 
 
 class XFormListSerializer(FieldSelectorSerializer,
@@ -41,6 +43,12 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
         allow_null=True, queryset=User.objects.all(), required=False)
     questionnaire = serializers.PrimaryKeyRelatedField(
         allow_null=True, queryset=Questionnaire.objects.all(), required=False)
+    instanceID = serializers.UUIDField(format='hex_verbose')
+
+    parties = party_serializer.PartySerializer(read_only=True, many=True)
+    spatial_units = SpatialUnitSerializer(read_only=True, many=True)
+    tenure_relationships = party_serializer.TenureRelationshipReadSerializer(
+        read_only=True, many=True)
 
     def create(self, validated_data):
         return XFormSubmission.objects.create(**validated_data)

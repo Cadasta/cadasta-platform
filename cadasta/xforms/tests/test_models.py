@@ -10,10 +10,18 @@ class XFormSubmissionTest(TestCase):
         user = UserFactory.build(username='john')
         questionnaire = QuestionnaireFactory(title='questions')
         json = {'key': 'value'}
+        instanceID = '19f004e7-d16f-49d0-abcc-a73762c6d102'
         submission = XFormSubmission(id='abc123',
                                      user=user,
                                      questionnaire=questionnaire,
+                                     instanceID=instanceID,
                                      json_submission=json)
         assert repr(submission) == ('<XFormSubmission id=abc123 user=john'
                                     ' questionnaire=questions'
-                                    ' json_submission={}>').format(dumps(json))
+                                    ' json_submission={json}'
+                                    ' instanceID={instance}'
+                                    ' spatial_units=[]'
+                                    ' parties=[]'
+                                    ' tenure_relationships=[]>'
+                                    ).format(json=dumps(json),
+                                             instance=instanceID)
