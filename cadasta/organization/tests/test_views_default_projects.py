@@ -1423,7 +1423,6 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'select_defaults-party_type': 'IN',
             'select_defaults-location_type': 'PA',
             'select_defaults-geometry_field': 'location_geometry',
-            'select_defaults-geometry_type_field': 'geo_type',
         }
 
     def _get(self, status=None, check_content=False, login_redirect=False):
