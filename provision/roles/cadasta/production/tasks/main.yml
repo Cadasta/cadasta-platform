@@ -5,3 +5,9 @@
        requirements="{{ application_path }}requirements/production.txt"
        extra_args="--find-links https://s3.amazonaws.com:443/cadasta-wheelhouse/index.html"
 
+- name: Write Inline Manual template to core files
+  become: yes
+  become_user: root
+  template: src=inline-manual-player
+            dest="{{ application_path }}cadasta/core/static/js/inline-manual-player.js"
+
