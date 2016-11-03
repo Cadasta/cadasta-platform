@@ -138,7 +138,7 @@
           </p>
           <form action="{% url 'set_language' %}" method="post" class="language">
           {% csrf_token %}
-            <select id="language" name="language">
+            <select id="language" class="form-control input-sm" name="language">
               {% get_current_language as LANGUAGE_CODE %}
               {% get_available_languages as LANGUAGES %}
               {% get_language_info_list for LANGUAGES as languages %}

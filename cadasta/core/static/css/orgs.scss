@@ -57,8 +57,7 @@ div.org-logo {
 @media (max-width: $screen-sm-max) {
   .member-info {
     .member-pic {
-      margin-right: 20px;
-      float: left;
+      display: none;
     }
   }
 }
@@ -84,7 +83,7 @@ div.org-logo {
     display: block;
   }
   #organization-single {
-    .content-single .row {
+    .content-single > .row {
       margin-left: 0;
     }
     .row-height {
@@ -93,21 +92,10 @@ div.org-logo {
       background: #fff;
     }
     .detail {
-      display: table-row-group;
+      display: table-header-group;
       box-shadow: none;
       section {
         padding: 20px;
-      }
-    }
-    .organization-dashboard .main-text {
-      display: table-footer-group;
-    }
-    .main-text {
-      h2 {
-        margin-left: 20px;
-      }
-      .panel {
-        margin: 20px;
       }
     }
   }
