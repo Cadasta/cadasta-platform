@@ -157,7 +157,9 @@ class EntityUserSerializer(serializers.Serializer):
 
     def validate_username(self, value):
         error = ""
-        if not self.instance:
+        if self.instance:
+            self.user = self.instance
+        else:
             users = User.objects.filter(Q(username=value) | Q(email=value))
             users_count = len(users)
 
