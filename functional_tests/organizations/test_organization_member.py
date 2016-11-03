@@ -58,12 +58,23 @@ class OrganizationMemberTest(FunctionalTest):
         roles = page.get_role_options()
         assert roles["member"].text == roles["selected"].text
 
-        roles["admin"].click()
-        page.click_submit_button()
+        page.try_cancel_and_close(page.click_admin_role_option, "role_admin")
+        page.click_admin_role_option()
+        roles['confirm_admin'].click()
+
         page.go_to_testuser_member_page()
 
         roles = page.get_role_options()
         assert roles["admin"].text == roles["selected"].text
+
+        page.try_cancel_and_close(page.click_member_role_option, "role_member")
+        page.click_member_role_option()
+        roles['confirm_member'].click()
+
+        page.go_to_testuser_member_page()
+
+        roles = page.get_role_options()
+        assert roles["member"].text == roles["selected"].text
 
     def test_changing_an_admins_organizational_role(self):
         """An admin member can change a member's role in the organization."""
@@ -90,7 +101,7 @@ class OrganizationMemberTest(FunctionalTest):
         OrganizationMemberListPage(self).go_to_member_list_page()
         page.go_to_testuser_member_page()
 
-        page.try_cancel_and_close()
+        page.try_cancel_and_close_remove()
         assert page.get_member_title() == "MEMBER: Test User"
 
         page.click_remove_member_and_confirm_buttons()

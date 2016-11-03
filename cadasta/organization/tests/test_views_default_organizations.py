@@ -9,7 +9,7 @@ from skivvy import ViewTestCase
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
 from ..views import default
-from ..models import Organization, OrganizationRole, Project
+from ..models import Organization, OrganizationRole, Project, ProjectRole
 from .. import forms
 from .factories import OrganizationFactory, ProjectFactory, clause
 
@@ -633,12 +633,12 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
 class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.OrganizationMembersEdit
     template = 'organization/organization_members_edit.html'
-    post_data = {'org_role': 'A'}
 
     def setup_models(self):
         self.user = UserFactory.create()
         self.member = UserFactory.create()
         self.org = OrganizationFactory.create(add_users=[self.member])
+        self.prj = ProjectFactory.create(organization=self.org)
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug, 'username': self.member.username}
@@ -647,8 +647,12 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         return {
             'object': self.member,
             'organization': self.org,
-            'form': forms.EditOrganizationMemberForm(
-                None, self.org, self.member, self.user)
+            'org_role_form': forms.EditOrganizationMemberForm(
+                None, self.org, self.member, self.user),
+            'project_role_form':
+                forms.EditOrganizationMemberProjectPermissionForm(
+                None, self.org, self.member, self.user),
+            'org_admin': False
         }
 
     def test_get_with_authorized_user(self):
@@ -679,6 +683,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(is_superuser=True,
                                                        is_administrator=True,
+                                                       org_admin=False,
                                                        add_allowed=True)
 
     def test_get_with_archived_organization(self):
@@ -692,9 +697,10 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert ("You don't have permission to edit roles of this organization"
                 in response.messages)
 
-    def test_post_with_authorized_user(self):
+    def test_post_org_role_with_authorized_user(self):
         assign_policies(self.user)
-        response = self.request(method='POST', user=self.user)
+        response = self.request(
+            method='POST', user=self.user, post_data={'org_role': 'A'})
 
         assert response.status_code == 302
         assert ('/organizations/{}/members/'.format(self.org.slug)
@@ -703,9 +709,10 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                             user=self.member)
         assert role.admin is True
 
-    def test_post_with_unauthorized_user(self):
+    def test_post_org_role_with_unauthorized_user(self):
         self.user = UserFactory.create()
-        response = self.request(method='POST', user=self.user)
+        response = self.request(
+            method='POST', user=self.user, post_data={'org_role': 'A'})
 
         assert response.status_code == 302
         assert ("You don't have permission to edit roles of this organization"
@@ -714,8 +721,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                             user=self.member)
         assert role.admin is False
 
-    def test_post_with_unauthenticated_user(self):
-        response = self.request(method='POST')
+    def test_post_org_role_with_unauthenticated_user(self):
+        response = self.request(method='POST', post_data={'org_role': 'A'})
 
         assert response.status_code == 302
         assert '/account/login/' in response.location
@@ -723,7 +730,31 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                             user=self.member)
         assert role.admin is False
 
-    def test_post_with_invalid_form(self):
+    def test_post_with_superuser(self):
+        superuser = UserFactory.create()
+        superuser_role = Role.objects.get(name='superuser')
+        superuser.assign_policies(superuser_role)
+        response = self.request(method='POST',
+                                post_data={'org_role': 'A'},
+                                user=superuser)
+        assert response.status_code == 302
+        assert ('/organizations/{}/members/'.format(self.org.slug)
+                in response.location)
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.member)
+        assert role.admin is True
+
+        response = self.request(method='POST',
+                                post_data={'org_role': 'M'},
+                                user=superuser)
+        assert response.status_code == 302
+        assert ('/organizations/{}/members/'.format(self.org.slug)
+                in response.location)
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.member)
+        assert role.admin is False
+
+    def test_post_org_role_with_invalid_form(self):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org, user=user)
         assign_policies(user)
@@ -732,21 +763,93 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
         form = forms.EditOrganizationMemberForm(
                 {'org_role': 'X'}, self.org, self.member, self.user)
+        prj_form = forms.EditOrganizationMemberProjectPermissionForm(
+                {'org_role': 'X'}, self.org, self.member, self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(form=form)
+        assert response.content == self.render_content(
+            org_role_form=form, project_role_form=prj_form)
 
-    def test_post_with_archived_organization(self):
+    def test_post_org_role_with_archived_organization(self):
         assign_policies(self.user)
         self.org.archived = True
         self.org.save()
 
-        response = self.request(method='POST', user=self.user)
+        response = self.request(
+            method='POST', user=self.user, post_data={'org_role': 'A'})
         assert response.status_code == 302
         assert ("You don't have permission to edit roles of this organization"
                 in response.messages)
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.member)
         assert role.admin is False
+
+    def test_post_prj_role_with_authorized_user(self):
+        assign_policies(self.user)
+        response = self.request(
+            method='POST', user=self.user, post_data={self.prj.id: 'PM'})
+        assert response.status_code == 302
+        assert ('/organizations/{}/members/'.format(self.org.slug)
+                in response.location)
+        role = ProjectRole.objects.get(project=self.prj, user=self.member).role
+        assert role == 'PM'
+
+    def test_post_prj_role_with_unauthorized_user(self):
+        self.user = UserFactory.create()
+        response = self.request(
+            method='POST', user=self.user, post_data={self.prj.id: 'PM'})
+
+        assert response.status_code == 302
+        assert ("You don't have permission to edit roles of this organization"
+                in response.messages)
+        assert (ProjectRole.objects.filter(
+            project=self.prj, user=self.user).exists() is False)
+
+    def test_post_prj_role_with_unauthenticated_user(self):
+        response = self.request(method='POST', post_data={self.prj.id: 'PM'})
+
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
+        assert (ProjectRole.objects.filter(
+            project=self.prj, user=self.user).exists() is False)
+
+    def test_post_prj_role_with_invalid_form(self):
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.org, user=user)
+        assign_policies(user)
+        response = self.request(method='POST', user=user,
+                                post_data={self.prj.id: 'X'})
+
+        org_form = forms.EditOrganizationMemberForm(
+                {self.prj.id: 'X'}, self.org, self.member, self.user)
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+                {self.prj.id: 'X'}, self.org, self.member, self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            project_role_form=form, org_role_form=org_form)
+
+    def test_post_prj_role_with_archived_organization(self):
+        assign_policies(self.user)
+        self.org.archived = True
+        self.org.save()
+
+        response = self.request(
+            method='POST', user=self.user, post_data={self.prj.id: 'PM'})
+        assert response.status_code == 302
+        assert ("You don't have permission to edit roles of this organization"
+                in response.messages)
+        assert (ProjectRole.objects.filter(
+            project=self.prj, user=self.member).exists() is False)
+
+    def test_post_prj_role_with_archived_project(self):
+        assign_policies(self.user)
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request(
+            method='POST', user=self.user, post_data={self.prj.id: 'PM'})
+        assert response.status_code == 302
+        assert (ProjectRole.objects.filter(
+            project=self.prj, user=self.member).exists() is False)
 
 
 class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):

@@ -73,11 +73,18 @@ class OrganizationMemberPage(Page):
         return self.get_member_role_select(
             "//option[contains(@selected, 'selected')]")
 
+    def get_confirm_button(self, role):
+        return self.browser.find_element_by_xpath(
+                "//div[@id='role_{role}']".format(role=role) +
+                "//a[contains (@class, '{role}-final')]".format(role=role))
+
     def get_role_options(self):
         return {
             "member": self.get_member_role_option(),
             "admin": self.get_admin_role_option(),
-            "selected": self.get_selected_role()
+            "selected": self.get_selected_role(),
+            "confirm_member": self.get_confirm_button('member'),
+            "confirm_admin": self.get_confirm_button('admin'),
         }
 
     def click_submit_button(self):
@@ -101,9 +108,26 @@ class OrganizationMemberPage(Page):
             self.test.link("confirm"), self.BY_ORG_MEMBERS
         )
 
-    def try_cancel_and_close(self):
+    def click_admin_role_option(self):
+        self.click_through(
+            self.get_admin_role_option(),
+            (By.CSS_SELECTOR, "div.modal.fade.in")
+        )
+
+    def click_member_role_option(self):
+        self.click_through(
+            self.get_member_role_option(),
+            (By.CSS_SELECTOR, "div.modal.fade.in")
+        )
+
+    def try_cancel_and_close(self, button, modal_id):
         self.test.try_cancel_and_close_confirm_modal(
-            self.click_remove_button
+            button, modal_id
+        )
+
+    def try_cancel_and_close_remove(self):
+        self.try_cancel_and_close(
+            button=self.click_remove_button, modal_id="remove_confirm"
         )
 
     def get_table_data(self, xpath, row):
@@ -111,7 +135,7 @@ class OrganizationMemberPage(Page):
             "projects-permissions", "//tr{}//td".format(row) + xpath)
 
     def get_project_title_in_table(self, row="[1]"):
-        return self.get_table_data("//label", row).text
+        return self.get_table_data("//p", row).text
 
     def get_project_permission(self, xpath):
         return self.test.table_body("projects-permissions", '//select' + xpath)

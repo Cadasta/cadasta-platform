@@ -69,7 +69,6 @@ class OrganizationTest(FunctionalTest):
 
         name = self.page_title().text
         info = page.get_org_description_and_members()
-        print(name)
         assert "Stark Enterprise".upper() in name
         assert "A technology company." in info
 

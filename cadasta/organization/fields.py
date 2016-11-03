@@ -1,5 +1,6 @@
 from django import forms
-from .widgets import ProjectRoleWidget, PublicPrivateToggle, ContactsWidget
+from organization.widgets import (ProjectRoleWidget, PublicPrivateToggle,
+                                  ContactsWidget, ProjectRoleEditWidget)
 
 
 class ProjectRoleField(forms.ChoiceField):
@@ -9,6 +10,18 @@ class ProjectRoleField(forms.ChoiceField):
         choices = kwargs.get('choices', ())
         role = kwargs.get('initial', ())
         self.widget = ProjectRoleWidget(user=user, role=role, choices=choices)
+
+
+class ProjectRoleEditField(forms.ChoiceField):
+    # def __init__(self, admin, user, *args, **kwargs):
+    def __init__(self, admin, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.admin = admin
+        # self.user = user
+        choices = kwargs.get('choices', ())
+        project = kwargs.get('label', ())
+        self.widget = ProjectRoleEditWidget(
+            admin=admin, project=project, choices=choices)
 
 
 class PublicPrivateField(forms.CharField):

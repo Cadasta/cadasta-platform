@@ -3,7 +3,8 @@ from django.http.request import QueryDict
 from django.forms import formset_factory
 
 from ..forms import FORM_CHOICES, ContactsForm
-from ..widgets import ProjectRoleWidget, PublicPrivateToggle, ContactsWidget
+from organization import widgets
+from organization.tests.factories import ProjectFactory
 
 from accounts.tests.factories import UserFactory
 
@@ -15,9 +16,9 @@ class ProjectRoleWidgetTest(TestCase):
             email='me@example.com',
             full_name='Bob Smith'
         )
-        self.widget = ProjectRoleWidget(user=self.user,
-                                        role='A',
-                                        choices=FORM_CHOICES)
+        self.widget = widgets.ProjectRoleWidget(user=self.user,
+                                                role='A',
+                                                choices=FORM_CHOICES)
 
     def test_render_with_admin(self):
         html = self.widget.render(self.user.username, 'A')
@@ -88,9 +89,65 @@ class ProjectRoleWidgetTest(TestCase):
         assert expected == html
 
 
+class ProjectRoleEditWidgetTest(TestCase):
+    def setUp(self):
+        self.user = UserFactory.build(
+            username='bob',
+            email='me@example.com',
+            full_name='Bob Smith'
+        )
+        self.prj = ProjectFactory.create(name='Project One')
+        self.widget = widgets.ProjectRoleEditWidget(admin=True,
+                                                    project=self.prj,
+                                                    choices=FORM_CHOICES)
+
+    def test_render_with_admin(self):
+        html = self.widget.render(self.user.username, 'A')
+
+        expected = (
+            '<tr>'
+            '  <td>'
+            '    <p><Project: Project One></p>'
+            '  </td>'
+            '  <td>'
+            '    Administrator'
+            '  </td>'
+            '</tr>'
+        )
+        assert expected == html
+
+    def test_render_with_member(self):
+        """
+         Setting widget role attribute to empty as it's initialize
+         as a Administrative user
+        """
+        self.widget = widgets.ProjectRoleEditWidget(admin=False,
+                                                    project=self.prj,
+                                                    choices=FORM_CHOICES)
+
+        html = self.widget.render(self.user.username, 'PM')
+
+        expected = (
+            '<tr>'
+            '  <td>'
+            '    <p><Project: Project One></p>'
+            '  </td>'
+            '  <td>'
+            '    <select name="bob">\n'
+            '<option value="Pb">Public User</option>\n'
+            '<option value="PU">Project User</option>\n'
+            '<option value="DC">Data Collector</option>\n'
+            '<option value="PM" selected="selected">Project Manager</option>\n'
+            '</select>'
+            '  </td>'
+            '</tr>'
+        )
+        assert expected == html
+
+
 class PublicPrivateToggleTest(TestCase):
     def test_render_none(self):
-        widget = PublicPrivateToggle()
+        widget = widgets.PublicPrivateToggle()
         html = widget.render('field-name', None)
 
         expected = (
@@ -115,7 +172,7 @@ class PublicPrivateToggleTest(TestCase):
         assert expected == html
 
     def test_render_public(self):
-        widget = PublicPrivateToggle()
+        widget = widgets.PublicPrivateToggle()
         html = widget.render('field-name', 'public')
 
         expected = (
@@ -140,7 +197,7 @@ class PublicPrivateToggleTest(TestCase):
         assert expected == html
 
     def test_render_private(self):
-        widget = PublicPrivateToggle()
+        widget = widgets.PublicPrivateToggle()
         html = widget.render('field-name', 'private')
 
         expected = (
@@ -165,7 +222,7 @@ class PublicPrivateToggleTest(TestCase):
         assert expected == html
 
     def test_render_on(self):
-        widget = PublicPrivateToggle()
+        widget = widgets.PublicPrivateToggle()
         html = widget.render('field-name', 'on')
 
         expected = (
@@ -193,7 +250,7 @@ class PublicPrivateToggleTest(TestCase):
 class ContactsWidgetTest(TestCase):
     def test_value_from_datadict(self):
         formset = formset_factory(ContactsForm)
-        widget = ContactsWidget(attrs={'formset': formset})
+        widget = widgets.ContactsWidget(attrs={'formset': formset})
         data = {
             'contacts-TOTAL_FORMS': '2',
             'contacts-INITIAL_FORMS': '1',
@@ -224,7 +281,7 @@ class ContactsWidgetTest(TestCase):
             for field in form:
                 field.field.widget.attrs = {'some': 'attr'}
 
-        widget = ContactsWidget(attrs={'formset': formset})
+        widget = widgets.ContactsWidget(attrs={'formset': formset})
         html = widget.render('contacts', value, attrs={'class': 'some'})
         assert ('<table class="table contacts-form">'
                 '  <thead>'

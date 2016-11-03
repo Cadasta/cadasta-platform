@@ -238,6 +238,48 @@ class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 
 
 class EditOrganizationMemberFormTest(UserTestCase, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.org_member = UserFactory.create()
+        self.org = OrganizationFactory.create()
+        self.org_role_user = OrganizationRole.objects.create(
+            organization=self.org, user=self.user)
+        self.org_role_member = OrganizationRole.objects.create(
+            organization=self.org, user=self.org_member)
+        self.prj_1 = ProjectFactory.create(organization=self.org)
+        self.prj_2 = ProjectFactory.create(organization=self.org)
+        self.prj_3 = ProjectFactory.create(organization=self.org)
+        self.prj_4 = ProjectFactory.create(organization=self.org)
+        self.prjs = [self.prj_1, self.prj_2, self.prj_3, self.prj_4]
+
+    def test_init(self):
+        # Test to make sure that the initial forms for all users
+        # aren't affected by changing one user.
+        data = {
+            'org_role': 'A'
+        }
+
+        form = forms.EditOrganizationMemberForm(
+            data, self.org, self.org_member, self.user)
+
+        assert form.data == data
+        assert form.user == self.org_member
+        assert form.current_user == self.user
+
+        assert form.org_role_instance.admin is False
+        assert form.initial['org_role'] == 'M'
+
+        form.save()
+
+        form = forms.EditOrganizationMemberForm(
+            data, self.org, self.user, self.user)
+
+        assert form.data == data
+        assert form.user == self.user
+        assert form.current_user == self.user
+        assert form.org_role_instance.admin is False
+        assert form.initial['org_role'] == 'M'
 
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
@@ -260,54 +302,197 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
     def test_edit_admin_role(self):
         # Should fail, since admins are not allowed to alter
         # their own permissions.
-        org = OrganizationFactory.create()
-        user = UserFactory.create()
 
         data = {'org_role': 'M'}
 
-        org_role = OrganizationRole.objects.create(
-            organization=org, user=user, admin=True)
-        form = forms.EditOrganizationMemberForm(data, org, user, user)
+        self.org_role_user.admin = True
+        self.org_role_user.save()
+        form = forms.EditOrganizationMemberForm(
+            data, self.org, self.user, self.user)
         assert not form.is_valid()
         assert form.errors == {
             'org_role': ["Organization administrators cannot change their" +
                          " own role in the organization."]
         }
-        org_role.refresh_from_db()
-        assert org_role.admin is True
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_user.admin is True
 
-    def test_edit_project_roles(self):
-        user = UserFactory.create()
-        org = OrganizationFactory.create()
-        prj_1 = ProjectFactory.create(organization=org)
-        prj_2 = ProjectFactory.create(organization=org)
-        prj_3 = ProjectFactory.create(organization=org)
-        prj_4 = ProjectFactory.create(organization=org)
-
-        org_role = OrganizationRole.objects.create(organization=org, user=user)
-        ProjectRole.objects.create(project=prj_4, user=user, role='PM')
+    def test_assign_and_unassign_admin_role(self):
+        # Assert that changing the admin role
+        # doesn't affect project permissions
+        ProjectRole.objects.create(
+            project=self.prj_1, user=self.org_member, role='DC')
+        ProjectRole.objects.create(
+            project=self.prj_2, user=self.user, role='PM')
 
         data = {
             'org_role': 'M',
-            prj_1.id: 'DC',
-            prj_2.id: 'PU',
-            prj_3.id: 'Pb',
-            prj_4.id: 'Pb'
         }
 
-        form = forms.EditOrganizationMemberForm(data, org, user, user)
+        form = forms.EditOrganizationMemberForm(
+            data, self.org, self.org_member, self.user)
+        form_2 = forms.EditOrganizationMemberForm(
+            data, self.org, self.user, self.user)
 
         form.save()
-        org_role.refresh_from_db()
+        form_2.save()
+        assert form.is_valid() is True
+        assert form_2.is_valid() is True
+
+        self.org_role_member.refresh_from_db()
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_member.admin is False
+        assert self.org_role_user.admin is False
+
+        assert (ProjectRole.objects.get(
+            user=self.org_member, project=self.prj_1).role == 'DC')
+
+        assert (ProjectRole.objects.filter(
+            user=self.org_member, project=self.prj_2).exists() is False)
+
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_1).exists() is False)
+
+        assert (ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PM')
+
+        data = {
+            'org_role': 'A',
+        }
+
+        form = forms.EditOrganizationMemberForm(
+            data, self.org, self.org_member, self.user)
+
+        form.save()
+        assert form.is_valid() is True
+
+        self.org_role_member.refresh_from_db()
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_member.admin is True
+        assert self.org_role_user.admin is False
+
+        assert (ProjectRole.objects.get(
+            user=self.org_member, project=self.prj_1).role == 'DC')
+
+        assert (ProjectRole.objects.filter(
+            user=self.org_member, project=self.prj_2).exists() is False)
+
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_1).exists() is False)
+
+        assert (ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PM')
+
+        data = {
+            'org_role': 'M'
+        }
+
+        form = forms.EditOrganizationMemberForm(
+            data, self.org, self.org_member, self.user)
+
+        form.save()
+        assert form.is_valid() is True
+
+        self.org_role_member.refresh_from_db()
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_member.admin is False
+        assert self.org_role_user.admin is False
+
+        assert (ProjectRole.objects.get(
+            user=self.org_member, project=self.prj_1).role == 'DC')
+
+        assert (ProjectRole.objects.filter(
+            user=self.org_member, project=self.prj_2).exists() is False)
+
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_1).exists() is False)
+
+        assert (ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PM')
+
+
+class EditOrganizationMemberProjectPermissionForm(UserTestCase, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.org_member = UserFactory.create()
+        self.org = OrganizationFactory.create()
+        self.org_role_user = OrganizationRole.objects.create(
+            organization=self.org, user=self.user)
+        self.org_role_member = OrganizationRole.objects.create(
+            organization=self.org, user=self.org_member)
+        self.prj_1 = ProjectFactory.create(organization=self.org)
+        self.prj_2 = ProjectFactory.create(organization=self.org)
+        self.prj_3 = ProjectFactory.create(organization=self.org)
+        self.prj_4 = ProjectFactory.create(organization=self.org)
+        self.prjs = [self.prj_1, self.prj_2, self.prj_3, self.prj_4]
+
+    def test_init(self):
+        # Test to make sure that the initial forms for all users
+        # aren't affected by changing one user.
+        for prj in self.prjs:
+            ProjectRole.objects.create(
+                project=prj, user=self.org_member, role='PM')
+
+        data = {
+            self.prj_1.id: 'DC',
+            self.prj_2.id: 'PU',
+            self.prj_3.id: 'Pb',
+            self.prj_4.id: 'Pb'
+            }
+
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+            data, self.org, self.org_member, self.user)
+
+        assert form.data == data
+        assert form.user == self.org_member
+        assert form.current_user == self.user
+
+        assert form.org_role_instance.admin is False
+        for f in form.fields:
+            assert form.fields[f].initial == 'PM'
+
+        form.save()
+
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+            data, self.org, self.user, self.user)
+        assert form.data == data
+        assert form.user == self.user
+        assert form.current_user == self.user
+        for f in form.fields:
+            assert form.fields[f].initial == 'Pb'
+
+    def test_edit_project_roles(self):
+        ProjectRole.objects.create(
+            project=self.prj_4, user=self.user, role='PM')
+
+        data = {
+            self.prj_1.id: 'DC',
+            self.prj_2.id: 'PU',
+            self.prj_3.id: 'Pb',
+            self.prj_4.id: 'Pb'
+        }
+
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+            data, self.org, self.user, self.user)
+
+        form.save()
+        self.org_role_user.refresh_from_db()
 
         assert form.is_valid() is True
-        assert org_role.admin is False
-        assert ProjectRole.objects.get(user=user, project=prj_1).role == 'DC'
-        assert ProjectRole.objects.get(user=user, project=prj_2).role == 'PU'
-        assert (ProjectRole.objects.filter(user=user, project=prj_3).exists()
-                is False)
-        assert (ProjectRole.objects.filter(user=user, project=prj_4).exists()
-                is False)
+        assert self.org_role_user.admin is False
+        assert ProjectRole.objects.get(
+            user=self.user, project=self.prj_1).role == 'DC'
+        assert ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PU'
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_3).exists() is False)
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_4).exists() is False)
+
+        for prj in self.prjs:
+            assert (ProjectRole.objects.filter(
+                user=self.org_member, project=prj).exists() is False)
 
 
 class ProjectAddDetailsTest(UserTestCase, TestCase):
