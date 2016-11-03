@@ -5,7 +5,16 @@
 {% load widget_tweaks %}
 
 {% block extra_script %}
-  {{ form.media }}
+{{ form.media }}
+<script>
+$(document).ready(function () {
+  $('a.file-remove').click(function() {
+    $('.file-well .errorlist').addClass('hidden');
+    $(this).parents('.form-group')
+      .removeClass('has-error');
+  });
+});
+</script>
 {% endblock %}
 
 {% block page_title %}{% trans "Edit project details" %} | {% endblock %}

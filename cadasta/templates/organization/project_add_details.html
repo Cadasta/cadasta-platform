@@ -8,19 +8,24 @@
 {% block extra_script %}
 {{ form.media }}
 <script>
- $(document).ready(function () {
-   var logos = {{ org_logos|safe }};
-   var select = $('#{{ wizard.form.organization.id_for_label }}');
-   var img = $('#org-logo');
-   select.change(function() {
-     if (logos[select[0].value]) {
-       img.css('display', 'inline-block');
-       img.attr('src', logos[select[0].value]);
-     } else {
-       img.css('display', 'none');
-     }
-   });
- });
+$(document).ready(function () {
+  var logos = {{ org_logos|safe }};
+  var select = $('#{{ wizard.form.organization.id_for_label }}');
+  var img = $('#org-logo');
+  select.change(function() {
+    if (logos[select[0].value]) {
+      img.css('display', 'inline-block');
+      img.attr('src', logos[select[0].value]);
+    } else {
+      img.css('display', 'none');
+    }
+  });
+  $('a.file-remove').click(function() {
+    $('.file-well .errorlist').addClass('hidden');
+    $(this).parents('.form-group')
+      .removeClass('has-error');
+  });
+});
 </script>
 {% endblock %}
 
