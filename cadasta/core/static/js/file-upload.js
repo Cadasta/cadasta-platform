@@ -24,4 +24,9 @@ $(function() {
 
   });
 
+  $('a.file-remove').click(function() {
+    $('.file-well .errorlist').addClass('hidden');
+    $(this).parents('.form-group').removeClass('has-error');
+  });
+
 });
