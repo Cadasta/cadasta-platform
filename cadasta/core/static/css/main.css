@@ -3740,17 +3740,21 @@ table th[class*="col-"] {
   margin-left: 0; }
 
 @media (max-width: 767px) {
-  .wizard {
+  .wizard, #project-wizard .wizard {
     width: 150px; }
-    .wizard > ul {
+    .wizard > ul, #project-wizard .wizard > ul {
       margin: 0; }
-      .wizard > ul > li a:before {
+      .wizard > ul > li a:before, #project-wizard .wizard > ul > li a:before {
         top: 16px; }
-      .wizard > ul > li a .wizard-step {
+      .wizard > ul > li a .wizard-step, #project-wizard .wizard > ul > li a .wizard-step {
         font-size: 16px;
         line-height: 36px;
         width: 36px;
         height: 36px; }
+      .wizard > ul > li a .wizard-description, #project-wizard .wizard > ul > li a .wizard-description {
+        display: none; }
+  #project-wizard h1 {
+    margin: 0 auto 14px auto; }
   #project-wizard .panel-buttons .btn {
     width: 100%;
     margin-bottom: 10px; }
@@ -3759,6 +3763,12 @@ table th[class*="col-"] {
     #project-wizard .panel-buttons .btn-group .btn {
       max-width: 50%;
       min-width: 50% !important; } }
+
+@media (max-width: 400px) {
+  .wizard, #project-wizard .wizard {
+    float: none !important;
+    margin: 0 auto 10px auto;
+    display: block; } }
 
 #configure-defaults-wizard .padded {
   margin-left: 1em; }
@@ -3893,6 +3903,11 @@ footer {
   overflow: hidden; }
   footer .copy {
     float: left; }
+  footer select.input-sm {
+    height: 18px;
+    line-height: 18px;
+    padding: 0;
+    font-size: 11px; }
   footer .list-inline {
     display: inline-block; }
   footer form.language {
@@ -3930,7 +3945,8 @@ footer {
   footer form.language {
     display: block;
     padding-left: 0;
-    padding-bottom: 8px; }
+    padding-bottom: 8px;
+    float: none; }
     footer form.language select {
       font-size: 9px; }
   footer .copy {
@@ -3981,8 +3997,7 @@ div.org-logo {
 
 @media (max-width: 991px) {
   .member-info .member-pic {
-    margin-right: 20px;
-    float: left; } }
+    display: none; } }
 
 /* =Columns of same height for organization overview
 -------------------------------------------------------------- */
@@ -4000,23 +4015,17 @@ div.org-logo {
 @media (max-width: 991px) {
   .row-height, .col-height {
     display: block; }
-  #organization-single .content-single .row {
+  #organization-single .content-single > .row {
     margin-left: 0; }
   #organization-single .row-height {
     display: table;
     margin: 0 auto;
     background: #fff; }
   #organization-single .detail {
-    display: table-row-group;
+    display: table-header-group;
     box-shadow: none; }
     #organization-single .detail section {
-      padding: 20px; }
-  #organization-single .organization-dashboard .main-text {
-    display: table-footer-group; }
-  #organization-single .main-text h2 {
-    margin-left: 20px; }
-  #organization-single .main-text .panel {
-    margin: 20px; } }
+      padding: 20px; } }
 
 @media (min-width: 480px) {
   .row-xs-height {
@@ -4498,7 +4507,15 @@ ul.parsley-errors-list, ul.errorlist {
 
 /* =Mobile
 -------------------------------------------------------------- */
-@media (max-width: 991px) {
+.leaflet-touch .leaflet-control-geolocate {
+  width: 34px !important;
+  height: 34px !important; }
+
+.leaflet-touch .leaflet-pelias-control {
+  width: 34px !important;
+  height: 34px !important; }
+
+@media (max-width: 767px) {
   .leaflet-container .leaflet-control-attribution, .leaflet-container .leaflet-control-scale {
     font-size: 9px !important; }
   .leaflet-container-default {
@@ -5343,7 +5360,7 @@ header {
     .page-title h1 a, .page-title h2 a {
       color: #a3b7e5; }
   .page-title h2 {
-    width: 60%; }
+    width: auto; }
 
 @media (max-width: 991px) {
   .page-header {
@@ -5543,7 +5560,7 @@ header {
   #organization-single .page-header {
     overflow: visible;
     padding-top: 8px;
-    padding-bottom: 4px;
+    padding-bottom: 0;
     border-bottom: solid 1px #0b2548;
     margin-top: 0;
     margin-bottom: 0;
@@ -5556,7 +5573,10 @@ header {
     #project-single .page-header h1, #project-single .page-header h2,
     #organization-single .page-header h1,
     #organization-single .page-header h2 {
-      margin-left: 14px; } }
+      margin-left: 14px; }
+  #project-single .page-header .page-title,
+  #organization-single .page-header .page-title {
+    padding-bottom: 0; } }
 
 @media (max-width: 767px) {
   #project-single .page-header .more-menu,
@@ -5574,7 +5594,7 @@ header {
 #organizations #page-content,
 #users #page-content {
   max-width: 1220px;
-  margin: -190px auto 10px;
+  margin: -190px auto 0;
   padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
@@ -5626,7 +5646,10 @@ body.tinted-bg #page-content {
   #users #page-content {
     border-radius: 0;
     margin-top: -220px;
-    padding-top: 14px; }
+    padding-top: 14px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none; }
   #project-single #page-content,
   #project-wizard.page #page-content,
   #organization-single #page-content {
@@ -5653,7 +5676,8 @@ main.container-fluid {
     padding-bottom: 0; }
   #project-single #page-content main,
   #organization-single #page-content main {
-    margin-left: 0; } }
+    margin-left: 0;
+    background: #fff; } }
 
 .content-single {
   position: absolute;
@@ -5725,7 +5749,7 @@ main.container-fluid {
     .content-single .detail .org-logo {
       margin: 10px auto 20px;
       float: none;
-      padding-left: 0; }
+      text-align: center; }
       .content-single .detail .org-logo img {
         width: 90%;
         max-width: 200px; }
@@ -5835,7 +5859,11 @@ textarea.form-control {
   max-height: 80px; }
 
 .file-well {
-  padding: 10px 20px; }
+  padding: 10px 0 10px 10px; }
+
+.s3-buckets {
+  width: 90%;
+  max-width: 90%; }
 
 .file-input, #id_select_file-file {
   margin: 14px 0;
@@ -5940,7 +5968,9 @@ textarea.form-control {
       padding: 2px; }
     .dataTables_wrapper .table-num select {
       width: 50px !important;
-      font-size: 10px; } }
+      font-size: 10px; }
+  .table > caption + thead > tr:first-child > th, .table > caption + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > thead:first-child > tr:first-child > th, .table > thead:first-child > tr:first-child > td {
+    width: auto !important; } }
 
 /* =Table views
 -------------------------------------------------------------- */

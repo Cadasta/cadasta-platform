@@ -67,7 +67,18 @@
 /* =Mobile
 -------------------------------------------------------------- */
 
-@media (max-width: $screen-sm-max) {
+.leaflet-touch {
+  .leaflet-control-geolocate {
+    width: 34px !important;
+    height: 34px !important;
+  }
+  .leaflet-pelias-control {
+    width: 34px !important;
+    height: 34px !important;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
   .leaflet-container .leaflet-control-attribution, .leaflet-container .leaflet-control-scale {
     font-size: 9px !important;
   }

@@ -175,7 +175,7 @@
 }
 
 @media (max-width: $screen-xs-max) {
-  .wizard {
+  .wizard, #project-wizard .wizard {
     width: 150px;
     > ul {
       margin: 0;
@@ -189,10 +189,16 @@
           width: 36px;
           height: 36px;
         }
+        .wizard-description {
+          display: none;
+        }
       }
     }
   }
   #project-wizard {
+    h1 {
+      margin: 0 auto 14px auto;
+    }
     .panel-buttons .btn {
       width: 100%;
       margin-bottom: 10px;
@@ -204,6 +210,14 @@
         min-width: 50% !important;
       }
     }
+  }
+}
+
+@media (max-width: 400px) {
+  .wizard, #project-wizard .wizard {
+    float: none !important;
+    margin: 0 auto 10px auto;
+    display: block;
   }
 }
 

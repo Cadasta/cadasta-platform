@@ -442,7 +442,7 @@ header {
     }
   }
   h2 {
-    width: 60%;
+    width: auto;
   }
 }
 
@@ -544,7 +544,7 @@ header {
   #organization-single .page-header { 
     overflow: visible;
     padding-top: 8px;
-    padding-bottom: 4px;
+    padding-bottom: 0;
     border-bottom: solid 1px $brand-darkerblue;
     margin-top: 0;
     margin-bottom: 0;
@@ -557,6 +557,10 @@ header {
     h1, h2 {
         margin-left: 14px;
     }
+  }
+  #project-single .page-header .page-title, 
+  #organization-single .page-header .page-title {
+    padding-bottom: 0;
   }
 }
 
@@ -582,7 +586,7 @@ header {
 #organizations #page-content,
 #users #page-content { // index pages without subnav that overlap page-header
   max-width: 1220px;
-  margin: -190px auto 10px;
+  margin: -190px auto 0;
   padding-top: 30px;
   background: #fff;
   -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -642,6 +646,9 @@ body.tinted-bg #page-content { // for bg image
     border-radius: 0;
     margin-top: -220px;
     padding-top: 14px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
   }
 
   #project-single #page-content,
@@ -679,6 +686,7 @@ main.container-fluid {
   #project-single #page-content main,
   #organization-single #page-content main { 
     margin-left: 0;
+    background: #fff;
   }
 }
 
@@ -765,7 +773,7 @@ main.container-fluid {
     .org-logo { // large org logo
       margin: 10px auto 20px;
       float: none;
-      padding-left: 0;
+      text-align: center;
       img { 
         width: 90%;
         max-width: 200px;
@@ -929,7 +937,11 @@ textarea.form-control {
 }
 
 .file-well {
-  padding: 10px 20px;
+  padding: 10px 0 10px 10px;
+}
+.s3-buckets {
+  width: 90%;
+  max-width: 90%;
 }
 
 .file-input, #id_select_file-file { // browse for file
@@ -1073,6 +1085,9 @@ textarea.form-control {
         font-size: 10px;
       }
     }
+  }
+  .table > caption + thead > tr:first-child > th, .table > caption + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > thead:first-child > tr:first-child > th, .table > thead:first-child > tr:first-child > td {
+    width: auto !important;
   }
 }
 

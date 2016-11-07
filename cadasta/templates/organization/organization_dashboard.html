@@ -22,7 +22,7 @@
                 <tr>
                   <th class="unarchived"><div>{% trans "Archived" %}</div></th>
                   <th class="col-md-6">{% trans "Project" %}</th>
-                  <th class="col-md-2">{% trans "Country" %}</th>
+                  <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
                   <th class="col-md-2">{% trans "Last updated" %}</th>
                 </tr>
               </thead>
@@ -42,7 +42,7 @@
                       </span>
                       {% endif %}
                   </td>
-                  <td>{{ prj.country }}</td>
+                  <td class="hidden-xs">{{ prj.country }}</td>
                   <td>{{ prj.last_updated }}</td>
                 </tr>
                 {% endfor %}
