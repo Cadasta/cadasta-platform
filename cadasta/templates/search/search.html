@@ -1,0 +1,153 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block page_title %}{% trans "Search" %} | {% endblock %}
+{% block left-nav %}search{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Search" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="row">
+            <form action="#" id="search-form" class="inline" data-search-api-url="{% url 'api:v1:search:search' object.organization.slug object.slug %}">
+              <div class="form-group col-md-9">
+                <label class="control-label sr-only">{% trans "Search within project for" %}</label>
+                <input type="search" id="search-input" class="form-control input-lg pull-left" value="{{ search_query }}">
+                <button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                <p class="small help-block">
+                  {% blocktrans %}
+                  e.g., “Parcel”, “John White”, <a id="search-guidelines-link">more search guidelines</a>
+                  {% endblocktrans %}
+                </p>
+                <div id="search-guidelines" class="hidden">
+                  {% blocktrans %}
+                  <ul>
+                    <li>Review your wording, make sure that there aren’t any typos in your search query</li>
+                    <li>If you are having no results matching your query, try removing some search terms (“John”, instead of “John White”)</li>
+                    <li>Search results are currently capped to 10 matches. If you want to narrow down your results, try including additional search terms or making the existing ones more restrictive (“John White Kansas”, instead of “John White”)</li>
+                  </ul>
+                  {% endblocktrans%}
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="row">
+            <div id="waiting-results"><img src="{% static 'img/loading.gif' %}"></div>
+            <div id="no-results" class="col-md-9">
+              <h4>{% trans "We’re sorry, we couldn’t find any results for:" %} <strong><span id="failed-query-string"></span></strong></h4>
+              <strong>{% trans "Search index was last updated on" %} <span id="index-timestamp-0"></span></strong>
+              <div class="divider-thick"></div>
+              <p><strong>{% trans "Search tips:" %}</strong></p>
+              <ul>
+                <li>{% trans "Double check your spelling for typos." %}</li>
+                <li>{% trans "Use fewer keywords." %}</li>
+                <li>{% trans "Refer to our search guidelines for more tips." %}</li>
+              </ul>
+            </div>
+            <div id="results" class="col-md-9">
+              <h4>
+                {% blocktrans %}
+                Showing <span id="total-results"></span> result(s) for <strong><span id="query-string"></span></strong>
+                {% endblocktrans %}
+              </h4>
+              <strong>{% trans "Search index was last updated on" %} <span id="index-timestamp-1"></span></strong>
+              <table id="search-results" class="table table-hover datatable" data-paging-type="simple">
+                <thead>
+                  <tr>
+                    <th class="entity-type hidden"></th>
+                    <th class="entity-main-label hidden"></th>
+                    <th class="col-md-12 entity-record">{% trans "Entity Record" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+
+function performSearch(query) {
+
+  $('#no-results').css('display', 'none');
+  $('#results').css('display', 'none');
+
+  if (query === '') return;
+
+  var url = $('#search-form')[0].dataset.searchApiUrl;
+  $('#waiting-results').css('display', 'block');
+
+  $.get(url + '?q=' + query, function(response) {
+
+    var t = $('#search-results').DataTable();
+    t.column(0).visible(false);
+    t.column(1).visible(false);
+    if (t.rows().length !== 0) t.rows().remove();
+    t.rows.add(response.results).draw();
+
+    var timestamp = response.timestamp;
+    timestamp = timestamp.replace(/T/, ' ');
+    timestamp = timestamp.replace(/:\d\d\.\d+Z/, ' UTC');
+
+    $('#waiting-results').css('display', 'none');
+    if (response.results.length === 0) {
+      $('#no-results').css('display', 'block');
+      $('#failed-query-string').text(query);
+      $('#index-timestamp-0').text(response.timestamp);
+      $('#results').css('display', 'none');
+    }
+    else {
+      $('#no-results').css('display', 'none');
+      $('#results').css('display', 'block');
+      $('#total-results').text(response.results.length);
+      $('#query-string').text(query);
+      $('#index-timestamp-1').text(response.timestamp);
+    }
+  });
+}
+
+window.addEventListener('load', function () {
+
+  // Toggle display of search guidelines
+  $('#search-guidelines-link').bind('click', function(e) {
+    $('#search-guidelines').toggleClass('hidden');
+  });
+
+  // Hide other sections at first
+  $('#waiting-results').css('display', 'none');
+  $('#no-results').css('display', 'none');
+  $('#results').css('display', 'none');
+
+  // If URL contains a search query, perform search
+  var query = RegExp('[?&]q=([^&]*)').exec(window.location.search);
+  query = query && decodeURIComponent(query[1].replace(/\+/g, ' '));
+  if (query) {
+    history.replaceState(history.state, null, window.location.href.split('?')[0]);
+    $('#search-input')[0].value = query;
+    performSearch(query);
+  }
+
+  // Perform search when the search form is submitted
+  $('#search-form').bind('submit', function(e) {
+    var query = $('#search-input')[0].value;
+    performSearch(query);
+    return false;
+  });
+});
+
+</script>
+
+{% endblock %}

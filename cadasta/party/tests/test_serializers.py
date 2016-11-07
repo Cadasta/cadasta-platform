@@ -20,7 +20,7 @@ class PartySerializerTest(UserTestCase, TestCase):
         assert serialized['type'] == party.type
         assert 'attributes' in serialized
 
-    def test_create_party(self,):
+    def test_create_party(self):
         project = ProjectFactory.create(name='Test Project')
 
         party_data = {'name': 'Tea Party'}

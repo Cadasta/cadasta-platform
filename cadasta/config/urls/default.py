@@ -54,6 +54,10 @@ api_v1 = [
         '(?P<project>[-\w]+)/relationships/',
         include('party.urls.api.relationships',
                 namespace='relationship')),
+    url(r'^organizations/(?P<organization>[-\w]+)/projects/'
+        '(?P<project>[-\w]+)/search/',
+        include('search.urls.api',
+                namespace='search')),
 
     url(r'^docs/',
         include('rest_framework_docs.urls'))
@@ -98,6 +102,9 @@ urlpatterns = [
     url(r'^',
         include('resources.urls.default',
                 namespace='resources')),
+    url(r'^',
+        include('search.urls.default',
+                namespace='search')),
 
     url(r'^api/',
         include(api,

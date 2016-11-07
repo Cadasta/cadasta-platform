@@ -107,12 +107,18 @@
 <!-- Sidebar -->
 <div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
-    <li class="overview">
+    <li class="search">
+      <a href="#">
+        <span class="icon"></span>
+        <span class="title">{% trans "Search" %}</span>
+      </a>
+    </li><!-- needed to eliminate spacing issue on horizontal menus
+    --><li class="overview">
       <a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li><!-- needed to eliminate spacing issue on horizontal menus
+    </li><!--
     --><li class="map">
       <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
@@ -134,6 +140,39 @@
   </ul>
 </div>
 <!-- /.sidebar -->
+<!-- Sidebar search box-->
+<div id="sidebar-search-box" class="disabled" data-search-url="{% url 'search:search' object.organization.slug object.slug %}">
+  <form action="#" class="form-inline">
+    <div class="form-group">
+      <label class="control-label sr-only">{% trans "Search within project for" %}</label>
+      <input type="text" class="form-control pull-left" placeholder="{% trans 'Search within project' %}" value="">
+      <button class="btn btn-primary" type="submit"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+    </div>
+  </form>
+</div>
+<script>
+'use strict';
+window.addEventListener('load', function() {
+  $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
+    console.log('print')
+    if (!$('#sidebar').hasClass('search')) {
+      if ($('#sidebar-search-box').hasClass('disabled')) {
+        $('#sidebar-search-box').removeClass('disabled');
+        $('#sidebar-search-box input').focus();
+      } else {
+        $('#sidebar-search-box').addClass('disabled');
+      }
+    } 
+  });
+  $('#sidebar-search-box form').bind('submit', function(e) {
+    var query = $('#sidebar-search-box input')[0].value;
+    var url = $('#sidebar-search-box')[0].dataset.searchUrl + '?q=' + encodeURIComponent(query);
+    window.location = url;
+    return false;
+  });
+});
+</script>
+<!-- /.sidebar search box -->
 {% endif %}
 
 {% endblock %}

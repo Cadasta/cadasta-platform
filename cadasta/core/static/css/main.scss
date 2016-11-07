@@ -275,7 +275,9 @@ main.container-fluid {
     margin-top: 0;
     padding-bottom: 6px;
     text-shadow: none;
-    max-width: 70%;
+    &.short { // provides room for admin buttons on right
+      width: 70%;
+    }
     a {
       color: #0e305e;
       text-decoration: none;
@@ -290,6 +292,15 @@ main.container-fluid {
     font-weight: 300;
     letter-spacing: 0;
     color: #0e305e;
+  }
+  h4 span.small { // small entity title above link in results tables
+    font-size: 11px;
+    color: $gray-medium;
+    display: block;
+    text-transform: uppercase;
+    padding-bottom: 2px;
+    font-weight: normal;
+    letter-spacing: 0;
   }
   .divider-thick {
     border-top: solid 7px $table-border-color;
@@ -674,8 +685,20 @@ table#select-list {
    font-size: 12px;
  }
  .form-control {
-   padding: 6px;
+   padding: 6px; 
  }
+}
+
+#search-results_filter .input-group {
+  width: 0px !important;
+  height: 0px !important;
+  z-index: -100;
+  display: inline-block;
+  overflow-x: none;
+}
+
+#no-results {
+  display: none;
 }
 
 /* =Dashboard map

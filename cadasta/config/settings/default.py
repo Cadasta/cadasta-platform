@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'buckets',
     'party',
     'xforms',
+    'search',
 
     'crispy_forms',
     'parsley',
@@ -502,11 +503,6 @@ FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
 
-IMPORTERS = {
-    'csv': 'organization.importers.csv.CSVImporter',
-    'xls': 'organization.importers.xls.XLSImporter'
-}
-
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
 # upon login
@@ -522,3 +518,7 @@ IMPORTERS = {
     'csv': 'organization.importers.csv.CSVImporter',
     'xls': 'organization.importers.xls.XLSImporter'
 }
+
+ES_SCHEME = 'http'
+ES_HOST = 'localhost'
+ES_PORT = '9200'
