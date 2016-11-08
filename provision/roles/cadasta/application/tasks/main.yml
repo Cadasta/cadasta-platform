@@ -3,10 +3,10 @@
   become_user: root
   apt_repository: repo='ppa:fkrull/deadsnakes'
 
-- name: Add ubuntugis repository
+- name: Remove ubuntugis repository
   become: yes
   become_user: root
-  apt_repository: repo='ppa:ubuntugis/ppa'
+  apt_repository: repo='ppa:ubuntugis/ppa' state=absent
 
 - name: Install packages
   become: yes
@@ -21,7 +21,7 @@
       - libxslt1-dev
       - libxml2-dev
       - libjpeg-dev
-      - libgdal1-dev
+      - libgdal-dev
       - libmemcached-dev
 
 - name: dev locale

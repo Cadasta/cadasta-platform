@@ -8,10 +8,9 @@ addons:
 
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
-  - sudo add-apt-repository ppa:ubuntugis/ppa -y
   - sudo -E apt-get -yq update &>> ~/apt-get-update.log
   - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2 squid3
-  - sudo apt-get -yq install libgdal1-dev
+  - sudo apt-get -yq install libgdal-dev
   - gdal-config --version
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
   - export C_INCLUDE_PATH=/usr/include/gdal
