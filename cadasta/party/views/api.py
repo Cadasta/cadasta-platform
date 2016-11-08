@@ -119,31 +119,20 @@ class RelationshipList(APIPermissionRequiredMixin,
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
         spatial_rels = []
-        if (
-            'location' in kwargs and
-            (rel_class is None or rel_class == 'spatial')
-        ):
+        if ('location' in kwargs and
+                (rel_class is None or rel_class == 'spatial')):
             manager = SpatialRelationship.objects
-            spatial_rels = (
-                manager.filter(
-                    Q(su1=kwargs['location']) |
-                    Q(su2=kwargs['location'])
-                )
+            spatial_rels = manager.filter(
+                Q(su1=kwargs['location']) | Q(su2=kwargs['location'])
             )
         serialized_spatial_rels = SpatialRelationshipReadSerializer(
             spatial_rels, many=True).data
 
         party_rels = []
-        if (
-            'party_id' in kwargs and
-            (rel_class is None or rel_class == 'party')
-        ):
+        if 'party' in kwargs and (rel_class is None or rel_class == 'party'):
             manager = PartyRelationship.objects
-            party_rels = (
-                manager.filter(
-                    Q(party1=kwargs['party_id']) |
-                    Q(party2=kwargs['party_id'])
-                )
+            party_rels = manager.filter(
+                Q(party1=kwargs['party']) | Q(party2=kwargs['party'])
             )
         serialized_party_rels = serializers.PartyRelationshipReadSerializer(
             party_rels, many=True).data
@@ -152,13 +141,9 @@ class RelationshipList(APIPermissionRequiredMixin,
         if rel_class is None or rel_class == 'tenure':
             manager = TenureRelationship.objects
             if 'location' in kwargs:
-                tenure_rels = (
-                    manager.filter(spatial_unit=kwargs['location'])
-                )
-            elif 'party_id' in kwargs:
-                tenure_rels = (
-                    manager.filter(party=kwargs['party_id'])
-                )
+                tenure_rels = manager.filter(spatial_unit=kwargs['location'])
+            elif 'party' in kwargs:
+                tenure_rels = (manager.filter(party=kwargs['party']))
         serialized_tenure_rels = serializers.TenureRelationshipReadSerializer(
             tenure_rels, many=True).data
 
