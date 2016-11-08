@@ -83,7 +83,7 @@ class SpatialUnitsRelationshipListAPITest(APITestCase, UserTestCase, TestCase):
         self.TR.create(project=self.prj, party=party2, spatial_unit=su1)
 
         response = self.request(user=self.user,
-                                url_kwargs={'party_id': party1.id})
+                                url_kwargs={'party': party1.id})
         assert response.status_code == 200
         assert len(response.content) == 3
         valid_ids = (pr1.id, pr2.id, tr1.id)
@@ -93,7 +93,7 @@ class SpatialUnitsRelationshipListAPITest(APITestCase, UserTestCase, TestCase):
     def test_get_invalid_relationship_class(self):
         party = party_factories.PartyFactory.create(project=self.prj)
         response = self.request(user=self.user,
-                                url_kwargs={'party_id': party.id},
+                                url_kwargs={'party': party.id},
                                 get_data={'class': 'nonsense'})
 
         assert response.status_code == 400
