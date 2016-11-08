@@ -3,6 +3,11 @@
   become_user: root
   apt_repository: repo='ppa:fkrull/deadsnakes'
 
+- name: Remove ubuntugis repository
+  become: yes
+  become_user: root
+  apt_repository: repo='ppa:ubuntugis/ppa' state=absent
+
 - name: Install packages
   become: yes
   become_user: root
