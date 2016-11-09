@@ -79,12 +79,13 @@ ORIENTATIONS = {
     8: ("Rotated 270 degrees", -270)
 }
 
+
 def fix_orientation(img):
     try:
         orientation = img._getexif()[EXIF_ORIENTATION_TAG]
     except (TypeError, AttributeError, KeyError):
         return img
-    if orientation in [3,6,8]:
+    if orientation in [3, 6, 8]:
         degrees = ORIENTATIONS[orientation][1]
         img = img.rotate(degrees)
         return img
