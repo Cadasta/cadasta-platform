@@ -236,6 +236,7 @@ LANGUAGES = [
     # ('fr', _('French')),    (hiding until translation coverage >= 75%)
     # ('de', _('German')),    (hiding until translation coverage >= 75%)
     # ('es', _('Spanish')),   (hiding until translation coverage >= 75%)
+    ('id', _('Indonesian')),
     ('pt', _('Portuguese')),
     # ('sw', _('Swahili')),   (hiding until translation coverage >= 75%)
 ]
