@@ -236,6 +236,13 @@
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
     }, 5000);
     </script>
+    <script>
+      // User tracking
+      window.inlineManualTracking = {
+        uid: "{{ user.id }}",
+        username: "{{ user.username }}"
+      }
+    </script>
     <script type="text/javascript" src="{% static 'js/inline-manual-player.js' %}"></script>
   </body>
 </html>
