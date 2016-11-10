@@ -554,6 +554,23 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
         role = ProjectRole.objects.get(user=user, project=project)
         assert role.role == data['role']
 
+    def test_update_roles_for_user_with_additional_payload(self):
+        user = UserFactory.create()
+        org = OrganizationFactory(add_users=[user])
+        project = ProjectFactory.create(add_users=[user], organization=org)
+        data = {'username': user.username, 'role': 'PM'}
+        serializer = serializers.ProjectUserSerializer(
+            user,
+            partial=True,
+            data=data,
+            context={'project': project}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        role = ProjectRole.objects.get(user=user, project=project)
+        assert role.role == data['role']
+
 
 class UserAdminSerializerTest(UserTestCase, TestCase):
     def test_user_fields_are_set(self):
