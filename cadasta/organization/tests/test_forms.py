@@ -1055,4 +1055,5 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
             files=file_dict, data=self.data,
             project=self.project, user=self.user)
         assert form.is_valid() is True
-        assert form.cleaned_data['mime_type'] == 'text/plain'
+        assert form.cleaned_data['mime_type'] == 'text/csv'
+        assert form.cleaned_data['original_file'] == 'test.csv'

@@ -1506,7 +1506,11 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
                 assert type(su.geometry) is Point
 
         resource = Resource.objects.filter(project_id=proj.pk).first()
-        assert resource.file.url == '/media/s3/uploads/resources/test.csv'
+        assert resource.original_file == 'test.csv'
+        assert resource.mime_type == 'text/csv'
+        random_filename = resource.file.url[resource.file.url.rfind('/'):]
+        assert random_filename.endswith('.csv')
+        assert len(random_filename.split('.')[0].strip('/')) == 24
 
     def test_full_flow_invalid_value(self):
         self.client.force_login(self.user)

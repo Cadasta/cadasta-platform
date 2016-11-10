@@ -1,7 +1,7 @@
+import mimetypes
 import time
 from zipfile import ZipFile
 
-import magic
 from accounts.models import User
 from buckets.widgets import S3FileUploadWidget
 from core.form_mixins import SuperUserCheck
@@ -482,7 +482,14 @@ class DownloadForm(forms.Form):
 
 
 class SelectImportForm(forms.Form):
-    VALID_IMPORT_MIME_TYPES = ['text/plain', 'text/csv']
+    MIME_TYPES = {
+        'xls': [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        ],
+        'csv': [
+            'text/csv'
+        ]
+    }
     MAX_FILE_SIZE = 512000
 
     class Media:
@@ -515,12 +522,22 @@ class SelectImportForm(forms.Form):
         if file.size > self.MAX_FILE_SIZE:
             raise ValidationError(
                 _('File too large, max size 512kb'))
-        mime = magic.Magic(mime=True)
-        mime_type = str(mime.from_buffer(file.read(1024)), 'utf-8')
-        if mime_type not in self.VALID_IMPORT_MIME_TYPES:
-            raise ValidationError(_("Invalid file type"))
-        self.data['mime_type'] = mime_type
         return file
+
+    def clean_mime_type(self):
+        file = self.cleaned_data.get("file", False)
+        type = self.cleaned_data.get("type", None)
+        if file and type:
+            mime_type = mimetypes.guess_type(file.name)[0]
+            types = self.MIME_TYPES.get(type)
+            if mime_type not in types:
+                self.add_error('file', _("Invalid file type"))
+            return mime_type
+
+    def clean_original_file(self):
+        file = self.cleaned_data.get("file", False)
+        if file:
+            return file.name
 
 
 class MapAttributesForm(forms.Form):

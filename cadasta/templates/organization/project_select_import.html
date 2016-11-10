@@ -1,9 +1,9 @@
-{% extends "organization/project_import_wrapper.html" %} 
+{% extends "organization/project_import_wrapper.html" %}
 
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% block extra_script %} {{ form.media }} {% endblock %} 
+{% block extra_script %} {{ form.media }} {% endblock %}
 
 {% block step_content %}
 
@@ -62,7 +62,6 @@
                 {% trans "Include import file in project resources" %}
               </label>
             </div>
-            {{ form.mime_type }}
           </div>
         </div>
       </div>
@@ -79,4 +78,3 @@
 {% endif %}
 
 {% endblock %}
-

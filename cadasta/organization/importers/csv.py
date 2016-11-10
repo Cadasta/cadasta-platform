@@ -22,12 +22,11 @@ TENURE_TYPE = 'tenure_type'
 
 class CSVImporter(base.Importer):
 
-    def __init__(self, project=None, path=None,
-                 delimiter=None, quotechar=None):
+    def __init__(self, project, path=None, delimiter=',', quotechar='"'):
         super(CSVImporter, self).__init__(project=project)
         self.path = path
-        self.delimiter = ',' if not delimiter else delimiter
-        self.quotechar = '"' if not quotechar else quotechar
+        self.delimiter = delimiter
+        self.quotechar = quotechar
 
     def get_headers(self):
         headers = []
@@ -154,25 +153,13 @@ class CSVImporter(base.Importer):
                 # handle select_multiple fields
                 if (attribute.attr_type.name == 'select_multiple'):
                     val = val.split(' ')
-                content_types[content_type][
-                    'attributes'][
-                        attribute.name] = val
-        party = Party.objects.create(
-            **content_types['party.party']
-        )
-        su = SpatialUnit.objects.create(
-            **content_types['spatial.spatialunit']
-        )
-        tt = TenureRelationshipType.objects.get(
-            id=tenure_type)
-        content_types[
-            'party.tenurerelationship']['party'] = party
-        content_types[
-            'party.tenurerelationship'][
-                'spatial_unit'] = su
-        content_types[
-            'party.tenurerelationship'][
-                'tenure_type'] = tt
+                content_types[content_type]['attributes'][attribute.name] = val
+        party = Party.objects.create(**content_types['party.party'])
+        su = SpatialUnit.objects.create(**content_types['spatial.spatialunit'])
+        tt = TenureRelationshipType.objects.get(id=tenure_type)
+        content_types['party.tenurerelationship']['party'] = party
+        content_types['party.tenurerelationship']['spatial_unit'] = su
+        content_types['party.tenurerelationship']['tenure_type'] = tt
         TenureRelationship.objects.create(
             **content_types['party.tenurerelationship']
         )

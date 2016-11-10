@@ -2,13 +2,13 @@ import json
 import os
 from collections import OrderedDict
 
-
 import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
 from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
+from core.util import random_id
 from core.views import mixins as core_mixins
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
@@ -19,9 +19,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from questionnaires.exceptions import InvalidXLSForm
 from questionnaires.models import Questionnaire
-from spatial.serializers import SpatialUnitGeoJsonSerializer
-
 from resources.models import ContentObject, Resource
+from spatial.serializers import SpatialUnitGeoJsonSerializer
 
 from . import mixins
 from .. import messages as error_messages
@@ -76,6 +75,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
+
     def get_actions(self, view, request):
         if self.get_object().archived:
             return 'org.view_archived'
@@ -327,6 +327,7 @@ class ProjectList(PermissionRequiredMixin,
                   mixins.ProjectQuerySetMixin,
                   mixins.ProjectCreateCheckMixin,
                   generic.ListView):
+
     def permission_filter(self, view, p):
         if p.archived is True:
             return ('project.view_archived',)
@@ -375,6 +376,7 @@ class ProjectDashboard(PermissionRequiredMixin,
                        mixins.ProjectAdminCheckMixin,
                        mixins.ProjectMixin,
                        generic.DetailView):
+
     def get_actions(self, view):
         if self.prj.archived:
             return 'project.view_archived'
@@ -664,6 +666,7 @@ class ProjectArchive(ProjectEdit,
 class ProjectUnarchive(ProjectEdit,
                        core_mixins.ArchiveMixin,
                        generic.DetailView):
+
     def patch_actions(self, request, view=None):
         if self.get_organization().archived:
             return False
@@ -812,7 +815,6 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
 
     def done(self, form_list, **kwargs):
         form_data = [form.cleaned_data for form in form_list]
-
         name = form_data[0]['name']
         description = form_data[0]['description']
         mime_type = form_data[0]['mime_type']
@@ -842,13 +844,18 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         if is_resource:
             default_storage = DefaultStorage()
             file.seek(0)
+            ext = file.name[file.name.rfind('.'):]
             resource = Resource(
                 name=name, description=description,
                 original_file=original_file, mime_type=mime_type,
                 contributor=self.request.user, project=self.get_project())
             upload_to = getattr(resource.file.field, 'upload_to')
-            url = default_storage.save(
-                upload_to + '/' + file.name, file.read())
+            url = ''
+            while not url:
+                temp_url = upload_to + '/' + random_id() + ext
+                if not Resource.objects.filter(
+                        file__contains=temp_url).exists():
+                    url = default_storage.save(temp_url, file.read())
             resource.file.url = url
             resource.save()
             ContentObject.objects.create(resource=resource,
