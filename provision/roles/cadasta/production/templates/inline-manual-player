@@ -3,14 +3,7 @@ Inline Manual Player, v2.34.1
 http://inlinemanual.com/
 */
 
-// User tracking
-
-window.inlineManualTracking = {
-  uid: "{{ user.id }}",
-  username: "{{ user.username }}"
-}
-
-// Embed correct player for site - myplayer variable
+// Embed correct player for environment - myplayer variable
 
 var myplayer = "{{ myplayer }}";
 
