@@ -5,12 +5,26 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
 from core.views.generic import UpdateView
+from core.views.mixins import SuperUserCheckMixin
 
+import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 
 from ..models import User
 from ..forms import ProfileForm
+
+
+class PasswordChangeView(LoginRequiredMixin,
+                         SuperUserCheckMixin,
+                         allauth_views.PasswordChangeView):
+    pass
+
+
+class PasswordResetView(LoginRequiredMixin,
+                        SuperUserCheckMixin,
+                        allauth_views.PasswordResetView):
+    pass
 
 
 class AccountProfile(LoginRequiredMixin, UpdateView):
