@@ -20,6 +20,10 @@ htmlcov
 */dist/bundle.js
 node_modules/
 
+# Floobits
+.floo
+.flooignore
+
 .idea
 /.envrc
 /.virtualenv/

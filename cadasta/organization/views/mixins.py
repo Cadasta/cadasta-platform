@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 
 from tutelary.models import Role, check_perms
 
@@ -65,7 +65,14 @@ class ProjectRoles(ProjectMixin):
 
     def get_queryset(self):
         self.prj = self.get_project()
-        return self.prj.users.all()
+        org = self.prj.organization
+        orgs = Prefetch(
+            'organizationrole_set',
+            queryset=OrganizationRole.objects.filter(organization=org))
+        prjs = Prefetch(
+            'projectrole_set',
+            queryset=ProjectRole.objects.filter(project=self.prj))
+        return org.users.prefetch_related(orgs, prjs)
 
     def get_serializer_context(self, *args, **kwargs):
         context = super(ProjectRoles, self).get_serializer_context(
