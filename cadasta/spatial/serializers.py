@@ -4,22 +4,19 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as geo_serializers
 
 from .models import SpatialUnit, SpatialRelationship
-from core.serializers import DetailSerializer, FieldSelectorSerializer
-from organization.serializers import NestedProjectSerializer
+from core.serializers import FieldSelectorSerializer
 
 
-class SpatialUnitSerializer(DetailSerializer, FieldSelectorSerializer,
+class SpatialUnitSerializer(FieldSelectorSerializer,
                             geo_serializers.GeoFeatureModelSerializer):
-    project = NestedProjectSerializer(read_only=True)
 
     class Meta:
         model = SpatialUnit
         context_key = 'project'
         geo_field = 'geometry'
         id_field = False
-        fields = ('id', 'geometry', 'type', 'attributes', 'project',)
-        read_only_fields = ('id', 'project',)
-        detail_only_fields = ('project',)
+        fields = ('id', 'geometry', 'type', 'attributes', )
+        read_only_fields = ('id', )
 
     def create(self, validated_data):
         project = self.context['project']

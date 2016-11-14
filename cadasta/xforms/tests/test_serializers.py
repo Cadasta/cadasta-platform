@@ -48,7 +48,7 @@ class XFormListSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert (serializer.data['downloadUrl'] ==
                 protocol + '://localhost:8000' +
                 questionnaire.data['xml_form'])
-        assert serializer.data['hash'] == questionnaire.data['md5_hash']
+        assert serializer.data['hash'] == form.md5_hash
 
     def test_serialize(self):
         self._test_serialize()

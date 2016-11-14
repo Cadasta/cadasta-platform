@@ -53,7 +53,7 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
         model = models.Questionnaire
         fields = (
             'id', 'filename', 'title', 'id_string', 'xls_form', 'xml_form',
-            'version', 'questions', 'question_groups', 'md5_hash'
+            'version', 'questions', 'question_groups',
         )
         read_only_fields = (
             'id', 'filename', 'title', 'id_string', 'version',

@@ -45,6 +45,8 @@ class ProjectFactory(ExtendedFactory):
 
         if users:
             for u in users:
+                OrganizationRole.objects.get_or_create(
+                    organization=self.organization, user=u)
                 ProjectRole.objects.create(project=self, user=u)
 
 

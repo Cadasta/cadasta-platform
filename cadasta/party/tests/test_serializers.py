@@ -19,11 +19,6 @@ class PartySerializerTest(UserTestCase, TestCase):
         assert serialized['name'] == party.name
         assert serialized['type'] == party.type
         assert 'attributes' in serialized
-        assert 'contacts' in serialized
-
-        assert serialized['project']['id'] == party.project.id
-        assert (serialized['project']['organization']['id'] ==
-                party.project.organization.id)
 
     def test_create_party(self,):
         project = ProjectFactory.create(name='Test Project')
@@ -37,4 +32,3 @@ class PartySerializerTest(UserTestCase, TestCase):
         serializer.save()
         party_instance = serializer.instance
         assert party_instance.name == 'Tea Party'
-        assert party_instance.project_id == project.id
