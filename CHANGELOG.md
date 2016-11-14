@@ -1,5 +1,97 @@
 # Change Log
 
+## [v1.2.0](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0) (2016-11-11)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.5...v1.2.0)
+
+**Implemented enhancements:**
+
+- Inline manual conditional variables for sign in options \(project walkthrough\) [\#623](https://github.com/Cadasta/cadasta-platform/issues/623)
+- Resources number on project overview [\#474](https://github.com/Cadasta/cadasta-platform/issues/474)
+
+**Fixed bugs:**
+
+- Users tab in top navigation disappears on certain pages [\#732](https://github.com/Cadasta/cadasta-platform/issues/732)
+- Translations need to be updated [\#580](https://github.com/Cadasta/cadasta-platform/issues/580)
+
+**Closed issues:**
+
+- Functional tests fail intermittently on Travis [\#902](https://github.com/Cadasta/cadasta-platform/issues/902)
+- Installation fails: pip 2 not installed because pip 1.5 already exists [\#900](https://github.com/Cadasta/cadasta-platform/issues/900)
+- Resources should accept or convert audio files besides mp3 [\#683](https://github.com/Cadasta/cadasta-platform/issues/683)
+- "Draw Rectangle" while defining project areas [\#464](https://github.com/Cadasta/cadasta-platform/issues/464)
+
+**Merged pull requests:**
+
+- Fix \#732: "Users" menu on password views [\#924](https://github.com/Cadasta/cadasta-platform/pull/924) ([ian-ross](https://github.com/ian-ross))
+
+## [v1.2.0-alpha.5](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0-alpha.5) (2016-11-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.4...v1.2.0-alpha.5)
+
+**Fixed bugs:**
+
+- Inline Manual player script still contains template variables [\#912](https://github.com/Cadasta/cadasta-platform/issues/912)
+- Imported resource filenames should be randomized [\#911](https://github.com/Cadasta/cadasta-platform/issues/911)
+- Error uploading questionnaires [\#907](https://github.com/Cadasta/cadasta-platform/issues/907)
+- Creating a new relationship via the API throws exception.  [\#897](https://github.com/Cadasta/cadasta-platform/issues/897)
+- API does not list relationships for a party [\#896](https://github.com/Cadasta/cadasta-platform/issues/896)
+- Error unzipping download data file  [\#885](https://github.com/Cadasta/cadasta-platform/issues/885)
+- original\_file field not set correctly on imported resources [\#884](https://github.com/Cadasta/cadasta-platform/issues/884)
+- PATCH /api/v1/organizations/{organization\_slug}/projects/{project\_slug}/users/{username}/  [\#881](https://github.com/Cadasta/cadasta-platform/issues/881)
+- Catch jsonattrs KeyError [\#715](https://github.com/Cadasta/cadasta-platform/issues/715)
+- Resource photo orientation all landscape [\#552](https://github.com/Cadasta/cadasta-platform/issues/552)
+
+**Merged pull requests:**
+
+- Fix: \#884 and \#911 update original\_file field and randomize filenames for imported resources [\#921](https://github.com/Cadasta/cadasta-platform/pull/921) ([bjohare](https://github.com/bjohare))
+- Re: \#902 -- Disable failing functional tests temporarily [\#920](https://github.com/Cadasta/cadasta-platform/pull/920) ([oliverroick](https://github.com/oliverroick))
+- Add Indonesian translations [\#918](https://github.com/Cadasta/cadasta-platform/pull/918) ([ian-ross](https://github.com/ian-ross))
+- Make image thumbnailing EXIF orientation-aware [\#917](https://github.com/Cadasta/cadasta-platform/pull/917) ([ian-ross](https://github.com/ian-ross))
+- Moved user tracking to base [\#916](https://github.com/Cadasta/cadasta-platform/pull/916) ([clash99](https://github.com/clash99))
+- Fix GDAL install [\#906](https://github.com/Cadasta/cadasta-platform/pull/906) ([oliverroick](https://github.com/oliverroick))
+- Fix \#896 [\#905](https://github.com/Cadasta/cadasta-platform/pull/905) ([ian-ross](https://github.com/ian-ross))
+- Fix \#881 -- Assign user instance when updating role via API [\#894](https://github.com/Cadasta/cadasta-platform/pull/894) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.2.0-alpha.4](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0-alpha.4) (2016-11-07)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.3...v1.2.0-alpha.4)
+
+**Implemented enhancements:**
+
+- Project overview stats needs CSS adjustment for large numbers [\#872](https://github.com/Cadasta/cadasta-platform/issues/872)
+- Support for WKT in Data Import  [\#831](https://github.com/Cadasta/cadasta-platform/issues/831)
+
+**Fixed bugs:**
+
+- Double "1." on Add Location Wizard page 1 [\#874](https://github.com/Cadasta/cadasta-platform/issues/874)
+- PUT method for updating a project member produces Platform Error [\#873](https://github.com/Cadasta/cadasta-platform/issues/873)
+- Project overview stats needs CSS adjustment for large numbers [\#872](https://github.com/Cadasta/cadasta-platform/issues/872)
+- Drawing Tools Do Not Show Up in Safari [\#858](https://github.com/Cadasta/cadasta-platform/issues/858)
+- Projects with large numbers of locations are unresponsive [\#801](https://github.com/Cadasta/cadasta-platform/issues/801)
+- Duplicated locations when submitting via ODK  [\#792](https://github.com/Cadasta/cadasta-platform/issues/792)
+- Inlinemanual help panel isn't working correctly [\#722](https://github.com/Cadasta/cadasta-platform/issues/722)
+- Unhandled exception if user already exists [\#696](https://github.com/Cadasta/cadasta-platform/issues/696)
+- xform errors are still visible after re-upload of working xform [\#679](https://github.com/Cadasta/cadasta-platform/issues/679)
+
+**Closed issues:**
+
+- Small screen member list isn't centered [\#859](https://github.com/Cadasta/cadasta-platform/issues/859)
+- Missing API endpoints [\#822](https://github.com/Cadasta/cadasta-platform/issues/822)
+- Design Data Import UI [\#565](https://github.com/Cadasta/cadasta-platform/issues/565)
+
+**Merged pull requests:**
+
+- Django upgrade to 1.9.11 [\#903](https://github.com/Cadasta/cadasta-platform/pull/903) ([oliverroick](https://github.com/oliverroick))
+- CSS fixes [\#899](https://github.com/Cadasta/cadasta-platform/pull/899) ([clash99](https://github.com/clash99))
+- Added script for removing file upload errors [\#895](https://github.com/Cadasta/cadasta-platform/pull/895) ([clash99](https://github.com/clash99))
+- Updated help link, embedded player per site [\#892](https://github.com/Cadasta/cadasta-platform/pull/892) ([clash99](https://github.com/clash99))
+- Adjusted stats number sizes and added parsley comment fix [\#891](https://github.com/Cadasta/cadasta-platform/pull/891) ([clash99](https://github.com/clash99))
+- Removed extra number [\#890](https://github.com/Cadasta/cadasta-platform/pull/890) ([clash99](https://github.com/clash99))
+- Fix \#858 -- Read map:init event details correctly [\#889](https://github.com/Cadasta/cadasta-platform/pull/889) ([oliverroick](https://github.com/oliverroick))
+- Added missing record resource api endpoints, and FileStorageTestCase [\#888](https://github.com/Cadasta/cadasta-platform/pull/888) ([linzjax](https://github.com/linzjax))
+- Upgrade to Django 1.9.10 [\#887](https://github.com/Cadasta/cadasta-platform/pull/887) ([oliverroick](https://github.com/oliverroick))
+- Update Changelog [\#883](https://github.com/Cadasta/cadasta-platform/pull/883) ([amplifi](https://github.com/amplifi))
+- Fix \#831: Add support for WKT in Data Import [\#882](https://github.com/Cadasta/cadasta-platform/pull/882) ([bjohare](https://github.com/bjohare))
+- Duplicate xform submissions detected, additional resources attached [\#851](https://github.com/Cadasta/cadasta-platform/pull/851) ([linzjax](https://github.com/linzjax))
+
 ## [v1.2.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0-alpha.3) (2016-10-28)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.2...v1.2.0-alpha.3)
 
