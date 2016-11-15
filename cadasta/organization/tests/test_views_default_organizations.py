@@ -648,10 +648,10 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
             'object': self.member,
             'organization': self.org,
             'org_role_form': forms.EditOrganizationMemberForm(
-                None, self.org, self.member, self.user),
+                self.org, self.member, self.user, data=None),
             'project_role_form':
                 forms.EditOrganizationMemberProjectPermissionForm(
-                None, self.org, self.member, self.user),
+                self.org, self.member, self.user, data=None),
             'org_admin': False
         }
 
@@ -762,9 +762,9 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                 post_data={'org_role': 'X'})
 
         form = forms.EditOrganizationMemberForm(
-                {'org_role': 'X'}, self.org, self.member, self.user)
+                self.org, self.member, self.user, {'org_role': 'X'},)
         prj_form = forms.EditOrganizationMemberProjectPermissionForm(
-                {'org_role': 'X'}, self.org, self.member, self.user)
+                self.org, self.member, self.user, {'org_role': 'X'},)
         assert response.status_code == 200
         assert response.content == self.render_content(
             org_role_form=form, project_role_form=prj_form)
@@ -820,9 +820,9 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                 post_data={self.prj.id: 'X'})
 
         org_form = forms.EditOrganizationMemberForm(
-                {self.prj.id: 'X'}, self.org, self.member, self.user)
+                self.org, self.member, self.user, {self.prj.id: 'X'},)
         form = forms.EditOrganizationMemberProjectPermissionForm(
-                {self.prj.id: 'X'}, self.org, self.member, self.user)
+                self.org, self.member, self.user, {self.prj.id: 'X'},)
         assert response.status_code == 200
         assert response.content == self.render_content(
             project_role_form=form, org_role_form=org_form)

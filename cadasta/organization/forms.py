@@ -194,7 +194,7 @@ class AddOrganizationMemberForm(forms.Form):
 class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
     org_role = forms.ChoiceField(choices=ADMIN_CHOICES)
 
-    def __init__(self, data, org, user, current_user, *args, **kwargs):
+    def __init__(self, org, user, current_user, data=None, *args, **kwargs):
         super(EditOrganizationMemberForm, self).__init__(data, *args, **kwargs)
         self.data = data
         self.organization = org
@@ -223,7 +223,7 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
 
 
 class EditOrganizationMemberProjectPermissionForm(forms.Form):
-    def __init__(self, data, org, user, current_user, *args, **kwargs):
+    def __init__(self, org, user, current_user, data=None, *args, **kwargs):
         super(EditOrganizationMemberProjectPermissionForm, self).__init__(
             data, *args, **kwargs)
         self.data = data

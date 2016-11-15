@@ -229,31 +229,25 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
 
     def get_form(self):
         if not hasattr(self, 'org_form'):
-            if self.request.method == 'POST':
-                self.form = self.org_role_form_class(self.request.POST,
-                                                     self.get_organization(),
-                                                     self.get_object(),
-                                                     self.request.user)
-            else:
-                self.form = self.org_role_form_class(None,
-                                                     self.get_organization(),
-                                                     self.get_object(),
-                                                     self.request.user)
-        return self.form
+            data = self.request.POST if self.request.POST else None
+            self.org_form = self.org_role_form_class(
+                self.get_organization(),
+                self.get_object(),
+                self.request.user,
+                data=data)
+
+        return self.org_form
 
     def get_prj_role_form(self):
         if not hasattr(self, 'prj_form'):
-            if self.request.method == 'POST':
-                self.form = self.project_form_class(self.request.POST,
-                                                    self.get_organization(),
-                                                    self.get_object(),
-                                                    self.request.user)
-            else:
-                self.form = self.project_form_class(None,
-                                                    self.get_organization(),
-                                                    self.get_object(),
-                                                    self.request.user)
-        return self.form
+            data = self.request.POST if self.request.POST else None
+            self.prj_form = self.project_form_class(
+                self.get_organization(),
+                self.get_object(),
+                self.request.user,
+                data=data)
+
+        return self.prj_form
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

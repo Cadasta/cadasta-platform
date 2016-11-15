@@ -1,6 +1,5 @@
 from django import forms
-from organization.widgets import (ProjectRoleWidget, PublicPrivateToggle,
-                                  ContactsWidget, ProjectRoleEditWidget)
+from . import widgets
 
 
 class ProjectRoleField(forms.ChoiceField):
@@ -9,24 +8,23 @@ class ProjectRoleField(forms.ChoiceField):
         self.user = user
         choices = kwargs.get('choices', ())
         role = kwargs.get('initial', ())
-        self.widget = ProjectRoleWidget(user=user, role=role, choices=choices)
+        self.widget = widgets.ProjectRoleWidget(
+            user=user, role=role, choices=choices)
 
 
 class ProjectRoleEditField(forms.ChoiceField):
-    # def __init__(self, admin, user, *args, **kwargs):
     def __init__(self, admin, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.admin = admin
-        # self.user = user
         choices = kwargs.get('choices', ())
         project = kwargs.get('label', ())
-        self.widget = ProjectRoleEditWidget(
+        self.widget = widgets.ProjectRoleEditWidget(
             admin=admin, project=project, choices=choices)
 
 
 class PublicPrivateField(forms.CharField):
     def __init__(self, *args, **kwargs):
-        super().__init__(widget=PublicPrivateToggle, *args, **kwargs)
+        super().__init__(widget=widgets.PublicPrivateToggle, *args, **kwargs)
 
     def clean(self, value):
         if value:
@@ -37,7 +35,7 @@ class PublicPrivateField(forms.CharField):
 
 
 class ContactsField(forms.Field):
-    widget = ContactsWidget
+    widget = widgets.ContactsWidget
 
     def __init__(self, form=None, *args, **kwargs):
         self.formset = forms.formset_factory(form)
