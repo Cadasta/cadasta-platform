@@ -1,3 +1,4 @@
+import json
 import random
 import pytest
 from datetime import datetime
@@ -151,7 +152,12 @@ class ProjectSerializerTest(TestCase):
         organization = OrganizationFactory.create()
         project_data = {
             'name': "Project",
-            'organization': organization
+            'organization': organization,
+            'extent': {
+                'coordinates': [[[0.0, 0.0], [1.0, 0.0], [1.0, 1.0],
+                                 [0., 1.0], [0.0, 0.0]]],
+                'type': 'Polygon'
+            }
         }
         serializer = serializers.ProjectSerializer(
             data=project_data,
@@ -162,6 +168,8 @@ class ProjectSerializerTest(TestCase):
 
         project_instance = serializer.instance
         assert project_instance.organization == organization
+        assert (json.loads(project_instance.extent.json) ==
+                project_data['extent'])
 
     def test_project_public_visibility(self):
         organization = OrganizationFactory.create()
@@ -348,7 +356,6 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         assert len(serializer.data) == 3
 
-        print(serializer.data)
         for u in serializer.data:
             if u['username'] == org_admin.username:
                 assert u['admin'] is True
@@ -462,21 +469,32 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
     def test_list_to_representation(self):
         users = UserFactory.create_batch(2)
         prj_admin = UserFactory.create()
-        project = ProjectFactory.create(add_users=users)
+        org_admin = UserFactory.create()
+        public_user = UserFactory.create()
+
+        org = OrganizationFactory.create(add_users=[prj_admin, public_user])
+        project = ProjectFactory.create(add_users=users, organization=org)
+
+        OrganizationRole.objects.create(
+            organization=org, user=org_admin, admin=True)
         ProjectRole.objects.create(
-            user=prj_admin, project=project, role='PM'
-        )
+            project=project, user=prj_admin, role='PM')
+
         serializer = serializers.ProjectUserSerializer(
-            project.users.all(),
+            org.users.all(),
             many=True,
             context={'project': project}
         )
 
-        assert len(serializer.data) == 3
+        assert len(serializer.data) == 5
 
         for u in serializer.data:
-            if u['username'] == prj_admin.username:
+            if u['username'] == org_admin.username:
+                assert u['role'] == 'A'
+            elif u['username'] == prj_admin.username:
                 assert u['role'] == 'PM'
+            elif u['username'] == public_user.username:
+                assert u['role'] == 'Pb'
             else:
                 assert u['role'] == 'PU'
 
@@ -556,8 +574,7 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
 
     def test_update_roles_for_user_with_additional_payload(self):
         user = UserFactory.create()
-        org = OrganizationFactory(add_users=[user])
-        project = ProjectFactory.create(add_users=[user], organization=org)
+        project = ProjectFactory.create(add_users=[user])
         data = {'username': user.username, 'role': 'PM'}
         serializer = serializers.ProjectUserSerializer(
             user,
@@ -570,6 +587,59 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
 
         role = ProjectRole.objects.get(user=user, project=project)
         assert role.role == data['role']
+
+    def test_update_roles_for_organization_user(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        project = ProjectFactory.create(organization=org)
+        data = {'role': 'PM'}
+        serializer = serializers.ProjectUserSerializer(
+            user,
+            partial=True,
+            data=data,
+            context={'project': project}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        role = ProjectRole.objects.get(user=user, project=project)
+        assert role.role == data['role']
+
+    def test_update_roles_for_org_admin(self):
+        user = UserFactory.create(username='some-user')
+        project = ProjectFactory.create()
+        OrganizationRole.objects.create(organization=project.organization,
+                                        user=user,
+                                        admin=True)
+        data = {'role': 'DC'}
+        serializer = serializers.ProjectUserSerializer(
+            user,
+            partial=True,
+            data=data,
+            context={'project': project}
+        )
+
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert (('User some-user is an organization admin, the role cannot be'
+                 ' updated.') in serializer.errors['non_field_errors'])
+
+    def test_update_roles_to_public_user(self):
+        user = UserFactory.create(username='some-user')
+        project = ProjectFactory.create(add_users=[user])
+        assert (ProjectRole.objects.filter(project=project, user=user).exists()
+                is True)
+        data = {'role': 'Pb'}
+        serializer = serializers.ProjectUserSerializer(
+            user,
+            partial=True,
+            data=data,
+            context={'project': project}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        assert (ProjectRole.objects.filter(project=project, user=user).exists()
+                is False)
 
 
 class UserAdminSerializerTest(UserTestCase, TestCase):

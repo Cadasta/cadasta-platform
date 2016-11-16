@@ -34,12 +34,6 @@ class SpatialUnitSerializerTest(TestCase):
         spatial_instance = serializer.instance
         assert spatial_instance.project == project
 
-    def test_project_detail_not_serialized(self):
-        project = ProjectFactory.create()
-        spatial_data = SpatialUnitFactory.create(project=project)
-        serializer = serializers.SpatialUnitSerializer(spatial_data)
-        assert 'description' not in serializer.data['properties']['project']
-
     def test_update_spatial_unit(self):
         project = ProjectFactory.create()
         su = SpatialUnitFactory.create(type='BU',
@@ -85,10 +79,10 @@ class SpatialUnitSerializerTest(TestCase):
     def test_update_spatial_unit_project_fails(self):
         project = ProjectFactory.create(name='Original Project')
         su = SpatialUnitFactory.create(project=project)
-        ProjectFactory.create(name='New Project')
+        new_project = ProjectFactory.create(name='New Project')
         spatial_data = {
             'properties': {
-                'project': 'something'
+                'project': new_project
             }
         }
         serializer = serializers.SpatialUnitSerializer(
@@ -100,8 +94,9 @@ class SpatialUnitSerializerTest(TestCase):
 
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        data = serializer.data['properties']
-        assert data['project']['name'] != 'New Project'
+
+        su.refresh_from_db()
+        assert su.project == project
 
 
 class SpatialUnitGeoJsonSerializerTest(TestCase):
