@@ -9,6 +9,9 @@ urlpatterns = [
         name='verify_email'),
     url(r'^password/change/$', default.PasswordChangeView.as_view(),
         name="account_change_password"),
+    url(r'^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$',
+        default.PasswordResetFromKeyView.as_view(),
+        name="account_reset_password_from_key"),
     url(r'^password/reset/$', default.PasswordResetView.as_view(),
         name="account_reset_password"),
 ]

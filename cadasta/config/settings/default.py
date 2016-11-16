@@ -160,6 +160,36 @@ ACCOUNT_FORMS = {
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': ('django.contrib.auth.'
+                 'password_validation.UserAttributeSimilarityValidator'),
+    },
+    {
+        'NAME':
+            'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 10,
+        }
+    },
+    {
+        'NAME':
+            'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME':
+            'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+    {
+        'NAME':
+            'accounts.validators.CharacterTypePasswordValidator'
+    },
+    {
+        'NAME':
+            'accounts.validators.EmailSimilarityValidator'
+    },
+]
+
 OSM_ATTRIBUTION = _(
     "Base map data &copy; <a href=\"http://openstreetmap.org\">"
     "OpenStreetMap</a> contributors under "

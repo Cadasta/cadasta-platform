@@ -12,17 +12,24 @@ from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 
 from ..models import User
-from ..forms import ProfileForm
+from ..forms import ProfileForm, ChangePasswordForm, ResetPasswordKeyForm
 
 
 class PasswordChangeView(LoginRequiredMixin,
                          SuperUserCheckMixin,
                          allauth_views.PasswordChangeView):
+    form_class = ChangePasswordForm
     pass
 
 
 class PasswordResetView(SuperUserCheckMixin,
                         allauth_views.PasswordResetView):
+    pass
+
+
+class PasswordResetFromKeyView(SuperUserCheckMixin,
+                               allauth_views.PasswordResetFromKeyView):
+    form_class = ResetPasswordKeyForm
     pass
 
 
