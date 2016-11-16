@@ -38,7 +38,6 @@ env:
   matrix:
     - TOX_ENV=py35-flake8
     - TOX_ENV=py35-django1.9-unit
-    - TOX_ENV=py35-django1.9-functional
 
 matrix:
   fast_finish: true
