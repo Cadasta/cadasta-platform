@@ -414,9 +414,6 @@ header {
   .btn-add {
     margin-right: 14px;
   }
-  .page-title h1, .page-title h2 {
-    width: 60%;
-  }
 }
 
 .page-title { // page title
@@ -430,7 +427,10 @@ header {
     position: relative;
     margin-top: 0;
     text-shadow: 1px 1px 3px rgba(0,0,0,.2);
-    width: 60%;
+    width: 80%;
+    &.short { // provides room for admin buttons on right
+      width: 60%;
+    }
     .org-name {
       font-size: 14px;
       display: block;
@@ -440,9 +440,6 @@ header {
     a {
       color: $brand-lightblue;
     }
-  }
-  h2 {
-    width: auto;
   }
 }
 
@@ -470,10 +467,10 @@ header {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      &:hover{
-        overflow: visible; 
-        white-space: normal; 
-      }
+      //&:hover{
+      //  overflow: visible; 
+      //  white-space: normal; 
+      //}
     }
   }
 }
@@ -653,7 +650,8 @@ body.tinted-bg #page-content { // for bg image
 
   #project-single #page-content,
   #project-wizard.page #page-content,
-  #organization-single #page-content {
+  #organization-single #page-content,
+  #registration #page-content {
     position: relative;
     top: 0;
     //background: #fff;
@@ -674,9 +672,14 @@ main.container-fluid {
 #organization-single #page-content main { 
   position: relative;
   left: 0;
-  margin-left: 100px;
+  margin-left: 0;
   min-height: 100%;
   overflow: hidden;
+}
+
+#project-single #page-content main.show-sidebar,
+#organization-single #page-content main.show-sidebar { 
+  margin-left: 100px;
 }
 
 @media (max-width: $screen-sm-max) {
@@ -684,7 +687,9 @@ main.container-fluid {
     padding-bottom: 0;
   }
   #project-single #page-content main,
-  #organization-single #page-content main { 
+  #organization-single #page-content main, 
+  #project-single #page-content main.show-sidebar,
+  #organization-single #page-content main.show-sidebar { 
     margin-left: 0;
     background: #fff;
   }
@@ -1300,6 +1305,12 @@ div.add-btn-btm { // add party link at bottom of table
   display: block;
 }
 
+@media (max-width: $screen-md-max) {
+  .btn-full .btn {
+    min-width: 100px;
+  }
+}
+
 @media (max-width: $screen-sm-max) {
  .top-btn .btn {
     min-width: 80px;
@@ -1316,9 +1327,9 @@ div.add-btn-btm { // add party link at bottom of table
   }
 }
 
-@media (max-width: $screen-md-max) {
-  .btn-full .btn {
-    min-width: 100px;
+@media (max-width: $screen-xs-max) {
+ .top-btn .btn {
+    min-width: auto;
   }
 }
 

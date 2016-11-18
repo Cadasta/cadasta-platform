@@ -16,7 +16,7 @@
       {% if add_allowed %}
       <div class="top-btn pull-right">
         <a href="{% url 'project:add' %}" class="btn btn-primary">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span class="hidden-xs"> {% trans "Add" %}</span>
         </a>
       </div>
       {% endif %}

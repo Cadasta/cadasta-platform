@@ -12,10 +12,10 @@
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <div class="page-title">
-        <h2>{% trans "Members" %}</h2>
+        <h2 class="short">{% trans "Members" %}</h2>
         <div class="top-btn pull-right">
           <a class="btn btn-primary" href="{% url 'organization:members_add' organization.slug %}">
-            <span class="glyphicon glyphicon-plus" aria-hidden=true></span> {% trans "Add" %}
+            <span class="glyphicon glyphicon-plus" aria-hidden=true></span><span class="hidden-xs"> {% trans "Add" %}</span>
           </a>
         </div>
       </div>

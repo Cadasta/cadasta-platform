@@ -6,6 +6,8 @@
 
 {% block title %} | {% block page_title %}{% endblock %} {{ object.name }}{% endblock %}
 
+{% block main-width %}{% if is_administrator %} show-sidebar{% endif %}{% endblock %}
+
 {% block page-header %}
 
 <!-- Single project header -->
@@ -14,7 +16,7 @@
     <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'project:list' %}">
       <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
     </a>
-    <h1>
+    <h1 class="{% if is_administrator or is_allowed_add_location or is_allowed_add_resource %}short{% endif %}">
       <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">
         {{ object.organization.name }}
       </a>
@@ -64,11 +66,10 @@
           <span class="sr-only">{%trans "Toggle add" %}</span>
         </button>
         <ul class="dropdown-menu">
-          <!--<li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add relationship" %}</a></li>-->
+          <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
-          <!-- <li role="separator" class="divider"></li> -->
-          <!-- <li><a class="edit" href="#">{% trans "Import data" %}</a></li> -->
+          <li role="separator" class="divider"></li>
+          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
       </div>
@@ -82,13 +83,12 @@
           {% if is_allowed_add_location %}
           <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
           {% endif %}
-          <!--<li><a href="#">{% trans "Add party" %}</a></li>
-          <li><a href="#">{% trans "Add relationship" %}</a></li>-->
+          <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
           {% if is_allowed_add_resource %}
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           {% endif %}
-          <!--<li role="separator" class="divider"></li>
-          <li><a class="edit" href="#">{% trans "Import data" %}</a></li>-->
+          <li role="separator" class="divider"></li>
+          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
       </div>
@@ -100,6 +100,7 @@
 
 {% block sub-nav %}
 
+{% if is_administrator %}
 <!-- Sidebar -->
 <div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
@@ -108,8 +109,8 @@
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li>
-    <li class="map">
+    </li><!--
+    --><li class="map">
       <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
@@ -136,6 +137,7 @@
   </ul>
 </div>
 <!-- /.sidebar -->
+{% endif %}
 
 {% endblock %}
 
