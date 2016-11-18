@@ -56,3 +56,7 @@ Do this::
   ...
 
   vagrant up --provider=aws ...
+  
+  
+.. |build-status-image| image:: https://secure.travis-ci.org/Cadasta/cadasta-platform.svg?branch=master
+   :target: http://travis-ci.org/Cadasta/cadasta-platform?branch=master
