@@ -13,23 +13,25 @@ Install:
 - `Vagrant <https://www.vagrantup.com/>`_
 - `Ansible <http://www.ansible.com/>`_ (version 2: install with PIP for a recent version)
 
-Clone the `repository <https://github.com/cadasta/cadasta-platform>`_.
+Clone the `repository <https://github.com/cadasta/cadasta-platform>`_ to your local machine and enter that directory.
 
 Provision the VM::
 
   vagrant up --provision
 
-SSH into to the VM (this automatically activate the Python virtual
-environment) and run the server::
+SSH into to the VM (this automatically activates the Python virtual
+environment)::
 
   vagrant ssh
+  
+Enter the cadasta directory and start the server:: 
+ 
   cd cadasta
   ./runserver
 
-Open ``http://localhost:8000/`` in your browser, you should see the
-front page of the platform site.
+Open ``http://localhost:8000/`` in your local machine's browser, this will forward you to the port on the VM and you should see the front page of the platform site.
 
-See the wiki `here <https://devwiki.corp.cadasta.org/Installation>`_ and `here <https://devwiki.corp.cadasta.org/Run%20for%20development>`_) for detailed instructions on installation and running the platform for development.
+See the wiki (`here <https://devwiki.corp.cadasta.org/Installation>`_ and `here <https://devwiki.corp.cadasta.org/Run%20for%20development>`_) for detailed instructions on installation and running the platform for development.
 
 Run tests
 ---------
@@ -54,7 +56,7 @@ Do this::
   ...
 
   vagrant up --provider=aws ...
-
-
+  
+  
 .. |build-status-image| image:: https://secure.travis-ci.org/Cadasta/cadasta-platform.svg?branch=master
    :target: http://travis-ci.org/Cadasta/cadasta-platform?branch=master
