@@ -4,7 +4,7 @@ from django.forms import formset_factory, ValidationError
 
 from accounts.tests.factories import UserFactory
 
-from ..fields import ProjectRoleField, PublicPrivateField, ContactsField
+from organization import fields as org_fields
 from ..forms import ContactsForm
 
 
@@ -12,21 +12,30 @@ class ProjectRoleFieldTest(TestCase):
     def test_init(self):
         user = UserFactory.build()
         choices = (('Ab', 'Ahh Bee',),)
-        field = ProjectRoleField(user, choices=choices)
+        field = org_fields.ProjectRoleField(user, choices=choices)
         assert field.widget.user == user
+        assert field.widget.choices == [choices[0]]
+
+
+class ProjectRoleEditFieldTest(TestCase):
+    def test_init(self):
+        choices = (('Ab', 'Ahh Bee',),)
+        admin = True
+        field = org_fields.ProjectRoleEditField(admin, choices=choices)
+        assert field.widget.admin == admin
         assert field.widget.choices == [choices[0]]
 
 
 class PublicPrivateFieldTest(TestCase):
     def test_clean(self):
-        field = PublicPrivateField()
+        field = org_fields.PublicPrivateField()
         assert field.clean(None) == 'public'
         assert field.clean('on') == 'private'
 
 
 class ContactsFieldTest(TestCase):
     def test_init(self):
-        field = ContactsField(form=ContactsForm)
+        field = org_fields.ContactsField(form=ContactsForm)
         assert isinstance(field.formset, type(formset_factory(ContactsForm)))
 
     def test_clean(self):
@@ -47,7 +56,7 @@ class ContactsFieldTest(TestCase):
             'form-2-email': '',
             'form-2-tel': '',
         })
-        field = ContactsField(form=ContactsForm)
+        field = org_fields.ContactsField(form=ContactsForm)
         expected = [{
             'name': 'Ringo',
             'email': 'ringo@beatles.uk',
@@ -69,11 +78,11 @@ class ContactsFieldTest(TestCase):
             'form-1-email': '',
             'form-1-tel': ''
         })
-        field = ContactsField(form=ContactsForm)
+        field = org_fields.ContactsField(form=ContactsForm)
         with raises(ValidationError):
             field.clean(value)
 
     def test_widget_attr(self):
-        field = ContactsField(form=ContactsForm)
+        field = org_fields.ContactsField(form=ContactsForm)
         widget_attrs = field.widget_attrs('widget')
         assert widget_attrs == {'formset': field.formset}

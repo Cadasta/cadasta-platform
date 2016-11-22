@@ -96,11 +96,6 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self.browser.find_element_by_xpath(
             "//button[@name='{}']".format(f))
 
-    def button_class(self, f):
-        """Find a button with a specific class"""
-        return self.browser.find_element_by_xpath(
-            "//button[contains(@class, '{}')]".format(f))
-
     def h1(self, f):
         """Find a header given a specific class"""
         return self.browser.find_element_by_xpath(
@@ -125,6 +120,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.browser.execute_script(
             "return arguments[0].scrollIntoView();", button)
         button.click()
+
         if screenshot is not None:
             self.get_screenshot(screenshot)
         try:
@@ -256,13 +252,19 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def try_cancel_and_close_confirm_modal(self,
                                            click_on_button,
+                                           modal_id,
                                            check_input=None):
-        close_buttons = ['btn-link', 'close']
+        close_buttons = ['cancel', 'close']
         for close in close_buttons:
             click_on_button()
-            cancel = self.button_class(close)
+            button = self.browser.find_element_by_xpath(
+                "//div[@id='{id}']"
+                "//button[contains(@class, '{button}')]".format(
+                    id=modal_id,
+                    button=close))
+
             self.click_through_close(
-                cancel, (By.CLASS_NAME, 'modal-backdrop'))
+                button, (By.CLASS_NAME, 'modal-backdrop'))
 
             if check_input:
                 check_input()

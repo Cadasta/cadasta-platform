@@ -35,6 +35,35 @@ class ProjectRoleWidget(Select):
         )
 
 
+class ProjectRoleEditWidget(Select):
+    html = (
+        '<tr>'
+        '  <td>'
+        '    <p>{project_name}</p>'
+        '  </td>'
+        '  <td>'
+        '    {select}'
+        '  </td>'
+        '</tr>'
+    )
+
+    def __init__(self, admin, project, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.project = project
+        self.admin = admin
+
+    def render(self, name, value, attrs=None, choices=()):
+        if self.admin:
+            select = _("Administrator")
+        else:
+            select = super().render(name, value, attrs=attrs, choices=choices)
+
+        return self.html.format(
+            project_name=self.project,
+            select=select
+        )
+
+
 class PublicPrivateToggle(Widget):
     html = (
         '<div class="public-private-widget">'

@@ -143,16 +143,14 @@ class OrganizationPage(Page):
         else:
             self.click_through(button, self.test.BY_ALERT)
 
+    def click_archive_button(self):
+        archive = self.get_archive_button()
+        return self.click_through(archive, self.BY_MODAL_FADE)
+
     def try_cancel_and_close_archive(self):
-        close_buttons = ["cancel", "close"]
-        for close in close_buttons:
-            archive = self.get_archive_button()
-            assert "Archive" in archive.text
-
-            self.click_through(archive, self.BY_MODAL_FADE)
-
-            cancel = self.test.button_class(close)
-            self.click_through_close(cancel, self.BY_MODAL_BACKDROP)
+        self.test.try_cancel_and_close_confirm_modal(
+            self.click_archive_button, 'archive_confirm'
+        )
 
     def get_view_all_button(self):
         return self.get_page_content(

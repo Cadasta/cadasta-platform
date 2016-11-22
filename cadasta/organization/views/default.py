@@ -211,7 +211,8 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     slug_field = 'username'
     slug_url_kwarg = 'username'
     template_name = 'organization/organization_members_edit.html'
-    form_class = forms.EditOrganizationMemberForm
+    project_form_class = forms.EditOrganizationMemberProjectPermissionForm
+    org_role_form_class = forms.EditOrganizationMemberForm
     permission_required = update_permissions('org.users.edit')
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
@@ -227,31 +228,49 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         return 'org_member'
 
     def get_form(self):
-        if not hasattr(self, 'form'):
-            if self.request.method == 'POST':
-                self.form = self.form_class(self.request.POST,
-                                            self.get_organization(),
-                                            self.get_object(),
-                                            self.request.user)
-            else:
-                self.form = self.form_class(None,
-                                            self.get_organization(),
-                                            self.get_object(),
-                                            self.request.user)
-        return self.form
+        if not hasattr(self, 'org_form'):
+            data = self.request.POST if self.request.POST else None
+            self.org_form = self.org_role_form_class(
+                self.get_organization(),
+                self.get_object(),
+                self.request.user,
+                data=data)
+
+        return self.org_form
+
+    def get_prj_role_form(self):
+        if not hasattr(self, 'prj_form'):
+            data = self.request.POST if self.request.POST else None
+            self.prj_form = self.project_form_class(
+                self.get_organization(),
+                self.get_object(),
+                self.request.user,
+                data=data)
+
+        return self.prj_form
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['organization'] = self.get_organization()
-        context['form'] = self.get_form()
-        context['org_admin'] = (self.is_administrator and
-                                not self.is_superuser and
-                                context['org_member'] == self.request.user)
+        context['project_role_form'] = self.get_prj_role_form()
+        context['org_role_form'] = self.get_form()
+
+        context['org_admin'] = OrganizationRole.objects.filter(
+            user=context['org_member'],
+            organization=context['organization'],
+            admin=True).exists()
+        context['current_user'] = (
+            context['org_member'] == self.request.user and
+            not self.is_superuser)
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = self.get_form()
+        if 'org_role' in request.POST:
+            form = self.get_form()
+        else:
+            form = self.get_prj_role_form()
+
         if form.is_valid():
             return self.form_valid(form)
         else:

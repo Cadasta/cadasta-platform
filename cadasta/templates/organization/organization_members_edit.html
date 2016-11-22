@@ -17,46 +17,49 @@
         <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_display_name }}</span></h2>
       </div>
       <div class="panel panel-default">
-        <form method="POST" action="" class="org-member-edit" data-parsley-validate>
-        {% csrf_token %}
-          <div class="panel-body">
-            <div class="row">
-              <div class="col-md-3">
-                <!-- Member panel -->
-                <div class="panel panel-default member-panel">
-                  <div class="panel-body member-info">
-                    <div class="member-pic">
-                      <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
-                    </div>
-                    <div class="member-detail">
-                      <h4>{{ object.username }}</h4>
-                      {{ object.full_name }}<br>
-                      {{ object.email }}<br>
-                      {% trans "Last login:" %} {{ object.last_login }}<br>
-                    </div>
-                    <div class="form-group member-role{% if form.org_role.errors %} has-error{% endif %}">
-                      <label class="control-label" for="{{ form.org_role.id_for_label }}">{% trans "Role" %}</label>
-                      {% if org_admin %}
-                      {% render_field form.org_role class+="form-control" data-parsley-required="true" disabled="disabled" %}
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+              <!-- Member panel -->
+              <div class="panel panel-default member-panel">
+                <div class="panel-body member-info">
+                  <div class="member-pic">
+                    <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+                  </div>
+                  <div class="member-detail">
+                    <h4>{{ object.username }}</h4>
+                    {{ object.full_name }}<br>
+                    {{ object.email }}<br>
+                    {% trans "Last login:" %} {{ object.last_login }}<br>
+                  </div>
+                    <form method="POST" action="" class="org-member-edit" id='organization_permissions' data-parsley-validate>
+                    {% csrf_token %}
+                    <div class="form-group member-role{% if org_role_form.org_role.errors %} has-error{% endif %}">
+                      <label class="control-label" for="{{ org_role_form.org_role.id_for_label }}">{% trans "Role" %}</label>
+                      {% if current_user %}
+                      {% trans "Administrator" %}
                       {% else %}
-                      {% render_field form.org_role class+="form-control" data-parsley-required="true" %}
+                      {% render_field org_role_form.org_role class+="form-control" data-parsley-required="true" %}
                       {% endif %}
-                      <div class="error-block">{{ form.org_role.errors }}</div>
+                      <div class="error-block">{{ org_role_form.org_role.errors }}</div>
                     </div>
                     <div class="btn-full">
-                      <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin %} disabled{% endif %}>
+                      <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin and current_user %} disabled{% endif %}>
                         <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Remove member" %}</button>
-                      {% if org_admin %}
+                      {% if current_user %}
                       <div class="alert alert-full" role="alert">
                         <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
                         <div>{% trans "An organization administrator cannot remove themself." %}</div>
                       </div>
                       {% endif %}
+                    </form>
                     </div>
                   </div>
                 </div>
                 <!-- /member panel -->
               </div>
+              <form method="POST" action="" class="org-member-edit" data-parsley-validate>
+              {% csrf_token %}
               <div class="col-md-9">
                 <!-- Members index -->
                 <div class="panel panel-default">
@@ -72,32 +75,23 @@
                         </tr>
                       </thead>
                       <tbody>
-                        {% for field in form %}
+                        {% for field in project_role_form %}
                           {% if field.name != 'org_role' %}
-                          <tr>
-                            <td>
-                              <label class="control-label" for="{{ field.id_for_label }}">
-                                {{field.label}}
-                              </label>
-                            </td>
-                            <td>
-                              <div class="form-group">
-                                {% render_field field class+="form-control" data-parsley-required="true" %}
-                              </div>
-                            </td>
-                          </tr>
+                            {% render_field field class+="form-control" data-parsley-required="true" %}
                           {% endif %}
                         {% endfor %}
                       </tbody>
                     </table>
                   </div>
+                  {% if not org_admin %}
+                  <div class="panel-footer panel-buttons text-center">
+                    <button type="submit" class="btn btn-primary" name="submit">{% trans "Save" %}</button>
+                    <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
             </div>
-          </div>
-          <div class="panel-footer panel-buttons text-center">
-            <button type="submit" class="btn btn-primary" name="submit">{% trans "Save" %}</button>
-            <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
           </div>
         </form>
       </div>
@@ -114,11 +108,39 @@
   $(function() {
     activateFormFieldsInDataTable('.org-member-edit', 1, 'select');
   });
+
+  $(document).ready(function(){
+    var org_admin = "{{org_admin}}"
+    $('#id_org_role').change(function() {
+      if ($(this).val() === 'M' && org_admin === "True") {
+        $('#role_member').modal('show')
+      } else if ($(this).val() === 'A' && org_admin === "False") {
+        $('#role_admin').modal('show')
+      }
+    })
+
+    function switch_member_role(role){
+      $('#id_org_role option:contains("' + role + '")').prop("selected", true)
+    }
+
+    $("#role_admin .close").click(function(){
+      switch_member_role("Member")
+    })
+    $("#role_admin .cancel").click(function(){
+      switch_member_role("Member")
+    })
+    $("#role_member .close").click(function(){
+      switch_member_role("Administrator")
+    })
+    $("#role_member .cancel").click(function(){
+      switch_member_role("Administrator")
+    })
+  })
 </script>
 {% endblock %}
 
 {% block modals %}
-{% if not org_admin  %}
+{% if not current_user  %}
 <div class="modal fade" id="remove_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -132,11 +154,63 @@
       </div>
       <div class="modal-footer">
         <a href="{% url 'organization:members_remove' slug=organization.slug username=object.username%}"  class="btn btn-danger confirm pull-right">{% trans "Yes, remove this member" %}</a>
-        <button type="button" class="btn btn-link" name="cancel" data-dismiss="modal">{% trans "Cancel" %}</button>
+        <button type="button" class="btn btn-link cancel" name="cancel" data-dismiss="modal">{% trans "Cancel" %}</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 {% endif %}
+
+<div class="modal fade" id="role_admin" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Confirm Role Change" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Changing this role to administrator will remove project-level permissions and grant full access. Are you sure you want to change the role from member to administrator?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'organization:members' slug=organization.slug %}" class="btn btn-primary admin-final pull-right" role="button" onclick="document.getElementById('organization_permissions').submit(); return false;">
+          {% trans "Confirm" %}
+        </a>
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="role_member" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Confirm Role Change" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Changing this role to member will remove full access and permissions will need to be assigned on a project level. Are you sure you want to change the role from administrator to member?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'organization:members' slug=organization.slug %}" class="btn btn-primary member-final pull-right" role="button" onclick="document.getElementById('organization_permissions').submit(); return false;">
+          {% trans "Confirm" %}
+        </a>
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 {% endblock %}

@@ -62,9 +62,8 @@ class OrganizationTest(UserTestCase, TestCase):
         self.data['description'] = 'Org description #2'
         form = forms.OrganizationForm(self.data, user=UserFactory.create())
         assert form.is_valid() is False
-        assert form.errors == {
-            'name': ["Organization with this Name already exists."]
-        }
+        assert ("Organization with this Name already exists."
+                in form.errors['name'])
         assert Organization.objects.count() == 1
 
     # NOTE: This test is no longer possible because unique org names masks
@@ -98,9 +97,7 @@ class OrganizationTest(UserTestCase, TestCase):
         self.data['urls'] = 'invalid url'
         form = forms.OrganizationForm(self.data, user=UserFactory.create())
         assert not form.is_valid()
-        assert form.errors == {
-            'urls': ["Enter a valid URL."]
-        }
+        assert ("Enter a valid URL." in form.errors['urls'])
 
     def test_add_organization_with_contact(self):
         self.data['contacts-0-name'] = "Ringo Starr"
@@ -132,9 +129,8 @@ class OrganizationTest(UserTestCase, TestCase):
         }
         form = forms.OrganizationForm(data, user=UserFactory.create())
         assert not form.is_valid()
-        assert form.errors == {
-            'name': ["Organization name cannot be “Add” or “New”."]
-        }
+        assert ("Organization name cannot be “Add” or “New”."
+                in form.errors['name'])
         assert not Organization.objects.exists()
 
     def test_update_organization(self):
@@ -156,9 +152,8 @@ class OrganizationTest(UserTestCase, TestCase):
         self.data['name'] = random.choice(invalid_names)
         form = forms.OrganizationForm(self.data, instance=org)
         assert not form.is_valid()
-        assert form.errors == {
-            'name': ["Organization name cannot be “Add” or “New”."]
-        }
+        assert ("Organization name cannot be “Add” or “New”."
+                in form.errors['name'])
 
     def test_remove_all_contacts(self):
         org = OrganizationFactory.create(
@@ -238,6 +233,46 @@ class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 
 
 class EditOrganizationMemberFormTest(UserTestCase, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.org_member = UserFactory.create()
+        self.org = OrganizationFactory.create()
+        self.org_role_user = OrganizationRole.objects.create(
+            organization=self.org, user=self.user)
+        self.org_role_member = OrganizationRole.objects.create(
+            organization=self.org, user=self.org_member)
+        self.prj_1 = ProjectFactory.create(organization=self.org)
+        self.prj_2 = ProjectFactory.create(organization=self.org)
+        self.prj_3 = ProjectFactory.create(organization=self.org)
+        self.prj_4 = ProjectFactory.create(organization=self.org)
+        self.prjs = [self.prj_1, self.prj_2, self.prj_3, self.prj_4]
+
+    def test_init(self):
+        # Test to make sure that the initial forms for all users
+        # aren't affected by changing one user.
+        data = {
+            'org_role': 'A'
+        }
+
+        form = forms.EditOrganizationMemberForm(
+            self.org, self.org_member, self.user, data)
+
+        assert form.data == data
+        assert form.user == self.org_member
+        assert form.current_user == self.user
+
+        assert form.org_role_instance.admin is False
+        assert form.initial['org_role'] == 'M'
+
+        form = forms.EditOrganizationMemberForm(
+            self.org, self.user, self.user, data)
+
+        assert form.data == data
+        assert form.user == self.user
+        assert form.current_user == self.user
+        assert form.org_role_instance.admin is False
+        assert form.initial['org_role'] == 'M'
 
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
@@ -249,7 +284,7 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
         org_role = OrganizationRole.objects.create(organization=org, user=user)
         OrganizationRole.objects.create(
             organization=org, user=current_user, admin=True)
-        form = forms.EditOrganizationMemberForm(data, org, user, current_user)
+        form = forms.EditOrganizationMemberForm(org, user, current_user, data,)
 
         form.save()
         org_role.refresh_from_db()
@@ -260,54 +295,193 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
     def test_edit_admin_role(self):
         # Should fail, since admins are not allowed to alter
         # their own permissions.
-        org = OrganizationFactory.create()
-        user = UserFactory.create()
 
         data = {'org_role': 'M'}
 
-        org_role = OrganizationRole.objects.create(
-            organization=org, user=user, admin=True)
-        form = forms.EditOrganizationMemberForm(data, org, user, user)
+        self.org_role_user.admin = True
+        self.org_role_user.save()
+        form = forms.EditOrganizationMemberForm(
+            self.org, self.user, self.user, data)
         assert not form.is_valid()
-        assert form.errors == {
-            'org_role': ["Organization administrators cannot change their" +
-                         " own role in the organization."]
-        }
-        org_role.refresh_from_db()
-        assert org_role.admin is True
+        assert ("Organization administrators cannot change their" +
+                " own role in the organization." in form.errors['org_role'])
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_user.admin is True
 
-    def test_edit_project_roles(self):
-        user = UserFactory.create()
-        org = OrganizationFactory.create()
-        prj_1 = ProjectFactory.create(organization=org)
-        prj_2 = ProjectFactory.create(organization=org)
-        prj_3 = ProjectFactory.create(organization=org)
-        prj_4 = ProjectFactory.create(organization=org)
-
-        org_role = OrganizationRole.objects.create(organization=org, user=user)
-        ProjectRole.objects.create(project=prj_4, user=user, role='PM')
+    def test_assign_and_unassign_admin_role(self):
+        # Assert that changing the admin role
+        # doesn't affect project permissions
+        ProjectRole.objects.create(
+            project=self.prj_1, user=self.org_member, role='DC')
+        ProjectRole.objects.create(
+            project=self.prj_2, user=self.user, role='PM')
 
         data = {
             'org_role': 'M',
-            prj_1.id: 'DC',
-            prj_2.id: 'PU',
-            prj_3.id: 'Pb',
-            prj_4.id: 'Pb'
         }
 
-        form = forms.EditOrganizationMemberForm(data, org, user, user)
+        form = forms.EditOrganizationMemberForm(
+            self.org, self.org_member, self.user, data,)
+        form_2 = forms.EditOrganizationMemberForm(
+            self.org, self.user, self.user, data,)
 
         form.save()
-        org_role.refresh_from_db()
+        form_2.save()
+        assert form.is_valid() is True
+        assert form_2.is_valid() is True
+
+        self.org_role_member.refresh_from_db()
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_member.admin is False
+        assert self.org_role_user.admin is False
+
+        assert (ProjectRole.objects.get(
+            user=self.org_member, project=self.prj_1).role == 'DC')
+
+        assert (ProjectRole.objects.filter(
+            user=self.org_member, project=self.prj_2).exists() is False)
+
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_1).exists() is False)
+
+        assert (ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PM')
+
+        data = {
+            'org_role': 'A',
+        }
+
+        form = forms.EditOrganizationMemberForm(
+            self.org, self.org_member, self.user, data,)
+
+        form.save()
+        assert form.is_valid() is True
+
+        self.org_role_member.refresh_from_db()
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_member.admin is True
+        assert self.org_role_user.admin is False
+
+        assert (ProjectRole.objects.get(
+            user=self.org_member, project=self.prj_1).role == 'DC')
+
+        assert (ProjectRole.objects.filter(
+            user=self.org_member, project=self.prj_2).exists() is False)
+
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_1).exists() is False)
+
+        assert (ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PM')
+
+        data = {
+            'org_role': 'M'
+        }
+
+        form = forms.EditOrganizationMemberForm(
+            self.org, self.org_member, self.user, data,)
+
+        form.save()
+        assert form.is_valid() is True
+
+        self.org_role_member.refresh_from_db()
+        self.org_role_user.refresh_from_db()
+        assert self.org_role_member.admin is False
+        assert self.org_role_user.admin is False
+
+        assert (ProjectRole.objects.get(
+            user=self.org_member, project=self.prj_1).role == 'DC')
+
+        assert (ProjectRole.objects.filter(
+            user=self.org_member, project=self.prj_2).exists() is False)
+
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_1).exists() is False)
+
+        assert (ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PM')
+
+
+class EditOrganizationMemberProjectPermissionForm(UserTestCase, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create()
+        self.org_member = UserFactory.create()
+        self.org = OrganizationFactory.create()
+        self.org_role_user = OrganizationRole.objects.create(
+            organization=self.org, user=self.user)
+        self.org_role_member = OrganizationRole.objects.create(
+            organization=self.org, user=self.org_member)
+        self.prj_1 = ProjectFactory.create(organization=self.org)
+        self.prj_2 = ProjectFactory.create(organization=self.org)
+        self.prj_3 = ProjectFactory.create(organization=self.org)
+        self.prj_4 = ProjectFactory.create(organization=self.org)
+        self.prjs = [self.prj_1, self.prj_2, self.prj_3, self.prj_4]
+
+    def test_init(self):
+        # Test to make sure that the initial forms for all users
+        # aren't affected by changing one user.
+        for prj in self.prjs:
+            ProjectRole.objects.create(
+                project=prj, user=self.org_member, role='PM')
+
+        data = {
+            self.prj_1.id: 'DC',
+            self.prj_2.id: 'PU',
+            self.prj_3.id: 'Pb',
+            self.prj_4.id: 'Pb'
+            }
+
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+            self.org, self.org_member, self.user, data,)
+
+        assert form.data == data
+        assert form.user == self.org_member
+        assert form.current_user == self.user
+
+        assert form.org_role_instance.admin is False
+        for f in form.fields:
+            assert form.fields[f].initial == 'PM'
+
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+            self.org, self.user, self.user, data,)
+        assert form.data == data
+        assert form.user == self.user
+        assert form.current_user == self.user
+        for f in form.fields:
+            assert form.fields[f].initial == 'Pb'
+
+    def test_edit_project_roles(self):
+        ProjectRole.objects.create(
+            project=self.prj_4, user=self.user, role='PM')
+
+        data = {
+            self.prj_1.id: 'DC',
+            self.prj_2.id: 'PU',
+            self.prj_3.id: 'Pb',
+            self.prj_4.id: 'Pb'
+        }
+
+        form = forms.EditOrganizationMemberProjectPermissionForm(
+            self.org, self.user, self.user, data,)
+
+        form.save()
+        self.org_role_user.refresh_from_db()
 
         assert form.is_valid() is True
-        assert org_role.admin is False
-        assert ProjectRole.objects.get(user=user, project=prj_1).role == 'DC'
-        assert ProjectRole.objects.get(user=user, project=prj_2).role == 'PU'
-        assert (ProjectRole.objects.filter(user=user, project=prj_3).exists()
-                is False)
-        assert (ProjectRole.objects.filter(user=user, project=prj_4).exists()
-                is False)
+        assert self.org_role_user.admin is False
+        assert ProjectRole.objects.get(
+            user=self.user, project=self.prj_1).role == 'DC'
+        assert ProjectRole.objects.get(
+            user=self.user, project=self.prj_2).role == 'PU'
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_3).exists() is False)
+        assert (ProjectRole.objects.filter(
+            user=self.user, project=self.prj_4).exists() is False)
+
+        for prj in self.prjs:
+            assert (ProjectRole.objects.filter(
+                user=self.org_member, project=prj).exists() is False)
 
 
 class ProjectAddDetailsTest(UserTestCase, TestCase):
@@ -338,9 +512,8 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
         data['name'] = random.choice(invalid_names)
         form = forms.ProjectAddDetails(data=data, user=self.user)
         assert not form.is_valid()
-        assert form.errors == {
-            'name': ["Project name cannot be “Add” or “New”."]
-        }
+        assert ("Project name cannot be “Add” or “New”."
+                in form.errors['name'])
 
     def test_add_new_project_with_duplicate_name(self):
         existing_project = ProjectFactory.create(organization=self.org)
@@ -348,10 +521,8 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
         data['name'] = existing_project.name
         form = forms.ProjectAddDetails(data=data, user=self.user)
         assert not form.is_valid()
-        assert form.errors == {
-            'name': [
-                "Project with this name already exists in this organization."]
-        }
+        assert ("Project with this name already exists in this organization."
+                in form.errors['name'])
 
     def test_add_new_project_with_duplicate_name_in_another_org(self):
         another_org = OrganizationFactory.create()
@@ -372,9 +543,7 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
         data['url'] = 'invalid url'
         form = forms.ProjectAddDetails(data=data, user=self.user)
         assert not form.is_valid()
-        assert form.errors == {
-            'url': ["Enter a valid URL."]
-        }
+        assert "Enter a valid URL." in form.errors['url']
 
     def test_add_new_project_with_archived_org(self):
         self.org.archived = True
@@ -549,9 +718,8 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         data['name'] = random.choice(invalid_names)
         form = forms.ProjectEditDetails(instance=self.project, data=data)
         assert not form.is_valid()
-        assert form.errors == {
-            'name': ["Project name cannot be “Add” or “New”."]
-        }
+        assert ("Project name cannot be “Add” or “New”."
+                in form.errors['name'])
 
     def test_update_project_with_duplicate_name(self):
         another_project = ProjectFactory.create(
@@ -560,10 +728,8 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         data['name'] = another_project.name
         form = forms.ProjectEditDetails(instance=self.project, data=data)
         assert not form.is_valid()
-        assert form.errors == {
-            'name': [
-                "Project with this name already exists in this organization."]
-        }
+        assert ("Project with this name already exists in this organization."
+                in form.errors['name'])
 
     def test_update_project_with_semivalid_url(self):
         data = self.data.copy()
@@ -578,9 +744,7 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         data['urls'] = 'invalid url'
         form = forms.ProjectEditDetails(instance=self.project, data=data)
         assert not form.is_valid()
-        assert form.errors == {
-            'urls': ["Enter a valid URL."]
-        }
+        assert "Enter a valid URL." in form.errors['urls']
 
 
 class UpdateProjectRolesTest(UserTestCase, TestCase):

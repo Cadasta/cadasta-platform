@@ -24,7 +24,7 @@ from .choices import ADMIN_CHOICES, ROLE_CHOICES
 from .download.resources import ResourceExporter
 from .download.shape import ShapeExporter
 from .download.xls import XLSExporter
-from .fields import ContactsField, ProjectRoleField, PublicPrivateField
+from organization import fields as org_fields
 from .models import Organization, OrganizationRole, Project, ProjectRole
 
 FORM_CHOICES = (('Pb', _('Public User')),) + ROLE_CHOICES
@@ -122,8 +122,8 @@ class OrganizationForm(forms.ModelForm):
         required=False,
         error_messages={'item_invalid': ""},
     )
-    contacts = ContactsField(form=ContactsForm, required=False)
-    access = PublicPrivateField()
+    contacts = org_fields.ContactsField(form=ContactsForm, required=False)
+    access = org_fields.PublicPrivateField()
 
     class Meta:
         model = Organization
@@ -191,10 +191,10 @@ class AddOrganizationMemberForm(forms.Form):
         return self.instance
 
 
-class EditOrganizationMemberForm(forms.Form):
+class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
     org_role = forms.ChoiceField(choices=ADMIN_CHOICES)
 
-    def __init__(self, data, org, user, current_user, *args, **kwargs):
+    def __init__(self, org, user, current_user, data=None, *args, **kwargs):
         super(EditOrganizationMemberForm, self).__init__(data, *args, **kwargs)
         self.data = data
         self.organization = org
@@ -206,24 +206,11 @@ class EditOrganizationMemberForm(forms.Form):
 
         self.initial['org_role'] = 'A' if self.org_role_instance.admin else 'M'
 
-        project_roles = ProjectRole.objects.filter(
-            project__organization=org).values('project__id', 'role')
-        project_roles = {r['project__id']: r['role'] for r in project_roles}
-
-        active_projects = self.organization.projects.filter(archived=False)
-        for p in active_projects.values_list('id', 'name'):
-            role = project_roles.get(p[0], 'Pb')
-
-            self.fields[p[0]] = forms.ChoiceField(
-                choices=FORM_CHOICES,
-                label=p[1],
-                required=False,
-                initial=role
-            )
-
     def clean_org_role(self):
         org_role = self.cleaned_data['org_role']
-        if self.org_role_instance.admin and self.current_user == self.user:
+        if (self.org_role_instance.admin and
+           self.current_user == self.user and
+           not self.is_superuser(self.user)):
             if self.data.get('org_role') != 'A':
                 raise forms.ValidationError(
                     _("Organization administrators cannot change their own" +
@@ -234,7 +221,35 @@ class EditOrganizationMemberForm(forms.Form):
         self.org_role_instance.admin = self.data.get('org_role') == 'A'
         self.org_role_instance.save()
 
-        for f in [field for field in self.fields if field != 'org_role']:
+
+class EditOrganizationMemberProjectPermissionForm(forms.Form):
+    def __init__(self, org, user, current_user, data=None, *args, **kwargs):
+        super(EditOrganizationMemberProjectPermissionForm, self).__init__(
+            data, *args, **kwargs)
+        self.data = data
+        self.organization = org
+        self.user = user
+        self.current_user = current_user
+        self.org_role_instance = OrganizationRole.objects.get(
+            user=user, organization=self.organization)
+
+        project_roles = ProjectRole.objects.filter(
+            user=user, project__organization=org).values('project__id', 'role')
+        project_roles = {r['project__id']: r['role'] for r in project_roles}
+        active_projects = self.organization.projects.filter(archived=False)
+
+        for p in active_projects.values_list('id', 'name'):
+            role = project_roles.get(p[0], 'Pb')
+            self.fields[p[0]] = org_fields.ProjectRoleEditField(
+                choices=FORM_CHOICES,
+                label=p[1],
+                required=(not self.org_role_instance.admin),
+                initial=role,
+                admin=self.org_role_instance.admin,
+            )
+
+    def save(self):
+        for f in [field for field in self.fields]:
             role = self.data.get(f)
             create_update_or_delete_project_role(f, self.user, role)
 
@@ -255,7 +270,7 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
     organization = forms.ChoiceField()
     name = forms.CharField(max_length=100)
     description = forms.CharField(required=False, widget=forms.Textarea)
-    access = PublicPrivateField(initial='public')
+    access = org_fields.PublicPrivateField(initial='public')
     url = forms.URLField(required=False)
     questionnaire = forms.CharField(
         required=False,
@@ -264,7 +279,7 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
     original_file = forms.CharField(required=False,
                                     max_length=200,
                                     widget=forms.HiddenInput)
-    contacts = ContactsField(form=ContactsForm, required=False)
+    contacts = org_fields.ContactsField(form=ContactsForm, required=False)
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -324,8 +339,8 @@ class ProjectEditDetails(forms.ModelForm):
     original_file = forms.CharField(required=False,
                                     max_length=200,
                                     widget=forms.HiddenInput)
-    access = PublicPrivateField()
-    contacts = ContactsField(form=ContactsForm, required=False)
+    access = org_fields.PublicPrivateField()
+    contacts = org_fields.ContactsField(form=ContactsForm, required=False)
 
     class Media:
         js = ('js/file-upload.js',)
@@ -399,7 +414,7 @@ class PermissionsForm(SuperUserCheck):
                 else:
                     role = 'Pb'
 
-            self.fields[user.username] = ProjectRoleField(
+            self.fields[user.username] = org_fields.ProjectRoleField(
                 choices=FORM_CHOICES,
                 label=user.full_name,
                 required=(role != 'A'),
