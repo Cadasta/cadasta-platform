@@ -7,10 +7,12 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as geo_serializers
 from django_countries.serializer_fields import CountryField
 
+from core.form_mixins import SuperUserCheck
 from core.serializers import DetailSerializer, FieldSelectorSerializer
 from accounts.models import User
 from accounts.serializers import UserSerializer
 from .models import Organization, Project, OrganizationRole, ProjectRole
+from .forms import create_update_or_delete_project_role
 
 
 class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
@@ -91,7 +93,8 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'organization', 'country', 'name', 'description',
-                  'archived', 'urls', 'contacts', 'users', 'access', 'slug')
+                  'archived', 'urls', 'contacts', 'users', 'access', 'slug',
+                  'extent',)
         read_only_fields = ('id', 'country', 'slug')
         detail_only_fields = ('users',)
 
@@ -106,19 +109,6 @@ class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
             organization_id=organization.id,
             **validated_data
         )
-
-
-class NestedProjectSerializer(DetailSerializer, FieldSelectorSerializer,
-                              serializers.ModelSerializer):
-    organization = OrganizationSerializer(
-        read_only=True, fields=('id', 'name', 'slug')
-    )
-
-    class Meta:
-        model = Project
-        fields = ('id', 'organization', 'name', 'slug')
-        read_only_fields = ('id', 'slug')
-        detail_only_fields = ('organization',)
 
 
 class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
@@ -140,7 +130,7 @@ class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
                     'project': object.slug})
 
 
-class EntityUserSerializer(serializers.Serializer):
+class EntityUserSerializer(SuperUserCheck, serializers.Serializer):
     username = serializers.CharField()
 
     def to_representation(self, instance):
@@ -175,20 +165,10 @@ class EntityUserSerializer(serializers.Serializer):
 
             try:
                 self.get_roles_object(self.user)
-            except self.Meta.role_model.DoesNotExist:
-                pass
-            else:
                 raise serializers.ValidationError(
                     _("Not able to add member. The role already exists."))
-
-    def validate_admin(self, role_value):
-        if 'request' in self.context:
-            if self.context['request'].user == self.instance:
-                if role_value != self.get_roles_object(self.instance).admin:
-                    raise serializers.ValidationError(
-                        _("Organization administrators cannot change their "
-                          "own permissions within the organization"))
-        return role_value
+            except self.Meta.role_model.DoesNotExist:
+                pass
 
     def create(self, validated_data):
         obj = self.context[self.Meta.context_key]
@@ -223,6 +203,15 @@ class OrganizationUserSerializer(EntityUserSerializer):
         role_key = 'admin'
     admin = serializers.BooleanField()
 
+    def validate_admin(self, role_value):
+        if 'request' in self.context:
+            if self.context['request'].user == self.instance:
+                if role_value != self.get_roles_object(self.instance).admin:
+                    raise serializers.ValidationError(
+                        _("Organization administrators cannot change their "
+                          "own permissions within the organization"))
+        return role_value
+
     def get_roles_object(self, instance):
         self.role = OrganizationRole.objects.get(
             user=instance,
@@ -254,37 +243,67 @@ class ProjectUserSerializer(EntityUserSerializer):
         role_key = 'role'
     role = serializers.CharField()
 
-    def validate_username(self, value):
-        super(ProjectUserSerializer, self).validate_username(value)
-        project = self.context[self.Meta.context_key]
+    def validate(self, data):
+        if ((self.instance and self.is_superuser(self.instance)) or
+                self.org_role.admin):
+            raise serializers.ValidationError(
+                _("User {username} is an organization admin, the role cannot "
+                  "be updated.").format(username=self.instance.username))
+        return super().validate(data)
 
-        if self.user not in project.organization.users.all():
+    def validate_username(self, value):
+        try:
+            super(ProjectUserSerializer, self).validate_username(value)
+        except OrganizationRole.DoesNotExist:
             raise serializers.ValidationError(
                 _("User {username} is not member of the project\'s "
                   "organization").format(username=value))
 
     def get_roles_object(self, instance):
-        self.role = ProjectRole.objects.get(
-            user=instance,
-            project=self.context['project'])
+        project = self.context[self.Meta.context_key]
+        self.org_role = instance.organizationrole_set.get(
+            organization_id=project.organization_id)
 
-        return self.role
+        if not self.org_role.admin:
+            return instance.projectrole_set.get(
+                project=self.context['project'])
+
+        return self.org_role
+
+    def get_role_key(self, role):
+        if hasattr(role, 'role'):
+            return role.role
+        else:
+            return 'A' if role.admin else 'Pb'
 
     def get_role_json(self, instance):
-        role = self.get_roles_object(instance)
-        return role.role
+        if self.is_superuser(instance):
+            return 'A'
+
+        try:
+            role = self.get_roles_object(instance)
+            return self.get_role_key(role)
+        except ProjectRole.DoesNotExist:
+            return 'Pb'
 
     def set_roles(self, data):
-        user_role = 'PU'
+        user_role = 'Pb'
 
         if self.instance:
-            role = self.get_roles_object(self.instance)
-            user_role = role.role
+            user_role = self.get_role_json(self.instance)
 
         if data:
             user_role = data
 
         return user_role
+
+    def update(self, instance, validated_data):
+        role = validated_data[self.Meta.role_key]
+        create_update_or_delete_project_role(self.context['project'].id,
+                                             instance,
+                                             role)
+
+        return instance
 
 
 class UserAdminSerializer(UserSerializer):

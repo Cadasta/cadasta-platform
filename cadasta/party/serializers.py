@@ -4,20 +4,15 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from .models import Party, PartyRelationship, TenureRelationship
-from core.serializers import DetailSerializer, FieldSelectorSerializer
-from organization.serializers import NestedProjectSerializer
+from core.serializers import FieldSelectorSerializer
 from spatial.serializers import SpatialUnitSerializer
 
 
-class PartySerializer(DetailSerializer, FieldSelectorSerializer,
-                      serializers.ModelSerializer):
-    project = NestedProjectSerializer(read_only=True)
-
+class PartySerializer(FieldSelectorSerializer, serializers.ModelSerializer):
     class Meta:
         model = Party
-        fields = ('id', 'name', 'type', 'contacts', 'attributes', 'project',)
-        read_only_fields = ('id', 'project',)
-        detail_only_fields = ('project',)
+        fields = ('id', 'name', 'type', 'attributes', )
+        read_only_fields = ('id', )
 
     def create(self, validated_data):
         project = self.context['project']
