@@ -15,7 +15,6 @@
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
-<script src="https://cdn.rawgit.com/ghybs/Leaflet.MarkerCluster.LayerSupport/3d4c4f24a008d6983a8f98b1c823f9a05ad62f80/leaflet.markercluster.layersupport-src.js"></script>
 <script>
   function project_map_init(map, options) {
     var trans = {
@@ -30,7 +29,6 @@
     var projectExtent = null;
     {% endif %}
     var spatialUnits = {{ geojson|safe }};
-
     renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
 
     var orgSlug = '{{ project.organization.slug }}';
