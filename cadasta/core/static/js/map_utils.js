@@ -65,7 +65,7 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
     projectBounds = boundary.getBounds();
     if (fitBounds === 'project') {map.fitBounds(projectBounds);}
   }
-
+  
   var geoJson = L.geoJson(null, {
     style: { weight: 2 },
     onEachFeature: function(feature, layer) {
@@ -77,7 +77,8 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
     }
   });
 
-  L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+  L.Deflate({minSize: 20, layerGroup: geoJson}).addTo(map);
+  geoJson.addTo(map);
   geoJson.addData(spatialUnits);
 
   if (fitBounds === 'locations') {
@@ -87,11 +88,6 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
       map.fitBounds(projectBounds);
     }
   }
-
-  var markerGroup = L.markerClusterGroup.layerSupport();
-  markerGroup.addTo(map);
-  markerGroup.checkIn(geoJson);
-  geoJson.addTo(map);
 }
 
 function switch_layer_controls(map, options){
