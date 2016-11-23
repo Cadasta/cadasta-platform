@@ -19,7 +19,7 @@ ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 def create_children(children, errors=[], project=None,
                     default_language='', kwargs={}):
     if children:
-        for c in children:
+        for c, idx in zip(children, itertools.count()):
             if c.get('type') in ['group', 'repeat']:
                 model_name = 'QuestionGroup'
 
@@ -41,7 +41,10 @@ def create_children(children, errors=[], project=None,
                 model_name = 'Question'
 
             model = apps.get_model('questionnaires', model_name)
-            model.objects.create_from_dict(dict=c, errors=errors, **kwargs)
+            model.objects.create_from_dict(dict=c,
+                                           index=idx,
+                                           errors=errors,
+                                           **kwargs)
 
 
 def create_options(options, question, errors=[]):
@@ -236,7 +239,7 @@ class QuestionnaireManager(models.Manager):
 class QuestionGroupManager(models.Manager):
 
     def create_from_dict(self, dict=None, question_group=None,
-                         questionnaire=None, errors=[]):
+                         questionnaire=None, errors=[], index=0):
         instance = self.model(questionnaire=questionnaire,
                               question_group=question_group)
 
@@ -249,6 +252,7 @@ class QuestionGroupManager(models.Manager):
         instance.label_xlat = dict.get('label', {})
         instance.type = dict.get('type')
         instance.relevant = relevant
+        instance.index = index
         instance.save()
 
         create_children(
@@ -267,7 +271,7 @@ class QuestionGroupManager(models.Manager):
 
 class QuestionManager(models.Manager):
 
-    def create_from_dict(self, errors=[], **kwargs):
+    def create_from_dict(self, errors=[], index=0, **kwargs):
         dict = kwargs.pop('dict')
         instance = self.model(**kwargs)
         type_dict = {name: code for code, name in instance.TYPE_CHOICES}
@@ -287,6 +291,7 @@ class QuestionManager(models.Manager):
         instance.default = dict.get('default', None)
         instance.hint = dict.get('hint', None)
         instance.relevant = relevant
+        instance.index = index
         instance.save()
 
         if instance.has_options:

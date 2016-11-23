@@ -41,18 +41,12 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
     parser_classes = (FormParser, MultiPartParser,)
     serializer_class = XFormSubmissionSerializer
 
-    def dispatch(self, *args, **kwargs):
-        print(args[0].__dict__)
-        return super().dispatch(*args, **kwargs)
-
     def create(self, request, *args, **kwargs):
         if request.method.upper() == 'HEAD':
             return Response(headers=self.get_openrosa_headers(request),
                             status=status.HTTP_204_NO_CONTENT,)
-        print('REQUEST')
         try:
-            instance = ModelHelper(
-            ).upload_submission_data(request)
+            instance = ModelHelper().upload_submission_data(request)
         except InvalidXMLSubmission as e:
             logger.debug(str(e))
             return self._sendErrorResponse(request, e)

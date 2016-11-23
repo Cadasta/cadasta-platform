@@ -95,6 +95,9 @@ class Questionnaire(RandomIDModel):
 
 
 class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
+    class Meta:
+        ordering = ('index',)
+
     name = models.CharField(max_length=100)
     label_xlat = JSONField(default={})
     relevant = models.CharField(max_length=100, null=True, blank=True)
@@ -104,6 +107,7 @@ class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
                                        related_name='question_groups',
                                        null=True)
     type = models.CharField(max_length=50, default='group')
+    index = models.IntegerField(null=True)
 
     objects = managers.QuestionGroupManager()
 
@@ -116,6 +120,9 @@ class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
 
 
 class Question(MultilingualLabelsMixin, RandomIDModel):
+    class Meta:
+        ordering = ('index',)
+
     TYPE_CHOICES = (('IN', 'integer'),
                     ('DE', 'decimal'),
                     ('TX', 'text'),
@@ -156,6 +163,7 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
     question_group = models.ForeignKey(QuestionGroup,
                                        related_name='questions',
                                        null=True)
+    index = models.IntegerField(null=True)
 
     objects = managers.QuestionManager()
 

@@ -93,6 +93,7 @@ class XFormRendererTest(TestCase):
                   'type': "S1",
                   'required': False,
                   'constraint': None,
+                  'index': 0,
                   'options': [
                     {
                       'id': "d9pkepyjg4sgaepdytgwkgfv",
@@ -111,21 +112,25 @@ class XFormRendererTest(TestCase):
                 'id': '123',
                 'name': 'group_1',
                 'label': 'Group 2',
+                'index': 1,
                 'questions': [{
                     'id': "bzs2984c3gxgwcjhvambdt3w",
                     'name': "start",
                     'label': None,
                     'type': "ST",
+                    'index': 0,
                 }]
             }, {
                 'id': '456',
                 'name': 'group_2',
                 'label': 'Group 2',
+                'index': 2,
                 'questions': [{
                     'id': "xp8vjr6dsk46p47u22fft7bg",
                     'name': "party_type",
                     'label': "What is the party type?",
                     'type': "TX",
+                    'index': 0,
                 }]
             }]
         }
@@ -150,6 +155,7 @@ class XFormRendererTest(TestCase):
                   'type': "S1",
                   'required': False,
                   'constraint': None,
+                  'index': 0,
                   'options': [
                     {
                       'id': "d9pkepyjg4sgaepdytgwkgfv",
@@ -169,7 +175,8 @@ class XFormRendererTest(TestCase):
                   'label': None,
                   'type': "ST",
                   'required': False,
-                  'constraint': None
+                  'constraint': None,
+                  'index': 1,
                 }
             ]
         }
@@ -177,3 +184,6 @@ class XFormRendererTest(TestCase):
         xml = renderer.render(data).decode()
         assert '<h:title>abc123</h:title>' in xml
         assert '<abc123 id="abc123" version="1234567890">' in xml
+        assert ('<bind calculate="concat(\'uuid:\', uuid())" '
+                'nodeset="/abc123/meta/instanceID" readonly="true()" '
+                'type="string"/>' in xml)

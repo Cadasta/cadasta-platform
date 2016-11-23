@@ -62,7 +62,7 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Question
         fields = ('id', 'name', 'label', 'type', 'required', 'constraint',
-                  'default', 'hint', 'relevant', 'label_xlat', )
+                  'default', 'hint', 'relevant', 'label_xlat', 'index', )
         read_only_fields = ('id', )
         write_only_fields = ('label_xlat', )
 
@@ -105,7 +105,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
     class Meta:
         model = models.QuestionGroup
         fields = ('id', 'name', 'label',  'type', 'questions',
-                  'question_groups', 'label_xlat', 'relevant', )
+                  'question_groups', 'label_xlat', 'relevant', 'index', )
         read_only_fields = ('id', 'questions', 'question_groups', )
         write_only_fields = ('label_xlat', )
 
