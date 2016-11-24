@@ -1,4 +1,3 @@
-import json
 from jsonattrs.mixins import JsonAttrsMixin
 import django.views.generic as base_generic
 from core.views import generic
@@ -12,7 +11,6 @@ from party.messages import TENURE_REL_CREATE
 from . import mixins
 from organization.views import mixins as organization_mixins
 from .. import forms
-from ..serializers import SpatialUnitGeoJsonSerializer
 from .. import messages as error_messages
 
 
@@ -149,17 +147,6 @@ class LocationResourceNew(LoginPermissionRequiredMixin,
     template_name = 'spatial/resources_new.html'
     permission_required = update_permissions('spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        project_locations = context['object'].spatial_units.only(
-            'id', 'type', 'geometry', 'project')
-        context['geojson'] = json.dumps(
-            SpatialUnitGeoJsonSerializer(
-                project_locations.exclude(id=context['location'].id),
-                many=True).data
-        )
-        return context
 
 
 class TenureRelationshipAdd(LoginPermissionRequiredMixin,

@@ -25,7 +25,6 @@ from .factories import SpatialUnitFactory
 from ..views import default
 from .. import forms
 from ..models import SpatialUnit
-from ..serializers import SpatialUnitGeoJsonSerializer
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
@@ -67,12 +66,9 @@ class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
         SpatialUnitFactory.create()
 
     def setup_template_context(self):
-        geojson = json.dumps(
-            SpatialUnitGeoJsonSerializer(self.locations, many=True).data)
         return {
             'object': self.project,
             'object_list': self.locations,
-            'geojson': geojson,
             'is_allowed_add_location': True
         }
 
@@ -153,7 +149,6 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
                      'selector': self.project.current_questionnaire}
                 )
             ),
-            'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_allowed_add_location': True
         }
 
@@ -342,7 +337,6 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         return {
             'object': self.project,
             'location': self.location,
-            'geojson': '{"type": "FeatureCollection", "features": []}',
             'attributes': (('Test field', 'test', ),
                            ('Test field 2', 'Choice 2', ),
                            ('Test field 3', 'Choice 1, Choice 3', )),
@@ -423,7 +417,6 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': forms.LocationForm(instance=self.location),
-                'geojson': '{"type": "FeatureCollection", "features": []}',
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -529,7 +522,6 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
-                'geojson': '{"type": "FeatureCollection", "features": []}',
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -644,7 +636,6 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}',
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -767,7 +758,6 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}',
                 'is_allowed_add_location': True}
 
     def setup_post_data(self):
@@ -922,7 +912,6 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                     'new_entity': not self.project.parties.exists(),
                 },
             ),
-            'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_allowed_add_location': True
         }
 

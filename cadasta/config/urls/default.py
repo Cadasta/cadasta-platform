@@ -63,6 +63,12 @@ api = [
     url(r'^v1/', include(api_v1, namespace='v1'))
 ]
 
+async = [
+    url(r'^',
+        include('spatial.urls.async',
+                namespace='spatial')),
+]
+
 urlpatterns = [
     url(r'^',
         include('core.urls',
@@ -96,6 +102,9 @@ urlpatterns = [
     url(r'^api/',
         include(api,
                 namespace='api')),
+    url(r'^async/',
+        include(async,
+                namespace='async')),
     url(r'^collect/', include('xforms.urls.api')),
 
     url(r'^i18n/',

@@ -112,7 +112,6 @@
       <div id="page-content">
         {% block sub-nav %}{% endblock %}
         <main class="container-fluid{% block main-width %}{% endblock %}" role="main">
-          {% if messages %}
           <div id="messages">
             {% for message in messages %}
             <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
@@ -122,8 +121,10 @@
               {{message}}
             </div>
             {% endfor %}
+            <div class="alert alert-info hidden" role="alert" id="loading">
+              {% trans "Loading locations..." %}
+            </div>
           </div>
-          {% endif %}
           {% block content %}{% endblock %}
         </main>
       </div>

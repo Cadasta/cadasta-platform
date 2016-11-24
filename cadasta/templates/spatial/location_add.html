@@ -41,11 +41,8 @@
       }
       var options = detail.options;
       add_map_controls(detail.map);
-
       switch_layer_controls(detail.map, options);
 
-      // TODO: It seems Leaflet has a bug with L.geoJson()
-      // not returning the correct bounds (see #377 for details)
       var trans = {
         open: "{% trans 'Open location' %}"
       };
@@ -55,9 +52,10 @@
       {% else %}
       var projectExtent = null;
       {% endif %}
-      var spatialUnits = {{ geojson|safe }};
 
-      renderFeatures(detail.map, projectExtent, spatialUnits, trans, 'project');
+      renderFeatures(detail.map,
+                     '{% url "async:spatial:list" object.organization.slug object.slug %}',
+                     {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
 
       var orgSlug = '{{ object.organization.slug }}';
       var projectSlug = '{{ object.slug }}';

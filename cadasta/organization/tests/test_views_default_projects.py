@@ -24,7 +24,6 @@ from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
-from spatial.serializers import SpatialUnitGeoJsonSerializer
 from spatial.tests.factories import SpatialUnitFactory
 from tutelary.models import Policy, Role, assign_user_policies
 
@@ -211,7 +210,6 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         return {
             'object': self.project,
             'project': self.project,
-            'geojson': '{"type": "FeatureCollection", "features": []}',
             'is_superuser': False,
             'is_administrator': False,
             'has_content': False,
@@ -412,16 +410,13 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == expected
 
     def test_get_with_overview_stats(self):
-        su = SpatialUnitFactory.create(project=self.project)
+        SpatialUnitFactory.create(project=self.project)
         PartyFactory.create(project=self.project)
         ResourceFactory.create(project=self.project)
         ResourceFactory.create(project=self.project, archived=True)
-        geojson = json.dumps(
-            SpatialUnitGeoJsonSerializer([su], many=True).data)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.render_content(geojson=geojson,
-                                                       has_content=True,
+        assert response.content == self.render_content(has_content=True,
                                                        num_locations=1,
                                                        num_parties=1,
                                                        num_resources=1)

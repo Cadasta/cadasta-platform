@@ -1,4 +1,3 @@
-import json
 import os
 from collections import OrderedDict
 
@@ -20,7 +19,6 @@ from django.shortcuts import get_object_or_404, redirect
 from questionnaires.exceptions import InvalidXLSForm
 from questionnaires.models import Questionnaire
 from resources.models import ContentObject, Resource
-from spatial.serializers import SpatialUnitGeoJsonSerializer
 
 from . import mixins
 from .. import messages as error_messages
@@ -419,12 +417,6 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
-
-        su = self.object.spatial_units.all().only(
-            'id', 'type', 'geometry', 'project')
-        context['geojson'] = json.dumps(
-            SpatialUnitGeoJsonSerializer(su, many=True).data
-        )
 
         return context
 
