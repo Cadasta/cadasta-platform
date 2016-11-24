@@ -2,9 +2,9 @@ L.Deflate = function(options) {
     var removedPaths = [];
     var minSize = options.minSize || 10;
     var layer, map;
-    var zoomBins = {};
     var startZoom;
     var markers = L.markerClusterGroup();
+    var layers = [];
 
     function isCollapsed(path, zoom) {
         var bounds = path.getBounds();
@@ -66,16 +66,11 @@ L.Deflate = function(options) {
             feature.zoomState = map.getZoom();
             
             layer.removeLayer(feature);
+            layers.push(feature)
             if (map.getZoom() <= zoomThreshold) {
                 markers.addLayer(feature.marker);
             } else {
                 markers.addLayer(feature);
-            }
-
-            if (zoomBins[zoomThreshold]) {
-                zoomBins[zoomThreshold].push(feature);
-            } else {
-                zoomBins[zoomThreshold] = [feature];
             }
         }
     }
@@ -94,22 +89,16 @@ L.Deflate = function(options) {
         var start = (show ? startZoom : endZoom);
         var end = (show ? endZoom : startZoom);
 
-        for (var i = start; i <= end; i++) {
-            if (zoomBins[i]) {
-                var features = zoomBins[i];
-
-                for (var j = 0, len = features.length; j < len; j++) {
-                    if (features[j].zoomState !== endZoom && features[j].getBounds().intersects(bounds)) {
-                        if (show) {
-                            layer.addLayer(features[j]);
-                            markersToRemove.push(features[j].marker);
-                        } else {
-                            layer.removeLayer(features[j]);
-                            markersToAdd.push(features[j].marker);
-                        }
-                        features[j].zoomState = endZoom;
-                    }
+        for (var i = 0, len = layers.length; i < len; i++) {
+            if (layers[i].zoomState !== endZoom && layers[i].getBounds().intersects(bounds)) {
+                if (endZoom <= layers[i].zoomThreshold) {
+                    markersToRemove.push(layers[i]);
+                    markersToAdd.push(layers[i].marker);
+                } else {
+                    markersToAdd.push(layers[i]);
+                    markersToRemove.push(layers[i].marker);
                 }
+                layers[i].zoomState = endZoom;
             }
         }
         markers.removeLayers(markersToRemove);
