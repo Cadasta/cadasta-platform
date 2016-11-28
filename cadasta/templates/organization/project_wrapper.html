@@ -66,7 +66,6 @@
           <span class="sr-only">{%trans "Toggle add" %}</span>
         </button>
         <ul class="dropdown-menu">
-          <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           <li role="separator" class="divider"></li>
           <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
@@ -109,26 +108,26 @@
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li><!--
-    --><li class="map">
+    </li>
+    <li class="map">
       <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
       </a>
-    </li><!--
-    --><li class="resources">
+    </li>
+    <li class="resources">
       <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
         <span class="icon resources"></span>
         <span class="title">{% trans "Resources" %}</span>
       </a>
-    </li><!--
-    --><li class="reports hidden">
+    </li>
+    <li class="reports hidden">
       <a href="#">
          <span class="icon reports"></span>
          <span class="title">{% trans "Reports" %}</span>
       </a>
-    </li><!--
-    --><li class="activity hidden">
+    </li>
+    <li class="activity hidden">
       <a href="#">
         <span class="icon activity"></span>
         <span class="title">{% trans "Activity" %}</span>
