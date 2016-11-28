@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
-from rest_framework.permissions import IsAuthenticated
 from tutelary.mixins import APIPermissionRequiredMixin
 
 from organization.models import Project
@@ -18,7 +17,11 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
                           mixins.CreateModelMixin,
                           generics.RetrieveUpdateAPIView):
     renderer_classes = (JSONRenderer, BrowsableAPIRenderer, XFormRenderer, )
-    permission_classes = (IsAuthenticated,)
+
+    def get_actions(self, request):
+        if request.GET.get('format') == 'xform':
+            return None
+        return 'questionnaire.view'
 
     def patch_actions(self, request):
         try:
@@ -28,7 +31,7 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
 
     serializer_class = QuestionnaireSerializer
     permission_required = {
-        'GET': 'questionnaire.view',
+        'GET': get_actions,
         'PUT': patch_actions,
     }
 

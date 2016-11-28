@@ -71,8 +71,6 @@ class XFormRenderer(BaseRenderer):
             data.get('question_groups', []))
         json['children'] = sorted(questions + question_groups,
                                   key=lambda x: x['index'])
-        for c in json['children']:
-            print(c['name'], c.get('index', "nothing"))
         return json
 
     def insert_version_attribute(self, xform, root_node, version):
