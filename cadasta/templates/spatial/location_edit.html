@@ -50,23 +50,8 @@
 
       var data = {{ geojson|safe }};
 
-      var geoJson = L.geoJson(null, {
-        onEachFeature: function(feature, layer) {
-          layer.bindPopup("<div class=\"text-wrap\">" +
-                         "<h2><span>Location</span>" +
-                         feature.properties.type + "</h2></div>" +
-                         "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open location' %}</a>"  +
-                         "</div>");
-        }
-      });
-
-      L.Deflate(map, {minSize: 20, layerGroup: geoJson});
-      geoJson.addData(data);
-
-      var markerGroup = L.markerClusterGroup.layerSupport()
-      markerGroup.addTo(map);
-      markerGroup.checkIn(geoJson);
-      geoJson.addTo(map);
+      var trans = {open: "{% trans 'Open location' %}"}
+      renderFeatures(detail.map, null, data, trans);
 
       // Enable edit mode on map load and save the geometry on page save
       setTimeout(enableMapEditMode, 500);
