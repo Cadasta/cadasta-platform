@@ -82,12 +82,8 @@ L.Deflate = function(options) {
     function deflate() {
         var bounds = map.getBounds();
         var endZoom = map.getZoom();
-        var show = startZoom < endZoom;
         var markersToAdd = []
         var markersToRemove = [];
-
-        var start = (show ? startZoom : endZoom);
-        var end = (show ? endZoom : startZoom);
 
         for (var i = 0, len = layers.length; i < len; i++) {
             if (layers[i].zoomState !== endZoom && layers[i].getBounds().intersects(bounds)) {
