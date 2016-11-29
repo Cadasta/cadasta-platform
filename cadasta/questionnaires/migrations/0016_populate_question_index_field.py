@@ -19,6 +19,7 @@ def populate_index_fields(apps, schema_editor):
         question.save()
 
     def update_group(idx, **kwargs):
+        print(kwargs)
         group = QuestionGroup.objects.get(**kwargs)
         group.index = idx
         group.save()

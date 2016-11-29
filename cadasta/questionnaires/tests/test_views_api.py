@@ -51,16 +51,6 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
         assert response.status_code == 200
         assert response.content['id'] == questionnaire.id
 
-    def test_get_questionnaire_as_xform(self):
-        questionnaire = QuestionnaireFactory.create(project=self.prj)
-        response = self.request(user=self.user, get_data={'format': 'xform'})
-        assert response.status_code == 200
-        assert (response.headers['content-type'][1] ==
-                'application/xml; charset=utf-8')
-        assert '<{id} id="{id}" version="{v}"/>'.format(
-                id=questionnaire.id_string,
-                v=questionnaire.version) in response.content
-
     def test_get_questionnaire_that_does_not_exist(self):
         response = self.request(user=self.user)
         assert response.status_code == 404

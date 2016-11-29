@@ -1,5 +1,5 @@
 from django.test import TestCase
-from ..renderer.xform import XFormRenderer
+from ..renderers import XFormRenderer
 
 
 class XFormRendererTest(TestCase):

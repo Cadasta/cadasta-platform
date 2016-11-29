@@ -1,3 +1,4 @@
+import json
 import io
 
 import pytest
@@ -8,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from skivvy import APITestCase
+from tutelary.models import Policy
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
@@ -62,9 +64,8 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
 
         assert response.status_code == 200
         assert questionnaire.md5_hash in response.content
-        assert ('/v1/organizations/{}/projects/{}/questionnaire/'.format(
-                    questionnaire.project.organization.slug,
-                    questionnaire.project.slug) in response.content)
+        assert ('/collect/formList/{}/'.format(
+                    questionnaire.id) in response.content)
         assert str(questionnaire.version) in response.content
 
     def test_get_xforms_with_unauthroized_user(self):
@@ -73,9 +74,8 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
 
         assert response.status_code == 200
         assert questionnaire.md5_hash not in response.content
-        assert ('/v1/organizations/{}/projects/{}/questionnaire/'.format(
-                    questionnaire.project.organization.slug,
-                    questionnaire.project.slug) not in response.content)
+        assert ('/collect/formList/{}/'.format(
+                    questionnaire.id) not in response.content)
 
     def test_get_xforms_with_superuser(self):
         self.user.assign_policies(self.superuser_role)
@@ -84,9 +84,8 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
 
         assert response.status_code == 200
         assert questionnaire.md5_hash in response.content
-        assert ('/v1/organizations/{}/projects/{}/questionnaire/'.format(
-                    questionnaire.project.organization.slug,
-                    questionnaire.project.slug) in response.content)
+        assert ('/collect/formList/{}/'.format(
+                    questionnaire.id) in response.content)
 
     def test_get_xforms_with_no_superuser(self):
         OrganizationRole.objects.create(
@@ -663,3 +662,56 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         self._test_resource('test_image_three', party_one)
         self._test_resource('test_image_four', party_one)
         self._test_resource('test_image_five', party_two)
+
+
+class XFormDownloadView(APITestCase, UserTestCase, TestCase):
+    view_class = api.XFormDownloadView
+
+    def setup_models(self):
+        clause = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project/*/*'],
+                    'action': ['questionnaire.*']
+                }
+            ]
+        }
+        policy = Policy.objects.create(
+            name='test-policy',
+            body=json.dumps(clause))
+        self.user = UserFactory.create()
+        self.user.assign_policies(policy)
+
+        self.questionnaire = QuestionnaireFactory.create()
+
+    def setup_url_kwargs(self):
+        return {'questionnaire': self.questionnaire.id}
+
+    def test_get_questionnaire_as_xform(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert (response.headers['content-type'][1] ==
+                'application/xml; charset=utf-8')
+        assert '<{id} id="{id}" version="{v}"/>'.format(
+                id=self.questionnaire.id_string,
+                v=self.questionnaire.version) in response.content
+
+    def test_get_questionnaire_that_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'questionnaire': 'abc'})
+        assert response.status_code == 404
+        assert '<detail>Questionnaire not found.</detail>' in response.content
+
+    def test_get_questionnaire_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(user=user)
+        assert response.status_code == 403
+        assert ('<detail>You do not have permission to perform this '
+                'action.</detail>' in response.content)
+
+    def test_get_questionnaire_with_authenticated_user(self):
+        response = self.request(user=None)
+        assert response.status_code == 401
+        assert ('<detail>Authentication credentials were '
+                'not provided.</detail>' in response.content)

@@ -3,25 +3,17 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, mixins, status
 from rest_framework.response import Response
-from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from tutelary.mixins import APIPermissionRequiredMixin
 
 from organization.models import Project
 from ..models import Questionnaire
 from ..serializers import QuestionnaireSerializer
 from ..exceptions import InvalidXLSForm
-from ..renderer.xform import XFormRenderer
 
 
 class QuestionnaireDetail(APIPermissionRequiredMixin,
                           mixins.CreateModelMixin,
                           generics.RetrieveUpdateAPIView):
-    renderer_classes = (JSONRenderer, BrowsableAPIRenderer, XFormRenderer, )
-
-    def get_actions(self, request):
-        if request.GET.get('format') == 'xform':
-            return None
-        return 'questionnaire.view'
 
     def patch_actions(self, request):
         try:
@@ -31,7 +23,7 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
 
     serializer_class = QuestionnaireSerializer
     permission_required = {
-        'GET': get_actions,
+        'GET': 'questionnaire.view',
         'PUT': patch_actions,
     }
 

@@ -11,6 +11,13 @@ class XFormsUrlTest(TestCase):
         resolved = resolve('/collect/')
         assert resolved.func.__name__ == api.XFormListView.__name__
 
+    def test_xforms_download(self):
+        assert reverse('form-download', args=['a']) == '/collect/formList/a/'
+
+        resolved = resolve('/collect/formList/a/')
+        assert resolved.func.__name__ == api.XFormDownloadView.__name__
+        assert resolved.kwargs['questionnaire'] == 'a'
+
     def test_xforms_submission(self):
         assert reverse('submissions') == '/collect/submission'
 

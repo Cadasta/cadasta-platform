@@ -21,13 +21,9 @@ class XFormListSerializer(FieldSelectorSerializer,
     downloadUrl = serializers.SerializerMethodField('get_xml_form')
 
     def get_xml_form(self, obj):
-        url = reverse('api:v1:questionnaires:detail',
-                      kwargs={
-                        'organization': obj.project.organization.slug,
-                        'project': obj.project.slug
-                       }) + '?format=xform'
+        url = reverse('form-download', args=[obj.id])
         url = self.context['request'].build_absolute_uri(url)
-        if self.context['request'].META['SERVER_PROTOCOL'] != 'HTTP/1.1':
+        if self.context['request'].META['SERVER_PROTOCOL'] == 'HTTPS/1.1':
             url = url.replace('http://', 'https://')
         return url
 
