@@ -39,13 +39,8 @@
       }
     });
 
-    L.Deflate(map, {minSize: 20, layerGroup: geoJson});
+    L.Deflate({minSize: 20, layerGroup: geoJson}).addTo(map);
     geoJson.addData(data);
-
-    var markerGroup = L.markerClusterGroup.layerSupport()
-    markerGroup.addTo(map);
-    markerGroup.checkIn(geoJson);
-    geoJson.addTo(map);
   }
 </script>
 {% endblock %}
