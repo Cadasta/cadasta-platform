@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
+from django.contrib.auth.password_validation import validate_password
 
 from rest_framework.serializers import EmailField, ValidationError
 from rest_framework.validators import UniqueValidator
@@ -38,6 +39,24 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
+
+    def validate_password(self, password):
+        validate_password(password)
+
+        errors = []
+        if self.initial_data.get('email'):
+            email = self.initial_data.get('email').lower().split('@')
+            if email[0] in password:
+                errors.append(_("Passwords cannot contain your email."))
+
+        if self.initial_data.get('username') in password:
+            errors.append(
+                _("The password is too similar to the username."))
+
+        if errors:
+            raise ValidationError(errors)
+
+        return password
 
 
 class UserSerializer(djoser_serializers.UserSerializer):

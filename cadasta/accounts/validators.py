@@ -18,9 +18,9 @@ class CharacterTypePasswordValidator(object):
         self.unique_types = unique_types
 
     def error_message(self):
-        return _((
+        return (_(
             "Passwords must contain at least {unique_types} of the following "
-            " {character_types} character types:\n"
+            "{character_types} character types:\n"
             "lowercase characters, uppercase characters, "
             "special characters, "
             "and/or numerical character.\n").format(

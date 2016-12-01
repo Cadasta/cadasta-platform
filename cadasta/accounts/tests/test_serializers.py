@@ -19,7 +19,7 @@ from .factories import UserFactory
 BASIC_TEST_DATA = {
     'username': 'imagine71',
     'email': 'john@beatles.uk',
-    'password': 'iloveyoko79',
+    'password': 'iloveyoko79!',
     'full_name': 'John Lennon',
 }
 
@@ -48,8 +48,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'imagine71',
-            'password': 'iloveyoko79',
-            'password_repeat': 'iloveyoko79',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
 
@@ -65,8 +65,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'password': 'iloveyoko79',
-            'password_repeat': 'iloveyoko79',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
 
@@ -80,8 +80,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
-            'password': 'iloveyoko79',
-            'password_repeat': 'iloveyoko79',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
 
@@ -89,6 +89,62 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         assert not serializer.is_valid()
         assert (_("Username cannot be “add” or “new”.")
                 in serializer._errors['username'])
+
+    def test_password_contains_username(self):
+        data = {
+            'username': 'yoko79',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+        }
+        serializer = RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert (_("The password is too similar to the username.") in
+                serializer._errors['password'])
+
+    def test_password_contains_email(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password': 'johnisjustheBest!!',
+            'password_repeat': 'johnisjustheBest!!',
+            'full_name': 'John Lennon',
+        }
+        serializer = RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert (_("Passwords cannot contain your email.") in
+                serializer._errors['password'])
+
+    def test_password_contains_less_than_min_characters(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password': 'yoko<3',
+            'password_repeat': 'yoko<3',
+            'full_name': 'John Lennon',
+        }
+        serializer = RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert (_("This password is too short."
+                  " It must contain at least 10 characters.") in
+                serializer._errors['password'])
+
+    def test_password_does_not_meet_unique_character_requirements(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko',
+            'password_repeat': 'iloveyoko',
+            'full_name': 'John Lennon',
+        }
+        serializer = RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert (_("Passwords must contain at least 3"
+                  " of the following 4 character types:\n"
+                  "lowercase characters, uppercase characters,"
+                  " special characters, and/or numerical character.\n"
+                  ) in serializer._errors['password'])
 
 
 class UserSerializerTest(UserTestCase, TestCase):
