@@ -8,6 +8,52 @@
 
 {% block title %} | {% trans "Register" %}{% endblock %}
 
+{% block extra_script %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("input[name='password1']").on('focus', function() {
+      $(this).next(".help-block").removeClass("hidden");
+    });
+  });
+
+  // checks password 3 out of 4 character requirement
+  window.Parsley
+    .addValidator('character', function (value, requirement) {
+      var isNumeric = + /\d+/.test(value),
+        isCapitals  = + /[A-Z]+/.test(value),
+        isSmall     = + /[a-z]+/.test(value),
+        isSpecial   = + /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value);
+      if (isNumeric + isCapitals  + isSmall + isSpecial < requirement) {
+        return false;
+      }
+    }, 3)
+    .addMessage('character', 'Your password must contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.');
+
+  // checks username not contained in password
+  window.Parsley
+    .addValidator('username', function (value, requirement) {
+      var term = $("#id_username").val();
+      if (value.indexOf(term) >= 0) {
+        return false;
+      }
+    }, 2)
+    .addMessage('username', 'Your password cannot contain your username.');
+
+  // checks email not contained in password
+  window.Parsley
+    .addValidator('email', function (value, requirement) {
+      var term = $("#id_email").val().split("@");
+      if (value.indexOf(term[0]) >= 0) {
+        return false;
+      }
+    }, 2)
+    .addMessage('email', 'Your password cannot contain your email mailbox name.');
+
+</script>
+
+{% endblock %}
+
 {% block content %}
 
 {% if form.non_field_errors %}
@@ -33,7 +79,7 @@
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label class="control-label" for="id_username">{% trans "Choose your username" %}</label>
-    {% render_field form.username class+="form-control input-lg" %}
+    {% render_field form.username class+="form-control input-lg" data-parsley-minlength="3" %}
     <div class="error-block">{{ form.username.errors }}</div>
   </div>
 
@@ -45,7 +91,8 @@
 
   <div class="form-group{% if form.password1.errors %} has-error{% endif %}">
     <label class="control-label" for="id_password1">{% trans "Password" %}</label>
-    {% render_field form.password1 class+="form-control input-lg" %}
+    {% render_field form.password1 class+="form-control input-lg" data-parsley-minlength="10" data-parsley-character="3" data-parsley-username="1" data-parsley-email="1" %}
+    <p class="help-block small hidden">Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username or email address.</p>
     <div class="error-block">{{ form.password1.errors }}</div>
   </div>
 
