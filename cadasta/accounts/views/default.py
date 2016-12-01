@@ -21,8 +21,7 @@ class PasswordChangeView(LoginRequiredMixin,
     pass
 
 
-class PasswordResetView(LoginRequiredMixin,
-                        SuperUserCheckMixin,
+class PasswordResetView(SuperUserCheckMixin,
                         allauth_views.PasswordResetView):
     pass
 
