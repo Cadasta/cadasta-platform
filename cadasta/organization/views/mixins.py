@@ -56,6 +56,66 @@ class ProjectMixin:
             self._org = self.get_project().organization
         return self._org
 
+    def get_org_role(self):
+        if not hasattr(self, '_org_role'):
+            try:
+                self._org_role = OrganizationRole.objects.get(
+                    organization=self.get_project().organization,
+                    user=self.request.user
+                )
+            except OrganizationRole.DoesNotExist:
+                return None
+
+        return self._org_role
+
+    def get_prj_role(self):
+        if self.request.user.is_anonymous():
+            return None
+
+        if not hasattr(self, '_prj_role'):
+            try:
+                self._prj_role = ProjectRole.objects.get(
+                    project=self.get_project(),
+                    user=self.request.user
+                )
+            except ProjectRole.DoesNotExist:
+                return None
+
+        return self._prj_role
+
+    @property
+    def is_administrator(self):
+        if not hasattr(self, '_is_admin'):
+            self._is_admin = False
+
+            # Check if the user is anonymous: not an admin
+            if isinstance(self.request.user, AnonymousUser):
+                return False
+
+            # Check if the user is a superuser: is an admin
+            if self.is_superuser:
+                self._is_admin = True
+                return self._is_admin
+
+            # Check if the user has the organization admin role: is an admin
+            org_role = self.get_org_role()
+            if org_role and org_role.admin:
+                self._is_admin = True
+                return self._is_admin
+
+            # Check if the user has the project manager role: is an admin
+            prj_role = self.get_prj_role()
+            if prj_role and prj_role.role == 'PM':
+                self._is_admin = True
+                return self._is_admin
+
+        return self._is_admin
+
+    def get_context_data(self, *args, **kwargs):
+        prj_member = self.is_administrator or self.get_prj_role() is not None
+        return super().get_context_data(is_project_member=prj_member,
+                                        *args, **kwargs)
+
 
 class ProjectRoles(ProjectMixin):
     lookup_field = 'username'
@@ -103,43 +163,6 @@ class ProjectQuerySetMixin:
 
 
 class ProjectAdminCheckMixin(SuperUserCheckMixin):
-    @property
-    def is_administrator(self):
-        if not hasattr(self, '_is_admin'):
-            self._is_admin = False
-
-            # Check if the user is anonymous: not an admin
-            if isinstance(self.request.user, AnonymousUser):
-                return False
-
-            # Check if the user is a superuser: is an admin
-            if self.is_superuser:
-                self._is_admin = True
-
-            # Check if the user has the organization admin role: is an admin
-            try:
-                OrganizationRole.objects.get(
-                    organization=self.get_project().organization,
-                    user=self.request.user,
-                    admin=True,
-                )
-                self._is_admin = True
-            except OrganizationRole.DoesNotExist:
-                pass
-
-            # Check if the user has the project manager role: is an admin
-            try:
-                ProjectRole.objects.get(
-                    project=self.get_project(),
-                    user=self.request.user,
-                    role='PM',
-                )
-                self._is_admin = True
-            except ProjectRole.DoesNotExist:
-                pass
-
-        return self._is_admin
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['is_administrator'] = self.is_administrator

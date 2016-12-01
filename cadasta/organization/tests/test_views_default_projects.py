@@ -219,7 +219,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
             'num_parties': 0,
             'num_resources': 0,
             'is_allowed_add_location': False,
-            'is_allowed_add_resource': False
+            'is_allowed_add_resource': False,
+            'is_project_member': False
         }
 
     def setup_url_kwargs(self):
@@ -251,7 +252,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         expected = self.render_content(is_superuser=True,
                                        is_administrator=True,
                                        is_allowed_add_location=True,
-                                       is_allowed_add_resource=True)
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True)
         assert response.content == expected
 
     def test_get_with_org_admin(self):
@@ -264,7 +266,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
-                                       is_allowed_add_resource=True)
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True)
         assert response.content == expected
 
     def test_get_with_project_manager(self):
@@ -277,7 +280,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
-                                       is_allowed_add_resource=True)
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True)
         assert response.content == expected
 
     def test_get_non_existent_project(self):
@@ -368,7 +372,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         expected = self.render_content(is_superuser=True,
                                        is_administrator=True,
                                        is_allowed_add_location=True,
-                                       is_allowed_add_resource=True)
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True)
         assert response.content == expected
 
     def test_get_archived_project_with_unauthorized_user(self):
@@ -402,7 +407,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
-                                       is_allowed_add_resource=True)
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True)
         assert response.content == expected
 
     def test_get_with_overview_stats(self):
