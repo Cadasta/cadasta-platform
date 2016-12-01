@@ -108,29 +108,23 @@
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li>
-    <li class="map">
+    </li><!-- needed to eliminate spacing issue on horizontal menus
+    --><li class="map">
       <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
       </a>
-    </li>
-    <li class="resources">
+    </li><!--
+    --><li class="parties">
+      <a href="{% url 'parties:list' object.organization.slug object.slug %}">
+        <span class="icon parties"></span>
+        <span class="title">{% trans "Parties" %}</span>
+      </a>
+    </li><!--
+    --><li class="resources">
       <a href="{% url 'resources:project_list' object.organization.slug object.slug %}">
         <span class="icon resources"></span>
         <span class="title">{% trans "Resources" %}</span>
-      </a>
-    </li>
-    <li class="reports hidden">
-      <a href="#">
-         <span class="icon reports"></span>
-         <span class="title">{% trans "Reports" %}</span>
-      </a>
-    </li>
-    <li class="activity hidden">
-      <a href="#">
-        <span class="icon activity"></span>
-        <span class="title">{% trans "Activity" %}</span>
       </a>
     </li>
   </ul>

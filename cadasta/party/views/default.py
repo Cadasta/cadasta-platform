@@ -14,6 +14,7 @@ from .. import messages as error_messages
 
 class PartiesList(LoginPermissionRequiredMixin,
                   mixins.PartyQuerySetMixin,
+                  organization_mixins.ProjectAdminCheckMixin,
                   generic.ListView):
     template_name = 'party/party_list.html'
     permission_required = 'party.list'
