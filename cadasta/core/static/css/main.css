@@ -3651,9 +3651,6 @@ table th[class*="col-"] {
       left: auto;
       width: 50%; }
 
-#project-wizard .wizard {
-  width: 270px; }
-
 .wizard > ul > li.enabled a .wizard-step {
   background: #2e51a3; }
 
@@ -3675,6 +3672,9 @@ table th[class*="col-"] {
 .actionBar a.btn {
   float: right;
   margin-left: 10px; }
+
+#project-wizard .wizard {
+  width: 270px; }
 
 #project-wizard .main-wizard {
   padding: 24px; }
@@ -3768,7 +3768,11 @@ table th[class*="col-"] {
   .wizard, #project-wizard .wizard {
     float: none !important;
     margin: 0 auto 10px auto;
-    display: block; } }
+    display: block; }
+  #project-wizard h1 {
+    width: 100%;
+    text-align: center;
+    margin: 14px auto; } }
 
 #configure-defaults-wizard .padded {
   margin-left: 1em; }
@@ -3841,7 +3845,7 @@ body.tinted-bg {
   -webkit-background-size: cover; }
 
 .form-narrow, .narrow {
-  margin: 0 auto;
+  margin: 0 auto 20px;
   max-width: 500px;
   background: #fff;
   border-radius: 4px;
@@ -3858,6 +3862,10 @@ body.tinted-bg {
   .form-narrow h1, .narrow h1 {
     text-align: center;
     margin: 4px auto 24px; }
+    .form-narrow h1 .xlg, .narrow h1 .xlg {
+      font-size: 150%;
+      font-weight: 600;
+      letter-spacing: -0.5px; }
   .form-narrow h5, .narrow h5 {
     border-top: 1px dashed #ddd;
     padding-top: 20px; }
@@ -3877,6 +3885,26 @@ body.tinted-bg {
     .form-narrow .btn-full .btn-group .btn, .narrow .btn-full .btn-group .btn {
       margin: 0; }
 
+.form-2col {
+  max-width: 970px;
+  padding: 40px;
+  margin-bottom: 50px; }
+  .form-2col .form-text {
+    margin-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 40px;
+    border-right: solid 1px #e7e8ea; }
+    .form-2col .form-text h1 {
+      text-align: left; }
+    .form-2col .form-text h2 {
+      font-size: 24px;
+      font-weight: 500;
+      margin-top: 40px; }
+  .form-2col .form-inner {
+    max-width: 460px;
+    padding-left: 40px;
+    margin: 0 auto; }
+
 @media (max-width: 1199px) {
   .form-narrow {
     margin-top: 15px;
@@ -3885,6 +3913,24 @@ body.tinted-bg {
     margin-bottom: 10px; }
   .form-narrow .btn-block {
     margin-bottom: 8px; } }
+
+@media (max-width: 991px) {
+  .form-2col {
+    padding: 20px; }
+    .form-2col .form-text {
+      border-right: none;
+      border-bottom: solid 1px #e7e8ea;
+      margin-bottom: 20px;
+      padding-right: 0;
+      margin-top: 0; }
+      .form-2col .form-text h2 {
+        margin-top: auto; }
+    .form-2col .form-inner {
+      padding-left: 0; } }
+
+@media (max-width: 400px) {
+  body.tinted-bg {
+    background: #f2f4f7; } }
 
 /* =Footer
 -------------------------------------------------------------- */
@@ -3950,7 +3996,13 @@ footer {
     footer form.language select {
       font-size: 9px; }
   footer .copy {
-    font-size: 9px; } }
+    font-size: 9px; }
+  #registration footer {
+    position: relative;
+    top: 0;
+    display: block;
+    overflow: visible;
+    height: auto; } }
 
 /* =Organizations
 -------------------------------------------------------------- */
@@ -5337,8 +5389,6 @@ header {
     margin-top: 0; }
   .page-header .btn-add {
     margin-right: 14px; }
-  .page-header .page-title h1, .page-header .page-title h2 {
-    width: 60%; }
 
 .page-title {
   padding-top: 2px;
@@ -5351,7 +5401,9 @@ header {
     position: relative;
     margin-top: 0;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
-    width: 60%; }
+    width: 80%; }
+    .page-title h1.short, .page-title h2.short {
+      width: 60%; }
     .page-title h1 .org-name, .page-title h2 .org-name {
       font-size: 14px;
       display: block;
@@ -5359,8 +5411,6 @@ header {
       text-transform: uppercase; }
     .page-title h1 a, .page-title h2 a {
       color: #a3b7e5; }
-  .page-title h2 {
-    width: auto; }
 
 @media (max-width: 991px) {
   .page-header {
@@ -5378,10 +5428,7 @@ header {
   .page-header .page-title h1, .page-header .page-title h2 {
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; }
-    .page-header .page-title h1:hover, .page-header .page-title h2:hover {
-      overflow: visible;
-      white-space: normal; } }
+    text-overflow: ellipsis; } }
 
 /* =Page header single project or organizations
 -------------------------------------------------------------- */
@@ -5652,7 +5699,8 @@ body.tinted-bg #page-content {
     box-shadow: none; }
   #project-single #page-content,
   #project-wizard.page #page-content,
-  #organization-single #page-content {
+  #organization-single #page-content,
+  #registration #page-content {
     position: relative;
     top: 0; } }
 
@@ -5667,15 +5715,21 @@ main.container-fluid {
 #organization-single #page-content main {
   position: relative;
   left: 0;
-  margin-left: 100px;
+  margin-left: 0;
   min-height: 100%;
   overflow: hidden; }
+
+#project-single #page-content main.show-sidebar,
+#organization-single #page-content main.show-sidebar {
+  margin-left: 100px; }
 
 @media (max-width: 991px) {
   main.container-fluid {
     padding-bottom: 0; }
   #project-single #page-content main,
-  #organization-single #page-content main {
+  #organization-single #page-content main,
+  #project-single #page-content main.show-sidebar,
+  #organization-single #page-content main.show-sidebar {
     margin-left: 0;
     background: #fff; } }
 
@@ -6131,6 +6185,10 @@ div.add-btn-btm {
   height: 48px;
   display: block; }
 
+@media (max-width: 1199px) {
+  .btn-full .btn {
+    min-width: 100px; } }
+
 @media (max-width: 991px) {
   .top-btn .btn {
     min-width: 80px; }
@@ -6142,9 +6200,9 @@ div.add-btn-btm {
     #organization-single .page-header .top-btn .btn {
       min-width: auto; } }
 
-@media (max-width: 1199px) {
-  .btn-full .btn {
-    min-width: 100px; } }
+@media (max-width: 767px) {
+  .top-btn .btn {
+    min-width: auto; } }
 
 /* =Alerts, labels, text
 -------------------------------------------------------------- */

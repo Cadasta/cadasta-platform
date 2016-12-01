@@ -74,42 +74,50 @@
           </dl>
         {% endif %}
         <div class="divider-thick"></div>
-          {% if has_content or not is_allowed_add_location %}
-          <h4>{% trans "Project stats" %}</h4>
-          <ul class="list-inline stats">
-            <li>
-              {% blocktrans count counter=num_locations %}
-              <div class="num">{{ counter }}</div> location
-              {% plural %}
-              <div class="num">{{ counter }}</div> locations
-              {% endblocktrans %}
-            </li>
-            <li>
-              {% blocktrans count counter=num_parties %}
-              <div class="num">{{ counter }}</div> party
-              {% plural %}
-              <div class="num">{{ counter }}</div> parties
-              {% endblocktrans %}
-            </li>
-            <li>
-              {% blocktrans count counter=num_resources %}
-              <div class="num">{{ counter }}</div> resource
-              {% plural %}
-              <div class="num">{{ counter }}</div> resources
-              {% endblocktrans %}
-            </li>
-          </ul>
+          {% if user.is_authenticated %}
+            {% if has_content or not is_allowed_add_location %}
+            <h4>{% trans "Project stats" %}</h4>
+            <ul class="list-inline stats">
+              <li>
+                {% blocktrans count counter=num_locations %}
+                <div class="num">{{ counter }}</div> location
+                {% plural %}
+                <div class="num">{{ counter }}</div> locations
+                {% endblocktrans %}
+              </li>
+              <li>
+                {% blocktrans count counter=num_parties %}
+                <div class="num">{{ counter }}</div> party
+                {% plural %}
+                <div class="num">{{ counter }}</div> parties
+                {% endblocktrans %}
+              </li>
+              <li>
+                {% blocktrans count counter=num_resources %}
+                <div class="num">{{ counter }}</div> resource
+                {% plural %}
+                <div class="num">{{ counter }}</div> resources
+                {% endblocktrans %}
+              </li>
+            </ul>
+          {% else %}
+            <!-- Starter text -->
+            <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
+            <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
+          {% endif %}
+          {% if is_allowed_add_location %}
+          <div class="btn-full">
+            <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
+            </a>
+          </div>
+          {% endif %}
         {% else %}
-          <!-- Starter text -->
-          <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
-          <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
-        {% endif %}
-        {% if is_allowed_add_location %}
-        <div class="btn-full">
-          <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
-            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
-          </a>
-        </div>
+          <div class="alert alert-info alert-full clearfix row" role="alert">
+            <div class="text-center">
+              <a href="{% url 'account_login' %}?next={{ request.path }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
+            </div>
+          </div>
         {% endif %}
       </section>
     </div>

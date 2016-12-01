@@ -8,6 +8,8 @@
 
 {% block title %} | {% block page_title %}{% endblock %}{{ organization.name }} {% endblock %}
 
+{% block main-width %}{% if is_administrator %} show-sidebar{% endif %}{% endblock %}
+
 {% block page-header %}
 
 <!-- Single organization header -->
@@ -16,7 +18,7 @@
     <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:list' %}">
       <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
     </a>
-      <h1>
+      <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
         {{ organization.name }}
         {% if organization.archived %}
         <span class="label label-danger">
@@ -87,6 +89,7 @@
 
 {% block sub-nav %}
 
+{% if is_administrator %}
 <!-- Sidebar -->
 <div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
@@ -123,6 +126,7 @@
   </ul>
 </div>
 <!-- /.sidebar -->
+{% endif %}
 
 {% endblock %}
 

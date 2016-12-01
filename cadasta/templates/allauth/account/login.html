@@ -5,7 +5,7 @@
 {% load account socialaccount %}
 
 {% block top-nav %}registration{% endblock %}
-{% block body-class %} tinted-bg{% endblock %}
+{% block body-class %}{% if not redirect_field_value %} tinted-bg{% endif %}{% endblock %}
 
 {% block title %} | {% trans "Sign In" %}{% endblock %}
 
@@ -26,49 +26,65 @@
 </div>
 {% endif %}
 
-<form class="login-form form-narrow" method="POST" action="{% url 'account_login' %}" data-parsley-validate>
-  <h1>{% trans "Sign in to your account" %}</h1>
-
-  {% csrf_token %}
-
-  <div class="form-group{% if form.login.errors %} has-error{% endif %}">
-    <label class="control-label" for="id_login">{% trans "Username" %}</label>
-    {% render_field form.login class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
-    <div class="error-block">{{ form.login.errors }}</div>
+<form class="login-form form-narrow{% if redirect_field_value %} form-2col container{% endif %}" method="POST" action="{% url 'account_login' %}" data-parsley-validate>
+ 
+  {% if redirect_field_value %}
+  <div class="col-md-6 form-text">
+    <h1>{% blocktrans %}<span class="xlg">Hello.</span><br>Have we met?{% endblocktrans %}</h1>
+    <p>{% trans "Because we care about protecting your sensitive data, you must sign in to verify you have the proper permission to view project information. Access to project data is restricted to current project members only.  Please sign in to continue." %}</p>
+    <h2>{% trans "No account? No problem!" %}</h2>
+    <p>{% trans "Registration is free and easy." %} <a href="{% url 'account_signup' %}"><strong>{% trans "Create an account now." %}</strong></a></p>
   </div>
+  <div class="col-md-6 form-container">
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %} 
 
-  <div class="form-group{% if form.password.errors %} has-error{% endif %}">
-    <label class="control-label" for="id_password">{% trans "Password" %}</label>
-    {% render_field form.password class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
-    <div class="error-block">{{ form.password.errors }}</div>
-  </div>
+    <div class="form-inner">
+      <h1>{% trans "Sign in to your account" %}</h1>
 
-  <div class="small pull-right">
-    <a href="{% url 'account_reset_password' %}">
-      {% trans "Forgotten password?" %}
-    </a>
-  </div>
+      {% csrf_token %}
 
-  <div class="checkbox pull-left">
-    <label>
-      <input id="id_remember" label="{% trans 'Remember me' %}"
-             name="remember" type="checkbox" />
-      {% trans "Remember me" %}
-    </label>
-  </div>
+      <div class="form-group{% if form.login.errors %} has-error{% endif %}">
+        <label class="control-label" for="id_login">{% trans "Username" %}</label>
+        {% render_field form.login class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
+        <div class="error-block">{{ form.login.errors }}</div>
+      </div>
+
+      <div class="form-group{% if form.password.errors %} has-error{% endif %}">
+        <label class="control-label" for="id_password">{% trans "Password" %}</label>
+        {% render_field form.password class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
+        <div class="error-block">{{ form.password.errors }}</div>
+      </div>
+
+      <div class="small pull-right">
+        <a href="{% url 'account_reset_password' %}">
+          {% trans "Forgotten password?" %}
+        </a>
+      </div>
+
+      <div class="checkbox pull-left">
+        <label>
+          <input id="id_remember" label="{% trans 'Remember me' %}"
+                 name="remember" type="checkbox" />
+          {% trans "Remember me" %}
+        </label>
+      </div>
+
+      <button name="sign-in" type="submit"
+              class="btn btn-primary btn-lg btn-block text-uppercase">
+        {% trans "Sign In" %}
+      </button>
+
+      <p class="text-center">
+        {% trans "Don't have an account?" %}
+        <a href="{% url 'account_signup' %}">{% trans "Register here" %}</a>
+      </p>
+    </div>
 
   {% if redirect_field_value %}
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  </div>
   {% endif %}
-  <button name="sign-in" type="submit"
-          class="btn btn-primary btn-lg btn-block text-uppercase">
-    {% trans "Sign In" %}
-  </button>
 
-  <p class="text-center">
-    {% trans "Don't have an account?" %}
-    <a href="{% url 'account_signup' %}">{% trans "Register here" %}</a>
-  </p>
 </form>
 
 {% endblock %}

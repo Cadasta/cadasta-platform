@@ -72,10 +72,6 @@
   }
 }
 
-#project-wizard .wizard {
-  width: 270px;
-}
-
 .wizard > ul > li.enabled a .wizard-step {
   background: $brand-primary;
 }
@@ -100,6 +96,9 @@
 }
 
 #project-wizard {
+  .wizard {
+    width: 270px;
+  }
   .main-wizard {
     padding: 24px;
   }
@@ -218,6 +217,11 @@
     float: none !important;
     margin: 0 auto 10px auto;
     display: block;
+  }
+  #project-wizard h1 {
+    width: 100%;
+    text-align: center;
+    margin: 14px auto;
   }
 }
 
