@@ -19,7 +19,6 @@ class PasswordChangeView(LoginRequiredMixin,
                          SuperUserCheckMixin,
                          allauth_views.PasswordChangeView):
     form_class = ChangePasswordForm
-    pass
 
 
 class PasswordResetView(SuperUserCheckMixin,
@@ -30,7 +29,6 @@ class PasswordResetView(SuperUserCheckMixin,
 class PasswordResetFromKeyView(SuperUserCheckMixin,
                                allauth_views.PasswordResetFromKeyView):
     form_class = ResetPasswordKeyForm
-    pass
 
 
 class AccountProfile(LoginRequiredMixin, UpdateView):

@@ -267,7 +267,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
         form = forms.ChangePasswordForm(user, data)
 
         assert form.is_valid() is False
-        assert _("Passwords do not match") in form.errors.get('password2')
+        assert (_('You must type the same password each time.') in
+                form.errors.get('password2'))
 
     def test_password_contains_username(self):
         user = UserFactory.create(
@@ -360,7 +361,8 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
         form = forms.ResetPasswordKeyForm(data, user=user)
 
         assert form.is_valid() is False
-        assert _("Passwords do not match") in form.errors.get('password2')
+        assert (_('You must type the same password each time.') in
+                form.errors.get('password2'))
 
     def test_password_contains_username(self):
         user = UserFactory.create(

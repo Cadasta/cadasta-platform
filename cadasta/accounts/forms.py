@@ -119,15 +119,6 @@ class ChangePasswordForm(allauth_forms.ChangePasswordForm):
 
         return password
 
-    def clean_password2(self):
-        if ('password1' in self.cleaned_data and
-           'password2' in self.cleaned_data):
-            if (self.cleaned_data['password1'] !=
-               self.cleaned_data['password2']):
-                raise forms.ValidationError(_("Passwords do not match"))
-
-        return self.cleaned_data['password2']
-
 
 class ResetPasswordKeyForm(allauth_forms.ResetPasswordKeyForm):
     def __init__(self, *args, **kwargs):
@@ -138,12 +129,3 @@ class ResetPasswordKeyForm(allauth_forms.ResetPasswordKeyForm):
         validate_password(password, self.user)
 
         return password
-
-    def clean_password2(self):
-        if ('password1' in self.cleaned_data and
-           'password2' in self.cleaned_data):
-            if (self.cleaned_data['password1'] !=
-               self.cleaned_data['password2']):
-                raise forms.ValidationError(_("Passwords do not match"))
-
-        return self.cleaned_data['password2']
