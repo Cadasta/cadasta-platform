@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import itertools
 from django.db import migrations
 from pyxform.xls2json import parse_file_to_json
+from botocore.exceptions import ClientError
 
 
 def populate_index_fields(apps, schema_editor):
@@ -19,7 +20,6 @@ def populate_index_fields(apps, schema_editor):
         question.save()
 
     def update_group(idx, **kwargs):
-        print(kwargs)
         group = QuestionGroup.objects.get(**kwargs)
         group.index = idx
         group.save()
@@ -47,8 +47,13 @@ def populate_index_fields(apps, schema_editor):
                 id=project.current_questionnaire)
 
             if questionnaire.xls_form:
-                q_json = parse_file_to_json(questionnaire.xls_form.file.name)
-                update_children(q_json.get('children', []), questionnaire.id)
+                try:
+                    q_json = parse_file_to_json(
+                        questionnaire.xls_form.file.name)
+                    update_children(
+                        q_json.get('children', []), questionnaire.id)
+                except ClientError:
+                    pass
 
 
 class Migration(migrations.Migration):
