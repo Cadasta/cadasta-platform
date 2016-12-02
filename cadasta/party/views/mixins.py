@@ -1,4 +1,3 @@
-import json
 from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
@@ -6,7 +5,6 @@ from organization.views.mixins import ProjectMixin
 from resources.views.mixins import ResourceViewMixin
 from resources.models import Resource
 
-from spatial.serializers import SpatialUnitGeoJsonSerializer
 from party.models import Party, TenureRelationship
 
 
@@ -113,14 +111,6 @@ class PartyRelationshipObjectMixin(ProjectMixin):
         context['object'] = self.get_project()
         context['relationship'] = self.get_object()
         context['location'] = self.get_object().spatial_unit
-
-        locations = context['object'].spatial_units.exclude(
-            id=context['location'].id
-        ).only('id', 'type', 'geometry', 'project')
-
-        context['geojson'] = json.dumps(
-            SpatialUnitGeoJsonSerializer(locations, many=True).data
-        )
 
         return context
 

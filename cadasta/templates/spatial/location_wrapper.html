@@ -32,19 +32,9 @@
     {% else %}
     var projectExtent = null;
     {% endif %}
-    var spatialUnits = {{ geojson|safe }};
-
-    renderFeatures(map, projectExtent, spatialUnits, trans, false);
-    
-    var orgSlug = '{{ object.organization.slug }}';
-    var projectSlug = '{{ object.slug }}';
-    var url = '/api/v1/organizations/'
-            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
-    add_spatial_resources(map, url);
-
 
     var data = {{ location.geometry.geojson|safe }};
-    var location = L.geoJson(data, {
+    var currentlocation = L.geoJson(data, {
       style: {color: '#edaa00', fillColor: '#edaa00', weight: 3},
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
@@ -53,8 +43,16 @@
                        "</div>");
       }
     });
-    location.addTo(map);
-    map.fitBounds(location.getBounds());
+
+    renderFeatures(map,
+                   '{% url "async:spatial:list" object.organization.slug object.slug %}?exclude={{location.id}}',
+                   {projectExtent: projectExtent, trans: trans, location: currentlocation});
+    
+    var orgSlug = '{{ object.organization.slug }}';
+    var projectSlug = '{{ object.slug }}';
+    var url = '/api/v1/organizations/'
+            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+    add_spatial_resources(map, url);
   }
 
   $(document).ready(function() {

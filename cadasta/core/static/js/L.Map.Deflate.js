@@ -112,5 +112,12 @@ L.Deflate = function(options) {
         map.on('dragend', deflate);
     }
 
-    return { addTo: addTo }
+    function getBounds() {
+        return markers.getBounds();
+    }
+
+    return {
+        addTo: addTo,
+        getBounds: getBounds
+    }
 }

@@ -28,8 +28,10 @@
     {% else %}
     var projectExtent = null;
     {% endif %}
-    var spatialUnits = {{ geojson|safe }};
-    renderFeatures(map, projectExtent, spatialUnits, trans, 'locations');
+
+    renderFeatures(map,
+                   '{% url "async:spatial:list" project.organization.slug project.slug %}',
+                   {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
 
     var orgSlug = '{{ project.organization.slug }}';
     var projectSlug = '{{ project.slug }}';

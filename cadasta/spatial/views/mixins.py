@@ -1,4 +1,3 @@
-import json
 from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404
@@ -6,7 +5,6 @@ from organization.views.mixins import ProjectMixin
 from resources.views.mixins import ResourceViewMixin
 from resources.models import Resource
 
-from ..serializers import SpatialUnitGeoJsonSerializer
 from ..models import SpatialUnit
 
 
@@ -14,28 +12,13 @@ class SpatialQuerySetMixin(ProjectMixin):
     def get_queryset(self):
         self.proj = self.get_project()
         if not hasattr(self, '_queryset'):
-            if (
-                hasattr(self, 'queryset_excludes_object') and
-                self.queryset_excludes_object
-            ):
-                self._queryset = self.proj.spatial_units.exclude(
-                    id=self.kwargs['location']).only(
-                    'id', 'type', 'geometry', 'project')
-            else:
-                self._queryset = self.proj.spatial_units.all().only(
-                    'id', 'type', 'geometry', 'project')
+            self._queryset = self.proj.spatial_units.all().only(
+                'id', 'type', 'geometry', 'project').order_by('id')
         return self._queryset
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['object'] = self.get_project()
-        locations = self.get_queryset()
-        if locations.model == SpatialUnit:
-            context['geojson'] = json.dumps(
-                SpatialUnitGeoJsonSerializer(locations, many=True).data)
-        else:
-            context['geojson'] = (
-                '{"type": "FeatureCollection", "features": []}')
         return context
 
     def get_serializer_context(self, *args, **kwargs):
@@ -66,8 +49,6 @@ class SpatialRelationshipQuerySetMixin(ProjectMixin):
 
 
 class SpatialUnitObjectMixin(SpatialQuerySetMixin):
-    queryset_excludes_object = True
-
     def get_object(self):
         if not hasattr(self, '_obj'):
             self._obj = get_object_or_404(

@@ -44,12 +44,38 @@ function add_map_controls(map) {
   return map
 }
 
-function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
+function renderFeatures(map, featuresUrl, options) {
+  options = options || {};
+
+  function locationToFront() {
+    if (options.location) {
+      options.location.bringToFront();
+    }
+  }
+
+  function loadFeatures(url) {
+    $('#messages #loading').removeClass('hidden');
+    $.get(url, function(response) {
+      geoJson.addData(response);
+
+      if (response.next) {
+        loadFeatures(response.next, map, options.trans);
+      } else {
+        $('#messages #loading').addClass('hidden');
+        if (options.fitBounds === 'locations') {
+          map.fitBounds(markers.getBounds());
+        }
+      }
+
+      locationToFront();
+    });
+  }
+
   var projectBounds;
 
-  if (projectExtent) {
+  if (options.projectExtent) {
     var boundary = L.geoJson(
-      projectExtent, {
+      options.projectExtent, {
         style: {
           stroke: true,
           color: "#0e305e",
@@ -63,31 +89,35 @@ function renderFeatures(map, projectExtent, spatialUnits, trans, fitBounds) {
     );
     boundary.addTo(map);
     projectBounds = boundary.getBounds();
-    if (fitBounds === 'project') {map.fitBounds(projectBounds);}
+    if (options.fitBounds === 'project') {map.fitBounds(projectBounds);}
   }
   
   var geoJson = L.geoJson(null, {
     style: { weight: 2 },
     onEachFeature: function(feature, layer) {
-      layer.bindPopup("<div class=\"text-wrap\">" +
+      if (options.trans) {
+        layer.bindPopup("<div class=\"text-wrap\">" +
                       "<h2><span>Location</span>" +
                       feature.properties.type + "</h2></div>" +
-                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + trans['open'] + "</a>"  +
-                      "</div>");
+                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
+                      "</div>");  
+      }
     }
   });
 
-  L.Deflate({minSize: 20, layerGroup: geoJson}).addTo(map);
+  var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
+  markers.addTo(map);
   geoJson.addTo(map);
-  geoJson.addData(spatialUnits);
 
-  if (fitBounds === 'locations') {
-    if (spatialUnits.features.length) {
-      map.fitBounds(L.geoJson(spatialUnits).getBounds());
-    } else if (projectBounds) {
-      map.fitBounds(projectBounds);
-    }
+  if (options.location) {
+    options.location.addTo(map);
+    map.fitBounds(options.location.getBounds());  
+  } else if (projectBounds) {
+    map.fitBounds(projectBounds);
   }
+  loadFeatures(featuresUrl);
+  map.on('zoomend', locationToFront);
+  map.on('dragend', locationToFront);
 }
 
 function switch_layer_controls(map, options){

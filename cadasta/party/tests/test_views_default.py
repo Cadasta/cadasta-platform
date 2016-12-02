@@ -823,7 +823,6 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
-                'geojson': '{"type": "FeatureCollection", "features": []}',
                 'attributes': (('Test field', 'test', ),
                                ('Test field 2', 'Choice 2', ),
                                ('Test field 3', 'Choice 1, Choice 3', ))}
@@ -898,8 +897,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
-                'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'form': form}
 
     def setup_url_kwargs(self):
         return {
@@ -1014,8 +1012,7 @@ class PartyRelationshipDeleteTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'relationship': self.relationship,
-                'location': self.relationship.spatial_unit,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'location': self.relationship.spatial_unit}
 
     def setup_url_kwargs(self):
         return {
@@ -1133,8 +1130,7 @@ class PartyRelationshipResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
-                'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'form': form}
 
     def setup_url_kwargs(self):
         return {
@@ -1268,8 +1264,7 @@ class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase,
         return {'object': self.project,
                 'location': self.relationship.spatial_unit,
                 'relationship': self.relationship,
-                'form': form,
-                'geojson': '{"type": "FeatureCollection", "features": []}'}
+                'form': form}
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
