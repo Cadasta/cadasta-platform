@@ -49,8 +49,6 @@ class SpatialRelationshipQuerySetMixin(ProjectMixin):
 
 
 class SpatialUnitObjectMixin(SpatialQuerySetMixin):
-    queryset_excludes_object = True
-
     def get_object(self):
         if not hasattr(self, '_obj'):
             self._obj = get_object_or_404(
