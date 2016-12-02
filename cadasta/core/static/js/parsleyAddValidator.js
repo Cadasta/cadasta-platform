@@ -13,7 +13,7 @@
         return false;
       }
     }, 3)
-    .addMessage('character', 'Your password must contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.');
+    .addMessage('character', gettext('Your password must contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.'));
 
   // checks username not contained in password when username is another field in form
   window.Parsley
@@ -23,7 +23,7 @@
         return false;
       }
     }, 2)
-    .addMessage('userfield', 'Your password cannot contain your username.');
+    .addMessage('userfield', gettext('Your password cannot contain your username.'));
 
   // checks email not contained in password when email is another field in form
   window.Parsley
@@ -33,4 +33,4 @@
         return false;
       }
     }, 2)
-    .addMessage('emailfield', 'Your password cannot contain your email mailbox name.');
+    .addMessage('emailfield', gettext('Your password cannot contain your email mailbox name.'));

@@ -487,6 +487,9 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
   var ParsleyValidatorRegistry = function ParsleyValidatorRegistry(validators, catalog) {
     this.__class__ = 'ParsleyValidatorRegistry';
 
+    // Default Parsley locale is en
+    // this.locale = 'en'; custom for Cadasta
+
     this.init(validators || {}, catalog || {});
   };
 
@@ -555,14 +558,34 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
       window.Parsley.trigger('parsley:validator:init');
     },
 
-    // Add a specific message for a given constraint
-    addMessage: function addMessage(name, message) {
-      this.catalog[name] = message;
+    /* Set new messages locale if we have dictionary loaded in ParsleyConfig.i18n
+    setLocale: function setLocale(locale) {
+      if ('undefined' === typeof this.catalog[locale]) throw new Error(locale + ' is not available in the catalog');
 
+      this.locale = locale;
+
+      return this;
+    }, custom for Cadasta
+
+    Add a new messages catalog for a given locale. Set locale for this catalog if set === `true`
+    addCatalog: function addCatalog(locale, messages, set) {
+      if ('object' === typeof messages) this.catalog[locale] = messages;
+
+      if (true === set) return this.setLocale(locale);
+
+      return this;
+    }, custom for Cadasta */
+
+    // Add a specific message for a given constraint in a given locale - custom for Cadasta
+    //addMessage: function addMessage(locale, name, message) { 
+    //  if ('undefined' === typeof this.catalog[locale]) this.catalog[locale] = {};
+    //  this.catalog[locale][name] = message;
+    addMessage: function addMessage(name, message) { 
+      this.catalog[name] = message;
       return this;
     },
 
-    // Add messages
+    // Add messages for a given locale - custom for Cadasta
     addMessages: function addMessages(nameMessageObject) {
       for (var name in nameMessageObject) this.addMessage(name, nameMessageObject[name]);
 
@@ -2279,6 +2302,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
     check: gettext('You must select between %s and %s choices.'),
     equalto: gettext('This value should be the same.')
   });
+
+  // Parsley.setLocale('en'); custom to Cadasta
 
   /**
    * inputevent - Alleviate browser bugs for input events
