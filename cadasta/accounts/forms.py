@@ -2,7 +2,9 @@ from datetime import datetime, timezone, timedelta
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
+from allauth.account import forms as allauth_forms
 
 from .models import User
 from parsley.decorators import parsleyfy
@@ -13,6 +15,7 @@ class RegisterForm(forms.ModelForm):
     email = forms.EmailField(required=True)
     password1 = forms.CharField(widget=forms.PasswordInput())
     password2 = forms.CharField(widget=forms.PasswordInput())
+    MIN_LENGTH = 10
 
     class Meta:
         model = User
@@ -28,8 +31,23 @@ class RegisterForm(forms.ModelForm):
 
     def clean_password1(self):
         password = self.data.get('password1')
+        validate_password(password)
+        errors = []
+
         if password != self.data.get('password2'):
             raise forms.ValidationError(_("Passwords do not match"))
+
+        email = self.data.get('email').lower().split('@')
+        if email[0] in password:
+            errors.append(_("Passwords cannot contain your email."))
+
+        if self.data.get('username') in password:
+            errors.append(
+                _("The password is too similar to the username."))
+
+        if errors:
+            raise forms.ValidationError(errors)
+
         return password
 
     def clean_email(self):
@@ -89,3 +107,25 @@ class ProfileForm(forms.ModelForm):
 
         user.save()
         return user
+
+
+class ChangePasswordForm(allauth_forms.ChangePasswordForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def clean_password1(self):
+        password = self.cleaned_data['password1']
+        validate_password(password, user=self.user)
+
+        return password
+
+
+class ResetPasswordKeyForm(allauth_forms.ResetPasswordKeyForm):
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordKeyForm, self).__init__(*args, **kwargs)
+
+    def clean_password1(self):
+        password = self.cleaned_data['password1']
+        validate_password(password, self.user)
+
+        return password

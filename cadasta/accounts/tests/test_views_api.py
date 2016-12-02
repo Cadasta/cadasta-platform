@@ -68,7 +68,7 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'password': 'iloveyoko79',
+            'password': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
         response = self.request(method='POST', post_data=data)
@@ -80,7 +80,7 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
            to sign up with invalid data"""
         data = {
             'username': 'imagine71',
-            'password': 'iloveyoko79',
+            'password': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
         response = self.request(method='POST', post_data=data)
@@ -94,18 +94,18 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
                                        email='john@beatles.uk',
-                                       password='iloveyoko79')
+                                       password='iloveyoko79!')
 
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""
-        data = {'username': 'imagine71', 'password': 'iloveyoko79'}
+        data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
         assert 'auth_token' in response.content
 
     def test_unsuccessful_login(self):
         """The view should return a token to authenticate API calls"""
-        data = {'username': 'imagine71', 'password': 'iloveyoko78'}
+        data = {'username': 'imagine71', 'password': 'iloveyoko78!'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 400
 
@@ -115,7 +115,7 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
            sent to the user."""
         self.user.verify_email_by = datetime.now()
         self.user.save()
-        data = {'username': 'imagine71', 'password': 'iloveyoko79'}
+        data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 400
         assert 'auth_token' not in response.content
