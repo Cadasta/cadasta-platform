@@ -5,6 +5,7 @@ python:
   - '3.5'
 addons:
   postgresql: '9.4'
+  firefox: '46.0'
 
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
