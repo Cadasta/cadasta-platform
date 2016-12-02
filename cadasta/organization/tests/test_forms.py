@@ -2,22 +2,22 @@ import random
 from string import ascii_lowercase
 from zipfile import ZipFile
 
-from django.forms.utils import ErrorDict
-from django.test import TestCase
 import pytest
 from pytest import raises
 
 from accounts.tests.factories import UserFactory
-from tutelary.models import Role
-
-from core.tests.utils.cases import UserTestCase, FileStorageTestCase
+from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
-from questionnaires.tests.factories import QuestionnaireFactory
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.forms.utils import ErrorDict
+from django.test import TestCase
 from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.tests.factories import QuestionnaireFactory
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
+from spatial.tests.factories import SpatialUnitFactory
+from tutelary.models import Role
 
 from .. import forms
 from ..models import Organization, OrganizationRole, ProjectRole
@@ -1132,6 +1132,8 @@ class DownloadFormTest(UserTestCase, TestCase):
         data = {'type': 'xls'}
         user = UserFactory.create()
         project = ProjectFactory.create()
+        geometry = 'SRID=4326;POINT (30 10)'
+        SpatialUnitFactory.create(project=project, geometry=geometry)
         form = forms.DownloadForm(project, user, data=data)
         assert form.is_valid() is True
         path, mime = form.get_file()
@@ -1155,6 +1157,8 @@ class DownloadFormTest(UserTestCase, TestCase):
         data = {'type': 'all'}
         user = UserFactory.create()
         project = ProjectFactory.create()
+        geometry = 'SRID=4326;POINT (30 10)'
+        SpatialUnitFactory.create(project=project, geometry=geometry)
         res = ResourceFactory.create(project=project)
 
         form = forms.DownloadForm(project, user, data=data)
@@ -1184,7 +1188,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
         self.data = {
             'name': 'Test Imports',
             'description': 'A description of the import',
-            'type': 'csv'
+            'type': 'csv',
+            'entity_types': ['PT', 'SU']
         }
 
     def test_invalid_file_type(self):
@@ -1206,7 +1211,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
         file_dict = {'file': file}
         form = forms.SelectImportForm(
             files=file_dict, data=self.data,
-            project=self.project, user=self.user)
+            project=self.project, user=self.user
+        )
         assert form.is_valid() is False
         assert form.errors['file'][0] == 'File too large, max size 512kb'
 
@@ -1217,7 +1223,70 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
         file_dict = {'file': file}
         form = forms.SelectImportForm(
             files=file_dict, data=self.data,
-            project=self.project, user=self.user)
+            project=self.project, user=self.user
+        )
         assert form.is_valid() is True
         assert form.cleaned_data['mime_type'] == 'text/csv'
+
+    def test_mime_type_file_mismatch(self):
+        valid_file = self.get_file(self.valid_file_type, 'rb')
+        file = SimpleUploadedFile(
+            'test.csv', valid_file, 'text/csv')
+        file_dict = {'file': file}
+        data = self.data.copy()
+        data['type'] = 'xls'
+        form = forms.SelectImportForm(
+            files=file_dict, data=data,
+            project=self.project, user=self.user
+        )
+        assert form.is_valid() is False
+        assert form.errors['file'][0] == 'Invalid file type'
+
+    def test_set_original_file(self):
+        valid_file = self.get_file(self.valid_file_type, 'rb')
+        file = SimpleUploadedFile(
+            'test.csv', valid_file, 'text/csv')
+        file_dict = {'file': file}
+        form = forms.SelectImportForm(
+            files=file_dict, data=self.data,
+            project=self.project, user=self.user
+        )
+        assert form.is_valid() is True
         assert form.cleaned_data['original_file'] == 'test.csv'
+
+    def test_clean_entity_types(self):
+        valid_file = self.get_file(self.valid_file_type, 'rb')
+        file = SimpleUploadedFile(
+            'test.csv', valid_file, 'text/csv')
+        file_dict = {'file': file}
+        data = self.data.copy()
+        data['entity_types'] = []
+        form = forms.SelectImportForm(
+            files=file_dict, data=data, project=self.project, user=self.user
+        )
+        assert form.is_valid() is False
+        assert form.errors.get('entity_types')[0] == (
+            'Select at least one data type.'
+        )
+
+
+class SelectDefaultsFormTest(UserTestCase, FileStorageTestCase, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.org = OrganizationFactory.create(name='Test Org')
+        self.project = ProjectFactory.create(
+            name='Test Project', organization=self.org)
+        self.user = UserFactory.create()
+        self.data = {
+            'entity_types': ['PT', 'SU'],
+            'party_name_field': 'party_name',
+            'party_type_field': 'type',
+            'location_type_field': 'location_type',
+            'geometry_field': 'location_geometry'
+        }
+
+    def test_valid_form(self):
+        form = forms.SelectDefaultsForm(
+            data=self.data, project=self.project, user=self.user)
+        assert form.is_valid() is True

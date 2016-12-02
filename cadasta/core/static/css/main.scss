@@ -117,7 +117,7 @@ label {
 
 a {
   color: $link-color;
-  &:hover, 
+  &:hover,
   &:focus {
    color: $brand-darkblue;
    outline: none;
@@ -209,7 +209,7 @@ header {
       text-align: center;
       padding-top: 24px;
       @include button-variant($gray-lighter, transparent, $btn-blue-bg);
-      &:hover, 
+      &:hover,
       &:focus {
         @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
         transition: all 0.3s ease 0s;
@@ -281,7 +281,7 @@ header {
 #dashboard .header,
 #project-single .header,
 #project-wizard .header,
-#organization-single .header { 
+#organization-single .header {
   position: fixed;
 }
 
@@ -400,9 +400,9 @@ header {
 .page-header { // navy band on index pages
   background: $brand-darkblue;
   background-color: $brand-primary;
-  background: -moz-linear-gradient(top, $brand-darkblue 0%, $brand-primary 70%); 
-  background: -webkit-linear-gradient(top, $brand-darkblue 0%,$brand-primary 70%); 
-  background: linear-gradient(to bottom, $brand-darkblue 0%,$brand-primary 70%); 
+  background: -moz-linear-gradient(top, $brand-darkblue 0%, $brand-primary 70%);
+  background: -webkit-linear-gradient(top, $brand-darkblue 0%,$brand-primary 70%);
+  background: linear-gradient(to bottom, $brand-darkblue 0%,$brand-primary 70%);
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$brand-darkblue', endColorstr='$brand-primary',GradientType=0 );
   margin: 0;
   padding-top: 48px;
@@ -467,6 +467,11 @@ header {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      &:hover{
+        overflow: visible;
+        white-space: normal;
+      }
     }
   }
 }
@@ -474,7 +479,7 @@ header {
 /* =Page header single project or organizations
 -------------------------------------------------------------- */
 
-#project-single .page-header, 
+#project-single .page-header,
 #organization-single .page-header { // navy band on pages for single project or organization
   background: $brand-darkblue;
   height: 110px;
@@ -525,16 +530,16 @@ header {
   }
 }
 
-#organization-single .page-header { 
-  padding-top: 35px; // offset to match project 
+#organization-single .page-header {
+  padding-top: 35px; // offset to match project
   .top-btn {
     margin-top: 1px;
   }
 }
 
 @media (max-width: $screen-sm-max) {
-  #project-single .page-header, 
-  #organization-single .page-header { 
+  #project-single .page-header,
+  #organization-single .page-header {
     overflow: visible;
     padding-top: 8px;
     padding-bottom: 0;
@@ -551,14 +556,14 @@ header {
         margin-left: 14px;
     }
   }
-  #project-single .page-header .page-title, 
+  #project-single .page-header .page-title,
   #organization-single .page-header .page-title {
     padding-bottom: 0;
   }
 }
 
 @media (max-width: $screen-xs-max) {
-  #project-single .page-header, 
+  #project-single .page-header,
   #organization-single .page-header {
     .more-menu {
       width: 24px;
@@ -665,7 +670,7 @@ main.container-fluid {
 -------------------------------------------------------------- */
 
 #project-single #page-content main,
-#organization-single #page-content main { 
+#organization-single #page-content main {
   position: relative;
   left: 0;
   margin-left: 0;
@@ -685,7 +690,8 @@ main.container-fluid {
   #project-single #page-content main,
   #organization-single #page-content main, 
   #project-single #page-content main.show-sidebar,
-  #organization-single #page-content main.show-sidebar { 
+  #organization-single #page-content main.show-sidebar,
+  #organization-single #page-content main {
     margin-left: 0;
     background: #fff;
   }
@@ -775,7 +781,7 @@ main.container-fluid {
       margin: 10px auto 20px;
       float: none;
       text-align: center;
-      img { 
+      img {
         width: 90%;
         max-width: 200px;
       }
@@ -834,7 +840,7 @@ main.container-fluid {
       }
     }
   }
-  .row-height .detail { // columns fixed to match heights like org overview 
+  .row-height .detail { // columns fixed to match heights like org overview
     padding-top: 0;
   }
   .detail-edit { // edit on right
@@ -843,7 +849,7 @@ main.container-fluid {
       background: transparent;
     }
   }
-  .panel { // content box in main panel 
+  .panel { // content box in main panel
     border: 1px solid $table-border-color;
     clear: both;
     .panel-heading {
@@ -877,7 +883,7 @@ main.container-fluid {
       }
     }
   }
-  .member-panel { // member edit page 
+  .member-panel { // member edit page
     border: 0;
     -webkit-box-shadow: none !important;
     box-shadow: none !important;
@@ -961,7 +967,24 @@ textarea.form-control {
       font-size: 16px;
       font-weight: 600;
     }
-    small { 
+    small {
+      margin-top: 6px;
+      font-weight: 300;
+      display: block;
+    }
+  }
+}
+
+.spacing-md {
+  margin-top: 15px;
+  li {
+    margin-left: 15px;
+    margin-bottom: 15px;
+    label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    small {
       margin-top: 6px;
       font-weight: 300;
       display: block;
@@ -982,7 +1005,7 @@ textarea.form-control {
 
 .dataTables_wrapper {
   clear: both;
-  .table-search { // search 
+  .table-search { // search
     label {
       float: left;
       text-align: left;
@@ -1017,7 +1040,7 @@ textarea.form-control {
   .table-pagination { // pagination
     float: right;
     display: inline-block;
-    .pagination > li > a, 
+    .pagination > li > a,
     .pagination > li > span {
       color: $gray-dark;
     }
@@ -1060,7 +1083,7 @@ textarea.form-control {
 }
 
 @media (max-width: 400px) {
-  #project-single .dataTables_wrapper .col-sm-6, 
+  #project-single .dataTables_wrapper .col-sm-6,
   #organization-single .dataTables_wrapper .col-sm-6 {
     width: 100% !important; // fix for col-xs-6
     float: left !important;
@@ -1285,7 +1308,7 @@ img.org-logo, img#org-logo {
   }
 }
 
-div.add-btn-btm { // add party link at bottom of table 
+div.add-btn-btm { // add party link at bottom of table
   padding: 10px 24px;
   text-align: left;
   border-bottom: 3px solid $table-border-color;
@@ -1311,7 +1334,7 @@ div.add-btn-btm { // add party link at bottom of table
  .top-btn .btn {
     min-width: 80px;
   }
-  #project-single .page-header, 
+  #project-single .page-header,
   #organization-single .page-header {
     .top-btn {
       padding: 4px 14px 0;
@@ -1392,8 +1415,8 @@ div.add-btn-btm { // add party link at bottom of table
   display: inline-block;
   margin-left: 6px;
   margin-right: 6px;
-  font-size: 11px; 
-  font-weight: 500; 
+  font-size: 11px;
+  font-weight: 500;
   vertical-align: middle;
 }
 
@@ -1415,7 +1438,7 @@ h1 .label {
 @media (max-width: $screen-xs-max) {
   h1 .label {
     font-size: 12px;
-  } 
+  }
 }
 
 /* =Modals

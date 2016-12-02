@@ -31,3 +31,4 @@ shapely==1.5.16
 gdal==1.10.0
 pylibmc==1.5.1
 awscli==1.11.23
+pandas==0.19.0

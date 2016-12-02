@@ -1,9 +1,9 @@
-{% extends "organization/project_import_wrapper.html" %} 
+{% extends "organization/project_import_wrapper.html" %}
 
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% block extra_script %} {{ form.media }} {% endblock %} 
+{% block extra_script %} {{ form.media }} {% endblock %}
 
 {% block step_content %}
 
@@ -22,7 +22,8 @@
       <div class="row">
         <div class="col-md-12">
           {{ wizard.form.non_field_errors }}
-          <p>{% trans "The following fields can be imported.  To prevent a field from being imported, deselect the checkbox in the right column." %}</p>
+          {% if object.current_questionnaire and attr_map %}
+          <p>{% trans "The following attribute fields can be imported.  To prevent a field from being imported, deselect the checkbox in the right column." %}</p>
           <table id="import-mapping" class="table table-hover">
             <thead>
               <tr>
@@ -34,7 +35,8 @@
               </tr>
             </thead>
             <tbody>
-            {% for header, attr in attr_map.items %}
+            {% for content_type, attributes in attr_map.items %}
+              {% for header, attr in attributes.items %}
               <tr>
               {% if attr %}
                 <td>{{ header }}</td>
@@ -42,34 +44,56 @@
                 <td>{{ attr.2 }}</td>
                 <td>{{ attr.0.required }}</td>
                 <td>
-                    <input type="checkbox" name="attributes" value="{{ header }}" {% if attr.0.required %} disabled {% endif %} checked /> {% if attr.0.required %}
-                    <input type=hidden name="attributes" value="{{header}}" /> {% endif %}
+                    <input type="checkbox" name="attributes" value="{{content_type}}::{{header}}" {% if attr.0.required %} disabled {% endif %} checked /> {% if attr.0.required %}
+                    <input type=hidden name="attributes" value="{{content_type}}::{{header}}" /> {% endif %}
                 </td>
               {% endif %}
               </tr>
+              {% endfor %}
             {% endfor %}
             </tbody>
           </table>
-          {% if extra_headers %}
+          {% elif object.current_questionnaire and not attr_map %}
+          <div class="alert alert-warning alert-full clearfix row" role="alert">
+            <div class="text-center">
+              <span class="glyphicon glyphicon-warning-sign"></span>
+            </div>
+            <div>
+              <p>{% trans "We could not match any import fields to attributes in your project schema." %}</p>
+            </div>
+          </div>
+          {% endif %}
+
+          {% if object.current_questionnaire and extra_headers %}
             <div class="alert alert-warning alert-full clearfix row" role="alert">
               <div class="text-center">
                 <span class="glyphicon glyphicon-warning-sign"></span>
               </div>
               <div>
-                <p>{% trans "The following fields have no corresponding attribute." %}</p>
+                <p>{% trans "The following import fields have no corresponding attribute in your project schema:" %}</p>
                 <div class="well">
                   {{ extra_headers|join:" / "}}
                 </div>
               </div>
             </div>
+          {% else %}
+          <div class="alert alert-full clearfix row">
+            <div>
+              <p>{% trans "The following fields can be imported:" %}</p>
+              <div class="well">
+                {{ extra_headers|join:" / "}}
+              </div>
+            </div>
+          </div>
           {% endif %}
+
           {% if extra_attrs %}
           <div class="alert alert-warning alert-full clearfix row" role="alert">
             <div class="text-center">
               <span class="glyphicon glyphicon-warning-sign"></span>
             </div>
             <div>
-              <p>{% trans "The following attributes exist in your schema but are not in the import." %}</p>
+              <p>{% trans "The following attributes were found in your schema but do not correspond to any import fields." %}</p>
               <div class="well">
                 {{ extra_attrs|join:" / "}}
               </div>

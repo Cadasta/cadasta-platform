@@ -342,19 +342,16 @@ class ShapeTest(UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('clear_temp')
 class XLSTest(UserTestCase, TestCase):
-    def test_init(self):
-        project = ProjectFactory.build()
-        exporter = XLSExporter(project)
-        assert exporter.project == project
 
-    def test_write_items(self):
-        project = ProjectFactory.create(current_questionnaire='123abc')
-
-        content_type = ContentType.objects.get(app_label='spatial',
-                                               model='spatialunit')
+    def setUp(self):
+        super().setUp()
+        self.project = ProjectFactory.create(current_questionnaire='123abc')
+        self.content_type = ContentType.objects.get(app_label='spatial',
+                                                    model='spatialunit')
         schema = Schema.objects.create(
-            content_type=content_type,
-            selectors=(project.organization.id, project.id, '123abc', ))
+            content_type=self.content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', ))
         attr_type = AttributeType.objects.get(name='text')
         Attribute.objects.create(
             schema=schema,
@@ -363,57 +360,100 @@ class XLSTest(UserTestCase, TestCase):
             required=False, omit=False
         )
 
-        spatialunit_1 = SpatialUnitFactory.create(
-            project=project,
+        self.spatialunit_1 = SpatialUnitFactory.create(
+            project=self.project,
             geometry='POINT (1 1)',
             attributes={'key': 'value 1'})
-        spatialunit_2 = SpatialUnitFactory.create(
-            project=project,
+        self.spatialunit_2 = SpatialUnitFactory.create(
+            project=self.project,
             geometry='POINT (2 2)',
             attributes={'key': 'value 2'})
-        spatialunits = [spatialunit_1, spatialunit_2]
-        attrs = ['id', 'geometry.ewkt']
+        self.spatialunits = [self.spatialunit_1, self.spatialunit_2]
+        self.attrs = ['id', 'geometry.ewkt']
 
+        self.parties = PartyFactory.create_batch(
+            project=self.project, size=2)
+
+        TenureRelationshipFactory.create(
+            project=self.project, party=self.parties[0],
+            spatial_unit=self.spatialunit_1
+        )
+
+    def test_init(self):
+        exporter = XLSExporter(self.project)
+        assert exporter.project == self.project
+
+    def test_write_items(self):
         workbook = Workbook()
         worksheet = workbook.create_sheet()
         worksheet.title = 'locations'
 
-        exporter = XLSExporter(project)
-        exporter.write_items(worksheet, spatialunits, content_type, attrs)
+        exporter = XLSExporter(self.project)
+        exporter.write_items(
+            worksheet, self.spatialunits, self.content_type, self.attrs)
 
         assert worksheet['A1'].value == 'id'
         assert worksheet['B1'].value == 'geometry.ewkt'
         assert worksheet['C1'].value == 'key'
 
-        assert worksheet['A2'].value == spatialunit_1.id
-        assert worksheet['B2'].value == spatialunit_1.geometry.ewkt
+        assert worksheet['A2'].value == self.spatialunit_1.id
+        assert worksheet['B2'].value == self.spatialunit_1.geometry.ewkt
         assert worksheet['C2'].value == 'value 1'
 
-        assert worksheet['A3'].value == spatialunit_2.id
-        assert worksheet['B3'].value == spatialunit_2.geometry.ewkt
+        assert worksheet['A3'].value == self.spatialunit_2.id
+        assert worksheet['B3'].value == self.spatialunit_2.geometry.ewkt
         assert worksheet['C3'].value == 'value 2'
 
     def test_write_locations(self):
+        workbook = Workbook()
+        exporter = XLSExporter(self.project)
+        exporter.workbook = workbook
+        exporter.write_locations()
+        assert workbook['locations']
+        assert len(workbook['locations'].rows) == 3
+
+    def test_write_locations_empty(self):
         workbook = Workbook()
 
         project = ProjectFactory.build()
         exporter = XLSExporter(project)
         exporter.workbook = workbook
         exporter.write_locations()
-        assert workbook['locations']
-        assert len(workbook['locations'].rows) == 1
+        with pytest.raises(KeyError) as e:
+            workbook['locations']
+        assert str(e.value) == "'Worksheet locations does not exist.'"
 
     def test_write_parties(self):
+        workbook = Workbook()
+
+        exporter = XLSExporter(self.project)
+        exporter.workbook = workbook
+        exporter.write_parties()
+        assert workbook['parties']
+        assert len(workbook['parties'].rows) == 3
+
+    def test_write_parties_empty(self):
         workbook = Workbook()
 
         project = ProjectFactory.build()
         exporter = XLSExporter(project)
         exporter.workbook = workbook
         exporter.write_parties()
-        assert workbook['parties']
-        assert len(workbook['parties'].rows) == 1
+        with pytest.raises(KeyError) as e:
+            workbook['parties']
+        assert str(e.value) == "'Worksheet parties does not exist.'"
 
     def test_write_relationships(self):
+        workbook = Workbook()
+
+        exporter = XLSExporter(self.project)
+        exporter.workbook = workbook
+
+        exporter.write_relationships()
+        assert workbook['relationships']
+        assert len(workbook['relationships'].rows) == 2
+
+    def test_write_relationships_empty(self):
         workbook = Workbook()
 
         project = ProjectFactory.build()
@@ -421,13 +461,13 @@ class XLSTest(UserTestCase, TestCase):
         exporter.workbook = workbook
 
         exporter.write_relationships()
-        assert workbook['relationships']
-        assert len(workbook['relationships'].rows) == 1
+        with pytest.raises(KeyError) as e:
+            workbook['relationships']
+        assert str(e.value) == "'Worksheet relationships does not exist.'"
 
     def test_make_download(self):
         ensure_dirs()
-        project = ProjectFactory.create()
-        exporter = XLSExporter(project)
+        exporter = XLSExporter(self.project)
         path, mime = exporter.make_download('file')
 
         assert path == os.path.join(settings.MEDIA_ROOT, 'temp/file.xlsx')

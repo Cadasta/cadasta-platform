@@ -486,3 +486,8 @@ MIME_LOOKUPS = {
 FILE_UPLOAD_HANDLERS = [
     'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 ]
+
+IMPORTERS = {
+    'csv': 'organization.importers.csv.CSVImporter',
+    'xls': 'organization.importers.xls.XLSImporter'
+}
