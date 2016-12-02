@@ -98,7 +98,7 @@
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
-    </li><!--
+    </li><!-- needed to eliminate spacing issue on horizontal menus
     --><li class="projects hidden">
       <a href="#">
         <span class="icon projects"></span>
@@ -109,18 +109,6 @@
       <a href="{% url 'organization:members' organization.slug %}">
         <span class="icon members"></span>
         <span class="title">{% trans "Members" %}</span>
-      </a>
-    </li><!--
-    --><li class="reports hidden">
-      <a href="#">
-         <span class="icon reports"></span>
-         <span class="title">{% trans "Reports" %}</span>
-      </a>
-    </li><!--
-    --><li class="activity hidden">
-      <a href="#">
-        <span class="icon activity"></span>
-        <span class="title">{% trans "Activity" %}</span>
       </a>
     </li>
   </ul>

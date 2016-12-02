@@ -73,6 +73,11 @@
       background-image: url('/static/img/icon-map.png');
     }
   }
+  li.parties {
+    .icon { 
+      background-image: url('/static/img/icon-parties.png');
+    }
+  }
   li.resources {
     .icon { 
       background-image: url('/static/img/icon-resources.png');
@@ -102,6 +107,7 @@
 
 #sidebar.overview li.overview,
 #sidebar.map li.map,
+#sidebar.parties li.parties,
 #sidebar.resources li.resources,
 #sidebar.reports li.reports,
 #sidebar.activity li.activity, 
@@ -162,6 +168,7 @@
   }
   #sidebar.overview li.overview,
   #sidebar.map li.map,
+  #sidebar.parties li.parties,
   #sidebar.resources li.resources,
   #sidebar.reports li.reports,
   #sidebar.activity li.activity, 

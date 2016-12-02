@@ -4245,6 +4245,9 @@ ul.resource-actions > li {
 #sidebar li.map .icon {
   background-image: url("/static/img/icon-map.png"); }
 
+#sidebar li.parties .icon {
+  background-image: url("/static/img/icon-parties.png"); }
+
 #sidebar li.resources .icon {
   background-image: url("/static/img/icon-resources.png"); }
 
@@ -4262,6 +4265,7 @@ ul.resource-actions > li {
 
 #sidebar.overview li.overview a,
 #sidebar.map li.map a,
+#sidebar.parties li.parties a,
 #sidebar.resources li.resources a,
 #sidebar.reports li.reports a,
 #sidebar.activity li.activity a,
@@ -4271,6 +4275,7 @@ ul.resource-actions > li {
 
 #sidebar.overview li.overview .icon,
 #sidebar.map li.map .icon,
+#sidebar.parties li.parties .icon,
 #sidebar.resources li.resources .icon,
 #sidebar.reports li.reports .icon,
 #sidebar.activity li.activity .icon,
@@ -4280,6 +4285,7 @@ ul.resource-actions > li {
 
 #sidebar.overview li.overview .title,
 #sidebar.map li.map .title,
+#sidebar.parties li.parties .title,
 #sidebar.resources li.resources .title,
 #sidebar.reports li.reports .title,
 #sidebar.activity li.activity .title,
@@ -4322,6 +4328,7 @@ ul.resource-actions > li {
           background-position: -8px -60px; }
   #sidebar.overview li.overview a,
   #sidebar.map li.map a,
+  #sidebar.parties li.parties a,
   #sidebar.resources li.resources a,
   #sidebar.reports li.reports a,
   #sidebar.activity li.activity a,
@@ -4331,6 +4338,7 @@ ul.resource-actions > li {
     border-left: 0; }
   #sidebar.overview li.overview .icon,
   #sidebar.map li.map .icon,
+  #sidebar.parties li.parties .icon,
   #sidebar.resources li.resources .icon,
   #sidebar.reports li.reports .icon,
   #sidebar.activity li.activity .icon,
