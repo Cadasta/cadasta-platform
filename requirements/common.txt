@@ -9,7 +9,7 @@ django-crispy-forms==1.6.0
 django-parsley==0.6
 django-formtools==1.0
 django-countries==3.4.1
-django-leaflet==0.18.0
+django-leaflet==0.18.1
 django-sass-processor==0.3.4
 djangorestframework-gis==0.10.1
 jsonschema==2.5.1
