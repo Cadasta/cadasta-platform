@@ -4,6 +4,7 @@ import pytest
 
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from django.db.utils import IntegrityError
 from jsonattrs.models import Attribute, AttributeType, Schema
 from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
@@ -238,7 +239,7 @@ class TenureRelationshipTest(UserTestCase, TestCase):
             'description'] == tenure_relationship.attributes['description']
 
     def test_tenure_relationship_type_not_set(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(IntegrityError):
             TenureRelationshipFactory.create(tenure_type=None)
 
     def test_project_relationship_invalid(self):

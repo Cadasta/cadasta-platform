@@ -196,7 +196,6 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         assert os.path.isfile(os.path.join(
             settings.MEDIA_ROOT, 's3/uploads/resources/deramola.xml')
         )
-        create_spatial_resource(Resource, resource, True)
         spatial_resources = resource.spatial_resources.all()
         assert spatial_resources.count() == 1
         geom = spatial_resources[0].geom

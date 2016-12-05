@@ -66,21 +66,6 @@ class OrganizationTest(UserTestCase, TestCase):
                 in form.errors['name'])
         assert Organization.objects.count() == 1
 
-    # NOTE: This test is no longer possible because unique org names masks
-    # the testing of unique org slugs via OrganizationForm. Unique org slugs
-    # can only be tested via model unit tests.
-    # def test_unique_slugs(self):
-    #     self.data['description'] = 'Org description #1'
-    #     self._save(self.data)
-    #     org1 = Organization.objects.first()
-    #     assert org1.slug == 'org'
-    #
-    #     self.data['description'] = 'Org description #2'
-    #     self._save(self.data, count=2)
-    #     orgs = Organization.objects.all()
-    #     assert len(orgs) == 2
-    #     assert orgs[0].slug != orgs[1].slug
-
     def test_add_organization_with_url(self):
         self.data['urls'] = 'http://example.com'
         self._save(self.data)
@@ -184,7 +169,7 @@ class OrganizationTest(UserTestCase, TestCase):
             'contacts-1-remove': 'on',
             'contacts-2-name': '',
             'contacts-2-email': '',
-            'contacts-3-tel': ''
+            'contacts-2-tel': ''
         }
         form = forms.OrganizationForm(data, instance=org)
         form.is_valid()

@@ -40,10 +40,10 @@ class ResourceWidgetTest(UserTestCase, TestCase):
     def test_render(self):
         expected_html = (
             '  <td>'
-            '    <img src="https://example.com/file-128x128.txt"'
+            '    <img src="{thumbnail}"'
             '         class="thumb-60">'
             '    <label for="file"><strong>Resource Name</strong></label>'
-            '    <br>original_file.jpg'
+            '    <br>file.txt'
             '  </td>'
             '  <td class="hidden-xs hidden-sm">txt</td>'
             '  <td class="hidden-xs hidden-sm">'
@@ -54,8 +54,14 @@ class ResourceWidgetTest(UserTestCase, TestCase):
         )
         widget = ResourceWidget(resource=self.resource)
         rendered = widget.render('file', True)
+        print(rendered)
+        print(expected_html.format(
+                    updated=date(self.resource.last_updated, 'N j, Y, P'),
+                    thumbnail=self.resource.thumbnail
+                ))
         assert expected_html.format(
             updated=date(self.resource.last_updated, 'N j, Y, P'),
+            thumbnail=self.resource.thumbnail
         ) in rendered
 
     def test_attachment_text_for_0_entities(self):

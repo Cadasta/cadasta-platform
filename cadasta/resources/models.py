@@ -174,6 +174,7 @@ def create_spatial_resource(sender, instance, created, **kwargs):
             # of gpx mime type is not reliable
             mime = magic.Magic(mime=True)
             mime_type = str(mime.from_file(write_path), 'utf-8')
+
             if mime_type in GPX_MIME_TYPES:
                 try:
                     processor = GPXProcessor(write_path)
