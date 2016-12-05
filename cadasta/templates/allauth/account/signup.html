@@ -1,12 +1,24 @@
 {% extends "account/base.html" %}
 
 {% load widget_tweaks %}
+{% load staticfiles %}
 {% load i18n %}
 
 {% block top-nav %}registration{% endblock %}
 {% block body-class %} tinted-bg{% endblock %}
 
 {% block title %} | {% trans "Register" %}{% endblock %}
+
+{% block extra_script %}
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("input[name='password1']").on('focus', function() {
+      $(this).next(".help-block").removeClass("hidden");
+    });
+  });
+</script>
+<script src="{% static 'js/parsleyAddValidator.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -33,7 +45,7 @@
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label class="control-label" for="id_username">{% trans "Choose your username" %}</label>
-    {% render_field form.username class+="form-control input-lg" %}
+    {% render_field form.username class+="form-control input-lg" data-parsley-minlength="3" %}
     <div class="error-block">{{ form.username.errors }}</div>
   </div>
 
@@ -45,7 +57,8 @@
 
   <div class="form-group{% if form.password1.errors %} has-error{% endif %}">
     <label class="control-label" for="id_password1">{% trans "Password" %}</label>
-    {% render_field form.password1 class+="form-control input-lg" %}
+    {% render_field form.password1 class+="form-control input-lg" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" %}
+    <p class="help-block small hidden">{% trans "Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username or email address." %}</p>
     <div class="error-block">{{ form.password1.errors }}</div>
   </div>
 

@@ -64,7 +64,7 @@ $modal-backdrop-bg:              rgba(0, 0, 0, 0.6);
 
 $table-cell-padding:            12px 24px !default;
 $table-bg-accent:               #f9f9f9 !default; // Bg for table-striped
-$table-bg-accent:               #lighten($table-bg-accent, 25%); // Bg for table-striped
+$table-bg-accent:               lighten($table-bg-accent, 25%); // Bg for table-striped
 $table-bg-hover:                #f9fafe !default; // Bg for table-hover
 $table-bg-active:               $table-bg-hover !default;
 $table-border-color:            #e7e8ea; // Bg for table borders
