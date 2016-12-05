@@ -5,11 +5,14 @@ python:
   - '3.5'
 addons:
   postgresql: '9.4'
+  apt:
+    packages:
+      - postgresql-9.4-postgis-2.3
 
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
   - sudo -E apt-get -yq update &>> ~/apt-get-update.log
-  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install postgresql-9.4-postgis-2.2 squid3
+  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install squid3
   - sudo apt-get -yq install libgdal-dev
   - gdal-config --version
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
