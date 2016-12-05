@@ -19,11 +19,12 @@
   window.Parsley
     .addValidator('userfield', function (value, requirement) {
       var term = $("#id_username").val();
+      console.log(term)
       if (value.indexOf(term) >= 0) {
         return false;
       }
     }, 2)
-    .addMessage('userfield', gettext('Your password cannot contain your username.'));
+    .addMessage('userfield', gettext('BLAHHHHH Your password cannot contain your username.'));
 
   // checks email not contained in password when email is another field in form
   window.Parsley

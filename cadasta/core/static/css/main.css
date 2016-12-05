@@ -5436,7 +5436,10 @@ header {
   .page-header .page-title h1, .page-header .page-title h2 {
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; } }
+    text-overflow: ellipsis; }
+    .page-header .page-title h1:hover, .page-header .page-title h2:hover {
+      overflow: visible;
+      white-space: normal; } }
 
 /* =Page header single project or organizations
 -------------------------------------------------------------- */
@@ -5737,7 +5740,8 @@ main.container-fluid {
   #project-single #page-content main,
   #organization-single #page-content main,
   #project-single #page-content main.show-sidebar,
-  #organization-single #page-content main.show-sidebar {
+  #organization-single #page-content main.show-sidebar,
+  #organization-single #page-content main {
     margin-left: 0;
     background: #fff; } }
 
