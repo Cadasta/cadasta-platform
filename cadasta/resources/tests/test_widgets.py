@@ -3,6 +3,7 @@ from django.test import TestCase
 from django.template.defaultfilters import date
 from django.contrib.contenttypes.models import ContentType
 
+from core.tests.utils.cases import UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
@@ -11,23 +12,21 @@ from ..models import ContentObject
 from ..widgets import ResourceWidget
 
 
-class ResourceWidgetTest(TestCase):
+class ResourceWidgetTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
 
         # Create a floating resource
-        self.user = UserFactory.build(
+        self.user = UserFactory.create(
             full_name='John Lennon',
             username='john'
         )
-        self.last_updated = datetime.now()
-        self.resource = ResourceFactory.build(
+        self.resource = ResourceFactory.create(
             name='Resource Name',
             file='https://example.com/file.txt',
-            original_file='original_file.jpg',
-            mime_type='image/png',
-            contributor=self.user,
-            last_updated=self.last_updated,
+            original_file='file.txt',
+            mime_type='text/plain',
+            contributor=self.user
         )
 
         # Attach it to a project
@@ -56,7 +55,7 @@ class ResourceWidgetTest(TestCase):
         widget = ResourceWidget(resource=self.resource)
         rendered = widget.render('file', True)
         assert expected_html.format(
-            updated=date(self.last_updated, 'N j, Y, P'),
+            updated=date(self.resource.last_updated, 'N j, Y, P'),
         ) in rendered
 
     def test_attachment_text_for_0_entities(self):

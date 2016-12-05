@@ -16,6 +16,7 @@ from django.http import Http404, HttpRequest
 from django.template.loader import render_to_string
 from django.test import TestCase
 from jsonattrs.models import Attribute, Schema
+from skivvy import remove_csrf
 from organization.models import OrganizationRole, Project, ProjectRole
 from party.models import Party, TenureRelationship
 from party.tests.factories import PartyFactory
@@ -489,7 +490,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
                 context=response.context_data,
                 request=response.wsgi_request
             )
-            assert expected == content
+            assert remove_csrf(expected) == remove_csrf(content)
 
     def test_initial_get_valid(self):
         self.client.force_login(self.user)
@@ -1525,7 +1526,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
                 context=response.context_data,
                 request=response.wsgi_request
             )
-            assert expected == content
+            assert remove_csrf(expected) == remove_csrf(content)
 
     def test_initial_get_valid(self):
         self.client.force_login(self.user)

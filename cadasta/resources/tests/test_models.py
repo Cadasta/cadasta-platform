@@ -180,9 +180,9 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
         file_name = self.storage.save('resources/thumb_test.jpg', file)
         contributor = UserFactory.create()
-        resource = ResourceFactory.build(file=file_name,
-                                         mime_type='image/jpeg',
-                                         contributor=contributor)
+        resource = ResourceFactory.create(file=file_name,
+                                          mime_type='image/jpeg',
+                                          contributor=contributor)
         resource.save()
         assert os.path.isfile(os.path.join(
             settings.MEDIA_ROOT, 's3/uploads/resources/thumb_test-128x128.jpg')
@@ -191,7 +191,7 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_create_spatial_resource(self):
         file = self.get_file('/resources/tests/files/deramola.xml', 'rb')
         file_name = self.storage.save('resources/deramola.xml', file)
-        resource = ResourceFactory.build(
+        resource = ResourceFactory.create(
             file=file_name, mime_type='text/xml')
         assert os.path.isfile(os.path.join(
             settings.MEDIA_ROOT, 's3/uploads/resources/deramola.xml')
@@ -240,7 +240,7 @@ class SpatialResourceTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_spatial_resource(self):
         file = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
         file_name = self.storage.save('resources/tracks_test.gpx', file)
-        resource = ResourceFactory.build(
+        resource = ResourceFactory.create(
             file=file_name, mime_type='text/xml')
         spatial_resource = SpatialResourceFactory.create(resource=resource)
         assert spatial_resource.project.pk == resource.project.pk

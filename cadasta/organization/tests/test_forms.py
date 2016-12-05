@@ -922,7 +922,8 @@ class ContactsFormTest(UserTestCase, TestCase):
         html = form.as_table()
 
         expected = (
-            '<tr><td><input id="id_c-name" name="c-name" type="text" required /></td>\n'
+            '<tr><td><input id="id_c-name" name="c-name" type="text" '
+            'required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
             '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
@@ -945,7 +946,8 @@ class ContactsFormTest(UserTestCase, TestCase):
             '<td colspan="4"><ul class="errorlist nonfield"><li>'
             'Please provide a name.</li></ul></td></tr>\n'
             '<tr>\n'
-            '<td><input id="id_c-name" name="c-name" type="text" required /></td>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" '
+            'required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" '
             'value="john@beatles.uk" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
@@ -995,7 +997,8 @@ class ContactsFormTest(UserTestCase, TestCase):
             'Please provide a name. '
             'The provided email address is invalid.</li></ul></td></tr>\n'
             '<tr>\n'
-            '<td><input id="id_c-name" name="c-name" type="text" required /></td>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" '
+            'required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" '
             'value="invalid email" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
