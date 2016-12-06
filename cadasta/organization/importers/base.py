@@ -192,7 +192,7 @@ class Importer(object):
                     )
         except ValidationError as e:
             raise exceptions.DataImportError(
-                e.message, line_num=reader.line_num)
+                e.messages[0], line_num=reader.line_num)
 
     def _create_models(self, type, headers, row, content_types, tenure_type):
 
