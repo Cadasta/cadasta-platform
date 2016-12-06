@@ -1,5 +1,65 @@
 # Change Log
 
+## [v1.3.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.2) (2016-12-06)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.1...v1.3.0-alpha.2)
+
+**Implemented enhancements:**
+
+- Data import: support for xlsx format used in data download [\#832](https://github.com/Cadasta/cadasta-platform/issues/832)
+- Party list and add party pages are unused [\#768](https://github.com/Cadasta/cadasta-platform/issues/768)
+- Include AWS CLI for all envs [\#959](https://github.com/Cadasta/cadasta-platform/pull/959) ([amplifi](https://github.com/amplifi))
+
+**Fixed bugs:**
+
+- Password reset is unavailable for users who have forgotten their password [\#950](https://github.com/Cadasta/cadasta-platform/issues/950)
+- After PR \#944 was merged, projects have disappeared from the dashboard map [\#949](https://github.com/Cadasta/cadasta-platform/issues/949)
+- As a superuser, activating a user fails [\#927](https://github.com/Cadasta/cadasta-platform/issues/927)
+- User roles for projects and organizations are not assigned correctly. [\#914](https://github.com/Cadasta/cadasta-platform/issues/914)
+- It's not possible to remove the URL for an organization or a project [\#537](https://github.com/Cadasta/cadasta-platform/issues/537)
+
+**Closed issues:**
+
+- Asynchronous loading of geographic features [\#931](https://github.com/Cadasta/cadasta-platform/issues/931)
+- Switch to Argon2 hash algorithm [\#876](https://github.com/Cadasta/cadasta-platform/issues/876)
+- Implement password validation criteria [\#735](https://github.com/Cadasta/cadasta-platform/issues/735)
+
+**Merged pull requests:**
+
+- PostGIS 2.3 for Travis builds [\#965](https://github.com/Cadasta/cadasta-platform/pull/965) ([oliverroick](https://github.com/oliverroick))
+- Added party index to project subnav [\#963](https://github.com/Cadasta/cadasta-platform/pull/963) ([clash99](https://github.com/clash99))
+- Password validation on registration page - client-side [\#962](https://github.com/Cadasta/cadasta-platform/pull/962) ([clash99](https://github.com/clash99))
+- Password strength requirements implemented for server-side [\#958](https://github.com/Cadasta/cadasta-platform/pull/958) ([linzjax](https://github.com/linzjax))
+- Fix \#950 -- Remove LoginRequiredMixin from PasswordResetView [\#952](https://github.com/Cadasta/cadasta-platform/pull/952) ([oliverroick](https://github.com/oliverroick))
+- Fix \#949 -- Remove markerClusterGroup and initialize L.Deflate correctly [\#951](https://github.com/Cadasta/cadasta-platform/pull/951) ([oliverroick](https://github.com/oliverroick))
+- Add asychronous loading to map views [\#948](https://github.com/Cadasta/cadasta-platform/pull/948) ([oliverroick](https://github.com/oliverroick))
+- Fix handling of L.Deflate for location edit page [\#947](https://github.com/Cadasta/cadasta-platform/pull/947) ([oliverroick](https://github.com/oliverroick))
+- User layout changes [\#942](https://github.com/Cadasta/cadasta-platform/pull/942) ([clash99](https://github.com/clash99))
+- Questionnaire API [\#938](https://github.com/Cadasta/cadasta-platform/pull/938) ([oliverroick](https://github.com/oliverroick))
+- Add suport for XLSX imports [\#898](https://github.com/Cadasta/cadasta-platform/pull/898) ([bjohare](https://github.com/bjohare))
+
+## [v1.3.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.1) (2016-11-22)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0...v1.3.0-alpha.1)
+
+**Fixed bugs:**
+
+- Org Admin should have Administrator role automatically assigned for all projects within organization [\#737](https://github.com/Cadasta/cadasta-platform/issues/737)
+
+**Closed issues:**
+
+- Improve performance of Leaflet.Deflate [\#932](https://github.com/Cadasta/cadasta-platform/issues/932)
+- Edit Project Boundaries not working in Safari [\#929](https://github.com/Cadasta/cadasta-platform/issues/929)
+- API cleanup [\#880](https://github.com/Cadasta/cadasta-platform/issues/880)
+- API Documentation/Doc Box Set-up [\#667](https://github.com/Cadasta/cadasta-platform/issues/667)
+
+**Merged pull requests:**
+
+- Map interaction performance improvements [\#944](https://github.com/Cadasta/cadasta-platform/pull/944) ([oliverroick](https://github.com/oliverroick))
+- Readme updates [\#941](https://github.com/Cadasta/cadasta-platform/pull/941) ([IknowJoseph](https://github.com/IknowJoseph))
+- API Cleanup [\#940](https://github.com/Cadasta/cadasta-platform/pull/940) ([oliverroick](https://github.com/oliverroick))
+- Disable functional tests for now [\#939](https://github.com/Cadasta/cadasta-platform/pull/939) ([ian-ross](https://github.com/ian-ross))
+- Users can no longer edit org admins project permissions [\#934](https://github.com/Cadasta/cadasta-platform/pull/934) ([linzjax](https://github.com/linzjax))
+- Update changelog for v1.2.0 [\#933](https://github.com/Cadasta/cadasta-platform/pull/933) ([amplifi](https://github.com/amplifi))
+
 ## [v1.2.0](https://github.com/Cadasta/cadasta-platform/tree/v1.2.0) (2016-11-11)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.2.0-alpha.5...v1.2.0)
 
