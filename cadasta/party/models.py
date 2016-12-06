@@ -14,7 +14,7 @@ from organization.models import Project
 from organization.validators import validate_contact
 from simple_history.models import HistoricalRecords
 
-from resources.mixins import ResourceModelMixin, detach_object_resources
+from resources.mixins import ResourceModelMixin
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
 
@@ -135,9 +135,6 @@ class Party(ResourceModelMixin, RandomIDModel):
                 'party': self.id,
             },
         )
-
-
-models.signals.pre_delete.connect(detach_object_resources, sender=Party)
 
 
 @fix_model_for_attributes
@@ -329,10 +326,6 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
                 'relationship': self.id,
             },
         )
-
-
-models.signals.pre_delete.connect(
-    detach_object_resources, sender=TenureRelationship)
 
 
 class TenureRelationshipType(models.Model):

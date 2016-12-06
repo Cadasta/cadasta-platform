@@ -12,7 +12,7 @@ from shapely.wkt import dumps
 
 from . import messages, managers
 from .choices import TYPE_CHOICES
-from resources.mixins import ResourceModelMixin, detach_object_resources
+from resources.mixins import ResourceModelMixin
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
 
@@ -146,8 +146,6 @@ def reassign_spatial_geometry(instance):
 def check_extent(sender, instance, **kwargs):
     if instance.geometry:
         reassign_spatial_geometry(instance)
-
-models.signals.pre_delete.connect(detach_object_resources, sender=SpatialUnit)
 
 
 @fix_model_for_attributes
