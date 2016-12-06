@@ -318,23 +318,28 @@ JSONATTRS_SCHEMA_SELECTORS = {
 ATTRIBUTE_GROUPS = {
     'location_attributes': {
         'app_label': 'spatial',
-        'model': 'spatialunit'
-    },
-    'location_relationship_attributes': {
-        'app_label': 'spatial',
-        'model': 'spatialrelationship'
+        'model': 'spatialunit',
+        'label': 'Location'
     },
     'party_attributes': {
         'app_label': 'party',
-        'model': 'party'
+        'model': 'party',
+        'label': 'Party'
+    },
+    'location_relationship_attributes': {
+        'app_label': 'spatial',
+        'model': 'spatialrelationship',
+        'label': 'Spatial relationship'
     },
     'party_relationship_attributes': {
         'app_label': 'party',
-        'model': 'partyrelationship'
+        'model': 'partyrelationship',
+        'label': 'Party relationship'
     },
     'tenure_relationship_attributes': {
         'app_label': 'party',
-        'model': 'tenurerelationship'
+        'model': 'tenurerelationship',
+        'label': 'Tenure Relationship'
     }
 }
 

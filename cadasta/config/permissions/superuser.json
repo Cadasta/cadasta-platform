@@ -28,7 +28,11 @@
       "action": ["resource.*"],
       "object": ["project/*/*", "resource/*/*/*"]
     },
-
+    {
+      "effect": "allow",
+      "action": ["questionnaire.*"],
+      "object": ["project/*/*"]
+    },
     {
       "effect": "allow",
       "action": ["spatial.*"],

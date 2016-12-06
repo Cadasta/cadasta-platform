@@ -1,21 +1,25 @@
 import logging
 
+from django.shortcuts import get_object_or_404
 from django.utils.six import BytesIO
 from django.utils.translation import ugettext as _
 from questionnaires.models import Questionnaire
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, generics
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from tutelary.models import Role
+from tutelary.mixins import APIPermissionRequiredMixin
 from xforms.models import XFormSubmission
 from xforms.mixins.model_helper import ModelHelper
 from xforms.mixins.openrosa_headers_mixin import OpenRosaHeadersMixin
 from xforms.renderers import XFormListRenderer
 from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
 from xforms.exceptions import InvalidXMLSubmission
+from questionnaires.serializers import QuestionnaireSerializer
+from ..renderers import XFormRenderer
 
 logger = logging.getLogger('xform.submissions')
 
@@ -46,8 +50,7 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin,
             return Response(headers=self.get_openrosa_headers(request),
                             status=status.HTTP_204_NO_CONTENT,)
         try:
-            instance = ModelHelper(
-            ).upload_submission_data(request)
+            instance = ModelHelper().upload_submission_data(request)
         except InvalidXMLSubmission as e:
             logger.debug(str(e))
             return self._sendErrorResponse(request, e)
@@ -105,6 +108,11 @@ class XFormListView(OpenRosaHeadersMixin,
     renderer_classes = (XFormListRenderer,)
     serializer_class = XFormListSerializer
 
+    def get_serializer_context(self, *args, **kwargs):
+        context = super().get_serializer_context(*args, **kwargs)
+        context['request'] = self.request
+        return context
+
     def get_user_forms(self):
         forms = []
         policies = self.request.user.assigned_policies()
@@ -131,3 +139,26 @@ class XFormListView(OpenRosaHeadersMixin,
         serializer = self.get_serializer(self.object_list, many=True)
         return Response(
             serializer.data, headers=self.get_openrosa_headers(request))
+
+
+class XFormDownloadView(APIPermissionRequiredMixin, generics.RetrieveAPIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (XFormRenderer,)
+    serializer_class = QuestionnaireSerializer
+    permission_required = 'questionnaire.view'
+
+    def get_perms_objects(self):
+        return [self.get_object().project]
+
+    def get_object(self):
+        if not hasattr(self, '_object'):
+            self._object = get_object_or_404(
+                Questionnaire, id=self.kwargs['questionnaire'])
+
+        return self._object
+
+    def get_serializer_context(self, *args, **kwargs):
+        context = super().get_serializer_context(*args, **kwargs)
+        context['project'] = self.get_object().project
+        return context

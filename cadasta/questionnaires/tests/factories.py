@@ -13,13 +13,14 @@ class QuestionnaireFactory(ExtendedFactory):
 
     filename = factory.Sequence(lambda n: "questionnaire_%s" % n)
     title = factory.Sequence(lambda n: "Questionnaire #%s" % n)
-    id_string = factory.Sequence(lambda n: "q_id_%s" % n)
+    id_string = factory.Sequence(lambda n: "questionnaire_%s" % n)
     xls_form = 'http://example.com/test.txt'
     xml_form = 'http://example.com/test.txt'
     version = int(datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4])
     md5_hash = hashlib.md5((str(filename) + str(id_string) + str(version)
                             ).encode()).hexdigest()
     project = factory.SubFactory(ProjectFactory)
+    default_language = 'en'
 
     @factory.post_generation
     def add_current_questionnaire(self, create, extracted, **kwargs):

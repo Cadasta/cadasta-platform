@@ -1,6 +1,7 @@
 import pytest
 
 from django.test import TestCase
+from django.core.urlresolvers import reverse
 from rest_framework.test import APIRequestFactory, force_authenticate
 
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
@@ -40,15 +41,15 @@ class XFormListSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
         serializer = serializers.XFormListSerializer(
             form, context={'request': request})
+        url_refix = 'https' if https else 'http'
 
         assert serializer.data['formID'] == questionnaire.data['id_string']
         assert serializer.data['name'] == questionnaire.data['title']
         assert serializer.data['version'] == questionnaire.data['version']
-        protocol = 'https' if https else 'http'
         assert (serializer.data['downloadUrl'] ==
-                protocol + '://localhost:8000' +
-                questionnaire.data['xml_form'])
-        assert serializer.data['hash'] == form.md5_hash
+                url_refix + '://testserver' +
+                reverse('form-download', args=[form.id]))
+        assert serializer.data['hash'] == questionnaire.data['md5_hash']
 
     def test_serialize(self):
         self._test_serialize()

@@ -1,5 +1,4 @@
 import pytest
-from lxml import etree
 
 from django.db import IntegrityError
 from django.test import TestCase
@@ -93,12 +92,12 @@ class CreateChildrenTest(TestCase):
         create_children(children, kwargs={'questionnaire': questionnaire})
 
         assert models.QuestionGroup.objects.filter(
-            questionnaire=questionnaire).count() == 1
+            questionnaire=questionnaire).count() == 2
         assert models.Question.objects.filter(
             questionnaire=questionnaire).count() == 3
         assert models.Question.objects.filter(
             questionnaire=questionnaire,
-            question_group__isnull=False).count() == 1
+            question_group__isnull=False).count() == 2
 
 
 class CreateOptionsTest(TestCase):
@@ -175,27 +174,6 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
         assert models.QuestionGroup.objects.exists() is False
         assert models.Question.objects.exists() is False
 
-    def test_insert_version_attr(self):
-        xform = self.get_file(
-            '/questionnaires/tests/files/ekcjvf464y5afks6b33qkct3.xml',
-            'r')
-        id_string = 'jurassic_park_survey'
-        version = '2016072518593012'
-        filename = 'ekcjvf464y5afks6b33qkct3'
-        xml = models.Questionnaire.objects.insert_version_attribute(
-            xform, filename, version
-        )
-        root = etree.fromstring(xml)
-        ns = {'xf': 'http://www.w3.org/2002/xforms'}
-        root_node = root.find(
-            './/xf:instance/xf:{root_node}'.format(
-                root_node=filename
-            ), namespaces=ns
-        )
-        assert root_node is not None
-        assert root_node.get('id') == id_string
-        assert root_node.get('version') == version
-
     def test_unique_together_idstring_version(self):
         project = ProjectFactory.create()
         q1 = factories.QuestionnaireFactory.create(
@@ -217,7 +195,8 @@ class QuestionGroupManagerTest(TestCase):
         question_group_dict = {
             'label': 'Basic Select question types',
             'name': 'select_questions',
-            'type': 'group'
+            'type': 'group',
+            'bind': {'relevant': "${party_type}='IN'"}
         }
         questionnaire = factories.QuestionnaireFactory.create()
 
@@ -228,6 +207,33 @@ class QuestionGroupManagerTest(TestCase):
         assert model.questionnaire == questionnaire
         assert model.label == question_group_dict['label']
         assert model.name == question_group_dict['name']
+        assert model.type == 'group'
+        assert model.relevant == question_group_dict['bind']['relevant']
+        assert model.question_groups.count() == 0
+
+    def test_create_nested_group_from_dict(self):
+        question_group_dict = {
+            'label': 'Repeat',
+            'name': 'repeat_me',
+            'type': 'repeat',
+            'children': [{
+                'label': 'Basic Select question types',
+                'name': 'select_questions',
+                'type': 'group'
+            }]
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+
+        model = models.QuestionGroup.objects.create_from_dict(
+            dict=question_group_dict,
+            questionnaire=questionnaire
+        )
+        assert model.questionnaire == questionnaire
+        assert model.label == question_group_dict['label']
+        assert model.name == question_group_dict['name']
+        assert model.type == 'repeat'
+        assert model.question_groups.count() == 1
+        assert questionnaire.question_groups.count() == 2
 
 
 class QuestionManagerTest(TestCase):
@@ -237,7 +243,13 @@ class QuestionManagerTest(TestCase):
             'hint': 'For this field (type=integer)',
             'label': 'Integer',
             'name': 'my_int',
-            'type': 'integer'
+            'type': 'integer',
+            'default': 'default val',
+            'hint': 'An informative hint',
+            'bind': {
+                'relevant': '${party_id}="abc123"',
+                'required': 'yes'
+            }
         }
         questionnaire = factories.QuestionnaireFactory.create()
 
@@ -251,6 +263,10 @@ class QuestionManagerTest(TestCase):
         assert model.label == question_dict['label']
         assert model.name == question_dict['name']
         assert model.type == 'IN'
+        assert model.default == 'default val'
+        assert model.hint == 'An informative hint'
+        assert model.relevant == '${party_id}="abc123"'
+        assert model.required is True
 
     def test_create_from_dict_with_group(self):
         question_dict = {

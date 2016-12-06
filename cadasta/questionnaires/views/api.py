@@ -14,10 +14,10 @@ from ..exceptions import InvalidXLSForm
 class QuestionnaireDetail(APIPermissionRequiredMixin,
                           mixins.CreateModelMixin,
                           generics.RetrieveUpdateAPIView):
+
     def patch_actions(self, request):
         try:
             self.get_object()
-            # return ('questionnaire.edit')
         except Questionnaire.DoesNotExist:
             return ('questionnaire.add')
 
@@ -70,4 +70,10 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
             raise Http404('No Questionnaire matches the given query.')
 
     def put(self, request, *args, **kwargs):
+        if self.get_project().has_records:
+            return Response(
+                {'xls_form': "Data has already been contributed to this "
+                             "project. To ensure data integrity, uploading a "
+                             "new questionnaire is diabled for this project."},
+                status=status.HTTP_400_BAD_REQUEST)
         return self.create(request)

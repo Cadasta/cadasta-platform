@@ -40,6 +40,11 @@
       "effect": "allow",
       "action": ["tenure_rel.*", "tenure_rel.resources.*"],
       "object": ["tenure_rel/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["questionnaire.view"],
+      "object": ["project/$organization/$project"]
     }
   ]
 }

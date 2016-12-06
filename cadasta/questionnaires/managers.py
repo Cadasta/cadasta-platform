@@ -1,12 +1,6 @@
-import hashlib
 import itertools
-import os
 import re
-from datetime import datetime
-
-from lxml import etree
 from xml.dom.minidom import Element
-
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -25,11 +19,8 @@ ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 def create_children(children, errors=[], project=None,
                     default_language='', kwargs={}):
     if children:
-        for c in children:
-            if c.get('type') == 'repeat':
-                create_children(c['children'], errors, project,
-                                default_language, kwargs)
-            elif c.get('type') == 'group':
+        for c, idx in zip(children, itertools.count()):
+            if c.get('type') in ['group', 'repeat']:
                 model_name = 'QuestionGroup'
 
                 # parse attribute group
@@ -49,9 +40,11 @@ def create_children(children, errors=[], project=None,
             else:
                 model_name = 'Question'
 
-            if c.get('type') != 'repeat':
-                model = apps.get_model('questionnaires', model_name)
-                model.objects.create_from_dict(dict=c, errors=errors, **kwargs)
+            model = apps.get_model('questionnaires', model_name)
+            model.objects.create_from_dict(dict=c,
+                                           index=idx,
+                                           errors=errors,
+                                           **kwargs)
 
 
 def create_options(options, question, errors=[]):
@@ -215,26 +208,10 @@ class QuestionnaireManager(models.Manager):
                 instance.filename = json.get('name')
                 instance.title = json.get('title')
                 instance.id_string = json.get('id_string')
-                instance.version = int(
-                    datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4]
-                )
-                instance.md5_hash = self.get_hash(
-                    instance.filename, instance.id_string, instance.version
-                )
 
                 survey = create_survey_element_from_dict(json)
                 xml_form = survey.xml()
                 fix_languages(xml_form)
-                xml_form = xml_form.toxml()
-                # insert version attr into the xform instance root node
-                xml = self.insert_version_attribute(
-                    xml_form, instance.filename, instance.version
-                )
-                name = os.path.join(instance.xml_form.field.upload_to,
-                                    os.path.basename(instance.filename))
-                url = instance.xml_form.storage.save(
-                    '{}.xml'.format(name), xml)
-                instance.xml_form = url
 
                 instance.save()
 
@@ -258,38 +235,31 @@ class QuestionnaireManager(models.Manager):
         except PyXFormError as e:
             raise InvalidXLSForm([str(e)])
 
-    def get_hash(self, filename, id_string, version):
-        string = str(filename) + str(id_string) + str(version)
-        return hashlib.md5(string.encode()).hexdigest()
-
-    def insert_version_attribute(self, xform, root_node, version):
-        ns = {'xf': 'http://www.w3.org/2002/xforms'}
-        root = etree.fromstring(xform)
-        inst = root.find(
-            './/xf:instance/xf:{root_node}'.format(
-                root_node=root_node
-            ), namespaces=ns
-        )
-        inst.set('version', str(version))
-        xml = etree.tostring(
-            root, method='xml', encoding='utf-8', pretty_print=True
-        )
-        return xml
-
 
 class QuestionGroupManager(models.Manager):
 
-    def create_from_dict(self, dict=None, questionnaire=None, errors=[]):
-        instance = self.model(questionnaire=questionnaire)
+    def create_from_dict(self, dict=None, question_group=None,
+                         questionnaire=None, errors=[], index=0):
+        instance = self.model(questionnaire=questionnaire,
+                              question_group=question_group)
+
+        relevant = None
+        bind = dict.get('bind')
+        if bind:
+            relevant = bind.get('relevant', None)
 
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
+        instance.type = dict.get('type')
+        instance.relevant = relevant
+        instance.index = index
         instance.save()
 
         create_children(
             children=dict.get('children'),
             errors=errors,
             project=questionnaire.project,
+            default_language=questionnaire.default_language,
             kwargs={
                 'questionnaire': questionnaire,
                 'question_group': instance
@@ -301,24 +271,27 @@ class QuestionGroupManager(models.Manager):
 
 class QuestionManager(models.Manager):
 
-    def create_from_dict(self, errors=[], **kwargs):
+    def create_from_dict(self, errors=[], index=0, **kwargs):
         dict = kwargs.pop('dict')
         instance = self.model(**kwargs)
         type_dict = {name: code for code, name in instance.TYPE_CHOICES}
 
+        relevant = None
+        required = False
+        bind = dict.get('bind')
+        if bind:
+            relevant = bind.get('relevant', None)
+            required = True if bind.get('required', 'no') == 'yes' else False
+
         instance.type = type_dict[dict.get('type')]
-
-        # try:
-        #     instance.type = type_dict[dict.get('type')]
-        # except KeyError as e:
-        #     errors.append(
-        #         _('{type} is not an accepted question type').format(type=e)
-        #     )
-
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
-        instance.required = dict.get('required', False)
+        instance.required = required
         instance.constraint = dict.get('constraint')
+        instance.default = dict.get('default', None)
+        instance.hint = dict.get('hint', None)
+        instance.relevant = relevant
+        instance.index = index
         instance.save()
 
         if instance.has_options:

@@ -1,3 +1,5 @@
+import hashlib
+from datetime import datetime
 from buckets.fields import S3FileField
 from core.models import RandomIDModel
 from django.db import models
@@ -47,7 +49,7 @@ class Questionnaire(RandomIDModel):
     original_file = models.CharField(max_length=200, null=True)
     project = models.ForeignKey('organization.Project',
                                 related_name='questionnaires')
-    version = models.BigIntegerField(default=1)
+    version = models.BigIntegerField()
     md5_hash = models.CharField(max_length=50, default=False)
 
     objects = managers.QuestionnaireManager()
@@ -79,12 +81,33 @@ class Questionnaire(RandomIDModel):
                        ' project={obj.project.slug}>')
         return repr_string.format(obj=self)
 
+    def save(self, *args, **kwargs):
+        if not self.id and not self.version:
+            self.version = int(
+                datetime.utcnow().strftime('%Y%m%d%H%M%S%f')[:-4])
+
+        if not self.id and not self.md5_hash:
+            string = (str(self.filename) + str(self.id_string) +
+                      str(self.version))
+            self.md5_hash = hashlib.md5(string.encode()).hexdigest()
+
+        return super().save(*args, **kwargs)
+
 
 class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
+    class Meta:
+        ordering = ('index',)
+
     name = models.CharField(max_length=100)
     label_xlat = JSONField(default={})
+    relevant = models.CharField(max_length=100, null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire,
                                       related_name='question_groups')
+    question_group = models.ForeignKey('QuestionGroup',
+                                       related_name='question_groups',
+                                       null=True)
+    type = models.CharField(max_length=50, default='group')
+    index = models.IntegerField(null=True)
 
     objects = managers.QuestionGroupManager()
 
@@ -97,6 +120,9 @@ class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
 
 
 class Question(MultilingualLabelsMixin, RandomIDModel):
+    class Meta:
+        ordering = ('index',)
+
     TYPE_CHOICES = (('IN', 'integer'),
                     ('DE', 'decimal'),
                     ('TX', 'text'),
@@ -129,11 +155,15 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
     label_xlat = JSONField(default={})
     type = models.CharField(max_length=2, choices=TYPE_CHOICES)
     required = models.BooleanField(default=False)
+    default = models.CharField(max_length=100, null=True, blank=True)
+    hint = models.CharField(max_length=2500, null=True, blank=True)
+    relevant = models.CharField(max_length=100, null=True, blank=True)
     constraint = models.CharField(max_length=50, null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire, related_name='questions')
     question_group = models.ForeignKey(QuestionGroup,
                                        related_name='questions',
                                        null=True)
+    index = models.IntegerField(null=True)
 
     objects = managers.QuestionManager()
 

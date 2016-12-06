@@ -9,6 +9,7 @@ from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory, ProjectFactory
+from spatial.tests.factories import SpatialUnitFactory
 from ..views import api
 from ..models import Questionnaire
 from .factories import QuestionnaireFactory
@@ -18,10 +19,6 @@ from .factories import QuestionnaireFactory
 class QuestionnaireDetailTest(APITestCase, UserTestCase,
                               FileStorageTestCase, TestCase):
     view_class = api.QuestionnaireDetail
-
-    def setup_post_data(self):
-        form = self.get_form('xls-form')
-        return {'xls_form': form}
 
     def setup_models(self):
         clause = {
@@ -71,15 +68,16 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
         assert response.status_code == 403
 
     def test_create_questionnaire(self):
-        response = self.request(method='PUT', user=self.user)
+        data = {'xls_form': self.get_form('xls-form')}
+        response = self.request(method='PUT', user=self.user, post_data=data)
         assert response.status_code == 201
-        assert (response.content.get('xls_form') ==
-                self.setup_post_data()['xls_form'])
+        assert response.content.get('xls_form') == data['xls_form']
         assert Questionnaire.objects.filter(project=self.prj).count() == 1
 
     def test_create_questionnaire_with_unauthorized_user(self):
+        data = {'xls_form': self.get_form('xls-form')}
         user = UserFactory.create()
-        response = self.request(method='PUT', user=user)
+        response = self.request(method='PUT', user=user, post_data=data)
         assert response.status_code == 403
         assert Questionnaire.objects.filter(project=self.prj).count() == 0
 
@@ -90,3 +88,50 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
         assert ("Unknown question type 'interger'." in
                 response.content.get('xls_form'))
         assert Questionnaire.objects.filter(project=self.prj).count() == 0
+
+    def test_create_with_blocked_questionnaire_upload(self):
+        data = {'xls_form': self.get_form('xls-form')}
+        SpatialUnitFactory.create(project=self.prj)
+        response = self.request(method='PUT', user=self.user, post_data=data)
+
+        assert response.status_code == 400
+        assert ("Data has already been contributed to this "
+                "project. To ensure data integrity, uploading a "
+                "new questionnaire is diabled for this project." in
+                response.content.get('xls_form'))
+
+    def test_create_valid_questionnaire_from_json(self):
+        data = {
+            'title': 'yx8sqx6488wbc4yysnkrbnfq',
+            'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+            'questions': [{
+                'name': "start",
+                'label': "Start",
+                'type': "ST",
+                'required': False,
+                'constraint': None
+            }, {
+                'name': "end",
+                'label': "end",
+                'type': "EN",
+            }]
+        }
+        response = self.request(method='PUT', post_data=data, user=self.user)
+
+        assert response.status_code == 201
+        assert Questionnaire.objects.filter(project=self.prj).count() == 1
+        assert response.content['title'] == data['title']
+        self.prj.refresh_from_db()
+        assert self.prj.current_questionnaire == response.content['id']
+
+    def test_create_invalid_questionnaire_from_json(self):
+        data = {
+            'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+        }
+        response = self.request(method='PUT', post_data=data, user=self.user)
+
+        assert response.status_code == 400
+        assert Questionnaire.objects.filter(project=self.prj).count() == 0
+        assert response.content['title'] == ['This field is required.']
+        self.prj.refresh_from_db()
+        assert self.prj.current_questionnaire is None
