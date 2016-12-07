@@ -33,27 +33,25 @@
         </div>
         <h3>{% trans "Import data" %}</h3>
         <div class="row">
-            <div class="col-md-3">
-                <ul class="list-unstyled spacing-lg pull-left">
+            <div class="col-md-9">
+                <ul class="list-unstyled spacing-lg">
                     <div class="form-group{% if wizard.form.type.errors %} has-error{% endif %}">
                         <label class="control-label required" for="{{ wizard.form.type.id_for_label }}">{% trans "Select the import file format" %}</label>
                         <li class="radio">
                             <label class="control-label">
                                 <input type="radio" name="select_file-type" id="import_csv" value="csv" {% if wizard.form.type.value == 'csv' %}checked{% endif %}> {% trans "CSV" %}
-                                <small>{% trans "A file in CSV format." %}</small>
                             </label>
                         </li>
                         <li class="radio">
                             <label class="control-label">
                                 <input type="radio" name="select_file-type" id="import_xls" value="xls" {% if wizard.form.type.value == 'xls' %}checked{% endif%}> {% trans "XLSX" %}
-                                <small>{% trans "A file in XLSX spreadsheet format." %}</small>
                             </label>
                         </li>
                     </div>
                 </ul>
             </div>
-            <div class="col-md-6">
-                <ul class="list-unstyled spacing-lg pull-left">
+            <div class="col-md-9">
+                <ul class="list-unstyled spacing-lg">
                     <div class="form-group{% if wizard.form.entity_types.errors %} has-error{% endif %}">
                         <label class="control-label required" for="{{ wizard.form.entity_types.id_for_label }}">{% trans "Select the type of data to import" %}</label>
                         <div class="error-block">
@@ -63,22 +61,20 @@
                             {{ wizard.form.entity_types.values_list }}
                             <label class="control-label" for="id_select_file-entity_types_parties">
                                 <input type="checkbox" id="id_select_file-entity_types_parties" name="select_file-entity_types" type="checkbox" value="PT" data-parsley-multiple="select_file-entity_types" {% if 'PT' in wizard.form.entity_types.value %}checked{% endif %}> {% trans "Party" %}
-                                <small>{% trans "Import party data." %}</small>
+                                <small>{% trans "Includes party information for individuals, groups, corporations." %}</small>
                             </label>
                         </li>
                         <li class="checkbox">
                             <label class="control-label" for="id_select_file-entity_types_locations">
                                 <input type="checkbox" id="id_select_file-entity_types_locations" name="select_file-entity_types" type="checkbox" value="SU" data-parsley-multiple="select_file-entity_types" {% if 'SU' in wizard.form.entity_types.value %}checked{% endif %}> {% trans "Location" %}
-                                <small>{% trans "Import location data." %}</small>
+                                <small>{% trans "Includes spatial information for project locations." %}</small>
                             </label>
                         </li>
                     </div>
                 </ul>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-9">
-                <div class="form-group{% if wizard.form.file.errors %} has-error{% endif %}">
+                <div class="form-group spacing-lg{% if wizard.form.file.errors %} has-error{% endif %}">
                     <label class="control-label required" for="{{ wizard.form.file.id_for_label }}">{% trans "Select the file to import" %}</label>
                     <div class="well file-well">
                         {{ form.file }}
