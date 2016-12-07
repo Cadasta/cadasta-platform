@@ -74,6 +74,6 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
             return Response(
                 {'xls_form': "Data has already been contributed to this "
                              "project. To ensure data integrity, uploading a "
-                             "new questionnaire is diabled for this project."},
+                             "new questionnaire is disabled for this project."},
                 status=status.HTTP_400_BAD_REQUEST)
         return self.create(request)
