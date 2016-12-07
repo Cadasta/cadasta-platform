@@ -28,8 +28,8 @@ class PolicyFactory(factory.django.DjangoModelFactory):
         kwargs['body'] = open(body_file).read()
         return kwargs
 
-    def load_policies(update=False):
-        load.run(force=not update, update=update)
+    def load_policies(force=True):
+        load.run(force)
 
 
 class RoleFactory(factory.django.DjangoModelFactory):
