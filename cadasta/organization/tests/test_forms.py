@@ -43,8 +43,8 @@ class OrganizationTest(UserTestCase, TestCase):
 
     def _save(self, data, count=1):
         form = forms.OrganizationForm(data, user=UserFactory.create())
-        form.save()
         assert form.is_valid() is True
+        form.save()
         assert Organization.objects.count() == count
 
     def test_add_organization(self):
@@ -153,14 +153,15 @@ class OrganizationTest(UserTestCase, TestCase):
                 'tel': '555-5555'
             }]
         )
+
         data = {
             'name': 'New Name',
-            'contacts-TOTAL_FORMS': 3,
+            'contacts-TOTAL_FORMS': 2,
             'contacts-INITIAL_FORMS': 0,
             'contacts-MIN_NUM_FORMS': 0,
             'contacts-MAX_NUM_FORMS': 1000,
             'contacts-0-name': 'User A',
-            'contacts-0-email': 'a@example.com',
+            'contacts-0-email': 'user.a@example.com',
             'contacts-0-tel': '',
             'contacts-0-remove': 'on',
             'contacts-1-name': 'User B',

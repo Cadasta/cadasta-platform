@@ -43,6 +43,8 @@ class ValidateContactTest(TestCase):
             'name': 'This field is required.',
             'email': '\'noemail\' is not a \'email\''
         }
+        print(actual)
+        print(expected)
         assert actual == expected
 
     def test_validate_multiple_contacts(self):
@@ -56,7 +58,6 @@ class ValidateContactTest(TestCase):
         with pytest.raises(ValidationError) as exc:
             validate_contact(value)
 
-        print(exc.value.error_list)
         assert len(exc.value.error_list) == 2
         assert exc.value.error_list[0].messages[0] == (
             '{"name": "' + _("This field is required.") + '"}')

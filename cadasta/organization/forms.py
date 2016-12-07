@@ -12,6 +12,7 @@ from django.contrib.gis import forms as gisforms
 from django.contrib.postgres import forms as pg_forms
 from django.db import transaction
 from django.forms import ValidationError
+from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
 from leaflet.forms.widgets import LeafletWidget
@@ -126,7 +127,7 @@ class OrganizationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
-        super(OrganizationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -137,7 +138,7 @@ class OrganizationForm(forms.ModelForm):
         return name
 
     def save(self, *args, **kwargs):
-        instance = super(OrganizationForm, self).save(commit=False)
+        instance = super().save(commit=False)
         is_create = not instance.id
 
         instance.save()
