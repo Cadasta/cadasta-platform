@@ -97,7 +97,7 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
         assert response.status_code == 400
         assert ("Data has already been contributed to this "
                 "project. To ensure data integrity, uploading a "
-                "new questionnaire is diabled for this project." in
+                "new questionnaire is disabled for this project." in
                 response.content.get('xls_form'))
 
     def test_create_valid_questionnaire_from_json(self):
