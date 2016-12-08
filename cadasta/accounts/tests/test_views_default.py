@@ -8,12 +8,12 @@ from core.tests.utils.cases import UserTestCase
 
 from allauth.account.models import EmailConfirmation, EmailAddress
 
-from ..views.default import AccountProfile, AccountLogin, ConfirmEmail
+from ..views import default
 from ..forms import ProfileForm
 
 
 class ProfileTest(ViewTestCase, UserTestCase, TestCase):
-    view_class = AccountProfile
+    view_class = default.AccountProfile
     template = 'accounts/profile.html'
 
     def setup_template_context(self):
@@ -66,7 +66,7 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
 
 
 class LoginTest(ViewTestCase, UserTestCase, TestCase):
-    view_class = AccountLogin
+    view_class = default.AccountLogin
 
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
@@ -93,7 +93,7 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
 
 
 class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
-    view_class = ConfirmEmail
+    view_class = default.ConfirmEmail
     url_kwargs = {'key': '123'}
 
     def setup_models(self):
