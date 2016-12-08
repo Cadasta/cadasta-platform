@@ -24,7 +24,7 @@
         return false;
       }
     }, 2)
-    .addMessage('userfield', gettext('BLAHHHHH Your password cannot contain your username.'));
+    .addMessage('userfield', gettext('Your password cannot contain your username.'));
 
   // checks email not contained in password when email is another field in form
   window.Parsley
