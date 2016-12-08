@@ -9,7 +9,7 @@ from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
 from resources.models import ContentObject
-from party.models import Party, TenureRelationshipType
+from party.models import Party, TenureRelationshipType, TenureRelationship
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
 from spatial.tests.factories import SpatialUnitFactory
@@ -87,6 +87,24 @@ class PartyTest(UserTestCase, TestCase):
         party.delete()
         assert not ContentObject.objects.filter(
             object_id=party.id, resource=resource).exists()
+
+    def test_detach_deferred_party_resources(self):
+        project = ProjectFactory.create()
+        party = PartyFactory.create(project=project)
+        resource = ResourceFactory.create(project=project)
+        resource.content_objects.create(
+            content_object=party)
+
+        assert ContentObject.objects.filter(
+            object_id=party.id, resource=resource).exists()
+
+        party_deferred = Party.objects.all().defer('attributes')[0]
+        assert resource in party_deferred.resources
+
+        party_deferred.delete()
+        assert not ContentObject.objects.filter(
+            object_id=party.id, resource=resource).exists()
+        assert Party.objects.all().count() == 0
 
 
 class PartyRelationshipTest(UserTestCase, TestCase):
@@ -271,6 +289,25 @@ class TenureRelationshipTest(UserTestCase, TestCase):
         tenure.delete()
         assert not ContentObject.objects.filter(
             object_id=tenure.id, resource=resource).exists()
+
+    def test_detach_deferred_tenure_relationship_resources(self):
+        project = ProjectFactory.create()
+        tenure = TenureRelationshipFactory.create(project=project)
+        resource = ResourceFactory.create(project=project)
+        resource.content_objects.create(
+            content_object=tenure)
+        assert ContentObject.objects.filter(
+            object_id=tenure.id,
+            resource=resource,).exists()
+        tenure_deferred = TenureRelationship.objects.all(
+                                                    ).defer('attributes')[0]
+
+        assert resource in tenure_deferred.resources
+
+        tenure_deferred.delete()
+        assert not ContentObject.objects.filter(
+            object_id=tenure.id, resource=resource).exists()
+        assert TenureRelationship.objects.all().count() == 0
 
 
 class TenureRelationshipTypeTest(UserTestCase, TestCase):

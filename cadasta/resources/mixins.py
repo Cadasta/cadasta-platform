@@ -1,5 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
+from django.dispatch import receiver
+from django.db.models.signals import pre_delete
 
 
 class ResourceModelMixin:
@@ -24,9 +26,14 @@ class ResourceModelMixin:
             del self._resources
 
 
+@receiver(pre_delete)
 def detach_object_resources(sender, instance, **kwargs):
-    for resource in instance.resources:
-        content_object = resource.content_objects.get(
-            object_id=instance.id,
-            resource__project__slug=instance.project.slug)
-        content_object.delete()
+    list_of_models = ('Party', 'TenureRelationship', 'SpatialUnit')
+    sender = sender.__base__ if sender._deferred else sender
+
+    if sender.__name__ in list_of_models:
+        for resource in instance.resources:
+            content_object = resource.content_objects.get(
+                object_id=instance.id,
+                resource__project__slug=instance.project.slug)
+            content_object.delete()

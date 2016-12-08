@@ -8,6 +8,7 @@ from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
 from resources.models import ContentObject
 from party import exceptions
+from spatial.models import SpatialUnit
 from spatial.tests.factories import (SpatialUnitFactory,
                                      SpatialRelationshipFactory)
 
@@ -118,6 +119,24 @@ class SpatialUnitTest(UserTestCase, TestCase):
         su.delete()
         assert not ContentObject.objects.filter(
             object_id=su.id, resource=resource).exists()
+
+    def test_detach_deferred_spatial_unit_resources(self):
+        project = ProjectFactory.create()
+        su = SpatialUnitFactory.create(project=project)
+        resource = ResourceFactory.create(project=project)
+        resource.content_objects.create(
+          content_object=su)
+        assert ContentObject.objects.filter(
+            object_id=su.id,
+            resource=resource,).exists()
+
+        su_deferred = SpatialUnit.objects.all().defer('attributes')[0]
+        assert resource in su_deferred.resources
+
+        su_deferred.delete()
+        assert not ContentObject.objects.filter(
+            object_id=su.id, resource=resource).exists()
+        assert SpatialUnit.objects.all().count() == 0
 
 
 class SpatialRelationshipTest(UserTestCase, TestCase):
