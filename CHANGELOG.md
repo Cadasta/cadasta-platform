@@ -1,5 +1,38 @@
 # Change Log
 
+## [Unreleased](https://github.com/Cadasta/cadasta-platform/tree/HEAD)
+
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.3...HEAD)
+
+**Fixed bugs:**
+
+- Typo [\#979](https://github.com/Cadasta/cadasta-platform/issues/979)
+
+**Closed issues:**
+
+- Broken password for demo users [\#985](https://github.com/Cadasta/cadasta-platform/issues/985)
+- Updating questionnaires via the API [\#686](https://github.com/Cadasta/cadasta-platform/issues/686)
+
+## [v1.3.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.3) (2016-12-08)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.2...v1.3.0-alpha.3)
+
+**Fixed bugs:**
+
+- Broken password reset on staging  [\#984](https://github.com/Cadasta/cadasta-platform/issues/984)
+- Data Collector User Can't Download Forms [\#978](https://github.com/Cadasta/cadasta-platform/issues/978)
+- XForms missing constraints and default values [\#969](https://github.com/Cadasta/cadasta-platform/issues/969)
+- Refine user messaging and flow for anonymous users [\#677](https://github.com/Cadasta/cadasta-platform/issues/677)
+
+**Merged pull requests:**
+
+- Fix \#984 -- Remove client-side validation [\#988](https://github.com/Cadasta/cadasta-platform/pull/988) ([oliverroick](https://github.com/oliverroick))
+- Populate new question and group fields [\#987](https://github.com/Cadasta/cadasta-platform/pull/987) ([oliverroick](https://github.com/oliverroick))
+- Fix error message text [\#986](https://github.com/Cadasta/cadasta-platform/pull/986) ([clash99](https://github.com/clash99))
+- Fixed misspelling [\#981](https://github.com/Cadasta/cadasta-platform/pull/981) ([clash99](https://github.com/clash99))
+- Loadpolicies bugfix & provisioning [\#980](https://github.com/Cadasta/cadasta-platform/pull/980) ([amplifi](https://github.com/amplifi))
+- detach\_object\_resources now works for deferred objects [\#974](https://github.com/Cadasta/cadasta-platform/pull/974) ([linzjax](https://github.com/linzjax))
+- Update changelog for staging release [\#968](https://github.com/Cadasta/cadasta-platform/pull/968) ([amplifi](https://github.com/amplifi))
+
 ## [v1.3.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.2) (2016-12-06)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.1...v1.3.0-alpha.2)
 
