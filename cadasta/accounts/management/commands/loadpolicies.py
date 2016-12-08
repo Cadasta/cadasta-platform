@@ -13,11 +13,5 @@ class Command(BaseCommand):
             dest='force',
             default=False)
 
-        parser.add_argument(
-            '--update',
-            action='store_true',
-            dest='update',
-            default=False)
-
     def handle(self, *args, **options):
-        load.run(force=options['force'], update=options['update'])
+        load.run(force=options['force'])

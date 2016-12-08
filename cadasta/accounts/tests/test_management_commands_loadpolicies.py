@@ -25,10 +25,10 @@ class LoadPoliciesTest(TestCase):
         call_command('loadpolicies')
         assert accounts.load.run.call_count == 1
         assert accounts.load.run.args == ()
-        assert accounts.load.run.kwargs == {'force': False, 'update': False}
+        assert accounts.load.run.kwargs == {'force': False}
 
     def test_command_with_args(self):
-        call_command('loadpolicies', force=True, update=True)
+        call_command('loadpolicies', force=True)
         assert accounts.load.run.call_count == 1
         assert accounts.load.run.args == ()
-        assert accounts.load.run.kwargs == {'force': True, 'update': True}
+        assert accounts.load.run.kwargs == {'force': True}
