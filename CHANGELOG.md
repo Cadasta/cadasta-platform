@@ -1,18 +1,5 @@
 # Change Log
 
-## [Unreleased](https://github.com/Cadasta/cadasta-platform/tree/HEAD)
-
-[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.3...HEAD)
-
-**Fixed bugs:**
-
-- Typo [\#979](https://github.com/Cadasta/cadasta-platform/issues/979)
-
-**Closed issues:**
-
-- Broken password for demo users [\#985](https://github.com/Cadasta/cadasta-platform/issues/985)
-- Updating questionnaires via the API [\#686](https://github.com/Cadasta/cadasta-platform/issues/686)
-
 ## [v1.3.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.3) (2016-12-08)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.2...v1.3.0-alpha.3)
 
