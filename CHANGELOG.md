@@ -1,5 +1,25 @@
 # Change Log
 
+## [v1.3.0-alpha.4](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.4) (2016-12-09)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.3...v1.3.0-alpha.4)
+
+**Fixed bugs:**
+
+- Typo [\#979](https://github.com/Cadasta/cadasta-platform/issues/979)
+
+**Closed issues:**
+
+- Broken password for demo users [\#985](https://github.com/Cadasta/cadasta-platform/issues/985)
+- Malformed error message during import when a required attribute is missing [\#970](https://github.com/Cadasta/cadasta-platform/issues/970)
+- Updating questionnaires via the API [\#686](https://github.com/Cadasta/cadasta-platform/issues/686)
+
+**Merged pull requests:**
+
+- Parties detail page - updated left nav tab on [\#995](https://github.com/Cadasta/cadasta-platform/pull/995) ([clash99](https://github.com/clash99))
+- Update changelog for v1.3.0-alpha.3 [\#992](https://github.com/Cadasta/cadasta-platform/pull/992) ([amplifi](https://github.com/amplifi))
+- Fix for \#970 [\#991](https://github.com/Cadasta/cadasta-platform/pull/991) ([bjohare](https://github.com/bjohare))
+- Project data import ui changes [\#989](https://github.com/Cadasta/cadasta-platform/pull/989) ([clash99](https://github.com/clash99))
+
 ## [v1.3.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.3) (2016-12-08)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.2...v1.3.0-alpha.3)
 
