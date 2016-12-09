@@ -11,6 +11,7 @@ from core.tests.utils.files import make_dirs  # noqa
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.exceptions import InvalidXLSForm
 from questionnaires.tests.factories import QuestionnaireFactory
 from resources.tests.factories import ResourceFactory
@@ -215,6 +216,7 @@ class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 
 
 class EditOrganizationMemberFormTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -385,6 +387,7 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
 
 
 class EditOrganizationMemberProjectPermissionForm(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create()
@@ -412,7 +415,7 @@ class EditOrganizationMemberProjectPermissionForm(UserTestCase, TestCase):
             self.prj_2.id: 'PU',
             self.prj_3.id: 'Pb',
             self.prj_4.id: 'Pb'
-            }
+        }
 
         form = forms.EditOrganizationMemberProjectPermissionForm(
             self.org, self.org_member, self.user, data,)
@@ -1146,6 +1149,11 @@ class DownloadFormTest(UserTestCase, TestCase):
         data = {'type': 'shp'}
         user = UserFactory.create()
         project = ProjectFactory.create()
+        geometry = 'SRID=4326;POINT (30 10)'
+        su = SpatialUnitFactory.create(project=project, geometry=geometry)
+        party = PartyFactory.create(project=project)
+        TenureRelationshipFactory.create(
+            spatial_unit=su, party=party, project=project)
         form = forms.DownloadForm(project, user, data=data)
         assert form.is_valid() is True
         path, mime = form.get_file()
