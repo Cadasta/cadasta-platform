@@ -40,6 +40,11 @@ class LocationForm(AttributeModelForm):
         self.project = project
         self.add_attribute_fields()
 
+        if self.project.current_questionnaire:
+            self.set_standard_field('location_type',
+                                    _('Please select a location type'),
+                                    field_name='type')
+
     def save(self, *args, **kwargs):
         entity_type = self.cleaned_data['type']
         kwargs['entity_type'] = entity_type
@@ -60,16 +65,26 @@ class TenureRelationshipForm(AttributeForm):
 
     def __init__(self, project, spatial_unit, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.project = project
+
         self.fields['id'].widget = SelectPartyWidget(project.id)
         self.fields['party_type'].choices = (
-            [('', _("Please select a party type"))] +
-            list(Party.TYPE_CHOICES))
+            [('', _("Please select a party type"))] + list(Party.TYPE_CHOICES))
         self.fields['tenure_type'].choices = (
             [('', _("Please select a relationship type"))] +
             sorted([
                 (choice[0], _(choice[1])) for choice in
                 TenureRelationshipType.objects.values_list('id', 'label')]))
-        self.project = project
+
+        if self.project.current_questionnaire:
+            self.set_standard_field('party_name',
+                                    _('Please select a party type'),
+                                    field_name='name')
+            self.set_standard_field('party_type',
+                                    _('Please select a party type'))
+            self.set_standard_field('tenure_type',
+                                    _('Please select a relationship type'))
+
         self.spatial_unit = spatial_unit
         self.party_ct = ContentType.objects.get(
             app_label='party', model='party')

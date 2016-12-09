@@ -8,6 +8,7 @@ from tutelary.models import Role, check_perms
 
 from core.views.mixins import SuperUserCheckMixin
 from ..models import Organization, Project, OrganizationRole, ProjectRole
+from questionnaires.models import Questionnaire
 
 
 class OrganizationMixin:
@@ -113,7 +114,25 @@ class ProjectMixin:
 
     def get_context_data(self, *args, **kwargs):
         prj_member = self.is_administrator or self.get_prj_role() is not None
+        project = self.get_project()
+
+        form_lang_default = None
+        form_langs = []
+
+        if project.current_questionnaire:
+            q = Questionnaire.objects.get(id=project.current_questionnaire)
+            form_lang_default = q.default_language
+            question = q.questions.filter(~Q(label_xlat={})).first()
+
+            if (question and isinstance(question.label_xlat, dict)):
+                form_langs = sorted([(l, settings.FORM_LANGS.get(l))
+                                     for l in question.label_xlat.keys()],
+                                    key=lambda x: x[1])
+
         return super().get_context_data(is_project_member=prj_member,
+                                        form_lang_default=form_lang_default,
+                                        form_langs=sorted(form_langs,
+                                                          key=lambda x: x[1]),
                                         *args, **kwargs)
 
 

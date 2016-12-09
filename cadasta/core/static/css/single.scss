@@ -36,7 +36,7 @@
     text-shadow: 1px 1px 3px rgba(0,0,0,.2);
     max-width: 80%;
     &.short { // provides room for admin buttons on right
-      width: 60%;
+      width: 50%;
     }
     .org-name {
       font-size: 14px;
@@ -50,13 +50,21 @@
   }
 }
 
+@media (min-width: $screen-md-min) {
+  .page-header { // navy band on index pages
+    .page-title h1, .page-title h2 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 500px;
+    }
+  }
+}
+
 @media (max-width: $screen-sm-max) {
   .page-header {
     padding-top: 24px;
   }
-}
-
-@media (max-width: $screen-xs-max) {
   .page-title h1, .page-title h2, h1, h2 {
     font-size: 1.8em;
   }
@@ -68,13 +76,15 @@
   }
 }
 
-@media (min-width: $screen-md-min) {
-  .page-header { // navy band on index pages
-    .page-title h1, .page-title h2 {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+@media (max-width: $screen-xs-max) {
+  .page-title h1, .page-title h2, h1, h2 {
+    font-size: 1.4em;
+  }
+  .page-title h2, h2 {
+    font-size: 1.2em;
+  }
+  h3 {
+    font-size: 1.0em;
   }
 }
 
@@ -83,12 +93,14 @@
 
 #project-single .page-header,
 #organization-single .page-header { // navy band on pages for single project or organization
+  display: table;
   background: $brand-darkblue;
   height: 110px;
   min-height: 110px;
   border-bottom: solid 1px #fff;
   margin: 0;
-  padding-top: 18px;
+  padding-top: 0;
+  padding-bottom: 0;
   position: fixed;
   top: $header-height;
   z-index: 999;
@@ -99,43 +111,38 @@
       color: #fff;
     }
   }
-  .index-link {
-    padding: 4px 10px;
-    margin-right: 10px;
-    border: 1px solid $brand-lightblue;
-    border-radius: 8px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: 0;
-    position: absolute;
-    top: 55px;
-    display: inline-block;
-    &:hover,
-    &:focus {
-      @include button-variant(#fff, lighten($btn-blue-bg, 5%), #fff);
-      transition: all 0.3s ease 0s;
-    }
-  }
   .page-title {
+    display: table-row;
     padding-top: 14px;
     padding-bottom: 8px;
-  }
-  h1, h2 {
-    margin-left: 54px;
-    padding-bottom: 8px;
-  }
-  .top-btn {
-    margin-top: 18px;
-  }
-  .btn-add {
-    margin-right: 14px;
-  }
-}
-
-#organization-single .page-header {
-  padding-top: 35px; // offset to match project
-  .top-btn {
-    margin-top: 1px;
+    > div {
+      display: table-cell;
+      vertical-align: middle;  
+    }
+    .index-link {
+      padding: 4px 10px;
+      margin-right: 10px;
+      border: 1px solid $brand-lightblue;
+      border-radius: 8px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+      &:hover,
+      &:focus {
+        @include button-variant(#fff, lighten($btn-blue-bg, 5%), #fff);
+        transition: all 0.3s ease 0s;
+      }
+    }
+    h1, h2 {
+      display: table-cell;
+      vertical-align: middle;
+    }
+    .top-btn {
+      vertical-align: middle;
+      .btn-add {
+        margin-right: 14px;
+      }
+    }
   }
 }
 
@@ -144,7 +151,7 @@
   #organization-single .page-header {
     overflow: visible;
     padding-top: 8px;
-    padding-bottom: 0;
+    padding-bottom: 8px;
     border-bottom: solid 1px $brand-darkerblue;
     margin-top: 0;
     margin-bottom: 0;
@@ -155,7 +162,7 @@
       height: 36px;
     }
     h1, h2 {
-        margin-left: 14px;
+        padding-left: 14px;
     }
   }
   #project-single .page-header .page-title,

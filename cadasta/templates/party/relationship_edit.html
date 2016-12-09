@@ -42,14 +42,14 @@
       <div class="panel-body">
         <h4>{% trans "Details" %}</h4>
         <div class="clearfix form-group{% if form.tenure_type.errors %} has-error{% endif %}">
-          <label class="control-label" for="{{ form.tenure_type.id_for_label }}">{% trans "Relationship type" %}</label>
+          <label class="control-label" for="{{ form.tenure_type.id_for_label }}" {{ form.tenure_type.field.labels_xlang|safe }}>{% trans "Relationship type" %}</label>
           {% render_field form.tenure_type class+="form-control" data-parsley-required="true" %}
           <div class="error-block">{{ form.tenure_type.errors }}</div>
         </div>
         {% for field in form %}
           {% if "tenurerelationship::" in field.name %}
           <div class="clearfix form-group{% if field.errors %} has-error{% endif %}">
-            <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <label class="control-label" for="{{ field.id_for_label }}" {{ field.field.labels_xlang|safe }}>{{ field.label }}</label>
             {% if field|field_type == "datefield" %}
               {{ field|add_class:"form-control datepicker"|set_parsley_required }}
             {% else %}

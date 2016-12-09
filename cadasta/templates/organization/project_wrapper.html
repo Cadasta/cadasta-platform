@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block top-nav %}project-single{% endblock %}
 
@@ -13,9 +14,11 @@
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'project:list' %}">
-      <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-    </a>
+    <div>
+      <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'project:list' %}">
+        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+      </a>
+    </div>
     <h1 class="{% if is_administrator or is_allowed_add_location or is_allowed_add_resource %}short{% endif %}">
       <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">
         {{ object.organization.name }}
@@ -27,17 +30,29 @@
       </span>
       {% endif %}
     </h1>
-    <div class="top-btn pull-right">
+    <div class="top-btn">
 
-      <!-- More options menu -->
+      <!-- Project translation dropdown-->
+      {% if form_langs %}
+      <div class="langs-select form-group pull-right">
+        <label class="control-label sr-only" for="form-langs-select">Language for project fields</label>
+        <select id="form-langs-select" class="form-control">
+          {% for lang in form_langs %}
+          <option value="{{ lang.0 }}" {% if lang.0 == form_lang_default %}selected{% endif %}>{{ lang.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% endif %}
+
+      <!-- More actions menu -->
       {% if is_administrator %}
       <div class="dropdown pull-right btn-add">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
         </a>
         <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
-          <div class="visible-md-inline visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
-          <div class="visible-sm-inline">{% trans "More" %} <span class="caret"></span></div>   
+          <div class="visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
+          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>   
         </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
@@ -58,6 +73,7 @@
       </div>
       {% endif %}
 
+      <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
         <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">
@@ -76,6 +92,7 @@
         </ul>
         {% endif %}
       </div>
+
       <!-- Single add button for smaller screens-->
       <div class="dropdown pull-right visible-xs-inline">
         {% if is_allowed_add_location or is_allowed_add_resource %}
@@ -94,11 +111,17 @@
           <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
-      </div>
+      </div>      
+
     </div>
   </div>
 </div>
 <!-- / single project header -->
+{% endblock %}
+
+{% block extra_script %}
+{{ block.super }}
+<script type="text/javascript" src="{% static 'js/xlang.js' %}"></script>
 {% endblock %}
 
 {% block sub-nav %}

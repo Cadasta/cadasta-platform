@@ -183,7 +183,8 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=True)
 
 
-class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
+class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
+                           TestCase):
     view_class = default.ProjectDashboard
     template = 'organization/project_dashboard.html'
 
@@ -429,6 +430,21 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert "<div class=\"num\">1</div> location" in response.content
         assert "<div class=\"num\">1</div> party" in response.content
         assert "<div class=\"num\">1</div> resource" in response.content
+
+    def test_get_with_labels(self):
+        file = self.get_file(
+            '/questionnaires/tests/files/ok-multilingual.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form.xlsx', file)
+        Questionnaire.objects.create_from_form(
+            xls_form=form,
+            original_file='original.xls',
+            project=self.project
+        )
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('fr', 'French')])
 
 
 @pytest.mark.usefixtures('make_dirs')
@@ -707,7 +723,6 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         assert extents_response.status_code == 200
         form = extents_response.context_data['form']
-        print(str(form.fields))
         assert len(form.fields['organization'].choices) == 3
         assert form.fields['organization'].choices[0] == (
             '', "Please select an organization")
@@ -928,7 +943,6 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         'name': 'New Name',
         'description': 'New Description',
         'urls': '',
-        'questionnaire': '',
         'contacts-TOTAL_FORMS': 1,
         'contacts-INITIAL_FORMS': 0,
         'contacts-0-name': '',
@@ -1027,7 +1041,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
-        response = self.request(user=user, method='POST')
+        response = self.request(user=user, method='POST',
+                                post_data={'questionnaire': ''})
 
         assert response.status_code == 302
         assert self.expected_success_url in response.location
@@ -1040,7 +1055,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
         assign_policies(user)
-        response = self.request(user=user, method='POST')
+        response = self.request(user=user, method='POST',
+                                post_data={'questionnaire': ''})
 
         assert response.status_code == 200
         self.project.refresh_from_db()
@@ -1052,8 +1068,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
         assign_policies(user)
-        response = self.request(user=user, method='POST',
-                                post_data={'questionnaire': None})
+        response = self.request(user=user, method='POST')
 
         assert response.status_code == 302
         assert self.expected_success_url in response.location

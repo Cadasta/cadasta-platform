@@ -4880,7 +4880,7 @@ ul.resource-actions > li {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
     max-width: 80%; }
     .page-title h1.short, .page-title h2.short {
-      width: 60%; }
+      width: 50%; }
     .page-title h1 .org-name, .page-title h2 .org-name {
       font-size: 14px;
       display: block;
@@ -4889,11 +4889,16 @@ ul.resource-actions > li {
     .page-title h1 a, .page-title h2 a {
       color: #a3b7e5; }
 
+@media (min-width: 992px) {
+  .page-header .page-title h1, .page-header .page-title h2 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 500px; } }
+
 @media (max-width: 991px) {
   .page-header {
-    padding-top: 24px; } }
-
-@media (max-width: 767px) {
+    padding-top: 24px; }
   .page-title h1, .page-title h2, h1, h2 {
     font-size: 1.8em; }
   .page-title h2, h2 {
@@ -4901,22 +4906,26 @@ ul.resource-actions > li {
   h3 {
     font-size: 1.4em; } }
 
-@media (min-width: 992px) {
-  .page-header .page-title h1, .page-header .page-title h2 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; } }
+@media (max-width: 767px) {
+  .page-title h1, .page-title h2, h1, h2 {
+    font-size: 1.4em; }
+  .page-title h2, h2 {
+    font-size: 1.2em; }
+  h3 {
+    font-size: 1.0em; } }
 
 /* =Page header single project or organizations
 -------------------------------------------------------------- */
 #project-single .page-header,
 #organization-single .page-header {
+  display: table;
   background: #0e305e;
   height: 110px;
   min-height: 110px;
   border-bottom: solid 1px #fff;
   margin: 0;
-  padding-top: 18px;
+  padding-top: 0;
+  padding-bottom: 0;
   position: fixed;
   top: 70px;
   z-index: 999; }
@@ -4927,164 +4936,161 @@ ul.resource-actions > li {
     #organization-single .page-header div > a:hover,
     #organization-single .page-header div > a:focus {
       color: #fff; }
-  #project-single .page-header .index-link,
-  #organization-single .page-header .index-link {
-    padding: 4px 10px;
-    margin-right: 10px;
-    border: 1px solid #a3b7e5;
-    border-radius: 8px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: 0;
-    position: absolute;
-    top: 55px;
-    display: inline-block; }
-    #project-single .page-header .index-link:hover, #project-single .page-header .index-link:focus,
-    #organization-single .page-header .index-link:hover,
-    #organization-single .page-header .index-link:focus {
-      color: #fff;
-      background-color: #345bb7;
-      border-color: #fff;
-      transition: all 0.3s ease 0s; }
-      #project-single .page-header .index-link:hover:focus, #project-single .page-header .index-link:hover.focus, #project-single .page-header .index-link:focus:focus, #project-single .page-header .index-link:focus.focus,
-      #organization-single .page-header .index-link:hover:focus,
-      #organization-single .page-header .index-link:hover.focus,
-      #organization-single .page-header .index-link:focus:focus,
-      #organization-single .page-header .index-link:focus.focus {
-        color: #fff;
-        background-color: #28478f;
-        border-color: #bfbfbf; }
-      #project-single .page-header .index-link:hover:hover, #project-single .page-header .index-link:focus:hover,
-      #organization-single .page-header .index-link:hover:hover,
-      #organization-single .page-header .index-link:focus:hover {
-        color: #fff;
-        background-color: #28478f;
-        border-color: #e0e0e0; }
-      #project-single .page-header .index-link:hover:active, #project-single .page-header .index-link:hover.active,
-      .open > #project-single .page-header .index-link:hover.dropdown-toggle, #project-single .page-header .index-link:focus:active, #project-single .page-header .index-link:focus.active,
-      .open > #project-single .page-header .index-link:focus.dropdown-toggle,
-      #organization-single .page-header .index-link:hover:active,
-      #organization-single .page-header .index-link:hover.active,
-      .open >
-      #organization-single .page-header .index-link:hover.dropdown-toggle,
-      #organization-single .page-header .index-link:focus:active,
-      #organization-single .page-header .index-link:focus.active,
-      .open >
-      #organization-single .page-header .index-link:focus.dropdown-toggle {
-        color: #fff;
-        background-color: #28478f;
-        border-color: #e0e0e0; }
-        #project-single .page-header .index-link:hover:active:hover, #project-single .page-header .index-link:hover:active:focus, #project-single .page-header .index-link:hover:active.focus, #project-single .page-header .index-link:hover.active:hover, #project-single .page-header .index-link:hover.active:focus, #project-single .page-header .index-link:hover.active.focus,
-        .open > #project-single .page-header .index-link:hover.dropdown-toggle:hover,
-        .open > #project-single .page-header .index-link:hover.dropdown-toggle:focus,
-        .open > #project-single .page-header .index-link:hover.dropdown-toggle.focus, #project-single .page-header .index-link:focus:active:hover, #project-single .page-header .index-link:focus:active:focus, #project-single .page-header .index-link:focus:active.focus, #project-single .page-header .index-link:focus.active:hover, #project-single .page-header .index-link:focus.active:focus, #project-single .page-header .index-link:focus.active.focus,
-        .open > #project-single .page-header .index-link:focus.dropdown-toggle:hover,
-        .open > #project-single .page-header .index-link:focus.dropdown-toggle:focus,
-        .open > #project-single .page-header .index-link:focus.dropdown-toggle.focus,
-        #organization-single .page-header .index-link:hover:active:hover,
-        #organization-single .page-header .index-link:hover:active:focus,
-        #organization-single .page-header .index-link:hover:active.focus,
-        #organization-single .page-header .index-link:hover.active:hover,
-        #organization-single .page-header .index-link:hover.active:focus,
-        #organization-single .page-header .index-link:hover.active.focus,
-        .open >
-        #organization-single .page-header .index-link:hover.dropdown-toggle:hover,
-        .open >
-        #organization-single .page-header .index-link:hover.dropdown-toggle:focus,
-        .open >
-        #organization-single .page-header .index-link:hover.dropdown-toggle.focus,
-        #organization-single .page-header .index-link:focus:active:hover,
-        #organization-single .page-header .index-link:focus:active:focus,
-        #organization-single .page-header .index-link:focus:active.focus,
-        #organization-single .page-header .index-link:focus.active:hover,
-        #organization-single .page-header .index-link:focus.active:focus,
-        #organization-single .page-header .index-link:focus.active.focus,
-        .open >
-        #organization-single .page-header .index-link:focus.dropdown-toggle:hover,
-        .open >
-        #organization-single .page-header .index-link:focus.dropdown-toggle:focus,
-        .open >
-        #organization-single .page-header .index-link:focus.dropdown-toggle.focus {
-          color: #fff;
-          background-color: #213973;
-          border-color: #bfbfbf; }
-      #project-single .page-header .index-link:hover:active, #project-single .page-header .index-link:hover.active,
-      .open > #project-single .page-header .index-link:hover.dropdown-toggle, #project-single .page-header .index-link:focus:active, #project-single .page-header .index-link:focus.active,
-      .open > #project-single .page-header .index-link:focus.dropdown-toggle,
-      #organization-single .page-header .index-link:hover:active,
-      #organization-single .page-header .index-link:hover.active,
-      .open >
-      #organization-single .page-header .index-link:hover.dropdown-toggle,
-      #organization-single .page-header .index-link:focus:active,
-      #organization-single .page-header .index-link:focus.active,
-      .open >
-      #organization-single .page-header .index-link:focus.dropdown-toggle {
-        background-image: none; }
-      #project-single .page-header .index-link:hover.disabled:hover, #project-single .page-header .index-link:hover.disabled:focus, #project-single .page-header .index-link:hover.disabled.focus, #project-single .page-header .index-link:hover[disabled]:hover, #project-single .page-header .index-link:hover[disabled]:focus, #project-single .page-header .index-link:hover[disabled].focus,
-      fieldset[disabled] #project-single .page-header .index-link:hover:hover,
-      fieldset[disabled] #project-single .page-header .index-link:hover:focus,
-      fieldset[disabled] #project-single .page-header .index-link:hover.focus, #project-single .page-header .index-link:focus.disabled:hover, #project-single .page-header .index-link:focus.disabled:focus, #project-single .page-header .index-link:focus.disabled.focus, #project-single .page-header .index-link:focus[disabled]:hover, #project-single .page-header .index-link:focus[disabled]:focus, #project-single .page-header .index-link:focus[disabled].focus,
-      fieldset[disabled] #project-single .page-header .index-link:focus:hover,
-      fieldset[disabled] #project-single .page-header .index-link:focus:focus,
-      fieldset[disabled] #project-single .page-header .index-link:focus.focus,
-      #organization-single .page-header .index-link:hover.disabled:hover,
-      #organization-single .page-header .index-link:hover.disabled:focus,
-      #organization-single .page-header .index-link:hover.disabled.focus,
-      #organization-single .page-header .index-link:hover[disabled]:hover,
-      #organization-single .page-header .index-link:hover[disabled]:focus,
-      #organization-single .page-header .index-link:hover[disabled].focus,
-      fieldset[disabled]
-      #organization-single .page-header .index-link:hover:hover,
-      fieldset[disabled]
-      #organization-single .page-header .index-link:hover:focus,
-      fieldset[disabled]
-      #organization-single .page-header .index-link:hover.focus,
-      #organization-single .page-header .index-link:focus.disabled:hover,
-      #organization-single .page-header .index-link:focus.disabled:focus,
-      #organization-single .page-header .index-link:focus.disabled.focus,
-      #organization-single .page-header .index-link:focus[disabled]:hover,
-      #organization-single .page-header .index-link:focus[disabled]:focus,
-      #organization-single .page-header .index-link:focus[disabled].focus,
-      fieldset[disabled]
-      #organization-single .page-header .index-link:focus:hover,
-      fieldset[disabled]
-      #organization-single .page-header .index-link:focus:focus,
-      fieldset[disabled]
-      #organization-single .page-header .index-link:focus.focus {
-        background-color: #345bb7;
-        border-color: #fff; }
-      #project-single .page-header .index-link:hover .badge, #project-single .page-header .index-link:focus .badge,
-      #organization-single .page-header .index-link:hover .badge,
-      #organization-single .page-header .index-link:focus .badge {
-        color: #345bb7;
-        background-color: #fff; }
   #project-single .page-header .page-title,
   #organization-single .page-header .page-title {
+    display: table-row;
     padding-top: 14px;
     padding-bottom: 8px; }
-  #project-single .page-header h1, #project-single .page-header h2,
-  #organization-single .page-header h1,
-  #organization-single .page-header h2 {
-    margin-left: 54px;
-    padding-bottom: 8px; }
-  #project-single .page-header .top-btn,
-  #organization-single .page-header .top-btn {
-    margin-top: 18px; }
-  #project-single .page-header .btn-add,
-  #organization-single .page-header .btn-add {
-    margin-right: 14px; }
-
-#organization-single .page-header {
-  padding-top: 35px; }
-  #organization-single .page-header .top-btn {
-    margin-top: 1px; }
+    #project-single .page-header .page-title > div,
+    #organization-single .page-header .page-title > div {
+      display: table-cell;
+      vertical-align: middle; }
+    #project-single .page-header .page-title .index-link,
+    #organization-single .page-header .page-title .index-link {
+      padding: 4px 10px;
+      margin-right: 10px;
+      border: 1px solid #a3b7e5;
+      border-radius: 8px;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0; }
+      #project-single .page-header .page-title .index-link:hover, #project-single .page-header .page-title .index-link:focus,
+      #organization-single .page-header .page-title .index-link:hover,
+      #organization-single .page-header .page-title .index-link:focus {
+        color: #fff;
+        background-color: #345bb7;
+        border-color: #fff;
+        transition: all 0.3s ease 0s; }
+        #project-single .page-header .page-title .index-link:hover:focus, #project-single .page-header .page-title .index-link:hover.focus, #project-single .page-header .page-title .index-link:focus:focus, #project-single .page-header .page-title .index-link:focus.focus,
+        #organization-single .page-header .page-title .index-link:hover:focus,
+        #organization-single .page-header .page-title .index-link:hover.focus,
+        #organization-single .page-header .page-title .index-link:focus:focus,
+        #organization-single .page-header .page-title .index-link:focus.focus {
+          color: #fff;
+          background-color: #28478f;
+          border-color: #bfbfbf; }
+        #project-single .page-header .page-title .index-link:hover:hover, #project-single .page-header .page-title .index-link:focus:hover,
+        #organization-single .page-header .page-title .index-link:hover:hover,
+        #organization-single .page-header .page-title .index-link:focus:hover {
+          color: #fff;
+          background-color: #28478f;
+          border-color: #e0e0e0; }
+        #project-single .page-header .page-title .index-link:hover:active, #project-single .page-header .page-title .index-link:hover.active,
+        .open > #project-single .page-header .page-title .index-link:hover.dropdown-toggle, #project-single .page-header .page-title .index-link:focus:active, #project-single .page-header .page-title .index-link:focus.active,
+        .open > #project-single .page-header .page-title .index-link:focus.dropdown-toggle,
+        #organization-single .page-header .page-title .index-link:hover:active,
+        #organization-single .page-header .page-title .index-link:hover.active,
+        .open >
+        #organization-single .page-header .page-title .index-link:hover.dropdown-toggle,
+        #organization-single .page-header .page-title .index-link:focus:active,
+        #organization-single .page-header .page-title .index-link:focus.active,
+        .open >
+        #organization-single .page-header .page-title .index-link:focus.dropdown-toggle {
+          color: #fff;
+          background-color: #28478f;
+          border-color: #e0e0e0; }
+          #project-single .page-header .page-title .index-link:hover:active:hover, #project-single .page-header .page-title .index-link:hover:active:focus, #project-single .page-header .page-title .index-link:hover:active.focus, #project-single .page-header .page-title .index-link:hover.active:hover, #project-single .page-header .page-title .index-link:hover.active:focus, #project-single .page-header .page-title .index-link:hover.active.focus,
+          .open > #project-single .page-header .page-title .index-link:hover.dropdown-toggle:hover,
+          .open > #project-single .page-header .page-title .index-link:hover.dropdown-toggle:focus,
+          .open > #project-single .page-header .page-title .index-link:hover.dropdown-toggle.focus, #project-single .page-header .page-title .index-link:focus:active:hover, #project-single .page-header .page-title .index-link:focus:active:focus, #project-single .page-header .page-title .index-link:focus:active.focus, #project-single .page-header .page-title .index-link:focus.active:hover, #project-single .page-header .page-title .index-link:focus.active:focus, #project-single .page-header .page-title .index-link:focus.active.focus,
+          .open > #project-single .page-header .page-title .index-link:focus.dropdown-toggle:hover,
+          .open > #project-single .page-header .page-title .index-link:focus.dropdown-toggle:focus,
+          .open > #project-single .page-header .page-title .index-link:focus.dropdown-toggle.focus,
+          #organization-single .page-header .page-title .index-link:hover:active:hover,
+          #organization-single .page-header .page-title .index-link:hover:active:focus,
+          #organization-single .page-header .page-title .index-link:hover:active.focus,
+          #organization-single .page-header .page-title .index-link:hover.active:hover,
+          #organization-single .page-header .page-title .index-link:hover.active:focus,
+          #organization-single .page-header .page-title .index-link:hover.active.focus,
+          .open >
+          #organization-single .page-header .page-title .index-link:hover.dropdown-toggle:hover,
+          .open >
+          #organization-single .page-header .page-title .index-link:hover.dropdown-toggle:focus,
+          .open >
+          #organization-single .page-header .page-title .index-link:hover.dropdown-toggle.focus,
+          #organization-single .page-header .page-title .index-link:focus:active:hover,
+          #organization-single .page-header .page-title .index-link:focus:active:focus,
+          #organization-single .page-header .page-title .index-link:focus:active.focus,
+          #organization-single .page-header .page-title .index-link:focus.active:hover,
+          #organization-single .page-header .page-title .index-link:focus.active:focus,
+          #organization-single .page-header .page-title .index-link:focus.active.focus,
+          .open >
+          #organization-single .page-header .page-title .index-link:focus.dropdown-toggle:hover,
+          .open >
+          #organization-single .page-header .page-title .index-link:focus.dropdown-toggle:focus,
+          .open >
+          #organization-single .page-header .page-title .index-link:focus.dropdown-toggle.focus {
+            color: #fff;
+            background-color: #213973;
+            border-color: #bfbfbf; }
+        #project-single .page-header .page-title .index-link:hover:active, #project-single .page-header .page-title .index-link:hover.active,
+        .open > #project-single .page-header .page-title .index-link:hover.dropdown-toggle, #project-single .page-header .page-title .index-link:focus:active, #project-single .page-header .page-title .index-link:focus.active,
+        .open > #project-single .page-header .page-title .index-link:focus.dropdown-toggle,
+        #organization-single .page-header .page-title .index-link:hover:active,
+        #organization-single .page-header .page-title .index-link:hover.active,
+        .open >
+        #organization-single .page-header .page-title .index-link:hover.dropdown-toggle,
+        #organization-single .page-header .page-title .index-link:focus:active,
+        #organization-single .page-header .page-title .index-link:focus.active,
+        .open >
+        #organization-single .page-header .page-title .index-link:focus.dropdown-toggle {
+          background-image: none; }
+        #project-single .page-header .page-title .index-link:hover.disabled:hover, #project-single .page-header .page-title .index-link:hover.disabled:focus, #project-single .page-header .page-title .index-link:hover.disabled.focus, #project-single .page-header .page-title .index-link:hover[disabled]:hover, #project-single .page-header .page-title .index-link:hover[disabled]:focus, #project-single .page-header .page-title .index-link:hover[disabled].focus,
+        fieldset[disabled] #project-single .page-header .page-title .index-link:hover:hover,
+        fieldset[disabled] #project-single .page-header .page-title .index-link:hover:focus,
+        fieldset[disabled] #project-single .page-header .page-title .index-link:hover.focus, #project-single .page-header .page-title .index-link:focus.disabled:hover, #project-single .page-header .page-title .index-link:focus.disabled:focus, #project-single .page-header .page-title .index-link:focus.disabled.focus, #project-single .page-header .page-title .index-link:focus[disabled]:hover, #project-single .page-header .page-title .index-link:focus[disabled]:focus, #project-single .page-header .page-title .index-link:focus[disabled].focus,
+        fieldset[disabled] #project-single .page-header .page-title .index-link:focus:hover,
+        fieldset[disabled] #project-single .page-header .page-title .index-link:focus:focus,
+        fieldset[disabled] #project-single .page-header .page-title .index-link:focus.focus,
+        #organization-single .page-header .page-title .index-link:hover.disabled:hover,
+        #organization-single .page-header .page-title .index-link:hover.disabled:focus,
+        #organization-single .page-header .page-title .index-link:hover.disabled.focus,
+        #organization-single .page-header .page-title .index-link:hover[disabled]:hover,
+        #organization-single .page-header .page-title .index-link:hover[disabled]:focus,
+        #organization-single .page-header .page-title .index-link:hover[disabled].focus,
+        fieldset[disabled]
+        #organization-single .page-header .page-title .index-link:hover:hover,
+        fieldset[disabled]
+        #organization-single .page-header .page-title .index-link:hover:focus,
+        fieldset[disabled]
+        #organization-single .page-header .page-title .index-link:hover.focus,
+        #organization-single .page-header .page-title .index-link:focus.disabled:hover,
+        #organization-single .page-header .page-title .index-link:focus.disabled:focus,
+        #organization-single .page-header .page-title .index-link:focus.disabled.focus,
+        #organization-single .page-header .page-title .index-link:focus[disabled]:hover,
+        #organization-single .page-header .page-title .index-link:focus[disabled]:focus,
+        #organization-single .page-header .page-title .index-link:focus[disabled].focus,
+        fieldset[disabled]
+        #organization-single .page-header .page-title .index-link:focus:hover,
+        fieldset[disabled]
+        #organization-single .page-header .page-title .index-link:focus:focus,
+        fieldset[disabled]
+        #organization-single .page-header .page-title .index-link:focus.focus {
+          background-color: #345bb7;
+          border-color: #fff; }
+        #project-single .page-header .page-title .index-link:hover .badge, #project-single .page-header .page-title .index-link:focus .badge,
+        #organization-single .page-header .page-title .index-link:hover .badge,
+        #organization-single .page-header .page-title .index-link:focus .badge {
+          color: #345bb7;
+          background-color: #fff; }
+    #project-single .page-header .page-title h1, #project-single .page-header .page-title h2,
+    #organization-single .page-header .page-title h1,
+    #organization-single .page-header .page-title h2 {
+      display: table-cell;
+      vertical-align: middle; }
+    #project-single .page-header .page-title .top-btn,
+    #organization-single .page-header .page-title .top-btn {
+      vertical-align: middle; }
+      #project-single .page-header .page-title .top-btn .btn-add,
+      #organization-single .page-header .page-title .top-btn .btn-add {
+        margin-right: 14px; }
 
 @media (max-width: 991px) {
   #project-single .page-header,
   #organization-single .page-header {
     overflow: visible;
     padding-top: 8px;
-    padding-bottom: 0;
+    padding-bottom: 8px;
     border-bottom: solid 1px #0b2548;
     margin-top: 0;
     margin-bottom: 0;
@@ -5097,7 +5103,7 @@ ul.resource-actions > li {
     #project-single .page-header h1, #project-single .page-header h2,
     #organization-single .page-header h1,
     #organization-single .page-header h2 {
-      margin-left: 14px; }
+      padding-left: 14px; }
   #project-single .page-header .page-title,
   #organization-single .page-header .page-title {
     padding-bottom: 0; } }
@@ -5382,6 +5388,9 @@ ul.resource-actions > li {
 #search-results.table h4 {
   margin-bottom: 12px; }
 
+#search-results.table img.thumb-60 {
+  margin-left: 24px; }
+
 #search-results.table img.thumb-60 ~ table {
   width: calc(100% - 100px); }
 
@@ -5480,6 +5489,47 @@ tr.contacts-error {
   display: block;
   font-size: 0.85em;
   opacity: 0.75; }
+
+/* =Project translation select dropdown
+-------------------------------------------------------------- */
+.langs-select {
+  overflow: hidden;
+  height: 34px;
+  position: relative;
+  margin-right: 30px;
+  margin-bottom: 0; }
+  .langs-select select {
+    color: #fff;
+    padding: 4px;
+    padding-right: 25px;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: unset;
+    -webkit-box-shadow: unset; }
+    .langs-select select > option {
+      background: #fff;
+      padding: 6px;
+      color: #595a5c; }
+  .langs-select:after {
+    font-family: 'Glyphicons Halflings';
+    font-size: 9px;
+    content: "\e252";
+    color: #fff;
+    padding: 12px 8px;
+    position: absolute;
+    right: 10px;
+    top: 0;
+    z-index: 1;
+    text-align: center;
+    width: 10%;
+    height: 100%;
+    pointer-events: none;
+    box-sizing: border-box; }
 
 /* =Required field label
 -------------------------------------------------------------- */
@@ -6301,7 +6351,7 @@ img.org-logo, img#org-logo {
   margin-top: 10px;
   margin-bottom: 10px; }
   .top-btn .btn {
-    min-width: 140px; }
+    min-width: 100px; }
   .top-btn .btn-rt, .top-btn .btn-action {
     min-width: 34px; }
 
@@ -6342,14 +6392,24 @@ div.add-btn-btm {
 
 @media (max-width: 991px) {
   .top-btn .btn {
-    min-width: auto; }
+    min-width: auto;
+    font-size: 13px;
+    color: black; }
   #project-single .page-header .top-btn,
   #organization-single .page-header .top-btn {
     padding: 4px 10px 0;
     margin-top: 0; }
     #project-single .page-header .top-btn .btn,
     #organization-single .page-header .top-btn .btn {
-      min-width: auto; } }
+      min-width: auto; }
+    #project-single .page-header .top-btn .langs-select,
+    #organization-single .page-header .top-btn .langs-select {
+      margin-right: 0;
+      width: 50px; }
+      #project-single .page-header .top-btn .langs-select select,
+      #organization-single .page-header .top-btn .langs-select select {
+        font-size: 13px;
+        padding: 2px; } }
 
 @media (max-width: 767px) {
   .top-btn .btn {

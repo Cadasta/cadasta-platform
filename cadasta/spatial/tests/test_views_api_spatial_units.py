@@ -319,7 +319,6 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 method='POST',
                                 post_data=invalid_data)
-        print(response.content)
         assert response.status_code == 400
         assert response.content['type'][0] == '"" is not a valid choice.'
 

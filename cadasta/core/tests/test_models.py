@@ -142,8 +142,6 @@ class SlugModelTest(TestCase):
         instance2.refresh_from_db()
         assert instance1.slug != instance2.slug
         assert instance2.slug[-2:] == '-1'
-        print(instance1.slug)
-        print(instance2.slug)
 
     def test_duplicate_slug_long_name_100_times(self):
         for i in range(0, 101):

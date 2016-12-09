@@ -43,8 +43,6 @@ class ValidateContactTest(TestCase):
             'name': 'This field is required.',
             'email': '\'noemail\' is not a \'email\''
         }
-        print(actual)
-        print(expected)
         assert actual == expected
 
     def test_validate_multiple_contacts(self):

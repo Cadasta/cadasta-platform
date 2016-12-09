@@ -48,6 +48,52 @@ tr.contacts-error {
   }
 }
 
+/* =Project translation select dropdown
+-------------------------------------------------------------- */
+
+.langs-select {
+  overflow: hidden; 
+  height: 34px;
+  position: relative;
+  margin-right: 30px;
+  margin-bottom: 0;
+  select {       
+    color: #fff;
+    padding: 4px;
+    padding-right: 25px;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
+    outline: none;      
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: unset;
+    -webkit-box-shadow: unset;
+    > option {
+      background: #fff;
+      padding: 6px;
+      color: $gray-dark;
+    } 
+  }
+  &:after {
+    font-family: 'Glyphicons Halflings';
+    font-size: 9px;
+    content:"\e252"; 
+    color: #fff;   
+    padding: 12px 8px;
+    position: absolute; 
+    right: 10px; 
+    top: 0;    
+    z-index: 1;
+    text-align: center;
+    width: 10%;
+    height: 100%;      
+    pointer-events: none;
+    box-sizing: border-box;   
+  }
+}
+
 /* =Required field label
 -------------------------------------------------------------- */
 
