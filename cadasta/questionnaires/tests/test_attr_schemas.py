@@ -391,7 +391,8 @@ class ConditionalAttributeSchemaTest(UserTestCase, FileStorageTestCase,
         party = PartyFactory.create(
             name='TestParty', project=self.project,
             attributes={
-                'notes': 'Some textual stuff'
+                'notes': 'Some textual stuff',
+                'dob': '2016-12-01'
             }
         )
         assert 'notes' in party.attributes.attributes

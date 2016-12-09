@@ -1,6 +1,7 @@
 {% extends "spatial/location_detail.html" %}
 {% load i18n %}
 {% load widget_tweaks %}
+{% load filters %}
 {% load staticfiles %}
 
 {% block page_title %}{% trans "Add relationship" %} | {% endblock %}
@@ -55,7 +56,7 @@ $(document).ready(function() {
   <div class="modal show" data-backdrop="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="POST" data-parsley-validate data-parsley-excluded=":hidden">
+        <form method="POST" data-parsley-validate data-parsley-excluded=":hidden, disabled">
           <div class="modal-header">
             <a class="close" href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
               <span aria-hidden="true">&times;</span>
@@ -89,23 +90,11 @@ $(document).ready(function() {
 
               <div class="form-group{% if form.party_type.errors %} has-error{% endif %}">
                 <label class="control-label" for="{{ form.party_type.id_for_label }}">{% trans "Party type" %}</label>
-                {% render_field form.party_type class+="form-control" data-parsley-required="true" %}
+                {% render_field form.party_type class+="form-control party-type" data-parsley-required="true" %}
                 <div class="error-block">{{ form.party_type.errors }}</div>
               </div>
 
-              {% for field in form %}
-                {% if "party::" in field.name %}
-                  <div class="form-group{% if field.errors %} has-error{% endif %}">
-                    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {% if field|field_type == "datefield" %}
-                      {% render_field field class+="form-control datepicker" %}
-                    {% else %}
-                      {% render_field field class+="form-control" %}
-                    {% endif %}
-                    <div class="error-block">{{ field.errors }}</div>
-                  </div>
-                {% endif %}
-              {% endfor %}
+              {% include "party/party_attrs.html" %}
 
             </div>
 
@@ -118,13 +107,13 @@ $(document).ready(function() {
             </div>
 
             {% for field in form %}
-              {% if "relationship::" in field.name %}
+              {% if "tenurerelationship::" in field.name %}
               <div class="form-group{% if field.errors %} has-error{% endif %}">
                 <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {% if field|field_type == "datefield" %}
-                  {% render_field field class+="form-control datepicker" %}
+                  {{ field|add_class:"form-control datepicker"|set_parsley_required }}}
                 {% else %}
-                  {% render_field field class+="form-control" %}
+                  {{ field|add_class:"form-control"|set_parsley_required }}
                 {% endif %}
                 <div class="error-block">{{ field.errors }}</div>
               </div>

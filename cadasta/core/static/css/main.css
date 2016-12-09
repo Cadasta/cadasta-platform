@@ -5362,6 +5362,9 @@ ul.resource-actions > li {
     height: 60px; }
     #sidebar .nav-sidebar > li {
       width: 20%; }
+      /* beta
+      float: left;
+      width: 19%; */ }
       #sidebar .nav-sidebar > li a {
         padding: 12px 0; }
         #sidebar .nav-sidebar > li a .title {

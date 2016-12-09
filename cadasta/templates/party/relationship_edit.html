@@ -1,6 +1,7 @@
 {% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
 {% load widget_tweaks %}
+{% load filters %}
 {% load staticfiles %}
 
 {% block extra_head %}
@@ -46,13 +47,13 @@
           <div class="error-block">{{ form.tenure_type.errors }}</div>
         </div>
         {% for field in form %}
-          {% if "attributes" in field.name %}
+          {% if "tenurerelationship::" in field.name %}
           <div class="clearfix form-group{% if field.errors %} has-error{% endif %}">
             <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
             {% if field|field_type == "datefield" %}
-              {% render_field field class+="form-control datepicker" %}
+              {{ field|add_class:"form-control datepicker"|set_parsley_required }}
             {% else %}
-              {% render_field field class+="form-control" %}
+              {{ field|add_class:"form-control"|set_parsley_required }}
             {% endif %}
             <div class="error-block">{{ field.errors }}</div>
           </div>

@@ -1,20 +1,20 @@
+from core.form_mixins import AttributeForm, AttributeModelForm
+from core.util import ID_FIELD_LENGTH
 from django import forms
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis import forms as gisforms
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
-from django.contrib.contenttypes.models import ContentType
-
-from jsonattrs.models import Schema, compose_schemas
-from jsonattrs.forms import form_field_from_name, AttributeModelForm
-
 from leaflet.forms.widgets import LeafletWidget
-from core.util import ID_FIELD_LENGTH
 from party.models import Party, TenureRelationship, TenureRelationshipType
-from .models import SpatialUnit, TYPE_CHOICES
-from .widgets import SelectPartyWidget, NewEntityWidget
+
+from .models import TYPE_CHOICES, SpatialUnit
+from .widgets import NewEntityWidget, SelectPartyWidget
 
 
 class LocationForm(AttributeModelForm):
+    attributes_field = 'attributes'
+
     geometry = gisforms.GeometryField(
         widget=LeafletWidget(),
         error_messages={
@@ -28,21 +28,21 @@ class LocationForm(AttributeModelForm):
             list(TYPE_CHOICES)
         ))
     )
-    attributes_field = 'attributes'
 
     class Meta:
         model = SpatialUnit
         fields = ['geometry', 'type']
 
-    def __init__(self, project_id=None, *args, **kwargs):
+    def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.project_id = project_id
+        self.project = project
+        self.add_attribute_fields()
 
-    def save(self):
-        instance = super().save(commit=False)
-        instance.project_id = self.project_id
-        instance.save()
-        return instance
+    def save(self, *args, **kwargs):
+        entity_type = self.cleaned_data['type']
+        kwargs['entity_type'] = entity_type
+        kwargs['project_id'] = self.project.pk
+        return super().save(*args, **kwargs)
 
 
 REL_TYPE_CHOICES = (
@@ -52,7 +52,7 @@ REL_TYPE_CHOICES = (
 )
 
 
-class TenureRelationshipForm(forms.Form):
+class TenureRelationshipForm(AttributeForm):
     # new_entity should be first because the other fields depend on it
     new_entity = forms.BooleanField(required=False, widget=NewEntityWidget())
     id = forms.CharField(required=False, max_length=ID_FIELD_LENGTH)
@@ -61,10 +61,9 @@ class TenureRelationshipForm(forms.Form):
     tenure_type = forms.ChoiceField(required=True, choices=[])
 
     class Media:
-        js = ('/static/js/rel_tenure.js',)
+        js = ('/static/js/rel_tenure.js', '/static/js/party_attrs.js')
 
-    def __init__(self, project, spatial_unit, schema_selectors=(),
-                 *args, **kwargs):
+    def __init__(self, project, spatial_unit, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['id'].widget = SelectPartyWidget(project.id)
         self.fields['party_type'].choices = (
@@ -75,7 +74,12 @@ class TenureRelationshipForm(forms.Form):
             sorted(TenureRelationshipType.objects.values_list('id', 'label')))
         self.project = project
         self.spatial_unit = spatial_unit
-        self.add_attribute_fields(schema_selectors)
+        self.party_ct = ContentType.objects.get(
+            app_label='party', model='party')
+        self.tenure_ct = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        self.add_attribute_fields(self.party_ct)
+        self.add_attribute_fields(self.tenure_ct)
 
     def clean_id(self):
         new_entity = self.cleaned_data.get('new_entity', None)
@@ -101,58 +105,26 @@ class TenureRelationshipForm(forms.Form):
             raise forms.ValidationError(_("This field is required."))
         return party_type
 
-    def create_model_fields(self, model, field_prefix, selectors,
-                            new_item=False):
-        content_type = ContentType.objects.get_for_model(model)
-        schemas = Schema.objects.lookup(
-            content_type=content_type, selectors=selectors
-        )
-        attrs, _, _ = compose_schemas(*schemas)
-        for name, attr in attrs.items():
-            fieldname = field_prefix + '::' + name
-            atype = attr.attr_type
-            initial = self.data.get(fieldname, '')
-            args = {
-                'label': attr.long_name,
-                'required': False,
-                'initial': initial
-            }
-            field = form_field_from_name(atype.form_field)
-            # if atype.form_field == 'CharField':
-            #     args['max_length'] = 32
-            if (atype.form_field == 'ChoiceField' or
-               atype.form_field == 'MultipleChoiceField'):
-                if attr.choice_labels is not None and attr.choice_labels != []:
-                    chs = list(zip(attr.choices, attr.choice_labels))
-                else:
-                    chs = list(map(lambda c: (c, c), attr.choices))
-                args['choices'] = chs
-            if atype.form_field == 'BooleanField':
-                args['required'] = False
-                if len(attr.default) > 0:
-                    args['initial'] = (attr.default != 'False')
-            else:
-                if attr.required and new_item:
-                    args['required'] = True
-                if len(attr.default) > 0 and len(initial) == 0:
-                    args['initial'] = attr.default
-            self.fields[fieldname] = field(**args)
+    def clean(self):
+        # remove validation errors for required fields
+        # which are not related to the current party type
+        new_entity = self.cleaned_data.get('new_entity', False)
+        if not new_entity:
+            for name, field in self.fields.items():
+                if name.startswith('party::'):
+                    if (field.required and
+                            self.errors.get(name, None) is not None):
+                        del self.errors[name]
 
-    def add_attribute_fields(self, schema_selectors):
-        selectors = [s['selector'] for s in schema_selectors]
-
-        new_item = self.data.get('new_item') == 'on'
-        self.create_model_fields(Party, 'party', selectors, new_item=new_item)
-        self.create_model_fields(TenureRelationship, 'relationship', selectors)
-
-    def process_attributes(self, key):
-        attributes = {}
-        length = len(key + '::')
-        for k, v in self.cleaned_data.items():
-            if k.startswith(key + '::'):
-                k = k[length::]
-                attributes[k] = v
-        return attributes
+        party_type = self.cleaned_data.get('party_type', None)
+        if party_type:
+            ptype = party_type.lower()
+            for name, field in self.fields.items():
+                if (name.startswith('party::') and not
+                        name.startswith('party::%s' % ptype)):
+                    if (field.required and self.errors.get(name, None)
+                            is not None):
+                        del self.errors[name]
 
     def save(self):
         if self.cleaned_data['new_entity']:
@@ -160,16 +132,20 @@ class TenureRelationshipForm(forms.Form):
                 name=self.cleaned_data['name'],
                 type=self.cleaned_data['party_type'],
                 project=self.project,
-                attributes=self.process_attributes('party')
+                attributes=self.process_attributes(
+                    self.party_ct.model, self.cleaned_data['party_type']
+                )
             )
         else:
             party = Party.objects.get(pk=self.cleaned_data['id'])
 
-        t = TenureRelationship.objects.create(
+        tenurerelationship = TenureRelationship.objects.create(
             party=party,
             spatial_unit=self.spatial_unit,
             tenure_type_id=self.cleaned_data['tenure_type'],
             project=self.project,
-            attributes=self.process_attributes('relationship')
+            attributes=self.process_attributes(
+                self.tenure_ct.model, self.cleaned_data['tenure_type']
+            )
         )
-        return t
+        return tenurerelationship

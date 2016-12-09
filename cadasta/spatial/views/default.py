@@ -1,17 +1,16 @@
-from jsonattrs.mixins import JsonAttrsMixin
 import django.views.generic as base_generic
+from core.mixins import LoginPermissionRequiredMixin, update_permissions
 from core.views import generic
 from django.core.urlresolvers import reverse
-
-from core.mixins import LoginPermissionRequiredMixin, update_permissions
-
+from jsonattrs.mixins import JsonAttrsMixin
+from organization.views import mixins as organization_mixins
+from party.messages import TENURE_REL_CREATE
 from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
-from party.messages import TENURE_REL_CREATE
+
 from . import mixins
-from organization.views import mixins as organization_mixins
-from .. import forms
 from .. import messages as error_messages
+from .. import forms
 
 
 class LocationsList(LoginPermissionRequiredMixin,
@@ -59,22 +58,7 @@ class LocationsAdd(LoginPermissionRequiredMixin,
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        prj = self.get_project()
-
-        kwargs['schema_selectors'] = ()
-        if prj.current_questionnaire:
-            kwargs['schema_selectors'] = (
-                {'name': 'organization',
-                 'value': prj.organization,
-                 'selector': prj.organization.id},
-                {'name': 'project',
-                 'value': prj,
-                 'selector': prj.id},
-                {'name': 'questionnaire',
-                 'value': prj.current_questionnaire,
-                 'selector': prj.current_questionnaire}
-            )
-
+        kwargs['project'] = self.get_project()
         return kwargs
 
 
@@ -93,7 +77,7 @@ class LocationDetail(LoginPermissionRequiredMixin,
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['relationships'] = self.object.tenurerelationship_set.all(
-            ).select_related('party').defer('party__attributes')
+        ).select_related('party').defer('party__attributes')
         return context
 
 
@@ -105,6 +89,11 @@ class LocationEdit(LoginPermissionRequiredMixin,
     form_class = forms.LocationForm
     permission_required = update_permissions('spatial.edit')
     permission_denied_message = error_messages.SPATIAL_UPDATE
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['project'] = self.get_project()
+        return kwargs
 
 
 class LocationDelete(LoginPermissionRequiredMixin,
@@ -163,27 +152,14 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-
         kwargs['initial'] = {
             'new_entity': not self.get_project().parties.exists(),
         }
-
-        prj = self.get_project()
-        kwargs['schema_selectors'] = ()
-        if prj.current_questionnaire:
-            kwargs['schema_selectors'] = (
-                {'name': 'organization',
-                 'value': prj.organization,
-                 'selector': prj.organization.id},
-                {'name': 'project',
-                 'value': prj,
-                 'selector': prj.id},
-                {'name': 'questionnaire',
-                 'value': prj.current_questionnaire,
-                 'selector': prj.current_questionnaire}
-            )
-
         return kwargs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        return context
 
     def get_success_url(self):
         return (reverse('locations:detail', kwargs=self.kwargs) +

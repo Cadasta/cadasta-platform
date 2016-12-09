@@ -1,0 +1,20 @@
+{% load i18n %}
+{% load widget_tweaks %}
+{% load filters %}
+{% csrf_token %}
+
+{% for field in form %}
+{% if field.name|slice:":7" == "party::" %}
+  {% with type=field.name|slice:"7:"|slice:":2" %}
+    <div class="form-group{% if field.errors %} has-error{% endif %} party-{{ type }} hidden">
+      <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {% if field|field_type == "datefield" %}
+        {{ field|add_class:"form-control datepicker"|set_parsley_required }}
+      {% else %}
+        {{ field|add_class:"form-control"|set_parsley_required }}
+      {% endif %}
+      <div class="error-block">{{ field.errors }}</div>
+    </div>
+  {% endwith %}
+ {% endif %}
+ {% endfor %}

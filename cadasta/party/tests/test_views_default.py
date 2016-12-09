@@ -1,24 +1,24 @@
 import json
-import pytest
-from django.http import Http404
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
 
-from tutelary.models import Policy, assign_user_policies
-from jsonattrs.models import Attribute, AttributeType, Schema
-from skivvy import ViewTestCase
+import pytest
 
 from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import FileStorageTestCase, UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
+from django.contrib.contenttypes.models import ContentType
+from django.http import Http404
+from django.test import TestCase
+from jsonattrs.models import Attribute, AttributeType, Schema
 from organization.tests.factories import ProjectFactory
+from resources.forms import AddResourceFromLibraryForm, ResourceForm
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
-from resources.forms import AddResourceFromLibraryForm, ResourceForm
-from core.tests.utils.cases import UserTestCase, FileStorageTestCase
-from core.tests.utils.files import make_dirs  # noqa
+from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
+from tutelary.models import Policy, assign_user_policies
 
-from ..models import Party, TenureRelationship, TenureRelationshipType
 from .. import forms
+from ..models import Party, TenureRelationship, TenureRelationshipType
 from ..views import default
 from .factories import PartyFactory, TenureRelationshipFactory
 
@@ -108,7 +108,7 @@ class PartiesAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {
             'object': self.project,
-            'form': forms.PartyForm(schema_selectors=())
+            'form': forms.PartyForm(project=self.project)
         }
 
     def setup_url_kwargs(self):
@@ -235,9 +235,9 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
         )
         self.party = PartyFactory.create(project=self.project,
                                          attributes={
-                                            'fname': 'test',
-                                            'fname_2': 'two',
-                                            'fname_3': ['one', 'three']
+                                             'fname': 'test',
+                                             'fname_2': 'two',
+                                             'fname_3': ['one', 'three']
                                          })
 
     def setup_template_context(self):
@@ -293,7 +293,7 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
     post_data = {
         'name': 'Party',
         'type': 'GR',
-        'attributes::fname': 'New text'
+        'party::gr::fname': 'New text'
     }
 
     def setup_models(self):
@@ -338,7 +338,7 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert '<div class="form-group party-gr hidden">' in response.content
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -870,7 +870,10 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PartyRelationshipEdit
     template = 'party/relationship_edit.html'
     success_url_name = 'parties:relationship_detail'
-    post_data = {'tenure_type': 'LH', 'attributes::fname': 'New text'}
+    post_data = {
+        'tenure_type': 'LH',
+        'tenurerelationship::default::fname': 'New text'
+    }
 
     def setup_models(self):
         self.project = ProjectFactory.create()
@@ -914,7 +917,10 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert ('<input class="form-control" '
+                'id="id_tenurerelationship::default::fname" '
+                'name="tenurerelationship::default::fname" '
+                'type="text" value="test" />') in response.content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()

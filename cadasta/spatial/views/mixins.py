@@ -25,11 +25,6 @@ class SpatialQuerySetMixin(ProjectMixin):
         context['project'] = self.get_project()
         return context
 
-    def get_form_kwargs(self, *args, **kwargs):
-        form_kwargs = super().get_form_kwargs(*args, **kwargs)
-        form_kwargs['project_id'] = self.get_project().id
-        return form_kwargs
-
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['location'] = self.object.id
@@ -55,7 +50,7 @@ class SpatialUnitObjectMixin(SpatialQuerySetMixin):
                 project__organization__slug=self.kwargs['organization'],
                 project__slug=self.kwargs['project'],
                 id=self.kwargs['location']
-                )
+            )
         return self._obj
 
     def get_context_data(self, *args, **kwargs):
@@ -81,11 +76,11 @@ class SpatialUnitResourceMixin(ResourceViewMixin, SpatialUnitObjectMixin):
     def get_spatial_unit(self):
         if not hasattr(self, 'spatial_unit_object'):
             self.spatial_unit_object = get_object_or_404(
-                    SpatialUnit,
-                    project__organization__slug=self.kwargs['organization'],
-                    project__slug=self.kwargs['project'],
-                    id=self.kwargs['location']
-                )
+                SpatialUnit,
+                project__organization__slug=self.kwargs['organization'],
+                project__slug=self.kwargs['project'],
+                id=self.kwargs['location']
+            )
         return self.spatial_unit_object
 
     def get_resource(self):
