@@ -96,9 +96,10 @@
 - name: Link static content
   become: yes
   become_user: "{{ app_user }}"
-  file: path="{{ application_path }}static"
-        src="{{ application_path }}app/dist"
-        state=link
+  django_manage: command=collectstatic
+                 app_path="{{ application_path }}cadasta"
+                 virtualenv="{{ virtualenv_path }}"
+                 settings="{{ django_settings }}"
 
 - name: Create cron job to prune MEDIA_ROOT files
   become: yes
