@@ -114,6 +114,14 @@ class SchemaSelectorMixin():
         attributes_for_models = self.get_attributes(project)
         return attributes_for_models[content_type]
 
+    def get_conditional_selector(self, content_type):
+        content_type_to_selectors = self._get_content_types_to_selectors()
+        selectors = list(content_type_to_selectors[content_type])
+        if '.' in selectors[-1]:
+            return None
+        else:
+            return selectors[-1]
+
     def _get_content_types_to_selectors(self):
         content_type_to_selectors = dict()
         for k, v in settings.JSONATTRS_SCHEMA_SELECTORS.items():

@@ -1,7 +1,10 @@
-import os
 import csv
-from osgeo import ogr, osr
+import os
+from collections import OrderedDict
 from zipfile import ZipFile
+
+from osgeo import ogr, osr
+
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
@@ -12,59 +15,72 @@ MIME_TYPE = 'application/zip'
 
 
 class ShapeExporter(Exporter):
+
     def write_items(self, filename, queryset, content_type, model_attrs):
         schema_attrs = self.get_schema_attrs(content_type)
-        fields = list(model_attrs) + [a.name for a in schema_attrs]
+
+        # build column labels
+        attr_columns = OrderedDict()
+        for a in model_attrs:
+            attr_columns[a] = ''
+        for _, attrs in schema_attrs.items():
+            for a in attrs.values():
+                if a.name not in attr_columns.keys():
+                    attr_columns[a.name] = None
 
         with open(filename, 'w+', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(fields)
+            csvwriter.writerow(attr_columns.keys())
 
             for item in queryset:
                 values = self.get_values(item, model_attrs, schema_attrs)
-                csvwriter.writerow(values)
+                data = attr_columns.copy()
+                data.update(values)
+                csvwriter.writerow(data.values())
 
     def write_relationships(self, filename):
+        relationships = self.project.tenure_relationships.all()
+        if relationships.count() == 0:
+            return
+
         content_type = ContentType.objects.get(app_label='party',
                                                model='tenurerelationship')
-        self.write_items(filename,
-                         self.project.tenure_relationships.all(),
-                         content_type,
+        self.write_items(filename, relationships, content_type,
                          ('id', 'party_id', 'spatial_unit_id',
-                          'tenure_type.label'))
+                          'tenure_type.id', 'tenure_type.label'))
 
     def write_parties(self, filename):
+        parties = self.project.parties.all()
+        if parties.count() == 0:
+            return
+
         content_type = ContentType.objects.get(app_label='party',
                                                model='party')
-        self.write_items(filename,
-                         self.project.parties.all(),
-                         content_type,
+        self.write_items(filename, parties, content_type,
                          ('id', 'name', 'type'))
 
     def write_features(self, layers, filename):
+        spatial_units = self.project.spatial_units.all()
+        if spatial_units.count() == 0:
+            return
+
         content_type = ContentType.objects.get(app_label='spatial',
                                                model='spatialunit')
         model_attrs = ('id', 'type')
-        schema_attrs = self.get_schema_attrs(content_type)
 
-        with open(filename, 'w+', newline='') as csvfile:
-            csvwriter = csv.writer(csvfile)
-            csvwriter.writerow(list(model_attrs) +
-                               [a.name for a in schema_attrs])
+        self.write_items(
+            filename, spatial_units, content_type, model_attrs)
 
-            for su in self.project.spatial_units.all():
-                geom = ogr.CreateGeometryFromWkt(su.geometry.wkt)
-                layer_type = geom.GetGeometryType() - 1
-                layer = layers[layer_type]
+        for su in spatial_units:
+            geom = ogr.CreateGeometryFromWkt(su.geometry.wkt)
+            layer_type = geom.GetGeometryType() - 1
+            layer = layers[layer_type]
 
-                feature = ogr.Feature(layer.GetLayerDefn())
-                feature.SetGeometry(ogr.CreateGeometryFromWkt(su.geometry.wkt))
-                feature.SetField('id', su.id)
-                layer.CreateFeature(feature)
-                feature.Destroy()
-
-                values = self.get_values(su, model_attrs, schema_attrs)
-                csvwriter.writerow(values)
+            feature = ogr.Feature(layer.GetLayerDefn())
+            feature.SetGeometry(ogr.CreateGeometryFromWkt(su.geometry.wkt))
+            feature.SetField('id', su.id)
+            layer.CreateFeature(feature)
+            feature.Destroy()
 
     def create_datasource(self, dst_dir):
         if not os.path.exists(dst_dir):

@@ -1,34 +1,34 @@
-import pytest
-import time
-import os
 import csv
-from openpyxl import load_workbook, Workbook
+import os
+import time
 from zipfile import ZipFile
 
-from django.test import TestCase
+import pytest
+
+from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-
+from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
-
-from core.tests.utils.files import make_dirs  # noqa
+from openpyxl import Workbook, load_workbook
 from organization.tests.factories import ProjectFactory
-from spatial.tests.factories import SpatialUnitFactory
-from resources.utils.io import ensure_dirs
+from party.models import TenureRelationshipType
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
+from resources.models import ContentObject
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
-from resources.models import ContentObject
-from core.tests.utils.cases import UserTestCase
-from party.tests.factories import TenureRelationshipFactory, PartyFactory
-from party.models import TenureRelationshipType
+from resources.utils.io import ensure_dirs
+from spatial.tests.factories import SpatialUnitFactory
 
 from ..download.base import Exporter
-from ..download.xls import XLSExporter
 from ..download.resources import ResourceExporter
 from ..download.shape import ShapeExporter
+from ..download.xls import XLSExporter
 
 
 class BaseExporterTest(UserTestCase, TestCase):
+
     def test_init(self):
         project = ProjectFactory.build()
         exporter = Exporter(project)
@@ -39,8 +39,7 @@ class BaseExporterTest(UserTestCase, TestCase):
         content_type = ContentType.objects.get(app_label='spatial',
                                                model='spatialunit')
         exporter = Exporter(project)
-        assert exporter.get_schema_attrs(content_type) == []
-        assert exporter._schema_attrs['spatial.spatialunit'] == []
+        assert exporter.get_schema_attrs(content_type) == {}
 
     def test_get_schema_attrs(self):
         project = ProjectFactory.create(current_questionnaire='123abc')
@@ -74,7 +73,7 @@ class BaseExporterTest(UserTestCase, TestCase):
 
         exporter = Exporter(project)
         attrs = exporter.get_schema_attrs(content_type)
-        assert len(attrs) == 2
+        assert len(attrs['DEFAULT']) == 2
 
     def test_get_values(self):
         project = ProjectFactory.create(current_questionnaire='123abc')
@@ -86,13 +85,13 @@ class BaseExporterTest(UserTestCase, TestCase):
             selectors=(project.organization.id, project.id, '123abc', ))
         text_type = AttributeType.objects.get(name='text')
         select_m_type = AttributeType.objects.get(name='select_multiple')
-        attr = Attribute.objects.create(
+        Attribute.objects.create(
             schema=schema,
             name='key', long_name='Test field',
             attr_type=text_type, index=0,
             required=False, omit=False
         )
-        attr2 = Attribute.objects.create(
+        Attribute.objects.create(
             schema=schema,
             name='key_2', long_name='Test select multiple field',
             attr_type=select_m_type, index=1,
@@ -110,14 +109,184 @@ class BaseExporterTest(UserTestCase, TestCase):
                                                               'choice_2']})
         model_attrs = ('id', 'party_id', 'spatial_unit_id',
                        'tenure_type.label')
-        schema_attrs = [attr, attr2]
+        schema_attrs = exporter.get_schema_attrs(content_type)
         values = exporter.get_values(item, model_attrs, schema_attrs)
-        assert values == [item.id, item.party_id, item.spatial_unit_id,
-                          'Leasehold', 'text', 'choice_1, choice_2']
+        assert values == {
+            'id': item.id, 'party_id': item.party_id,
+            'spatial_unit_id': item.spatial_unit_id,
+            'tenure_type.label': 'Leasehold',
+            'key': 'text', 'key_2': 'choice_1, choice_2'}
+
+    def test_get_values_with_conditional_selector(self):
+        project = ProjectFactory.create(current_questionnaire='123abc')
+        exporter = Exporter(project)
+        content_type = ContentType.objects.get(app_label='party',
+                                               model='party')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, '123abc',))
+        schema_in = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, '123abc', 'IN'))
+        schema_gr = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, '123abc', 'GR'))
+        text_type = AttributeType.objects.get(name='text')
+        select_m_type = AttributeType.objects.get(name='select_multiple')
+        Attribute.objects.create(
+            schema=schema,
+            name='key', long_name='Test field',
+            attr_type=text_type, index=0,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=schema_in,
+            name='key_2', long_name='Test select multiple field',
+            attr_type=select_m_type, index=1,
+            choices=['choice_1', 'choice_2', 'choice_3'],
+            choice_labels=['Choice 1', 'Choice 2', 'Choice 3'],
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=schema_gr,
+            name='gr_key', long_name='Test Group Field',
+            attr_type=text_type, index=0,
+            required=False, omit=False
+        )
+
+        # test individual attrs
+        item = PartyFactory.create(project=project,
+                                   name='Test Party',
+                                   type='IN',
+                                   attributes={
+                                       'key': 'text',
+                                       'key_2': ['choice_1',
+                                                 'choice_2']})
+        model_attrs = ('id', 'name', 'type')
+        schema_attrs = exporter.get_schema_attrs(content_type)
+        values = exporter.get_values(item, model_attrs, schema_attrs)
+        assert values == {
+            'id': item.id, 'name': item.name, 'type': item.type,
+            'key': 'text', 'key_2': 'choice_1, choice_2'
+        }
+
+        # test group attrs
+        item = PartyFactory.create(project=project,
+                                   name='Test Party',
+                                   type='GR',
+                                   attributes={
+                                       'key': 'text',
+                                       'gr_key': 'Test Group Field'})
+        model_attrs = ('id', 'name', 'type')
+        schema_attrs = exporter.get_schema_attrs(content_type)
+        values = exporter.get_values(item, model_attrs, schema_attrs)
+        assert values == {
+            'id': item.id, 'name': item.name, 'type': item.type,
+            'key': 'text', 'gr_key': 'Test Group Field'
+        }
 
 
 @pytest.mark.usefixtures('clear_temp')
 class ShapeTest(UserTestCase, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.project = ProjectFactory.create(current_questionnaire='123abc')
+        self.spatial_content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit'
+        )
+        sp_schema = Schema.objects.create(
+            content_type=self.spatial_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=sp_schema,
+            name='key', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        self.spatialunit_1 = SpatialUnitFactory.create(
+            project=self.project,
+            geometry='POINT (1 1)',
+            attributes={'key': 'value 1'})
+        self.spatialunit_2 = SpatialUnitFactory.create(
+            project=self.project,
+            geometry='POINT (2 2)',
+            attributes={'key': 'value 2'})
+        self.spatialunits = [self.spatialunit_1, self.spatialunit_2]
+        self.spatial_attrs = ['id', 'geometry.ewkt']
+
+        self.party_content_type = ContentType.objects.get(
+            app_label='party', model='party'
+        )
+        pt_schema = Schema.objects.create(
+            content_type=self.party_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', ))
+        pt_schema_in = Schema.objects.create(
+            content_type=self.party_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', 'IN'))
+        pt_schema_gr = Schema.objects.create(
+            content_type=self.party_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', 'GR'))
+        attr_type_txt = AttributeType.objects.get(name='text')
+        attr_type_int = AttributeType.objects.get(name='integer')
+        attr_type_dec = AttributeType.objects.get(name='decimal')
+
+        Attribute.objects.create(
+            schema=pt_schema,
+            name='default_attr', long_name='Test field',
+            attr_type=attr_type_txt, index=0,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=pt_schema,
+            name='default_int_attr', long_name='Test integer field',
+            attr_type=attr_type_int, index=1,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=pt_schema_in,
+            name='party_in', long_name='Test IN field',
+            attr_type=attr_type_txt, index=0,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=pt_schema_gr,
+            name='party_gr', long_name='Test GR field',
+            attr_type=attr_type_txt, index=0,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=pt_schema_gr,
+            name='party_gr_dec', long_name='Test GR dec field',
+            attr_type=attr_type_dec, index=1,
+            required=False, omit=False
+        )
+        party_in = PartyFactory.create(
+            project=self.project, type='IN',
+            attributes={'default_attr': 'Test Schema',
+                        'default_int_attr': 1,
+                        'party_in': 'Test IN attribute'}
+        )
+        party_gr = PartyFactory.create(
+            project=self.project, type='GR',
+            attributes={'default_attr': 'Another Test Schema',
+                        'default_int_attr': 2,
+                        'party_gr_dec': 2.333,
+                        'party_gr': 'Test GR attribute'}
+        )
+        self.parties = [party_in, party_gr]
+
+        tenure_type = TenureRelationshipType.objects.get(id='CR')
+        self.tenurerelationship = TenureRelationshipFactory.create(
+            project=self.project, party=self.parties[0],
+            spatial_unit=self.spatialunit_1, tenure_type=tenure_type
+        )
+
     def test_init(self):
         project = ProjectFactory.build()
         exporter = ShapeExporter(project)
@@ -149,111 +318,101 @@ class ShapeTest(UserTestCase, TestCase):
         ds.Destroy()
 
     def test_write_items(self):
-        project = ProjectFactory.create(current_questionnaire='123abc')
 
-        content_type = ContentType.objects.get(app_label='party',
-                                               model='party')
-        schema = Schema.objects.create(
-            content_type=content_type,
-            selectors=(project.organization.id, project.id, '123abc', ))
-
-        for idx, type in enumerate(['text', 'boolean', 'dateTime', 'integer']):
-            attr_type = AttributeType.objects.get(name=type)
-            Attribute.objects.create(
-                schema=schema,
-                name=type, long_name=type,
-                attr_type=attr_type, index=idx,
-                required=False, omit=False
-            )
-
-        party = PartyFactory.create(
-            project=project,
-            name='Donald Duck',
-            type='IN',
-            attributes={
-                'text': 'text',
-                'boolean': True,
-                'dateTime': '2011-08-12 11:13',
-                'integer': 1,
-            }
-        )
-
-        exporter = ShapeExporter(project)
+        exporter = ShapeExporter(self.project)
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/party')
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
         filename = os.path.join(dst_dir, 'parties.csv')
-        exporter.write_items(filename,
-                             [party],
-                             content_type,
+        exporter.write_items(filename, self.parties, self.party_content_type,
                              ('id', 'name', 'type'))
 
         with open(filename) as csvfile:
             csvreader = csv.reader(csvfile)
-
             for i, row in enumerate(csvreader):
-                assert len(row) == 7
+                assert len(row) == 8
                 if i == 0:
-                    assert row == ['id', 'name', 'type', 'text', 'boolean',
-                                   'dateTime', 'integer']
-                else:
-                    assert row == [party.id, party.name, party.type, 'text',
-                                   'True', '2011-08-12 11:13', '1']
+                    assert row == [
+                        'id', 'name', 'type', 'default_attr',
+                        'default_int_attr', 'party_in', 'party_gr',
+                        'party_gr_dec']
+                if i == 1:
+                    assert row == [
+                        self.parties[0].id, self.parties[0].name,
+                        self.parties[0].type, 'Test Schema', '1',
+                        'Test IN attribute', '', ''
+                    ]
+                if i == 2:
+                    assert row == [
+                        self.parties[1].id, self.parties[1].name,
+                        self.parties[1].type, 'Another Test Schema', '2',
+                        '', 'Test GR attribute', '2.333'
+                    ]
+                if i > 2:
+                    assert False, 'Too many rows in CSV'
 
     def test_write_features(self):
         ensure_dirs()
-        project = ProjectFactory.create(current_questionnaire='123abc')
-        exporter = ShapeExporter(project)
-
-        content_type = ContentType.objects.get(app_label='spatial',
-                                               model='spatialunit')
-        schema = Schema.objects.create(
-            content_type=content_type,
-            selectors=(project.organization.id, project.id, '123abc', ))
-        attr_type = AttributeType.objects.get(name='text')
-        Attribute.objects.create(
-            schema=schema,
-            name='key', long_name='Test field',
-            attr_type=attr_type, index=0,
-            required=False, omit=False
-        )
-
-        su1 = SpatialUnitFactory.create(
-            project=project,
-            geometry='POINT (1 1)',
-            attributes={'key': 'value 1'})
-        su2 = SpatialUnitFactory.create(
-            project=project,
-            geometry='POINT (2 2)',
-            attributes={'key': 'value 2'})
+        exporter = ShapeExporter(self.project)
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file4')
         ds = exporter.create_datasource(dst_dir)
         layers = exporter.create_shp_layers(ds)
 
-        csvfile = os.path.join(dst_dir, 'locations.csv')
-        exporter.write_features(layers, csvfile)
+        filename = os.path.join(dst_dir, 'locations.csv')
+        exporter.write_features(layers, filename)
 
         assert len(layers[0]) == 2
         f = layers[0].GetNextFeature()
         while f:
             geom = f.geometry()
             assert geom.ExportToWkt() in ['POINT (1 1)', 'POINT (2 2)']
-            assert f.GetFieldAsString('id') in [su1.id, su2.id]
-
+            assert f.GetFieldAsString('id') in [
+                self.spatialunit_1.id, self.spatialunit_2.id]
             f = layers[0].GetNextFeature()
 
         ds.Destroy()
 
-        with open(csvfile) as csvfile:
+        with open(filename) as csvfile:
             csvreader = csv.reader(csvfile)
             for i, row in enumerate(csvreader):
                 if i == 0:
                     assert row == ['id', 'type', 'key']
-                elif row[0] == su1.id:
-                    assert row == [su1.id, su1.type, 'value 1']
-                elif row[1] == su2.id:
-                    assert row == [su2.id, su2.type, 'value 2']
+                elif row[0] == self.spatialunit_1.id:
+                    assert row == [
+                        self.spatialunit_1.id,
+                        self.spatialunit_1.type, 'value 1']
+                elif row[1] == self.spatialunit_2.id:
+                    assert row == [
+                        self.spatialunit_2.id,
+                        self.spatialunit_2.type, 'value 2']
+
+        # remove this so other tests pass
+        os.remove(filename)
+
+    def test_write_features_empty(self):
+        project = ProjectFactory.create()
+        dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file4')
+        if not os.path.exists(dst_dir):
+            os.makedirs(dst_dir)
+        filename = os.path.join(dst_dir, 'locations.csv')
+
+        exporter = ShapeExporter(project)
+        exporter.write_features((), filename)
+
+        assert not os.path.exists(filename)
+
+    def test_write_relationships_empty(self):
+        project = ProjectFactory.create()
+        dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/rel')
+        if not os.path.exists(dst_dir):
+            os.makedirs(dst_dir)
+        filename = os.path.join(dst_dir, 'relationships.csv')
+
+        exporter = ShapeExporter(project)
+        exporter.write_relationships(filename)
+
+        assert not os.path.exists(filename)
 
     def test_write_relationships(self):
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/rels')
@@ -261,8 +420,7 @@ class ShapeTest(UserTestCase, TestCase):
             os.makedirs(dst_dir)
         filename = os.path.join(dst_dir, 'releationships.csv')
 
-        project = ProjectFactory.create()
-        exporter = ShapeExporter(project)
+        exporter = ShapeExporter(self.project)
         exporter.write_relationships(filename)
 
         with open(filename) as csvfile:
@@ -270,9 +428,25 @@ class ShapeTest(UserTestCase, TestCase):
             for i, row in enumerate(csvreader):
                 if i == 0:
                     assert row == ['id', 'party_id', 'spatial_unit_id',
-                                   'tenure_type.label']
+                                   'tenure_type.id', 'tenure_type.label']
                 else:
-                    assert False, "Too many rows in CSV."
+                    assert row == [
+                        self.tenurerelationship.id, self.parties[0].id,
+                        self.spatialunit_1.id, 'CR', 'Carbon Rights']
+
+        # remove this so other tests pass
+        os.remove(filename)
+
+    def test_write_parties_empty(self):
+        project = ProjectFactory.create()
+        dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/party')
+        if not os.path.exists(dst_dir):
+            os.makedirs(dst_dir)
+        filename = os.path.join(dst_dir, 'parties.csv')
+
+        exporter = ShapeExporter(project)
+        exporter.write_parties(filename)
+        assert not os.path.exists(filename)
 
     def test_write_parties(self):
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/party')
@@ -280,40 +454,38 @@ class ShapeTest(UserTestCase, TestCase):
             os.makedirs(dst_dir)
         filename = os.path.join(dst_dir, 'parties.csv')
 
-        project = ProjectFactory.create()
-        exporter = ShapeExporter(project)
+        exporter = ShapeExporter(self.project)
         exporter.write_parties(filename)
 
         with open(filename) as csvfile:
             csvreader = csv.reader(csvfile)
             for i, row in enumerate(csvreader):
                 if i == 0:
-                    assert row == ['id', 'name', 'type']
-                else:
-                    assert False, "Too many rows in CSV."
+                    assert row == [
+                        'id', 'name', 'type', 'default_attr',
+                        'default_int_attr', 'party_in', 'party_gr',
+                        'party_gr_dec'
+                    ]
+                if i == 1:
+                    assert row == [
+                        self.parties[0].id, self.parties[0].name, 'IN',
+                        'Test Schema', '1', 'Test IN attribute', '', ''
+                    ]
+                if i == 2:
+                    assert row == [
+                        self.parties[1].id, self.parties[1].name,
+                        self.parties[1].type, 'Another Test Schema', '2',
+                        '', 'Test GR attribute', '2.333'
+                    ]
+                if i > 2:
+                    assert False, 'Too many rows in CSV'
+
+        # remove this so other tests pass
+        os.remove(filename)
 
     def test_make_download(self):
         ensure_dirs()
-        project = ProjectFactory.create(current_questionnaire='123abc')
-        exporter = ShapeExporter(project)
-
-        content_type = ContentType.objects.get(app_label='spatial',
-                                               model='spatialunit')
-        schema = Schema.objects.create(
-            content_type=content_type,
-            selectors=(project.organization.id, project.id, '123abc', ))
-        attr_type = AttributeType.objects.get(name='text')
-        Attribute.objects.create(
-            schema=schema,
-            name='key', long_name='Test field',
-            attr_type=attr_type, index=0,
-            required=False, omit=False
-        )
-
-        SpatialUnitFactory.create(
-            project=project,
-            geometry='POINT (1 1)',
-            attributes={'key': 'value 1'})
+        exporter = ShapeExporter(self.project)
 
         path, mime = exporter.make_download('file5')
 
@@ -346,33 +518,90 @@ class XLSTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create(current_questionnaire='123abc')
-        self.content_type = ContentType.objects.get(app_label='spatial',
-                                                    model='spatialunit')
-        schema = Schema.objects.create(
-            content_type=self.content_type,
+        self.spatial_content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit'
+        )
+        sp_schema = Schema.objects.create(
+            content_type=self.spatial_content_type,
             selectors=(
                 self.project.organization.id, self.project.id, '123abc', ))
-        attr_type = AttributeType.objects.get(name='text')
+        attr_type_text = AttributeType.objects.get(name='text')
+        attr_type_int = AttributeType.objects.get(name='integer')
+        attr_type_dec = AttributeType.objects.get(name='decimal')
         Attribute.objects.create(
-            schema=schema,
+            schema=sp_schema,
             name='key', long_name='Test field',
-            attr_type=attr_type, index=0,
+            attr_type=attr_type_text, index=0,
             required=False, omit=False
         )
-
+        Attribute.objects.create(
+            schema=sp_schema,
+            name='integer', long_name='Test integer field',
+            attr_type=attr_type_int, index=1,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=sp_schema,
+            name='decimal', long_name='Test decimal field',
+            attr_type=attr_type_dec, index=2,
+            required=False, omit=False
+        )
         self.spatialunit_1 = SpatialUnitFactory.create(
             project=self.project,
             geometry='POINT (1 1)',
-            attributes={'key': 'value 1'})
+            attributes={'key': 'value 1', 'integer': '1', 'decimal': '1.0'})
         self.spatialunit_2 = SpatialUnitFactory.create(
             project=self.project,
             geometry='POINT (2 2)',
-            attributes={'key': 'value 2'})
+            attributes={'key': 'value 2', 'integer': '2', 'decimal': '2.0'})
         self.spatialunits = [self.spatialunit_1, self.spatialunit_2]
-        self.attrs = ['id', 'geometry.ewkt']
+        self.spatial_attrs = ['id', 'geometry.ewkt']
 
-        self.parties = PartyFactory.create_batch(
-            project=self.project, size=2)
+        self.party_content_type = ContentType.objects.get(
+            app_label='party', model='party'
+        )
+        pt_schema = Schema.objects.create(
+            content_type=self.party_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', ))
+        pt_schema_in = Schema.objects.create(
+            content_type=self.party_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', 'IN'))
+        pt_schema_gr = Schema.objects.create(
+            content_type=self.party_content_type,
+            selectors=(
+                self.project.organization.id, self.project.id, '123abc', 'GR'))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=pt_schema,
+            name='default_attr', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=pt_schema_in,
+            name='party_in', long_name='Test IN field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        Attribute.objects.create(
+            schema=pt_schema_gr,
+            name='party_gr', long_name='Test GR field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        party_in = PartyFactory.create(
+            project=self.project, type='IN',
+            attributes={'default_attr': 'Test Schema',
+                        'party_in': 'Test IN attribute'}
+        )
+        party_gr = PartyFactory.create(
+            project=self.project, type='GR',
+            attributes={'default_attr': 'Another Test Schema',
+                        'party_gr': 'Test GR attribute'}
+        )
+        self.parties = [party_in, party_gr]
 
         TenureRelationshipFactory.create(
             project=self.project, party=self.parties[0],
@@ -390,19 +619,27 @@ class XLSTest(UserTestCase, TestCase):
 
         exporter = XLSExporter(self.project)
         exporter.write_items(
-            worksheet, self.spatialunits, self.content_type, self.attrs)
+            worksheet, self.spatialunits, self.spatial_content_type,
+            self.spatial_attrs
+        )
 
         assert worksheet['A1'].value == 'id'
         assert worksheet['B1'].value == 'geometry.ewkt'
         assert worksheet['C1'].value == 'key'
+        assert worksheet['D1'].value == 'integer'
+        assert worksheet['E1'].value == 'decimal'
 
         assert worksheet['A2'].value == self.spatialunit_1.id
         assert worksheet['B2'].value == self.spatialunit_1.geometry.ewkt
         assert worksheet['C2'].value == 'value 1'
+        assert worksheet['D2'].value == '1'
+        assert worksheet['E2'].value == '1.0'
 
         assert worksheet['A3'].value == self.spatialunit_2.id
         assert worksheet['B3'].value == self.spatialunit_2.geometry.ewkt
         assert worksheet['C3'].value == 'value 2'
+        assert worksheet['D3'].value == '2'
+        assert worksheet['E3'].value == '2.0'
 
     def test_write_locations(self):
         workbook = Workbook()
@@ -410,7 +647,7 @@ class XLSTest(UserTestCase, TestCase):
         exporter.workbook = workbook
         exporter.write_locations()
         assert workbook['locations']
-        assert len(workbook['locations'].rows) == 3
+        assert len(list(workbook['locations'].rows)) == 3
 
     def test_write_locations_empty(self):
         workbook = Workbook()
@@ -430,7 +667,14 @@ class XLSTest(UserTestCase, TestCase):
         exporter.workbook = workbook
         exporter.write_parties()
         assert workbook['parties']
-        assert len(workbook['parties'].rows) == 3
+        assert len(list(workbook['parties'].rows)) == 3
+        assert workbook['parties']['C2'].value == 'IN'
+        assert workbook['parties']['E2'].value == 'Test IN attribute'
+        assert workbook['parties']['E3'].value == ''
+        assert workbook['parties']['F2'].value == ''
+        assert workbook['parties']['C3'].value == 'GR'
+        assert workbook['parties']['F3'].value == 'Test GR attribute'
+        assert workbook['parties']
 
     def test_write_parties_empty(self):
         workbook = Workbook()
@@ -451,7 +695,7 @@ class XLSTest(UserTestCase, TestCase):
 
         exporter.write_relationships()
         assert workbook['relationships']
-        assert len(workbook['relationships'].rows) == 2
+        assert len(list(workbook['relationships'].rows)) == 2
 
     def test_write_relationships_empty(self):
         workbook = Workbook()
@@ -478,6 +722,7 @@ class XLSTest(UserTestCase, TestCase):
 @pytest.mark.usefixtures('clear_temp')
 @pytest.mark.usefixtures('make_dirs')
 class ResourcesTest(UserTestCase, TestCase):
+
     def test_init(self):
         project = ProjectFactory.build()
         exporter = ResourceExporter(project)
