@@ -142,6 +142,9 @@ class ContactsWidget(Widget):
     def value_from_datadict(self, data, files, name):
         return self.attrs['formset'](data, files, prefix=name)
 
+    def value_omitted_from_data(self, data, files, name):
+        return not any([k.startswith(name) for k in data.keys()])
+
     def render(self, name, value, attrs=None):
         if not isinstance(value, self.attrs['formset']):
             value = self.attrs['formset'](prefix=name, initial=value)

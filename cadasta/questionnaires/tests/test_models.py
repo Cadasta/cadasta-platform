@@ -13,7 +13,9 @@ class QuestionnaireTest(TestCase):
                                        'title=Questions project=prj>')
 
     def test_save(self):
-        questionnaire = factories.QuestionnaireFactory.build()
+        questionnaire = factories.QuestionnaireFactory.build(
+            project=ProjectFactory.create()
+        )
         questionnaire.version = None
         questionnaire.md5_hash = None
 
@@ -23,7 +25,8 @@ class QuestionnaireTest(TestCase):
 
         questionnaire = factories.QuestionnaireFactory.build(
             version=129839021903,
-            md5_hash='sakohjd89su90us9a0jd90sau90d'
+            md5_hash='sakohjd89su90us9a0jd90sau90d',
+            project=ProjectFactory.create()
         )
 
         questionnaire.save()

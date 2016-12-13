@@ -105,12 +105,7 @@ class OrganizationTest(UserTestCase, TestCase):
     def test_add_organization_with_restricted_name(self):
         invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
         data = {
-            'name': random.choice(invalid_names),
-            'contacts-TOTAL_FORMS': 1,
-            'contacts-INITIAL_FORMS': 0,
-            'contacts-0-name': '',
-            'contacts-0-email': '',
-            'contacts-0-tel': ''
+            'name': random.choice(invalid_names)
         }
         form = forms.OrganizationForm(data, user=UserFactory.create())
         assert not form.is_valid()
@@ -176,6 +171,7 @@ class OrganizationTest(UserTestCase, TestCase):
         form.is_valid()
         form.save()
         org.refresh_from_db()
+        assert org.name == 'New Name'
         assert org.contacts == []
 
 
