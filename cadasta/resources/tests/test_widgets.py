@@ -53,11 +53,6 @@ class ResourceWidgetTest(UserTestCase, TestCase):
         )
         widget = ResourceWidget(resource=self.resource)
         rendered = widget.render('file', True)
-        print(rendered)
-        print(expected_html.format(
-                    updated=date(self.resource.last_updated, 'N j, Y, P'),
-                    thumbnail=self.resource.thumbnail
-                ))
         assert expected_html.format(
             updated=date(self.resource.last_updated, 'N j, Y, P'),
             thumbnail=self.resource.thumbnail

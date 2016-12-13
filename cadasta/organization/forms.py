@@ -12,7 +12,6 @@ from django.contrib.gis import forms as gisforms
 from django.contrib.postgres import forms as pg_forms
 from django.db import transaction
 from django.forms import ValidationError
-from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
 from leaflet.forms.widgets import LeafletWidget
