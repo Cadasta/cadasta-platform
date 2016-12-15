@@ -4,8 +4,6 @@
 add a reference to that issue as well.]
 
 -
--
--
 
 ### When should this PR be merged
 
@@ -19,8 +17,6 @@ can merge this pull request.]
 [List any risks that could arise from merging your pull request.]
 
 -
--
--
 
 ### Follow up actions
 
@@ -29,11 +25,13 @@ migrations, software that we need to install on staging and production
 environments.]
 
 -
--
--
 
 
 ### Checklist (for reviewing)
+
+#### General
+
+- [ ] **Is the PR labeled correctly?** It should have the `migration` label if a new migration is added. 
 
 #### Functionality
 
