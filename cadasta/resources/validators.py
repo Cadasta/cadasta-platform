@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
-ACCEPTED_TYPES = settings.MIME_LOOKUPS.keys()
+ACCEPTED_TYPES = settings.ICON_LOOKUPS.keys()
 
 
 def validate_file_type(type):

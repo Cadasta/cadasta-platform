@@ -346,7 +346,7 @@ ATTRIBUTE_GROUPS = {
 ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-platformprod'
             '-bucket/icons/{}.png')
 
-MIME_LOOKUPS = {
+ICON_LOOKUPS = {
     'application/pdf': 'pdf',
     'audio/1d-interleaved-parityfec': '1d-interleaved-parityfec',
     'audio/32kadpcm': '32kadpcm',
@@ -485,7 +485,12 @@ MIME_LOOKUPS = {
     'image/png': 'png',
     'image/gif': 'gif',
     'image/tif': 'tiff',
-    'image/tiff': 'tiff'
+    'image/tiff': 'tiff',
+    'application/gpx+xml': 'gpx'
+}
+
+MIME_LOOKUPS = {
+     'gpx': 'application/gpx+xml'
 }
 
 FILE_UPLOAD_HANDLERS = [
