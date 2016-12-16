@@ -94,7 +94,7 @@ function renderFeatures(map, featuresUrl, options) {
     projectBounds = boundary.getBounds();
     if (options.fitBounds === 'project') {map.fitBounds(projectBounds);}
   } else {
-    map.fitBounds([[-180, -90], [180, 90]]);
+    map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
   }
   
   var geoJson = L.geoJson(null, {
