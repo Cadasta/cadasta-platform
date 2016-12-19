@@ -113,6 +113,17 @@ class QuestionnaireSerializerTest(FileStorageTestCase, TestCase):
 
     def test_serialize(self):
         questionnaire = factories.QuestionnaireFactory()
+
+        factories.QuestionFactory.create(questionnaire=questionnaire,
+                                         question_group=None)
+        group = factories.QuestionGroupFactory.create(
+            questionnaire=questionnaire,
+            question_group=None)
+        factories.QuestionGroupFactory.create(questionnaire=questionnaire,
+                                              question_group=group)
+        factories.QuestionFactory.create(questionnaire=questionnaire,
+                                         question_group=group)
+
         serializer = serializers.QuestionnaireSerializer(questionnaire)
 
         assert serializer.data['id'] == questionnaire.id
@@ -122,6 +133,12 @@ class QuestionnaireSerializerTest(FileStorageTestCase, TestCase):
         assert serializer.data['xls_form'] == questionnaire.xls_form.url
         assert serializer.data['version'] == questionnaire.version
         assert 'project' not in serializer.data
+
+        assert len(serializer.data['questions']) == 1
+        assert len(serializer.data['question_groups']) == 1
+        assert len(serializer.data['question_groups'][0]['questions']) == 1
+        assert (
+            len(serializer.data['question_groups'][0]['question_groups']) == 1)
 
     def test_huge(self):
         data = {
