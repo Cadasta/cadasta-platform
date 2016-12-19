@@ -63,7 +63,10 @@ function renderFeatures(map, featuresUrl, options) {
       } else {
         $('#messages #loading').addClass('hidden');
         if (options.fitBounds === 'locations') {
-          map.fitBounds(markers.getBounds());
+          var bounds = markers.getBounds();
+          if (bounds.isValid()) {
+            map.fitBounds(bounds);  
+          }
         }
       }
 
@@ -90,6 +93,8 @@ function renderFeatures(map, featuresUrl, options) {
     boundary.addTo(map);
     projectBounds = boundary.getBounds();
     if (options.fitBounds === 'project') {map.fitBounds(projectBounds);}
+  } else {
+    map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
   }
   
   var geoJson = L.geoJson(null, {

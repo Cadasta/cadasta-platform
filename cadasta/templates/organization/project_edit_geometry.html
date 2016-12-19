@@ -27,6 +27,15 @@
       }
       add_map_controls(map);
 
+      {% if project.extent %}
+      var projectExtent = {{ project.extent.geojson|safe }};
+      {% else %}
+      var projectExtent = null;
+      {% endif %}
+      if (!projectExtent) {
+        map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
+      }
+
       // Enable edit mode on map load and save the geometry on page save
       setTimeout(enableMapEditMode, 500);
       $('button.btn-primary[type=submit]')[0].addEventListener('click', saveOnMapEditMode);
