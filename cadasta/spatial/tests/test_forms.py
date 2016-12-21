@@ -310,9 +310,13 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         form.save()
 
         assert Party.objects.count() == 1
+        print('++++ BLAH ++++')
         party = Party.objects.first()
+        print('++++ BLAH 2 ++++')
         assert party.name == 'The Beatles'
         assert party.type == 'GR'
+        print('++++ BLAH 3 ++++')
+        print(party.attributes)
         assert party.attributes.get('p_name') == 'Party Name'
 
         assert TenureRelationship.objects.count() == 1

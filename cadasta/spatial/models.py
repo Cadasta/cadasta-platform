@@ -40,7 +40,6 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
-    objects = managers.SpatialUnitManager()
 
     # Spatial unit-spatial unit relationships: includes spatial
     # containment and split/merge relationships.

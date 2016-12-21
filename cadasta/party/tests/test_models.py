@@ -300,8 +300,7 @@ class TenureRelationshipTest(UserTestCase, TestCase):
         assert ContentObject.objects.filter(
             object_id=tenure.id,
             resource=resource,).exists()
-        tenure_deferred = TenureRelationship.objects.all(
-                                                    ).defer('attributes')[0]
+        tenure_deferred = TenureRelationship.objects.all()[0]
 
         assert resource in tenure_deferred.resources
 
