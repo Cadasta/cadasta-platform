@@ -66,21 +66,21 @@ class ShapeExporter(Exporter):
                 values = self.get_values(su, model_attrs, schema_attrs)
                 csvwriter.writerow(values)
 
-    def create_datasource(self, dst_dir, f_name):
+    def create_datasource(self, dst_dir):
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
-        path = os.path.join(dst_dir, f_name + '-point.shp')
+        path = os.path.join(dst_dir, 'point.shp')
         driver = ogr.GetDriverByName('ESRI Shapefile')
         return driver.CreateDataSource(path)
 
-    def create_shp_layers(self, datasource, f_name):
+    def create_shp_layers(self, datasource):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(4326)
 
         layers = (
-            datasource.CreateLayer(f_name + '-point', srs, geom_type=1),
-            datasource.CreateLayer(f_name + '-line', srs, geom_type=2),
-            datasource.CreateLayer(f_name + '-polygon', srs, geom_type=3)
+            datasource.CreateLayer('point', srs, geom_type=1),
+            datasource.CreateLayer('line', srs, geom_type=2),
+            datasource.CreateLayer('polygon', srs, geom_type=3)
         )
 
         for layer in layers:
@@ -92,8 +92,8 @@ class ShapeExporter(Exporter):
     def make_download(self, f_name):
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/{}'.format(f_name))
 
-        ds = self.create_datasource(dst_dir, self.project.slug)
-        layers = self.create_shp_layers(ds, self.project.slug)
+        ds = self.create_datasource(dst_dir)
+        layers = self.create_shp_layers(ds)
 
         self.write_features(layers, os.path.join(dst_dir, 'locations.csv'))
         self.write_relationships(os.path.join(dst_dir, 'relationships.csv'))
@@ -104,12 +104,11 @@ class ShapeExporter(Exporter):
         path = os.path.join(settings.MEDIA_ROOT, 'temp/{}.zip'.format(f_name))
         readme = render_to_string(
             'organization/download/shp_readme.txt',
-            {'project_name': self.project.name,
-             'project_slug': self.project.slug}
+            {'project_name': self.project.name}
         )
         with ZipFile(path, 'a') as myzip:
             myzip.writestr('README.txt', readme)
-            for file in os.listdir(dst_dir):
-                myzip.write(os.path.join(dst_dir, file), arcname=file)
+            for f in os.listdir(dst_dir):
+                myzip.write(os.path.join(dst_dir, f), arcname=f)
 
         return path, MIME_TYPE

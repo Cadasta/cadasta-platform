@@ -129,9 +129,9 @@ class ShapeTest(UserTestCase, TestCase):
         exporter = ShapeExporter(project)
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file')
-        ds = exporter.create_datasource(dst_dir, 'file0')
+        ds = exporter.create_datasource(dst_dir)
         assert (ds.GetName() ==
-                os.path.join(settings.MEDIA_ROOT, 'temp/file/file0-point.shp'))
+                os.path.join(settings.MEDIA_ROOT, 'temp/file/point.shp'))
         ds.Destroy()
 
     def test_create_shp_layers(self):
@@ -140,12 +140,12 @@ class ShapeTest(UserTestCase, TestCase):
         exporter = ShapeExporter(project)
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file6')
-        ds = exporter.create_datasource(dst_dir, 'file6')
-        layers = exporter.create_shp_layers(ds, 'file6')
+        ds = exporter.create_datasource(dst_dir)
+        layers = exporter.create_shp_layers(ds)
         assert len(layers) == 3
-        assert layers[0].GetName() == 'file6-point'
-        assert layers[1].GetName() == 'file6-line'
-        assert layers[2].GetName() == 'file6-polygon'
+        assert layers[0].GetName() == 'point'
+        assert layers[1].GetName() == 'line'
+        assert layers[2].GetName() == 'polygon'
         ds.Destroy()
 
     def test_write_items(self):
@@ -228,8 +228,8 @@ class ShapeTest(UserTestCase, TestCase):
             attributes={'key': 'value 2'})
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file4')
-        ds = exporter.create_datasource(dst_dir, 'file4')
-        layers = exporter.create_shp_layers(ds, 'file4')
+        ds = exporter.create_datasource(dst_dir)
+        layers = exporter.create_shp_layers(ds)
 
         csvfile = os.path.join(dst_dir, 'locations.csv')
         exporter.write_features(layers, csvfile)
@@ -322,18 +322,18 @@ class ShapeTest(UserTestCase, TestCase):
 
         with ZipFile(path, 'r') as testzip:
             assert len(testzip.namelist()) == 16
-            assert project.slug + '-point.dbf' in testzip.namelist()
-            assert project.slug + '-point.prj' in testzip.namelist()
-            assert project.slug + '-point.shp' in testzip.namelist()
-            assert project.slug + '-point.shx' in testzip.namelist()
-            assert project.slug + '-line.dbf' in testzip.namelist()
-            assert project.slug + '-line.prj' in testzip.namelist()
-            assert project.slug + '-line.shp' in testzip.namelist()
-            assert project.slug + '-line.shx' in testzip.namelist()
-            assert project.slug + '-polygon.dbf' in testzip.namelist()
-            assert project.slug + '-polygon.prj' in testzip.namelist()
-            assert project.slug + '-polygon.shp' in testzip.namelist()
-            assert project.slug + '-polygon.shx' in testzip.namelist()
+            assert 'point.dbf' in testzip.namelist()
+            assert 'point.prj' in testzip.namelist()
+            assert 'point.shp' in testzip.namelist()
+            assert 'point.shx' in testzip.namelist()
+            assert 'line.dbf' in testzip.namelist()
+            assert 'line.prj' in testzip.namelist()
+            assert 'line.shp' in testzip.namelist()
+            assert 'line.shx' in testzip.namelist()
+            assert 'polygon.dbf' in testzip.namelist()
+            assert 'polygon.prj' in testzip.namelist()
+            assert 'polygon.shp' in testzip.namelist()
+            assert 'polygon.shx' in testzip.namelist()
             assert 'relationships.csv' in testzip.namelist()
             assert 'parties.csv' in testzip.namelist()
             assert 'locations.csv' in testzip.namelist()
