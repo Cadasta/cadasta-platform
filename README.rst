@@ -66,7 +66,7 @@ Acknowledgements
 
 Cadasta is grateful for the technical considerations and support provided by:
 
-`BrowserStack <https://www.browserstack.com/>`_
+- `BrowserStack <https://www.browserstack.com/>`_
 
-`Opbeat <https://opbeat.com>`_
+- `Opbeat <https://opbeat.com>`_
 
