@@ -10,118 +10,115 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-12-12 21:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: fr rev <e2ffr02@hotmail.com>, 2016\n"
-"Language-Team: French (https://www.transifex.com/cadasta/teams/61422/fr/)\n"
+"Language-Team: Malayalam (https://www.transifex.com/cadasta/teams/61422/ml/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Language: ml\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: core/static/js/map_utils.js:10
 msgid "Zoom in"
-msgstr "Faire un zoom avant"
+msgstr ""
 
 #: core/static/js/map_utils.js:11
 msgid "Zoom out"
-msgstr "Faire un zoom arrière"
+msgstr ""
 
 #: core/static/js/map_utils.js:30
 msgid "Go to my location"
-msgstr "Accéder à mon emplacement"
+msgstr ""
 
 #: core/static/js/parsley.js:2282
 msgid "This field seems to be invalid."
-msgstr "Cette valeur semble non valide."
+msgstr ""
 
 #: core/static/js/parsley.js:2284
 msgid "This field should be a valid email."
-msgstr "Cette valeur n'est pas une adresse email valide."
+msgstr ""
 
 #: core/static/js/parsley.js:2285
 msgid "This value should be a valid url."
-msgstr "Cette valeur doit être une URL valide."
+msgstr ""
 
 #: core/static/js/parsley.js:2286
 msgid "This value should be a valid number."
-msgstr "Cette valeur doit être un nombre."
+msgstr ""
 
 #: core/static/js/parsley.js:2287
 msgid "This value should be a valid integer."
-msgstr "Cette valeur doit être un entier."
+msgstr ""
 
 #: core/static/js/parsley.js:2288
 msgid "This value should be digits."
-msgstr "Cette valeur doit être numérique."
+msgstr ""
 
 #: core/static/js/parsley.js:2289
 msgid "This value should be alphanumeric."
-msgstr "Cette valeur doit être alphanumérique."
+msgstr ""
 
 #: core/static/js/parsley.js:2291
 msgid "This field should not be blank."
-msgstr "Ce champ ne peut pas rester vide."
+msgstr ""
 
 #: core/static/js/parsley.js:2292
 msgid "This field is required."
-msgstr "Ce champ est obligatoire."
+msgstr ""
 
 #: core/static/js/parsley.js:2293
 msgid "This value seems to be invalid."
-msgstr "Cette valeur semble non valide."
+msgstr ""
 
 #: core/static/js/parsley.js:2294
 #, javascript-format
 msgid "This value should be greater than or equal to %s."
-msgstr "Cette valeur ne doit pas être inférieure à %s."
+msgstr ""
 
 #: core/static/js/parsley.js:2295
 #, javascript-format
 msgid "This value should be lower than or equal to %s."
-msgstr "Cette valeur ne doit pas excéder %s."
+msgstr ""
 
 #: core/static/js/parsley.js:2296
 #, javascript-format
 msgid "This value should be between %s and %s."
-msgstr "Cette valeur doit être comprise entre %s et %s."
+msgstr ""
 
 #: core/static/js/parsley.js:2297
 #, javascript-format
 msgid "This field is too short. It should have %s characters or more."
 msgstr ""
-"Cette chaîne est trop courte. Elle doit avoir au minimum %s caractères."
 
 #: core/static/js/parsley.js:2298
 #, javascript-format
 msgid "This field is too long. It should have %s characters or fewer."
 msgstr ""
-"Cette chaîne est trop longue. Elle doit avoir au maximum %s caractères."
 
 #: core/static/js/parsley.js:2299
 #, javascript-format
 msgid ""
 "This field length is invalid. It should be between %s and %s characters "
 "long."
-msgstr "Cette valeur doit contenir entre %s et %s caractères."
+msgstr ""
 
 #: core/static/js/parsley.js:2300
 #, javascript-format
 msgid "You must select at least %s choices."
-msgstr "Vous devez sélectionner au moins %s choix."
+msgstr ""
 
 #: core/static/js/parsley.js:2301
 #, javascript-format
 msgid "You must select %s choices or fewer."
-msgstr "Vous devez sélectionner %s choix maximum."
+msgstr ""
 
 #: core/static/js/parsley.js:2302
 #, javascript-format
 msgid "You must select between %s and %s choices."
-msgstr "Vous devez sélectionner entre %s et %s choix."
+msgstr ""
 
 #: core/static/js/parsley.js:2303
 msgid "This value should be the same."
-msgstr "Cette valeur devrait être identique."
+msgstr ""
 
 #: core/static/js/parsleyAddValidator.js:16
 msgid ""
@@ -129,15 +126,11 @@ msgid ""
 "characters, uppercase characters, special characters, and/or numerical "
 "characters."
 msgstr ""
-"Votre mot de passe doit contenir au moins 3 des types de caractères suivants"
-" : minuscules, majuscules, caractères spéciaux ou chiffres."
 
 #: core/static/js/parsleyAddValidator.js:27
 msgid "Your password cannot contain your username."
-msgstr "Votre mot de passe ne peut pas contenir votre nom d'utilisateur."
+msgstr ""
 
 #: core/static/js/parsleyAddValidator.js:37
 msgid "Your password cannot contain your email mailbox name."
 msgstr ""
-"Votre mot de passe ne peut pas contenir le nom de votre boîte aux lettres "
-"électronique."

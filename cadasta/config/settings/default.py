@@ -263,9 +263,9 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 LANGUAGES = [
     # ('ar', _('Arabic')),    (hiding until RTL support fixed)
     ('en', _('English')),
-    # ('fr', _('French')),    (hiding until translation coverage >= 75%)
+    ('fr', _('French')),
     # ('de', _('German')),    (hiding until translation coverage >= 75%)
-    # ('es', _('Spanish')),   (hiding until translation coverage >= 75%)
+    ('es', _('Spanish')),
     ('id', _('Indonesian')),
     ('pt', _('Portuguese')),
     # ('sw', _('Swahili')),   (hiding until translation coverage >= 75%)
