@@ -149,7 +149,7 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
     )
     version = serializers.IntegerField(required=False, default=1)
     questions = serializers.SerializerMethodField()
-    question_groups = QuestionGroupSerializer(many=True, read_only=True)
+    question_groups = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Questionnaire
@@ -210,4 +210,9 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
     def get_questions(self, instance):
         questions = instance.questions.filter(question_group__isnull=True)
         serializer = QuestionSerializer(questions, many=True)
+        return serializer.data
+
+    def get_question_groups(self, instance):
+        groups = instance.question_groups.filter(question_group__isnull=True)
+        serializer = QuestionGroupSerializer(groups, many=True)
         return serializer.data

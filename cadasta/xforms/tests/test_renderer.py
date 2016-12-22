@@ -50,35 +50,50 @@ class XFormRendererTest(TestCase):
         groups = [{
             'id': '123',
             'name': 'group_1',
-            'label': 'Group 2',
+            'label': 'Group 1',
+            'type': 'group',
             'relevant': "${party_type}='IN'",
+            'index': 0,
             'questions': [{
                 'id': "bzs2984c3gxgwcjhvambdt3w",
                 'name': "start",
                 'label': None,
                 'type': "ST",
+                'index': 0
             }]
         }, {
             'id': '456',
             'name': 'group_2',
             'label': None,
+            'type': 'repeat',
+            'index': 1,
             'questions': [{
                 'id': "xp8vjr6dsk46p47u22fft7bg",
                 'name': "tenure_type",
                 'label': "What is the social tenure type?",
                 'type': "TX",
+                'index': 0
+            }],
+            'question_groups': [{
+                'id': "xp8vjr6dsk46p47u22fft7aa",
+                'name': 'group_3',
+                'label': 'Group 3',
+                'type': 'group',
+                'index': 1
             }]
         }]
         renderer = XFormRenderer()
         transformed = renderer.transform_groups(groups)
         assert len(transformed) == 2
         for g in transformed:
-            assert g['type'] == 'group'
-            assert len(g['children']) == 1
             if g['name'] == 'group_1':
                 assert g['bind']['relevant'] == "${party_type}='IN'"
+                assert g['type'] == 'group'
+                assert len(g['children']) == 1
             if g['name'] == 'group_2':
                 assert 'label' not in g
+                assert g['type'] == 'repeat'
+                assert len(g['children']) == 2
 
     def test_transform_to_xform_json(self):
         data = {

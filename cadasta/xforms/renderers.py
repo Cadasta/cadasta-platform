@@ -96,11 +96,15 @@ class XFormRenderer(BaseRenderer):
     def transform_groups(self, groups):
         transformed_groups = []
         for g in groups:
+            questions = self.transform_questions(g.get('questions', []))
+            groups = self.transform_groups(g.get('question_groups', []))
+            children = sorted(questions + groups,
+                              key=lambda x: x['index'])
             group = {
-                'type': 'group',
+                'type': g.get('type', 'group'),
                 'name': g.get('name'),
                 'label': g.get('label'),
-                'children': self.transform_questions(g.get('questions')),
+                'children': children,
                 'index': g.get('index')
             }
             if group['label'] is None:
