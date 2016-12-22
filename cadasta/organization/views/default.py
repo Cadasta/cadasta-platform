@@ -652,7 +652,7 @@ class ProjectEditDetails(ProjectEdit, generic.UpdateView):
 
     def post(self, *args, **kwargs):
         if self.get_project().has_records:
-            return self.get(*args, **kwargs)
+            return super().post(*args, **kwargs)
         else:
             try:
                 return super().post(*args, **kwargs)

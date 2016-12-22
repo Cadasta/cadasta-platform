@@ -925,7 +925,6 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         'description': 'New Description',
         'access': 'public',
         'urls': '',
-        'questionnaire': '',
         'contacts-TOTAL_FORMS': 1,
         'contacts-INITIAL_FORMS': 0,
         'contacts-0-name': '',
@@ -934,7 +933,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     }
 
     def setup_models(self):
-        self.project = ProjectFactory.create(current_questionnaire='abc')
+        self.project = ProjectFactory.create()
 
     def setup_url_kwargs(self):
         return {
@@ -1010,6 +1009,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         self.project.refresh_from_db()
         assert self.project.name == self.post_data['name']
         assert self.project.description == self.post_data['description']
+        assert self.project.current_questionnaire == ''
 
     def test_post_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
@@ -1017,11 +1017,12 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         assign_policies(user)
         response = self.request(user=user, method='POST')
 
-        assert response.status_code == 200
+        assert response.status_code == 302
+        assert self.expected_success_url in response.location
         self.project.refresh_from_db()
-        assert self.project.name != self.post_data['name']
-        assert self.project.description != self.post_data['description']
-        assert self.project.current_questionnaire == 'abc'
+        assert self.project.name == self.post_data['name']
+        assert self.project.description == self.post_data['description']
+        assert self.project.current_questionnaire == ''
 
     def test_post_invalid_form(self):
         question = self.get_form('xls-form-invalid')
