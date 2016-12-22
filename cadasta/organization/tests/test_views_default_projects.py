@@ -925,6 +925,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         'description': 'New Description',
         'access': 'public',
         'urls': '',
+        'questionnaire': '',
         'contacts-TOTAL_FORMS': 1,
         'contacts-INITIAL_FORMS': 0,
         'contacts-0-name': '',
@@ -933,7 +934,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     }
 
     def setup_models(self):
-        self.project = ProjectFactory.create()
+        self.project = ProjectFactory.create(current_questionnaire='abc')
 
     def setup_url_kwargs(self):
         return {
@@ -1017,12 +1018,26 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         assign_policies(user)
         response = self.request(user=user, method='POST')
 
-        assert response.status_code == 302
-        assert self.expected_success_url in response.location
+        assert response.status_code == 200
         self.project.refresh_from_db()
-        assert self.project.name == self.post_data['name']
-        assert self.project.description == self.post_data['description']
-        assert self.project.current_questionnaire == ''
+        assert self.project.name != self.post_data['name']
+        assert self.project.description != self.post_data['description']
+        assert self.project.current_questionnaire == 'abc'
+
+    def test_post_empty_questionnaire_with_blocked_questionnaire_upload(self):
+        SpatialUnitFactory.create(project=self.project)
+        user = UserFactory.create()
+        assign_policies(user)
+        post_data = self.post_data.copy()
+        del post_data['questionnaire']
+        assert 'questionnaire' not in post_data.keys()
+        response = self.request(user=user, method='POST')
+
+        assert response.status_code == 200
+        self.project.refresh_from_db()
+        assert self.project.name != self.post_data['name']
+        assert self.project.description != self.post_data['description']
+        assert self.project.current_questionnaire == 'abc'
 
     def test_post_invalid_form(self):
         question = self.get_form('xls-form-invalid')
