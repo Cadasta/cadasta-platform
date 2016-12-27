@@ -31,10 +31,14 @@
 
       <!-- More options menu -->
       {% if is_administrator %}
-      <div class="dropdown pull-right btn-more">
-        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+      <div class="dropdown pull-right btn-add">
+        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
         </a>
+        <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
+          <div class="visible-md-inline visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
+          <div class="visible-sm-inline">{% trans "More" %} <span class="caret"></span></div>   
+        </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
           <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
@@ -56,7 +60,7 @@
 
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
-        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
+        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add new location' %}">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
         </a>
         {% endif %}
@@ -75,7 +79,7 @@
       <!-- Single add button for smaller screens-->
       <div class="dropdown pull-right visible-xs-inline">
         {% if is_allowed_add_location or is_allowed_add_resource %}
-        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
+        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button" aria-label="{% trans 'Add new location' %}">
           <span class="glyphicon glyphicon-plus"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">

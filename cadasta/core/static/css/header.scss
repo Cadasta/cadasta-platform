@@ -1,0 +1,269 @@
+/* =Header
+-------------------------------------------------------------- */
+
+header {
+  z-index: 1000;
+  position: relative;
+  height: $header-height;
+  background-color: $brand-primary;
+  -webkit-box-shadow: 0 1px 4px rgba(31,54,79,.2);
+  -moz-box-shadow: 0 1px 4px rgba(31,54,79,.2);
+  box-shadow: 0 1px 4px rgba(31,54,79,.2);
+  &.header {
+    top: 0;
+  }
+  #logo {
+    display: inline-block;
+    line-height: $header-height;
+    font-size: 22px;
+    margin: 0 auto;
+    padding: 0;
+    img {
+      height: 18px;
+      width: 124px;
+    }
+  }
+  .nav {
+    display: inline-block;
+    float: right;
+    height: $navbar-height;
+    ul.list-inline {
+      margin-bottom: 0;
+      > li {
+        border-top: solid 7px $brand-primary;
+        padding-left: 0;
+        padding-right: 0;
+        &:hover, a:hover, a:focus {
+          @include button-variant(#fff, lighten($btn-blue-bg, 5%), $brand-gold);
+          transition: all 0.3s ease 0s;
+        }
+        a {
+          line-height: $navbar-height;
+          height: $navbar-height;
+          color: $gray-light;
+          padding-left: 24px;
+          padding-right: 24px;
+          display: inline-block;
+          &:hover,
+          &:focus {
+            color: #fff;
+            text-decoration: none;
+            background: $brand-darkblue;
+          }
+        }
+      }
+    }
+  }
+  .btn-help { // help button
+    border-radius: 0;
+    padding-top: 28px;
+    min-width: $header-height;
+    height: $header-height;
+    border: none;
+    font-size: 13px;
+    @include button-variant($gray-lighter, transparent, $btn-blue-bg);
+    border-left: solid 1px $btn-blue-border;
+    &:hover,
+    &:focus {
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+      transition: all 0.3s ease 0s;
+    }
+    .glyphicon-question-sign {
+      font-size: 18px;
+      width: 48px;
+      height: 32px;
+    }
+  }
+  .btn-hamburger { // mobile hamburger menu
+    > a {
+      display: block;
+      min-width: $header-height;
+      height: $header-height;
+      border: none;
+      text-align: center;
+      padding-top: 24px;
+      @include button-variant($gray-lighter, transparent, $btn-blue-bg);
+      &:hover,
+      &:focus {
+        @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+        transition: all 0.3s ease 0s;
+        text-decoration: none;
+         .glyphicon-menu-hamburger {
+           color: #fff;
+        }
+      }
+      .glyphicon-menu-hamburger {
+        font-size: 24px;
+      }
+    }
+    &.open > a { // menu is open
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+    }
+  }
+}
+
+.header {
+  width: 100%;
+  left: 0;
+  right: 0;
+}
+
+@media (max-width: $screen-sm-max) {
+  .header {
+    position: relative !important;
+    top: 0 !important;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  header #logo img {
+    height: 13px;
+    width: 90px;
+  }
+  header .btn-hamburger > a {
+    min-width: 50px;
+  }
+}
+
+/* =Top navigation status
+-------------------------------------------------------------- */
+
+#projects .nav li.projects,
+#project-single .nav li.projects,
+#project-wizard .nav li.projects,
+#organizations .nav li.organizations,
+#organization-single .nav li.organizations,
+#users .nav li.users {
+  border-top: solid 7px $brand-gold;
+  a {
+    color: #fff;
+  }
+}
+
+#projects .nav .dropdown-menu > li.projects,
+#project-single .nav .dropdown-menu > li.projects,
+#project-wizard .nav .dropdown-menu > li.projects,
+#organizations .nav .dropdown-menu > li.organizations,
+#organization-single .nav .dropdown-menu > li.organizations,
+#users .nav .dropdown-menu > li.users {
+  border-top: none;
+  > a {
+    background: $brand-gold;
+  }
+}
+
+#dashboard .header,
+#project-single .header,
+#project-wizard .header,
+#organization-single .header {
+  position: fixed;
+}
+
+/* =User links & links in registration
+-------------------------------------------------------------- */
+
+.reg-links {
+  .divider {
+    border-left: solid 1px $btn-blue-border;
+  }
+  div.divider {
+    height: $header-height;
+    min-width: 22px;
+  }
+  .dropdown-menu {
+    min-width: 224px;
+    min-width: 160px; // beta
+  }
+  .caret, .glyphicon-user {
+    margin-left: 14px;
+    color: lighten($btn-blue-bg, 20%);
+    transition: all 0.3s ease 0s;
+  }
+  .btn-user { // user profile links
+    border-radius: 0;
+    min-width: 224px;
+    min-width: 160px; // beta
+    max-width: 300px;
+    height: $header-height;
+    border: none;
+    font-size: 13px;
+    @include button-variant($gray-lighter, transparent, $btn-blue-bg);
+    .username {
+      display: inline-block !important;
+      position: relative;
+      top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+    &:hover,
+    &:focus {
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+      transition: all 0.3s ease 0s;
+       .caret, .glyphicon-user {
+         color: #fff;
+       }
+    }
+    .thumbnail {
+      display: inline-block;
+      margin-bottom: 0;
+      margin-right: 14px;
+      background-color: transparent;
+      display: none; // beta
+    }
+  }
+  .open .btn-user { // menu is open
+    @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
+  }
+  .btn-reg { // login and register links
+    margin-top: 22px;
+    margin-left: 22px;
+    min-width: 102px;
+    @include button-variant($gray-lighter, lighten($btn-blue-bg, 5%), #fff);
+    &:hover {
+      @include button-variant(#fff, darken($btn-blue-bg, 5%), #fff);
+      transition: all 0.3s ease 0s;
+    }
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .reg-links {
+    div.divider {
+      min-width: 12px;
+    }
+    .dropdown-menu {
+      min-width: auto;
+      left: -10px;
+    }
+    .caret {
+      margin-left: 4px;
+    }
+    .btn-user { // user profile links
+      min-width: 90px;
+      .username {
+        display: none !important;
+      }
+      .thumbnail {
+        margin-right: 4px;
+      }
+    }
+    .btn-reg { // login and register links
+      min-width: 50px;
+      margin-top: 24px;
+      margin-left: 0;
+      font-size: 12px;
+      padding: 4px 8px;
+      @include button-variant($gray-lighter, lighten($btn-blue-bg, 5%), transparent);
+      border-radius: 0 !important;
+      margin-left: 0 !important;
+      &:first-child {
+        margin-right: 8px;
+      }
+      &:hover {
+        @include button-variant(#fff, darken($btn-blue-bg, 5%), transparent);
+      }
+    }
+  }
+}

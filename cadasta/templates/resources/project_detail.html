@@ -11,7 +11,20 @@
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <div class="page-title">
-        <h2>{% trans "Resource detail" %}</h2>
+        <h2 class="short">{% trans "Resource detail" %}</h2>
+        <div class="top-btn pull-right">
+          <!-- Action buttons -->
+          {% if can_edit %}
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}" aria-label="{% trans 'Edit resource' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          {% endif %}
+          {% if resource.archived %}
+            <a class="btn btn-default btn-action btn-sm" href="#undelete_resource_confirm" data-toggle="modal"  aria-label="{% trans 'Restore deleted resource' %}"><span class="glyphicon glyphicon-repeat"></span></a>
+          {% else %}
+            {% if can_archive %}
+              <a class="btn btn-default btn-action btn-sm" href="#delete_resource_confirm" data-toggle="modal"  aria-label="{% trans 'Delete resource' %}"><span class="glyphicon glyphicon-trash"></span></a>
+            {% endif %}
+          {% endif %}
+        </div>
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
@@ -24,24 +37,6 @@
           </h4>
           <p>{{ resource.description }}<br><strong>{{ resource.original_file }}</strong></p>
           <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
-          <ul class="list-inline resource-actions">
-            {% if can_edit %}
-            <li>
-              <a href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}">{% trans "Edit resource" %}</a>
-            </li>
-            {% endif %}
-            {% if resource.archived %}
-            <li>
-              <a href="#undelete_resource_confirm" data-toggle="modal">{% trans "Restore deleted resource" %}</a>
-            </li>
-            {% else %}
-            {% if can_archive %}
-            <li>
-              <a href="#delete_resource_confirm" data-toggle="modal">{% trans "Delete resource" %}</a>
-            </li>
-            {% endif %}
-            {% endif %}
-          </ul>
         </div>
         <div class="panel-footer panel-buttons">
           <a href="{{ resource.file.url }}" class="btn btn-primary" download="{{ resource.original_file }}">{% trans "Download" %}</a>

@@ -31,10 +31,14 @@
 
       <!-- More options menu -->
       {% if is_administrator %}
-      <div class="dropdown pull-right btn-more">
-        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+      <div class="dropdown pull-right btn-add">
+        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
         </a>
+        <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
+          <div class="visible-md-inline visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
+          <div class="visible-sm-inline">{% trans "More" %} <span class="caret"></span></div>   
+        </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
           {% if is_administrator %}
@@ -53,7 +57,7 @@
 
       <!-- Split add button -->
       {% if add_allowed %}
-      <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
+      <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block" aria-label="{% trans 'Add new project' %}">
         <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add project" %}
         </a>

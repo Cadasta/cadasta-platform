@@ -66,5 +66,5 @@
 
 {% block content %}
   {% url 'locations:detail' object.organization.slug object.slug location.id as cancel_url %}
-  {% include "spatial/location_form.html" with title=_("Edit location") %}
+  {% include "spatial/location_form.html" with title=_("Edit details") %}
 {% endblock %}

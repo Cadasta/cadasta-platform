@@ -1,0 +1,62 @@
+/* =Modals
+-------------------------------------------------------------- */
+
+.modal {
+  .modal-dialog {
+    overflow-y: initial !important
+  }
+  .modal-title {
+    font-family: $font-family-sans-serif-alt;
+    text-transform: uppercase;
+  }
+  .step {
+    font-family: $font-family-sans-serif-alt;
+    text-transform: uppercase;
+    opacity: 0.8;
+    font-weight: 300;
+    letter-spacing: 0;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: solid 1px #d9dadb;
+  }
+  .modal-header .nav-tabs {
+    position: relative;
+    top: $modal-title-padding + 1px;
+    left: 30px - $modal-title-padding;
+    li.active a {
+      background: $modal-content-bg;
+    }
+  }
+  .modal-body {
+    max-height: calc(100vh - 240px);
+    overflow-y: auto;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+  .modal-footer {
+    background: $body-bg;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    padding-left: 30px;
+    padding-right: 30px;
+    .btn {
+      min-width: 100px;
+    }
+  }
+  .modal-6-12 .col-md-6 { // widen 6 columns to 12 for resource form
+    width: 100%;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .modal .modal-footer .btn {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .modal .modal-footer .btn-link {
+    margin-bottom: 0;
+  }
+  .nav-tabs a {
+    font-size: 12px;
+  }
+}

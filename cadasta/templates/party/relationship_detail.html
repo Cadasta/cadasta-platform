@@ -6,24 +6,18 @@
 <div class="col-md-4 detail">
   <section>
     <div class="page-title">
-      <h2>{% trans "Relationship" %}</h2>
+      <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
+      <hr class="border-btm">
+      <h3 class="inline">{% trans "Relationship Detail" %}</h3>
       <div class="top-btn pull-right">
-        <!-- More options menu -->
-        <div class="dropdown pull-right btn-more">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-            <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}">{% trans "Edit relationship" %}</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}">{% trans "Delete relationship" %}</a></li>
-          </ul>
-        </div>
+        <!-- Action buttons -->
+        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
       </div>
     </div>
 
     <!-- Relationship information -->
-    <h3>{% trans "Details" %}</h3>
+    <h4>{% trans "Details" %}</h4>
     <table class="table table-location">
       <tr>
         <td><label>{% trans "Type" %}</label></td>
@@ -43,7 +37,7 @@
     <!-- /relationship information -->
 
     <!-- Relationship resources -->
-    <h3>{% trans "Resources" %}</h3>
+    <h4>{% trans "Resources" %}</h4>
     {% if resource_list %}
       <div class="top-btn pull-right top-add">
         {% if has_unattached_resources %}
