@@ -96,6 +96,16 @@
       "effect": "allow",
       "action": ["user.*"],
       "object": ["user/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["pdfform.*"],
+      "object": ["project/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["pdfform.*"],
+      "object": ["pdfform/*/*/*"]
     }
   ]
 }

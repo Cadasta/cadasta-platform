@@ -5235,6 +5235,9 @@ ul.resource-actions > li {
 #sidebar li.members .icon {
   background-image: url("/static/img/icon-members.png"); }
 
+#sidebar li.forms .icon {
+  background-image: url("/static/img/icon-forms.png"); }
+
 #sidebar.search li.search a,
 #sidebar.overview li.overview a,
 #sidebar.map li.map a,
@@ -5243,6 +5246,7 @@ ul.resource-actions > li {
 #sidebar.reports li.reports a,
 #sidebar.activity li.activity a,
 #sidebar.projects li.projects a,
+#sidebar.forms li.forms a,
 #sidebar.members li.members a {
   border-left: 7px solid #edaa00; }
   #sidebar.search li.search a .icon,
@@ -5253,6 +5257,7 @@ ul.resource-actions > li {
   #sidebar.reports li.reports a .icon,
   #sidebar.activity li.activity a .icon,
   #sidebar.projects li.projects a .icon,
+  #sidebar.forms li.forms a .icon,
   #sidebar.members li.members a .icon {
     background-position: -96px 0; }
   #sidebar.search li.search a .title,
@@ -5263,6 +5268,7 @@ ul.resource-actions > li {
   #sidebar.reports li.reports a .title,
   #sidebar.activity li.activity a .title,
   #sidebar.projects li.projects a .title,
+  #sidebar.forms li.forms a .title,
   #sidebar.members li.members a .title {
     color: #fff; }
 
@@ -5335,6 +5341,7 @@ ul.resource-actions > li {
   #sidebar.reports li.reports a,
   #sidebar.activity li.activity a,
   #sidebar.projects li.projects a,
+  #sidebar.forms li.forms a,
   #sidebar.members li.members a {
     border-top: 3px solid #edaa00;
     border-left: 0; }
@@ -5346,6 +5353,7 @@ ul.resource-actions > li {
     #sidebar.reports li.reports a .icon,
     #sidebar.activity li.activity a .icon,
     #sidebar.projects li.projects a .icon,
+    #sidebar.forms li.forms a .icon,
     #sidebar.members li.members a .icon {
       background-position: -108px -60px; }
   #sidebar-search-box {
@@ -6071,6 +6079,9 @@ main.container-fluid {
       .content-single .detail ul.list-divider li:last-child {
         border-bottom: 0;
         padding-bottom: 6px; }
+      .content-single .detail ul.list-divider li.linked:hover {
+        cursor: pointer;
+        background-color: #f9fafe; }
     .content-single .detail .nav-tabs li > a {
       font-size: 13px;
       padding: 10px; }

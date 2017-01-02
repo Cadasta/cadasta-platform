@@ -117,7 +117,7 @@
     padding-bottom: 8px;
     > div {
       display: table-cell;
-      vertical-align: middle;  
+      vertical-align: middle;
     }
     .index-link {
       padding: 4px 10px;
@@ -245,48 +245,53 @@
 
 #sidebar {
   li.overview {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-overview.png');
     }
   }
   li.search {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-search.png');
     }
   }
   li.map {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-map.png');
     }
   }
   li.parties {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-parties.png');
     }
   }
   li.resources {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-resources.png');
     }
   }
   li.reports {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-reports.png');
     }
   }
   li.activity {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-activity.png');
     }
   }
   li.projects {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-projects.png');
     }
   }
   li.members {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-members.png');
+    }
+  }
+  li.forms {
+    .icon {
+      background-image: url('/static/img/icon-forms.png');
     }
   }
 }
@@ -299,6 +304,7 @@
 #sidebar.reports li.reports,
 #sidebar.activity li.activity,
 #sidebar.projects li.projects,
+#sidebar.forms li.forms,
 #sidebar.members li.members { // show active icon
   a {
     border-left: 7px solid $brand-gold;
@@ -397,6 +403,7 @@
   #sidebar.reports li.reports,
   #sidebar.activity li.activity,
   #sidebar.projects li.projects,
+  #sidebar.forms li.forms,
   #sidebar.members li.members { // show active icon
     a {
       border-top: 3px solid $brand-gold;
@@ -526,7 +533,7 @@
       font-size: 11px;
       color: $gray-medium;
       display: block;
-      text-transform: uppercase; 
+      text-transform: uppercase;
       padding-bottom: 2px;
     }
   }

@@ -1,0 +1,4 @@
+<div class="form-group col-md-10 pdf_form_fields">
+      <label class="control-label"><strong>{% if question.label_xlat.en %} {{question.label_xlat.en}} {% else %}{{ question.name}}{% endif %}</strong></label>
+      <input class="form-control" id="{{ question.name }}" maxlength="200" name="{{ question.name }}" type="text">
+</div>

@@ -23,6 +23,11 @@
       - libjpeg-dev
       - libgdal-dev
       - libmemcached-dev
+      - libffi-dev
+      - libcairo2
+      - libpango1.0-0
+      - libgdk-pixbuf2.0-0
+      - shared-mime-info
 
 - name: dev locale
   become: yes

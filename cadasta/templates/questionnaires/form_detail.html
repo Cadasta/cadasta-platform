@@ -1,0 +1,56 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Form detail:" %} {{ pdfform.name }} | {% endblock %}
+{% block left-nav %}forms{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Form detail" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+           {% if pdfform.file.url is not None and pdfform.file.url != "" %}
+                <img alt="Form Logo" src="{{ pdfform.file.url }}" class="thumb-128">
+           {% endif %}
+          <h4>
+            {{ pdfform.name }}
+          </h4>
+          <p>{{ pdfform.description }}<br></p>
+          <p class="small">{% blocktrans with date=pdfform.last_updated user=pdfform.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+          <div id="instructions">
+              <strong>{% trans "Instructions" %}</strong><br>
+              <p>{{ pdfform.instructions }}</p>
+          </div>
+          <ul class="list-inline resource-actions">
+            {% if can_edit %}
+            <li>
+              <a class="btn btn-primary" href="{% url 'questionnaires:pdf_form_edit' object.organization.slug object.slug pdfform.id %}">{% trans "Edit form" %}</a>
+            </li>
+            {% endif %}
+            {% if can_delete %}
+            <li>
+              <a class="btn btn-primary" href="{% url 'questionnaires:pdf_form_delete' object.organization.slug object.slug pdfform.id %}" data-toggle="modal">{% trans "Delete form" %}</a>
+            </li>
+            {% if can_generate %}
+            <li>
+                <form method="get" action="{% url 'questionnaires:pdf_form_download' object.organization.slug object.slug pdfform.id %}">
+                {% csrf_token %}
+                 <button class="btn btn-primary btn-block" type="submit">{% trans "Generate PDF Form" %}</button>
+                </form>
+             </li>
+            {% endif %}
+            {% endif %}
+
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
