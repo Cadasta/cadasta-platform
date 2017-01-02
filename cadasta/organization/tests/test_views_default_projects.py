@@ -935,6 +935,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def setup_models(self):
         self.project = ProjectFactory.create(current_questionnaire='abc')
+        self.questionnaire = QuestionnaireFactory.create(project=self.project,
+                                                         id='abc')
 
     def setup_url_kwargs(self):
         return {
@@ -945,7 +947,11 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def setup_template_context(self):
         return {'project': self.project,
                 'object': self.project,
-                'form': forms.ProjectEditDetails(instance=self.project)}
+                'form': forms.ProjectEditDetails(
+                    instance=self.project,
+                    initial={'questionnaire': self.questionnaire.xls_form.url,
+                             'original_file': self.questionnaire.original_file}
+                )}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -954,6 +960,20 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+        assert 'Select the questionnaire' in self.expected_content
+
+    def test_get_empty_questionnaire_with_authorized_user(self):
+        user = UserFactory.create()
+        assign_policies(user)
+
+        self.project.current_questionnaire = ''
+        self.project.save()
+
+        form = forms.ProjectEditDetails(instance=self.project)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(form=form)
         assert 'Select the questionnaire' in self.expected_content
 
     def test_get_with_blocked_questionnaire_upload(self):
@@ -1028,15 +1048,14 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
         assign_policies(user)
-        post_data = self.post_data.copy()
-        del post_data['questionnaire']
-        assert 'questionnaire' not in post_data.keys()
-        response = self.request(user=user, method='POST')
+        response = self.request(user=user, method='POST',
+                                post_data={'questionnaire': None})
 
-        assert response.status_code == 200
+        assert response.status_code == 302
+        assert self.expected_success_url in response.location
         self.project.refresh_from_db()
-        assert self.project.name != self.post_data['name']
-        assert self.project.description != self.post_data['description']
+        assert self.project.name == self.post_data['name']
+        assert self.project.description == self.post_data['description']
         assert self.project.current_questionnaire == 'abc'
 
     def test_post_invalid_form(self):
