@@ -157,8 +157,10 @@ ACCOUNT_FORMS = {
     'signup': 'accounts.forms.RegisterForm',
     'profile': 'accounts.forms.ProfileForm',
 }
+ACCOUNT_ADAPTER = 'accounts.adapter.DefaultAccountAdapter'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = LOGIN_URL
+ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = 86400
 
 AUTH_PASSWORD_VALIDATORS = [
     {
