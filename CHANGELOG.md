@@ -1,5 +1,48 @@
 # Change Log
 
+## [v1.4.0](https://github.com/Cadasta/cadasta-platform/tree/v1.4.0) (2017-01-03)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0...v1.4.0)
+
+**Implemented enhancements:**
+
+- Improve browser detection of .gpx files on GPX import [\#662](https://github.com/Cadasta/cadasta-platform/issues/662)
+
+**Fixed bugs:**
+
+- Files are deleted from S3 before a model instance is saved [\#972](https://github.com/Cadasta/cadasta-platform/issues/972)
+- Missing translation strings  [\#1003](https://github.com/Cadasta/cadasta-platform/issues/1003)
+- On view party details page, the map tab is highlighted [\#993](https://github.com/Cadasta/cadasta-platform/issues/993)
+- Project locations no longer displaying on any of the project pages [\#964](https://github.com/Cadasta/cadasta-platform/issues/964)
+- Data download from projects with non-ASCII slugs encounters error [\#925](https://github.com/Cadasta/cadasta-platform/issues/925)
+- Deleted records are not detached from resources [\#803](https://github.com/Cadasta/cadasta-platform/issues/803)
+
+**Closed issues:**
+
+- Localize platform in French [\#1017](https://github.com/Cadasta/cadasta-platform/issues/1017)
+- Localize platform in Spanish [\#1016](https://github.com/Cadasta/cadasta-platform/issues/1016)
+- Link to Questionnaire in Importing Data page doesn't work [\#999](https://github.com/Cadasta/cadasta-platform/issues/999)
+- Incorrect URL - "reach out to us" in user guide [\#998](https://github.com/Cadasta/cadasta-platform/issues/998)
+
+**Merged pull requests:**
+
+- Update Pillow to 3.4.2 [\#1024](https://github.com/Cadasta/cadasta-platform/pull/1024) ([oliverroick](https://github.com/oliverroick))
+- Added spanish and french translations [\#1020](https://github.com/Cadasta/cadasta-platform/pull/1020) ([clash99](https://github.com/clash99))
+- Fix repeat groups and question order in XForms [\#1014](https://github.com/Cadasta/cadasta-platform/pull/1014) ([oliverroick](https://github.com/oliverroick))
+- Update factory\_boy to 2.8.1 [\#1012](https://github.com/Cadasta/cadasta-platform/pull/1012) ([seav](https://github.com/seav))
+- Fix \#662 -- Define MIMETYPE\_LOOKUP to detect type from file extension [\#1010](https://github.com/Cadasta/cadasta-platform/pull/1010) ([oliverroick](https://github.com/oliverroick))
+- Adds PR review checklist [\#1007](https://github.com/Cadasta/cadasta-platform/pull/1007) ([oliverroick](https://github.com/oliverroick))
+- Fix map bounding box when there are no geometries [\#1006](https://github.com/Cadasta/cadasta-platform/pull/1006) ([oliverroick](https://github.com/oliverroick))
+- Updating untranslated strings in Portuguese and Indonesian [\#1004](https://github.com/Cadasta/cadasta-platform/pull/1004) ([clash99](https://github.com/clash99))
+- Fix \#925 -- Remove project slug from file names [\#1000](https://github.com/Cadasta/cadasta-platform/pull/1000) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.3.0](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0) (2016-12-09)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.4...v1.3.0)
+
+**Merged pull requests:**
+
+- Tidier static content handling [\#997](https://github.com/Cadasta/cadasta-platform/pull/997) ([amplifi](https://github.com/amplifi))
+- Update CHANGELOG.md [\#996](https://github.com/Cadasta/cadasta-platform/pull/996) ([amplifi](https://github.com/amplifi))
+
 ## [v1.3.0-alpha.4](https://github.com/Cadasta/cadasta-platform/tree/v1.3.0-alpha.4) (2016-12-09)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0-alpha.3...v1.3.0-alpha.4)
 
