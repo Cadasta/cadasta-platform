@@ -16,7 +16,10 @@ $(function() {
 
     $('input[name="original_file"]').val(file.name);
     $('input[name="details-original_file"]').val(file.name);
-    $('input[name="mime_type"]').val(file.type);
+
+    var ext = file.name.split('.').slice(-1)[0];
+    var type = file.type || MIME_LOOKUPS[ext];
+    $('input[name="mime_type"]').val(type);
 
     // import wizard
     $('input[name="select_file-original_file"]').val(file.name);
