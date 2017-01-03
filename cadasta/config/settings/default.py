@@ -514,3 +514,8 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
 ]
+
+IMPORTERS = {
+    'csv': 'organization.importers.csv.CSVImporter',
+    'xls': 'organization.importers.xls.XLSImporter'
+}
