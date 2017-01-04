@@ -12,7 +12,7 @@
     <!-- / end overview map -->
     <!-- Overview detail  -->
     <div class="col-md-4 detail detail-edit">
-      <h2><span>{% trans "Location" %} </span>{% trans title %}</h2>
+      <h2><span>{% trans "Location" %} </span>{% if add == 'yes' %}{% trans "Add location" %}{% else %}{% trans "Edit details" %}{% endif %}</h2>
       <div class="panel panel-default">
         <div class="panel-body">
           <h3>{% trans "Draw location on map" %}</h3>
