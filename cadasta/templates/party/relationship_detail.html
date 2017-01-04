@@ -11,8 +11,8 @@
       <h3 class="inline">{% trans "Relationship Detail" %}</h3>
       <div class="top-btn pull-right">
         <!-- Action buttons -->
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
+        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}" title="{% trans 'Edit relationship' %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}" title="{% trans 'Delete relationship' %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
       </div>
     </div>
 

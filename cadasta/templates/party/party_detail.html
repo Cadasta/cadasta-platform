@@ -13,8 +13,8 @@
         <h2 class="short">{% trans "Party detail" %}</h2>
         <div class="top-btn pull-right">
           <!-- Action buttons -->
-          <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:edit' object.organization.slug object.slug party.id %}" aria-label="{% trans 'Edit party' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-          <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:delete' object.organization.slug object.slug party.id %}" aria-label="{% trans 'Delete party' %}"><span class="glyphicon glyphicon-trash"></span></a>
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:edit' object.organization.slug object.slug party.id %}" title="{% trans 'Edit party' %}" aria-label="{% trans 'Edit party' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:delete' object.organization.slug object.slug party.id %}" title="{% trans 'Delete party' %}" aria-label="{% trans 'Delete party' %}"><span class="glyphicon glyphicon-trash"></span></a>
         </div>
       </div>
       <div class="panel panel-default">

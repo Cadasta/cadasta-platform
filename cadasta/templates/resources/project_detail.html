@@ -15,13 +15,13 @@
         <div class="top-btn pull-right">
           <!-- Action buttons -->
           {% if can_edit %}
-          <a class="btn btn-default btn-action btn-sm" href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}" aria-label="{% trans 'Edit resource' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'resources:project_edit' object.organization.slug object.slug resource.id %}" title="{% trans 'Edit resource' %}" aria-label="{% trans 'Edit resource' %}"><span class="glyphicon glyphicon-pencil"></span></a>
           {% endif %}
           {% if resource.archived %}
-            <a class="btn btn-default btn-action btn-sm" href="#undelete_resource_confirm" data-toggle="modal"  aria-label="{% trans 'Restore deleted resource' %}"><span class="glyphicon glyphicon-repeat"></span></a>
+            <a class="btn btn-default btn-action btn-sm" href="#undelete_resource_confirm" data-toggle="modal" title="{% trans 'Restore deleted resource' %}" aria-label="{% trans 'Restore deleted resource' %}"><span class="glyphicon glyphicon-repeat"></span></a>
           {% else %}
             {% if can_archive %}
-              <a class="btn btn-default btn-action btn-sm" href="#delete_resource_confirm" data-toggle="modal"  aria-label="{% trans 'Delete resource' %}"><span class="glyphicon glyphicon-trash"></span></a>
+              <a class="btn btn-default btn-action btn-sm" href="#delete_resource_confirm" data-toggle="modal" title="{% trans 'Delete resource' %}" aria-label="{% trans 'Delete resource' %}"><span class="glyphicon glyphicon-trash"></span></a>
             {% endif %}
           {% endif %}
         </div>
