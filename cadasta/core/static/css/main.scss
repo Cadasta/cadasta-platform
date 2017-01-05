@@ -334,9 +334,6 @@ main.container-fluid {
     -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
     z-index: 300;
-    .btn {
-      min-width: 110px;
-    }
     .more-menu {
       width: auto !important;
     }
@@ -486,9 +483,6 @@ body.map .content-single {
       }
     }
     .detail {
-      .btn {
-        min-width: 70px;
-      }
       .nav-tabs li > a {
         font-size: 12px;
       }
@@ -778,8 +772,8 @@ img.org-logo, img#org-logo {
   .btn {
     min-width: 140px;
   }
-  .btn-rt {
-    min-width: 20px;
+  .btn-rt, .btn-action {
+    min-width: 34px;
   }
 }
 
@@ -807,10 +801,6 @@ img.org-logo, img#org-logo {
   }
 }
 
-.top-btn .btn-action, .content-single .detail .btn-action {
-  min-width: 20px;
-}
-
 div.add-btn-btm { // add party link at bottom of table
   padding: 10px 24px;
   text-align: left;
@@ -834,8 +824,10 @@ div.add-btn-btm { // add party link at bottom of table
 }
 
 @media (max-width: $screen-sm-max) {
- .top-btn .btn {
-    min-width: 80px;
+  .top-btn {
+    .btn {
+      min-width: auto;
+    }
   }
   #project-single .page-header,
   #organization-single .page-header {

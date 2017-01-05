@@ -5911,8 +5911,6 @@ main.container-fluid {
     -moz-box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
     z-index: 300; }
-    .content-single .detail .btn {
-      min-width: 110px; }
     .content-single .detail .more-menu {
       width: auto !important; }
     .content-single .detail .org-logo {
@@ -6015,8 +6013,6 @@ body.map .content-single {
     margin-right: 0; }
   .content-single .panel .panel-body {
     font-size: 12px; }
-  .content-single .detail .btn {
-    min-width: 70px; }
   .content-single .detail .nav-tabs li > a {
     font-size: 12px; }
   .content-single .detail .tab-content {
@@ -6229,8 +6225,8 @@ img.org-logo, img#org-logo {
   margin-bottom: 10px; }
   .top-btn .btn {
     min-width: 140px; }
-  .top-btn .btn-rt {
-    min-width: 20px; }
+  .top-btn .btn-rt, .top-btn .btn-action {
+    min-width: 34px; }
 
 .btn-full {
   background: #eeeeee;
@@ -6248,9 +6244,6 @@ img.org-logo, img#org-logo {
 
 .btn-primary:hover {
   background-color: #009975; }
-
-.top-btn .btn-action, .content-single .detail .btn-action {
-  min-width: 20px; }
 
 div.add-btn-btm {
   padding: 10px 24px;
@@ -6272,7 +6265,7 @@ div.add-btn-btm {
 
 @media (max-width: 991px) {
   .top-btn .btn {
-    min-width: 80px; }
+    min-width: auto; }
   #project-single .page-header .top-btn,
   #organization-single .page-header .top-btn {
     padding: 4px 10px 0;
