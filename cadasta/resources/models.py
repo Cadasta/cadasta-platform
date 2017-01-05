@@ -59,7 +59,7 @@ class Resource(RandomIDModel):
               'permissions_object': 'project',
               'error_message': messages.RESOURCE_LIST}),
             ('resource.add',
-             {'description': _("Add new resources"),
+             {'description': _("Add resources"),
               'permissions_object': 'project',
               'error_message': messages.RESOURCE_ADD}),
             ('resource.view',
