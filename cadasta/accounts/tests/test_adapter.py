@@ -55,6 +55,9 @@ class AccountAdapterTests(UserTestCase, TestCase):
 
         a().pre_authenticate(request, **credentials)
 
+    @override_settings(CACHES={
+        'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
+        })
     def test_pre_authenticate_maxes_out(self):
         UserFactory.create(username='john_snow', password='Winteriscoming!')
         credentials = {'username': 'john_snow', 'password': 'knowsnothing'}
