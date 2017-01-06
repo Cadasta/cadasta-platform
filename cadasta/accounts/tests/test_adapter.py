@@ -54,3 +54,27 @@ class AccountAdapterTests(UserTestCase, TestCase):
         cache.set(cache_key, data, ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT)
 
         a().pre_authenticate(request, **credentials)
+
+    def test_pre_authenticate_maxes_out(self):
+        UserFactory.create(username='john_snow', password='Winteriscoming!')
+        credentials = {'username': 'john_snow', 'password': 'knowsnothing'}
+        request = self.client.get(
+            reverse('account:login'),
+            {'login': 'john_snow', 'password': 'knowsnothing'})
+        cache_key = all_auth()._get_login_attempts_cache_key(
+            request, **credentials)
+
+        data = [None]*1000
+        dt = timezone.now()
+
+        data.append(time.mktime(dt.timetuple()))
+        cache.set(cache_key, data, ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT)
+
+        with pytest.raises(ValidationError):
+            a().pre_authenticate(request, **credentials)
+
+        dt = timezone.now() - timedelta(seconds=ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT)
+        data.append(time.mktime(dt.timetuple()))
+        cache.set(cache_key, data, ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT)
+
+        a().pre_authenticate(request, **credentials)
