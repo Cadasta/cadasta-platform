@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext as _
 from django.contrib import messages
-from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
@@ -11,7 +10,6 @@ from core.views.mixins import SuperUserCheckMixin
 import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
-from allauth.account import signals
 
 from ..models import User
 from ..forms import ProfileForm, ChangePasswordForm, ResetPasswordKeyForm
@@ -21,18 +19,6 @@ class PasswordChangeView(LoginRequiredMixin,
                          SuperUserCheckMixin,
                          allauth_views.PasswordChangeView):
     success_url = reverse_lazy('account:profile')
-
-    def form_valid(self, form):
-        form.save()
-
-        # Update session to keep user logged in.
-        update_session_auth_hash(self.request, form.user)
-
-        signals.password_changed.send(sender=self.request.user.__class__,
-                                      request=self.request,
-                                      user=self.request.user)
-        return super(PasswordChangeView, self).form_valid(form)
-
     form_class = ChangePasswordForm
 
 
