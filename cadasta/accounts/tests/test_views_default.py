@@ -1,4 +1,5 @@
 import datetime
+from django.core.urlresolvers import reverse_lazy
 from django.test import TestCase
 from django.core import mail
 from skivvy import ViewTestCase
@@ -7,6 +8,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
 
 from allauth.account.models import EmailConfirmation, EmailAddress
+from allauth.account.forms import ChangePasswordForm
 
 from ..views import default
 from ..forms import ProfileForm
@@ -63,6 +65,27 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
 
         response = self.request(method='POST', user=user2, post_data=post_data)
         assert 'Failed to update profile information' in response.messages
+
+
+class PasswordChangeTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.PasswordChangeView
+    success_url = reverse_lazy('account:profile')
+
+    def setup_template_context(self):
+        return {
+            'form': ChangePasswordForm(instance=self.user)
+        }
+
+    def test_password_change(self):
+        self.user = UserFactory.create(password='Noonewillguess!')
+        data = {'oldpassword': 'Noonewillguess!',
+                'password1': 'Someonemightguess?',
+                'password2': 'Someonemightguess?'}
+        response = self.request(method='POST', post_data=data, user=self.user)
+
+        assert response.status_code == 302
+        assert response.location == self.expected_success_url
+        assert self.user.check_password('Someonemightguess?') is True
 
 
 class LoginTest(ViewTestCase, UserTestCase, TestCase):
