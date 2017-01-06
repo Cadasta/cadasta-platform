@@ -20,11 +20,9 @@ class DefaultAccountAdapter(adapter.DefaultAccountAdapter):
 
             # ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT should be set to maximum amount of
             # time a user can be locked out.
-            print('back_off:', back_off)
             if back_off > ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT:
                 back_off = ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT
 
-            print('back_off take two:', back_off)
             if current_attempt_time < (login_data[-1] + back_off):
                 raise forms.ValidationError(
                     self.error_messages['too_many_login_attempts'])
