@@ -18,6 +18,7 @@ from ..forms import ProfileForm, ChangePasswordForm, ResetPasswordKeyForm
 class PasswordChangeView(LoginRequiredMixin,
                          SuperUserCheckMixin,
                          allauth_views.PasswordChangeView):
+    success_url = reverse_lazy('account:profile')
     form_class = ChangePasswordForm
 
 
