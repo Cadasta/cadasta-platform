@@ -127,3 +127,67 @@ ul.parsley-errors-list, ul.errorlist {
 .well ul.parsley-errors-list li, .well ul.errorlist li {
   background-color: transparent
 }
+
+
+/* =Exceptions
+-------------------------------------------------------------- */
+
+textarea.form-control {
+  max-height: 80px;
+}
+
+.file-well {
+  padding: 10px 0 10px 10px;
+}
+.s3-buckets {
+  width: 90%;
+  max-width: 90%;
+}
+
+.file-input, #id_select_file-file { // browse for file
+  margin: 14px 0;
+  height: 34px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.spacing-lg { // for radio or checkboxes needing more space between items
+  margin-top: 10px;
+  li {
+    margin-left: 30px;
+    margin-bottom: 18px;
+    label {
+      font-weight: 600;
+    }
+    small {
+      margin-top: 4px;
+      font-weight: 300;
+      display: block;
+    }
+  }
+}
+
+.spacing-md {
+  margin-top: 15px;
+  li {
+    margin-left: 15px;
+    margin-bottom: 15px;
+    label {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    small {
+      margin-top: 6px;
+      font-weight: 300;
+      display: block;
+    }
+  }
+}
+
+.input-group-addon {
+  background: $body-bg;
+}
+
+.well {
+  margin-bottom: 10px;
+}

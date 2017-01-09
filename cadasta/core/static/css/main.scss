@@ -17,12 +17,14 @@
 @import "wizard";
 @import "widgets";
 @import "reg";
+@import "header";
 @import "footer";
 @import "orgs";
 @import "resources";
 @import "single";
 @import "forms";
 @import "maps";
+@import "modals";
 
 /* =Fonts
 -------------------------------------------------------------- */
@@ -121,448 +123,6 @@ a {
   &:focus {
    color: $brand-darkblue;
    outline: none;
-  }
-}
-
-/* =Header
--------------------------------------------------------------- */
-
-header {
-  z-index: 1000;
-  position: relative;
-  height: $header-height;
-  background-color: $brand-primary;
-  -webkit-box-shadow: 0 1px 4px rgba(31,54,79,.2);
-  -moz-box-shadow: 0 1px 4px rgba(31,54,79,.2);
-  box-shadow: 0 1px 4px rgba(31,54,79,.2);
-  &.header {
-    top: 0;
-  }
-  #logo {
-    display: inline-block;
-    line-height: $header-height;
-    font-size: 22px;
-    margin: 0 auto;
-    padding: 0;
-    img {
-      height: 18px;
-      width: 124px;
-    }
-  }
-  .nav {
-    display: inline-block;
-    float: right;
-    height: $navbar-height;
-    ul.list-inline {
-      margin-bottom: 0;
-      > li {
-        border-top: solid 7px $brand-primary;
-        padding-left: 0;
-        padding-right: 0;
-        &:hover, a:hover, a:focus {
-          @include button-variant(#fff, lighten($btn-blue-bg, 5%), $brand-gold);
-          transition: all 0.3s ease 0s;
-        }
-        a {
-          line-height: $navbar-height;
-          height: $navbar-height;
-          color: $gray-light;
-          padding-left: 24px;
-          padding-right: 24px;
-          display: inline-block;
-          &:hover,
-          &:focus {
-            color: #fff;
-            text-decoration: none;
-            background: $brand-darkblue;
-          }
-        }
-      }
-    }
-  }
-  .btn-help { // help button
-    border-radius: 0;
-    padding-top: 28px;
-    min-width: $header-height;
-    height: $header-height;
-    border: none;
-    font-size: 13px;
-    @include button-variant($gray-lighter, transparent, $btn-blue-bg);
-    border-left: solid 1px $btn-blue-border;
-    &:hover,
-    &:focus {
-      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
-      transition: all 0.3s ease 0s;
-    }
-    .glyphicon-question-sign {
-      font-size: 18px;
-      width: 48px;
-      height: 32px;
-    }
-  }
-  .btn-hamburger { // mobile hamburger menu
-    > a {
-      display: block;
-      min-width: $header-height;
-      height: $header-height;
-      border: none;
-      text-align: center;
-      padding-top: 24px;
-      @include button-variant($gray-lighter, transparent, $btn-blue-bg);
-      &:hover,
-      &:focus {
-        @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
-        transition: all 0.3s ease 0s;
-        text-decoration: none;
-         .glyphicon-menu-hamburger {
-           color: #fff;
-        }
-      }
-      .glyphicon-menu-hamburger {
-        font-size: 24px;
-      }
-    }
-    &.open > a { // menu is open
-      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
-    }
-  }
-}
-
-.header {
-  width: 100%;
-  left: 0;
-  right: 0;
-}
-
-@media (max-width: $screen-sm-max) {
-  .header {
-    position: relative !important;
-    top: 0 !important;
-  }
-}
-
-@media (max-width: $screen-xs-max) {
-  header #logo img {
-    height: 13px;
-    width: 90px;
-  }
-  header .btn-hamburger > a {
-    min-width: 50px;
-  }
-}
-
-/* =Top navigation status
--------------------------------------------------------------- */
-
-#projects .nav li.projects,
-#project-single .nav li.projects,
-#project-wizard .nav li.projects,
-#organizations .nav li.organizations,
-#organization-single .nav li.organizations,
-#users .nav li.users {
-  border-top: solid 7px $brand-gold;
-  a {
-    color: #fff;
-  }
-}
-
-#projects .nav .dropdown-menu > li.projects,
-#project-single .nav .dropdown-menu > li.projects,
-#project-wizard .nav .dropdown-menu > li.projects,
-#organizations .nav .dropdown-menu > li.organizations,
-#organization-single .nav .dropdown-menu > li.organizations,
-#users .nav .dropdown-menu > li.users {
-  border-top: none;
-  > a {
-    background: $brand-gold;
-  }
-}
-
-#dashboard .header,
-#project-single .header,
-#project-wizard .header,
-#organization-single .header {
-  position: fixed;
-}
-
-/* =User links & links in registration
--------------------------------------------------------------- */
-
-.reg-links {
-  .divider {
-    border-left: solid 1px $btn-blue-border;
-  }
-  div.divider {
-    height: $header-height;
-    min-width: 22px;
-  }
-  .dropdown-menu {
-    min-width: 224px;
-    min-width: 160px; // beta
-  }
-  .caret, .glyphicon-user {
-    margin-left: 14px;
-    color: lighten($btn-blue-bg, 20%);
-    transition: all 0.3s ease 0s;
-  }
-  .btn-user { // user profile links
-    border-radius: 0;
-    min-width: 224px;
-    min-width: 160px; // beta
-    max-width: 300px;
-    height: $header-height;
-    border: none;
-    font-size: 13px;
-    @include button-variant($gray-lighter, transparent, $btn-blue-bg);
-    .username {
-      display: inline-block !important;
-      position: relative;
-      top: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 200px;
-    }
-    &:hover,
-    &:focus {
-      @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
-      transition: all 0.3s ease 0s;
-       .caret, .glyphicon-user {
-         color: #fff;
-       }
-    }
-    .thumbnail {
-      display: inline-block;
-      margin-bottom: 0;
-      margin-right: 14px;
-      background-color: transparent;
-      display: none; // beta
-    }
-  }
-  .open .btn-user { // menu is open
-    @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
-  }
-  .btn-reg { // login and register links
-    margin-top: 22px;
-    margin-left: 22px;
-    min-width: 102px;
-    @include button-variant($gray-lighter, lighten($btn-blue-bg, 5%), #fff);
-    &:hover {
-      @include button-variant(#fff, darken($btn-blue-bg, 5%), #fff);
-      transition: all 0.3s ease 0s;
-    }
-  }
-}
-
-@media (max-width: $screen-xs-max) {
-  .reg-links {
-    div.divider {
-      min-width: 12px;
-    }
-    .dropdown-menu {
-      min-width: auto;
-      left: -10px;
-    }
-    .caret {
-      margin-left: 4px;
-    }
-    .btn-user { // user profile links
-      min-width: 90px;
-      .username {
-        display: none !important;
-      }
-      .thumbnail {
-        margin-right: 4px;
-      }
-    }
-    .btn-reg { // login and register links
-      min-width: 50px;
-      margin-top: 24px;
-      margin-left: 0;
-      font-size: 12px;
-      padding: 4px 8px;
-      @include button-variant($gray-lighter, lighten($btn-blue-bg, 5%), transparent);
-      border-radius: 0 !important;
-      margin-left: 0 !important;
-      &:first-child {
-        margin-right: 8px;
-      }
-      &:hover {
-        @include button-variant(#fff, darken($btn-blue-bg, 5%), transparent);
-      }
-    }
-  }
-}
-
-/* =Page header default
--------------------------------------------------------------- */
-
-.page-header { // navy band on index pages
-  background: $brand-darkblue;
-  background-color: $brand-primary;
-  background: -moz-linear-gradient(top, $brand-darkblue 0%, $brand-primary 70%);
-  background: -webkit-linear-gradient(top, $brand-darkblue 0%,$brand-primary 70%);
-  background: linear-gradient(to bottom, $brand-darkblue 0%,$brand-primary 70%);
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='$brand-darkblue', endColorstr='$brand-primary',GradientType=0 );
-  margin: 0;
-  padding-top: 48px;
-  padding-bottom: 48px;
-  min-height: 300px;
-  .top-btn {
-    margin-top: 0;
-  }
-  .btn-add {
-    margin-right: 14px;
-  }
-}
-
-.page-title { // page title
-  padding-top: 2px;
-  padding-bottom: 24px;
-  clear: both;
-  h1, h2 {
-    text-transform: uppercase;
-    display: inline-block;
-    color: #fff;
-    position: relative;
-    margin-top: 0;
-    text-shadow: 1px 1px 3px rgba(0,0,0,.2);
-    width: 80%;
-    &.short { // provides room for admin buttons on right
-      width: 60%;
-    }
-    .org-name {
-      font-size: 14px;
-      display: block;
-      padding-bottom: 2px;
-      text-transform: uppercase;
-    }
-    a {
-      color: $brand-lightblue;
-    }
-  }
-}
-
-@media (max-width: $screen-sm-max) {
-  .page-header {
-    padding-top: 24px;
-  }
-}
-
-@media (max-width: $screen-xs-max) {
-  .page-title h1, .page-title h2, h1, h2 {
-    font-size: 1.8em;
-  }
-  .page-title h2, h2 {
-    font-size: 1.6em;
-  }
-  h3 {
-    font-size: 1.4em;
-  }
-}
-
-@media (min-width: $screen-md-min) {
-  .page-header { // navy band on index pages
-    .page-title h1, .page-title h2 {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-}
-
-/* =Page header single project or organizations
--------------------------------------------------------------- */
-
-#project-single .page-header,
-#organization-single .page-header { // navy band on pages for single project or organization
-  background: $brand-darkblue;
-  height: 110px;
-  min-height: 110px;
-  border-bottom: solid 1px #fff;
-  margin: 0;
-  padding-top: 18px;
-  position: fixed;
-  top: $header-height;
-  z-index: 999;
-  div > a {
-    color: $brand-lightblue;
-    &:hover,
-    &:focus {
-      color: #fff;
-    }
-  }
-  .index-link {
-    padding: 4px 10px;
-    margin-right: 10px;
-    border: 1px solid $brand-lightblue;
-    border-radius: 8px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    border-left: 0;
-    position: absolute;
-    top: 55px;
-    display: inline-block;
-    &:hover,
-    &:focus {
-      @include button-variant(#fff, lighten($btn-blue-bg, 5%), #fff);
-      transition: all 0.3s ease 0s;
-    }
-  }
-  .page-title {
-    padding-top: 14px;
-    padding-bottom: 8px;
-  }
-  h1, h2 {
-    margin-left: 54px;
-    padding-bottom: 8px;
-  }
-  .top-btn {
-    margin-top: 18px;
-  }
-  .btn-add {
-    margin-right: 14px;
-  }
-}
-
-#organization-single .page-header {
-  padding-top: 35px; // offset to match project
-  .top-btn {
-    margin-top: 1px;
-  }
-}
-
-@media (max-width: $screen-sm-max) {
-  #project-single .page-header,
-  #organization-single .page-header {
-    overflow: visible;
-    padding-top: 8px;
-    padding-bottom: 0;
-    border-bottom: solid 1px $brand-darkerblue;
-    margin-top: 0;
-    margin-bottom: 0;
-    height: auto;
-    min-height: 74px;
-    .more-menu {
-      width: 36px;
-      height: 36px;
-    }
-    h1, h2 {
-        margin-left: 14px;
-    }
-  }
-  #project-single .page-header .page-title,
-  #organization-single .page-header .page-title {
-    padding-bottom: 0;
-  }
-}
-
-@media (max-width: $screen-xs-max) {
-  #project-single .page-header,
-  #organization-single .page-header {
-    .more-menu {
-      width: 24px;
-    }
   }
 }
 
@@ -713,15 +273,23 @@ main.container-fluid {
     color: $brand-darkblue;
     text-transform: uppercase;
     margin-top: 0;
-    padding-bottom: 14px;
+    padding-bottom: 6px;
     text-shadow: none;
+    max-width: 70%;
+    a {
+      color: #0e305e;
+      text-decoration: none;
+    }
+    a:hover {
+      color: #2e51a3;
+    }
   }
   h3 {
     font-family: $font-family-sans-serif-alt;
     text-transform: uppercase;
-    opacity: 0.8;
     font-weight: 300;
     letter-spacing: 0;
+    color: #0e305e;
   }
   .divider-thick {
     border-top: solid 7px $table-border-color;
@@ -766,9 +334,6 @@ main.container-fluid {
     -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
     box-shadow: 0 0 6px rgba(0,0,0,.3);
     z-index: 300;
-    .btn {
-      min-width: 110px;
-    }
     .more-menu {
       width: auto !important;
     }
@@ -918,9 +483,6 @@ body.map .content-single {
       }
     }
     .detail {
-      .btn {
-        min-width: 70px;
-      }
       .nav-tabs li > a {
         font-size: 12px;
       }
@@ -929,69 +491,6 @@ body.map .content-single {
       }
     }
   }
-}
-
-/* =Forms
--------------------------------------------------------------- */
-
-textarea.form-control {
-  max-height: 80px;
-}
-
-.file-well {
-  padding: 10px 0 10px 10px;
-}
-.s3-buckets {
-  width: 90%;
-  max-width: 90%;
-}
-
-.file-input, #id_select_file-file { // browse for file
-  margin: 14px 0;
-  height: 34px;
-  padding: 0;
-  cursor: pointer;
-}
-
-.spacing-lg { // for radio or checkboxes needing more space between items
-  margin-top: 10px;
-  li {
-    margin-left: 30px;
-    margin-bottom: 18px;
-    label {
-      font-weight: 600;
-    }
-    small {
-      margin-top: 4px;
-      font-weight: 300;
-      display: block;
-    }
-  }
-}
-
-.spacing-md {
-  margin-top: 15px;
-  li {
-    margin-left: 15px;
-    margin-bottom: 15px;
-    label {
-      font-size: 16px;
-      font-weight: 600;
-    }
-    small {
-      margin-top: 6px;
-      font-weight: 300;
-      display: block;
-    }
-  }
-}
-
-.input-group-addon {
-  background: $body-bg;
-}
-
-.well {
-  margin-bottom: 10px;
 }
 
 /* =Table for sort and filter
@@ -1273,8 +772,8 @@ img.org-logo, img#org-logo {
   .btn {
     min-width: 140px;
   }
-  .btn-rt {
-    min-width: 20px;
+  .btn-rt, .btn-action {
+    min-width: 34px;
   }
 }
 
@@ -1309,7 +808,7 @@ div.add-btn-btm { // add party link at bottom of table
   margin-bottom: 20px;
 }
 
-.more-menu {
+.more-menu { // for ellipsis menu on small screens
   float: left;
   font-size: 24px;
   margin: 2px 0 0 10px;
@@ -1325,13 +824,15 @@ div.add-btn-btm { // add party link at bottom of table
 }
 
 @media (max-width: $screen-sm-max) {
- .top-btn .btn {
-    min-width: 80px;
+  .top-btn {
+    .btn {
+      min-width: auto;
+    }
   }
   #project-single .page-header,
   #organization-single .page-header {
     .top-btn {
-      padding: 4px 14px 0;
+      padding: 4px 10px 0;
       margin-top: 0;
       .btn {
         min-width: auto;
@@ -1423,6 +924,17 @@ h1 .label {
   color: #000;
 }
 
+.border-btm {
+  margin-bottom: 20px;
+  margin-top: 0;
+  border: 0;
+  border-bottom: 1px solid #eee;
+}
+
+.inline {
+  display: inline;
+}
+
 @media (max-width: $screen-sm-max) {
   .alert {
     max-width: none;
@@ -1435,68 +947,6 @@ h1 .label {
   }
 }
 
-/* =Modals
--------------------------------------------------------------- */
-
-.modal {
-  .modal-dialog {
-    overflow-y: initial !important
-  }
-  h3.modal-title {
-    font-family: $font-family-sans-serif-alt;
-    text-transform: uppercase;
-  }
-  h4.step {
-    font-family: $font-family-sans-serif-alt;
-    text-transform: uppercase;
-    opacity: 0.8;
-    font-weight: 300;
-    letter-spacing: 0;
-    margin-bottom: 10px;
-    padding-bottom: 10px;
-    border-bottom: solid 1px #d9dadb;
-  }
-  .modal-header .nav-tabs {
-    position: relative;
-    top: $modal-title-padding + 1px;
-    left: 30px - $modal-title-padding;
-    li.active a {
-      background: $modal-content-bg;
-    }
-  }
-  .modal-body {
-    max-height: calc(100vh - 240px);
-    overflow-y: auto;
-    padding-left: 30px;
-    padding-right: 30px;
-  }
-  .modal-footer {
-    background: $body-bg;
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    padding-left: 30px;
-    padding-right: 30px;
-    .btn {
-      min-width: 100px;
-    }
-  }
-  .modal-6-12 .col-md-6 { // widen 6 columns to 12 for resource form
-    width: 100%;
-  }
-}
-
-@media (max-width: $screen-xs-max) {
-  .modal .modal-footer .btn {
-    width: 100%;
-    margin-bottom: 10px;
-  }
-  .modal .modal-footer .btn-link {
-    margin-bottom: 0;
-  }
-  .nav-tabs a {
-    font-size: 12px;
-  }
-}
 
 /* =Map location details
 -------------------------------------------------------------- */

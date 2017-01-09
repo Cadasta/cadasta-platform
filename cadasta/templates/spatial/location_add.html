@@ -8,7 +8,7 @@
 {% load staticfiles %}
 {% load leaflet_tags %}
 
-{% block page_title %}{% trans "Add new location" %} | {% endblock %}
+{% block page_title %}{% trans "Add location" %} | {% endblock %}
 
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms,groupedlayercontrol" %}
@@ -74,5 +74,5 @@
 {% endblock %}
 
 {% block content %}
-  {% include "spatial/location_form.html" with title=_("Add new location") %}
+  {% include "spatial/location_form.html" with add="yes" %}
 {% endblock %}

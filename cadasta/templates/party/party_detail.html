@@ -12,17 +12,9 @@
       <div class="page-title">
         <h2 class="short">{% trans "Party detail" %}</h2>
         <div class="top-btn pull-right">
-          <!-- More options menu -->
-          <div class="dropdown pull-right btn-more">
-              <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-                <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-              </a>
-              <ul class="dropdown-menu" aria-labelledby="dLabel">
-                <li><a href="{% url 'parties:edit' object.organization.slug object.slug party.id %}">{% trans "Edit party" %}</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="{% url 'parties:delete' object.organization.slug object.slug party.id %}">{% trans "Delete party" %}</a></li>
-              </ul>
-            </div>
+          <!-- Action buttons -->
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:edit' object.organization.slug object.slug party.id %}" title="{% trans 'Edit party' %}" aria-label="{% trans 'Edit party' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:delete' object.organization.slug object.slug party.id %}" title="{% trans 'Delete party' %}" aria-label="{% trans 'Delete party' %}"><span class="glyphicon glyphicon-trash"></span></a>
         </div>
       </div>
       <div class="panel panel-default">

@@ -11,17 +11,9 @@
     <div class="page-title">
       <h2><span>{% trans "Location" %} </span>{{ location.name }}</h2>
       <div class="top-btn pull-right">
-        <!-- More options menu -->
-        <div class="dropdown pull-right btn-more">
-            <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
-              <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="dLabel">
-              <li><a href="{% url 'locations:edit' object.organization.slug object.slug location.id %}">{% trans "Edit location" %}</a></li>
-              <li role="separator" class="divider"></li>
-              <li><a href="{% url 'locations:delete' object.organization.slug object.slug location.id %}">{% trans "Delete location" %}</a></li>
-            </ul>
-          </div>
+        <!-- Action buttons -->
+        <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:edit' object.organization.slug object.slug location.id %}" title="{% trans 'Edit location' %}" aria-label="{% trans 'Edit location' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:delete' object.organization.slug object.slug location.id %}" title="{% trans 'Delete location' %}" aria-label="{% trans 'Delete location' %}"><span class="glyphicon glyphicon-trash"></span></a>
       </div>
     </div>
 

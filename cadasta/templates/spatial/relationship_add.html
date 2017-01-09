@@ -3,7 +3,7 @@
 {% load widget_tweaks %}
 {% load staticfiles %}
 
-{% block page_title %}{% trans "Add new relationship" %} | {% endblock %}
+{% block page_title %}{% trans "Add relationship" %} | {% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
@@ -60,7 +60,7 @@ $(document).ready(function() {
             <a class="close" href="{% url 'locations:detail' object.organization.slug object.slug location.id %}">
               <span aria-hidden="true">&times;</span>
             </a>
-            <h3 class="modal-title">{% trans "Add new relationship" %}</h3>
+            <h3 class="modal-title">{% trans "Add relationship" %}</h3>
           </div>
 
           <div class="modal-body">

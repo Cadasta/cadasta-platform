@@ -12,7 +12,7 @@
     <!-- / end overview map -->
     <!-- Overview detail  -->
     <div class="col-md-4 detail detail-edit">
-      <h2>{% trans title %}</h2>
+      <h2><span>{% trans "Location" %} </span>{% if add == 'yes' %}{% trans "Add location" %}{% else %}{% trans "Edit details" %}{% endif %}</h2>
       <div class="panel panel-default">
         <div class="panel-body">
           <h3>{% trans "Draw location on map" %}</h3>
@@ -20,6 +20,7 @@
             <label class="control-label required">{% trans "1. Use the tools provided on the left side of the map to mark your new location." %}</label>
             <div class="error-block">{{ form.geometry.errors }}</div>
           </div>
+          <h3>{% trans "Overview" %}</h3>
           <div class="form-group{% if form.type.errors %} has-error{% endif %}">
             <label class="control-label" for="{{ form.type.id_for_label }}">{% trans "2. What type of location is this?" %}</label>
             {% render_field form.type class+="form-control" data-parsley-required="true" %}

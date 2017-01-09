@@ -18,7 +18,7 @@
             <li role="presentation" class="active"><a href="{% url 'parties:resource_list' object.organization.slug object.slug party.id %}">{% trans "Resources" %}</a></li>
 
             <li role="presentation" class="pull-right">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> {% trans "Add new resource" %}</a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="caret"></span> {% trans "Add resource" %}</a>
               <ul class="dropdown-menu">
                 <li><a href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">{% trans "Add from library" %}</a></li>
                 <li><a href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">{% trans "Upload new resource" %}</a></li>
