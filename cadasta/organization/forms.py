@@ -345,6 +345,17 @@ class ProjectEditDetails(forms.ModelForm):
         fields = ['name', 'description', 'access', 'urls', 'questionnaire',
                   'contacts']
 
+    def clean_questionnaire(self):
+        new_form = self.data.get('questionnaire')
+        current_form = self.initial.get('questionnaire')
+
+        if (new_form is not None and new_form != current_form and
+                self.instance.has_records):
+            raise ValidationError(
+                _("Data has already been contributed to this project. To "
+                  "ensure data integrity, uploading a new questionnaire is "
+                  "disabled for this project."))
+
     def save(self, *args, **kwargs):
         new_form = self.data.get('questionnaire')
         original_file = self.data.get('original_file')
@@ -357,7 +368,7 @@ class ProjectEditDetails(forms.ModelForm):
                     original_file=original_file,
                     project=self.instance
                 )
-        else:
+        elif new_form is not None and not self.instance.has_records:
             self.instance.current_questionnaire = ''
 
         return super().save(*args, **kwargs)

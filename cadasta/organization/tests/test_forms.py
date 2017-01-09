@@ -686,6 +686,65 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
             id=project.current_questionnaire
         ).xls_form.url == data['questionnaire'])
 
+    def test_replace_questionnaire_when_project_has_data(self):
+        project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(
+            project=project,
+            xls_form=self._get_form('xls-form'))
+
+        SpatialUnitFactory.create(project=project)
+
+        data = {
+            'name': 'New name',
+            'questionnaire': self._get_form('xls-form-copy'),
+            'access': project.access,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+
+        form = forms.ProjectEditDetails(
+            instance=project,
+            data=data,
+            initial={'questionnaire': questionnaire.xls_form.url})
+
+        assert form.is_valid() is False
+        assert ("Data has already been contributed to this project. To "
+                "ensure data integrity, uploading a new questionnaire is "
+                "disabled for this project." in
+                form.errors.get('questionnaire'))
+
+    def test_do_not_send_questionnaire_when_project_has_data(self):
+        project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(
+            project=project,
+            xls_form=self._get_form('xls-form'))
+
+        SpatialUnitFactory.create(project=project)
+
+        data = {
+            'name': 'New name',
+            'access': project.access,
+            'contacts-TOTAL_FORMS': 1,
+            'contacts-INITIAL_FORMS': 0,
+            'contacts-0-name': '',
+            'contacts-0-email': '',
+            'contacts-0-tel': ''
+        }
+
+        form = forms.ProjectEditDetails(
+            instance=project,
+            data=data,
+            initial={'questionnaire': questionnaire.xls_form.url})
+
+        assert form.is_valid() is True
+        form.save()
+        project.refresh_from_db()
+        assert project.name == data['name']
+        assert project.current_questionnaire == questionnaire.id
+
     def test_delete_questionnaire(self):
         project = ProjectFactory.create()
         questionnaire = QuestionnaireFactory.create(
