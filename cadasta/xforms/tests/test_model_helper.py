@@ -3,7 +3,7 @@ import io
 import pytest
 from django.conf import settings
 from django.test import TestCase
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -118,10 +118,16 @@ class XFormModelHelperTest(TestCase):
             'tenure_resource_photo': 'resource_three.png'
         }
 
+        user = UserFactory.create()
+        OrganizationRole.objects.create(
+            user=user, organization=self.project.organization, admin=True)
+
         (questionnaire,
          parties, party_resources,
          locations, location_resources,
-         tenure_relationships, tenure_resources) = mh.create_models(mh(), data)
+         tenure_relationships, tenure_resources) = mh.create_models(mh(),
+                                                                    data,
+                                                                    user)
 
         assert questionnaire == self.questionnaire
         party = Party.objects.get(name='Party One')
@@ -963,3 +969,18 @@ class XFormModelHelperTest(TestCase):
 
         assert 'Tenure Resource Thing' not in resources['resources']
         assert 'Party Type' not in resources['resources']
+
+    def test_check_perm(self):
+        with pytest.raises(PermissionDenied):
+            mh._check_perm(mh, self.user, self.project)
+
+        org_role = OrganizationRole.objects.get(
+            user=self.user,
+            organization=self.project.organization)
+        org_role.admin = True
+        org_role.save()
+
+        try:
+            mh._check_perm(mh, self.user, self.project)
+        except PermissionDenied:
+            self.fail("PermissionDenied raised unexpectedly")

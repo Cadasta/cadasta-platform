@@ -407,6 +407,16 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
                                 content_type='multipart/form-data')
         assert response.status_code == 403
 
+    def test_unauthorized_user(self):
+        self._create_questionnaire('t_questionnaire', 0)
+        data = self._submission(form='submission')
+        user = UserFactory.create()
+        response = self.request(method='POST', post_data=data, user=user,
+                                content_type='multipart/form-data')
+        assert response.status_code == 403
+        assert ("You don't have permission do contribute data to this project."
+                in response.content)
+
     def test_questionnaire_not_found(self):
         with pytest.raises(ValidationError):
             data = self._submission(form='submission_bad_questionnaire')
