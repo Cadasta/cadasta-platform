@@ -1,42 +1,45 @@
+'use strict';
 (function(window, document, $) {
-    $(document).on('init.dt', function(e, dtSettings) {
-        if ( e.namespace !== 'dt' ) {
-            return;
-        }
-        addSelectOptions = function(){
-            aData = ['Active', 'Archived', 'All']
-            var r='<label><select class="form-control input-sm" id="archive-filter">', i, iLen=aData.length;
-            for ( i=0 ; i<iLen ; i++ )
-            {
-                r += '<option value="'+aData[i]+'">'+aData[i]+'</option>';
-            }
-            return r+'</select></label>';
-        }
+  $(document).on('init.dt', function(e, dtSettings) {
 
-        var table = $('#DataTables_Table_0').DataTable();
-        if ($(".unarchived").length ){
-            table.order([1, 'asc']).draw()
+    if ( e.namespace !== 'dt' ) {
+      return;
+    }
+
+    var addSelectOptions = function(){
+      var options = [
+        { value: 'archived-False', label: gettext('Active'  ) },
+        { value: 'archived-True' , label: gettext('Archived') },
+        { value: ''              , label: gettext('All'     ) },
+      ];
+      var html = '<label><select class="form-control input-sm" id="archive-filter">';
+      for (var i = 0; i < options.length; i++) {
+        html += '<option value="' + options[i].value + '">' + options[i].label + '</option>';
+      }
+      return html + '</select></label>';
+    }
+
+    // When there are archived objects
+    if ($('td[data-filter="archived-True"]').length) {
+      var table = $('#DataTables_Table_0').DataTable();
+
+      // Add archived filter select field
+      dtSettings.nTableWrapper.childNodes[0].childNodes[0].innerHTML += addSelectOptions()
+
+      // Register custom DataTables search function for the archived filter field
+      $.fn.dataTable.ext.search.push(
+        function(settings, searchData, index, rowData, counter) {
+          var expected = $('#archive-filter').val()
+          var actual = searchData[searchData.length - 1];
+          return expected === '' || expected === actual;
         }
+      );
 
-        if ($(".archived").length ){
-            dtSettings.nTableWrapper.childNodes[0].childNodes[0].innerHTML += addSelectOptions()
-            table.columns(0).search('False').draw();
+      // Trigger refiltering when the archived filter field is changed
+      $('#archive-filter').change(function() { table.draw(); });
 
-            $('input').on( 'keyup', function () {
-                table.search( this.value ).draw();
-            });
-
-            $('#archive-filter').change(function () {
-                var value = ''
-                table.search(value).draw();
-                var selection = $('#archive-filter').val()
-                if (selection === 'Active') {
-                    value = 'False'
-                } else if (selection === 'Archived') {
-                    value = 'True';
-                }
-                table.columns(0).search(value).draw();
-            });
-        }
-    });
+      // Re-refresh table now that the archived filter field has been added
+      table.draw();
+    }
+  });
 })(window, document, jQuery);
