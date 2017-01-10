@@ -43,7 +43,7 @@
                       {% endif %}
                   </td>
                   <td class="hidden-xs">{{ prj.country }}</td>
-                  <td>{{ prj.last_updated }}</td>
+                  <td data-sort="{{ prj.last_updated|date:'U' }}">{{ prj.last_updated }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
