@@ -191,7 +191,7 @@ class ProjectList(PermissionsFilterMixin,
 
 class ProjectDetail(APIPermissionRequiredMixin,
                     mixins.OrganizationMixin,
-                    generics.RetrieveUpdateDestroyAPIView):
+                    generics.RetrieveUpdateAPIView):
     def get_actions(self, request):
         if self.get_object().archived:
             return 'project.view_archived'

@@ -856,3 +856,9 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 400
         self.project.refresh_from_db()
         assert self.project.access == 'public'
+
+    def test_delete_fails(self):
+        response = self.request(method='DELETE', user=self.user)
+        assert response.status_code == 405
+        self.project.refresh_from_db()
+        assert Project.objects.filter(id=self.project.id).exists()
