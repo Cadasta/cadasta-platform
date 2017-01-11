@@ -924,7 +924,6 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     post_data = {
         'name': 'New Name',
         'description': 'New Description',
-        'access': 'public',
         'urls': '',
         'questionnaire': '',
         'contacts-TOTAL_FORMS': 1,
@@ -1079,6 +1078,23 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
         assert response.status_code == 200
         assert response.content == self.render_content(form=form)
+
+    def test_post_private_project_form(self):
+        user = UserFactory.create()
+        assign_policies(user)
+
+        response = self.request(user=user, method='POST',
+                                post_data={'access': ['on']})
+
+        assert response.status_code == 302
+        self.project.refresh_from_db()
+        assert self.project.access == 'private'
+
+        response = self.request(user=user, method='POST',
+                                post_data={})
+        assert response.status_code == 302
+        self.project.refresh_from_db()
+        assert self.project.access == 'public'
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()

@@ -105,6 +105,9 @@ class PublicPrivateToggle(Widget):
             checked=('checked' if value in ['private', 'on'] else '')
         )
 
+    def value_omitted_from_data(self, data, files, name):
+        return False
+
 
 class ContactsWidget(Widget):
     html = (
