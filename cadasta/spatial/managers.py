@@ -1,15 +1,6 @@
-from django.db import models
-
 from . import models as spatial_models
 from .exceptions import SpatialRelationshipError
 from party.managers import BaseRelationshipManager
-
-
-class SpatialUnitManager(models.Manager):
-    use_for_related_fields = True
-
-    def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).defer('attributes')
 
 
 class SpatialRelationshipManager(BaseRelationshipManager):

@@ -97,6 +97,7 @@ class ContactsForm(forms.Form):
                 "Please provide either an email address or a phone number."))
         if error_msgs:
             raise forms.ValidationError(" ".join(error_msgs))
+
         return cleaned_data
 
     def clean_string(self, value):
@@ -126,7 +127,7 @@ class OrganizationForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
-        super(OrganizationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -137,7 +138,7 @@ class OrganizationForm(forms.ModelForm):
         return name
 
     def save(self, *args, **kwargs):
-        instance = super(OrganizationForm, self).save(commit=False)
+        instance = super().save(commit=False)
         is_create = not instance.id
 
         instance.save()

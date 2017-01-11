@@ -43,8 +43,8 @@ class OrganizationTest(UserTestCase, TestCase):
 
     def _save(self, data, count=1):
         form = forms.OrganizationForm(data, user=UserFactory.create())
-        form.save()
         assert form.is_valid() is True
+        form.save()
         assert Organization.objects.count() == count
 
     def test_add_organization(self):
@@ -65,21 +65,6 @@ class OrganizationTest(UserTestCase, TestCase):
         assert ("Organization with this Name already exists."
                 in form.errors['name'])
         assert Organization.objects.count() == 1
-
-    # NOTE: This test is no longer possible because unique org names masks
-    # the testing of unique org slugs via OrganizationForm. Unique org slugs
-    # can only be tested via model unit tests.
-    # def test_unique_slugs(self):
-    #     self.data['description'] = 'Org description #1'
-    #     self._save(self.data)
-    #     org1 = Organization.objects.first()
-    #     assert org1.slug == 'org'
-    #
-    #     self.data['description'] = 'Org description #2'
-    #     self._save(self.data, count=2)
-    #     orgs = Organization.objects.all()
-    #     assert len(orgs) == 2
-    #     assert orgs[0].slug != orgs[1].slug
 
     def test_add_organization_with_url(self):
         self.data['urls'] = 'http://example.com'
@@ -120,12 +105,7 @@ class OrganizationTest(UserTestCase, TestCase):
     def test_add_organization_with_restricted_name(self):
         invalid_names = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
         data = {
-            'name': random.choice(invalid_names),
-            'contacts-TOTAL_FORMS': 1,
-            'contacts-INITIAL_FORMS': 0,
-            'contacts-0-name': '',
-            'contacts-0-email': '',
-            'contacts-0-tel': ''
+            'name': random.choice(invalid_names)
         }
         form = forms.OrganizationForm(data, user=UserFactory.create())
         assert not form.is_valid()
@@ -168,14 +148,15 @@ class OrganizationTest(UserTestCase, TestCase):
                 'tel': '555-5555'
             }]
         )
+
         data = {
             'name': 'New Name',
-            'contacts-TOTAL_FORMS': 3,
+            'contacts-TOTAL_FORMS': 2,
             'contacts-INITIAL_FORMS': 0,
             'contacts-MIN_NUM_FORMS': 0,
             'contacts-MAX_NUM_FORMS': 1000,
             'contacts-0-name': 'User A',
-            'contacts-0-email': 'a@example.com',
+            'contacts-0-email': 'user.a@example.com',
             'contacts-0-tel': '',
             'contacts-0-remove': 'on',
             'contacts-1-name': 'User B',
@@ -184,12 +165,13 @@ class OrganizationTest(UserTestCase, TestCase):
             'contacts-1-remove': 'on',
             'contacts-2-name': '',
             'contacts-2-email': '',
-            'contacts-3-tel': ''
+            'contacts-2-tel': ''
         }
         form = forms.OrganizationForm(data, instance=org)
         form.is_valid()
         form.save()
         org.refresh_from_db()
+        assert org.name == 'New Name'
         assert org.contacts == []
 
 
@@ -922,7 +904,8 @@ class ContactsFormTest(UserTestCase, TestCase):
         html = form.as_table()
 
         expected = (
-            '<tr><td><input id="id_c-name" name="c-name" type="text" /></td>\n'
+            '<tr><td><input id="id_c-name" name="c-name" type="text" '
+            'required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
             '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'
@@ -945,7 +928,8 @@ class ContactsFormTest(UserTestCase, TestCase):
             '<td colspan="4"><ul class="errorlist nonfield"><li>'
             'Please provide a name.</li></ul></td></tr>\n'
             '<tr>\n'
-            '<td><input id="id_c-name" name="c-name" type="text" /></td>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" '
+            'required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" '
             'value="john@beatles.uk" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
@@ -970,7 +954,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             'The provided email address is invalid.</li></ul></td></tr>\n'
             '<tr>\n'
             '<td><input id="id_c-name" name="c-name" type="text" '
-            'value="John" /></td>\n'
+            'value="John" required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" '
             'value="invalid email" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
@@ -995,7 +979,8 @@ class ContactsFormTest(UserTestCase, TestCase):
             'Please provide a name. '
             'The provided email address is invalid.</li></ul></td></tr>\n'
             '<tr>\n'
-            '<td><input id="id_c-name" name="c-name" type="text" /></td>\n'
+            '<td><input id="id_c-name" name="c-name" type="text" '
+            'required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" '
             'value="invalid email" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
@@ -1020,7 +1005,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             '</li></ul></td></tr>\n'
             '<tr>\n'
             '<td><input id="id_c-name" name="c-name" type="text" '
-            'value="John" /></td>\n'
+            'value="John" required /></td>\n'
             '<td><input id="id_c-email" name="c-email" type="email" /></td>\n'
             '<td><input id="id_c-tel" name="c-tel" type="text" />'
             '<input id="id_c-remove" name="c-remove" type="hidden" /></td>'

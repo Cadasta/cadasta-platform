@@ -9,7 +9,7 @@ from django.test import TestCase
 
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
-from skivvy import ViewTestCase
+from skivvy import ViewTestCase, remove_csrf
 
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
@@ -212,7 +212,7 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         response = view(request, **url_params)
         content = response.render().content.decode('utf-8')
         assert response.status_code == 200
-        assert content == expected_content
+        assert remove_csrf(content) == expected_content
         assert request.session['cancel_add_location_url'] == '/info/'
 
         # Second request to check that the session is being used
@@ -221,7 +221,7 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         response = view(request, **url_params)
         content = response.render().content.decode('utf-8')
         assert response.status_code == 200
-        assert content == expected_content
+        assert remove_csrf(content) == expected_content
         assert request.session['cancel_add_location_url'] == '/info/'
 
     def test_get_from_non_existend_project(self):

@@ -62,7 +62,6 @@ class Party(ResourceModelMixin, RandomIDModel):
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
-    objects = managers.PartyManager()
 
     # Party-party relationships: includes things like family
     # relationships and group memberships.

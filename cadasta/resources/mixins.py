@@ -29,7 +29,7 @@ class ResourceModelMixin:
 @receiver(pre_delete)
 def detach_object_resources(sender, instance, **kwargs):
     list_of_models = ('Party', 'TenureRelationship', 'SpatialUnit')
-    sender = sender.__base__ if sender._deferred else sender
+    sender = sender.__base__ if hasattr(sender, '_deferred') else sender
 
     if sender.__name__ in list_of_models:
         for resource in instance.resources:

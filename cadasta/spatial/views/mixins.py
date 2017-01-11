@@ -12,8 +12,7 @@ class SpatialQuerySetMixin(ProjectMixin):
     def get_queryset(self):
         self.proj = self.get_project()
         if not hasattr(self, '_queryset'):
-            self._queryset = self.proj.spatial_units.all().only(
-                'id', 'type', 'geometry', 'project').order_by('id')
+            self._queryset = self.proj.spatial_units.all().order_by('id')
         return self._queryset
 
     def get_context_data(self, *args, **kwargs):

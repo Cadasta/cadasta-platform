@@ -42,6 +42,7 @@ class XFormSubmission(RandomIDModel):
         return repr_string.format(
                          obj=self,
                          json=json.dumps(self.json_submission),
-                         spatial_units=self.spatial_units.all(),
-                         parties=self.parties.all(),
-                         tenure_relationships=self.tenure_relationships.all())
+                         spatial_units=list(self.spatial_units.all()),
+                         parties=list(self.parties.all()),
+                         tenure_relationships=list(
+                            self.tenure_relationships.all()))

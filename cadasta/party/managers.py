@@ -5,13 +5,6 @@ from django.db import models
 from . import exceptions
 
 
-class PartyManager(models.Manager):
-    use_for_related_fields = True
-
-    def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).defer('attributes')
-
-
 class BaseRelationshipManager(models.Manager):
     """
     Manager to provide project relationship checks.
@@ -57,5 +50,5 @@ class TenureRelationshipManager(BaseRelationshipManager):
         return super().create(**kwargs)
 
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).defer(
-            'attributes').select_related('tenure_type')
+        return super().get_queryset(
+            *args, **kwargs).select_related('tenure_type')
