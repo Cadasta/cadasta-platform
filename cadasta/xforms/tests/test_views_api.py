@@ -414,7 +414,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         response = self.request(method='POST', post_data=data, user=user,
                                 content_type='multipart/form-data')
         assert response.status_code == 403
-        assert ("You don't have permission do contribute data to this project."
+        assert ("You don't have permission to contribute data to this project."
                 in response.content)
 
     def test_questionnaire_not_found(self):

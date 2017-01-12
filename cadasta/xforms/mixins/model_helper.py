@@ -39,7 +39,7 @@ class ModelHelper():
         roles = [superuser, org_admin, prj_manager, data_collector]
         assigned_policies = user.assigned_policies()
         if not any(role in assigned_policies for role in roles):
-            raise PermissionDenied(_("You don't have permission do contribute"
+            raise PermissionDenied(_("You don't have permission to contribute"
                                      " data to this project."))
 
     def create_models(self, data, user):

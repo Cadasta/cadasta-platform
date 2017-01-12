@@ -53,9 +53,11 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
             instance = ModelHelper().upload_submission_data(request)
         except InvalidXMLSubmission as e:
             logger.debug(str(e))
-            return self._sendErrorResponse(request, e, 'HTTP_400_BAD_REQUEST')
+            return self._sendErrorResponse(request, e,
+                                           status.HTTP_400_BAD_REQUEST)
         except PermissionDenied as e:
-            return self._sendErrorResponse(request, e, 'HTTP_403_FORBIDDEN')
+            return self._sendErrorResponse(request, e,
+                                           status.HTTP_403_FORBIDDEN)
 
         # If an already existing XFormSummission is sent back
         # don't create another.
@@ -88,12 +90,12 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
                 content_type='application/xml'
             )
 
-    def _sendErrorResponse(self, request, e, code):
+    def _sendErrorResponse(self, request, e, status):
         message = _(OPEN_ROSA_ENVELOPE.format(message=str(e)))
         headers = self.get_openrosa_headers(
             request, location=False, content_length=False)
         return Response(
-            message, status=getattr(status, code),
+            message, status=status,
             headers=headers, content_type='application/xml'
         )
 
