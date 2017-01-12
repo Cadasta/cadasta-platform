@@ -62,7 +62,6 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             'object_list': sorted(self.all_orgs, key=lambda p: p.slug),
             'user': self.user,
             'is_superuser': False,
-            'any_archived': False,
         }
 
     def test_get_with_user(self):
@@ -84,8 +83,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             organization=self.archived_org, user=adminuser, admin=True)
         response = self.request(user=adminuser)
         assert response.status_code == 200
-        assert response.content == self.render_content(user=adminuser,
-                                                       any_archived=True)
+        assert response.content == self.render_content(user=adminuser)
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
@@ -94,8 +92,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=superuser)
         assert response.status_code == 200
         assert response.content == self.render_content(user=superuser,
-                                                       is_superuser=True,
-                                                       any_archived=True)
+                                                       is_superuser=True)
 
 
 class OrganizationAddTest(ViewTestCase, UserTestCase, TestCase):

@@ -40,12 +40,6 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     # organization in order to count the number of projects per org
     queryset = Organization.objects.annotate(num_projects=Count('projects'))
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['any_archived'] = self.get_queryset().filter(
-            archived=True).exists()
-        return context
-
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
     model = Organization
@@ -358,12 +352,6 @@ class ProjectList(PermissionRequiredMixin,
     permission_required = 'project.list'
     permission_filter_queryset = permission_filter
     project_create_check_multiple = True
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['any_archived'] = self.get_queryset().filter(
-            archived=True).exists()
-        return context
 
     def get(self, request, *args, **kwargs):
         user = self.request.user
