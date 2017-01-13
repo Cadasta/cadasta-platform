@@ -128,27 +128,24 @@ class OrganizationRole(RandomIDModel):
         return repr_string.format(obj=self)
 
 
-def reassign_user_policies(instance, adding):
+def assign_org_policies(instance, delete=False):
     assigned_policies = instance.user.assigned_policies()
+    policy_vars = {'organization': instance.organization.slug}
 
-    org_admin = get_policy_instance('org-admin', {
-        'organization': instance.organization.slug
-    })
+    org_admin = get_policy_instance('org-admin', policy_vars)
     is_admin = org_admin in assigned_policies
 
-    org_member = get_policy_instance('org-member', {
-        'organization': instance.organization.slug
-    })
+    org_member = get_policy_instance('org-member', policy_vars)
     is_member = org_member in assigned_policies
 
-    if not is_admin and instance.admin:
+    if not is_admin and (instance.admin and not delete):
         assigned_policies.append(org_admin)
-    elif is_admin and not instance.admin:
+    elif is_admin and (not instance.admin or delete):
         assigned_policies.remove(org_admin)
 
-    if not is_member and adding:
+    if not is_member and not delete:
         assigned_policies.append(org_member)
-    elif is_member and not adding:
+    elif is_member and delete:
         assigned_policies.remove(org_member)
 
     instance.user.assign_policies(*assigned_policies)
@@ -156,15 +153,15 @@ def reassign_user_policies(instance, adding):
 
 @receiver(models.signals.post_save, sender=OrganizationRole)
 def assign_org_permissions(sender, instance, **kwargs):
-    reassign_user_policies(instance, True)
+    assign_org_policies(instance)
 
 
 @receiver(models.signals.pre_delete, sender=OrganizationRole)
-def remove_project_membership(sender, instance, **kwargs):
+def remove_org_permissions(sender, instance, **kwargs):
     prjs = instance.organization.projects.values_list('id', flat=True)
     ProjectRole.objects.filter(user=instance.user,
                                project_id__in=prjs).delete()
-    reassign_user_policies(instance, False)
+    assign_org_policies(instance, delete=True)
 
 
 @permissioned_model
@@ -331,43 +328,47 @@ class ProjectRole(RandomIDModel):
         return repr_string.format(obj=self)
 
 
-@receiver(models.signals.post_save, sender=ProjectRole)
-def assign_project_permissions(sender, instance, **kwargs):
-    assigned_policies = instance.user.assigned_policies()
+def assign_prj_policies(role, delete=False):
+    assigned_policies = role.user.assigned_policies()
+    policy_vars = {
+        'organization': role.project.organization.slug,
+        'project': role.project.slug
+    }
 
-    project_manager = get_policy_instance('project-manager', {
-        'organization': instance.project.organization.slug,
-        'project': instance.project.slug
-    })
+    project_manager = get_policy_instance('project-manager', policy_vars)
     is_manager = project_manager in assigned_policies
 
-    project_user = get_policy_instance('project-user', {
-        'organization': instance.project.organization.slug,
-        'project': instance.project.slug
-    })
+    project_user = get_policy_instance('project-user', policy_vars)
     is_user = project_user in assigned_policies
 
-    data_collector = get_policy_instance('data-collector', {
-        'organization': instance.project.organization.slug,
-        'project': instance.project.slug
-    })
+    data_collector = get_policy_instance('data-collector', policy_vars)
     is_collector = data_collector in assigned_policies
 
-    new_role = instance.role
+    new_role = role.role
 
-    if is_user and not new_role == 'PU':
+    if is_user and (delete or not new_role == 'PU'):
         assigned_policies.remove(project_user)
     elif not is_user and new_role == 'PU':
         assigned_policies.append(project_user)
 
-    if is_collector and not new_role == 'DC':
+    if is_collector and (delete or not new_role == 'DC'):
         assigned_policies.remove(data_collector)
     elif not is_collector and new_role == 'DC':
         assigned_policies.append(data_collector)
 
-    if is_manager and not new_role == 'PM':
+    if is_manager and (delete or not new_role == 'PM'):
         assigned_policies.remove(project_manager)
     elif not is_manager and new_role == 'PM':
         assigned_policies.append(project_manager)
 
-    instance.user.assign_policies(*assigned_policies)
+    role.user.assign_policies(*assigned_policies)
+
+
+@receiver(models.signals.post_save, sender=ProjectRole)
+def assign_project_permissions(sender, instance, **kwargs):
+    assign_prj_policies(instance)
+
+
+@receiver(models.signals.post_delete, sender=ProjectRole)
+def remove_project_permissions(sender, instance, **kwargs):
+    assign_prj_policies(instance, delete=True)
