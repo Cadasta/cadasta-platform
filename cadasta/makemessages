@@ -1,0 +1,21 @@
+#!/bin/bash
+
+LIBS=(buckets allauth)
+
+for i in "${LIBS[@]}"
+do
+   ln -s /opt/cadasta/env/lib/python3.5/site-packages/$i $i
+done
+
+ln -s /opt/cadasta/env/lib/python3.5/site-packages/allauth/account account
+
+./manage.py makemessages -l en -e py,txt,html,js -s
+./manage.py makemessages -l en -d djangojs -s
+
+for j in "${LIBS[@]}"
+do
+   rm $j
+done
+
+rm account
+echo "Done"
