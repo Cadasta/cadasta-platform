@@ -31,7 +31,7 @@
       </td>
       <td class="hidden-xs hidden-sm">{{ resource.file_type }}</td>
       <td class="hidden-xs hidden-sm">{{ resource.contributor.username }}<br>{{ resource.contributor.full_name }}</td>
-      <td class="hidden-xs hidden-sm">{{ resource.last_updated }}</td>
+      <td class="hidden-xs hidden-sm" data-sort="{{ resource.last_updated|date:'U' }}">{{ resource.last_updated }}</td>
       <td class="hidden-xs hidden-sm">
         {% if resource.attachment_id %}
           {% with amount=resource.num_entities|add:"-1" %}

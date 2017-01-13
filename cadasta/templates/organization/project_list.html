@@ -73,7 +73,7 @@
       {% endif %}
     </td>
     <td class="hidden-xs hidden-sm">{{ proj.country.name }}</td>
-    <td class="hidden-xs hidden-sm">{{ proj.last_updated|default_if_none:"&mdash;" }}</td>
+    <td class="hidden-xs hidden-sm" data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
   </tr>
   {% endfor %}
 </table>
