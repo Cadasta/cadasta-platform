@@ -1,8 +1,9 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.files.storage import get_storage_class
 from django.db import transaction
 from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType
+from tutelary.models import Policy
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from pyxform.xform2json import XFormToDict
 from questionnaires.models import Questionnaire
@@ -13,14 +14,39 @@ from xforms.models import XFormSubmission
 from xforms.utils import odk_geom_to_wkt
 
 
+def get_policy_instance(policy_name, variables=None):
+    return (Policy.objects.get(name=policy_name), variables)
+
+
 class ModelHelper():
     def __init__(self, *arg):
         self.arg = arg
 
-    def create_models(self, data):
+    def _check_perm(self, user, project):
+        superuser = get_policy_instance('superuser')
+        org_admin = get_policy_instance('org-admin', {
+            'organization': project.organization.slug
+        })
+        prj_manager = get_policy_instance('project-manager', {
+            'organization': project.organization.slug,
+            'project': project.slug
+        })
+        data_collector = get_policy_instance('data-collector', {
+            'organization': project.organization.slug,
+            'project': project.slug
+        })
+
+        roles = [superuser, org_admin, prj_manager, data_collector]
+        assigned_policies = user.assigned_policies()
+        if not any(role in assigned_policies for role in roles):
+            raise PermissionDenied(_("You don't have permission to contribute"
+                                     " data to this project."))
+
+    def create_models(self, data, user):
         questionnaire = self._get_questionnaire(
             id_string=data['id'], version=data['version']
         )
+        self._check_perm(user, questionnaire.project)
 
         # If xform has already been submitted, check for additional resources
         additional_resources = self.check_for_duplicate_submission(
@@ -238,7 +264,7 @@ class ModelHelper():
              parties, party_resources,
              locations, location_resources,
              tenure_relationships, tenure_resources
-             ) = self.create_models(submission)
+             ) = self.create_models(submission, request.user)
 
             party_submissions = [submission]
             location_submissions = [submission]
