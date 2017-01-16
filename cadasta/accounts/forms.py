@@ -109,23 +109,23 @@ class ProfileForm(forms.ModelForm):
         return user
 
 
-class ChangePasswordForm(allauth_forms.ChangePasswordForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+class ChangePasswordMixin:
     def clean_password1(self):
+        if not self.user.change_pw:
+            raise forms.ValidationError(_("The password for this user can not "
+                                          "be changed."))
+
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
 
         return password
 
 
-class ResetPasswordKeyForm(allauth_forms.ResetPasswordKeyForm):
-    def __init__(self, *args, **kwargs):
-        super(ResetPasswordKeyForm, self).__init__(*args, **kwargs)
+class ChangePasswordForm(ChangePasswordMixin,
+                         allauth_forms.ChangePasswordForm):
+    pass
 
-    def clean_password1(self):
-        password = self.cleaned_data['password1']
-        validate_password(password, self.user)
 
-        return password
+class ResetPasswordKeyForm(ChangePasswordMixin,
+                           allauth_forms.ResetPasswordKeyForm):
+    pass

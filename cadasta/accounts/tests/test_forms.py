@@ -332,6 +332,19 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
                   " special characters, and/or numerical character.\n"
                   ))
 
+    def test_user_not_allowed_change_password(self):
+        user = UserFactory.create(password='beatles4Lyfe!', change_pw=False)
+        data = {
+            'oldpassword': 'beatles4Lyfe!',
+            'password1': 'iloveyoko79!',
+            'password2': 'iloveyoko79!',
+        }
+        form = forms.ChangePasswordForm(user, data)
+
+        assert form.is_valid() is False
+        assert (_("The password for this user can not be changed.") in
+                form.errors.get('password1'))
+
 
 class ResetPasswordFormTest(UserTestCase, TestCase):
     def test_valid_data(self):
@@ -421,3 +434,15 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
                   "lowercase characters, uppercase characters,"
                   " special characters, and/or numerical character.\n"
                   ))
+
+    def test_user_not_allowed_change_password(self):
+        user = UserFactory.create(password='beatles4Lyfe!', change_pw=False)
+        data = {
+            'password1': 'iloveyoko79!',
+            'password2': 'iloveyoko79!',
+        }
+        form = forms.ResetPasswordKeyForm(data, user=user)
+
+        assert form.is_valid() is False
+        assert (_("The password for this user can not be changed.") in
+                form.errors.get('password1'))

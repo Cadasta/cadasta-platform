@@ -15,14 +15,8 @@ DATABASES = {
     }
 }
 
-# devserver must be first thing in the list of insalled apps
-INSTALLED_APPS = (
-    # 'devserver',
-) + INSTALLED_APPS  # NOQA
-
 DJOSER.update({  # NOQA
-    'DOMAIN': 'localhost:8080',
-    'SEND_ACTIVATION_EMAIL': False,
+    'DOMAIN': 'localhost:8000',
 })
 ALLOWED_HOSTS = ['*']
 # devserver settings

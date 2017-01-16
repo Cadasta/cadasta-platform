@@ -4,12 +4,10 @@ from django.core import mail
 from django.test import TestCase
 
 from skivvy import APITestCase
-from djoser.utils import encode_uid
 
 from core.tests.utils.cases import UserTestCase
 from ..models import User
 from ..views import api as api_views
-from ..token import cadastaTokenGenerator
 
 from .factories import UserFactory
 
@@ -19,7 +17,8 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
-                                       email='john@beatles.uk')
+                                       email='john@beatles.uk',
+                                       email_verified=True)
 
     def test_update_email_address(self):
         """Service should send a verification email when the user updates their
@@ -28,6 +27,8 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
         assert len(mail.outbox) == 1
+        self.user.refresh_from_db()
+        assert self.user.email_verified is False
 
     def test_keep_email_address(self):
         """Service should not send a verification email when the user does not
@@ -36,6 +37,8 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
         assert len(mail.outbox) == 0
+        self.user.refresh_from_db()
+        assert self.user.email_verified is True
 
     def test_update_with_existing_email(self):
         UserFactory.create(email='boss@beatles.uk')
@@ -44,6 +47,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert response.status_code == 400
         assert self.user.email == 'john@beatles.uk'
+        assert self.user.email_verified is True
 
     def test_update_username(self):
         data = {'email': self.user.email, 'username': 'john'}
@@ -51,6 +55,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert response.status_code == 200
         assert self.user.username == 'john'
+        assert self.user.email_verified is True
 
     def test_update_with_existing_username(self):
         UserFactory.create(username='boss')
@@ -59,6 +64,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert response.status_code == 400
         assert self.user.username == 'imagine71'
+        assert self.user.email_verified is True
 
 
 class AccountSignupTest(APITestCase, UserTestCase, TestCase):
@@ -74,6 +80,7 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 201
         assert User.objects.count() == 1
+        assert len(mail.outbox) == 1
 
     def test_user_signs_up_with_invalid(self):
         """The server should respond with an 404 error code when a user tries
@@ -86,6 +93,7 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 400
         assert User.objects.count() == 0
+        assert len(mail.outbox) == 0
 
 
 class AccountLoginTest(APITestCase, UserTestCase, TestCase):
@@ -116,26 +124,7 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
         self.user.verify_email_by = datetime.now()
         self.user.save()
         data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
-        response = self.request(method='POST', post_data=data)
+        response = self.request(method='POST', post_data=data, user=self.user)
         assert response.status_code == 400
         assert 'auth_token' not in response.content
         assert len(mail.outbox) == 1
-
-
-class AccountVerifyTest(APITestCase, UserTestCase, TestCase):
-    view_class = api_views.AccountVerify
-
-    def test_activate_account(self):
-        user = UserFactory.create()
-
-        token = cadastaTokenGenerator.make_token(user)
-
-        user.last_login = datetime.now()
-        user.save()
-
-        data = {'uid': encode_uid(user.pk), 'token': token}
-        response = self.request(method='POST', post_data=data)
-
-        user.refresh_from_db()
-        assert response.status_code == 200
-        assert user.email_verified is True
