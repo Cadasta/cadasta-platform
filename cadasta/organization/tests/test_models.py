@@ -183,9 +183,6 @@ class ProjectTest(TestCase):
 
 
 class ProjectRoleTest(UserTestCase, TestCase):
-    def _get_roles(self):
-        pass
-
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create()
