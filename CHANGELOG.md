@@ -1,5 +1,86 @@
 # Change Log
 
+## [v1.5.0](https://github.com/Cadasta/cadasta-platform/tree/v1.5.0) (2017-01-17)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.0-alpha.3...v1.5.0)
+
+**Fixed bugs:**
+
+- Unable to list Active/Archived projects in organizations with archived projects [\#1035](https://github.com/Cadasta/cadasta-platform/issues/1035)
+
+**Closed issues:**
+
+- Implement a search reindex management command [\#909](https://github.com/Cadasta/cadasta-platform/issues/909)
+- Implement a search index batch update daemon [\#908](https://github.com/Cadasta/cadasta-platform/issues/908)
+
+**Merged pull requests:**
+
+- Block access requests that do not specify hostname \(bots\) [\#1063](https://github.com/Cadasta/cadasta-platform/pull/1063) ([amplifi](https://github.com/amplifi))
+- Fix \#1035: Make archived filtering work when not using English [\#1044](https://github.com/Cadasta/cadasta-platform/pull/1044) ([seav](https://github.com/seav))
+
+## [v1.5.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.5.0-alpha.3) (2017-01-13)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.0-alpha.2...v1.5.0-alpha.3)
+
+**Fixed bugs:**
+
+- Internal server error when accessing to some locations [\#1039](https://github.com/Cadasta/cadasta-platform/issues/1039)
+- Private project can not be made public [\#1038](https://github.com/Cadasta/cadasta-platform/issues/1038)
+- Permissions Issue: Project Users can submit questionnaires [\#1036](https://github.com/Cadasta/cadasta-platform/issues/1036)
+
+**Merged pull requests:**
+
+- Fix \#1039 -- Bump django-jsonattrs [\#1054](https://github.com/Cadasta/cadasta-platform/pull/1054) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1036 -- Add permission check to GeoODK submissions [\#1047](https://github.com/Cadasta/cadasta-platform/pull/1047) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.5.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.5.0-alpha.2) (2017-01-13)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.0-alpha.1...v1.5.0-alpha.2)
+
+**Fixed bugs:**
+
+- API: Projects can be deleted via the api [\#1048](https://github.com/Cadasta/cadasta-platform/issues/1048)
+- Column sort by Last Updated not working correctly [\#1041](https://github.com/Cadasta/cadasta-platform/issues/1041)
+- Untranslated string when resetting password [\#926](https://github.com/Cadasta/cadasta-platform/issues/926)
+
+**Merged pull requests:**
+
+- Adjusted PublicPrivateToggle to work with django 1.10 [\#1051](https://github.com/Cadasta/cadasta-platform/pull/1051) ([linzjax](https://github.com/linzjax))
+- removed `destroy` option from ProjectDetail api view [\#1049](https://github.com/Cadasta/cadasta-platform/pull/1049) ([linzjax](https://github.com/linzjax))
+- Fix \#1041: Fix date sorting [\#1043](https://github.com/Cadasta/cadasta-platform/pull/1043) ([seav](https://github.com/seav))
+- Add makemessages command [\#1028](https://github.com/Cadasta/cadasta-platform/pull/1028) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.5.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.5.0-alpha.1) (2017-01-11)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.4.0...v1.5.0-alpha.1)
+
+**Fixed bugs:**
+
+- Editing project details does not succeed [\#1018](https://github.com/Cadasta/cadasta-platform/issues/1018)
+- Icon lookups for audio files fail [\#1013](https://github.com/Cadasta/cadasta-platform/issues/1013)
+- Files are deleted from S3 before a model instance is saved [\#972](https://github.com/Cadasta/cadasta-platform/issues/972)
+- Redirect after changing password [\#904](https://github.com/Cadasta/cadasta-platform/issues/904)
+- Improve browser detection of .gpx files on GPX import [\#662](https://github.com/Cadasta/cadasta-platform/issues/662)
+
+**Closed issues:**
+
+- User Removed from Organization can still submit questionnaires [\#1037](https://github.com/Cadasta/cadasta-platform/issues/1037)
+- Rework ellipsis menu [\#1023](https://github.com/Cadasta/cadasta-platform/issues/1023)
+- Import will not accept .xlsx [\#1022](https://github.com/Cadasta/cadasta-platform/issues/1022)
+- Localize platform in French [\#1017](https://github.com/Cadasta/cadasta-platform/issues/1017)
+- Localize platform in Spanish [\#1016](https://github.com/Cadasta/cadasta-platform/issues/1016)
+- Implement exponential back-off for password attempts [\#945](https://github.com/Cadasta/cadasta-platform/issues/945)
+- Research front-end performance improvement [\#893](https://github.com/Cadasta/cadasta-platform/issues/893)
+- Upgrade Django to resolve security vulnerabilities [\#886](https://github.com/Cadasta/cadasta-platform/issues/886)
+
+**Merged pull requests:**
+
+- Separate Role and Administrator [\#1033](https://github.com/Cadasta/cadasta-platform/pull/1033) ([clash99](https://github.com/clash99))
+- User is redirected to profile after changing password [\#1032](https://github.com/Cadasta/cadasta-platform/pull/1032) ([linzjax](https://github.com/linzjax))
+- Reconfigured allauth pre\_authentication to use an exponential back-off [\#1030](https://github.com/Cadasta/cadasta-platform/pull/1030) ([linzjax](https://github.com/linzjax))
+- Fix \#1013 -- Set correct icon name for audio types [\#1029](https://github.com/Cadasta/cadasta-platform/pull/1029) ([oliverroick](https://github.com/oliverroick))
+- Ellipsis menu rework [\#1026](https://github.com/Cadasta/cadasta-platform/pull/1026) ([clash99](https://github.com/clash99))
+- Update changelog for v1.4.0 [\#1025](https://github.com/Cadasta/cadasta-platform/pull/1025) ([amplifi](https://github.com/amplifi))
+- Fix \#1018: Make project details editing work again [\#1019](https://github.com/Cadasta/cadasta-platform/pull/1019) ([seav](https://github.com/seav))
+- Upgrade Django to 1.10 and improve json-attrs performance [\#1015](https://github.com/Cadasta/cadasta-platform/pull/1015) ([oliverroick](https://github.com/oliverroick))
+- Install argon2 support and set as default algorithm [\#928](https://github.com/Cadasta/cadasta-platform/pull/928) ([amplifi](https://github.com/amplifi))
+
 ## [v1.4.0](https://github.com/Cadasta/cadasta-platform/tree/v1.4.0) (2017-01-03)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.3.0...v1.4.0)
 
