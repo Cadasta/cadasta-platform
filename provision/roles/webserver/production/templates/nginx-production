@@ -17,6 +17,11 @@ server {
 server {
     listen      443 ssl;
     server_name {{ api_url }};
+
+    if ($http_host != "{{ api_url }}") {
+        return 403;
+    }
+
     ssl_certificate     /etc/ssl/private/domain.crt;
     ssl_certificate_key /etc/ssl/private/domain.key;
 
@@ -61,6 +66,11 @@ server {
 server {
     listen      443 ssl;
     server_name {{ main_url }};
+
+    if ($http_host != "{{ main_url }}") {
+        return 403;
+    }
+
     ssl_certificate     /etc/ssl/private/domain.crt;
     ssl_certificate_key /etc/ssl/private/domain.key;
 
