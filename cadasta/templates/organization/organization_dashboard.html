@@ -1,9 +1,14 @@
 {% extends "organization/organization_wrapper.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Overview" %} | {% endblock %}
 {% block left-nav %}overview{% endblock %}
+
+{% block extra_script %}
+    <script type="text/javascript" src="{% static 'js/dataTables.selectFiltering.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -20,30 +25,25 @@
             <table class="table table-hover datatable" data-paging-type="simple">
               <thead>
                 <tr>
-                  <th class="unarchived"><div>{% trans "Archived" %}</div></th>
                   <th class="col-md-6">{% trans "Project" %}</th>
                   <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
                   <th class="col-md-2">{% trans "Last updated" %}</th>
+                  <th class="hidden"><!-- Hidden archived status column --></th>
                 </tr>
               </thead>
               <tbody>
-                {% for prj in projects %}
-                <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}';">
-                  {% if prj.archived %}
-                    <td class="archived"><div>{% trans "True" %}</div></td>
-                  {% else %}
-                    <td class="unarchived"><div>{% trans "False" %}</div></td>
-                  {% endif %}
+                {% for proj in projects %}
+                <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}';">
                   <td>
-                      <a href="{% url 'organization:project-dashboard' organization=organization.slug project=prj.slug %}">{{ prj.name }}</a>
-                      {% if prj.archived %}
-                      <span class="label label-danger">
-                        {% trans "Archived" %}
-                      </span>
-                      {% endif %}
+                    <a href="{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}">{{ proj.name }}</a>
+                    {% if proj.archived %}
+                    <span class="label label-danger">{% trans "Archived" %}</span>
+                    {% endif %}
                   </td>
-                  <td class="hidden-xs">{{ prj.country }}</td>
-                  <td data-sort="{{ prj.last_updated|date:'U' }}">{{ prj.last_updated }}</td>
+                  
+                  <td class="hidden-xs">{{ proj.country }}</td>
+                  <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+                  <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
                 </tr>
                 {% endfor %}
               </tbody>

@@ -641,12 +641,6 @@ body.map .content-single {
   div.org-logo {
     padding: 4px 0;
   }
-  td.archived, td.unarchived {
-    display: none !important
-  }
-  th.archived, th.unarchived {
-    display: none !important
-  }
 }
 
 table.table-location { // location details in map area

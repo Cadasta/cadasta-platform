@@ -1,10 +1,15 @@
 {% extends "core/base.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block top-nav %}projects{% endblock %}
 
 {% block title %} | {% trans "Projects" %}{% endblock %}
+
+{% block extra_script %}
+    <script type="text/javascript" src="{% static 'js/dataTables.selectFiltering.js' %}"></script>
+{% endblock %}
 
 {% block page-header %}
 
@@ -33,24 +38,15 @@
 <table class="table table-hover datatable" data-paging-type="simple">
   <thead>
     <tr>
-      {% if any_archived %}
-      <th class="archived">{% trans "Archived" %}</th>
-      {% else %}
-      <th class="unarchived">{% trans "Archived" %}</th>
-      {% endif %}
       <th class="col-md-6">{% trans "Project" %}</th>
       <th class="col-md-2 hidden-xs">{% trans "Organization" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Country" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
+      <th class="hidden"><!-- Hidden archived status column --></th>
     </tr>
   </thead>
   {% for proj in object_list %}
   <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}';">
-    {% if proj.archived %}
-      <td class="archived"><div>{% trans "True" %}</div></td>
-    {% else %}
-      <td class="unarchived"><div>{% trans "False" %}</div></td>
-    {% endif %}
     <td>
       <h4>
           <a href="{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}">{{ proj.name }}</a>
@@ -74,6 +70,7 @@
     </td>
     <td class="hidden-xs hidden-sm">{{ proj.country.name }}</td>
     <td class="hidden-xs hidden-sm" data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+    <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
   </tr>
   {% endfor %}
 </table>

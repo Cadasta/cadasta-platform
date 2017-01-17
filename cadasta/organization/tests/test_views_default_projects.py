@@ -111,7 +111,6 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
             'object_list': sorted(projs, key=self.sort_key),
             'add_allowed': False,
             'is_superuser': False,
-            'any_archived': False,
         }
 
     def test_get_with_valid_user(self):
@@ -169,8 +168,7 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key),
-            add_allowed=True,
-            any_archived=True)
+            add_allowed=True)
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
@@ -182,9 +180,7 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.render_content(
             object_list=sorted(Project.objects.all(), key=self.sort_key),
             add_allowed=True,
-            is_superuser=True,
-            any_archived=True,
-        )
+            is_superuser=True)
 
 
 class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
