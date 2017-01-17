@@ -20,8 +20,14 @@
     }
 
     // When there are archived objects
-    if ($('td[data-filter="archived-True"]').length) {
-      var table = $('#DataTables_Table_0').DataTable();
+    var table = $('#DataTables_Table_0').DataTable();
+    var numCols = table.columns().count();
+    var hasArchived = table
+        .column(numCols - 1)
+        .nodes()
+        .filter(function(node) { return node.dataset.filter === "archived-True" })
+        .length > 0;
+    if (hasArchived) {
 
       // Add archived filter select field
       dtSettings.nTableWrapper.childNodes[0].childNodes[0].innerHTML += addSelectOptions()
