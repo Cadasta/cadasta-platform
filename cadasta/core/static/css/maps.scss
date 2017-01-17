@@ -1,9 +1,14 @@
+#mapid { 
+  height: 100%; 
+  z-index: 1;
+}
+
 /* =Leaflet popups
 -------------------------------------------------------------- */
 
 .leaflet-container {
   font-family: $font-family-sans-serif !important;
-  z-index: 1;
+  // z-index: 1;
 }
 
 .leaflet-popup-content-wrapper {
@@ -97,7 +102,7 @@
 -------------------------------------------------------------- */
 
 .leaflet-top, .leaflet-bottom {
-  z-index: 200;
+  // z-index: 200;
 }
 
 /* =Labels

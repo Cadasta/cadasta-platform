@@ -39,6 +39,10 @@ urlpatterns = [
         default.ProjectDashboard.as_view(),
         name='project-dashboard'),
     url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/map/$',
+        default.ProjectMap.as_view(),
+        name='project-map'),
+    url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/'
         'geometry/$',
         default.ProjectEditGeometry.as_view(),

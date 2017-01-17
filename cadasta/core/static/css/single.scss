@@ -416,22 +416,36 @@
 /* =Map location details in right column
 -------------------------------------------------------------- */
 
-.content-single .detail {
-  h2 {
-    span {
-      font-size: 11px;
-      color: $gray-medium;
-      display: block;
-      text-transform: uppercase; 
-      padding-bottom: 2px;
+.content-single.detail-hidden {
+  .detail {
+    display: none;
+  }
+
+  #project-map {
+    width: 151%;
+  }
+}
+
+
+.content-single.detail-display {
+  .detail {
+    h2 {
+      span {
+        font-size: 11px;
+        color: $gray-medium;
+        display: block;
+        text-transform: uppercase; 
+        padding-bottom: 2px;
+      }
     }
-  }
-  .btn-group {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .top-add {
-    margin-bottom: -30px;
+    .btn-group {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .top-add {
+      margin-bottom: -30px;
+    }
+    transition: all 0.5s ease-in-out;
   }
 }
 
@@ -445,4 +459,5 @@
       margin: 0 auto;
     }
   }
+  transition: all 0.5s ease-in-out;
 }

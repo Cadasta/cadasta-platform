@@ -1,0 +1,72 @@
+{% extends "organization/project_wrapper.html" %}
+
+{% load i18n %}
+
+{% load staticfiles %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+<link rel="stylesheet" href="{% static 'css/leaflet.groupedlayercontrol.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+{% endblock %}
+
+{% block extra_script %}
+<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<script src="{% static '/js/leaflet.groupedlayercontrol.min.js' %}"></script>
+<!-- <script src="{% static 'js/leaflet.markercluster.js' %}"></script> -->
+<!-- <script src="{% static 'js/L.Map.Deflate.js' %}"></script> -->
+<script src="{% static 'js/map_utils.js' %}"></script>
+
+<script>
+  function project_map_init(map) {
+    var trans = {
+      open: "{% trans 'Open location' %}"
+    };
+
+    {% if project.extent %}
+    var projectExtent = {{ project.extent.geojson|safe }};
+    {% else %}
+    var projectExtent = null;
+    {% endif %}
+
+    renderFeatures(map,
+                   '{% url "async:spatial:list" project.organization.slug project.slug %}',
+                   {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
+
+    var orgSlug = '{{ project.organization.slug }}';
+    var projectSlug = '{{ project.slug }}';
+    var url = '/api/v1/organizations/'
+            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+    add_spatial_resources(map, url);
+  };
+
+  var layers = {{ leaflet_tiles|safe }}
+  map = importMap(layers)
+  project_map_init(map)
+
+</script>
+{% endblock %}
+
+{% block page_title %}{% trans "Overview" %} | {% endblock %}
+{% block body-class %} map{% endblock %}
+{% block left-nav %}overview{% endblock %}
+
+{% block content %}
+<div class="col-md-12 content-single detail-display">
+  <div class="row">
+    <!-- Start overview map  -->
+    <div class="col-md-8 map">
+      <div id="mapid"></div>
+    </div>
+    <!-- / end overview map -->
+    <!-- Overview detail  -->
+    <div class='col-md-4 detail'>
+    <!-- THIS IS WHERE THE NEW SIDE MENU DETAILS GO -->
+    </div>
+  </div>
+  <!-- / overview detail -->
+</div>
+
+<script src="{% static 'js/map_page.js' %}"></script>
+{% endblock %}
