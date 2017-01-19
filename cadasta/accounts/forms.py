@@ -1,4 +1,3 @@
-from datetime import datetime, timezone, timedelta
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -6,7 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
-from .models import User
+from .models import User, now_plus_48_hours
 from parsley.decorators import parsleyfy
 
 
@@ -102,8 +101,7 @@ class ProfileForm(forms.ModelForm):
             send_email_confirmation(self.request, user)
             self._send_confirmation = False
             user.email_verified = False
-            user.verify_email_by = (datetime.now(tz=timezone.utc) +
-                                    timedelta(hours=48))
+            user.verify_email_by = now_plus_48_hours()
 
         user.save()
         return user

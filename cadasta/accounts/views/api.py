@@ -1,4 +1,3 @@
-from datetime import datetime, timezone, timedelta
 from django.utils.translation import ugettext as _
 from django.contrib.messages.api import MessageFailure
 from allauth.account.utils import send_email_confirmation
@@ -11,6 +10,7 @@ from djoser import views as djoser_views
 from djoser import signals
 
 from .. import serializers
+from ..models import now_plus_48_hours
 from ..exceptions import EmailNotVerifiedError
 
 
@@ -24,8 +24,7 @@ class AccountUser(djoser_views.UserView):
         if user.email != new_email:
             updated = serializer.save(
                 email_verified=False,
-                verify_email_by=(datetime.now(tz=timezone.utc) +
-                                 timedelta(hours=48))
+                verify_email_by=now_plus_48_hours()
             )
             try:
                 send_email_confirmation(self.request._request, updated)
