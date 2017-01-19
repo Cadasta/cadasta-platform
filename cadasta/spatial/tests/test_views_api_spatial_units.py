@@ -435,9 +435,8 @@ class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
                                         user=user)
 
         response = self.request(user=user)
-        assert response.status_code == 200
-        print(response.content)
-        assert response.content['properties']['id'] == self.su.id
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):

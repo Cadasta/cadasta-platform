@@ -267,8 +267,8 @@ class TenureRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
                                         user=user)
 
         response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content['id'] == self.rel.id
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
