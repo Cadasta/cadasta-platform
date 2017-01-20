@@ -167,10 +167,14 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
         context = super().get_context_data(*args, **kwargs)
         context['is_administrator'] = self.is_administrator
         user = self.request.user
+
+        project = self.get_project()
         context['is_allowed_add_location'] = user.has_perm('spatial.create',
-                                                           self.get_project())
+                                                           project)
         context['is_allowed_add_resource'] = user.has_perm('resource.add',
-                                                           self.get_project())
+                                                           project)
+        context['is_allowed_import'] = user.has_perm('project.import',
+                                                     project)
         return context
 
 
