@@ -35,6 +35,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     date_joined = abstract_user_field('date_joined')
     email_verified = models.BooleanField(default=False)
     verify_email_by = models.DateTimeField(default=now_plus_48_hours)
+    change_pw = models.BooleanField(default=True)
 
     objects = UserManager()
 

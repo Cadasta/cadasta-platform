@@ -1,91 +1,77 @@
 from django.utils.translation import ugettext as _
+from django.contrib.messages.api import MessageFailure
+from allauth.account.utils import send_email_confirmation
 
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny
 from rest_framework import status
 
 from djoser import views as djoser_views
-from djoser import utils as djoser_utils
-from djoser import serializers as djoser_serializers
-from djoser import settings
+from djoser import signals
 
 from .. import serializers
+from ..models import now_plus_48_hours
 from ..exceptions import EmailNotVerifiedError
-from ..token import cadastaTokenGenerator
 
 
-class AccountUser(djoser_utils.SendEmailViewMixin, djoser_views.UserView):
-    token_generator = cadastaTokenGenerator
-    subject_template_name = 'accounts/email/change_email_subject.txt'
-    plain_body_template_name = 'accounts/email/change_email.txt'
+class AccountUser(djoser_views.UserView):
     serializer_class = serializers.UserSerializer
 
-    def get_email_context(self, user):
-        context = super(AccountUser, self).get_email_context(user)
-        context['url'] = settings.get('ACTIVATION_URL').format(**context)
-        return context
-
     def perform_update(self, serializer):
-        old_email = self.get_object().email
-        new_email = serializer.validated_data['email']
+        user = self.get_object()
+        new_email = serializer.validated_data.get('email', user.email)
 
-        user = serializer.save()
-
-        if old_email != new_email:
-            self.send_email(**self.get_send_email_kwargs(user))
-
-    def put(self, *args, **kwargs):
-        return super().put(*args, **kwargs)
+        if user.email != new_email:
+            updated = serializer.save(
+                email_verified=False,
+                verify_email_by=now_plus_48_hours()
+            )
+            try:
+                send_email_confirmation(self.request._request, updated)
+            except MessageFailure:
+                pass
+        else:
+            serializer.save()
 
 
 class AccountRegister(djoser_views.RegistrationView):
-    token_generator = cadastaTokenGenerator
     serializer_class = serializers.RegistrationSerializer
-    plain_body_template_name = 'accounts/email/activate_email.txt'
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        signals.user_registered.send(sender=self.__class__, user=user,
+                                     request=self.request)
+
+        try:
+            send_email_confirmation(self.request._request, user)
+        except MessageFailure:
+            pass
 
 
-class AccountLogin(djoser_utils.SendEmailViewMixin, djoser_views.LoginView):
+class AccountLogin(djoser_views.LoginView):
     serializer_class = serializers.AccountLoginSerializer
-    token_generator = cadastaTokenGenerator
-    subject_template_name = 'accounts/email/activate_email_subject.txt'
-    plain_body_template_name = 'accounts/email/activate_email.txt'
-
-    def get_email_context(self, user):
-        context = super(AccountLogin, self).get_email_context(user)
-        context['url'] = settings.get('ACTIVATION_URL').format(**context)
-        return context
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-            return self.action(serializer)
+            return self._action(serializer)
         except ValidationError:
             return Response(
                 data=serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except EmailNotVerifiedError:
-            self.send_email(**self.get_send_email_kwargs(serializer.user))
+            user = serializer.user
+            user.is_active = False
+            user.save()
+
+            try:
+                send_email_confirmation(self.request._request, user)
+            except MessageFailure:
+                pass
+
             return Response(
                 data={'detail': _("The email has not been verified.")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-
-class PasswordReset(djoser_views.PasswordResetView):
-    plain_body_template_name = 'accounts/email/password_reset.txt'
-
-
-class AccountVerify(djoser_utils.ActionViewMixin, GenericAPIView):
-    serializer_class = djoser_serializers.UidAndTokenSerializer
-    permission_classes = (AllowAny, )
-    token_generator = cadastaTokenGenerator
-
-    def action(self, serializer):
-        serializer.user.email_verified = True
-        serializer.user.is_active = True
-        serializer.user.save()
-        return Response(status=status.HTTP_200_OK)

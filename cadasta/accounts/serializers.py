@@ -112,3 +112,11 @@ class AccountLoginSerializer(djoser_serializers.LoginSerializer):
             raise EmailNotVerifiedError
 
         return attrs
+
+
+class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
+    def validate(self, attrs):
+        if not self.context['request'].user.change_pw:
+            raise ValidationError(_("The password for this user can not "
+                                    "be changed."))
+        return super().validate(attrs)

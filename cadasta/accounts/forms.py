@@ -1,4 +1,3 @@
-from datetime import datetime, timezone, timedelta
 from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
@@ -6,7 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
-from .models import User
+from .models import User, now_plus_48_hours
 from parsley.decorators import parsleyfy
 
 
@@ -102,30 +101,29 @@ class ProfileForm(forms.ModelForm):
             send_email_confirmation(self.request, user)
             self._send_confirmation = False
             user.email_verified = False
-            user.verify_email_by = (datetime.now(tz=timezone.utc) +
-                                    timedelta(hours=48))
+            user.verify_email_by = now_plus_48_hours()
 
         user.save()
         return user
 
 
-class ChangePasswordForm(allauth_forms.ChangePasswordForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+class ChangePasswordMixin:
     def clean_password1(self):
+        if not self.user.change_pw:
+            raise forms.ValidationError(_("The password for this user can not "
+                                          "be changed."))
+
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
 
         return password
 
 
-class ResetPasswordKeyForm(allauth_forms.ResetPasswordKeyForm):
-    def __init__(self, *args, **kwargs):
-        super(ResetPasswordKeyForm, self).__init__(*args, **kwargs)
+class ChangePasswordForm(ChangePasswordMixin,
+                         allauth_forms.ChangePasswordForm):
+    pass
 
-    def clean_password1(self):
-        password = self.cleaned_data['password1']
-        validate_password(password, self.user)
 
-        return password
+class ResetPasswordKeyForm(ChangePasswordMixin,
+                           allauth_forms.ResetPasswordKeyForm):
+    pass

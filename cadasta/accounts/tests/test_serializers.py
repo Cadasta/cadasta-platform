@@ -7,9 +7,7 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
 
 from core.tests.utils.cases import UserTestCase
-from ..serializers import (
-    RegistrationSerializer, UserSerializer, AccountLoginSerializer
-)
+from .. import serializers
 from ..models import User
 from ..exceptions import EmailNotVerifiedError
 
@@ -27,12 +25,12 @@ BASIC_TEST_DATA = {
 class RegistrationSerializerTest(UserTestCase, TestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
-        serializer = RegistrationSerializer(user)
+        serializer = serializers.RegistrationSerializer(user)
         assert 'email_verified' in serializer.data
         assert 'password' not in serializer.data
 
     def test_create_with_valid_data(self):
-        serializer = RegistrationSerializer(data=BASIC_TEST_DATA)
+        serializer = serializers.RegistrationSerializer(data=BASIC_TEST_DATA)
         assert serializer.is_valid()
 
         serializer.save()
@@ -53,7 +51,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
 
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
 
     def test_create_with_existing_email(self):
@@ -70,7 +68,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
 
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
         assert (_("Another user is already registered with this email address")
                 in serializer._errors['email'])
@@ -85,7 +83,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
 
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
         assert (_("Username cannot be “add” or “new”.")
                 in serializer._errors['username'])
@@ -98,7 +96,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'password_repeat': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
         assert (_("The password is too similar to the username.") in
                 serializer._errors['password'])
@@ -111,7 +109,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'password_repeat': 'johnisjustheBest!!',
             'full_name': 'John Lennon',
         }
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
         assert (_("Passwords cannot contain your email.") in
                 serializer._errors['password'])
@@ -124,7 +122,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'password_repeat': 'yoko<3',
             'full_name': 'John Lennon',
         }
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
         assert (_("This password is too short."
                   " It must contain at least 10 characters.") in
@@ -138,7 +136,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'password_repeat': 'iloveyoko',
             'full_name': 'John Lennon',
         }
-        serializer = RegistrationSerializer(data=data)
+        serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
         assert (_("Passwords must contain at least 3"
                   " of the following 4 character types:\n"
@@ -150,7 +148,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 class UserSerializerTest(UserTestCase, TestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
-        serializer = UserSerializer(user)
+        serializer = serializers.UserSerializer(user)
         assert 'email_verified' in serializer.data
         assert 'password' not in serializer.data
 
@@ -162,7 +160,7 @@ class UserSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00'
         }
-        serializer = UserSerializer(data=data)
+        serializer = serializers.UserSerializer(data=data)
         assert serializer.is_valid()
 
         serializer.save()
@@ -173,32 +171,32 @@ class UserSerializerTest(UserTestCase, TestCase):
         assert not user_obj.email_verified
 
     def test_update_username_fails(self):
-        serializer = UserSerializer(data=BASIC_TEST_DATA)
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
         assert serializer.is_valid()
         user = serializer.save()
         other_user = UserFactory.create()
         update_data = {'username': 'bad-update'}
         request = APIRequestFactory().patch('/user/imagine71', update_data)
         force_authenticate(request, user=other_user)
-        serializer2 = UserSerializer(
+        serializer2 = serializers.UserSerializer(
             user, update_data, context={'request': Request(request)}
         )
         assert not serializer2.is_valid()
         assert serializer2.errors['username'] == ['Cannot update username']
 
     def test_update_last_login_fails(self):
-        serializer = UserSerializer(data=BASIC_TEST_DATA)
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
         assert serializer.is_valid()
         user = serializer.save()
         update_data1 = {'username': 'imagine71',
                         'email': 'john@beatles.uk',
                         'last_login': '2016-01-01 23:00:00'}
-        serializer2 = UserSerializer(user, data=update_data1)
+        serializer2 = serializers.UserSerializer(user, data=update_data1)
         assert not serializer2.is_valid()
         assert serializer2.errors['last_login'] == ['Cannot update last_login']
 
     def test_update_with_restricted_username(self):
-        serializer = UserSerializer(data=BASIC_TEST_DATA)
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
         assert serializer.is_valid()
         user = serializer.save()
         invalid_usernames = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
@@ -209,7 +207,7 @@ class UserSerializerTest(UserTestCase, TestCase):
         }
         request = APIRequestFactory().patch('/user/imagine71', data)
         force_authenticate(request, user=user)
-        serializer2 = UserSerializer(
+        serializer2 = serializers.UserSerializer(
             user, data=data, context={'request': Request(request)}
         )
         assert not serializer2.is_valid()
@@ -227,7 +225,41 @@ class AccountLoginSerializerTest(UserTestCase, TestCase):
                            verify_email_by=datetime.now())
 
         with pytest.raises(EmailNotVerifiedError):
-            AccountLoginSerializer().validate(attrs={
+            serializers.AccountLoginSerializer().validate(attrs={
                 'username': 'sgt_pepper',
                 'password': 'iloveyoko79'
             })
+
+
+class ChangePasswordSerializerTest(UserTestCase, TestCase):
+    def test_user_can_change_pw(self):
+        user = UserFactory.create(password='beatles4Lyfe!', change_pw=True)
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'current_password': 'beatles4Lyfe!',
+            'new_password': 'iloveyoko79!',
+            're_new_password': 'iloveyoko79!'
+        }
+
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)}
+        )
+        assert serializer.is_valid() is True
+
+    def test_user_can_not_change_pw(self):
+        user = UserFactory.create(password='beatles4Lyfe!', change_pw=False)
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'current_password': 'beatles4Lyfe!',
+            'new_password': 'iloveyoko79!',
+            're_new_password': 'iloveyoko79!'
+        }
+
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)}
+        )
+        assert serializer.is_valid() is False
+        assert ("The password for this user can not be changed."
+                in serializer.errors['non_field_errors'])
