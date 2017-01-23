@@ -218,7 +218,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
             'num_resources': 0,
             'is_allowed_add_location': False,
             'is_allowed_add_resource': False,
-            'is_project_member': False
+            'is_project_member': False,
+            'is_allowed_add_resource': False
         }
 
     def setup_url_kwargs(self):
@@ -251,7 +252,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
                                        is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
-                                       is_project_member=True)
+                                       is_project_member=True,
+                                       is_allowed_import=True)
         assert response.content == expected
 
     def test_get_with_org_admin(self):
@@ -265,7 +267,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
-                                       is_project_member=True)
+                                       is_project_member=True,
+                                       is_allowed_import=True)
         assert response.content == expected
 
     def test_get_with_project_manager(self):
@@ -279,7 +282,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
-                                       is_project_member=True)
+                                       is_project_member=True,
+                                       is_allowed_import=True)
         assert response.content == expected
 
     def test_get_non_existent_project(self):
@@ -371,7 +375,8 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
                                        is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
-                                       is_project_member=True)
+                                       is_project_member=True,
+                                       is_allowed_import=True)
         assert response.content == expected
 
     def test_get_archived_project_with_unauthorized_user(self):
@@ -406,6 +411,7 @@ class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
+                                       is_allowed_import=True,
                                        is_project_member=True)
         assert response.content == expected
 
@@ -837,7 +843,8 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'project': self.project,
                 'object': self.project,
-                'form': forms.ProjectAddExtents(instance=self.project)}
+                'form': forms.ProjectAddExtents(instance=self.project),
+                'is_allowed_import': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -947,7 +954,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
                     instance=self.project,
                     initial={'questionnaire': self.questionnaire.xls_form.url,
                              'original_file': self.questionnaire.original_file}
-                )}
+                ),
+                'is_allowed_import': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -1158,7 +1166,8 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'project': self.project,
                 'object': self.project,
-                'form': forms.ProjectEditPermissions(instance=self.project)}
+                'form': forms.ProjectEditPermissions(instance=self.project),
+                'is_allowed_import': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -1359,7 +1368,8 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         return {'project': self.project,
                 'object': self.project,
                 'form': forms.DownloadForm(project=self.project,
-                                           user=self.user)}
+                                           user=self.user),
+                'is_allowed_import': True}
 
     def test_get_with_authorized_user(self):
         assign_policies(self.user)
