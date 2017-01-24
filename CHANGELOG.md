@@ -1,5 +1,25 @@
 # Change Log
 
+## [v1.5.1](https://github.com/Cadasta/cadasta-platform/tree/v1.5.1) (2017-01-23)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.0...v1.5.1)
+
+**Fixed bugs:**
+
+- Drop-down menu for active/archived/all projects not appearing in orgs with more than 10 projects [\#1065](https://github.com/Cadasta/cadasta-platform/issues/1065)
+- Permissions issue: user changed from DC to PU in a project is still able to add/edit/delete records [\#1008](https://github.com/Cadasta/cadasta-platform/issues/1008)
+- Demo user password [\#990](https://github.com/Cadasta/cadasta-platform/issues/990)
+- Permissions issue:  Data Collector Role [\#960](https://github.com/Cadasta/cadasta-platform/issues/960)
+- Disabled org admin role dropdown causes field error [\#823](https://github.com/Cadasta/cadasta-platform/issues/823)
+- It's not possible to remove the URL for an organization or a project [\#537](https://github.com/Cadasta/cadasta-platform/issues/537)
+
+**Merged pull requests:**
+
+- Fix \#960 -- Hide Import button from UI [\#1070](https://github.com/Cadasta/cadasta-platform/pull/1070) ([oliverroick](https://github.com/oliverroick))
+- Fix \#990 -- Block selected  users from changing password [\#1067](https://github.com/Cadasta/cadasta-platform/pull/1067) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1065: Make archived filtering work with pagination [\#1066](https://github.com/Cadasta/cadasta-platform/pull/1066) ([seav](https://github.com/seav))
+- Update changelog for v1.5.0 [\#1064](https://github.com/Cadasta/cadasta-platform/pull/1064) ([amplifi](https://github.com/amplifi))
+- Fix \#1008 -- Unassign policies when roles are deleted [\#1062](https://github.com/Cadasta/cadasta-platform/pull/1062) ([oliverroick](https://github.com/oliverroick))
+
 ## [v1.5.0](https://github.com/Cadasta/cadasta-platform/tree/v1.5.0) (2017-01-17)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.0-alpha.3...v1.5.0)
 
