@@ -4,9 +4,7 @@ from organization import messages as org_messages
 from organization.views.mixins import ProjectMixin
 
 
-class Search(LoginPermissionRequiredMixin,
-             ProjectMixin,
-             TemplateView):
+class Search(LoginPermissionRequiredMixin, ProjectMixin, TemplateView):
     template_name = 'search/search.html'
     permission_required = 'project.view_private'
     permission_denied_message = org_messages.PROJ_VIEW

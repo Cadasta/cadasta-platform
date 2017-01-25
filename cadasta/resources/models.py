@@ -14,6 +14,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+from django.utils.encoding import iri_to_uri
 from jsonattrs.fields import JSONAttributeField
 from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
@@ -127,16 +128,15 @@ class Resource(RandomIDModel):
     def ui_class_name(self):
         return _("Resource")
 
-    @property
-    def ui_detail_url(self):
-        return reverse(
+    def get_absolute_url(self):
+        return iri_to_uri(reverse(
             'resources:project_detail',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
                 'resource': self.id,
             },
-        )
+        ))
 
 
 @receiver(models.signals.pre_save, sender=Resource)

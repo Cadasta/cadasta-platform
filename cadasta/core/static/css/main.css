@@ -5265,15 +5265,12 @@ ul.resource-actions > li {
   width: 290px;
   top: 0;
   left: 100px;
-  z-index: 1000;
+  z-index: 980;
   background: #0e305e;
   overflow: hidden;
-  transition: width 0.5s; }
+  transition: left 0.5s; }
   #sidebar-search-box.disabled {
-    width: 0;
-    height: 0;
-    padding-left: 0;
-    padding-right: 0; }
+    left: -190px; }
   #sidebar-search-box form {
     width: 290px;
     padding: 25.5px 15px; }
@@ -5346,13 +5343,16 @@ ul.resource-actions > li {
     #sidebar.members li.members a .icon {
       background-position: -108px -60px; }
   #sidebar-search-box {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 54px;
-    top: 0;
+    top: 70px;
     left: 0;
-    transition: height 0.5s;
+    transition: top 0.5s;
     border-top: 1px solid #fff; }
+    #sidebar-search-box.disabled {
+      left: 0;
+      top: 16px; }
     #sidebar-search-box form {
       padding: 10px 15px;
       width: auto; } }
@@ -5365,7 +5365,11 @@ ul.resource-actions > li {
       #sidebar .nav-sidebar > li a {
         padding: 12px 0; }
         #sidebar .nav-sidebar > li a .title {
-          display: none; } }
+          display: none; }
+  #sidebar-search-box {
+    top: 60px; }
+    #sidebar-search-box.disabled {
+      top: 6px; } }
 
 /* =Search results page
 -------------------------------------------------------------- */

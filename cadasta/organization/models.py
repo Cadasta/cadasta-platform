@@ -6,6 +6,7 @@ from django_countries.fields import CountryField
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+from django.utils.encoding import iri_to_uri
 import django.contrib.gis.db.models as gismodels
 from simple_history.models import HistoricalRecords
 from shapely.geometry import Polygon
@@ -255,15 +256,14 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
     def ui_class_name(self):
         return _("Project")
 
-    @property
-    def ui_detail_url(self):
-        return reverse(
+    def get_absolute_url(self):
+        return iri_to_uri(reverse(
             'organization:project-dashboard',
             kwargs={
                 'organization': self.organization.slug,
                 'project': self.slug,
             },
-        )
+        ))
 
     @cached_property
     def has_records(self):

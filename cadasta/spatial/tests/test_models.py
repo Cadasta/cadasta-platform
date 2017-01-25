@@ -96,9 +96,9 @@ class SpatialUnitTest(UserTestCase, TestCase):
         su = SpatialUnitFactory.create()
         assert su.ui_class_name == "Location"
 
-    def test_ui_detail_url(self):
+    def test_get_absolute_url(self):
         su = SpatialUnitFactory.create()
-        assert su.ui_detail_url == (
+        assert su.get_absolute_url() == (
             '/organizations/{org}/projects/{prj}/'
             'records/locations/{id}/'.format(
                 org=su.project.organization.slug,

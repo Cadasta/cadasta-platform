@@ -102,3 +102,5 @@ LOGGING = {
         }
     },
 }
+
+MOCK_ES = True

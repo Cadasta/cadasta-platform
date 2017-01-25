@@ -3,8 +3,9 @@ import pytest
 
 from unittest.mock import patch
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.contrib.contenttypes.models import ContentType
+from django.template.loader import render_to_string
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 from skivvy import APITestCase
@@ -23,8 +24,9 @@ from questionnaires.tests.attr_schemas import (individual_party_xform_group,
                                                default_party_xform_group,
                                                tenure_relationship_xform_group)
 from questionnaires.tests.factories import QuestionnaireFactory
-from ..views import api
-from .fake_results import get_test_results
+from ..views import async
+from .fake_results import get_fake_es_api_results
+from ..mock_results import get_mock_async_search_results
 
 
 api_url = (
@@ -48,7 +50,7 @@ def assign_policies(user):
 
 
 class SearchAPITest(APITestCase, UserTestCase, TestCase):
-    view_class = api.Search
+    view_class = async.Search
 
     def setup_models(self):
         self.user = UserFactory.create()
@@ -85,7 +87,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             attributes={'notes': 'PBS is the best.'})
         self.resource = ResourceFactory.create(project=self.project)
 
-        self.results = get_test_results(
+        self.results = get_fake_es_api_results(
             self.project, self.su, self.party, self.tenure_rel, self.resource)
         self.proj_result = self.results['hits']['hits'][0]
         self.su_result = self.results['hits']['hits'][1]
@@ -111,6 +113,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
+    @override_settings(MOCK_ES=False)
     def test_get_with_results(self, mock_post, mock_get):
         su = SpatialUnitFactory.create(project=self.project, type='CB')
 
@@ -130,23 +133,18 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         }
 
         response = self.request(user=self.user, get_data={'q': self.query})
+        expected_html = render_to_string(
+            'search/search_result_item.html',
+            context={'result': {
+                'entity_type': "Location",
+                'url': su.get_absolute_url(),
+                'main_label': "Community boundary",
+                'attributes': {},
+            }}
+        )
         assert response.status_code == 200
         assert response.content['results'] == [[
-            su.ui_class_name,
-            "Community boundary",
-            (
-                '<div class="search-result-item">'
-                '<h4><span class="small">Location</span> '
-                '<a href="/organizations/{org}/projects/{proj}/records/'
-                'locations/{su_id}/">Community boundary</a></h4>'
-                '<table class="table entity-attributes">'
-                '</table></div>'
-            ).format(
-                org=su.project.organization.slug,
-                proj=su.project.slug,
-                su_id=su.id,
-            ),
-        ]]
+            su.ui_class_name, "Community boundary", expected_html]]
         assert response.content['timestamp'] == 'TIMESTAMP'
         mock_post.assert_called_once_with(
             '{}/project-{}/_search'.format(api_url, self.project.id),
@@ -156,6 +154,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
+    @override_settings(MOCK_ES=False)
     def test_get_with_no_results(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
@@ -189,6 +188,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
+    @override_settings(MOCK_ES=False)
     def test_get_with_project_result(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
@@ -215,6 +215,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
+    @override_settings(MOCK_ES=False)
     def test_get_with_null_id(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
@@ -242,6 +243,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
+    @override_settings(MOCK_ES=False)
     def test_get_with_missing_query(self, mock_post, mock_get):
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -276,6 +278,18 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request()
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
+        mock_post.assert_not_called()
+        mock_get.assert_not_called()
+
+    @patch('requests.get')
+    @patch('requests.post')
+    @override_settings(MOCK_ES=True)
+    def test_get_with_mock_results(self, mock_post, mock_get):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        (results_as_html, timestamp) = get_mock_async_search_results()
+        assert response.content['results'] == results_as_html
+        assert response.content['timestamp'] == timestamp
         mock_post.assert_not_called()
         mock_get.assert_not_called()
 
@@ -339,14 +353,14 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
     def test_augment_result_location(self):
         augmented_result = self.view_class().augment_result(self.su_result)
         assert augmented_result['entity_type'] == "Location"
-        assert augmented_result['url'] == self.su.ui_detail_url
+        assert augmented_result['url'] == self.su.get_absolute_url()
         assert augmented_result['main_label'] == "Community boundary"
         assert augmented_result['attributes'] == []
 
     def test_augment_result_party(self):
         augmented_result = self.view_class().augment_result(self.party_result)
         assert augmented_result['entity_type'] == "Party"
-        assert augmented_result['url'] == self.party.ui_detail_url
+        assert augmented_result['url'] == self.party.get_absolute_url()
         assert augmented_result['main_label'] == "Party in the USA"
         attributes = augmented_result['attributes']
         assert len(attributes) == 1
@@ -356,7 +370,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         augmented_result = self.view_class().augment_result(
             self.tenure_rel_result)
         assert augmented_result['entity_type'] == "Relationship"
-        assert augmented_result['url'] == self.tenure_rel.ui_detail_url
+        assert augmented_result['url'] == self.tenure_rel.get_absolute_url()
         assert augmented_result['main_label'] == "Customary Rights"
         attributes = augmented_result['attributes']
         assert len(attributes) == 2
@@ -367,7 +381,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         augmented_result = self.view_class().augment_result(
             self.resource_result)
         assert augmented_result['entity_type'] == "Resource"
-        assert augmented_result['url'] == self.resource.ui_detail_url
+        assert augmented_result['url'] == self.resource.get_absolute_url()
         assert augmented_result['main_label'] == "Goat"
         attributes = augmented_result['attributes']
         assert len(attributes) == 2
@@ -461,22 +475,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert ("Description",
                 "Let's pretend there's a description.") in attributes
 
-    def test_htmlize_result_no_attributes_nor_image(self):
-        augmented_result = {
-            'entity_type': "Party",
-            'url': '/party/detail/',
-            'main_label': "Party People",
-            'attributes': [],
-        }
-        assert self.view_class().htmlize_result(augmented_result) == (
-            '<div class="search-result-item">'
-            '<h4><span class="small">Party</span> '
-            '<a href="/party/detail/">Party People</a></h4>'
-            '<table class="table entity-attributes">'
-            '</table></div>'
-        )
-
-    def test_htmlize_result_with_attributes_and_image(self):
+    def test_htmlize_result(self):
         augmented_result = {
             'entity_type': "Resource",
             'url': '/resource/detail/',
@@ -487,19 +486,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             ],
             'image': settings.ICON_URL.format('mp3'),
         }
-        assert self.view_class().htmlize_result(augmented_result) == (
-            '<div class="search-result-item">'
-            '<h4><span class="small">Resource</span> '
-            '<a href="/resource/detail/">Goat</a></h4>'
-            '<img src="{icon}" class="thumb-60 pull-left">'
-            '<table class="table entity-attributes">'
-            '<tr>'
-            '<td class="col-md-3"><strong>Original file</strong></td>'
-            '<td class="col-md-9">baby_goat.jpeg</td>'
-            '</tr>'
-            '<tr>'
-            '<td class="col-md-3"><strong>Description</strong></td>'
-            '<td class="col-md-9">Nothing to see here.</td>'
-            '</tr>'
-            '</table></div>'
-        ).format(icon=settings.ICON_URL.format('mp3'))
+        expected = render_to_string('search/search_result_item.html',
+                                    context={'result': augmented_result})
+        assert self.view_class().htmlize_result(augmented_result) == expected

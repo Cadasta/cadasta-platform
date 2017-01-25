@@ -7,6 +7,7 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy
+from django.utils.encoding import iri_to_uri
 
 from jsonattrs.decorators import fix_model_for_attributes
 from jsonattrs.fields import JSONAttributeField
@@ -124,16 +125,15 @@ class Party(ResourceModelMixin, RandomIDModel):
     def ui_class_name(self):
         return _("Party")
 
-    @property
-    def ui_detail_url(self):
-        return reverse(
+    def get_absolute_url(self):
+        return iri_to_uri(reverse(
             'parties:detail',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
                 'party': self.id,
             },
-        )
+        ))
 
 
 @fix_model_for_attributes
@@ -315,16 +315,15 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
     def ui_class_name(self):
         return _("Relationship")
 
-    @property
-    def ui_detail_url(self):
-        return reverse(
+    def get_absolute_url(self):
+        return iri_to_uri(reverse(
             'parties:relationship_detail',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
                 'relationship': self.id,
             },
-        )
+        ))
 
 
 class TenureRelationshipType(models.Model):

@@ -17,7 +17,7 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="row">
-            <form action="#" id="search-form" class="inline" data-search-api-url="{% url 'api:v1:search:search' object.organization.slug object.slug %}">
+            <form action="#" id="search-form" class="inline" data-search-async-url="{% url 'async:search:search' object.organization.slug object.slug %}">
               <div class="form-group col-md-9">
                 <label class="control-label sr-only">{% trans "Search within project for" %}</label>
                 <input type="search" id="search-input" class="form-control input-lg pull-left" value="{{ search_query }}">
@@ -31,7 +31,7 @@
                   {% blocktrans %}
                   <ul>
                     <li>Review your wording, make sure that there aren’t any typos in your search query</li>
-                    <li>If you are having no results matching your query, try removing some search terms (“John”, instead of “John White”)</li>
+                    <li>If no results match your query, try removing some search terms (“John”, instead of “John White”)</li>
                     <li>Search results are currently capped to 10 matches. If you want to narrow down your results, try including additional search terms or making the existing ones more restrictive (“John White Kansas”, instead of “John White”)</li>
                   </ul>
                   {% endblocktrans%}
@@ -87,7 +87,7 @@ function performSearch(query) {
 
   if (query === '') return;
 
-  var url = $('#search-form')[0].dataset.searchApiUrl;
+  var url = $('#search-form')[0].dataset.searchAsyncUrl;
   $('#waiting-results').css('display', 'block');
 
   $.get(url + '?q=' + query, function(response) {
@@ -106,7 +106,7 @@ function performSearch(query) {
     if (response.results.length === 0) {
       $('#no-results').css('display', 'block');
       $('#failed-query-string').text(query);
-      $('#index-timestamp-0').text(response.timestamp);
+      $('#index-timestamp-0').text(timestamp);
       $('#results').css('display', 'none');
     }
     else {
@@ -114,7 +114,7 @@ function performSearch(query) {
       $('#results').css('display', 'block');
       $('#total-results').text(response.results.length);
       $('#query-string').text(query);
-      $('#index-timestamp-1').text(response.timestamp);
+      $('#index-timestamp-1').text(timestamp);
     }
   });
 }

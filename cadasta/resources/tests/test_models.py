@@ -41,9 +41,9 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         resource = ResourceFactory.create()
         assert resource.ui_class_name == "Resource"
 
-    def test_ui_detail_url(self):
+    def test_get_absolute_url(self):
         resource = ResourceFactory.create()
-        assert resource.ui_detail_url == (
+        assert resource.get_absolute_url() == (
             '/organizations/{org}/projects/{prj}/'
             'resources/{id}/'.format(
                 org=resource.project.organization.slug,

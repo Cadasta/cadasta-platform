@@ -166,9 +166,9 @@ class ProjectTest(TestCase):
         project = ProjectFactory.create()
         assert project.ui_class_name == "Project"
 
-    def test_ui_detail_url(self):
+    def test_get_absolute_url(self):
         project = ProjectFactory.create()
-        assert project.ui_detail_url == (
+        assert project.get_absolute_url() == (
             '/organizations/{org}/projects/{prj}/'.format(
                 org=project.organization.slug,
                 prj=project.slug))

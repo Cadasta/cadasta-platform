@@ -1,4 +1,4 @@
-def get_test_results(proj, su, party, tenure_rel, resource):
+def get_fake_es_api_results(proj, su, party, tenure_rel, resource):
     return {
         "took": 63,
         "timed_out": 'false',
