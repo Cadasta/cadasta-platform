@@ -187,27 +187,6 @@ function saveOnMapEditMode() {
   }
 }
 
-function addTileLayers(map, layers) {
-  // modified from django-leaflet
-  layerscontrol = L.control.layers().addTo(map);
-  for (var i = 0, n = layers.length; i < n; i++) {
-    var layer = l2d(layers[i]);
-    l = L.tileLayer(layer.url, layer.options);
-    layerscontrol.addBaseLayer(l, layer.name);
-    // Show first one as default
-    if (i === 0) l.addTo(map);
-  }
 
-  function l2d(l) {
-      options = L.Util.extend(l['attrs']);
-      return {name: l['label'], url: l['url'], options: options};
-  }
-};
-
-function importMap(layers){
-  var mymap = L.map('mapid');
-  addTileLayers(mymap, layers)
-  return mymap;
-};
 
 

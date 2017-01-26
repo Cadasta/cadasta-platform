@@ -16,34 +16,27 @@
 <script src="{% static '/js/leaflet.groupedlayercontrol.min.js' %}"></script>
 <!-- <script src="{% static 'js/leaflet.markercluster.js' %}"></script> -->
 <!-- <script src="{% static 'js/L.Map.Deflate.js' %}"></script> -->
-<script src="{% static 'js/map_utils.js' %}"></script>
+<script src="{% static 'js/smap/index.js' %}"></script>
 
 <script>
-  function project_map_init(map) {
-    var trans = {
-      open: "{% trans 'Open location' %}"
-    };
+  var url = '{% url "async:spatial:list" project.organization.slug project.slug %}'
+  var fetch_spatial_resources = '/api/v1/organizations/' +
+      '{{ project.organization.slug }}/projects/{{ project.slug }}/spatialresources/';
+  var trans = {open: "{% trans 'Open location' %}"};
 
-    {% if project.extent %}
+  {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};
-    {% else %}
+  {% else %}
     var projectExtent = null;
-    {% endif %}
+  {% endif %}
 
-    renderFeatures(map,
-                   '{% url "async:spatial:list" project.organization.slug project.slug %}',
-                   {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
-
-    var orgSlug = '{{ project.organization.slug }}';
-    var projectSlug = '{{ project.slug }}';
-    var url = '/api/v1/organizations/'
-            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
-    add_spatial_resources(map, url);
-  };
+  var options = {
+    projectExtent: projectExtent,
+    trans: trans,
+    fitBounds: '{{ boundary }}'
+  }
 
   var layers = {{ leaflet_tiles|safe }}
-  map = importMap(layers)
-  project_map_init(map)
 
 </script>
 {% endblock %}
@@ -53,10 +46,10 @@
 {% block left-nav %}overview{% endblock %}
 
 {% block content %}
-<div class="col-md-12 content-single detail-display">
+<div class="col-md-12 content-single">
   <div class="row">
     <!-- Start overview map  -->
-    <div class="col-md-8 map">
+    <div class="col-md-8 map" id="project-map">
       <div id="mapid"></div>
     </div>
     <!-- / end overview map -->
@@ -67,6 +60,4 @@
   </div>
   <!-- / overview detail -->
 </div>
-
-<script src="{% static 'js/map_page.js' %}"></script>
 {% endblock %}

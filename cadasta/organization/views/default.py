@@ -434,6 +434,10 @@ class ProjectMap(PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.prj.spatial_units.count() > 0:
+            context['boundary'] = 'locations'
+        else:
+            context['boundary'] = 'project'
         context['leaflet_tiles'] = [
             {
               'label': force_text(label),

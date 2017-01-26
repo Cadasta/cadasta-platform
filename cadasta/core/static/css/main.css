@@ -5351,32 +5351,34 @@ ul.resource-actions > li {
 /* =Map location details in right column
 -------------------------------------------------------------- */
 .content-single.detail-hidden .detail {
-  display: none; }
+  left: 500px;
+  transition: all 0.5s ease-in-out; }
 
 .content-single.detail-hidden #project-map {
-  width: 151%; }
+  width: 100%; }
 
-.content-single.detail-display .detail {
+.content-single .detail {
+  left: 0px;
   transition: all 0.5s ease-in-out; }
-  .content-single.detail-display .detail h2 span {
+  .content-single .detail h2 span {
     font-size: 11px;
     color: #a6a7a8;
     display: block;
     text-transform: uppercase;
     padding-bottom: 2px; }
-  .content-single.detail-display .detail .btn-group {
+  .content-single .detail .btn-group {
     margin-left: auto;
     margin-right: auto; }
-  .content-single.detail-display .detail .top-add {
+  .content-single .detail .top-add {
     margin-bottom: -30px; }
 
-#project-map {
+.content-single #project-map {
   transition: all 0.5s ease-in-out; }
-  #project-map h2 {
+  .content-single #project-map h2 {
     padding-bottom: 0; }
-  #project-map .btn-wrap {
+  .content-single #project-map .btn-wrap {
     padding: 4px 4px 5px; }
-    #project-map .btn-wrap .btn-block {
+    .content-single #project-map .btn-wrap .btn-block {
       margin: 0 auto; }
 
 /* =Forms

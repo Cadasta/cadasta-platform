@@ -4,17 +4,14 @@
 {% block body-class %} map{% endblock %}
 {% block left-nav %}map{% endblock %}
 
-{% load leaflet_tags %}
 {% load staticfiles %}
 
 {% block extra_head %}
-{% leaflet_css plugins="groupedlayercontrol"%}
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-{% leaflet_js plugins="groupedlayercontrol" %}
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
@@ -77,7 +74,6 @@
   <div class="row">
     <!-- Start overview map  -->
     <div class="col-md-8 map">
-      {% leaflet_map "project-map" callback="locations_map_init" %}
     </div>
     <!-- / end overview map -->
     <!-- Overview detail  -->

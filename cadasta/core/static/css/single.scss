@@ -418,17 +418,19 @@
 
 .content-single.detail-hidden {
   .detail {
-    display: none;
+    left: 500px;
+    transition: all 0.5s ease-in-out;
   }
 
   #project-map {
-    width: 151%;
+    width: 100%;
   }
 }
 
 
-.content-single.detail-display {
+.content-single {
   .detail {
+    left: 0px;
     h2 {
       span {
         font-size: 11px;
@@ -447,17 +449,18 @@
     }
     transition: all 0.5s ease-in-out;
   }
+  #project-map {
+    // width: 100%;
+    h2 {
+    padding-bottom: 0;
+    }
+    .btn-wrap { // button
+      padding: 4px 4px 5px;
+      .btn-block {
+        margin: 0 auto;
+      }
+    }
+    transition: all 0.5s ease-in-out;
+  }
 }
 
-#project-map {
-  h2 {
-  padding-bottom: 0;
-  }
-  .btn-wrap { // button
-    padding: 4px 4px 5px;
-    .btn-block {
-      margin: 0 auto;
-    }
-  }
-  transition: all 0.5s ease-in-out;
-}
