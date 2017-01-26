@@ -50,6 +50,8 @@ CACHES = {
     }
 }
 
+ES_HOST = os.environ['ES_HOST']
+
 OPBEAT = {
     'ORGANIZATION_ID': os.environ['OPBEAT_ORGID'],
     'APP_ID': os.environ['OPBEAT_APPID'],

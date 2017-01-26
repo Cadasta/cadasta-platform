@@ -33,6 +33,7 @@
       S3_SECRET_KEY="{{ s3_secret_key }}"
       DJANGO_SETTINGS_MODULE="{{ django_settings }}"
       MEMCACHED_HOST="{{ memcached_host }}"
+      ES_HOST="{{ es_host }}"
       OPBEAT_ORGID="{{ opbeat_orgID }}"
       OPBEAT_APPID="{{ opbeat_appID }}"
       OPBEAT_TOKEN="{{ opbeat_token }}"
@@ -57,6 +58,7 @@
       Defaults  env_keep += S3_ACCESS_KEY
       Defaults  env_keep += S3_SECRET_KEY
       Defaults  env_keep += MEMCACHED_HOST
+      Defaults  env_keep += ES_HOST
       Defaults  env_keep += OPBEAT_ORGID
       Defaults  env_keep += OPBEAT_APPID
       Defaults  env_keep += OPBEAT_TOKEN
