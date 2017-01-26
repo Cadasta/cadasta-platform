@@ -38,6 +38,9 @@
                 </div>
               </div>
             </form>
+            <div id="lastupdate" class="hidden col-md-3 text-right">
+              <p class="help-block">{% trans "Search index was last updated on" %} <span id="index-timestamp-1"></span></p>
+            </div>
           </div>
           <div class="row">
             <div id="waiting-results" class="hidden"><img src="{% static 'img/loading.gif' %}"></div>
@@ -58,7 +61,6 @@
                 Showing <span id="total-results"></span> result(s) for <strong><span id="query-string"></span></strong>
                 {% endblocktrans %}
               </h4>
-              <strong>{% trans "Search index was last updated on" %} <span id="index-timestamp-1"></span></strong>
               <table id="search-results" class="table table-hover datatable" data-paging-type="simple">
                 <thead>
                   <tr>
@@ -106,12 +108,14 @@ function performSearch(query) {
     if (response.results.length === 0) {
       $('#no-results').removeClass('hidden');
       $('#results').addClass('hidden');
+      $('#lastupdate').addClass('hidden');
       $('#failed-query-string').text(query);
       $('#index-timestamp-0').text(timestamp);
     }
     else {
       $('#no-results').addClass('hidden');
       $('#results').removeClass('hidden');
+      $('#lastupdate').removeClass('hidden');
       $('#total-results').text(response.results.length);
       $('#query-string').text(query);
       $('#index-timestamp-1').text(timestamp);
