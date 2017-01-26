@@ -3,7 +3,7 @@ import pytest
 
 from unittest.mock import patch
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.template.loader import render_to_string
 from rest_framework.exceptions import PermissionDenied
@@ -26,7 +26,6 @@ from questionnaires.tests.attr_schemas import (individual_party_xform_group,
 from questionnaires.tests.factories import QuestionnaireFactory
 from ..views import async
 from .fake_results import get_fake_es_api_results
-from ..mock_results import get_mock_async_search_results
 
 
 api_url = (
@@ -113,7 +112,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    @override_settings(MOCK_ES=False)
     def test_get_with_results(self, mock_post, mock_get):
         su = SpatialUnitFactory.create(project=self.project, type='CB')
 
@@ -154,7 +152,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    @override_settings(MOCK_ES=False)
     def test_get_with_no_results(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
@@ -188,7 +185,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    @override_settings(MOCK_ES=False)
     def test_get_with_project_result(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
@@ -215,7 +211,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    @override_settings(MOCK_ES=False)
     def test_get_with_null_id(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
@@ -243,7 +238,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    @override_settings(MOCK_ES=False)
     def test_get_with_missing_query(self, mock_post, mock_get):
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -278,18 +272,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request()
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
-        mock_post.assert_not_called()
-        mock_get.assert_not_called()
-
-    @patch('requests.get')
-    @patch('requests.post')
-    @override_settings(MOCK_ES=True)
-    def test_get_with_mock_results(self, mock_post, mock_get):
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        (results_as_html, timestamp) = get_mock_async_search_results()
-        assert response.content['results'] == results_as_html
-        assert response.content['timestamp'] == timestamp
         mock_post.assert_not_called()
         mock_get.assert_not_called()
 

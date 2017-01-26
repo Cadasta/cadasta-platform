@@ -16,7 +16,6 @@ from spatial.models import SpatialUnit
 from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from resources.models import Resource
-from ..mock_results import get_mock_async_search_results
 
 api = settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT
 spatial_type_choices = {c[0]: c[1] for c in SPATIAL_TYPE_CHOICES}
@@ -35,10 +34,7 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
         results_as_html = []
         timestamp = ''
 
-        if settings.MOCK_ES:
-            (results_as_html, timestamp) = get_mock_async_search_results()
-
-        elif query:
+        if query:
             raw_results = self.query_es(query, self.get_project().id)
             results = raw_results['hits']['hits']
 
