@@ -40,8 +40,8 @@
             </form>
           </div>
           <div class="row">
-            <div id="waiting-results"><img src="{% static 'img/loading.gif' %}"></div>
-            <div id="no-results" class="col-md-9">
+            <div id="waiting-results" class="hidden"><img src="{% static 'img/loading.gif' %}"></div>
+            <div id="no-results" class="hidden col-md-9">
               <h4>{% trans "We’re sorry, we couldn’t find any results for:" %} <strong><span id="failed-query-string"></span></strong></h4>
               <strong>{% trans "Search index was last updated on" %} <span id="index-timestamp-0"></span></strong>
               <div class="divider-thick"></div>
@@ -52,7 +52,7 @@
                 <li>{% trans "Refer to our search guidelines for more tips." %}</li>
               </ul>
             </div>
-            <div id="results" class="col-md-9">
+            <div id="results" class="hidden col-md-9">
               <h4>
                 {% blocktrans %}
                 Showing <span id="total-results"></span> result(s) for <strong><span id="query-string"></span></strong>
@@ -82,13 +82,13 @@
 
 function performSearch(query) {
 
-  $('#no-results').css('display', 'none');
-  $('#results').css('display', 'none');
+  $('#no-results').addClass('hidden');
+  $('#results').addClass('hidden');
 
   if (query === '') return;
 
   var url = $('#search-form')[0].dataset.searchAsyncUrl;
-  $('#waiting-results').css('display', 'block');
+  $('#waiting-results').removeClass('hidden');
 
   $.get(url + '?q=' + query, function(response) {
 
@@ -102,16 +102,16 @@ function performSearch(query) {
     timestamp = timestamp.replace(/T/, ' ');
     timestamp = timestamp.replace(/:\d\d\.\d+Z/, ' UTC');
 
-    $('#waiting-results').css('display', 'none');
+    $('#waiting-results').addClass('hidden');
     if (response.results.length === 0) {
-      $('#no-results').css('display', 'block');
+      $('#no-results').removeClass('hidden');
+      $('#results').addClass('hidden');
       $('#failed-query-string').text(query);
       $('#index-timestamp-0').text(timestamp);
-      $('#results').css('display', 'none');
     }
     else {
-      $('#no-results').css('display', 'none');
-      $('#results').css('display', 'block');
+      $('#no-results').addClass('hidden');
+      $('#results').removeClass('hidden');
       $('#total-results').text(response.results.length);
       $('#query-string').text(query);
       $('#index-timestamp-1').text(timestamp);
@@ -125,11 +125,6 @@ window.addEventListener('load', function () {
   $('#search-guidelines-link').bind('click', function(e) {
     $('#search-guidelines').toggleClass('hidden');
   });
-
-  // Hide other sections at first
-  $('#waiting-results').css('display', 'none');
-  $('#no-results').css('display', 'none');
-  $('#results').css('display', 'none');
 
   // If URL contains a search query, perform search
   var query = RegExp('[?&]q=([^&]*)').exec(window.location.search);
