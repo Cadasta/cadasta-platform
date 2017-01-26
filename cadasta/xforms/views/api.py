@@ -24,12 +24,7 @@ from ..renderers import XFormRenderer
 
 logger = logging.getLogger('xform.submissions')
 
-OPEN_ROSA_ENVELOPE = """
-    <OpenRosaResponse xmlns="http://openrosa.org/http/response">
-        <message>{message}</message>
-    </OpenRosaResponse>
-"""
-
+OPEN_ROSA_ENVELOPE = "<OpenRosaResponse xmlns='http://openrosa.org/http/response'><message>{message}</message></OpenRosaResponse>"
 
 class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
     """
