@@ -36,6 +36,11 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
 
         if query:
             raw_results = self.query_es(query, self.get_project().id)
+            if raw_results is None:
+                return Response({
+                    'error': 'unavailable',
+                })
+
             results = raw_results['hits']['hits']
 
             if len(results) == 0:
@@ -74,15 +79,19 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
         }
         r = requests.post('{}/project-{}/_search'.format(api, project_id),
                           data=json.dumps(body, sort_keys=True))
-        assert r.status_code == 200
-        return r.json()
+        if r.status_code == 200:
+            return r.json()
+        else:
+            return None
 
     def query_es_timestamp(self, project_id):
         """Queries the ES API project type to get the index timestamp."""
         r = requests.get(
             '{}/project-{}/project/_search?q=*'.format(api, project_id))
-        assert r.status_code == 200
-        return r.json()['hits']['hits'][0]['_source'].get('@timestamp')
+        if r.status_code == 200:
+            return r.json()['hits']['hits'][0]['_source'].get('@timestamp')
+        else:
+            return _("unknown")
 
     def augment_result(self, result):
         """Returns an augmented data suitable for plugging into HTML

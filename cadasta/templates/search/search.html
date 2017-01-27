@@ -38,15 +38,17 @@
                 </div>
               </div>
             </form>
-            <div id="lastupdate" class="hidden col-md-3 text-right">
-              <p class="help-block">{% trans "Search index was last updated on" %} <span id="index-timestamp-1"></span></p>
+            <div id="last-update" class="hidden col-md-3 text-right">
+              <p class="help-block">{% trans "Search index was last updated on" %} <span id="index-timestamp"></span></p>
             </div>
           </div>
           <div class="row">
             <div id="waiting-results" class="hidden"><img src="{% static 'img/loading.gif' %}"></div>
+            <div id="failed-results" class="hidden col-md-9">
+              <h4>{% trans "We’re sorry, it seems the search index is currently not available" %}</h4>
+            </div>
             <div id="no-results" class="hidden col-md-9">
               <h4>{% trans "We’re sorry, we couldn’t find any results for:" %} <strong><span id="failed-query-string"></span></strong></h4>
-              <strong>{% trans "Search index was last updated on" %} <span id="index-timestamp-0"></span></strong>
               <div class="divider-thick"></div>
               <p><strong>{% trans "Search tips:" %}</strong></p>
               <ul>
@@ -82,43 +84,60 @@
 <script>
 'use strict';
 
-function performSearch(query) {
+function performSearch(query, updateDocumentUrl) {
 
+  $('#failed-results').addClass('hidden');
   $('#no-results').addClass('hidden');
   $('#results').addClass('hidden');
 
   if (query === '') return;
+
+    if (updateDocumentUrl) {
+      history.pushState(history.state, null,
+        window.location.href.split('?')[0] + '?q=' + encodeURIComponent(query)
+      );
+    }
 
   var url = $('#search-form')[0].dataset.searchAsyncUrl;
   $('#waiting-results').removeClass('hidden');
 
   $.get(url + '?q=' + query, function(response) {
 
-    var t = $('#search-results').DataTable();
-    t.column(0).visible(false);
-    t.column(1).visible(false);
-    if (t.rows().length !== 0) t.rows().remove();
-    t.rows.add(response.results).draw();
+    $('#waiting-results').addClass('hidden');
 
+    // Search error encountered
+    if (response.error) {
+      $('#failed-results').removeClass('hidden');
+      $('#last-update').addClass('hidden');
+      return;
+    }
+    $('#failed-results').addClass('hidden');
+
+    // Show timestamp
     var timestamp = response.timestamp;
     timestamp = timestamp.replace(/T/, ' ');
     timestamp = timestamp.replace(/:\d\d\.\d+Z/, ' UTC');
+    $('#last-update').removeClass('hidden');
+    $('#index-timestamp').text(timestamp);
 
-    $('#waiting-results').addClass('hidden');
+    // No results
     if (response.results.length === 0) {
       $('#no-results').removeClass('hidden');
       $('#results').addClass('hidden');
-      $('#lastupdate').addClass('hidden');
       $('#failed-query-string').text(query);
-      $('#index-timestamp-0').text(timestamp);
     }
+
+    // With results
     else {
       $('#no-results').addClass('hidden');
       $('#results').removeClass('hidden');
-      $('#lastupdate').removeClass('hidden');
       $('#total-results').text(response.results.length);
       $('#query-string').text(query);
-      $('#index-timestamp-1').text(timestamp);
+      var t = $('#search-results').DataTable();
+      t.column(0).visible(false);
+      t.column(1).visible(false);
+      if (t.rows().length !== 0) t.rows().remove();
+      t.rows.add(response.results).draw();
     }
   });
 }
@@ -134,15 +153,14 @@ window.addEventListener('load', function () {
   var query = RegExp('[?&]q=([^&]*)').exec(window.location.search);
   query = query && decodeURIComponent(query[1].replace(/\+/g, ' '));
   if (query) {
-    history.replaceState(history.state, null, window.location.href.split('?')[0]);
     $('#search-input')[0].value = query;
-    performSearch(query);
+    performSearch(query, false);
   }
 
   // Perform search when the search form is submitted
   $('#search-form').bind('submit', function(e) {
     var query = $('#search-input')[0].value;
-    performSearch(query);
+    performSearch(query, true);
     return false;
   });
 });

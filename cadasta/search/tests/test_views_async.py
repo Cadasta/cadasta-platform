@@ -1,5 +1,4 @@
 import json
-import pytest
 
 from unittest.mock import patch
 from django.conf import settings
@@ -72,7 +71,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             project=self.project, dict=tenure_relationship_xform_group,
             content_type=content_type, errors=[])
 
-        self.su = SpatialUnitFactory.create(project=self.project)
+        self.su = SpatialUnitFactory.create(project=self.project, type='CB')
         self.party = PartyFactory.create(
             project=self.project,
             type='IN',
@@ -103,6 +102,9 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
                 }
             }
         }
+        self.es_endpoint = '{}/project-{}/_search'.format(api_url,
+                                                          self.project.id)
+        self.es_body = json.dumps(self.query_body, sort_keys=True)
 
     def setup_url_kwargs(self):
         return {
@@ -113,8 +115,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
     @patch('requests.get')
     @patch('requests.post')
     def test_get_with_results(self, mock_post, mock_get):
-        su = SpatialUnitFactory.create(project=self.project, type='CB')
-
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             'hits': {
@@ -122,8 +122,8 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
                 'hits': [{
                     '_type': 'spatial',
                     '_source': {
-                        'id': su.id,
-                        'type': 'CB',
+                        'id': self.su.id,
+                        'type': 'AP',
                         '@timestamp': 'TIMESTAMP',
                     },
                 }],
@@ -134,20 +134,17 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         expected_html = render_to_string(
             'search/search_result_item.html',
             context={'result': {
-                'entity_type': "Location",
-                'url': su.get_absolute_url(),
-                'main_label': "Community boundary",
+                'entity_type': self.su.ui_class_name,
+                'url': self.su.get_absolute_url(),
+                'main_label': "Apartment",
                 'attributes': {},
             }}
         )
         assert response.status_code == 200
         assert response.content['results'] == [[
-            su.ui_class_name, "Community boundary", expected_html]]
+            self.su.ui_class_name, "Apartment", expected_html]]
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(
-            '{}/project-{}/_search'.format(api_url, self.project.id),
-            data=json.dumps(self.query_body, sort_keys=True),
-        )
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
         mock_get.assert_not_called()
 
     @patch('requests.get')
@@ -175,10 +172,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content['results'] == []
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(
-            '{}/project-{}/_search'.format(api_url, self.project.id),
-            data=json.dumps(self.query_body, sort_keys=True),
-        )
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
         mock_get.assert_called_once_with(
             '{}/project-{}/project/_search?q=*'.format(api_url,
                                                        self.project.id))
@@ -203,10 +197,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content['results'] == []
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(
-            '{}/project-{}/_search'.format(api_url, self.project.id),
-            data=json.dumps(self.query_body, sort_keys=True),
-        )
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
         mock_get.assert_not_called()
 
     @patch('requests.get')
@@ -230,10 +221,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content['results'] == []
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(
-            '{}/project-{}/_search'.format(api_url, self.project.id),
-            data=json.dumps(self.query_body, sort_keys=True),
-        )
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
         mock_get.assert_not_called()
 
     @patch('requests.get')
@@ -244,6 +232,15 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['results'] == []
         assert response.content['timestamp'] == ''
         mock_post.assert_not_called()
+        mock_get.assert_not_called()
+
+    @patch('requests.get')
+    @patch('requests.post')
+    def test_get_with_es_not_ok(self, mock_post, mock_get):
+        response = self.request(user=self.user, get_data={'q': self.query})
+        assert response.status_code == 200
+        assert response.content['error'] == 'unavailable'
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
         mock_get.assert_not_called()
 
     @patch('requests.get')
@@ -287,21 +284,15 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
         raw_results = self.view_class().query_es(self.query, self.project.id)
         assert raw_results == mock_post.return_value.json.return_value
-        mock_post.assert_called_once_with(
-            '{}/project-{}/_search'.format(api_url, self.project.id),
-            data=json.dumps(self.query_body, sort_keys=True),
-        )
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
 
     @patch('requests.post')
     def test_query_es_not_ok(self, mock_post):
         mock_post.return_value.status_code = 404
 
-        with pytest.raises(AssertionError):
-            self.view_class().query_es(self.query, self.project.id)
-        mock_post.assert_called_once_with(
-            '{}/project-{}/_search'.format(api_url, self.project.id),
-            data=json.dumps(self.query_body, sort_keys=True),
-        )
+        raw_results = self.view_class().query_es(self.query, self.project.id)
+        assert raw_results is None
+        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
 
     @patch('requests.get')
     def test_query_es_timestamp(self, mock_get):
@@ -326,8 +317,8 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
     def test_query_es_timestamp_not_ok(self, mock_get):
         mock_get.return_value.status_code = 404
 
-        with pytest.raises(AssertionError):
-            self.view_class().query_es_timestamp(self.project.id)
+        timestamp = self.view_class().query_es_timestamp(self.project.id)
+        assert timestamp == "unknown"
         mock_get.assert_called_once_with(
             '{}/project-{}/project/_search?q=*'.format(api_url,
                                                        self.project.id))
@@ -336,7 +327,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         augmented_result = self.view_class().augment_result(self.su_result)
         assert augmented_result['entity_type'] == "Location"
         assert augmented_result['url'] == self.su.get_absolute_url()
-        assert augmented_result['main_label'] == "Community boundary"
+        assert augmented_result['main_label'] == "Apartment"
         assert augmented_result['attributes'] == []
 
     def test_augment_result_party(self):
@@ -405,7 +396,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_get_main_label_location(self):
         assert self.view_class().get_main_label(
-            SpatialUnit, self.su_result['_source']) == "Community boundary"
+            SpatialUnit, self.su_result['_source']) == "Apartment"
 
     def test_get_main_label_party(self):
         assert self.view_class().get_main_label(
