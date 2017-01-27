@@ -11,3 +11,8 @@
   template: src=inline-manual-player
             dest="{{ application_path }}cadasta/core/static/js/inline-manual-player.js"
 
+- name: Write base template to core files
+  become: yes
+  become_user: root
+  template: src=base
+            dest="{{ application_path }}cadasta/templates/core/base.html"

@@ -1,0 +1,255 @@
+{% load i18n %}
+{% load sass_tags %}
+{% load staticfiles %}
+
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="shortcut icon" href="/static/img/favicon.png" type="image/x-icon">
+    <link rel="icon" href="/static/img/favicon.png" type="image/x-icon">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadasta{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css"/>
+    <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
+    {% if LANGUAGE_BIDI %}
+    <link rel="stylesheet" type="text/css"
+          href="//cdn.rawgit.com/morteza/bootstrap-rtl/v3.3.4/dist/css/bootstrap-rtl.min.css">
+    {% endif %}
+    {% block extra_head %}{% endblock %}
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+      ga('create', '{{ ga_token }}', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('set', 'forceSSL', true);
+      ga('send', 'pageview');
+    </script>
+  </head>
+  <body id="{% block top-nav %}{% endblock %}" class="page{% block body-class %}{% endblock %}">
+    <div id="cadasta">
+      <!-- Site header -->
+      <header class="header" role="banner">
+        <div class="container">
+          <div id="logo" class="pull-left">
+            <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>
+          </div>
+          <div class="reg-links pull-right">
+            {% if user.is_authenticated %}
+            <!-- User menu -->
+            <div class="btn-group divider" role="group">
+              <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+                <img src="/static/img/avatar.jpg" class="avatar thumbnail">
+                <span class="visible-xs-inline glyphicon glyphicon-user"></span>
+                <span class="username visible-sm-inline visible-md-inline visible-lg-inline">
+                  {% if user.full_name %}
+                  {{ user.full_name }}
+                  {% else %}
+                  {{ user.username }}
+                  {% endif %}
+                </span>
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="{% url 'account:profile' %}">{% trans "Edit profile" %}</a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
+                  <a href="{% url 'account_logout' %}">{% trans "Logout" %}</a>
+                </li>
+              </ul>
+            </div>
+            {% else %}
+            <!-- New user menu -->
+            <div class="divider pull-left"></div>
+            <div class="btn-group" role="group">
+              <a href="{% url 'account_login' %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a>
+              <a href="{% url 'account_signup' %}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
+            </div>
+            {% endif %}
+          </div>
+          <!-- Help -->
+          <a class="btn btn-help pull-right visible-md-inline visible-lg-inline" aria-label="Help" id="help-link" href="#">
+            <span class="glyphicon glyphicon-question-sign"></span>
+          </a>
+          <nav class="nav" role="navigation">
+            <ul class="list-inline visible-md-block visible-lg-block">
+              <li class="projects">
+                <a href="{% url 'project:list' %}">
+                  {% trans "Projects" %}
+                </a>
+              </li><!--
+              --><li class="organizations">
+                <a href="{% url 'organization:list' %}">
+                  {% trans "Organizations" %}
+                </a>
+              </li>
+              {% if is_superuser %}
+              <li class="users">
+                <a href="{% url 'user:list' %}">
+                  {% trans "Users" %}
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+            <!-- Hamburger -->
+            <div class="dropdown pull-right btn-group btn-hamburger visible-xs-inline visible-sm-inline">
+              <a data-target="#" data-toggle="dropdown" class="dropdown-toggle" role="button">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="dLabel">
+                <li class="projects"><a href="{% url 'project:list' %}">{% trans "Projects" %}</a></li>
+                <li class="organizations"><a href="{% url 'organization:list' %}">{% trans "Organizations" %}</a></li>
+                {% if is_superuser %}<li class="users"><a href="{% url 'user:list' %}">{% trans "Users" %}</a></li>{% endif %}
+                <li role="separator" class="divider"></li>
+                <li><a id="help-link" href="#"><span class="glyphicon glyphicon-question-sign"></span> {% trans "Help" %}</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </header>
+      <!-- /.header -->
+      {% block page-header %}{% endblock %}
+      <!-- Page content -->
+      <div id="page-content">
+        {% block sub-nav %}{% endblock %}
+        <main class="container-fluid{% block main-width %}{% endblock %}" role="main">
+          <div id="messages">
+            {% for message in messages %}
+            <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              {{message}}
+            </div>
+            {% endfor %}
+            <div class="alert alert-info hidden" role="alert" id="loading">
+              {% trans "Loading locations..." %}
+            </div>
+          </div>
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+      <!-- /.page-content -->
+
+      <!-- Site footer -->
+      <footer class="footer" role="contentinfo">
+        <div class="container-fluid">
+          <p class="copy">
+            {% now 'Y' as copydate %}
+            {% blocktrans %}Copyright {{ copydate }} Cadasta. <span>All Rights Reserved.</span> {% endblocktrans %}
+          </p>
+          <form action="{% url 'set_language' %}" method="post" class="language">
+          {% csrf_token %}
+            <select id="language" class="form-control input-sm" name="language">
+              {% get_current_language as LANGUAGE_CODE %}
+              {% get_available_languages as LANGUAGES %}
+              {% get_language_info_list for LANGUAGES as languages %}
+              {% for language in languages %}
+              <option value="{{ language.code }}" {% if language.code == LANGUAGE_CODE %} selected="selected" {% endif %}>
+                {{ language.name_local|capfirst }} ({{ language.code }})
+              </option>
+              {% endfor %}
+            </select>
+            <input hidden="true" type="submit" value="Go" />
+          </form>
+          <div class="footer-links">
+            <ul class="list-inline">
+              <li>
+                <a href="http://cadasta.org/about-us/">
+                  {% trans "About Us" %}
+                </a>
+              </li>
+              <li>
+                <a href="http://cadasta.org/privacy-policy/">
+                  {% trans "Privacy" %}
+                </a>
+              </li>
+              <li>
+                <a href="http://cadasta.org/terms-of-use/">
+                  {% trans "Terms of Use" %}
+                </a>
+              </li>
+              <li>
+                <a href="http://cadasta.org/code-of-conduct/">
+                  {% trans "Code of Conduct" %}
+                </a>
+              </li>
+              <li>
+                <a href="http://github.com/Cadasta">
+                  {% trans "Visit us on Github" %}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </footer>
+      <!-- /.footer -->
+
+    </div>
+    {% block modals %} {% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/parsleyConfig.js' %}"></script>
+    <script src="{% static 'js/parsley.js' %}"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
+    {% block extra_script %}{% endblock %}
+    <script>
+    $(document).ready(function () {
+      $('.datatable').DataTable({
+        conditionalPaging: true,
+        "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
+        "language": {
+          "emptyTable":     "{% trans "No data available in table" %}",
+          "info":           "{% trans "Showing _START_ - _END_ of _TOTAL_" %}",
+          "infoEmpty":      "{% trans "Showing 0 - 0 of 0" %}",
+          "infoFiltered":   "{% trans "(filtered from _MAX_ total rows)" %}",
+          "lengthMenu":     "{% trans "Show _MENU_ rows" %}",
+          "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
+          "searchPlaceholder": '{% trans "Search" %}',
+          "zeroRecords":    "{% trans "No matching records found" %}",
+          "paginate": {
+            "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
+            "previous": '<span class="glyphicon glyphicon-triangle-left"></span>',
+            "first":      "{% trans "First" %}",
+            "last":       "{% trans "Last" %}"
+          },
+          "aria": {
+            "sortAscending":  ": {% trans "activate to sort column ascending" %}",
+            "sortDescending": ": {% trans "activate to sort column descending" %}"
+          }
+        }
+      });
+      $('.dropdown-toggle').dropdown();
+      $('#language').change(function() { this.form.submit(); });
+      $('[data-parsley-required="true"]')
+        .closest('.form-group')
+          .children('label.control-label')
+            .addClass('required');
+    });
+    window.setTimeout(function() {
+      $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
+    }, 5000);
+    </script>
+    <script>
+      // User tracking
+      window.inlineManualTracking = {
+        uid: "{{ user.id }}",
+        username: "{{ user.username }}"
+      }
+    </script>
+    <script type="text/javascript" src="{% static 'js/inline-manual-player.js' %}"></script>
+  </body>
+</html>
