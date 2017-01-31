@@ -80,9 +80,8 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
             data.parties.add(*parties)
             data.spatial_units.add(*locations)
             data.tenure_relationships.add(*tenure_relationships)
-
-            success_msg = "Form was Successfully Received"
-            message = _(OPEN_ROSA_ENVELOPE.format(message=str(success_msg)))
+            success_msg = _("Form was Successfully Received")
+            message = OPEN_ROSA_ENVELOPE.format(message=str(success_msg))
             return Response(
                 message,
                 headers=self.get_openrosa_headers(request),
@@ -91,7 +90,8 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
             )
 
     def _sendErrorResponse(self, request, e, status):
-        message = _(OPEN_ROSA_ENVELOPE.format(message=str(e)))
+        error_msg = e
+        message = OPEN_ROSA_ENVELOPE.format(message=str(error_msg))
         headers = self.get_openrosa_headers(
             request, location=False, content_length=False)
         return Response(
