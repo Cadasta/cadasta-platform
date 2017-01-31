@@ -1,7 +1,9 @@
 import json
 
+from config.settings.default import LEAFLET_CONFIG
 from core.views.generic import TemplateView
 from django.shortcuts import redirect
+from django.utils.encoding import force_text
 from organization.models import Organization, Project
 from organization.serializers import ProjectGeometrySerializer
 
@@ -21,6 +23,12 @@ class Dashboard(TemplateView):
         context['geojson'] = json.dumps(
             ProjectGeometrySerializer(projects, many=True).data
         )
+        context['leaflet_tiles'] = [
+            {
+              'label': force_text(label),
+              'url': url,
+              'attrs': force_text(attrs)
+            } for (label, url, attrs) in LEAFLET_CONFIG.get('TILES')]
         return context
 
     def get(self, request, *args, **kwargs):

@@ -1,17 +1,17 @@
 {% extends "organization/project_wrapper.html" %}
 
 {% load i18n %}
-{% load leaflet_tags %}
+<!-- {% load leaflet_tags %} -->
 {% load staticfiles %}
 
 {% block extra_head %}
-{% leaflet_css plugins="groupedlayercontrol"%}
+<!-- {% leaflet_css plugins="groupedlayercontrol"%} -->
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-{% leaflet_js plugins="groupedlayercontrol"%}
+<!-- {% leaflet_js plugins="groupedlayercontrol"%} -->
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
