@@ -58,7 +58,6 @@ INSTALLED_APPS = (
     'parsley',
     'widget_tweaks',
     'django_countries',
-    'leaflet',
     'rest_framework',
     'rest_framework_gis',
     'rest_framework.authtoken',

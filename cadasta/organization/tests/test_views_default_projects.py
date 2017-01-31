@@ -6,6 +6,7 @@ import pytest
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
+from config.settings.default import LEAFLET_CONFIG
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.gis.geos import Point
@@ -15,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.http import Http404, HttpRequest
 from django.template.loader import render_to_string
 from django.test import TestCase
+from django.utils.encoding import force_text
 from jsonattrs.models import Attribute, Schema
 from skivvy import remove_csrf
 from organization.models import OrganizationRole, Project, ProjectRole
@@ -184,8 +186,248 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=True)
 
 
-class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
-                           TestCase):
+# <<<<<<< HEAD
+# class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
+#                            TestCase):
+# =======
+class ProjectMapTest(FileStorageTestCase, ViewTestCase, UserTestCase,
+                     TestCase):
+    view_class = default.ProjectMap
+    template = 'organization/project_map.html'
+
+    def setup_models(self):
+        self.project = ProjectFactory.create()
+        clauses = {
+            'clause': [
+                clause('allow',
+                       ['project.list'],
+                       ['organization/*']),
+                clause('allow',
+                       ['project.view', 'project.view_private'],
+                       ['project/*/*'])
+            ]
+        }
+        self.policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+
+        self.user = UserFactory.create()
+        self.user.assign_policies(self.policy)
+
+    def setup_template_context(self):
+        return {
+            'object': self.project,
+            'project': self.project,
+            'is_superuser': False,
+            'is_administrator': False,
+            'is_allowed_add_location': False,
+            'is_allowed_add_resource': False,
+            'is_project_member': False,
+            'is_allowed_add_resource': False,
+            'leaflet_tiles': [
+                {
+                  'label': force_text(label),
+                  'url': url,
+                  'attrs': force_text(attrs)
+                } for (label, url, attrs) in LEAFLET_CONFIG.get('TILES')]
+        }
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug
+        }
+
+    def test_get_with_authorized_user(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_unauthorized_user(self):
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_unauthenticated_user(self):
+        response = self.request()
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_superuser(self):
+        superuser_role = Role.objects.get(name='superuser')
+        self.user.assign_policies(superuser_role)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        expected = self.render_content(is_superuser=True,
+                                       is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True,
+                                       is_allowed_import=True)
+        assert response.content == expected
+
+    def test_get_with_org_admin(self):
+        OrganizationRole.objects.create(
+            organization=self.project.organization,
+            user=self.user,
+            admin=True
+        )
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        expected = self.render_content(is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True,
+                                       is_allowed_import=True)
+        assert response.content == expected
+
+    def test_get_with_project_manager(self):
+        ProjectRole.objects.create(
+            project=self.project,
+            user=self.user,
+            role='PM',
+        )
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        expected = self.render_content(is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True,
+                                       is_allowed_import=True)
+        assert response.content == expected
+
+    def test_get_non_existent_project(self):
+        with pytest.raises(Http404):
+            self.request(
+                user=self.user,
+                url_kwargs={'organization': 'some-org', 'project': 'some=prj'})
+
+    def test_get_with_project_extent(self):
+        self.project.extent = (
+            'SRID=4326;'
+            'POLYGON ((-5.1031494140625000 8.1299292850467957, '
+            '-5.0482177734375000 7.6837733211111425, '
+            '-4.6746826171875000 7.8252894725496338, '
+            '-4.8641967773437491 8.2278005261522775, '
+            '-5.1031494140625000 8.1299292850467957))')
+        self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_private_project(self):
+        self.project.access = 'private'
+        self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_private_project_with_unauthenticated_user(self):
+        self.project.access = 'private'
+        self.project.save()
+        response = self.request()
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
+
+    def test_get_private_project_without_permission(self):
+        # Note, no project.view_private!
+        restricted_clauses = {
+            'clause': [
+                clause('allow', ['org.list']),
+                clause('allow', ['org.view'], ['organization/*']),
+                clause('allow', ['project.list'], ['organization/*']),
+                clause('allow', ['project.view'], ['project/*/*'])
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        self.user.assign_policies(restricted_policy)
+
+        self.project.access = 'private'
+        self.project.save()
+        response = self.request()
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
+
+    def test_get_private_project_based_on_org_membership(self):
+        OrganizationRole.objects.create(organization=self.project.organization,
+                                        user=self.user)
+        self.project.access = 'private'
+        self.project.save()
+
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_private_project_with_other_org_membership(self):
+        org = OrganizationFactory.create()
+        OrganizationRole.objects.create(organization=org, user=self.user)
+        self.project.access = 'private'
+        self.project.save()
+
+        response = self.request(user=UserFactory.create())
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
+
+    def test_get_private_project_with_superuser(self):
+        self.project.access = 'private'
+        self.project.save()
+
+        self.superuser_role = Role.objects.get(name='superuser')
+        self.user.assign_policies(self.superuser_role)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        expected = self.render_content(is_superuser=True,
+                                       is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_project_member=True,
+                                       is_allowed_import=True)
+        assert response.content == expected
+
+    def test_get_archived_project_with_unauthorized_user(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request()
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
+
+    def test_get_archived_project_with_unauthentic_user(self):
+        self.project.archived = True
+        self.project.save()
+
+        response = self.request(user=AnonymousUser())
+        assert response.status_code == 302
+        assert ("You don't have permission to access this project"
+                in response.messages)
+
+    def test_get_archived_project_with_org_admin(self):
+        org_admin = UserFactory.create()
+        OrganizationRole.objects.create(
+            organization=self.project.organization,
+            user=org_admin,
+            admin=True
+        )
+        self.project.archived = True
+        self.project.save()
+        response = self.request(user=org_admin)
+        assert response.status_code == 200
+        expected = self.render_content(is_administrator=True,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_allowed_import=True,
+                                       is_project_member=True)
+        assert response.content == expected
+
+
+# >>>>>>> 2be592a... Single page map scaffolding view and html. Upgrade (kinda) to Leaflet1.0 (#1077)
+class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.ProjectDashboard
     template = 'organization/project_dashboard.html'
 

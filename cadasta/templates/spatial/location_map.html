@@ -5,7 +5,6 @@
 {% block body-class %} map{% endblock %}
 {% block left-nav %}map{% endblock %}
 
-{% load leaflet_tags %}
 {% load staticfiles %}
 
 {% block extra_script %}
@@ -47,7 +46,6 @@
 {% endblock %}
 
 {% block extra_head %}
-{% leaflet_css plugins="groupedlayercontrol"%}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
@@ -64,7 +62,7 @@
   <div class="row">
     <!-- Start overview map  -->
     <div class="col-sm-12 map">
-      {% leaflet_map "project-map" callback="locations_map_init" %}
+      
     </div>
   </div>
 </div>

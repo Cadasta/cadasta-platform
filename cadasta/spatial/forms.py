@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as __
 
 from leaflet.forms.widgets import LeafletWidget
 from core import form_mixins
+
 from core.util import ID_FIELD_LENGTH
 from party.models import Party, TenureRelationship
 from party.choices import TENURE_RELATIONSHIP_TYPES
@@ -19,7 +20,7 @@ class LocationForm(form_mixins.SanitizeFieldsForm,
     attributes_field = 'attributes'
 
     geometry = gisforms.GeometryField(
-        widget=LeafletWidget(),
+        # widget=LeafletWidget(),
         error_messages={
             'required': __('No map location was provided. Please use the '
                            'tools provided on the left side of the map to '

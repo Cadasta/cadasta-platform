@@ -63,7 +63,8 @@ function renderFeatures(map, featuresUrl, options) {
       } else {
         $('#messages #loading').addClass('hidden');
         if (options.fitBounds === 'locations') {
-          var bounds = markers.getBounds();
+          // var bounds = markers.getBounds();
+          var bounds = geoJson.getBounds();
           if (bounds.isValid()) {
             map.fitBounds(bounds);
           }
@@ -109,9 +110,8 @@ function renderFeatures(map, featuresUrl, options) {
       }
     }
   });
-
-  var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
-  markers.addTo(map);
+  // var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
+  // markers.addTo(map);
   geoJson.addTo(map);
 
   if (options.location) {
@@ -142,7 +142,7 @@ function switch_layer_controls(map, options){
   var groupedOptions = {
     groupCheckboxes: false
   };
-  map.removeControl(map.layerscontrol);
+  // map.removeControl(map.layerscontrol);
   map.layerscontrol = L.control.groupedLayers(
     baseLayers, groupedOptions).addTo(map);
 }
@@ -187,3 +187,7 @@ function saveOnMapEditMode() {
     saveButton.dispatchEvent(clickEvent);
   }
 }
+
+
+
+
