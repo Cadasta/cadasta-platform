@@ -4,9 +4,10 @@ from django.contrib.gis import forms as gisforms
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy as __
 
-from leaflet.forms.widgets import LeafletWidget
+# from leaflet.forms.widgets import LeafletWidget
 
 from core.form_mixins import AttributeForm, AttributeModelForm
+
 from core.util import ID_FIELD_LENGTH
 from party.models import Party, TenureRelationship, TenureRelationshipType
 
@@ -18,7 +19,7 @@ class LocationForm(AttributeModelForm):
     attributes_field = 'attributes'
 
     geometry = gisforms.GeometryField(
-        widget=LeafletWidget(),
+        # widget=LeafletWidget(),
         error_messages={
             'required': __('No map location was provided. Please use the '
                            'tools provided on the left side of the map to '
