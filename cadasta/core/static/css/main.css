@@ -5438,20 +5438,36 @@ ul.resource-actions > li {
   text-transform: uppercase;
   padding-bottom: 2px; }
 
-.content-single .detail .btn-group {
-  margin-left: auto;
-  margin-right: auto; }
+.content-single.detail-hidden .detail {
+  left: 500px;
+  transition: all 0.5s ease-in-out; }
 
-.content-single .detail .top-add {
-  margin-bottom: -30px; }
+.content-single.detail-hidden #project-map {
+  width: 100%; }
 
-#project-map h2 {
-  padding-bottom: 0; }
+.content-single .detail {
+  left: 0px;
+  transition: all 0.5s ease-in-out; }
+  .content-single .detail h2 span {
+    font-size: 11px;
+    color: #a6a7a8;
+    display: block;
+    text-transform: uppercase;
+    padding-bottom: 2px; }
+  .content-single .detail .btn-group {
+    margin-left: auto;
+    margin-right: auto; }
+  .content-single .detail .top-add {
+    margin-bottom: -30px; }
 
-#project-map .btn-wrap {
-  padding: 4px 4px 5px; }
-  #project-map .btn-wrap .btn-block {
-    margin: 0 auto; }
+.content-single #project-map {
+  transition: all 0.5s ease-in-out; }
+  .content-single #project-map h2 {
+    padding-bottom: 0; }
+  .content-single #project-map .btn-wrap {
+    padding: 4px 4px 5px; }
+    .content-single #project-map .btn-wrap .btn-block {
+      margin: 0 auto; }
 
 /* =Forms
 -------------------------------------------------------------- */
@@ -5654,11 +5670,14 @@ textarea.form-control {
 .well {
   margin-bottom: 10px; }
 
+#mapid {
+  height: 100%;
+  z-index: 1; }
+
 /* =Leaflet popups
 -------------------------------------------------------------- */
 .leaflet-container {
-  font-family: "Roboto", Helvetica, Arial, "Noto Sans Bengali", sans-serif !important;
-  z-index: 1; }
+  font-family: "Roboto", Helvetica, Arial, "Noto Sans Bengali", sans-serif !important; }
 
 .leaflet-popup-content-wrapper {
   border-radius: 4px !important;
@@ -5728,9 +5747,6 @@ textarea.form-control {
 
 /* =Map controls
 -------------------------------------------------------------- */
-.leaflet-top, .leaflet-bottom {
-  z-index: 200; }
-
 /* =Labels
 -------------------------------------------------------------- */
 div#id_extents_location_map {
