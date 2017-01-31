@@ -24,7 +24,9 @@ from ..renderers import XFormRenderer
 
 logger = logging.getLogger('xform.submissions')
 
-OPEN_ROSA_ENVELOPE = "<OpenRosaResponse xmlns='http://openrosa.org/http/response'><message>{message}</message></OpenRosaResponse>"
+OPEN_ROSA_ENVELOPE = "<OpenRosaResponse xmlns='http://openrosa.org/http/response'>\
+<message>{message}</message></OpenRosaResponse>"
+
 
 class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
     """
@@ -79,9 +81,8 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
             data.spatial_units.add(*locations)
             data.tenure_relationships.add(*tenure_relationships)
 
-            # This should be changed to be similor to how _sendErrorResponse works
-            successful_response_message = "Form was Successfully Received"
-            message = _(OPEN_ROSA_ENVELOPE.format(message=str(successful_response_message)))
+            success_msg = "Form was Successfully Received"
+            message = _(OPEN_ROSA_ENVELOPE.format(message=str(success_msg)))
             return Response(
                 message,
                 headers=self.get_openrosa_headers(request),
