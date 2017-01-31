@@ -6,12 +6,10 @@
 {% block left-nav %}map{% endblock %}
 
 {% load staticfiles %}
-{% load leaflet_tags %}
 
 {% block page_title %}{% trans "Add location" %} | {% endblock %}
 
 {% block extra_head %}
-{% leaflet_css plugins="draw,forms,groupedlayercontrol" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">

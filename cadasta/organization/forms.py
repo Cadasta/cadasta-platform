@@ -8,13 +8,13 @@ from core.form_mixins import SuperUserCheck
 from core.util import slugify
 from django import forms
 from django.conf import settings
-from django.contrib.gis import forms as gisforms
+# from django.contrib.gis import forms as gisforms
 from django.contrib.postgres import forms as pg_forms
 from django.db import transaction
 from django.forms import ValidationError
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
-from leaflet.forms.widgets import LeafletWidget
+# from leaflet.forms.widgets import LeafletWidget
 from questionnaires.models import Questionnaire
 from tutelary.models import check_perms
 
@@ -251,7 +251,7 @@ class EditOrganizationMemberProjectPermissionForm(forms.Form):
 
 
 class ProjectAddExtents(forms.ModelForm):
-    extent = gisforms.PolygonField(widget=LeafletWidget(), required=False)
+    # extent = gisforms.PolygonField(widget=LeafletWidget(), required=False)
 
     class Meta:
         model = Project
