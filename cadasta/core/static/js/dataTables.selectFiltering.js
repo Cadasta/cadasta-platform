@@ -1,6 +1,6 @@
 'use strict';
 (function(window, document, $) {
-  $(document).on('init.dt', function(e, dtSettings) {
+  $(document).on('init.dt', function(e) {
 
     if ( e.namespace !== 'dt' ) {
       return;
@@ -12,11 +12,14 @@
         { value: 'archived-True' , label: gettext('Archived') },
         { value: ''              , label: gettext('All'     ) },
       ];
-      var html = '<label><select class="form-control input-sm" id="archive-filter">';
+      var html = '<select class="form-control input-sm" id="archive-filter">';
       for (var i = 0; i < options.length; i++) {
         html += '<option value="' + options[i].value + '">' + options[i].label + '</option>';
       }
-      return html + '</select></label>';
+      html += '</select>';
+      var selectOptions = document.createElement('label');
+      selectOptions.innerHTML = html;
+      return selectOptions;
     }
 
     // When there are archived objects
@@ -30,7 +33,7 @@
     if (hasArchived) {
 
       // Add archived filter select field
-      dtSettings.nTableWrapper.childNodes[0].childNodes[0].innerHTML += addSelectOptions()
+      $('.dataTables_filter')[0].appendChild(addSelectOptions());
 
       // Register custom DataTables search function for the archived filter field
       $.fn.dataTable.ext.search.push(
