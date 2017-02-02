@@ -50,6 +50,7 @@ environments.]
 
 - [ ] **Are there sufficient test cases?** Ensure that all components are tested individually; models, forms, and serializers should be tested in isolation even if a test for a view covers these components. 
 - [ ] **If this is a bug fix, are tests for the issue in place**  There must be a test case for the bug to ensure the issue won’t regress. Make sure that the tests break without the new code to fix the issue.
+- [ ] **If this is a new feature or a significant change to an existing feature** has the manual testing spreadsheet been updated with instructions for manual testing?
 
 
 #### Documentation
