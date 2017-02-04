@@ -427,7 +427,7 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
 class PartiesDeleteTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PartiesDelete
     template = 'party/party_delete.html'
-    success_url_name = 'locations:list'
+    success_url_name = 'parties:list'
     post_data = {}
 
     def setup_models(self):
