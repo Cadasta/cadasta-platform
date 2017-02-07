@@ -1,8 +1,9 @@
 {% load i18n %}
 {% load leaflet_tags %}
 {% load widget_tweaks %}
+{% load filters %}
 
-<form method="POST" id="location-wizard" class="col-sm-12 content-single" data-parsley-validate data-parsley-excluded=":hidden">
+<form method="POST" id="location-wizard" class="col-sm-12 content-single" data-parsley-validate data-parsley-excluded=":hidden, [disabled]">
   {% csrf_token %}
   <div class="row">
     <!-- Start overview map  -->
@@ -27,13 +28,13 @@
             <div class="error-block">{{ form.type.errors }}</div>
           </div>
           {% for field in form %}
-            {% if "attributes" in field.name %}
+            {% if "spatialunit::" in field.name %}
             <div class="form-group{% if field.errors %} has-error{% endif %}">
               <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
               {% if field|field_type == "datefield" %}
-                {% render_field field class+="form-control datepicker" %}
+                {{ field|add_class:"form-control datepicker"|set_parsley_required }}
               {% else %}
-                {% render_field field class+="form-control" %}
+                {{ field|add_class:"form-control"|set_parsley_required }}
               {% endif %}
               <div class="error-block">{{ field.errors }}</div>
             </div>

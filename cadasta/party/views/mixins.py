@@ -1,14 +1,14 @@
-from django.http import Http404
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from organization.views.mixins import ProjectMixin
-from resources.views.mixins import ResourceViewMixin
-from resources.models import Resource
-
 from party.models import Party, TenureRelationship
+from resources.models import Resource
+from resources.views.mixins import ResourceViewMixin
 
 
 class PartyQuerySetMixin(ProjectMixin):
+
     def get_queryset(self):
         self.proj = self.get_project()
         parties = self.proj.parties.all()
@@ -29,11 +29,6 @@ class PartyQuerySetMixin(ProjectMixin):
         context['object'] = self.get_project()
         return context
 
-    def get_form_kwargs(self, *args, **kwargs):
-        form_kwargs = super().get_form_kwargs(*args, **kwargs)
-        form_kwargs['project_id'] = self.get_project().id
-        return form_kwargs
-
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['party'] = self.object.id
@@ -41,6 +36,7 @@ class PartyQuerySetMixin(ProjectMixin):
 
 
 class PartyRelationshipQuerySetMixin(ProjectMixin):
+
     def get_queryset(self):
         self.proj = self.get_project()
         return self.proj.party_relationships.all()
@@ -52,6 +48,7 @@ class PartyRelationshipQuerySetMixin(ProjectMixin):
 
 
 class PartyObjectMixin(PartyQuerySetMixin):
+
     def get_object(self):
         if not hasattr(self, '_obj'):
             self._obj = get_object_or_404(
@@ -69,6 +66,7 @@ class PartyObjectMixin(PartyQuerySetMixin):
 
 
 class PartyResourceMixin(ResourceViewMixin, PartyObjectMixin):
+
     def get_content_object(self):
         return self.get_object()
 
@@ -106,6 +104,7 @@ class PartyResourceMixin(ResourceViewMixin, PartyObjectMixin):
 
 
 class PartyRelationshipObjectMixin(ProjectMixin):
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['object'] = self.get_project()
@@ -127,6 +126,7 @@ class PartyRelationshipObjectMixin(ProjectMixin):
 
 class PartyRelationshipResourceMixin(ResourceViewMixin,
                                      PartyRelationshipObjectMixin):
+
     def get_content_object(self):
         return self.get_object()
 
@@ -147,6 +147,7 @@ class PartyRelationshipResourceMixin(ResourceViewMixin,
 
 
 class TenureRelationshipQuerySetMixin(ProjectMixin):
+
     def get_queryset(self):
         self.proj = self.get_project()
         return self.proj.tenure_relationships.all()
@@ -159,6 +160,7 @@ class TenureRelationshipQuerySetMixin(ProjectMixin):
 
 class TenureRelationshipResourceMixin(ResourceViewMixin,
                                       TenureRelationshipQuerySetMixin):
+
     def get_object(self):
         if not hasattr(self, '_obj'):
             self._obj = get_object_or_404(
@@ -194,7 +196,7 @@ class TenureRelationshipResourceMixin(ResourceViewMixin,
         if not hasattr(self, 'resource_object'):
             try:
                 self.resource_object = self.get_tenure_relationship(
-                    ).resources.get(
+                ).resources.get(
                     id=self.kwargs['resource'])
             except Resource.DoesNotExist as e:
                 raise Http404(e)

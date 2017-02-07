@@ -1,6 +1,6 @@
 {% load i18n %}
 {% load widget_tweaks %}
-
+{% load filters %}
 {% csrf_token %}
 <div class="form-group{% if form.name.errors %} has-error{% endif %}">
   <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
@@ -8,22 +8,20 @@
   <div class="error-block">{{ form.name.errors }}</div>
 </div>
 
+{% if form.new_item %}
 <div class="form-group{% if form.type.errors %} has-error{% endif %}">
   <label class="control-label" for="{{ form.type.id_for_label }}">{% trans "Type" %}</label>
-  {% render_field form.type class+="form-control" data-parsley-required="true" %}
+  {% render_field form.type class+="form-control party-type" data-parsley-required="false" %}
   <div class="error-block">{{ form.type.errors }}</div>
 </div>
-
-{% for field in form %}
-  {% if "attributes" in field.name %}
-  <div class="form-group{% if field.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-    {% if field|field_type == "datefield" %}
-      {% render_field field class+="form-control datepicker" %}
-    {% else %}
-      {% render_field field class+="form-control" %}
-    {% endif %}
-    <div class="error-block">{{ field.errors }}</div>
+{% else %}
+<div class="form-group">
+  <label class="control-label" for="{{ form.type.id_for_label }}">{% trans "Type" %}</label>
+  <div class="well well-sm">
+      {{ form.type|display_choice_verbose }}
   </div>
-  {% endif %}
-{% endfor %}
+  <input type="hidden" value="{{ form.type.value }}" name="type" class="party-type"/>
+</div>
+{% endif %}
+
+{% include "party/party_attrs.html" %}

@@ -36,7 +36,7 @@ class PartiesAdd(LoginPermissionRequiredMixin,
 
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = super().get_form_kwargs(*args, **kwargs)
-        kwargs['schema_selectors'] = ()
+        kwargs['project'] = self.get_project()
         return kwargs
 
 
@@ -61,6 +61,11 @@ class PartiesEdit(LoginPermissionRequiredMixin,
     form_class = forms.PartyForm
     permission_required = update_permissions('party.update')
     permission_denied_message = error_messages.PARTY_UPDATE
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['project'] = self.get_project()
+        return kwargs
 
 
 class PartiesDelete(LoginPermissionRequiredMixin,
@@ -129,6 +134,11 @@ class PartyRelationshipEdit(LoginPermissionRequiredMixin,
 
     def get_success_url(self):
         return reverse('parties:relationship_detail', kwargs=self.kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['project'] = self.get_project()
+        return kwargs
 
 
 class PartyRelationshipDelete(LoginPermissionRequiredMixin,

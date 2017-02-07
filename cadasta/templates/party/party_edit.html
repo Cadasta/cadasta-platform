@@ -11,6 +11,7 @@
 
 {% block extra_script %}
 {{ block.super }}
+{{ form.media }}
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
 {% if get_current_language != "en-us" %}
 {% get_current_language as LANGUAGE_CODE %}
@@ -33,7 +34,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <form method="POST"
-              action="{% url 'parties:edit' object.organization.slug object.slug form.instance.id %}" data-parsley-validate>
+              action="{% url 'parties:edit' object.organization.slug object.slug form.instance.id %}" data-parsley-validate data-parsley-excluded=':hidden, [disabled]'>
           <div class="modal-header">
             <a class="close" href="{% url 'parties:detail' object.organization.slug object.slug form.instance.id %}">
               <span aria-hidden="true">&times;</span>

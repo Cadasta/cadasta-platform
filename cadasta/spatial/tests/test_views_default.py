@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
+from questionnaires.tests.factories import QuestionnaireFactory
 
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -115,16 +116,20 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
                     '0.1411271095275879,51.55254631651022],[-0.14181375503'
                     '54004,51.55240622205599]]]}',
         'type': 'CB',
-        'attributes::fname': 'Test text'
+        'spatialunit::default::fname': 'Test text'
     }
 
     def setup_models(self):
-        self.project = ProjectFactory.create(current_questionnaire='a1')
+        self.project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(project=self.project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         schema = Schema.objects.create(
             content_type=content_type,
-            selectors=(self.project.organization.id, self.project.id, 'a1'))
+            selectors=(
+                self.project.organization.id, self.project.id, questionnaire.id
+            )
+        )
         attr_type = AttributeType.objects.get(name='text')
         Attribute.objects.create(
             schema=schema,
@@ -136,20 +141,8 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {
             'object': self.project,
-            'form': forms.LocationForm(
-                schema_selectors=(
-                    {'name': 'organization',
-                     'value': self.project.organization,
-                     'selector': self.project.organization.id},
-                    {'name': 'project',
-                     'value': self.project,
-                     'selector': self.project.id},
-                    {'name': 'questionnaire',
-                     'value': self.project.current_questionnaire,
-                     'selector': self.project.current_questionnaire}
-                )
-            ),
-            'is_allowed_add_location': True
+            'is_allowed_add_location': True,
+            'form': forms.LocationForm(project=self.project)
         }
 
     def setup_url_kwargs(self):
@@ -170,8 +163,12 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.render_content(cancel_url=reverse(
+        expected_content = self.render_content(cancel_url=reverse(
             'organization:project-dashboard', kwargs=self.setup_url_kwargs()))
+        assert response.content == expected_content
+        assert '<input class="form-control" '
+        'id="id_spatialunit::default::fname" '
+        'name="spatialunit::default::fname" type="text" />' in response.content
 
     def test_get_with_authorized_user_with_referrer(self):
         user = UserFactory.create()
@@ -179,7 +176,9 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user,
                                 request_meta={'HTTP_REFERER': '/help/'})
         assert response.status_code == 200
-        assert response.content == self.render_content(cancel_url='/help/')
+        assert '<input class="form-control" '
+        'id="id_spatialunit::default::fname" '
+        'name="spatialunit::default::fname" type="text" />' in response.content
 
     def test_get_with_authorized_user_with_same_referrer(self):
         user = UserFactory.create()
@@ -188,8 +187,9 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user,
                                 request_meta={'HTTP_REFERER': referer})
         assert response.status_code == 200
-        assert response.content == self.render_content(cancel_url=reverse(
-            'organization:project-dashboard', kwargs=self.setup_url_kwargs()))
+        assert '<input class="form-control" '
+        'id="id_spatialunit::default::fname" '
+        'name="spatialunit::default::fname" type="text" />' in response.content
 
     def test_get_with_authorized_user_with_same_referrer_with_session(self):
         user = UserFactory.create()
@@ -393,16 +393,20 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
                     '0.1411271095275879,51.55254631651022],[-0.14181375503'
                     '54004,51.55240622205599]]]}',
         'type': 'NP',
-        'attributes::fname': 'New text'
+        'spatialunit::default::fname': 'New text'
     }
 
     def setup_models(self):
         self.project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(project=self.project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         schema = Schema.objects.create(
             content_type=content_type,
-            selectors=(self.project.organization.id, self.project.id, ))
+            selectors=(
+                self.project.organization.id, self.project.id, questionnaire.id
+            )
+        )
         attr_type = AttributeType.objects.get(name='text')
         Attribute.objects.create(
             schema=schema,
@@ -431,7 +435,9 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert '<input class="form-control" '
+        'id="id_spatialunit::default::fname" '
+        'name="spatialunit::default::fname" type="text" />' in response.content
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -857,18 +863,23 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         'name': 'The Beatles',
         'party_type': 'GR',
         'tenure_type': 'CU',
-        'party::p_name': 'Party Name',
-        'relationship::r_name': 'Rel Name'
+        'party::gr::p_name': 'Party Name',
+        'party::gr::p_gr_name': 'Party Group Name',
+        'tenurerelationship::default::r_name': 'Rel Name'
     }
 
     def setup_models(self):
-        self.project = ProjectFactory.create(current_questionnaire='a1')
+        self.project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(project=self.project)
         self.spatial_unit = SpatialUnitFactory(project=self.project)
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         schema = Schema.objects.create(
             content_type=content_type,
-            selectors=(self.project.organization.id, self.project.id, 'a1'))
+            selectors=(
+                self.project.organization.id, self.project.id, questionnaire.id
+            )
+        )
         attr_type = AttributeType.objects.get(name='text')
         Attribute.objects.create(
             schema=schema,
@@ -881,11 +892,27 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             app_label='party', model='party')
         schema = Schema.objects.create(
             content_type=content_type,
-            selectors=(self.project.organization.id, self.project.id, 'a1'))
+            selectors=(
+                self.project.organization.id, self.project.id, questionnaire.id
+            )
+        )
         attr_type = AttributeType.objects.get(name='text')
         Attribute.objects.create(
             schema=schema,
             name='p_name', long_name='Party field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                self.project.organization.id, self.project.id,
+                questionnaire.id, 'GR'
+            )
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='p_gr_name', long_name='Party Group field',
             attr_type=attr_type, index=0,
             required=False, omit=False
         )
@@ -897,17 +924,6 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             'form': forms.TenureRelationshipForm(
                 project=self.project,
                 spatial_unit=self.spatial_unit,
-                schema_selectors=(
-                    {'name': 'organization',
-                     'value': self.project.organization,
-                     'selector': self.project.organization.id},
-                    {'name': 'project',
-                     'value': self.project,
-                     'selector': self.project.id},
-                    {'name': 'questionnaire',
-                     'value': self.project.current_questionnaire,
-                     'selector': self.project.current_questionnaire}
-                ),
                 initial={
                     'new_entity': not self.project.parties.exists(),
                 },
@@ -977,13 +993,17 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         assert Party.objects.count() == 1
         party = Party.objects.first()
         assert party.attributes.get('p_name') == 'Party Name'
+        assert party.attributes.get('p_gr_name') == 'Party Group Name'
 
     def test_post_existing_party_with_authorized(self):
         user = UserFactory.create()
         assign_policies(user)
         party = PartyFactory.create(project=self.project)
         response = self.request(method='POST', user=user,
-                                post_data={'new_entity': '', 'id': party.id})
+                                post_data={
+                                    'new_entity': '',
+                                    'id': party.id,
+                                })
         assert response.status_code == 302
         assert (response.location ==
                 self.expected_success_url + '#relationships')
@@ -1006,18 +1026,8 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         form = forms.TenureRelationshipForm(
             project=self.project,
             spatial_unit=self.spatial_unit,
-            data=data,
-            schema_selectors=(
-                {'name': 'organization',
-                 'value': self.project.organization,
-                 'selector': self.project.organization.id},
-                {'name': 'project',
-                 'value': self.project,
-                 'selector': self.project.id},
-                {'name': 'questionnaire',
-                 'value': self.project.current_questionnaire,
-                 'selector': self.project.current_questionnaire}
-            ))
+            data=data
+        )
         expected = self.render_content(form=form)
         assert response.content == expected
 
@@ -1038,18 +1048,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         form = forms.TenureRelationshipForm(
             project=self.project,
             spatial_unit=self.spatial_unit,
-            data=data,
-            schema_selectors=(
-                {'name': 'organization',
-                 'value': self.project.organization,
-                 'selector': self.project.organization.id},
-                {'name': 'project',
-                 'value': self.project,
-                 'selector': self.project.id},
-                {'name': 'questionnaire',
-                 'value': self.project.current_questionnaire,
-                 'selector': self.project.current_questionnaire}
-            )
+            data=data
         )
         assert response.status_code == 200
         expected = self.render_content(form=form)

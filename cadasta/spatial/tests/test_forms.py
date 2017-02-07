@@ -8,6 +8,7 @@ from django.utils.translation import ugettext as _
 from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import PartyFactory
+from questionnaires.tests.factories import QuestionnaireFactory
 from party.models import TenureRelationship, Party, TENURE_RELATIONSHIP_TYPES
 from .factories import SpatialUnitFactory
 from ..models import SpatialUnit
@@ -26,9 +27,7 @@ class LocationFormTest(UserTestCase, TestCase):
             'type': 'CB'
         }
         project = ProjectFactory.create()
-        form = forms.LocationForm(project_id=project.id,
-                                  data=data,
-                                  schema_selectors=())
+        form = forms.LocationForm(project=project, data=data)
         form.is_valid()
         form.save()
 
@@ -43,7 +42,7 @@ class LocationFormTest(UserTestCase, TestCase):
                         '0.1411271095275879,51.55254631651022],[-0.14181375503'
                         '54004,51.55240622205599]]]}',
             'type': 'CB',
-            'attributes::fname': 'test'
+            'spatialunit::default::fname': 'test'
         }
 
         project = ProjectFactory.create()
@@ -60,16 +59,7 @@ class LocationFormTest(UserTestCase, TestCase):
             required=False, omit=False
         )
 
-        form = forms.LocationForm(project_id=project.id,
-                                  data=data,
-                                  schema_selectors=(
-                                    {'name': 'organization',
-                                     'value': project.organization,
-                                     'selector': project.organization.id},
-                                    {'name': 'project',
-                                     'value': project,
-                                     'selector': project.id}
-                                  ))
+        form = forms.LocationForm(project=project, data=data)
         form.is_valid()
         form.save()
 
@@ -84,9 +74,7 @@ class LocationFormTest(UserTestCase, TestCase):
             'type': '',
         }
         project = ProjectFactory.create()
-        form = forms.LocationForm(project_id=project.id,
-                                  data=data,
-                                  schema_selectors=())
+        form = forms.LocationForm(project=project, data=data)
         type_dict = dict(form.fields['type'].choices)
         assert type_dict[''] == "Please select a location type"
         assert not form.is_valid()
@@ -144,27 +132,23 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         form = forms.TenureRelationshipForm(
             data={'new_item': 'on'},
             project=project,
-            spatial_unit=spatial_unit,
-            schema_selectors=(
-                {'name': 'organization',
-                 'value': project.organization,
-                 'selector': project.organization.id},
-                {'name': 'project',
-                 'value': project,
-                 'selector': project.id}
-            ))
+            spatial_unit=spatial_unit)
 
         assert form.project == project
         assert form.spatial_unit == spatial_unit
         assert isinstance(form.fields['id'].widget, SelectPartyWidget)
-        assert isinstance(form.fields['party::p_name'], CharField)
-        assert form.fields['party::p_name'].initial == 'John'
-        assert form.fields['party::p_name'].required is True
-        assert isinstance(form.fields['party::p_choice1'], ChoiceField)
-        assert isinstance(form.fields['party::p_choice2'], ChoiceField)
-        assert isinstance(form.fields['party::p_bool'], BooleanField)
-        assert form.fields['party::p_bool'].initial is False
-        assert isinstance(form.fields['relationship::r_name'], CharField)
+        assert isinstance(form.fields['party::in::p_name'], CharField)
+        assert form.fields['party::in::p_name'].initial == 'John'
+        assert form.fields['party::in::p_name'].required is True
+        assert isinstance(form.fields[
+            'party::in::p_choice1'], ChoiceField)
+        assert isinstance(form.fields[
+            'party::in::p_choice2'], ChoiceField)
+        assert isinstance(form.fields[
+            'party::in::p_bool'], BooleanField)
+        assert form.fields['party::in::p_bool'].initial is False
+        assert isinstance(form.fields[
+            'tenurerelationship::default::r_name'], CharField)
         assert isinstance(form.fields['tenure_type'], ChoiceField)
         assert form.fields['tenure_type'].choices == (
             [('', _('Please select a relationship type'))] +
@@ -259,13 +243,15 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
 
     def test_save_new_party_with_attributes(self):
         project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(project=project)
         spatial_unit = SpatialUnitFactory.create(project=project)
 
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         schema = Schema.objects.create(
             content_type=content_type,
-            selectors=(project.organization.id, project.id, ))
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, ))
         attr_type = AttributeType.objects.get(name='text')
         Attribute.objects.create(
             schema=schema,
@@ -276,15 +262,15 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
 
         content_type = ContentType.objects.get(
             app_label='party', model='party')
-        schema = Schema.objects.create(
+        schema_gr = Schema.objects.create(
             content_type=content_type,
-            selectors=(project.organization.id, project.id, ))
-        attr_type = AttributeType.objects.get(name='text')
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, 'GR'))
         Attribute.objects.create(
-            schema=schema,
-            name='p_name', long_name='Party field',
+            schema=schema_gr,
+            name='p_gr_name', long_name='Party GR field',
             attr_type=attr_type, index=0,
-            required=False, omit=False
+            required=True, omit=False
         )
 
         form = forms.TenureRelationshipForm(
@@ -293,31 +279,20 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
             data={'new_entity': 'on',
                   'id': '',
                   'name': 'The Beatles',
-                  'party::p_name': 'Party Name',
+                  'party::gr::p_gr_name': 'Party Group Name',
                   'party_type': 'GR',
                   'tenure_type': 'CU',
-                  'relationship::r_name': 'Rel Name'},
-            schema_selectors=(
-                {'name': 'organization',
-                 'value': project.organization,
-                 'selector': project.organization.id},
-                {'name': 'project',
-                 'value': project,
-                 'selector': project.id}
-            ))
+                  'tenurerelationship::default::r_name': 'Rel Name'})
 
-        form.is_valid()
+        assert form.is_valid()
         form.save()
 
         assert Party.objects.count() == 1
-        print('++++ BLAH ++++')
         party = Party.objects.first()
-        print('++++ BLAH 2 ++++')
         assert party.name == 'The Beatles'
         assert party.type == 'GR'
-        print('++++ BLAH 3 ++++')
-        print(party.attributes)
-        assert party.attributes.get('p_name') == 'Party Name'
+
+        assert party.attributes.get('p_gr_name') == 'Party Group Name'
 
         assert TenureRelationship.objects.count() == 1
         rel = TenureRelationship.objects.first()
@@ -325,3 +300,125 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         assert rel.spatial_unit == spatial_unit
         assert rel.tenure_type_id == 'CU'
         assert rel.attributes.get('r_name') == 'Rel Name'
+
+    def test_clean(self):
+        project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(project=project)
+        spatial_unit = SpatialUnitFactory.create(project=project)
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='r_name', long_name='Relationship field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema_in = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, 'IN'))
+        Attribute.objects.create(
+            schema=schema_in,
+            name='p_in_name', long_name='Party IN field',
+            attr_type=attr_type, index=0,
+            required=True, omit=False
+        )
+        schema_gr = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, 'GR'))
+        Attribute.objects.create(
+            schema=schema_gr,
+            name='p_gr_name', long_name='Party GR field',
+            attr_type=attr_type, index=0,
+            required=True, omit=False
+        )
+
+        form = forms.TenureRelationshipForm(
+            project=project,
+            spatial_unit=spatial_unit,
+            data={'new_entity': 'on',
+                  'id': '',
+                  'name': 'The Beatles',
+                  'party::gr::p_gr_name': 'Party Group Name',
+                  'party_type': 'GR',
+                  'tenure_type': 'CU',
+                  'tenurerelationship::default::r_name': 'Rel Name'})
+
+        assert form.is_valid()
+        form.save()
+
+        assert Party.objects.count() == 1
+        party = Party.objects.first()
+        assert party.name == 'The Beatles'
+        assert party.type == 'GR'
+
+        assert party.attributes.get('p_gr_name') == 'Party Group Name'
+
+        assert TenureRelationship.objects.count() == 1
+        rel = TenureRelationship.objects.first()
+        assert rel.party == party
+        assert rel.spatial_unit == spatial_unit
+        assert rel.tenure_type_id == 'CU'
+        assert rel.attributes.get('r_name') == 'Rel Name'
+
+    def test_clean_with_existing_party(self):
+        project = ProjectFactory.create()
+        party = PartyFactory.create(project=project)
+        questionnaire = QuestionnaireFactory.create(project=project)
+        spatial_unit = SpatialUnitFactory.create(project=project)
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='r_name', long_name='Relationship field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema_in = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, 'IN'))
+        Attribute.objects.create(
+            schema=schema_in,
+            name='p_in_name', long_name='Party IN field',
+            attr_type=attr_type, index=0,
+            required=True, omit=False
+        )
+        schema_gr = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, 'GR'))
+        Attribute.objects.create(
+            schema=schema_gr,
+            name='p_gr_name', long_name='Party GR field',
+            attr_type=attr_type, index=0,
+            required=True, omit=False
+        )
+
+        form = forms.TenureRelationshipForm(project=project,
+                                            spatial_unit=spatial_unit,
+                                            data={'new_entity': '',
+                                                  'id': party.id,
+                                                  'tenure_type': 'CU'})
+
+        assert form.is_valid()
+        form.save()
