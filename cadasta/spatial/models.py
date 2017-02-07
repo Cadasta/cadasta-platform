@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.gis.db.models import GeometryField
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.utils.encoding import iri_to_uri
 from django.dispatch import receiver
 from organization.models import Project
 from tutelary.decorators import permissioned_model
@@ -99,16 +100,15 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     def ui_class_name(self):
         return _("Location")
 
-    @property
-    def ui_detail_url(self):
-        return reverse(
+    def get_absolute_url(self):
+        return iri_to_uri(reverse(
             'locations:detail',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
                 'location': self.id,
             },
-        )
+        ))
 
 
 def reassign_spatial_geometry(instance):

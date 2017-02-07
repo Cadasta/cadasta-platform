@@ -37,6 +37,19 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         resource = Resource(file='http://example.com/dir/filename.txt')
         assert resource.file_type == 'txt'
 
+    def test_ui_class_name(self):
+        resource = ResourceFactory.create()
+        assert resource.ui_class_name == "Resource"
+
+    def test_get_absolute_url(self):
+        resource = ResourceFactory.create()
+        assert resource.get_absolute_url() == (
+            '/organizations/{org}/projects/{prj}/'
+            'resources/{id}/'.format(
+                org=resource.project.organization.slug,
+                prj=resource.project.slug,
+                id=resource.id))
+
     def test_thumbnail_img(self):
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.jpg',

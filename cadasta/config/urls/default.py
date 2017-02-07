@@ -67,6 +67,9 @@ async = [
     url(r'^',
         include('spatial.urls.async',
                 namespace='spatial')),
+    url(r'^',
+        include('search.urls.async',
+                namespace='search')),
 ]
 
 urlpatterns = [
@@ -98,6 +101,9 @@ urlpatterns = [
     url(r'^',
         include('resources.urls.default',
                 namespace='resources')),
+    url(r'^',
+        include('search.urls.default',
+                namespace='search')),
 
     url(r'^api/',
         include(api,

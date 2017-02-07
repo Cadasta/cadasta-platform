@@ -5,6 +5,7 @@ import magic
 from buckets.fields import S3FileField
 from core.models import ID_FIELD_LENGTH, RandomIDModel
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db.models import GeometryCollectionField
@@ -13,6 +14,7 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+from django.utils.encoding import iri_to_uri
 from jsonattrs.fields import JSONAttributeField
 from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
@@ -121,6 +123,20 @@ class Resource(RandomIDModel):
     def save(self, *args, **kwargs):
         create_thumbnails(self, (not self.id))
         super().save(*args, **kwargs)
+
+    @property
+    def ui_class_name(self):
+        return _("Resource")
+
+    def get_absolute_url(self):
+        return iri_to_uri(reverse(
+            'resources:project_detail',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug,
+                'resource': self.id,
+            },
+        ))
 
 
 @receiver(models.signals.pre_save, sender=Resource)

@@ -195,6 +195,7 @@
     width: 100%;
     position: relative;
     > li {
+      overflow-y: visible;
       position: relative;
       cursor: pointer;
       display: block;
@@ -213,22 +214,22 @@
             background-position: -48px 0;
           }
         }
-      }
-      .icon {
-        margin: 0 auto;
-        height: 48px;
-        width: 48px;
-        position: relative;
-        background-position: 0 0;
-        display: block;
-      }
-      .title {
-        display: block;
-        position: relative; 
-        margin: 0;
-        font-size: 11px;
-        font-weight: 500;
-        text-transform: uppercase;
+        .icon {
+          margin: 0 auto;
+          height: 48px;
+          width: 48px;
+          position: relative;
+          background-position: 0 0;
+          display: block;
+        }
+        .title {
+          display: block;
+          position: relative;
+          margin: 0;
+          font-size: 11px;
+          font-weight: 500;
+          text-transform: uppercase;
+        }
       }
     }
   }
@@ -238,6 +239,11 @@
   li.overview {
     .icon { 
       background-image: url('/static/img/icon-overview.png');
+    }
+  }
+  li.search {
+    .icon { 
+      background-image: url('/static/img/icon-search.png');
     }
   }
   li.map {
@@ -277,22 +283,59 @@
   }
 }
 
+#sidebar.search li.search,
 #sidebar.overview li.overview,
 #sidebar.map li.map,
 #sidebar.parties li.parties,
 #sidebar.resources li.resources,
 #sidebar.reports li.reports,
-#sidebar.activity li.activity, 
+#sidebar.activity li.activity,
 #sidebar.projects li.projects,
 #sidebar.members li.members { // show active icon
   a {
     border-left: 7px solid $brand-gold;
+    .icon { // show active icon
+      background-position: -96px 0;
+    }
+    .title {
+      color: #fff;
+    }
   }
-  .icon { // show active icon
-    background-position: -96px 0;
+}
+
+#sidebar-search-box { // open search box from sidebar
+  position: absolute;
+  width: 290px;
+  top: 0;
+  left: 100px;
+  z-index: 980;
+  background: $brand-darkblue;
+  overflow: hidden;
+  transition: left 0.5s;
+  &.disabled {
+    left: 100px - 290px;
   }
-  .title {
-    color: #fff;
+  form {
+    width: 290px;
+    padding: 25.5px 15px;
+  }
+  input {
+    width: 80%;
+    height: 34px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  button {
+    height: 34px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+}
+
+#search-form {
+  input {
+    width: 80%;
+    margin-right: 10px;
   }
 }
 
@@ -329,29 +372,47 @@
               background-position: -56px -60px;
             }
           }
-        }
-        .icon {
-          height: 32px;
-          width: 32px;
-          background-position: -8px -60px;
+          .icon {
+            height: 32px;
+            width: 32px;
+            background-position: -8px -60px;
+          }
         }
       }
     }
   }
+  #sidebar.search li.search,
   #sidebar.overview li.overview,
   #sidebar.map li.map,
   #sidebar.parties li.parties,
   #sidebar.resources li.resources,
   #sidebar.reports li.reports,
-  #sidebar.activity li.activity, 
+  #sidebar.activity li.activity,
   #sidebar.projects li.projects,
   #sidebar.members li.members { // show active icon
     a {
       border-top: 3px solid $brand-gold;
       border-left: 0;
+      .icon { // show active icon
+        background-position: -108px -60px;
+      }
     }
-    .icon { // show active icon
-      background-position: -108px -60px;
+  }
+  #sidebar-search-box {
+    position: absolute;
+    width: 100%;
+    height: 54px;
+    top: 70px;
+    left: 0;
+    transition: top 0.5s;
+    border-top: 1px solid #fff;
+    &.disabled {
+      left: 0;
+      top: 70px - 54px;
+    }
+    form {
+      padding: 10px 15px;
+      width: auto;
     }
   }
 }
@@ -360,16 +421,48 @@
   #sidebar {
     height: 60px;
     .nav-sidebar > li {
-      width: 25%;
-      /* beta 
-      float: left; 
-      width: 19%; */
+      width: 20%; // 5 tabs
       a {
         padding: 12px 0;
         .title {
           display: none;
         }
       }
+    }
+  }
+  #sidebar-search-box {
+    top: 60px;
+    &.disabled {
+      top: 60px - 54px;
+    }
+  }
+}
+
+/* =Search results page
+-------------------------------------------------------------- */
+
+#waiting-results {
+  padding: 20px;
+  img {
+    display: block;
+    margin: auto;
+  }
+}
+
+#search-results.table {
+  h4 {
+    margin-bottom: 12px;
+  }
+  img.thumb-60 ~ table {
+    width: calc(100% - 100px);
+  }
+  table.entity-attributes {
+    background: transparent;
+    border: 0;
+    td {
+      border: 0;
+      padding-top: 2px;
+      padding-bottom: 2px;
     }
   }
 }
@@ -417,7 +510,7 @@
 -------------------------------------------------------------- */
 
 .content-single .detail {
-  h2 {
+  h2, h3, h4 {
     span {
       font-size: 11px;
       color: $gray-medium;

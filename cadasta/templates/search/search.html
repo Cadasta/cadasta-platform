@@ -1,0 +1,170 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+{% load staticfiles %}
+
+{% block page_title %}{% trans "Search" %} | {% endblock %}
+{% block left-nav %}search{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Search" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="row">
+            <form action="#" id="search-form" class="inline" data-search-async-url="{% url 'async:search:search' object.organization.slug object.slug %}">
+              <div class="form-group col-md-9">
+                <label class="control-label sr-only">{% trans "Search within project for" %}</label>
+                <input type="search" id="search-input" class="form-control input-lg pull-left" value="{{ search_query }}">
+                <button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                <p class="small help-block">
+                  {% blocktrans %}
+                  e.g., “Parcel”, “John White”, <a id="search-guidelines-link">more search guidelines</a>
+                  {% endblocktrans %}
+                </p>
+                <div id="search-guidelines" class="hidden">
+                  {% blocktrans %}
+                  <ul>
+                    <li>Review your wording, make sure that there aren’t any typos in your search query</li>
+                    <li>If no results match your query, try removing some search terms (“John”, instead of “John White”)</li>
+                    <li>Search results are currently capped to 10 matches. If you want to narrow down your results, try including additional search terms or making the existing ones more restrictive (“John White Kansas”, instead of “John White”)</li>
+                  </ul>
+                  {% endblocktrans%}
+                </div>
+              </div>
+            </form>
+            <div id="last-update" class="hidden col-md-3 text-right">
+              <p class="help-block">{% trans "Search index was last updated on" %} <span id="index-timestamp"></span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div id="waiting-results" class="hidden"><img src="{% static 'img/loading.gif' %}"></div>
+            <div id="failed-results" class="hidden col-md-9">
+              <h4>{% trans "We’re sorry, it seems the search index is currently not available" %}</h4>
+            </div>
+            <div id="no-results" class="hidden col-md-9">
+              <h4>{% trans "We’re sorry, we couldn’t find any results for:" %} <strong><span id="failed-query-string"></span></strong></h4>
+              <div class="divider-thick"></div>
+              <p><strong>{% trans "Search tips:" %}</strong></p>
+              <ul>
+                <li>{% trans "Double check your spelling for typos." %}</li>
+                <li>{% trans "Use fewer keywords." %}</li>
+                <li>{% trans "Refer to our search guidelines for more tips." %}</li>
+              </ul>
+            </div>
+            <div id="results" class="hidden col-md-9">
+              <h4>
+                {% blocktrans %}
+                Showing <span id="total-results"></span> result(s) for <strong><span id="query-string"></span></strong>
+                {% endblocktrans %}
+              </h4>
+              <table id="search-results" class="table table-hover datatable" data-paging-type="simple">
+                <thead>
+                  <tr>
+                    <th class="entity-type hidden"></th>
+                    <th class="entity-main-label hidden"></th>
+                    <th class="col-md-12 entity-record">{% trans "Entity Record" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+'use strict';
+
+function performSearch(query, updateDocumentUrl) {
+
+  $('#failed-results').addClass('hidden');
+  $('#no-results').addClass('hidden');
+  $('#results').addClass('hidden');
+
+  if (query === '') return;
+
+    if (updateDocumentUrl) {
+      history.pushState(history.state, null,
+        window.location.href.split('?')[0] + '?q=' + encodeURIComponent(query)
+      );
+    }
+
+  var url = $('#search-form')[0].dataset.searchAsyncUrl;
+  $('#waiting-results').removeClass('hidden');
+
+  $.get(url + '?q=' + query, function(response) {
+
+    $('#waiting-results').addClass('hidden');
+
+    // Search error encountered
+    if (response.error) {
+      $('#failed-results').removeClass('hidden');
+      $('#last-update').addClass('hidden');
+      return;
+    }
+    $('#failed-results').addClass('hidden');
+
+    // Show timestamp
+    var timestamp = response.timestamp;
+    timestamp = timestamp.replace(/T/, ' ');
+    timestamp = timestamp.replace(/:\d\d\.\d+Z/, ' UTC');
+    $('#last-update').removeClass('hidden');
+    $('#index-timestamp').text(timestamp);
+
+    // No results
+    if (response.results.length === 0) {
+      $('#no-results').removeClass('hidden');
+      $('#results').addClass('hidden');
+      $('#failed-query-string').text(query);
+    }
+
+    // With results
+    else {
+      $('#no-results').addClass('hidden');
+      $('#results').removeClass('hidden');
+      $('#total-results').text(response.results.length);
+      $('#query-string').text(query);
+      var t = $('#search-results').DataTable();
+      t.column(0).visible(false);
+      t.column(1).visible(false);
+      if (t.rows().length !== 0) t.rows().remove();
+      t.rows.add(response.results).draw();
+    }
+  });
+}
+
+window.addEventListener('load', function () {
+
+  // Toggle display of search guidelines
+  $('#search-guidelines-link').bind('click', function(e) {
+    $('#search-guidelines').toggleClass('hidden');
+  });
+
+  // If URL contains a search query, perform search
+  var query = RegExp('[?&]q=([^&]*)').exec(window.location.search);
+  query = query && decodeURIComponent(query[1].replace(/\+/g, ' '));
+  if (query) {
+    $('#search-input')[0].value = query;
+    performSearch(query, false);
+  }
+
+  // Perform search when the search form is submitted
+  $('#search-form').bind('submit', function(e) {
+    var query = $('#search-input')[0].value;
+    performSearch(query, true);
+    return false;
+  });
+});
+
+</script>
+
+{% endblock %}

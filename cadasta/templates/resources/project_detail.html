@@ -59,7 +59,7 @@
             </thead>
             <tbody>
               {% for attachment in attachment_list %}
-              <tr class="linked" onclick="window.document.location='{{ attachment.object.ui_detail_url }}';">
+              <tr class="linked" onclick="window.document.location='{{ attachment.object.get_absolute_url }}';">
                 <td>{{ attachment.object.ui_class_name }}</td>
                 <td>{{ attachment.object.name }}</td>
                 <td>

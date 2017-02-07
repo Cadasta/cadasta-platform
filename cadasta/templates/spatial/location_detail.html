@@ -9,7 +9,7 @@
 <div class="col-md-4 detail">
   <section>
     <div class="page-title">
-      <h2><span>{% trans "Location" %} </span>{{ location.name }}</h2>
+      <h2 class="short"><span>{% trans "Location" %} </span>{{ location.name }}</h2>
       <div class="top-btn pull-right">
         <!-- Action buttons -->
         <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:edit' object.organization.slug object.slug location.id %}" title="{% trans 'Edit location' %}" aria-label="{% trans 'Edit location' %}"><span class="glyphicon glyphicon-pencil"></span></a>

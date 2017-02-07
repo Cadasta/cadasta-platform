@@ -66,9 +66,9 @@ class PartyTest(UserTestCase, TestCase):
         party = PartyFactory.create()
         assert party.ui_class_name == "Party"
 
-    def test_ui_detail_url(self):
+    def test_get_absolute_url(self):
         party = PartyFactory.create()
-        assert party.ui_detail_url == (
+        assert party.get_absolute_url() == (
             '/organizations/{org}/projects/{prj}/records/parties/{id}/'.format(
                 org=party.project.organization.slug,
                 prj=party.project.slug,
@@ -268,9 +268,9 @@ class TenureRelationshipTest(UserTestCase, TestCase):
         tenurerel = TenureRelationshipFactory.create()
         assert tenurerel.ui_class_name == "Relationship"
 
-    def test_ui_detail_url(self):
+    def test_get_absolute_url(self):
         tenurerel = TenureRelationshipFactory.create()
-        assert tenurerel.ui_detail_url == (
+        assert tenurerel.get_absolute_url() == (
             '/organizations/{org}/projects/{prj}/relationships/{id}/'.format(
                 org=tenurerel.project.organization.slug,
                 prj=tenurerel.project.slug,
