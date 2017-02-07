@@ -11,3 +11,8 @@
   template: src=inline-manual-player
             dest="{{ application_path }}cadasta/core/static/js/inline-manual-player.js"
 
+- name: Write tracker to core template file
+  become: yes
+  become_user: root
+  template: src=tracker
+            dest="{{ application_path }}cadasta/templates/core/tracker.html"

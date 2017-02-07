@@ -20,6 +20,7 @@
     <link rel="stylesheet" type="text/css"
           href="//cdn.rawgit.com/morteza/bootstrap-rtl/v3.3.4/dist/css/bootstrap-rtl.min.css">
     {% endif %}
+    {% include "core/tracker.html" %}
     {% block extra_head %}{% endblock %}
   </head>
   <body id="{% block top-nav %}{% endblock %}" class="page{% block body-class %}{% endblock %}">
