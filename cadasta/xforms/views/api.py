@@ -21,11 +21,9 @@ from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
 from xforms.exceptions import InvalidXMLSubmission
 from questionnaires.serializers import QuestionnaireSerializer
 from ..renderers import XFormRenderer
+from django.shortcuts import render_to_response
 
 logger = logging.getLogger('xform.submissions')
-
-OPEN_ROSA_ENVELOPE = "<OpenRosaResponse xmlns='http://openrosa.org/http/response'>\
-<message>{message}</message></OpenRosaResponse>"
 
 
 class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
@@ -62,7 +60,7 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
             return Response(
                 headers=self.get_openrosa_headers(request),
                 status=status.HTTP_201_CREATED,
-                content_type='application/xml'
+                content_type=self.DEFAULT_CONTENT_TYPE
             )
 
         instance, parties, locations, tenure_relationships = instance
@@ -81,23 +79,29 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
             data.spatial_units.add(*locations)
             data.tenure_relationships.add(*tenure_relationships)
             success_msg = _("Form was Successfully Received")
-            message = OPEN_ROSA_ENVELOPE.format(message=str(success_msg))
-            return Response(
-                message,
-                headers=self.get_openrosa_headers(request),
-                status=status.HTTP_201_CREATED,
-                content_type='application/xml'
+            return self._formatMessageResponse(
+                request,
+                success_msg,
+                status.HTTP_201_CREATED
             )
 
     def _sendErrorResponse(self, request, e, status):
-        error_msg = e
-        message = OPEN_ROSA_ENVELOPE.format(message=str(error_msg))
+        return self._formatMessageResponse(request, e, status)
+
+    def _formatMessageResponse(self, request, message, status):
+        tempate_data = {'message': message}
+        # print(DEFAULT_CONTENT_TYPE)
+        response = render_to_response(
+            'xforms/submission_response.xml',
+            tempate_data,
+            status=status,
+            content_type=self.DEFAULT_CONTENT_TYPE
+        )
         headers = self.get_openrosa_headers(
             request, location=False, content_length=False)
-        return Response(
-            message, status=status,
-            headers=headers, content_type='application/xml'
-        )
+        response['X-OpenRosa-Version'] = headers['X-OpenRosa-Version']
+        response['Date'] = headers['Date']
+        return response
 
 
 class XFormListView(OpenRosaHeadersMixin,

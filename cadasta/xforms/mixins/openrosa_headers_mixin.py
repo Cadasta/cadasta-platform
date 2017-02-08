@@ -10,6 +10,8 @@ DEFAULT_CONTENT_LENGTH = getattr(settings, 'DEFAULT_CONTENT_LENGTH', 10000000)
 
 class OpenRosaHeadersMixin(object):
 
+    DEFAULT_CONTENT_TYPE = 'application/xml'
+
     def get_openrosa_headers(
             self, request, location=True, content_length=True):
 
