@@ -1,3 +1,5 @@
+from django.utils.translation import ugettext as _
+
 from core.form_mixins import AttributeModelForm
 from .models import Party, TenureRelationshipType, TenureRelationship
 
@@ -47,9 +49,10 @@ class TenureRelationshipEditForm(AttributeModelForm):
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project
-        tenuretypes = sorted(
+        tenuretypes = sorted([
+            (choice[0], _(choice[1])) for choice in
             TenureRelationshipType.objects.values_list('id', 'label')
-        )
+        ])
         self.fields['tenure_type'].choices = tenuretypes
         self.add_attribute_fields()
 

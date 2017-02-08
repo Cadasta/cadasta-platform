@@ -261,7 +261,7 @@ class TenureRelationshipTest(UserTestCase, TestCase):
         tenurerel = TenureRelationshipFactory.create()
         assert tenurerel.name == "<{party}> {type} <{su}>".format(
             party=tenurerel.party.name,
-            type=tenurerel.tenure_type.label,
+            type=tenurerel.tenure_type_label,
             su=tenurerel.spatial_unit.get_type_display())
 
     def test_ui_class_name(self):
@@ -275,6 +275,10 @@ class TenureRelationshipTest(UserTestCase, TestCase):
                 org=tenurerel.project.organization.slug,
                 prj=tenurerel.project.slug,
                 id=tenurerel.id))
+
+    def test_tenure_type_label(self):
+        tenurerel = TenureRelationshipFactory.create()
+        assert tenurerel.tenure_type_label == tenurerel.tenure_type.label
 
     def test_detach_tenure_relationship_resources(self):
         project = ProjectFactory.create()

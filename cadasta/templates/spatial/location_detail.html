@@ -63,7 +63,7 @@
               {% for rel in relationships %}
               {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
               <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
-                <td><a href="{{ relationship_url }}">{{ rel.tenure_type.label }}</a></td>
+                <td><a href="{{ relationship_url }}">{{ rel.tenure_type_label }}</a></td>
                 <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
               </tr>
               {% endfor %}
