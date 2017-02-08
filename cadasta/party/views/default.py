@@ -79,7 +79,7 @@ class PartiesDelete(LoginPermissionRequiredMixin,
     def get_success_url(self):
         kwargs = self.kwargs
         del kwargs['party']
-        return reverse('locations:list', kwargs=self.kwargs)
+        return reverse('parties:list', kwargs=self.kwargs)
 
 
 class PartyResourcesAdd(LoginPermissionRequiredMixin,
