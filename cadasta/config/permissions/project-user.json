@@ -6,32 +6,32 @@
     {
       "effect": "allow",
       "action": ["spatial.view"],
-      "object": ["spatial/$organization/*/*"]
+      "object": ["spatial/$organization/$project/*"]
     },
     {
       "effect": "allow",
       "action": ["spatial_rel.view"],
-      "object": ["spatial_rel/$organization/*/*"]
+      "object": ["spatial_rel/$organization/$project/*"]
     },
     {
       "effect": "allow",
       "action": ["party.view"],
-      "object": ["party/$organization/*/*"]
+      "object": ["party/$organization/$project/*"]
     },
     {
       "effect": "allow",
       "action": ["party_rel.view"],
-      "object": ["party_rel/$organization/*/*"]
+      "object": ["party_rel/$organization/$project/*"]
     },
     {
       "effect": "allow",
       "action": ["tenure_rel.view"],
-      "object": ["tenure_rel/$organization/*/*"]
+      "object": ["tenure_rel/$organization/$project/*"]
     },
     {
       "effect": "allow",
       "action": ["resource.view"],
-      "object": ["resource/$organization/*/*"]
+      "object": ["resource/$organization/$project/*"]
     }
   ]
 }
