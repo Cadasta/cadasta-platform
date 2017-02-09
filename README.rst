@@ -70,3 +70,7 @@ Cadasta is grateful for the technical considerations and support provided by:
 
 - `Opbeat <https://opbeat.com>`_
 
+- `Travis CI <https://travis-ci.com/>`_
+
+
+
