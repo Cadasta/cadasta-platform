@@ -1,37 +1,21 @@
-from jsonattrs.models import Schema
+from collections import OrderedDict
+from core.mixins import SchemaSelectorMixin
+from django.contrib.contenttypes.models import ContentType
 
 
-class Exporter():
+class Exporter(SchemaSelectorMixin):
     def __init__(self, project):
         self.project = project
         self._schema_attrs = {}
 
     def get_schema_attrs(self, content_type):
-        content_type_key = '{}.{}'.format(content_type.app_label,
-                                          content_type.model)
-
-        if content_type_key not in self._schema_attrs.keys():
-            selectors = [
-                self.project.organization.id,
-                self.project.id,
-                self.project.current_questionnaire
-            ]
-            schemas = Schema.objects.lookup(
-                content_type=content_type, selectors=selectors
-            )
-
-            attrs = []
-            if schemas:
-                attrs = [
-                    a for s in schemas
-                    for a in s.attributes.all() if not a.omit
-                ]
-            self._schema_attrs[content_type_key] = attrs
-
-        return self._schema_attrs[content_type_key]
+        label = '{0}.{1}'.format(content_type.app_label, content_type.model)
+        if self._schema_attrs == {}:
+            self._schema_attrs = self.get_attributes(self.project)
+        return self._schema_attrs[label]
 
     def get_values(self, item, model_attrs, schema_attrs):
-        values = []
+        values = OrderedDict()
         for attr in model_attrs:
             if '.' in attr:
                 attr_items = attr.split('.')
@@ -39,14 +23,21 @@ class Exporter():
                 for a in attr_items:
                     value = (getattr(item, a)
                              if not value else getattr(value, a))
-                values.append(value)
+                values[attr] = value
             else:
-                values.append(getattr(item, attr))
+                values[attr] = getattr(item, attr)
 
-        for attr in schema_attrs:
-            attr_value = item.attributes.get(attr.name, '')
+        content_type = ContentType.objects.get_for_model(item)
+        conditional_selector = self.get_conditional_selector(content_type)
+        if conditional_selector:
+            entity_type = getattr(item, conditional_selector)
+            attributes = schema_attrs.get(entity_type, {})
+        else:
+            attributes = schema_attrs.get('DEFAULT', {})
+        for key, attr in attributes.items():
+            attr_value = item.attributes.get(key, '')
             if type(attr_value) == list:
                 attr_value = (', ').join(attr_value)
-            values.append(attr_value)
+            values[key] = attr_value
 
         return values

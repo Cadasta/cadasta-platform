@@ -1,32 +1,42 @@
 import os
-from openpyxl import Workbook
+from collections import OrderedDict
+
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from openpyxl import Workbook
 
 from .base import Exporter
-
 
 MIME_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 
 
 class XLSExporter(Exporter):
+
     def write_items(self, worksheet, queryset, content_type, model_attrs):
         schema_attrs = self.get_schema_attrs(content_type)
 
-        # write column labels
-        worksheet.append(model_attrs + [a.name for a in schema_attrs])
+        # build column labels
+        attr_columns = OrderedDict()
+        for a in model_attrs:
+            attr_columns[a] = ''
+        for _, attrs in schema_attrs.items():
+            for a in attrs.values():
+                if a.name not in attr_columns.keys():
+                    attr_columns[a.name] = ''
+        worksheet.append(list(attr_columns.keys()))
 
         # write data
         for i, item in enumerate(queryset):
             values = self.get_values(item, model_attrs, schema_attrs)
-            worksheet.append(values)
+            data = attr_columns.copy()
+            data.update(values)
+            worksheet.append(list(data.values()))
 
     def write_locations(self):
         locations = self.project.spatial_units.all()
         if locations.count() == 0:
             return
         worksheet = self.workbook.create_sheet(title='locations')
-
         content_type = ContentType.objects.get(app_label='spatial',
                                                model='spatialunit')
         self.write_items(worksheet, locations, content_type,
@@ -37,7 +47,6 @@ class XLSExporter(Exporter):
         if parties.count() == 0:
             return
         worksheet = self.workbook.create_sheet(title='parties')
-
         content_type = ContentType.objects.get(app_label='party',
                                                model='party')
         self.write_items(worksheet, parties, content_type,
@@ -48,7 +57,6 @@ class XLSExporter(Exporter):
         if relationships.count() == 0:
             return
         worksheet = self.workbook.create_sheet(title='relationships')
-
         content_type = ContentType.objects.get(app_label='party',
                                                model='tenurerelationship')
         self.write_items(worksheet, relationships, content_type,
@@ -57,8 +65,7 @@ class XLSExporter(Exporter):
 
     def make_download(self, f_name):
         path = os.path.join(settings.MEDIA_ROOT, 'temp/{}.xlsx'.format(f_name))
-        self.workbook = Workbook()
-        self.workbook.remove_sheet(self.workbook['Sheet'])
+        self.workbook = Workbook(write_only=True)
 
         self.write_locations()
         self.write_parties()
