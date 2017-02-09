@@ -1,10 +1,9 @@
 import csv
 
+from core.mixins import SchemaSelectorMixin
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from jsonattrs.models import Schema
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from spatial.models import SpatialUnit
 
@@ -37,7 +36,7 @@ XLS_WORKSHEET_TO_CONTENT_TYPE = {
 }
 
 
-class Importer(object):
+class Importer(SchemaSelectorMixin):
 
     class Meta:
         abstract = True
@@ -72,74 +71,84 @@ class Importer(object):
         return content_type_keys
 
     def get_schema_attrs(self):
-        for attribute_group in ATTRIBUTE_GROUPS:
-            app_label = ATTRIBUTE_GROUPS[attribute_group]['app_label']
-            model = ATTRIBUTE_GROUPS[attribute_group]['model']
-            content_type_key = '{}.{}'.format(app_label, model)
-            content_type = ContentType.objects.get(
-                app_label=app_label, model=model)
-
-            if content_type_key not in self._schema_attrs.keys():
-                selectors = [
-                    self.project.organization.id,
-                    self.project.id,
-                    self.project.current_questionnaire
-                ]
-                schemas = Schema.objects.lookup(
-                    content_type=content_type, selectors=selectors
-                )
-                attrs = []
-                if schemas:
-                    attrs = [
-                        a for s in schemas
-                        for a in s.attributes.all() if not a.omit
-                    ]
-                self._schema_attrs[content_type_key] = attrs
-
+        self._schema_attrs = self.get_attributes(self.project)
         return self._schema_attrs
 
-    def get_attribute_map(self, type, entity_types):
+    def get_attribute_map(self, type, entity_types, flatten=False):
         # make sure we pick up tenure attributes if
         # importing both parties and locations
         if 'PT' in entity_types and 'SU' in entity_types:
             entity_types.append('TR')
 
         attribute_map = {}
-        extra_attrs, exclude_attrs, extra_headers, found_attrs = [], [], [], []
-        schema_attrs = self.get_schema_attrs()
+        extra_attrs, extra_headers, found_attrs = [], [], []
         selected_content_types = [
             ENTITY_TYPES[selection] for selection in entity_types
         ]
-        for content_type in schema_attrs:
-            if content_type not in selected_content_types:
-                exclude_attrs += [a.name for a in schema_attrs[content_type]]
-                continue
-            attributes = schema_attrs[content_type]
+
+        project_attrs = self.get_schema_attrs()
+
+        # build a dict of content_type to attrs selected for import
+        selected_attrs = {
+            content_type: attrs for content_type, attrs
+            in project_attrs.items()
+            if content_type in selected_content_types
+        }
+
+        # build list of attribute names not selected for import
+        exclude_attrs = list(set([
+            name.lower() for content_type, selectors in project_attrs.items()
+            for selector, attrs in selectors.items()
+            for name, attr in attrs.items()
+            if content_type not in selected_content_types
+        ]))
+
+        for content_type, selectors in selected_attrs.items():
+            attribute_map[content_type] = {}
             attr_map = {}
-            for attr in attributes:
-                name = attr.name.lower()
-                if type == 'xls':
-                    sheet = XLS_WORKSHEET_TO_CONTENT_TYPE.get(
-                        content_type, None
-                    )
-                    headers = self.get_header_map().get(sheet, [])
-                else:
-                    headers = self.get_headers()
-                if name in headers:
-                    attr_map[name] = (
-                        attr, content_type, CONTENT_TYPES[content_type]
-                    )
-                    found_attrs.append(name)
-                else:
-                    extra_attrs.append(name)
-            model = content_type.split('.')[1]
-            attribute_map[model] = attr_map
+            for selector, attributes in selectors.items():
+                attr_map[selector] = {}
+                for attr_name, attr in attributes.items():
+                    name = attr_name.lower()
+                    if type == 'xls':
+                        sheet = XLS_WORKSHEET_TO_CONTENT_TYPE.get(
+                            content_type, None
+                        )
+                        headers = self.get_header_map().get(sheet, [])
+                    else:
+                        headers = self.get_headers()
+                    if name in headers:
+                        attr_map[selector][name] = (
+                            attr, content_type, CONTENT_TYPES[content_type]
+                        )
+                        found_attrs.append(name)
+                    else:
+                        extra_attrs.append(name)
+            attribute_map[content_type] = attr_map
+
+        # enfoce uniqueness on these lists
+        found_attrs = list(set(found_attrs))
+        extra_attrs = list(set(extra_attrs))
 
         headers = self.get_headers()
+        extra_headers = list(set([
+            h for h in headers if h not in found_attrs and h not in
+            exclude_attrs and h not in extra_attrs
+        ]))
 
-        for header in headers:
-            if header not in exclude_attrs and header not in found_attrs:
-                extra_headers.append(header)
+        if flatten:
+            # return a simplified representation for use in import wizard
+            flat_attr_map = {}
+            for model, selectors in attribute_map.items():
+                attr_list = {}
+                for _, attributes in selectors.items():
+                    attr_list.update({
+                        attr_name: attrs for attr_name, attrs
+                        in attributes.items()
+                    })
+                flat_attr_map[model.split('.')[1]] = attr_list
+            return (flat_attr_map,
+                    sorted(extra_attrs), sorted(extra_headers))
 
         return (attribute_map,
                 sorted(extra_attrs), sorted(extra_headers))
@@ -158,6 +167,7 @@ class Importer(object):
                     quotechar=self.quotechar
                 )
                 headers = [h.lower() for h in next(reader)]
+
                 for row in reader:
                     content_types = dict(
                         (key, None) for key in self.get_content_type_keys()
@@ -180,7 +190,7 @@ class Importer(object):
                             'geometry': geometry,
                             'attributes': {}
                         }
-                    if 'SU' in entity_types and 'PT' in entity_types:
+                    if location_type and party_type and tenure_type:
                         content_types['party.tenurerelationship'] = {
                             'project': self.project,
                             'attributes': {}
@@ -253,23 +263,42 @@ class Importer(object):
 
     def _map_attrs_to_content_types(self, headers, row, content_types,
                                     attributes, attr_map):
-        for attr in attributes:
-            model, attr_name = tuple(attr.split('::'))
-            content_type_attrs = attr_map.get(model, None)
-            if content_type_attrs is not None:
-                attribute, content_type, name = content_type_attrs.get(
-                    attr_name)
-                if (attribute is not None):
-                    try:
-                        val = row[headers.index(attr_name)]
-                    except:
-                        val = row[headers.index(attr)]
-                    if (not attribute.required and val == ""):
-                        continue
-                    # handle select_multiple fields
-                    if (attribute.attr_type.name == 'select_multiple'):
-                        val = [v.strip() for v in val.split(',')]
-                    if content_types[content_type]:
-                        content_types[
-                            content_type]['attributes'][attribute.name] = val
+        for model, selectors in attr_map.items():
+            for selector, attrs in selectors.items():
+                content_type = content_types.get(model, None)
+                if not content_type:
+                    continue
+                if selector in ['DEFAULT', content_type.get('type', '')]:
+                    for attr in attrs:
+                        attribute = attrs[attr][0]
+                        attr_label = '{0}::{1}'.format(
+                            model.split('.')[1], attr)
+                        if attr_label not in attributes:
+                            continue
+                        try:
+                            val = row[headers.index(attribute.name.lower())]
+                        except:
+                            val = row[headers.index(attr_label)]
+                        if not attribute.required and val == '':
+                            continue
+                        if attribute.attr_type.name == 'select_multiple':
+                            val = [v.strip() for v in val.split(',')]
+                        if attribute.attr_type.name in ['integer', 'decimal']:
+                                val = self._cast_to_type(
+                                    val, attribute.attr_type.name)
+                        if content_type:
+                            content_type['attributes'][attribute.name] = val
         return content_types
+
+    def _cast_to_type(self, val, type):
+        if type == 'integer':
+            try:
+                val = int(float(val))
+            except:
+                val = 0
+        if type == 'decimal':
+            try:
+                val = float(val)
+            except:
+                val = 0.0
+        return val

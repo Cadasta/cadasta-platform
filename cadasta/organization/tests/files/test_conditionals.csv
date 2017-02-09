@@ -1,0 +1,3 @@
+location_geometry,location_type,su_attr,party_name,party_type,default_attr,default_int_attr,party_in,party_gr,party_gr_dec,tenure_type
+SRID=4326;POINT (1 0),PA,some value,Test Party,IN,test default attr in,10,some individual value,,,FH
+SRID=4326;POINT (2 3),BU,some other value,Another Test Party,GR,test default attr gr,20,,some group value,2.00,LH

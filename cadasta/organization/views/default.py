@@ -782,7 +782,8 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             importer = self._get_importer(type, path)
             (attr_map,
                 extra_attrs, extra_headers) = importer.get_attribute_map(
-                    type, entity_types.copy())
+                    type, entity_types.copy(), flatten=True)
+
             return self.render(
                 form, attr_map=attr_map,
                 extra_attrs=extra_attrs, extra_headers=extra_headers, **kwargs
@@ -819,7 +820,7 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             importer = self._get_importer(type, path)
             (attr_map,
                 extra_attrs, extra_headers) = importer.get_attribute_map(
-                    type, entity_types.copy()
+                    type, entity_types.copy(), flatten=True
             )
             return self.render(
                 form, attr_map=attr_map,
