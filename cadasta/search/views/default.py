@@ -1,10 +1,13 @@
 from core.views.generic import TemplateView
 from core.mixins import LoginPermissionRequiredMixin
 from organization import messages as org_messages
-from organization.views.mixins import ProjectMixin
+from organization.views import mixins as org_mixins
 
 
-class Search(LoginPermissionRequiredMixin, ProjectMixin, TemplateView):
+class Search(LoginPermissionRequiredMixin,
+             org_mixins.ProjectMixin,
+             org_mixins.ProjectAdminCheckMixin,
+             TemplateView):
     template_name = 'search/search.html'
     permission_required = 'project.view_private'
     permission_denied_message = org_messages.PROJ_VIEW

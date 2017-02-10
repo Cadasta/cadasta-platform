@@ -7,6 +7,7 @@ from tutelary.models import Policy, assign_user_policies
 from skivvy import ViewTestCase
 
 from accounts.tests.factories import UserFactory
+from organization.models import ProjectRole
 from organization.tests.factories import ProjectFactory
 from core.tests.utils.cases import UserTestCase
 
@@ -53,6 +54,23 @@ class SearchTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+
+    def test_get_with_pm_user(self):
+        user = UserFactory.create()
+        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project,
+            user=user,
+            role='PM',
+        )
+        response = self.request(user=user)
+        assert response.status_code == 200
+        expected_content = self.render_content(is_administrator=True,
+                                               is_allowed_add_location=True,
+                                               is_allowed_add_resource=True,
+                                               is_project_member=True,
+                                               is_allowed_import=True)
+        assert response.content == expected_content
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
