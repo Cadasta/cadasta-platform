@@ -39,13 +39,13 @@
               </div>
             </form>
             <div id="last-update" class="hidden col-md-3 text-right">
-              <p class="help-block">{% trans "Search index was last updated on" %} <span id="index-timestamp"></span></p>
+              <p class="small help-block">{% trans "Last updated on" %} <span id="index-timestamp"></span></p>
             </div>
           </div>
           <div class="row">
             <div id="waiting-results" class="hidden"><img src="{% static 'img/loading.gif' %}"></div>
             <div id="failed-results" class="hidden col-md-9">
-              <h4>{% trans "We’re sorry, it seems the search index is currently not available" %}</h4>
+              <h4>{% trans "We’re sorry, search is currently not available" %}</h4>
             </div>
             <div id="no-results" class="hidden col-md-9">
               <h4>{% trans "We’re sorry, we couldn’t find any results for:" %} <strong><span id="failed-query-string"></span></strong></h4>
