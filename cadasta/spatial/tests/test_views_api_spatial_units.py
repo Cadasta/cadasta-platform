@@ -497,8 +497,34 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 404
         assert response.content['detail'] == "SpatialUnit not found."
 
-    def test_update_with_unauthorized_user(self):
+    def test_PATCH_with_anonymous_user(self):
         response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_PATCH_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(method='PATCH', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_PUT_with_anonymous_user(self):
+        response = self.request(method='PUT')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.su.refresh_from_db()
+        assert self.su.type == 'PA'
+
+    def test_PUT_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(method='PUT', user=user)
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
 
@@ -997,6 +1023,40 @@ class SpatialUnitResourceUpdateAPITest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
         response = self.request(method='PATCH', user=UserFactory.create())
         assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PATCH_with_anonymous_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PATCH_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(method='PATCH', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_with_anonymous_user(self):
+        response = self.request(method='PUT')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(method='PUT', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
         self.resource.refresh_from_db()
         assert self.resource.name != self.post_data['name']
 

@@ -253,9 +253,32 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.org.refresh_from_db()
         assert self.org.name == data.get('name')
 
-    def test_update_with_unauthorized_user(self):
+    def test_PATCH_with_anonymous_user(self):
         data = {'name': 'Org Name'}
         response = self.request(method='PATCH', post_data=data)
+        assert response.status_code == 403
+        self.org.refresh_from_db()
+        assert self.org.name == 'Org'
+
+    def test_PATCH_with_unauthorized_user(self):
+        user = UserFactory.create()
+        data = {'name': 'Org Name'}
+        response = self.request(method='PATCH', post_data=data, user=user)
+        assert response.status_code == 403
+        self.org.refresh_from_db()
+        assert self.org.name == 'Org'
+
+    def test_PUT_with_anonymous_user(self):
+        data = {'name': 'Org Name'}
+        response = self.request(method='PUT', post_data=data)
+        assert response.status_code == 403
+        self.org.refresh_from_db()
+        assert self.org.name == 'Org'
+
+    def test_PUT_with_unauthorized_user(self):
+        user = UserFactory.create()
+        data = {'name': 'Org Name'}
+        response = self.request(method='PUT', post_data=data, user=user)
         assert response.status_code == 403
         self.org.refresh_from_db()
         assert self.org.name == 'Org'
@@ -456,6 +479,42 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.org_user)
         assert role.admin is True
+
+    def test_PATCH_user_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(user=user,
+                                method='PATCH',
+                                post_data={'admin': 'true'})
+        assert response.status_code == 403
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.org_user)
+        assert role.admin is False
+
+    def test_PATCH_user_with_anonymous_user(self):
+        response = self.request(method='PATCH',
+                                post_data={'admin': 'true'})
+        assert response.status_code == 403
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.org_user)
+        assert role.admin is False
+
+    def test_PUT_user_with_unauthorized_user(self):
+        user = UserFactory.create()
+        response = self.request(user=user,
+                                method='PUT',
+                                post_data={'admin': 'true'})
+        assert response.status_code == 403
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.org_user)
+        assert role.admin is False
+
+    def test_PUT_user_with_anonymous_user(self):
+        response = self.request(method='PUT',
+                                post_data={'admin': 'true'})
+        assert response.status_code == 403
+        role = OrganizationRole.objects.get(organization=self.org,
+                                            user=self.org_user)
+        assert role.admin is False
 
     def test_update_admin_user(self):
         OrganizationRole.objects.create(organization=self.org,

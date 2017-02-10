@@ -333,8 +333,35 @@ class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 404
         assert response.content['detail'] == "TenureRelationship not found."
 
-    def test_update_with_unauthorized_user(self):
+    def test_PATCH_with_anonymous_user(self):
         response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_PATCH_with_unauthorized_user(self):
+        response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_PUT_with_anonymous_user(self):
+        response = self.request(method='PUT')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party == self.party
+        assert self.rel.spatial_unit == self.spatial_unit
+
+    def test_PUT_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
 
@@ -831,8 +858,26 @@ class TenureRelationshipResourceUpdateAPITest(APITestCase, UserTestCase,
         self.resource.refresh_from_db()
         assert self.resource.name == self.post_data['name']
 
-    def test_update_resource_with_unauthorized_user(self):
+    def test_PATCH_resource_with_anonymous_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PATCH_resource_with_unauthorized_user(self):
         response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_anonymous_user(self):
+        response = self.request(method='PUT')
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
         assert response.status_code == 403
         self.resource.refresh_from_db()
         assert self.resource.name != self.post_data['name']

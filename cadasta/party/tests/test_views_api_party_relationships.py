@@ -349,8 +349,35 @@ class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 404
         assert response.content['detail'] == "PartyRelationship not found."
 
-    def test_update_with_unauthorized_user(self):
+    def test_PATCH_with_anonymous_user(self):
         response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_PATCH_with_unauthorized_user(self):
+        response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_PUT_with_anonymous_user(self):
+        response = self.request(method='PUT')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+        self.rel.refresh_from_db()
+        assert self.rel.party1 == self.party1
+        assert self.rel.party2 == self.party2
+
+    def test_PUT_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
 

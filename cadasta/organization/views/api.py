@@ -62,6 +62,7 @@ class OrganizationDetail(APIPermissionRequiredMixin,
     permission_required = {
         'GET': view_actions,
         'PATCH': patch_actions,
+        'PUT': patch_actions
     }
 
 
@@ -83,7 +84,11 @@ class OrganizationUsersDetail(APIPermissionRequiredMixin,
                               generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = serializers.OrganizationUserSerializer
-    permission_required = update_permissions('org.users.remove')
+    permission_required = {
+        'PUT': update_permissions('org.users.edit'),
+        'PATCH': update_permissions('org.users.edit'),
+        'DELETE': update_permissions('org.users.remove')
+    }
 
     def destroy(self, request, *args, **kwargs):
         user = self.get_object()
@@ -115,7 +120,8 @@ class UserAdminDetail(APIPermissionRequiredMixin,
     lookup_field = 'username'
     permission_required = {
         'GET': 'user.list',
-        'PATCH': 'user.update'
+        'PATCH': 'user.update',
+        'PUT': 'user.update'
     }
 
 
@@ -221,6 +227,7 @@ class ProjectDetail(APIPermissionRequiredMixin,
     permission_required = {
         'GET': get_actions,
         'PATCH': patch_actions,
+        'PUT': patch_actions,
     }
 
     def get_perms_objects(self):
@@ -250,6 +257,7 @@ class ProjectUsersDetail(APIPermissionRequiredMixin,
     permission_required = {
         'GET': 'project.users.list',
         'PATCH': update_permissions('project.users.update'),
+        'PUT': update_permissions('project.users.update'),
         'DELETE': update_permissions('project.users.delete'),
     }
 

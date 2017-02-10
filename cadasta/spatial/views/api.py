@@ -43,6 +43,7 @@ class SpatialUnitDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'spatial.view',
+        'PUT': update_permissions('spatial.update'),
         'PATCH': update_permissions('spatial.update'),
         'DELETE': update_permissions('spatial.delete')
     }
@@ -87,6 +88,7 @@ class SpatialUnitResourceDetail(APIPermissionRequiredMixin,
     serializer_class = ResourceSerializer
     permission_required = {
         'GET': 'spatial.resources.view',
+        'PUT': patch_actions,
         'PATCH': patch_actions,
         'DELETE': patch_actions,
     }
@@ -123,6 +125,7 @@ class SpatialRelationshipDetail(APIPermissionRequiredMixin,
     permission_required = {
         'GET': 'spatial_rel.view',
         'PATCH': update_permissions('spatial_rel.update'),
+        'PUT': update_permissions('spatial_rel.update'),
         'DELETE': update_permissions('spatial_rel.delete')
     }
 
