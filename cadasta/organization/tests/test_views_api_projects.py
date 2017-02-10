@@ -775,7 +775,7 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert self.project.name == 'Test Project'
 
     def test_PATCH_with_unauthorized_user(self):
-        response = self.request(method='PATCH')
+        response = self.request(method='PATCH', user=UserFactory.create())
         assert response.status_code == 403
         self.project.refresh_from_db()
         assert self.project.name == 'Test Project'
@@ -787,7 +787,7 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert self.project.name == 'Test Project'
 
     def test_PUT_with_unauthorized_user(self):
-        response = self.request(method='PUT')
+        response = self.request(method='PUT', user=UserFactory.create())
         assert response.status_code == 403
         self.project.refresh_from_db()
         assert self.project.name == 'Test Project'
