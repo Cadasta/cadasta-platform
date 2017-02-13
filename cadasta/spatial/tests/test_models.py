@@ -100,7 +100,7 @@ class SpatialUnitTest(UserTestCase, TestCase):
         su = SpatialUnitFactory.create()
         assert su.get_absolute_url() == (
             '/organizations/{org}/projects/{prj}/'
-            'records/locations/{id}/'.format(
+            '#/records/location/{id}'.format(
                 org=su.project.organization.slug,
                 prj=su.project.slug,
                 id=su.id))

@@ -1,18 +1,15 @@
-{% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
 
 {% block location_panel %}
-
-<div class="col-md-4 detail">
   <section>
     <div class="page-title">
-      <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
+      <h2><a href="#/records/location/{{ location.id }}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
       <hr class="border-btm">
       <h3 class="inline">{% trans "Relationship Detail" %}</h3>
       <div class="top-btn pull-right">
         <!-- Action buttons -->
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}" title="{% trans 'Edit relationship' %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}" title="{% trans 'Delete relationship' %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
+        <a class="btn btn-default btn-action btn-sm" href="#/records/relationship/{{ relationship.id }}/edit" title="{% trans 'Edit relationship' %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        <a class="btn btn-default btn-action btn-sm" href="#/records/relationship/{{ relationship.id }}/delete" title="{% trans 'Delete relationship' %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
       </div>
     </div>
 
@@ -41,9 +38,9 @@
     {% if resource_list %}
       <div class="top-btn pull-right top-add">
         {% if has_unattached_resources %}
-        <a class="btn btn-primary btn-sm" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">
+        <a class="btn btn-primary btn-sm" href="#/records/relationship/{{ relationship.id }}/resources/add">
         {% else %}
-        <a class="btn btn-primary btn-sm" href="{% url 'parties:relationship_resource_new' object.organization.slug object.slug relationship.id %}">
+        <a class="btn btn-primary btn-sm" href="#/records/relationship/{{ relationship.id }}/resources/new">
         {% endif %}
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
       </div>
@@ -53,9 +50,9 @@
         <p>{% trans "This relationship does not have any attached resources. To attach a resource, select the button below." %}</p>
         <div class="btn-full">
           {% if has_unattached_resources %}
-          <a class="btn btn-primary" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">
+          <a class="btn btn-primary" href="#/records/relationship/{{ relationship.id }}/resources/add">
           {% else %}
-          <a class="btn btn-primary" href="{% url 'parties:relationship_resource_new' object.organization.slug object.slug relationship.id %}">
+          <a class="btn btn-primary" href="#/records/relationship/{{ relationship.id }}/resources/new">
           {% endif %}
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
         </div>
@@ -63,6 +60,5 @@
     {% endif %}
     <!-- /relationship resources -->
   </section>
-</div>
 
 {% endblock %}

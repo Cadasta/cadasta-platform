@@ -21,11 +21,9 @@ from jsonattrs.models import Attribute, Schema
 from skivvy import remove_csrf
 from organization.models import OrganizationRole, Project, ProjectRole
 from party.models import Party, TenureRelationship
-from party.tests.factories import PartyFactory
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
 from resources.models import Resource
-from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase

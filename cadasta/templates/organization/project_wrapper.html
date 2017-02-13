@@ -71,7 +71,7 @@
       <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
-        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">
+        <a class="btn btn-primary" href="#/records/location/new" aria-label="{% trans 'Add location' %}">
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
         </a>
         {% endif %}
@@ -96,7 +96,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           {% if is_allowed_add_location %}
-          <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
+          <li><a href="#/records/location/new">{% trans "Add location" %}</a></li>
           {% endif %}
           <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
           {% if is_allowed_add_resource %}
@@ -126,21 +126,29 @@
 <div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">
     <li class="search">
-      <a href="#">
+      <a href="#/search">
         <span class="icon"></span>
         <span class="title">{% trans "Search" %}</span>
       </a>
     </li><!-- needed to eliminate spacing issue on horizontal menus
     -->
     <li class="overview">
-      <a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}#overview">
+    {% url 'organization:project-dashboard' object.organization.slug object.slug as project_url %}
+    {% ifnotequal request.path project_url %}
+      <a href='{{ project_url }}'>
+    {% else %}
+      <a href="#/overview">
+    {% endifnotequal %}
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
       </a>
     </li><!--
     --><li class="map">
-      <!-- <a href="{% url 'locations:list' object.organization.slug object.slug %}"> -->
-      <a href="#">
+      {% ifnotequal request.path project_url %}
+        <a href='{{ project_url }}#/map'>
+      {% else %}
+        <a href="#/map">
+      {% endifnotequal %}
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
       </a>
@@ -250,5 +258,8 @@ window.addEventListener('load', function() {
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+
+<div class="modal fade" id="additional_modals" ></div>
 
 {% endblock %}

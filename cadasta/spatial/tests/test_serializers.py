@@ -112,10 +112,8 @@ class SpatialUnitGeoJsonSerializerTest(TestCase):
         location = SpatialUnitFactory.build(id='abc123')
         serializer = serializers.SpatialUnitGeoJsonSerializer(location)
 
-        expected_url = ('/organizations/{o}/projects/{p}/records/'
-                        'locations/{l}/'.format(
-                            o=location.project.organization.slug,
-                            p=location.project.slug,
+        expected_url = ('records/'
+                        'location/{l}'.format(
                             l=location.id
                         ))
 
