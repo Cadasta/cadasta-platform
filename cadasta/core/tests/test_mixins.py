@@ -12,7 +12,7 @@ from organization.tests.factories import OrganizationFactory, ProjectFactory
 from organization.views import default as org_views
 
 from questionnaires.models import Questionnaire
-from spatial.views.default import LocationsAdd
+from spatial.views.async import LocationsAdd
 from tutelary.models import assign_user_policies
 
 from ..mixins import SchemaSelectorMixin

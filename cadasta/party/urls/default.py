@@ -36,26 +36,26 @@ urls = [
 ]
 
 relationship_urls = [
-    url(
-        r'^relationships/(?P<relationship>[-\w]+)/$',
-        default.PartyRelationshipDetail.as_view(),
-        name='relationship_detail'),
-    url(
-        r'^relationships/(?P<relationship>[-\w]+)/edit/$',
-        default.PartyRelationshipEdit.as_view(),
-        name='relationship_edit'),
-    url(
-        r'^relationships/(?P<relationship>[-\w]+)/delete/$',
-        default.PartyRelationshipDelete.as_view(),
-        name='relationship_delete'),
-    url(
-        r'^relationships/(?P<relationship>[-\w]+)/resources/add/$',
-        default.PartyRelationshipResourceAdd.as_view(),
-        name='relationship_resource_add'),
-    url(
-        r'^relationships/(?P<relationship>[-\w]+)/resources/new/$',
-        default.PartyRelationshipResourceNew.as_view(),
-        name='relationship_resource_new'),
+    # url(
+    #     r'^relationships/(?P<relationship>[-\w]+)/$',
+    #     default.PartyRelationshipDetail.as_view(),
+    #     name='relationship_detail'),
+    # url(
+    #     r'^relationships/(?P<relationship>[-\w]+)/edit/$',
+    #     default.PartyRelationshipEdit.as_view(),
+    #     name='relationship_edit'),
+    # url(
+    #     r'^relationships/(?P<relationship>[-\w]+)/delete/$',
+    #     default.PartyRelationshipDelete.as_view(),
+    #     name='relationship_delete'),
+    # url(
+    #     r'^relationships/(?P<relationship>[-\w]+)/resources/add/$',
+    #     default.PartyRelationshipResourceAdd.as_view(),
+    #     name='relationship_resource_add'),
+    # url(
+    #     r'^relationships/(?P<relationship>[-\w]+)/resources/new/$',
+    #     default.PartyRelationshipResourceNew.as_view(),
+    #     name='relationship_resource_new'),
 ]
 
 urlpatterns = [

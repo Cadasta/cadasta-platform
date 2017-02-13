@@ -70,6 +70,12 @@ async = [
     url(r'^',
         include('search.urls.async',
                 namespace='search')),
+    url(r'^',
+        include('organization.urls.async',
+                namespace='project')),
+    url(r'^',
+        include('party.urls.async',
+                namespace='party')),
 ]
 
 urlpatterns = [
@@ -93,9 +99,6 @@ urlpatterns = [
     url(r'^',
         include('party.urls.default',
                 namespace='parties')),
-    url(r'^',
-        include('spatial.urls.default',
-                namespace='locations')),
     url(r'^',
         include('resources.urls.default',
                 namespace='resources')),

@@ -3,6 +3,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
     _requests: [],
     _loadedfeatures: {},
     _tiles: {},
+    _ticker: 1,
     _addTile: function(tilePoint) {
         var tile = {
             datum: null,
@@ -40,12 +41,26 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         // _update has been refactored is no longer required?
         // ****
         // this._update(tilePoint);
+        if (tilePoint.x < 0 || tilePoint.y < 0) {
+            return;
+        }
         var layer = this;
         var req = new XMLHttpRequest();
         this._requests.push(req);
         req.onreadystatechange = this._xhrHandler(req, layer, tile, tilePoint);
         req.open('GET', this.getTileUrl(tilePoint), true);
         req.send();
+
+        // *** DELETE THIS ***
+        req.addEventListener("loadend", this._loadEnd.bind(this));
+        // *******************
+    },
+    _loadEnd: function() {
+        if (this._ticker < this._requests.length) {
+            this._ticker++;
+        } else {
+            $('#messages #loading').addClass('hidden');
+        }
     },
     _reset: function() {
         L.TileLayer.prototype._reset.apply(this, arguments);
@@ -74,6 +89,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     _clipPathRectangles: {},
 
     initialize: function(url, options, geojsonOptions) {
+        $('#messages #loading').removeClass('hidden');
         L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
         this.features = L.deflate({
@@ -203,7 +219,6 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         var features = L.Util.isArray(geojson) ? geojson : geojson.features,
             i, len, feature;
         if (features) {
-            $('#messages #loading').removeClass('hidden');
             for (i = 0, len = features.length; i < len; i++) {
                 // Only add this if geometry or geometries are set and not null
                 feature = features[i];
@@ -217,7 +232,6 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
                     }
                 }
             }
-            $('#messages #loading').addClass('hidden');
             return this;
         }
 
