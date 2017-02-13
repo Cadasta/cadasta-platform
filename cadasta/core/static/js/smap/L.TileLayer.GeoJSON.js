@@ -42,7 +42,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         this._requests.push(req);
         req.onreadystatechange = this._xhrHandler(req, layer, tile, tilePoint);
         req.open('GET', this.getTileUrl(tilePoint), true);
-        req.send();
+        req.send();    
     },
     _reset: function () {
         L.TileLayer.prototype._reset.apply(this, arguments);
@@ -69,15 +69,14 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     initialize: function (url, options, geojsonOptions) {
         L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
-        console.log(this.geojsonLayer)
     },
     onAdd: function (map) {
+        this._lazyTiles = new Tile(0, 0, 0, map.maxZoom);
         this._map = map;
         L.TileLayer.Ajax.prototype.onAdd.call(this, map);
         map.addLayer(this.geojsonLayer);
     },
     onRemove: function (map) {
-        console.log(this.geojsonLayer);
         map.removeLayer(this.geojsonLayer);
         L.TileLayer.Ajax.prototype.onRemove.call(this, map);
     },
@@ -281,5 +280,12 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         // L.TileLayer.Ajax.prototype._tileOnLoad.apply(this, tile);
         if (tile.datum === null) { return null; }
         this.addTileData(tile.datum, tilePoint);
-    }
+        this._lazyTiles.load(tilePoint.x, tilePoint.y, tilePoint.z);
+    },
+
+    _loadTile: function (tile, tilePoint) {
+        if (!this._lazyTiles.isLoaded(tilePoint.x, tilePoint.y, tilePoint.z)) {
+            L.TileLayer.Ajax.prototype._loadTile.call(this, tile, tilePoint);
+        }
+    },
 });
