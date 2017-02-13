@@ -1,121 +1,112 @@
-{% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
-{% load widget_tweaks %}
-
-{% block page_title %}{% trans "Location detail" %} | {% endblock %}
-
-{% block location_panel %}
-
-<div class="col-md-4 detail">
-  <section>
-    <div class="page-title">
-      <h2 class="short"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</h2>
-      <div class="top-btn pull-right">
-        <!-- Action buttons -->
-        {% if is_allowed_edit_location %}
-          <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:edit' object.organization.slug object.slug location.id %}" title="{% trans 'Edit location' %}" aria-label="{% trans 'Edit location' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        {% endif %}
-        {% if is_allowed_delete_location %}
-          <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:delete' object.organization.slug object.slug location.id %}" title="{% trans 'Delete location' %}" aria-label="{% trans 'Delete location' %}"><span class="glyphicon glyphicon-trash"></span></a>
-        {% endif %}
-      </div>
+<section>
+  <div class="page-title">
+    <h2 class="short"><span>{% trans "Location" %} </span>{{ location.name }}</h2>
+    <div class="top-btn pull-right">
+      <!-- Action buttons -->
+      {% if is_allowed_edit_location %}
+        <a class="btn btn-default btn-action btn-sm" href="#/records/location/{{ location.id }}/edit" title="{% trans 'Edit location' %}" aria-label="{% trans 'Edit location' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+      {% endif %}
+      
+      {% if is_allowed_delete_location %}
+        <a class="btn btn-default btn-action btn-sm" href="#/records/location/{{ location.id }}/delete" title="{% trans 'Delete location' %}" aria-label="{% trans 'Delete location' %}"><span class="glyphicon glyphicon-trash"></span></a>
+      {% endif %}
     </div>
+  </div>
 
-    <ul class="nav nav-tabs" role="tablist">
-      <li role="presentation" class="active"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">{% trans "Overview" %}</a></li>
-      <li role="presentation"><a href="#relationships" aria-controls="relationships" role="tab" data-toggle="tab">{% trans "Relationships" %}</a></li>
-      <li role="presentation"><a  href="#resources" aria-controls="resources" role="tab" data-toggle="tab">{% trans "Resources" %}</a></li>
-    </ul>
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">{% trans "Overview" %}</a></li>
+    <li role="presentation"><a href="#relationships" aria-controls="relationships" role="tab" data-toggle="tab">{% trans "Relationships" %}</a></li>
+    <li role="presentation"><a  href="#resources" aria-controls="resources" role="tab" data-toggle="tab">{% trans "Resources" %}</a></li>
+  </ul>
 
-    <div class="tab-content">
-      <!-- Overview tab -->
-      <div role="tabpanel" class="tab-pane active" id="overview">
-        <table class="table table-location">
+  <div class="tab-content">
+    <!-- Overview tab -->
+    <div role="tabpanel" class="tab-pane active" id="overview">
+      <table class="table table-location">
+        <tbody>
+          <tr>
+            <td class="col-md-4"><label {{ type_labels|safe }}>{% trans "Type" %}</label></td>
+            <td class="col-md-8" {{ type_choice_labels|safe }}>{{ location.get_type_display }}</td>
+          </tr>
+          {% for attr in attributes %}
+          <tr>
+            <td><label {{ attr.2|safe }}>{{ attr.0 }}</label></td>
+            <td {{ attr.3|safe }}>{{ attr.1 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <!-- /overview tab -->
+
+    <!-- Relationship tab -->
+    <div role="tabpanel" class="tab-pane" id="relationships">
+      {% if relationships %}
+        <div class="top-btn pull-right top-add">
+          <a class="btn btn-primary btn-sm" href="#/records/location/{{ location.id }}/relationships/new">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          {% trans "Add" %}
+          </a>
+        </div>
+        <table class="table table-hover datatable" data-paging-type="simple">
+          <thead>
+            <tr>
+              <th>{% trans "Relationship" %}</th>
+              <th>{% trans "Party" %}</th>
+            </tr>
+          </thead>
           <tbody>
-            <tr>
-              <td class="col-md-4"><label {{ type_labels|safe }}>{% trans "Type" %}</label></td>
-              <td class="col-md-8" {{ type_choice_labels|safe }}>{{ location.get_type_display }}</td>
+            {% for rel in relationships %}
+            {% with '#/records/relationship/'|add:rel.id as relationship_url %}
+            <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
+              <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
+              <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
             </tr>
-            {% for attr in attributes %}
-            <tr>
-              <td><label {{ attr.2|safe }}>{{ attr.0 }}</label></td>
-              <td {{ attr.3|safe }}>{{ attr.1 }}</td>
-            </tr>
+            {% endwith %}
             {% endfor %}
           </tbody>
         </table>
-      </div>
-      <!-- /overview tab -->
-
-      <!-- Relationship tab -->
-      <div role="tabpanel" class="tab-pane" id="relationships">
-        {% if relationships %}
-          <div class="top-btn pull-right top-add">
-            <a class="btn btn-primary btn-sm" href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}">
+      {% else %}
+        <div>
+          <p>{% trans "This location does not have any relationships and is not connected to any parties. To add your first relationship, select the button below." %}</p>
+          <div class="btn-full">
+            <a class="btn btn-primary" href="#/records/location/{{location.id}}/relationships/new">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            {% trans "Add" %}
+            {% trans "Add relationship" %}
             </a>
           </div>
-          <table class="table table-hover datatable" data-paging-type="simple">
-            <thead>
-              <tr>
-                <th>{% trans "Relationship" %}</th>
-                <th>{% trans "Party" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for rel in relationships %}
-              {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
-              <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
-                <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
-                <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <div>
-            <p>{% trans "This location does not have any relationships and is not connected to any parties. To add your first relationship, select the button below." %}</p>
-            <div class="btn-full">
-              <a class="btn btn-primary" href="{% url 'locations:relationship_add' object.organization.slug object.slug location.id %}">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-              {% trans "Add relationship" %}
-              </a>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-      <!-- /relationship tab -->
+        </div>
+      {% endif %}
+    </div>
+    <!-- /relationship tab -->
 
-      <!-- Resources tab -->
-      <div role="tabpanel" class="tab-pane" id="resources">
-        {% if resource_list %}
-          <div class="top-btn pull-right top-add">
+    <!-- Resources tab -->
+    <div role="tabpanel" class="tab-pane" id="resources">
+      {% if resource_list %}
+        <div class="top-btn pull-right top-add">
+          {% if has_unattached_resources %}
+          <a class="btn btn-primary btn-sm" href="#/records/location/{{ location.id }}/resources/add">
+          {% else %}
+          <a class="btn btn-primary btn-sm" href="#/records/location/{{ location.id }}/resources/new">
+          {% endif %}
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
+        </div>
+        {% include 'resources/table_sm.html' %}
+      {% else %}
+        <div>
+          <p>{% trans "This location does not have any attached resources. To attach a resource, select the button below." %}</p>
+          <div class="btn-full">
             {% if has_unattached_resources %}
-            <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
+            <a class="btn btn-primary" href="#/records/location/{{ location.id }}/resources/add">
             {% else %}
-            <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
+            <a class="btn btn-primary" href="#/records/location/{{ location.id }}/resources/new">
             {% endif %}
               <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
           </div>
-          {% include 'resources/table_sm.html' %}
-        {% else %}
-          <div>
-            <p>{% trans "This location does not have any attached resources. To attach a resource, select the button below." %}</p>
-            <div class="btn-full">
-              {% if has_unattached_resources %}
-              <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
-              {% else %}
-              <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
-              {% endif %}
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
-            </div>
-          </div>
-        {% endif %}
-      </div>
-      <!-- /resources tab -->
+        </div>
+      {% endif %}
     </div>
-  </section>
-</div>
-
-{% endblock %}
+    <!-- /resources tab -->
+  </div>
+</section>

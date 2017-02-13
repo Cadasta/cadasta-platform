@@ -1,7 +1,7 @@
 function geoLocate(map) {
   return function(event) {
     map.locate({ setView: true });
-  }
+  };
 }
 
 function add_map_controls(map) {

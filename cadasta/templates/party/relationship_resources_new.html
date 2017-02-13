@@ -1,4 +1,3 @@
-{% extends "party/relationship_detail.html" %}
 {% load i18n %}
 {% load staticfiles %}
 
@@ -10,7 +9,5 @@
 {% endblock %}
 
 {% block modals %}
-{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id as cancel_url %}
-{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id as add_lib_url %}
-{% include 'resources/modal_upload.html' %}
+{% include 'resources/modal_upload.html' with add_lib_url="#/records/relationship/"|add:relationship.id|add:"/resources/add" cancel_url="#/records/relationship/"|add:relationship.id %}
 {% endblock %}

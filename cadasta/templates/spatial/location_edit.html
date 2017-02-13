@@ -1,4 +1,3 @@
-{% extends "spatial/location_detail.html" %}
 {% load i18n %}
 {% load widget_tweaks %}
 {% load staticfiles %}
@@ -26,7 +25,7 @@
 {% endif %}
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
-<script>
+<!-- <script>
   $(document).ready(function () {
     $(window).on('map:init', function(e) {
       if (e.detail) {
@@ -37,32 +36,9 @@
       var map = detail.map;
       var options = detail.options;
       switch_layer_controls(map, options);
-
-      var orgSlug = '{{ object.organization.slug }}';
-      var projectSlug = '{{ object.slug }}';
-      var url = '/api/v1/organizations/'
-              + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
-      add_spatial_resources(map, url);
-
-      add_map_controls(map);
-      renderFeatures(detail.map,
-                     '{% url "async:spatial:list" object.organization.slug object.slug %}?exclude={{location.id}}');
-
-      // Enable edit mode on map load and save the geometry on page save
-      setTimeout(enableMapEditMode, 500);
-      $('input.btn-primary')[0].addEventListener('click', saveOnMapEditMode);
-    });
-
-    $('.datepicker').datepicker({
-      yearRange: "c-200:c+200",
-      changeMonth: true,
-      changeYear: true,
-    });
-  });
-</script>
+</script> -->
 {% endblock %}
 
 {% block content %}
-  {% url 'locations:detail' object.organization.slug object.slug location.id as cancel_url %}
   {% include "spatial/location_form.html" %}
 {% endblock %}
