@@ -1,16 +1,11 @@
-{% extends "spatial/location_detail.html" %}
 {% load i18n %}
-
-{% block page_title %}{% trans "Delete location" %} | {% endblock %}
-
-{% block modals %}
-
-<form method="POST" class="modal-backdrop">
-  <div class="modal show" data-backdrop="true">
+  <form method="POST" class="modal-backdrop">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"  class="close">&times;</a>
+          <a href="{{ cancel_url }}"  class="close">
+            <span aria-hidden="true">&times;</span>
+          </a>
           <h3 class="modal-title">{% trans "Delete location" %}</h3>
         </div>
         <div class="modal-body">
@@ -18,14 +13,11 @@
         </div>
         <div class="modal-footer">
           <button type="submit" value="Confirm" class="btn btn-danger archive-final pull-right">{% trans "Yes, delete this location" %}</button>
-          <a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"  class="btn btn-link cancel">
+          <a href="{{ cancel_url }}"  class="btn btn-link cancel">
             {% trans "Cancel" %}
           </a>
           {% csrf_token %}
         </div>
       </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
-  </div><!-- /.modal -->
-</form>
-
-{% endblock %}
+  </form>

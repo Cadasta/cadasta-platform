@@ -1,138 +1,66 @@
-{% extends "organization/project_wrapper.html" %}
-
 {% load i18n %}
-<!-- {% load leaflet_tags %} -->
-{% load staticfiles %}
-
-{% block extra_head %}
-{% leaflet_css plugins="groupedlayercontrol"%}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
-{% endblock %}
-
-{% block extra_script %}
-{{ block.super }}
-{% leaflet_js plugins="groupedlayercontrol"%}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
-<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
-<script src="{% static 'js/map_utils.js' %}"></script>
-<script>
-  function project_map_init(map, options) {
-    var trans = {
-      open: "{% trans 'Open location' %}"
-    };
-
-    {% if project.extent %}
-    var projectExtent = {{ project.extent.geojson|safe }};
+<section>
+  <h2>{% trans "Project Overview" %}</h2>
+  <p>{{ object.description }}</p>
+  {% if object.urls.0 %}
+    <p><a href="{{ object.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ object.urls.0 }}</a></p>
+  {% endif %}
+  {% if object.contacts %}
+    <h4>{% trans "Contact information" %}</h4>
+    <dl class="contacts">
+    {% for contact in object.contacts %}
+      <dt>{{ contact.name }}</dt>
+      <dd class="clearfix">
+        {% if contact.email %}<a href="mailto:{{ contact.email }}"><span class="glyphicon glyphicon-envelope"></span>{{ contact.email }}</a>{% endif %}
+        {% if contact.tel %} <a href="tel:{{ contact.tel }}"><span class="glyphicon glyphicon-earphone"></span>{{ contact.tel }}</a>{% endif %}
+      </dd>
+    {% endfor %}
+    </dl>
+  {% endif %}
+  <div class="divider-thick"></div>
+    {% if user.is_authenticated %}
+      {% if has_content or not is_allowed_add_location %}
+      <h4>{% trans "Project stats" %}</h4>
+      <ul class="list-inline stats">
+        <li>
+          {% blocktrans count counter=num_locations %}
+          <div class="num">{{ counter }}</div> location
+          {% plural %}
+          <div class="num">{{ counter }}</div> locations
+          {% endblocktrans %}
+        </li>
+        <li>
+          {% blocktrans count counter=num_parties %}
+          <div class="num">{{ counter }}</div> party
+          {% plural %}
+          <div class="num">{{ counter }}</div> parties
+          {% endblocktrans %}
+        </li>
+        <li>
+          {% blocktrans count counter=num_resources %}
+          <div class="num">{{ counter }}</div> resource
+          {% plural %}
+          <div class="num">{{ counter }}</div> resources
+          {% endblocktrans %}
+        </li>
+      </ul>
     {% else %}
-    var projectExtent = null;
+      <!-- Starter text -->
+      <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
+      <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
     {% endif %}
-
-    options.project_slug = '{{ project.slug }}'
-    options.org_slug = '{{ project.organization.slug }}'
-    options.trans = trans
-
-    switch_layer_controls(map, options);
-
-    renderFeatures(map,
-                   '{% url "async:spatial:list" project.organization.slug project.slug %}',
-                   '{% url "async:spatial:tiled" project.organization.slug project.slug 0 0 0 %}',
-                   {projectExtent: projectExtent, trans: trans, fitBounds: 'project'});
-
-    var orgSlug = '{{ project.organization.slug }}';
-    var projectSlug = '{{ project.slug }}';
-    var url = '/api/v1/organizations/'
-            + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
-    add_spatial_resources(map, url);
-  }
-</script>
-{% endblock %}
-
-{% block page_title %}{% trans "Overview" %} | {% endblock %}
-{% block body-class %} map{% endblock %}
-{% block left-nav %}overview{% endblock %}
-
-{% block content %}
-
-<div class="col-md-12 content-single">
-  <div class="row">
-    <!-- Start overview map  -->
-    <div class="col-md-8 map">
-      {% leaflet_map "project-map" callback="project_map_init" %}
+    {% if is_allowed_add_location %}
+    <div class="btn-full">
+      <a class="btn btn-primary" href="#/records/location/new">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
+      </a>
     </div>
-    <!-- / end overview map -->
-    <!-- Overview detail  -->
-    <div class="col-md-4 detail">
-      <section>
-        <h2>{% trans "Project Overview" %}</h2>
-        <p>{{ object.description }}</p>
-        {% if object.urls.0 %}
-          <p><a href="{{ object.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ object.urls.0 }}</a></p>
-        {% endif %}
-        {% if object.contacts %}
-          <h4>{% trans "Contact information" %}</h4>
-          <dl class="contacts">
-          {% for contact in object.contacts %}
-            <dt>{{ contact.name }}</dt>
-            <dd class="clearfix">
-              {% if contact.email %}<a href="mailto:{{ contact.email }}"><span class="glyphicon glyphicon-envelope"></span>{{ contact.email }}</a>{% endif %}
-              {% if contact.tel %} <a href="tel:{{ contact.tel }}"><span class="glyphicon glyphicon-earphone"></span>{{ contact.tel }}</a>{% endif %}
-            </dd>
-          {% endfor %}
-          </dl>
-        {% endif %}
-        <div class="divider-thick"></div>
-          {% if user.is_authenticated %}
-            {% if has_content or not is_allowed_add_location %}
-            <h4>{% trans "Project stats" %}</h4>
-            <ul class="list-inline stats">
-              <li>
-                {% blocktrans count counter=num_locations %}
-                <div class="num">{{ counter }}</div> location
-                {% plural %}
-                <div class="num">{{ counter }}</div> locations
-                {% endblocktrans %}
-              </li>
-              <li>
-                {% blocktrans count counter=num_parties %}
-                <div class="num">{{ counter }}</div> party
-                {% plural %}
-                <div class="num">{{ counter }}</div> parties
-                {% endblocktrans %}
-              </li>
-              <li>
-                {% blocktrans count counter=num_resources %}
-                <div class="num">{{ counter }}</div> resource
-                {% plural %}
-                <div class="num">{{ counter }}</div> resources
-                {% endblocktrans %}
-              </li>
-            </ul>
-          {% else %}
-            <!-- Starter text -->
-            <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
-            <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
-          {% endif %}
-          {% if is_allowed_add_location %}
-          <div class="btn-full">
-            <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
-            </a>
-          </div>
-          {% endif %}
-        {% else %}
-          <div class="alert alert-info alert-full clearfix row" role="alert">
-            <div class="text-center">
-              <a href="{% url 'account_login' %}?next={{ request.path }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
-            </div>
-          </div>
-        {% endif %}
-      </section>
+    {% endif %}
+  {% else %}
+    <div class="alert alert-info alert-full clearfix row" role="alert">
+      <div class="text-center">
+        <a href="{% url 'account_login' %}?next={{ request.path }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
+      </div>
     </div>
-    <!-- / overview detail -->
-  </div>
-</div>
-
-{% endblock %}
+  {% endif %}
+</section>

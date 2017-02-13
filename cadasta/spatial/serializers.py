@@ -1,5 +1,4 @@
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
 from rest_framework import serializers
 from rest_framework_gis import serializers as geo_serializers
 
@@ -50,12 +49,13 @@ class SpatialUnitGeoJsonSerializer(geo_serializers.GeoFeatureModelSerializer):
         fields = ('id', 'type', 'url')
 
     def get_url(self, location):
-        project = location.project
-        return reverse(
-            'locations:detail',
-            kwargs={'organization': project.organization.slug,
-                    'project': project.slug,
-                    'location': location.id})
+        # project = location.project
+        return 'records/location/' + location.id
+        # return reverse(
+        #     'locations:detail',
+        #     kwargs={'organization': project.organization.slug,
+        #             'project': project.slug,
+        #             'location': location.id})
 
     def get_type(self, location):
         return location.name
