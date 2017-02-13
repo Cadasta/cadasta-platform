@@ -1,8 +1,11 @@
-{% extends "spatial/location_detail.html" %}
 {% load i18n %}
 {% load staticfiles %}
 
 {% block page_title %}{% trans "Upload new resource for location" %} | {% endblock %}
+
+{% block extra_script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+{% endblock %}
 
 {% block location_extra_script %}
   {{ form.media }}
@@ -10,7 +13,5 @@
 {% endblock %}
 
 {% block modals %}
-{% url 'locations:detail' object.organization.slug object.slug location.id as cancel_url %}
-{% url 'locations:resource_add' object.organization.slug object.slug location.id as add_lib_url %}
-{% include 'resources/modal_upload.html' with cancel_url_hash="#resources" %}
+{% include 'resources/modal_upload.html' %}
 {% endblock %}
