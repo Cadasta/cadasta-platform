@@ -1,0 +1,43 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+{% if get_current_language != "en-us" %}
+{% get_current_language as LANGUAGE_CODE %}
+<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
+{% endif %}
+<script src="{% static 'js/map_utils.js' %}"></script> -->
+<script>
+  $(document).ready(function () {
+    $(window).on('map:init', function(e) {
+      if (e.detail) {
+        var detail = e.detail;
+      } else {
+        var detail = e.originalEvent.detail;
+      }
+      var map = detail.map;
+      var options = detail.options;
+      switch_layer_controls(map, options);
+
+      var orgSlug = '{{ object.organization.slug }}';
+      var projectSlug = '{{ object.slug }}';
+      var url = '/api/v1/organizations/'
+              + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
+      add_spatial_resources(map, url);
+
+      add_map_controls(map);
+      renderFeatures(detail.map,
+                     '{% url "async:spatial:list" object.organization.slug object.slug %}?exclude={{location.id}}');
+
+      // Enable edit mode on map load and save the geometry on page save
+      setTimeout(enableMapEditMode, 500);
+      $('input.btn-primary')[0].addEventListener('click', saveOnMapEditMode);
+    });
+
+    $('.datepicker').datepicker({
+      yearRange: "c-200:c+200",
+      changeMonth: true,
+      changeYear: true,
+    });
+  });
+</script>
