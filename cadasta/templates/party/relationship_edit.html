@@ -1,37 +1,13 @@
-{% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
 {% load widget_tweaks %}
 {% load filters %}
 {% load staticfiles %}
 
-{% block extra_head %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
-{% endblock %}
-
-{% block extra_script %}
-{{ block.super }}
-{{ form.media }}
-<script src="{% static 'js/jquery-ui.min.js' %}"></script>
-<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
-<script>
-  $(document).ready(function () {
-    $('.datepicker').datepicker({
-      yearRange: "c-200:c+200",
-      changeMonth: true,
-      changeYear: true,
-    });
-  });
-</script>
-{% endblock %}
-
-
 {% block location_panel %}
 
-<div class="col-md-4 detail detail-edit">
-  <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</a></h2>
+<!-- <div class="col-md-4 detail detail-edit"> -->
+<section>
+  <h2><a href="#/records/location/{{location.id}}"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</a></h2>
   <hr class="border-btm">
   <h3>{% trans "Edit Relationship" %}</h3>
   <div class="panel panel-default">
@@ -60,10 +36,9 @@
       </div>
       <div class="panel-footer panel-buttons">
         <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-        <a href="{% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id %}" class="btn btn-default">{% trans "Cancel" %}</a>
+        <a href="#/records/relationship/{{ relationship.id }}" class="btn btn-default">{% trans "Cancel" %}</a>
       </div>
     </form>
   </div>
-</div>
-
+</section>
 {% endblock %}

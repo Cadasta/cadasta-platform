@@ -104,13 +104,13 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
     def get_absolute_url(self):
         return iri_to_uri(reverse(
-            'locations:detail',
+            'organization:project-dashboard',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
-                'location': self.id,
+                # 'location': self.id,
             },
-        ))
+        ) + '#/records/location/' + self.id)
 
     @cached_property
     def location_type_label(self):
