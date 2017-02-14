@@ -71,6 +71,8 @@ class PartiesDetail(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context['relationships'] = self.object.tenurerelationship_set.all(
+        ).select_related('spatial_unit').defer('spatial_unit__attributes')
 
         project = context['object']
         if project.current_questionnaire:
@@ -90,10 +92,31 @@ class PartiesDetail(LoginPermissionRequiredMixin,
             context['type_choice_labels'] = template_xlang_labels(
                 option.label_xlat)
 
+            tenure_type = Question.objects.get(
+                name='tenure_type',
+                questionnaire_id=project.current_questionnaire)
+            tenure_opts = QuestionOption.objects.filter(question=tenure_type)
+            tenure_opts = dict(tenure_opts.values_list('name', 'label_xlat'))
+
+            location_type = Question.objects.get(
+                name='location_type',
+                questionnaire_id=project.current_questionnaire)
+            location_opts = QuestionOption.objects.filter(
+                question=location_type)
+            location_opts = dict(
+                location_opts.values_list('name', 'label_xlat'))
+
+            for rel in context['relationships']:
+                rel.type_labels = template_xlang_labels(
+                    tenure_opts.get(rel.tenure_type_id))
+                rel.location_labels = template_xlang_labels(
+                    location_opts.get(rel.spatial_unit.type))
+
         return context
 
 
 class PartiesEdit(LoginPermissionRequiredMixin,
+                  JsonAttrsMixin,
                   mixins.PartyObjectMixin,
                   organization_mixins.ProjectAdminCheckMixin,
                   generic.UpdateView):
@@ -101,6 +124,7 @@ class PartiesEdit(LoginPermissionRequiredMixin,
     form_class = forms.PartyForm
     permission_required = update_permissions('party.update')
     permission_denied_message = error_messages.PARTY_UPDATE
+    attributes_field = 'attributes'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

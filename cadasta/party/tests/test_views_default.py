@@ -15,6 +15,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
+from spatial.tests.factories import SpatialUnitFactory
 from tutelary.models import Policy, assign_user_policies
 from questionnaires.tests import factories as q_factories
 
@@ -330,6 +331,54 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             name='IN',
             label={'en': 'Individual', 'de': 'Einzelperson'})
 
+        location_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+
+        tenure_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='LH',
+            label={'en': 'Leasehold', 'de': 'Miete'})
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='WR',
+            label={'en': 'Water rights', 'de': 'Wasserecht'})
+
+        lh_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            party=self.party,
+            spatial_unit=SpatialUnitFactory(project=self.project, type='PA'),
+            project=self.project)
+        q_factories.QuestionOptionFactory.create(
+            question=location_type_question,
+            name='PA',
+            label={'en': 'Parcel', 'de': 'Parzelle'})
+        lh_ten.type_labels = ('data-label-de="Miete" '
+                              'data-label-en="Leasehold"')
+        lh_ten.location_labels = ('data-label-de="Parzelle" '
+                                  'data-label-en="Parcel"')
+
+        wr_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            party=self.party,
+            spatial_unit=SpatialUnitFactory(project=self.project, type='BU'),
+            project=self.project)
+        q_factories.QuestionOptionFactory.create(
+            question=location_type_question,
+            name='BU',
+            label={'en': 'Building', 'de': 'Haus'})
+        wr_ten.type_labels = ('data-label-de="Wasserecht" '
+                              'data-label-en="Water rights"')
+        wr_ten.location_labels = ('data-label-de="Haus" '
+                                  'data-label-en="Building"')
+
         user = UserFactory.create()
         assign_policies(user)
         response = self.request(user=user)
@@ -342,7 +391,19 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             type_choice_labels=('data-label-de="Einzelperson" '
                                 'data-label-en="Individual"'),
             form_lang_default='en',
-            form_langs=[('en', 'English'), ('de', 'German')])
+            form_langs=[('en', 'English'), ('de', 'German')],
+            relationships=[wr_ten, lh_ten])
+
+    def test_get_with_authorized_user_including_relationships(self):
+        TenureRelationshipFactory.create_batch(2,
+                                               party=self.party,
+                                               project=self.project)
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            relationships=self.party.tenurerelationship_set.all())
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -401,7 +462,8 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'party': self.party,
                 'form': forms.PartyForm(instance=self.party,
-                                        project=self.project)}
+                                        project=self.project),
+                'attributes': (('Test field', 'test'), )}
 
     def setup_url_kwargs(self):
         return {
@@ -726,7 +788,7 @@ class PartyResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert response.location == self.expected_success_url
+        assert response.location == self.expected_success_url + '#resources'
 
         party_resources = self.party.resources.all()
         assert len(party_resources) == 2
@@ -851,7 +913,7 @@ class PartyResourcesNewTest(ViewTestCase, UserTestCase, FileStorageTestCase,
         assign_policies(user)
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
-        assert response.location == self.expected_success_url
+        assert response.location == self.expected_success_url + '#resources'
 
         assert self.party.resources.count() == 1
 

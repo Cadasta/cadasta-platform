@@ -73,7 +73,7 @@ class PartyResourceMixin(ResourceViewMixin, PartyObjectMixin):
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['party'] = self.get_object().id
-        return reverse('parties:detail', kwargs=kwargs)
+        return reverse('parties:detail', kwargs=kwargs) + '#resources'
 
     def get_party(self):
         if not hasattr(self, 'party_object'):
