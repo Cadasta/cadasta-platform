@@ -1,28 +1,40 @@
-import requests
 import json
+import os
+import requests
+import subprocess
+import time
 
 from django.conf import settings
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
-
+from django.views.generic.base import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from tutelary.mixins import APIPermissionRequiredMixin
-from jsonattrs.models import Schema
+from urllib.parse import quote as url_quote
 
+from jsonattrs.models import Schema
+from tutelary import mixins as tmixins
+
+from organization import messages as org_messages
 from organization.views.mixins import ProjectMixin
 from spatial.models import SpatialUnit
 from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from resources.models import Resource
+from ..export.all import AllExporter
+from ..export.resource import ResourceExporter
+from ..export.shape import ShapeExporter
+from ..export.xls import XLSExporter
 
-api = settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT
+api_url = (
+    settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT)
 spatial_type_choices = {c[0]: c[1] for c in SPATIAL_TYPE_CHOICES}
 party_type_choices = {c[0]: c[1] for c in Party.TYPE_CHOICES}
 
 
-class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
+class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
 
     permission_required = 'project.view_private'
 
@@ -91,7 +103,7 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
             'size': page_size,
             'sort': {'_score': {'order': 'desc'}},
         }
-        r = requests.post('{}/project-{}/_search/'.format(api, project_id),
+        r = requests.post('{}/project-{}/_search/'.format(api_url, project_id),
                           data=json.dumps(body, sort_keys=True),
                           headers={'content-type': 'application/json'})
         if r.status_code == 200:
@@ -102,7 +114,7 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
     def query_es_timestamp(self, project_id):
         """Queries the ES API project type to get the index timestamp."""
         r = requests.get(
-            '{}/project-{}/project/_search/?q=*'.format(api, project_id))
+            '{}/project-{}/project/_search/?q=*'.format(api_url, project_id))
         if r.status_code == 200:
             return r.json()['hits']['hits'][0]['_source'].get('@timestamp')
         else:
@@ -210,3 +222,67 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
         """Formats the search result into an HTML snippet."""
         return render_to_string(
             'search/search_result_item.html', {'result': result})
+
+
+class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
+
+    permission_required = 'project.download'
+    permission_denied_message = org_messages.PROJ_DOWNLOAD
+    raise_exception = True
+
+    exporters = {
+        'shp': ShapeExporter,
+        'xls': XLSExporter,
+        'res': ResourceExporter,
+        'all': AllExporter,
+    }
+
+    def get_perms_objects(self):
+        return [self.get_project()]
+
+    def post(self, request, *args, **kwargs):
+        query = request.POST.get('q')
+        export_format = request.POST.get('type')
+        if not query or export_format not in self.exporters.keys():
+            return HttpResponseBadRequest()
+
+        project = self.get_project()
+        es_dump_path = self.query_es(project.id, request.user.id, query)
+        exporter = self.exporters[export_format](project)
+        path, mime_type = exporter.make_download(es_dump_path)
+
+        ext = os.path.splitext(path)[1]
+        response = HttpResponse(open(path, 'rb'), content_type=mime_type)
+        response['Content-Disposition'] = ('attachment; filename=' +
+                                           project.slug + ext)
+        return response
+
+    def query_es(self, project_id, user_id, query):
+        """Run a curl command to ES and dump the results into a temp file."""
+
+        query_dsl = {
+            'query': {
+                'simple_query_string': {
+                    'default_operator': 'and',
+                    'query': query,
+                }
+            },
+            'from': 0,
+            'size': settings.ES_MAX_RESULTS,
+            'sort': {'_score': {'order': 'desc'}},
+        }
+        query_dsl_param = url_quote(json.dumps(query_dsl), safe='')
+        t = round(time.time() * 1000)
+        es_dump_path = os.path.join(
+            settings.MEDIA_ROOT,
+            'temp/{}-{}-{}.esjson'.format(project_id, user_id, t)
+        )
+        subprocess.run([
+            'curl',
+            '-o', es_dump_path,
+            '-XGET',
+            '{}/project-{}/_data/?format=json&source={}'.format(
+                api_url, project_id, query_dsl_param
+            )
+        ])
+        return es_dump_path

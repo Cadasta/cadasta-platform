@@ -1,16 +1,29 @@
+import csv
+import io
 import json
+import os
+import pytest
+import shutil
 
-from unittest.mock import patch
 from django.conf import settings
-from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.template.loader import render_to_string
-from rest_framework.exceptions import PermissionDenied
+from django.test import TestCase
+from openpyxl import load_workbook
+from rest_framework.exceptions import PermissionDenied as APIPermissionDenied
+from unittest.mock import patch
+from urllib.parse import quote as url_quote
+from zipfile import ZipFile
+
 from tutelary.models import Policy, assign_user_policies
-from skivvy import APITestCase
+from skivvy import ViewTestCase, APITestCase
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
+from core.tests.utils.files import make_dirs  # noqa
 from organization.tests.factories import ProjectFactory
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
@@ -18,10 +31,10 @@ from party.models import Party, TenureRelationship
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from resources.models import Resource
 from resources.tests.factories import ResourceFactory
+from resources.tests.utils import clear_temp  # noqa
+from resources.utils.io import ensure_dirs
 from questionnaires.managers import create_attrs_schema
-from questionnaires.tests.attr_schemas import (individual_party_xform_group,
-                                               default_party_xform_group,
-                                               tenure_relationship_xform_group)
+from questionnaires.tests import attr_schemas
 from questionnaires.tests.factories import QuestionnaireFactory
 from ..views import async
 from .fake_results import get_fake_es_api_results
@@ -29,6 +42,7 @@ from .fake_results import get_fake_es_api_results
 
 api_url = (
     settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT)
+test_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
 
 
 def assign_policies(user):
@@ -37,7 +51,7 @@ def assign_policies(user):
             {
                 'effect': 'allow',
                 'object': ['project/*/*'],
-                'action': ['project.view_private']
+                'action': ['project.view_private', 'project.download'],
             },
         ],
     }
@@ -61,22 +75,27 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
         self.project = ProjectFactory.create(slug='test-project')
-
         QuestionnaireFactory.create(project=self.project)
+
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=self.project, dict=individual_party_xform_group,
-            content_type=content_type, errors=[])
+            project=self.project,
+            dict=attr_schemas.individual_party_xform_group,
+            content_type=content_type,
+        )
         create_attrs_schema(
-            project=self.project, dict=default_party_xform_group,
-            content_type=content_type, errors=[])
-
+            project=self.project,
+            dict=attr_schemas.default_party_xform_group,
+            content_type=content_type,
+        )
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
-            project=self.project, dict=tenure_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=self.project,
+            dict=attr_schemas.tenure_relationship_xform_group,
+            content_type=content_type,
+        )
 
         self.su = SpatialUnitFactory.create(project=self.project, type='CB')
         self.party = PartyFactory.create(
@@ -360,7 +379,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
     def test_post_with_unauthorized_user(self, mock_post, mock_get):
         response = self.request(method='POST')
         assert response.status_code == 403
-        assert response.content['detail'] == PermissionDenied.default_detail
+        assert response.content['detail'] == APIPermissionDenied.default_detail
         mock_post.assert_not_called()
         mock_get.assert_not_called()
 
@@ -564,3 +583,238 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         expected = render_to_string('search/search_result_item.html',
                                     context={'result': augmented_result})
         assert self.view_class().htmlize_result(augmented_result) == expected
+
+
+def mock_subprocess_run_curl(*args):
+    assert args[0][0] == 'curl'
+    ensure_dirs()
+    original_es_dump_path = os.path.join(
+        os.path.dirname(settings.BASE_DIR),
+        'search/tests/files/test_es_dump_basic.esjson'
+    )
+    shutil.copy(original_es_dump_path, args[0][2])
+
+
+@pytest.mark.usefixtures('clear_temp')
+@pytest.mark.usefixtures('make_dirs')
+class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
+
+    view_class = async.SearchExport
+    post_data = {
+        'q': 'searching',
+        'type': 'all',
+    }
+
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.project = ProjectFactory.create(slug='test-project')
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+        }
+
+    # Note: The following 4 tests, which correspond to the 4 export formats,
+    # skip django-skivvy in order to test that the downloaded file contents
+    # was generated by the correct exporter class
+
+    @patch('subprocess.run', new=mock_subprocess_run_curl)
+    def test_post_shp_type(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse('async:search:export', kwargs=self.setup_url_kwargs()),
+            {'q': 'searching', 'type': 'shp'},
+        )
+        assert response.status_code == 200
+        assert (response.__getitem__('content-disposition') ==
+                'attachment; filename={}.zip'.format(self.project.slug))
+        assert response.__getitem__('content-type') == 'application/zip'
+
+        # Dump content to a file
+        zip_path = os.path.join(test_dir, 'tmp.zip')
+        f = open(zip_path, 'wb')
+        f.write(response.content)
+        f.close()
+
+        # Sanity content checks (full checking is done in text_export.py)
+        with ZipFile(zip_path) as myzip:
+            files = myzip.namelist()
+            assert len(files) == 8
+            assert 'README.txt' in files
+            assert 'locations.csv' in files
+            assert 'point.shp' in files
+
+            with myzip.open('locations.csv') as csv_file:
+                rows = list(csv.reader(io.TextIOWrapper(csv_file)))
+                assert rows[0][0] == 'id'
+                assert rows[1][0] == 'ID0'
+
+    @patch('subprocess.run', new=mock_subprocess_run_curl)
+    def test_post_xls_type(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse('async:search:export', kwargs=self.setup_url_kwargs()),
+            {'q': 'searching', 'type': 'xls'},
+        )
+        assert response.status_code == 200
+        assert (response.__getitem__('content-disposition') ==
+                'attachment; filename={}.xlsx'.format(self.project.slug))
+        assert (response.__getitem__('content-type') ==
+                'application/vnd.openxmlformats-officedocument'
+                '.spreadsheetml.sheet')
+
+        # Dump content to a file
+        xls_path = os.path.join(test_dir, 'tmp.xlsx')
+        f = open(xls_path, 'wb')
+        f.write(response.content)
+        f.close()
+
+        # Sanity content checks (full checking is done in text_export.py)
+        wb = load_workbook(xls_path)
+        assert wb.get_sheet_names() == [
+            'locations', 'parties', 'relationships']
+        assert wb['locations']['B1'].value == 'geometry.ewkt'
+        assert wb['locations']['D1'].value is None
+        assert wb['locations']['B2'].value == 'SRID=4326;POINT (1 1)'
+        assert wb['locations']['D2'].value is None
+
+    @patch('subprocess.run', new=mock_subprocess_run_curl)
+    def test_post_res_type(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse('async:search:export', kwargs=self.setup_url_kwargs()),
+            {'q': 'searching', 'type': 'res'},
+        )
+        assert response.status_code == 200
+        assert (response.__getitem__('content-disposition') ==
+                'attachment; filename={}.zip'.format(self.project.slug))
+        assert response.__getitem__('content-type') == 'application/zip'
+
+        # Dump content to a file
+        zip_path = os.path.join(test_dir, 'tmp.zip')
+        f = open(zip_path, 'wb')
+        f.write(response.content)
+        f.close()
+
+        # Sanity content checks (full checking is done in text_export.py)
+        with ZipFile(zip_path) as myzip:
+            files = myzip.namelist()
+            assert len(files) == 2
+            assert 'resources.xlsx' in files
+            assert 'resources/baby_goat.jpeg' in files
+
+            myzip.extract('resources.xlsx', test_dir)
+            wb = load_workbook(os.path.join(test_dir, 'resources.xlsx'))
+            assert wb.get_sheet_names() == ['resources']
+            assert wb['resources']['G1'].value == 'relationships'
+            assert wb['resources']['A2'].value == 'ID3'
+            assert wb['resources']['E2'].value is None
+            assert wb['resources']['F2'].value is None
+            assert wb['resources']['G2'].value is None
+
+    @patch('subprocess.run', new=mock_subprocess_run_curl)
+    def test_post_all_type(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse('async:search:export', kwargs=self.setup_url_kwargs()),
+            {'q': 'searching', 'type': 'all'},
+        )
+        assert response.status_code == 200
+        assert (response.__getitem__('content-disposition') ==
+                'attachment; filename={}.zip'.format(self.project.slug))
+        assert response.__getitem__('content-type') == 'application/zip'
+
+        # Dump content to a file
+        zip_path = os.path.join(test_dir, 'tmp.zip')
+        f = open(zip_path, 'wb')
+        f.write(response.content)
+        f.close()
+
+        # Sanity content checks (full checking is done in text_export.py)
+        with ZipFile(zip_path) as myzip:
+            files = myzip.namelist()
+            assert len(files) == 8
+            assert 'data.xlsx' in files
+            assert 'resources.xlsx' in files
+            assert 'resources/baby_goat.jpeg' in files
+            assert 'shape_files/README.txt' in files
+            assert 'shape_files/point.shp' in files
+
+            myzip.extract('resources.xlsx', test_dir)
+            wb = load_workbook(os.path.join(test_dir, 'resources.xlsx'))
+            assert wb.get_sheet_names() == ['resources']
+            assert wb['resources']['G1'].value == 'relationships'
+            assert wb['resources']['A2'].value == 'ID3'
+            assert wb['resources']['E2'].value is None
+            assert wb['resources']['F2'].value is None
+            assert wb['resources']['G2'].value is None
+
+            myzip.extract('data.xlsx', test_dir)
+            wb = load_workbook(os.path.join(test_dir, 'data.xlsx'))
+            assert wb.get_sheet_names() == [
+                'locations', 'parties', 'relationships']
+            assert wb['locations']['B1'].value == 'geometry.ewkt'
+            assert wb['locations']['D1'].value is None
+            assert wb['locations']['B2'].value == 'SRID=4326;POINT (1 1)'
+            assert wb['locations']['D2'].value is None
+
+    def test_post_with_missing_query(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data={'q': None})
+        assert response.status_code == 400
+
+    def test_post_with_invalid_type(self):
+        response = self.request(user=self.user,
+                                method='POST',
+                                post_data={'type': 'nonsense'})
+        assert response.status_code == 400
+
+    def test_post_with_nonexistent_org(self):
+        with pytest.raises(Http404):
+            self.request(user=self.user,
+                         method='POST',
+                         url_kwargs={'organization': 'evil-corp'})
+
+    def test_post_with_nonexistent_project(self):
+        with pytest.raises(Http404):
+            self.request(user=self.user,
+                         method='POST',
+                         url_kwargs={'project': 'world-domination'})
+
+    def test_post_with_unauthorized_user(self):
+        with pytest.raises(PermissionDenied):
+            self.request(method='POST')
+
+    @patch('subprocess.run')
+    def test_query_es(self, mock_run):
+        es_dump_path = self.view_class().query_es(
+            'projectid', 'userid', 'query')
+        expected_path_begin = os.path.join(
+            settings.MEDIA_ROOT,
+            'temp/projectid-userid-'
+        )
+        query_dsl = {
+            'query': {
+                'simple_query_string': {
+                    'default_operator': 'and',
+                    'query': 'query',
+                }
+            },
+            'from': 0,
+            'size': settings.ES_MAX_RESULTS,
+            'sort': {'_score': {'order': 'desc'}},
+        }
+        query_dsl_param = url_quote(json.dumps(query_dsl), safe='')
+        assert es_dump_path[0:len(expected_path_begin)] == expected_path_begin
+        assert '.esjson' in es_dump_path
+        mock_run.assert_called_once_with([
+            'curl',
+            '-o', es_dump_path,
+            '-XGET',
+            '{}/project-projectid/_data/?format=json&source={}'.format(
+                api_url, query_dsl_param
+            )
+        ])

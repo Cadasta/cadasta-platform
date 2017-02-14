@@ -6,7 +6,6 @@
 {% block left-nav %}search{% endblock %}
 
 {% block content %}
-
 <div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
@@ -17,7 +16,8 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="row">
-            <form action="#" id="search-form" class="inline" data-search-async-url="{% url 'async:search:search' object.organization.slug object.slug %}">
+            <form action="#" id="search-form" class="inline">
+              {% csrf_token %}
               <div class="form-group col-md-9">
                 <label class="control-label sr-only">{% trans "Search within project for" %}</label>
                 <input type="search" id="search-input" class="form-control input-lg pull-left" value="{{ search_query }}">
@@ -38,7 +38,6 @@
                   {% endblocktrans%}
                 </div>
               </div>
-              {% csrf_token %}
             </form>
             <div id="last-update" class="hidden col-md-3 text-right">
               <p class="small help-block">{% trans "Last updated on" %} <span id="index-timestamp"></span></p>
@@ -60,6 +59,11 @@
               </ul>
             </div>
             <div id="results" class="hidden col-md-9">
+              {% if is_allowed_download %}
+              <a class="btn btn-default btn-action btn-sm pull-right" href="#search_export_modal" data-toggle="modal">
+                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {% trans "Export" %}
+              </a>
+              {% endif %}
               <h4>
                 {% blocktrans %}
                 Showing <span id="total-results"></span> result(s) for <strong><span id="query-string"></span></strong>
@@ -102,7 +106,7 @@ function performSearch(query, updateDocumentUrl) {
     ordering: false,
     serverSide: true,
     ajax: {
-      url: $('#search-form')[0].dataset.searchAsyncUrl,
+      url: '{% url "async:search:search" object.organization.slug object.slug %}',
       method: 'POST',
       headers: {'X-CSRFToken': $('#search-form input[name="csrfmiddlewaretoken"]')[0].value},
       data: {q: query},
@@ -185,6 +189,7 @@ window.addEventListener('load', function () {
   if (query) {
     $('#search-input')[0].value = query;
     $('#search-clear').addClass('search-clear-show');
+    $('#search_export_form_query')[0].value = query;
     performSearch(query, false);
   } else {
     $('#search-clear').removeClass('search-clear-show');
@@ -194,6 +199,7 @@ window.addEventListener('load', function () {
   // Perform search when the search form is submitted
   $('#search-form').bind('submit', function(e) {
     var query = $('#search-input')[0].value;
+    $('#search_export_form_query')[0].value = query;
     performSearch(query, true);
     return false;
   });
@@ -219,5 +225,64 @@ window.addEventListener('load', function () {
 });
 
 </script>
+{% endblock %}
 
+{% block form_modal %}
+<div class="modal fade" id="search_export_modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="search_export_form" action="{% url 'async:search:export' object.organization.slug object.slug %}" method="POST">
+        {% csrf_token %}
+        <input id="search_export_form_query" type="hidden" name="q" value="">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h3 class="modal-title">{% trans "Export search results" %}</h3>
+        </div>
+        <div class="modal-body">
+          <p>{% trans "Select your desired file format" %}</p>
+          <ul class="list-unstyled spacing-lg">
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_shp" value="shp">
+                {% trans "SHP" %}
+                <small>{% trans "A zip file containing shape files for result locations, relationships, and parties." %}</small>
+              </label>
+            </li>
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_xls" value="xls">
+                {% trans "XLS" %}
+                <small>{% trans "A single XLS spreadsheet containing result locations, relationships, and parties." %}</small>
+              </label>
+            </li>
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_res" value="res">
+                {% trans "Resources" %}
+                <small>{% trans "A zip file containing result resources." %}</small>
+              </label>
+            </li>
+            <li class="radio">
+              <label>
+                <input type="radio" name="type" id="data_all" value="all" checked>
+                {% trans "All data" %}
+                <small>{% trans "A zip file containing result data XLS and SHP files and resources." %}</small>
+              </label>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary pull-right" role="button">
+            {% trans "Export" %}
+          </button>
+          <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+            {% trans "Cancel" %}
+          </button>
+      </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 {% endblock %}
