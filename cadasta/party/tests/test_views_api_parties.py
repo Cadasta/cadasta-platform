@@ -214,6 +214,36 @@ class PartyDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.party.refresh_from_db()
         assert self.party.name == response.content['name']
 
+    def test_PATCH_party_with_anonymous_user(self):
+        data = {'name': 'Test Party Patched'}
+        response = self.request(method='PATCH', post_data=data)
+        assert response.status_code == 403
+        self.party.refresh_from_db()
+        assert self.party.name != data['name']
+
+    def test_PATCH_party_with_unauthorized_user(self):
+        data = {'name': 'Test Party Patched'}
+        user = UserFactory.create()
+        response = self.request(method='PATCH', post_data=data, user=user)
+        assert response.status_code == 403
+        self.party.refresh_from_db()
+        assert self.party.name != data['name']
+
+    def test_PUT_party_with_anonymous_user(self):
+        data = {'name': 'Test Party Patched'}
+        response = self.request(method='PUT', post_data=data)
+        assert response.status_code == 403
+        self.party.refresh_from_db()
+        assert self.party.name != data['name']
+
+    def test_PUT_party_with_unauthorized_user(self):
+        data = {'name': 'Test Party Patched'}
+        user = UserFactory.create()
+        response = self.request(method='PUT', post_data=data, user=user)
+        assert response.status_code == 403
+        self.party.refresh_from_db()
+        assert self.party.name != data['name']
+
     def test_update_party_in_archived_project(self):
         self.prj.archived = True
         self.prj.save()
@@ -473,8 +503,26 @@ class PartyResourceUpdateAPITest(APITestCase, UserTestCase, TestCase):
         self.resource.refresh_from_db()
         assert self.resource.name == self.post_data['name']
 
-    def test_update_resource_with_unauthorized_user(self):
+    def test_PATCH_resource_with_unauthorized_user(self):
         response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PATCH_resource_with_anonymous_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_anonymous_user(self):
+        response = self.request(method='PUT')
         assert response.status_code == 403
         self.resource.refresh_from_db()
         assert self.resource.name != self.post_data['name']

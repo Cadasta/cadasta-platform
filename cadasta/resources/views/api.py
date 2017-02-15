@@ -49,6 +49,7 @@ class ProjectResourcesDetail(APIPermissionRequiredMixin,
     lookup_url_kwarg = 'resource'
     permission_required = {
         'GET': 'resource.view',
+        'PUT': patch_actions,
         'PATCH': patch_actions
     }
     use_resource_library_queryset = True
@@ -77,5 +78,6 @@ class ProjectSpatialResourcesDetail(APIPermissionRequiredMixin,
     lookup_url_kwarg = 'resource'
     permission_required = {
         'GET': 'resource.view',
+        'PUT': patch_actions,
         'PATCH': patch_actions,
     }

@@ -47,6 +47,7 @@ class PartyDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'party.view',
+        'PUT': update_permissions('party.update'),
         'PATCH': update_permissions('party.update'),
         'DELETE': update_permissions('party.delete'),
     }
@@ -87,6 +88,7 @@ class PartyResourceDetail(APIPermissionRequiredMixin,
     serializer_class = ResourceSerializer
     permission_required = {
         'GET': 'party.resources.view',
+        'PUT': patch_actions,
         'PATCH': patch_actions,
         'DELETE': patch_actions,
     }
@@ -176,6 +178,7 @@ class PartyRelationshipDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'party_rel.view',
+        'PUT': update_permissions('party_rel.update'),
         'PATCH': update_permissions('party_rel.update'),
         'DELETE': update_permissions('party_rel.delete')
     }
@@ -210,6 +213,7 @@ class TenureRelationshipDetail(APIPermissionRequiredMixin,
     lookup_field = 'id'
     permission_required = {
         'GET': 'tenure_rel.view',
+        'PUT': update_permissions('tenure_rel.update'),
         'PATCH': update_permissions('tenure_rel.update'),
         'DELETE': update_permissions('tenure_rel.delete')
     }
@@ -261,6 +265,7 @@ class TenureRelationshipResourceDetail(APIPermissionRequiredMixin,
     serializer_class = ResourceSerializer
     permission_required = {
         'GET': 'tenure_rel.resources.view',
+        'PUT': patch_actions,
         'PATCH': patch_actions,
         'DELETE': patch_actions,
     }

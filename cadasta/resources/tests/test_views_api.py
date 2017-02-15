@@ -321,8 +321,26 @@ class ProjectResourcesDetailTest(APITestCase, UserTestCase, TestCase):
         self.resource.refresh_from_db()
         assert self.resource.name == self.post_data['name']
 
-    def test_update_resource_with_unauthorized_user(self):
+    def test_PATCH_resource_with_unauthorized_user(self):
         response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PATCH_resource_with_anonymous_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_anonymous_user(self):
+        response = self.request(method='PUT')
         assert response.status_code == 403
         self.resource.refresh_from_db()
         assert self.resource.name != self.post_data['name']
@@ -571,8 +589,26 @@ class ProjectSpatialResourcesDetailTest(APITestCase, UserTestCase,
         self.resource.refresh_from_db()
         assert self.resource.name == self.post_data['name']
 
-    def test_update_resource_with_unauthorized_user(self):
+    def test_PATCH_resource_with_unauthorized_user(self):
         response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PATCH_resource_with_anonymous_user(self):
+        response = self.request(method='PATCH')
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
+        assert response.status_code == 403
+        self.resource.refresh_from_db()
+        assert self.resource.name != self.post_data['name']
+
+    def test_PUT_resource_with_anonymous_user(self):
+        response = self.request(method='PUT')
         assert response.status_code == 403
         self.resource.refresh_from_db()
         assert self.resource.name != self.post_data['name']

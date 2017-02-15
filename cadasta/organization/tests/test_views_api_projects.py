@@ -205,10 +205,42 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
                                        user=self.test_user)
         assert role.role == 'PM'
 
-    def test_update_user_with_unauthorized_user(self):
+    def test_PATCH_user_with_unauthorized_user(self):
+        user = UserFactory.create()
+        self.test_user = UserFactory.create()
+        self.project = ProjectFactory.create(add_users=[self.test_user])
+        response = self.request(method='PATCH', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        role = ProjectRole.objects.get(project=self.project,
+                                       user=self.test_user)
+        assert role.role == 'PU'
+
+    def test_PATCH_user_with_anonymous_user(self):
         self.test_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=[self.test_user])
         response = self.request(method='PATCH')
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        role = ProjectRole.objects.get(project=self.project,
+                                       user=self.test_user)
+        assert role.role == 'PU'
+
+    def test_PUT_user_with_unauthorized_user(self):
+        user = UserFactory.create()
+        self.test_user = UserFactory.create()
+        self.project = ProjectFactory.create(add_users=[self.test_user])
+        response = self.request(method='PUT', user=user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+        role = ProjectRole.objects.get(project=self.project,
+                                       user=self.test_user)
+        assert role.role == 'PU'
+
+    def test_PUT_user_with_anonymous_user(self):
+        self.test_user = UserFactory.create()
+        self.project = ProjectFactory.create(add_users=[self.test_user])
+        response = self.request(method='PUT')
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
         role = ProjectRole.objects.get(project=self.project,
@@ -736,8 +768,26 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.project.refresh_from_db()
         assert self.project.name == 'OPDP'
 
-    def test_update_with_unauthorized_user(self):
+    def test_PATCH_with_anonymous_user(self):
         response = self.request(method='PATCH')
+        assert response.status_code == 403
+        self.project.refresh_from_db()
+        assert self.project.name == 'Test Project'
+
+    def test_PATCH_with_unauthorized_user(self):
+        response = self.request(method='PATCH', user=UserFactory.create())
+        assert response.status_code == 403
+        self.project.refresh_from_db()
+        assert self.project.name == 'Test Project'
+
+    def test_PUT_with_anonymous_user(self):
+        response = self.request(method='PUT')
+        assert response.status_code == 403
+        self.project.refresh_from_db()
+        assert self.project.name == 'Test Project'
+
+    def test_PUT_with_unauthorized_user(self):
+        response = self.request(method='PUT', user=UserFactory.create())
         assert response.status_code == 403
         self.project.refresh_from_db()
         assert self.project.name == 'Test Project'
