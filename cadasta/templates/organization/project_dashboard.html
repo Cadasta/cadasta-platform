@@ -24,19 +24,21 @@
       open: "{% trans 'Open location' %}"
     };
 
-    add_map_controls(map);
-
-    switch_layer_controls(map, options);
-
     {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};
     {% else %}
     var projectExtent = null;
     {% endif %}
 
+    options.project_slug = '{{ project.slug }}'
+    options.org_slug = '{{ project.organization.slug }}'
+    options.trans = trans
+
+    switch_layer_controls(map, options);
+
     renderFeatures(map,
-                   '{% url "async:spatial:list" project.organization.slug project.slug %}',
-                   {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
+                   '{% url "async:spatial:tiled" project.organization.slug project.slug 0 0 0 %}',
+                   {projectExtent: projectExtent, trans: trans, fitBounds: 'project'});
 
     var orgSlug = '{{ project.organization.slug }}';
     var projectSlug = '{{ project.slug }}';

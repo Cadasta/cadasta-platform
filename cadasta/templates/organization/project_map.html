@@ -13,13 +13,16 @@
 
 {% block extra_script %}
 <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-tilelayer-geojson/1.0.4/TileLayer.GeoJSON.min.js"></script> -->
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-tilelayer-geojson/1.0.4/TileLayer.GeoJSON.min.js.map"></script> -->
 <script src="{% static '/js/leaflet.groupedlayercontrol.min.js' %}"></script>
 <!-- <script src="{% static 'js/leaflet.markercluster.js' %}"></script> -->
-<!-- <script src="{% static 'js/L.Map.Deflate.js' %}"></script> -->
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/smap/index.js' %}"></script>
 
 <script>
-  var url = '{% url "async:spatial:list" project.organization.slug project.slug %}'
+  var url = '/async/organizations/' +
+      '{{ project.organization.slug }}/projects/{{ project.slug }}/spatial/tiled/{z}/{x}/{y}'
   var fetch_spatial_resources = '/api/v1/organizations/' +
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatialresources/';
   var trans = {open: "{% trans 'Open location' %}"};
@@ -29,11 +32,13 @@
   {% else %}
     var projectExtent = null;
   {% endif %}
-
   var options = {
     projectExtent: projectExtent,
     trans: trans,
-    fitBounds: '{{ boundary }}'
+    // SHOULD BE USED: fitBounds: '{{ boundary }}',
+    fitBounds: 'project',
+    project_slug: '{{ project.slug }}',
+    org_slug: '{{ project.organization.slug }}'
   }
 
   var layers = {{ leaflet_tiles|safe }}
