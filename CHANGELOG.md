@@ -1,5 +1,76 @@
 # Change Log
 
+## [v1.6.0](https://github.com/Cadasta/cadasta-platform/tree/v1.6.0) (2017-02-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.6.0-alpha.4...v1.6.0)
+
+## [v1.6.0-alpha.4](https://github.com/Cadasta/cadasta-platform/tree/v1.6.0-alpha.4) (2017-02-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.6.0-alpha.3...v1.6.0-alpha.4)
+
+**Fixed bugs:**
+
+- API: unauthorizated users can edit organization [\#1104](https://github.com/Cadasta/cadasta-platform/issues/1104)
+
+**Merged pull requests:**
+
+- Fix \#1104 -- Add PUT actions to API views [\#1109](https://github.com/Cadasta/cadasta-platform/pull/1109) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.6.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.6.0-alpha.3) (2017-02-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.6.0-alpha.2...v1.6.0-alpha.3)
+
+**Merged pull requests:**
+
+- Simplified search text strings, adjusted img left margin [\#1112](https://github.com/Cadasta/cadasta-platform/pull/1112) ([clash99](https://github.com/clash99))
+- Update readme [\#1101](https://github.com/Cadasta/cadasta-platform/pull/1101) ([amplifi](https://github.com/amplifi))
+
+## [v1.6.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.6.0-alpha.2) (2017-02-09)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.6.0-alpha.1...v1.6.0-alpha.2)
+
+**Fixed bugs:**
+
+- Review the use of hard-coded jsonattrs schema selectors in platform code [\#936](https://github.com/Cadasta/cadasta-platform/issues/936)
+
+**Closed issues:**
+
+- MSPA: Create map scaffolding [\#1057](https://github.com/Cadasta/cadasta-platform/issues/1057)
+- Selecting language dropdown: wireframes [\#1055](https://github.com/Cadasta/cadasta-platform/issues/1055)
+
+**Merged pull requests:**
+
+- Bugfix CSS [\#1103](https://github.com/Cadasta/cadasta-platform/pull/1103) ([amplifi](https://github.com/amplifi))
+
+## [v1.6.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.6.0-alpha.1) (2017-02-09)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.1...v1.6.0-alpha.1)
+
+**Fixed bugs:**
+
+- List with archived items doesn't filter [\#1088](https://github.com/Cadasta/cadasta-platform/issues/1088)
+- Search phase 1 adjustments [\#1080](https://github.com/Cadasta/cadasta-platform/issues/1080)
+- Unarchived Project - map won't load [\#1021](https://github.com/Cadasta/cadasta-platform/issues/1021)
+- 'Conditional' attributes not exported during download process [\#935](https://github.com/Cadasta/cadasta-platform/issues/935)
+- \[Import\] improve handling of required fields in imports [\#813](https://github.com/Cadasta/cadasta-platform/issues/813)
+- Attributes that depend on party type don't show up on party creation [\#761](https://github.com/Cadasta/cadasta-platform/issues/761)
+
+**Closed issues:**
+
+- Search CSS [\#1050](https://github.com/Cadasta/cadasta-platform/issues/1050)
+- Presentation of records search results [\#829](https://github.com/Cadasta/cadasta-platform/issues/829)
+- Security audit for file upload process and handling [\#700](https://github.com/Cadasta/cadasta-platform/issues/700)
+
+**Merged pull requests:**
+
+- Fixing delete party redirection page : bugfix \#1073 [\#1095](https://github.com/Cadasta/cadasta-platform/pull/1095) ([kpdp](https://github.com/kpdp))
+- Fix \#813: Import conditional attributes [\#1094](https://github.com/Cadasta/cadasta-platform/pull/1094) ([bjohare](https://github.com/bjohare))
+- Ensure translations are applied [\#1093](https://github.com/Cadasta/cadasta-platform/pull/1093) ([seav](https://github.com/seav))
+- Add check for manual test cases to PR template [\#1091](https://github.com/Cadasta/cadasta-platform/pull/1091) ([bjohare](https://github.com/bjohare))
+- Fix \#1088: Make DataTables search work with archived filter [\#1089](https://github.com/Cadasta/cadasta-platform/pull/1089) ([seav](https://github.com/seav))
+- Fix \#935: Conditional attributes not exported during download process [\#1083](https://github.com/Cadasta/cadasta-platform/pull/1083) ([bjohare](https://github.com/bjohare))
+- Google Analytics implementation [\#1082](https://github.com/Cadasta/cadasta-platform/pull/1082) ([amplifi](https://github.com/amplifi))
+- Add ElasticSearch host to production override of defaults [\#1079](https://github.com/Cadasta/cadasta-platform/pull/1079) ([amplifi](https://github.com/amplifi))
+- Single page map scaffolding view and html. Upgrade \(kinda\) to Leaflet1.0 [\#1077](https://github.com/Cadasta/cadasta-platform/pull/1077) ([linzjax](https://github.com/linzjax))
+- Fix \#761: Attributes that depend on party type don't show up on party creation [\#1076](https://github.com/Cadasta/cadasta-platform/pull/1076) ([bjohare](https://github.com/bjohare))
+- Search feature phase 1 implementation [\#1075](https://github.com/Cadasta/cadasta-platform/pull/1075) ([seav](https://github.com/seav))
+- Update changelog for v1.5.1 [\#1074](https://github.com/Cadasta/cadasta-platform/pull/1074) ([amplifi](https://github.com/amplifi))
+
 ## [v1.5.1](https://github.com/Cadasta/cadasta-platform/tree/v1.5.1) (2017-01-23)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.5.0...v1.5.1)
 
