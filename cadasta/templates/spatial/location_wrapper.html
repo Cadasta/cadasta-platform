@@ -21,7 +21,12 @@
     var trans = {
       open: "{% trans 'Open location' %}"
     };
+    var orgSlug = '{{ object.organization.slug }}';
+    var projectSlug = '{{ object.slug }}';
 
+    options.org_slug = orgSlug;
+    options.project_slug = projectSlug;
+    options.trans = trans;
     switch_layer_controls(map, options);
 
     {% if object.extent %}
@@ -45,8 +50,6 @@
                    '{% url "async:spatial:list" object.organization.slug object.slug %}?exclude={{location.id}}',
                    {projectExtent: projectExtent, trans: trans, location: currentlocation});
     
-    var orgSlug = '{{ object.organization.slug }}';
-    var projectSlug = '{{ object.slug }}';
     var url = '/api/v1/organizations/'
             + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
     add_spatial_resources(map, url);

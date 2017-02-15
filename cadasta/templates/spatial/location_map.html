@@ -19,6 +19,9 @@
     var trans = {
       open: "{% trans 'Open location' %}"
     };
+    options.project_slug = '{{ object.slug }}'
+    options.org_slug = '{{ object.organization.slug }}'
+    options.trans = trans
 
     switch_layer_controls(map, options);
 
@@ -29,7 +32,7 @@
     {% endif %}
 
     renderFeatures(map,
-                   '{% url "async:spatial:list" object.organization.slug object.slug %}',
+                   '{% url "async:spatial:tiled" object.organization.slug object.slug 0 0 0 %}',
                    {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
 
     var orgSlug = '{{ object.organization.slug }}';
