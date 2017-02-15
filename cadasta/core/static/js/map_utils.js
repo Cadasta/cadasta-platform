@@ -63,10 +63,9 @@ function renderFeatures(map, featuresUrl, options) {
       } else {
         $('#messages #loading').addClass('hidden');
         if (options.fitBounds === 'locations') {
-          // var bounds = markers.getBounds();
-          var bounds = geoJson.getBounds();
+          var bounds = markers.getBounds();
           if (bounds.isValid()) {
-            map.fitBounds(bounds);
+            map.fitBounds(bounds);  
           }
         }
       }
@@ -97,7 +96,7 @@ function renderFeatures(map, featuresUrl, options) {
   } else {
     map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
   }
-
+  
   var geoJson = L.geoJson(null, {
     style: { weight: 2 },
     onEachFeature: function(feature, layer) {
@@ -106,17 +105,18 @@ function renderFeatures(map, featuresUrl, options) {
                       "<h2><span class=\"entity\">Location</span>" +
                       feature.properties.type + "</h2></div>" +
                       "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
-                      "</div>");
+                      "</div>");  
       }
     }
   });
-  // var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
-  // markers.addTo(map);
+
+  var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
+  markers.addTo(map);
   geoJson.addTo(map);
 
   if (options.location) {
     options.location.addTo(map);
-    map.fitBounds(options.location.getBounds());
+    map.fitBounds(options.location.getBounds());  
   } else if (projectBounds) {
     map.fitBounds(projectBounds);
   }
@@ -142,7 +142,7 @@ function switch_layer_controls(map, options){
   var groupedOptions = {
     groupCheckboxes: false
   };
-  // map.removeControl(map.layerscontrol);
+  map.removeControl(map.layerscontrol);
   map.layerscontrol = L.control.groupedLayers(
     baseLayers, groupedOptions).addTo(map);
 }
@@ -186,7 +186,3 @@ function saveOnMapEditMode() {
     saveButton.dispatchEvent(clickEvent);
   }
 }
-
-
-
-
