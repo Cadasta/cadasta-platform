@@ -1,87 +1,83 @@
 var SMap = (function() {
-    var map = L.map('mapid');
-    var layerscontrol = L.control.layers().addTo(map);
+  var map = L.map('mapid');
+  var layerscontrol = L.control.layers().addTo(map);
+  var prev_urls = [];
+  var loaded_features = {};
 
-    function add_tile_layers() {
-      for (var i = 0, n = layers.length; i < n; i++) {
-        var options = L.Util.extend(layers[i]['attrs']);
-        var layer = {name: layers[i]['label'], url: layers[i]['url'], options: options};
-
-        var l = L.tileLayer(layer.url, layer.options);
-        layerscontrol.addBaseLayer(l, layer.name);
-
-        if (i === 0) {
-          l.addTo(map); 
+  var geojsonTileLayer = new L.TileLayer.GeoJSON(
+    url, 
+    {
+      clipTiles: true,
+      unique: function (feature) {return feature.id;}
+    }, 
+    {
+      style: { weight: 2 },
+      onEachFeature: function(feature, layer) {
+        if (options.trans) {
+          layer.bindPopup("<div class=\"text-wrap\">" +
+                      "<h2><span>Location</span>" +
+                      feature.properties.type + "</h2></div>" +
+                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
+                      "</div>");
         }
       }
-    }
+    });
 
-    add_tile_layers();
+  function add_tile_layers() {
+    for (var i = 0, n = layers.length; i < n; i++) {
+      var attrs = L.Util.extend(layers[i]['attrs']);
+      var layer = {name: layers[i]['label'], url: layers[i]['url'], options: attrs};
+      var l = L.tileLayer(layer.url, layer.options);
+      layerscontrol.addBaseLayer(l, layer.name);
 
-    function load_project_extent() {
-      if (options.projectExtent) {
-          var boundary = L.geoJson(
-            options.projectExtent, {
-              style: {
-              stroke: true,
-              color: "#0e305e",
-              weight: 2,
-              dashArray: "5, 5",
-              opacity: 1,
-              fill: false,
-              clickable: false,
-            }
-          }
-        );
-        boundary.addTo(map);
-        projectBounds = boundary.getBounds();
-      }
-      if (options.fitBounds === 'project') {
-        map.fitBounds(projectBounds);
-      } else if (options.fitBounds !== 'locations') {
-        map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
+      if (i === 0) {
+        l.addTo(map);
       }
     }
-
-    load_project_extent()
-
-    function render_features(){
-      var geoJson = L.geoJson(null, {
-        style: { weight: 2 },
-        onEachFeature: function(feature, layer) {
-          if (options.trans) {
-            layer.bindPopup("<div class=\"text-wrap\">" +
-                          "<h2><span>Location</span>" +
-                          feature.properties.type + "</h2></div>" +
-                          "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
-                          "</div>");
-          }
-        }
-      });
-
-      function load_features(request_url) {
-        $('#messages #loading').removeClass('hidden');
-        $.get(request_url, function(response) {
-          geoJson.addData(response);
-          if (response.next) {
-            load_features(response.next);
-          } else {
-            $('#messages #loading').addClass('hidden');
-            if (options.fitBounds === 'locations') {
-              var bounds = geoJson.getBounds();
-              if (bounds.isValid()) {
-                map.fitBounds(bounds);
-              }
-            }
-          }
-        });
-      }
-
-      geoJson.addTo(map);
-      load_features(url);
   }
 
-  render_features()
+  add_tile_layers();
+  // var features = L.deflate4({minSize: 20}).addTo(map);
+  // features.addLayer(geojsonTileLayer);
+  map.addLayer(geojsonTileLayer);
+
+  function load_project_extent() {
+    if (options.projectExtent) {
+        var boundary = L.geoJson(
+          options.projectExtent, {
+            style: {
+            stroke: true,
+            color: "#0e305e",
+            weight: 2,
+            dashArray: "5, 5",
+            opacity: 1,
+            fill: false,
+            clickable: false,
+          }
+        }
+      );
+      boundary.addTo(map);
+      projectBounds = boundary.getBounds();
+      if (options.fitBounds === 'project') {
+        map.fitBounds(projectBounds);
+      }
+    } else {
+      map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
+    }
+  }
+
+  load_project_extent()
+
+  function load_features() {;
+    if (options.fitBounds === 'locations') {
+      var bounds = geojsonTileLayer.geojsonLayer.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds);
+      }
+    }
+  }
+
+  load_features();
 
   function render_spatial_resource(){
     $.ajax(fetch_spatial_resources).done(function(data){
