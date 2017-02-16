@@ -13,7 +13,7 @@
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'project:list' %}">
+    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:dashboard' slug=object.organization.slug %}">
       <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
     </a>
     <h1 class="{% if is_administrator or is_allowed_add_location or is_allowed_add_resource %}short{% endif %}">
