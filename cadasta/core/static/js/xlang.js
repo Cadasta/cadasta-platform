@@ -18,7 +18,7 @@ $(document).ready(function () {
   });
 
   const form_lang = sessionStorage.getItem("form_lang");
-  if (form_lang) {
+  if (form_lang && $('#form-langs-select option[value="' + form_lang + '"]').length) {
     $('#form-langs-select').val(form_lang);
     setLabels(form_lang);
   }
