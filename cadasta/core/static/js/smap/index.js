@@ -1,7 +1,6 @@
 $(window).load(function () {
   var js_files = [
     'lazytiles.js',
-    'L.Map.Deflate4.js',
     'L.TileLayer.GeoJSON.js',
     'map.js'
   ];
