@@ -69,16 +69,19 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     initialize: function (url, options, geojsonOptions) {
         L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
+        this.features = L.deflate({minSize: 20, markerCluster: true});
     },
     onAdd: function (map) {
         this._lazyTiles = new Tile(0, 0, 0, map.maxZoom);
         this._map = map;
         L.TileLayer.Ajax.prototype.onAdd.call(this, map);
         map.addLayer(this.geojsonLayer);
+        map.addLayer(this.features);
     },
     onRemove: function (map) {
         map.removeLayer(this.geojsonLayer);
         L.TileLayer.Ajax.prototype.onRemove.call(this, map);
+        map.removeLayer(this.features);
     },
     _reset: function () {
         this.geojsonLayer.clearLayers();
@@ -263,7 +266,8 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         if (options.onEachFeature) {
             options.onEachFeature(geojson, incomingLayer);
         }
-        parentLayer.addLayer(incomingLayer);
+        // parentLayer.addLayer(incomingLayer);
+        this.features.addLayer(incomingLayer);
 
         // If options.clipTiles is set and the browser is using SVG
         // then clip the layer using SVG clipping

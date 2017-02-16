@@ -1,8 +1,6 @@
 var SMap = (function() {
   var map = L.map('mapid');
   var layerscontrol = L.control.layers().addTo(map);
-  var prev_urls = [];
-  var loaded_features = {};
 
   var geojsonTileLayer = new L.TileLayer.GeoJSON(
     url, 
@@ -37,8 +35,6 @@ var SMap = (function() {
   }
 
   add_tile_layers();
-  // var features = L.deflate4({minSize: 20}).addTo(map);
-  // features.addLayer(geojsonTileLayer);
   map.addLayer(geojsonTileLayer);
 
   function load_project_extent() {
