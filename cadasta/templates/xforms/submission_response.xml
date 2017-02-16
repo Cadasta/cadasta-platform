@@ -1,0 +1,5 @@
+<OpenRosaResponse xmlns='http://openrosa.org/http/response'>
+  {% autoescape off %}
+    <message>{{ message }}</message>
+  {% endautoescape %}
+</OpenRosaResponse>
