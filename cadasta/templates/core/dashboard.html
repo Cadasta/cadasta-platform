@@ -11,24 +11,23 @@
 {% block extra_head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
-<!-- <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}"> -->
-<!-- <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}"> -->
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
 <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
-<!-- <script src="{% static 'js/leaflet.markercluster.js' %}"></script> -->
-<!-- <script src="{% static 'js/L.Map.Deflate.js' %}"></script> -->
-<!-- <script src="{% static 'js/smap/index.js' %}"></script> -->
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script>
   function project_map_init(map, options) {
-    var data = {{ geojson|safe }};
     map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
+    var features = L.deflate({minSize: 20, markerCluster: true});
+    features.addTo(map);
 
-    // add_map_controls(map);
-
-    var geoJson = L.geoJson(null, {
+    var data = {{ geojson|safe }};
+    var geoJson = L.geoJson(data, {
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                        "<h2><span>" + feature.properties.org + "</span>" +
@@ -37,9 +36,7 @@
                        "</div>");
       }
     });
-
-    geoJson.addData(data);
-    geoJson.addTo(map);
+    geoJson.addTo(features);
   }
 
   function add_tile_layers() {
@@ -57,22 +54,10 @@
   }
 
   var map = L.map('mapid');
-  var layers = {{ leaflet_tiles|safe }}
+  var layers = {{ leaflet_tiles|safe }};
   var layerscontrol = L.control.layers().addTo(map);
-  add_tile_layers()
-  project_map_init(map)
-
-  // {% if project.extent %}
-  //   var projectExtent = {{ project.extent.geojson|safe }};
-  // {% else %}
-  //   var projectExtent = null;
-  // {% endif %}
-
-  // var options = {
-  //   projectExtent: projectExtent,
-  //   trans: trans,
-  //   fitBounds: '{{ boundary }}'
-  // }
+  add_tile_layers();
+  project_map_init(map);
 
 </script>
 {% endblock %}
