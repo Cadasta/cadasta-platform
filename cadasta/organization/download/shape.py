@@ -59,7 +59,7 @@ class ShapeExporter(Exporter):
         self.write_items(filename, parties, content_type,
                          ('id', 'name', 'type'))
 
-    def write_features(self, layers, filename):
+    def write_features(self, ds, filename):
         spatial_units = self.project.spatial_units.all()
         if spatial_units.count() == 0:
             return
@@ -71,47 +71,55 @@ class ShapeExporter(Exporter):
         self.write_items(
             filename, spatial_units, content_type, model_attrs)
 
+        layers = {}
+
         for su in spatial_units:
             geom = ogr.CreateGeometryFromWkt(su.geometry.wkt)
-            layer_type = geom.GetGeometryType() - 1
-            layer = layers[layer_type]
-
-            feature = ogr.Feature(layer.GetLayerDefn())
-            feature.SetGeometry(ogr.CreateGeometryFromWkt(su.geometry.wkt))
-            feature.SetField('id', su.id)
-            layer.CreateFeature(feature)
-            feature.Destroy()
+            layer_type = geom.GetGeometryName().lower()
+            layer = layers.get(layer_type, None)
+            if layer is None:
+                layer = self.create_layer(ds, layer_type)
+                layers[layer_type] = layer
+            if layer:
+                feature = ogr.Feature(layer.GetLayerDefn())
+                feature.SetGeometry(geom)
+                feature.SetField('id', su.id)
+                layer.CreateFeature(feature)
+                feature.Destroy()
+        return layers
 
     def create_datasource(self, dst_dir):
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
-        path = os.path.join(dst_dir, 'point.shp')
         driver = ogr.GetDriverByName('ESRI Shapefile')
-        return driver.CreateDataSource(path)
+        return driver.CreateDataSource(dst_dir)
 
-    def create_shp_layers(self, datasource):
+    def create_layer(self, datasource, layer_type):
         srs = osr.SpatialReference()
         srs.ImportFromEPSG(4326)
 
-        layers = (
-            datasource.CreateLayer('point', srs, geom_type=1),
-            datasource.CreateLayer('line', srs, geom_type=2),
-            datasource.CreateLayer('polygon', srs, geom_type=3)
-        )
+        types = {
+            'point': ogr.wkbPoint,
+            'linestring': ogr.wkbLineString,
+            'polygon': ogr.wkbPolygon,
+            'multipoint': ogr.wkbMultiPoint,
+            'multilinestring': ogr.wkbMultiLineString,
+            'multipolygon': ogr.wkbMultiPolygon
+        }
 
-        for layer in layers:
+        if layer_type in types.keys():
+            layer = datasource.CreateLayer(
+                layer_type, srs, geom_type=types[layer_type])
             field = ogr.FieldDefn('id', ogr.OFTString)
             layer.CreateField(field)
-
-        return layers
+            return layer
 
     def make_download(self, f_name):
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/{}'.format(f_name))
 
         ds = self.create_datasource(dst_dir)
-        layers = self.create_shp_layers(ds)
 
-        self.write_features(layers, os.path.join(dst_dir, 'locations.csv'))
+        self.write_features(ds, os.path.join(dst_dir, 'locations.csv'))
         self.write_relationships(os.path.join(dst_dir, 'relationships.csv'))
         self.write_parties(os.path.join(dst_dir, 'parties.csv'))
 

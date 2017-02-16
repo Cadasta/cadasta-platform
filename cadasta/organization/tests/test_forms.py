@@ -8,9 +8,11 @@ from pytest import raises
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
+from jsonattrs.models import Attribute, AttributeType, Schema
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.exceptions import InvalidXLSForm
 from questionnaires.tests.factories import QuestionnaireFactory
@@ -1149,11 +1151,33 @@ class DownloadFormTest(UserTestCase, TestCase):
         data = {'type': 'shp'}
         user = UserFactory.create()
         project = ProjectFactory.create()
-        geometry = 'SRID=4326;POINT (30 10)'
-        su = SpatialUnitFactory.create(project=project, geometry=geometry)
+        content_type = ContentType.objects.get(app_label='spatial',
+                                               model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='key', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        su1 = SpatialUnitFactory.create(
+            project=project,
+            geometry='POINT (1 1)',
+            attributes={'key': 'value 1'})
+        SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;'
+                     'MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),'
+                     '((15 5, 40 10, 10 20, 5 10, 15 5)))',
+            attributes={'key': 'value 2'})
         party = PartyFactory.create(project=project)
         TenureRelationshipFactory.create(
-            spatial_unit=su, party=party, project=project)
+            spatial_unit=su1, party=party, project=project)
+
         form = forms.DownloadForm(project, user, data=data)
         assert form.is_valid() is True
         path, mime = form.get_file()
@@ -1161,19 +1185,15 @@ class DownloadFormTest(UserTestCase, TestCase):
         assert (mime == 'application/zip')
 
         with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 16
+            assert len(testzip.namelist()) == 12
             assert 'point.dbf' in testzip.namelist()
             assert 'point.prj' in testzip.namelist()
             assert 'point.shp' in testzip.namelist()
             assert 'point.shx' in testzip.namelist()
-            assert 'line.dbf' in testzip.namelist()
-            assert 'line.prj' in testzip.namelist()
-            assert 'line.shp' in testzip.namelist()
-            assert 'line.shx' in testzip.namelist()
-            assert 'polygon.dbf' in testzip.namelist()
-            assert 'polygon.prj' in testzip.namelist()
-            assert 'polygon.shp' in testzip.namelist()
-            assert 'polygon.shx' in testzip.namelist()
+            assert 'multipolygon.dbf' in testzip.namelist()
+            assert 'multipolygon.prj' in testzip.namelist()
+            assert 'multipolygon.shp' in testzip.namelist()
+            assert 'multipolygon.shx' in testzip.namelist()
             assert 'relationships.csv' in testzip.namelist()
             assert 'parties.csv' in testzip.namelist()
             assert 'locations.csv' in testzip.namelist()

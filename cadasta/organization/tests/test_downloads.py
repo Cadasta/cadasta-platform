@@ -9,6 +9,7 @@ from core.tests.utils.cases import UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.geos import GEOSGeometry
 from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from openpyxl import Workbook, load_workbook
@@ -20,6 +21,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 from spatial.tests.factories import SpatialUnitFactory
+from spatial.models import SpatialUnit
 
 from ..download.base import Exporter
 from ..download.resources import ResourceExporter
@@ -300,21 +302,24 @@ class ShapeTest(UserTestCase, TestCase):
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file')
         ds = exporter.create_datasource(dst_dir)
         assert (ds.GetName() ==
-                os.path.join(settings.MEDIA_ROOT, 'temp/file/point.shp'))
+                os.path.join(settings.MEDIA_ROOT, 'temp/file'))
         ds.Destroy()
 
-    def test_create_shp_layers(self):
+    def test_create_layer(self):
         ensure_dirs()
         project = ProjectFactory.create()
         exporter = ShapeExporter(project)
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file6')
         ds = exporter.create_datasource(dst_dir)
-        layers = exporter.create_shp_layers(ds)
-        assert len(layers) == 3
-        assert layers[0].GetName() == 'point'
-        assert layers[1].GetName() == 'line'
-        assert layers[2].GetName() == 'polygon'
+        for layer_type in [
+                'point', 'linestring', 'polygon',
+                'multilinestring', 'multipoint', 'multipolygon']:
+            layer = exporter.create_layer(ds, layer_type)
+            assert layer is not None
+            assert layer.GetName() == layer_type
+            assert layer.GetGeomType() in [1, 2, 3, 4]
+            assert layer.GetLayerDefn().GetFieldCount() == 1
         ds.Destroy()
 
     def test_write_items(self):
@@ -353,39 +358,83 @@ class ShapeTest(UserTestCase, TestCase):
 
     def test_write_features(self):
         ensure_dirs()
-        exporter = ShapeExporter(self.project)
+        project = ProjectFactory.create(current_questionnaire='123abc')
+        exporter = ShapeExporter(project)
+
+        content_type = ContentType.objects.get(app_label='spatial',
+                                               model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, '123abc', ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='geom_type', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        su1 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;POINT (30 10)',
+            attributes={'geom_type': 'point'})
+        su2 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;LINESTRING (30 10, 10 30, 40 40)',
+            attributes={'geom_type': 'linestring'})
+        su3 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))',
+            attributes={'geom_type': 'polygon'})
+        su4 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;'
+                     'MULTIPOINT ((10 40), (40 30), (20 20), (30 10))',
+            attributes={'geom_type': 'multipoint'})
+        su5 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;'
+                     'MULTILINESTRING ((10 10, 20 20, 10 40),'
+                     '(40 40, 30 30, 40 20, 30 10))',
+            attributes={'geom_type': 'multilinestring'})
+        su6 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;'
+                     'MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),'
+                     '((15 5, 40 10, 10 20, 5 10, 15 5)))',
+            attributes={'geom_type': 'multipolygon'})
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file4')
         ds = exporter.create_datasource(dst_dir)
-        layers = exporter.create_shp_layers(ds)
-
         filename = os.path.join(dst_dir, 'locations.csv')
-        exporter.write_features(layers, filename)
 
-        assert len(layers[0]) == 2
-        f = layers[0].GetNextFeature()
-        while f:
-            geom = f.geometry()
-            assert geom.ExportToWkt() in ['POINT (1 1)', 'POINT (2 2)']
-            assert f.GetFieldAsString('id') in [
-                self.spatialunit_1.id, self.spatialunit_2.id]
-            f = layers[0].GetNextFeature()
-
+        layers = exporter.write_features(ds, filename)
+        assert len(layers.keys()) == 6
+        for layer_name, layer in layers.items():
+            su = SpatialUnit.objects.get(attributes={'geom_type': layer_name})
+            geom = su.geometry
+            feature = layer.GetNextFeature()
+            assert geom.equals(GEOSGeometry(feature.geometry().ExportToWkt()))
+            assert feature.GetFieldAsString('id') == su.id
         ds.Destroy()
 
         with open(filename) as csvfile:
             csvreader = csv.reader(csvfile)
             for i, row in enumerate(csvreader):
                 if i == 0:
-                    assert row == ['id', 'type', 'key']
-                elif row[0] == self.spatialunit_1.id:
-                    assert row == [
-                        self.spatialunit_1.id,
-                        self.spatialunit_1.type, 'value 1']
-                elif row[1] == self.spatialunit_2.id:
-                    assert row == [
-                        self.spatialunit_2.id,
-                        self.spatialunit_2.type, 'value 2']
+                    assert row == ['id', 'type', 'geom_type']
+                if i == 1:
+                    assert row == [su1.id, su1.type, 'point']
+                if i == 2:
+                    assert row == [su2.id, su2.type, 'linestring']
+                if i == 3:
+                    assert row == [su3.id, su3.type, 'polygon']
+                if i == 4:
+                    assert row == [su4.id, su4.type, 'multipoint']
+                if i == 5:
+                    assert row == [su5.id, su5.type, 'multilinestring']
+                if i == 6:
+                    assert row == [su6.id, su6.type, 'multipolygon']
 
         # remove this so other tests pass
         os.remove(filename)
@@ -485,7 +534,32 @@ class ShapeTest(UserTestCase, TestCase):
 
     def test_make_download(self):
         ensure_dirs()
-        exporter = ShapeExporter(self.project)
+        project = ProjectFactory.create(current_questionnaire='123abc')
+        exporter = ShapeExporter(project)
+
+        content_type = ContentType.objects.get(app_label='spatial',
+                                               model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, '123abc', ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='key', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        SpatialUnitFactory.create(
+            project=project,
+            geometry='POINT (1 1)',
+            attributes={'key': 'value 1'})
+        SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;'
+                     'MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),'
+                     '((15 5, 40 10, 10 20, 5 10, 15 5)))',
+            attributes={'key': 'value 2'})
 
         path, mime = exporter.make_download('file5')
 
@@ -493,21 +567,15 @@ class ShapeTest(UserTestCase, TestCase):
         assert mime == 'application/zip'
 
         with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 16
+            assert len(testzip.namelist()) == 10
             assert 'point.dbf' in testzip.namelist()
             assert 'point.prj' in testzip.namelist()
             assert 'point.shp' in testzip.namelist()
             assert 'point.shx' in testzip.namelist()
-            assert 'line.dbf' in testzip.namelist()
-            assert 'line.prj' in testzip.namelist()
-            assert 'line.shp' in testzip.namelist()
-            assert 'line.shx' in testzip.namelist()
-            assert 'polygon.dbf' in testzip.namelist()
-            assert 'polygon.prj' in testzip.namelist()
-            assert 'polygon.shp' in testzip.namelist()
-            assert 'polygon.shx' in testzip.namelist()
-            assert 'relationships.csv' in testzip.namelist()
-            assert 'parties.csv' in testzip.namelist()
+            assert 'multipolygon.dbf' in testzip.namelist()
+            assert 'multipolygon.prj' in testzip.namelist()
+            assert 'multipolygon.shp' in testzip.namelist()
+            assert 'multipolygon.shx' in testzip.namelist()
             assert 'locations.csv' in testzip.namelist()
             assert 'README.txt' in testzip.namelist()
 
