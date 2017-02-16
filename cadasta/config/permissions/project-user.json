@@ -1,8 +1,37 @@
 {
   "clause": [
-    // Currently, "ordinary" users associated with a project have no
-    // additional permissions over those given to all users.  This may
-    // change in the future.  In particular, project users may be
-    // permitted access to projects that are normally private.
+    // In addition to the permissions provided by the organization member
+    // policy, project users can view details of locations, parties,
+    // relationships and resources. 
+    {
+      "effect": "allow",
+      "action": ["spatial.view"],
+      "object": ["spatial/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["spatial_rel.view"],
+      "object": ["spatial_rel/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party.view"],
+      "object": ["party/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["party_rel.view"],
+      "object": ["party_rel/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["tenure_rel.view"],
+      "object": ["tenure_rel/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["resource.view"],
+      "object": ["resource/$organization/$project/*"]
+    }
   ]
 }

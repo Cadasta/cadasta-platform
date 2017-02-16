@@ -283,8 +283,8 @@ class PartyRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(organization=self.org, user=user)
 
         response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content['id'] == self.rel.id
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
 
 
 class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):

@@ -84,8 +84,27 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
         response = self.request(user=user)
+        assert response.status_code == 302
+
+    def test_get_with_user_without_view_permissions(self):
+        user = UserFactory.create()
+        clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project/*/*'],
+                    'action': ['project.*.*', 'party.list']
+                }
+            ]
+        }
+        policy = Policy.objects.create(
+            name='allow',
+            body=json.dumps(clauses))
+        assign_user_policies(user, policy)
+
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.render_content(object_list=[])
+        assert response.content == self.expected_content
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()

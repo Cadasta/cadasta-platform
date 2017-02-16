@@ -10,36 +10,6 @@
                  "party.list", "party_rel.list",
                  "tenure_rel.list", "resource.list"],
       "object": ["project/$organization/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["spatial.view"],
-      "object": ["spatial/$organization/*/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["spatial_rel.view"],
-      "object": ["spatial_rel/$organization/*/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["party.view"],
-      "object": ["party/$organization/*/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["party_rel.view"],
-      "object": ["party_rel/$organization/*/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["tenure_rel.view"],
-      "object": ["tenure_rel/$organization/*/*"]
-    },
-    {
-      "effect": "allow",
-      "action": ["resource.view"],
-      "object": ["resource/$organization/*/*"]
     }
   ]
 }
