@@ -20,7 +20,7 @@
     .addValidator('userfield', function (value, requirement) {
       var term = $("#id_username").val();
       console.log(term)
-      if (value.indexOf(term) >= 0) {
+      if (term.length && value.indexOf(term) >= 0) {
         return false;
       }
     }, 2)
@@ -30,7 +30,7 @@
   window.Parsley
     .addValidator('emailfield', function (value, requirement) {
       var term = $("#id_email").val().split("@");
-      if (value.indexOf(term[0]) >= 0) {
+      if (term[0].length && value.indexOf(term[0]) >= 0) {
         return false;
       }
     }, 2)
