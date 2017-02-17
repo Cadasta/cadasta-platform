@@ -113,7 +113,7 @@ class ProjectUrlsTest(TestCase):
         assert (url == '/organizations/org-slug/projects/proj-slug/')
 
         resolved = resolve('/organizations/org-slug/projects/proj-slug/')
-        assert resolved.func.__name__ == default.ProjectDashboard.__name__
+        assert resolved.func.__name__ == default.ProjectMap.__name__
         assert resolved.kwargs['organization'] == 'org-slug'
         assert resolved.kwargs['project'] == 'proj-slug'
 

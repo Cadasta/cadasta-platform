@@ -1,4 +1,4 @@
-;(function(window, Math) {
+(function(window, Math) {
     function Tile(x, y, z, maxLevels, parent) {
         this.x = x;
         this.y = y;
@@ -9,7 +9,7 @@
         this.parent = parent || null;
     }
 
-    Tile.prototype.findPathToChild = function (x, y, z) {
+    Tile.prototype.findPathToChild = function(x, y, z) {
         const nleafs = Math.pow(2, z - this.z);
         const l0x = nleafs * this.x;
         const l0y = nleafs * this.y;
@@ -45,10 +45,14 @@
     Tile.prototype.load = function(x, y, z) {
         if (this.x === x && this.y === y && this.z === z && !this.loaded) {
             this.loaded = true;
-            if (this.parent) { this.parent.loadFromChild(); }
+            if (this.parent) {
+                this.parent.loadFromChild();
+            }
         } else {
             const child = this.findPathToChild(x, y, z);
-            if (child) {child.load(x, y, z);}
+            if (child) {
+                child.load(x, y, z);
+            }
         }
     }
 
@@ -61,7 +65,9 @@
         }
         if (loaded) {
             this.loaded = true;
-            if (this.parent) { this.parent.loadFromChild(); }
+            if (this.parent) {
+                this.parent.loadFromChild();
+            }
         }
     }
 
@@ -76,7 +82,7 @@
 
         const child = this.findPathToChild(x, y, z);
         if (child) {
-            return child.isLoaded(x, y, z);    
+            return child.isLoaded(x, y, z);
         } else {
             return false;
         }

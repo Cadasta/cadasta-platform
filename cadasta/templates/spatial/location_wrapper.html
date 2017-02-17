@@ -4,16 +4,15 @@
 {% block body-class %} map{% endblock %}
 {% block left-nav %}map{% endblock %}
 
+{% load leaflet_tags %}
 {% load staticfiles %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+{% leaflet_css plugins="groupedlayercontrol,markercluster"%}
 {% endblock %}
 
 {% block extra_script %}
-<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+{% leaflet_js plugins="groupedlayercontrol,markercluster,deflate" %}
 <script src="{% static 'js/map_utils.js' %}"></script>
 <!-- Detail extra script-->
 <script>
@@ -49,7 +48,7 @@
     renderFeatures(map,
                    '{% url "async:spatial:list" object.organization.slug object.slug %}?exclude={{location.id}}',
                    {projectExtent: projectExtent, trans: trans, location: currentlocation});
-    
+
     var url = '/api/v1/organizations/'
             + orgSlug + '/projects/' + projectSlug + '/spatialresources/';
     add_spatial_resources(map, url);
@@ -77,6 +76,7 @@
   <div class="row">
     <!-- Start overview map  -->
     <div class="col-md-8 map">
+        {% leaflet_map "project-map" callback="locations_map_init" %}
     </div>
     <!-- / end overview map -->
     <!-- Overview detail  -->
