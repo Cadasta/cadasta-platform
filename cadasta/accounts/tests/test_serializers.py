@@ -101,6 +101,18 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         assert (_("The password is too similar to the username.") in
                 serializer._errors['password'])
 
+    def test_password_contains_blank_username(self):
+        data = {
+            'username': '',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert ('password' not in serializer._errors)
+
     def test_password_contains_email(self):
         data = {
             'username': 'imagine71',
@@ -113,6 +125,18 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         assert not serializer.is_valid()
         assert (_("Passwords cannot contain your email.") in
                 serializer._errors['password'])
+
+    def test_password_contains_blank_email(self):
+        data = {
+            'username': 'imagine71',
+            'email': '',
+            'password': 'johnisjustheBest!!',
+            'password_repeat': 'johnisjustheBest!!',
+            'full_name': 'John Lennon',
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert ('password' not in serializer._errors)
 
     def test_password_contains_less_than_min_characters(self):
         data = {
