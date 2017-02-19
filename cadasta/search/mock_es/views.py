@@ -51,9 +51,8 @@ class EsAllTypes(APIView):
         start_idx = request.data.get('from', 0)
         num_page_results = request.data.get('size', 10)
 
-        hits = []
-        for entity in entities[start_idx:start_idx + num_page_results]:
-            hits.append(self.transform(entity))
+        hits = [self.transform(entity)
+                for entity in entities[start_idx:start_idx + num_page_results]]
 
         return Response({
             'hits': {

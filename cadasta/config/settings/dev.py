@@ -15,10 +15,6 @@ DATABASES = {
     }
 }
 
-INSTALLED_APPS = (
-    'mock_es',
-) + INSTALLED_APPS  # NOQA
-
 DJOSER.update({  # NOQA
     'DOMAIN': 'localhost:8000',
 })
