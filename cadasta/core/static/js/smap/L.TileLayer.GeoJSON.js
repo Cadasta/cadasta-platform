@@ -266,7 +266,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         if (options.onEachFeature) {
             options.onEachFeature(geojson, incomingLayer);
         }
-        // parentLayer.addLayer(incomingLayer);
+        parentLayer.addLayer(incomingLayer);
         this.features.addLayer(incomingLayer);
 
         // If options.clipTiles is set and the browser is using SVG
