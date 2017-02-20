@@ -36,5 +36,5 @@ class Command(BaseCommand):
             data.add_test_users_and_roles()
             data.add_test_projects()
             data.add_test_spatial_units()
-            data.add_huge_project(num_records=int(options['records']))
+            data.add_huge_project(max_num_records=int(options['records']))
             self.stdout.write(self.style.SUCCESS("All test data loaded."))

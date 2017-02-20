@@ -394,7 +394,7 @@ class FixturesData:
             type='MI',
             attributes={})
 
-    def add_huge_project(self, num_records=4000):
+    def add_huge_project(self, max_num_records=4000):
         project = models.Project.objects.get(slug='london-2')
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
@@ -416,11 +416,11 @@ class FixturesData:
                 if not geometry.rstrip() or geometry.startswith('#'):
                     continue
 
-                i = len(spatial_units)
-                if not i < num_records:
+                num_records = len(spatial_units)
+                if not num_records < max_num_records:
                     break
 
-                name = 'Spatial Unit #{}'.format(i)
+                name = 'Spatial Unit #{}'.format(num_records)
                 type = random.choice(choices)
 
                 spatial_units.append({
