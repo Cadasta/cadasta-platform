@@ -31,9 +31,9 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
 
     def post(self, request, *args, **kwargs):
         query = request.data.get('q')
-        start_idx = self.convert_field_to_int(request.data, 'start', 0)
-        page_size = self.convert_field_to_int(request.data, 'length', 10)
-        dataTablesDraw = self.convert_field_to_int(request.data, 'draw', 1)
+        start_idx = int(request.data.get('start', 0))
+        page_size = int(request.data.get('length', 10))
+        dataTablesDraw = int(request.data['draw'])
 
         results_as_html = []
         num_hits = 0
@@ -75,12 +75,6 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
             'data': results_as_html,
             'timestamp': timestamp,
         })
-
-    def convert_field_to_int(self, data, field, default):
-        try:
-            return int(data.get(field, default))
-        except ValueError:
-            return default
 
     def query_es(self, project_id, query, start_idx, page_size):
         """Queries the ES API based on the UI query string and returns the

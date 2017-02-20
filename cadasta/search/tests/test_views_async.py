@@ -323,17 +323,6 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         mock_post.assert_not_called()
         mock_get.assert_not_called()
 
-    def test_convert_field_to_int_ok(self):
-        assert self.view_class().convert_field_to_int(
-            {'fielder': '100'}, 'fielder', 10) == 100
-
-    def test_convert_field_to_int_ok_default(self):
-        assert self.view_class().convert_field_to_int({}, 'fielder', 10) == 10
-
-    def test_convert_field_to_int_not_ok(self):
-        assert self.view_class().convert_field_to_int(
-            {'fielder': 'x'}, 'fielder', 10) == 10
-
     @patch('requests.post')
     def test_query_es(self, mock_post):
         mock_post.return_value.status_code = 200
