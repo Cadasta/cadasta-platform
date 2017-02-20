@@ -19,7 +19,6 @@
   window.Parsley
     .addValidator('userfield', function (value, requirement) {
       var term = $("#id_username").val();
-      console.log(term)
       if (term.length && value.indexOf(term) >= 0) {
         return false;
       }
