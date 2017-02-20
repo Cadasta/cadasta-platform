@@ -40,11 +40,11 @@ class FixturesData:
         for n in range(20):
             if n < len(named_users):
                 users.append(UserFactory.create(
-                    **named_users[n],
                     password='password',
                     email_verified=True,
                     last_login=datetime.now(tz=timezone.utc),
                     is_active=True,
+                    **named_users[n]
                 ))
             else:
                 users.append(UserFactory.create(
@@ -408,15 +408,20 @@ class FixturesData:
         )
 
         spatial_units = []
+        choices = [c[0] for c in TYPE_CHOICES]
 
         with open(os.path.join(os.path.dirname(__file__),
                                "londondata.txt"), "r") as ins:
-            for i, geometry in enumerate(ins):
+            for geometry in ins:
+                if not geometry.rstrip() or geometry.startswith('#'):
+                    continue
+
+                i = len(spatial_units)
                 if not i < num_records:
                     break
 
                 name = 'Spatial Unit #{}'.format(i)
-                type = random.choice([c[0] for c in TYPE_CHOICES])
+                type = random.choice(choices)
 
                 spatial_units.append({
                     'geometry': GEOSGeometry(geometry),
