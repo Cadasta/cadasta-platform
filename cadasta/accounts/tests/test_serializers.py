@@ -92,6 +92,19 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'yoko79',
             'email': 'john@beatles.uk',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert not serializer.is_valid()
+        assert (_("The password is too similar to the username.") in
+                serializer._errors['password'])
+
+    def test_password_contains_username_case_insensitive(self):
+        data = {
+            'username': 'yoko79',
+            'email': 'john@beatles.uk',
             'password': 'iloveYoKo79!',
             'password_repeat': 'iloveYoKo79!',
             'full_name': 'John Lennon',
