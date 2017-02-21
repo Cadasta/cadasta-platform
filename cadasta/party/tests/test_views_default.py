@@ -16,6 +16,7 @@ from resources.tests.utils import clear_temp  # noqa
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
 from tutelary.models import Policy, assign_user_policies
+from questionnaires.tests import factories as q_factories
 
 from .. import forms
 from ..models import Party, TenureRelationship, TenureRelationshipType
@@ -74,6 +75,34 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+
+    def test_get_with_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        party_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='party_type',
+            label={'en': 'Party type', 'de': 'Party Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=party_type_question,
+            name='IN',
+            label={'en': 'Individual', 'de': 'Einzelperson'})
+
+        for p in self.parties:
+            p.type_labels = ('data-label-de="Einzelperson" '
+                             'data-label-en="Individual"')
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=self.parties,
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')])
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
@@ -280,6 +309,41 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
+    def test_get_with_with_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='party_name',
+            label={'en': 'Party name', 'de': 'Name der Party'},
+            type='TX')
+
+        party_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='party_type',
+            label={'en': 'Party type', 'de': 'Party Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=party_type_question,
+            name='IN',
+            label={'en': 'Individual', 'de': 'Einzelperson'})
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            name_labels=('data-label-de="Name der Party" '
+                         'data-label-en="Party name"'),
+            type_labels=('data-label-de="Party Typ" '
+                         'data-label-en="Party type"'),
+            type_choice_labels=('data-label-de="Einzelperson" '
+                                'data-label-en="Individual"'),
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')])
+
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -336,7 +400,8 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'party': self.party,
-                'form': forms.PartyForm(instance=self.party)}
+                'form': forms.PartyForm(instance=self.party,
+                                        project=self.project)}
 
     def setup_url_kwargs(self):
         return {
@@ -358,6 +423,31 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert '<div class="form-group party-gr hidden">' in response.content
+
+    def test_get_with_with_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        party_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='party_type',
+            label={'en': 'Party type', 'de': 'Party Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=party_type_question,
+            name='IN',
+            label={'en': 'Individual', 'de': 'Einzelperson'})
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            type_choice_labels=('data-label-de="Einzelperson" '
+                                'data-label-en="Individual"'),
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')])
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -859,6 +949,33 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+
+    def test_get_with_with_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        tenure_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Tenure type', 'de': 'Anrecht'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name=self.relationship.tenure_type_id,
+            label={'en': 'Some type', 'de': 'Ein Typ'})
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            type_labels=('data-label-de="Anrecht" '
+                         'data-label-en="Tenure type"'),
+            type_choice_labels=('data-label-de="Ein Typ" '
+                                'data-label-en="Some type"'),
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')])
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()

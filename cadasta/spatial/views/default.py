@@ -2,11 +2,12 @@ import django.views.generic as base_generic
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 from core.views import generic
 from django.core.urlresolvers import reverse
-from jsonattrs.mixins import JsonAttrsMixin
+from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 from organization.views import mixins as organization_mixins
 from party.messages import TENURE_REL_CREATE
 from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
+from questionnaires.models import Question, QuestionOption
 
 from . import mixins
 from .. import messages as error_messages
@@ -78,6 +79,29 @@ class LocationDetail(LoginPermissionRequiredMixin,
         context = super().get_context_data(*args, **kwargs)
         context['relationships'] = self.object.tenurerelationship_set.all(
         ).select_related('party').defer('party__attributes')
+
+        project = context['object']
+        if project.current_questionnaire:
+            question = Question.objects.get(
+                name='location_type',
+                questionnaire_id=project.current_questionnaire)
+            context['type_labels'] = template_xlang_labels(question.label_xlat)
+
+            option = QuestionOption.objects.get(question=question,
+                                                name=context['location'].type)
+            context['type_choice_labels'] = template_xlang_labels(
+                option.label_xlat)
+
+            tenure_type = Question.objects.get(
+                name='tenure_type',
+                questionnaire_id=project.current_questionnaire)
+            tenure_opts = QuestionOption.objects.filter(question=tenure_type)
+            tenure_opts = dict(tenure_opts.values_list('name', 'label_xlat'))
+
+            for rel in context['relationships']:
+                rel.type_labels = template_xlang_labels(
+                    tenure_opts.get(rel.tenure_type_id))
+
         return context
 
 

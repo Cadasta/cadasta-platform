@@ -37,8 +37,14 @@ class AttributeFormMixin(SchemaSelectorMixin):
             if question.has_options:
                 choices = QuestionOption.objects.filter(
                     question=question).values_list('name', 'label_xlat')
-                choices, xlang_labels = zip(*[((c[0], c[1].get(default_lang)),
-                                              (c[0], c[1])) for c in choices])
+
+                try:
+                    choices, xlang_labels = zip(
+                        *[((c[0], c[1].get(default_lang)),
+                          (c[0], c[1])) for c in choices])
+                except AttributeError:
+                    choices = choices
+                    xlang_labels = ''
 
                 choices = ([('', empty_choice)] + list(choices)
                            if empty_choice else list(choices))

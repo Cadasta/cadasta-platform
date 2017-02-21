@@ -297,6 +297,40 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
             'house': {'de': 'Haus', 'en': 'Haus'}
         }
 
+    def test_set_standard_field_with_single_lang(self):
+        form_mixin = AttributeFormMixin()
+        form_mixin.project = self.project
+        form_mixin.fields = {'building': ChoiceField(
+            choices=(('barn', 'Barn'), ('house', 'House')))}
+        questionnaire = q_factories.QuestionnaireFactory(
+            project=self.project)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='building',
+            questionnaire=questionnaire,
+            label='Name')
+        q_factories.QuestionOptionFactory(
+            question=question,
+            name='barn',
+            label='Barn',
+            index=0)
+        q_factories.QuestionOptionFactory(
+            question=question,
+            name='house',
+            label='House',
+            index=1)
+        form_mixin.set_standard_field('building',
+                                      empty_choice='Select house type')
+
+        widget = form_mixin.fields['building'].widget
+        assert isinstance(widget, XLangSelect) is True
+        assert widget.choices == [
+            ('', 'Select house type'),
+            ('barn', 'Barn'),
+            ('house', 'House')
+        ]
+        assert widget.xlang_labels == {}
+
 
 class AttributeFormBaseTest(UserTestCase, FileStorageTestCase, TestCase):
 

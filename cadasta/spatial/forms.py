@@ -78,7 +78,6 @@ class TenureRelationshipForm(AttributeForm):
 
         if self.project.current_questionnaire:
             self.set_standard_field('party_name',
-                                    _('Please select a party type'),
                                     field_name='name')
             self.set_standard_field('party_type',
                                     _('Please select a party type'))

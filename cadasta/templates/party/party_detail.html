@@ -26,12 +26,12 @@
               <table class="table table-location">
                 <tbody>
                   <tr>
-                    <td class="col-md-4"><label>{% trans "Name" %}</label></td>
+                    <td class="col-md-4"><label {{ name_labels|safe }}>{% trans "Name" %}</label></td>
                     <td class="col-md-8">{{ party.name }}</td>
                   </tr>
                   <tr>
-                    <td><label>{% trans "Type" %}</label></td>
-                    <td>{{ party.get_type_display }}</td>
+                    <td><label {{ type_labels|safe }}>{% trans "Type" %}</label></td>
+                    <td {{ type_choice_labels|safe }}>{{ party.get_type_display }}</td>
                   </tr>
                   {% for attr in attributes %}
                   <tr>

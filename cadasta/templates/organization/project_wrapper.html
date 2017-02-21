@@ -35,7 +35,7 @@
       <!-- Project translation dropdown-->
       {% if form_langs %}
       <div class="langs-select form-group pull-right">
-        <label class="control-label sr-only" for="form-langs-select">Language for project fields</label>
+        <label class="control-label sr-only" for="form-langs-select">{% trans "Language for project fields" %}</label>
         <select id="form-langs-select" class="form-control">
           {% for lang in form_langs %}
           <option value="{{ lang.0 }}" {% if lang.0 == form_lang_default %}selected{% endif %}>{{ lang.1 }}</option>

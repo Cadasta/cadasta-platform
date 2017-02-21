@@ -20,8 +20,8 @@
     <h4>{% trans "Details" %}</h4>
     <table class="table table-location">
       <tr>
-        <td><label>{% trans "Type" %}</label></td>
-        <td>{{ relationship.tenure_type_label }}</td>
+        <td><label {{ type_labels|safe }}>{% trans "Type" %}</label></td>
+        <td {{ type_choice_labels|safe }}>{{ relationship.tenure_type_label }}</td>
       </tr>
       <tr>
         <td><label>{% trans "Party" %}</label></td>

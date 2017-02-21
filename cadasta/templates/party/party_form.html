@@ -17,7 +17,7 @@
 {% else %}
 <div class="form-group">
   <label class="control-label" for="{{ form.type.id_for_label }}" {{ form.type.field.labels_xlang|safe }}>{% trans "Type" %}</label>
-  <div class="well well-sm">
+  <div class="well well-sm" {{ type_choice_labels|safe }}>
       {{ form.type|display_choice_verbose }}
   </div>
   <input type="hidden" value="{{ form.type.value }}" name="type" class="party-type"/>

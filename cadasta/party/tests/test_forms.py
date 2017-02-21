@@ -12,13 +12,13 @@ from ..models import Party, TenureRelationshipType
 
 class PartyFormTest(UserTestCase, TestCase):
 
-    def test_init_without_form(self):
+    def test_init_without_questionnaire(self):
         project = ProjectFactory.create()
         form = forms.PartyForm(project)
         assert hasattr(form.fields['name'], 'labels_xlang') is False
         assert hasattr(form.fields['type'], 'labels_xlang') is False
 
-    def test_init_with_form(self):
+    def test_init_with_questionnaire(self):
         project = ProjectFactory.create()
         questionnaire = q_factories.QuestionnaireFactory(project=project)
         q_factories.QuestionFactory.create(
