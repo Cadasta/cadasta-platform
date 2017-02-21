@@ -92,8 +92,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'yoko79',
             'email': 'john@beatles.uk',
-            'password': 'iloveyoko79!',
-            'password_repeat': 'iloveyoko79!',
+            'password': 'iloveYoKo79!',
+            'password_repeat': 'iloveYoKo79!',
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
