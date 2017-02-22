@@ -4769,8 +4769,11 @@ div.org-logo {
   height: 100%; }
 
 @media (max-width: 991px) {
-  .row-height, .col-height {
+  .row-height {
     display: block; }
+  .col-height {
+    display: table-header-group;
+  }
   #organization-single .content-single > .row {
     margin-left: 0; }
   #organization-single .row-height {
