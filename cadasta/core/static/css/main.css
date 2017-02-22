@@ -4788,6 +4788,7 @@ div.org-logo {
     display: block; }
   .col-height {
     display: table-header-group;
+    width: 100%;
   }
   #organization-single .content-single > .row {
     margin-left: 0; }
