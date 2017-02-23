@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'simple_history',
     'jsonattrs',
     'compressor',
+    'leaflet',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -254,6 +255,16 @@ LEAFLET_CONFIG = {
         'groupedlayercontrol': {
             'js': '/static/js/leaflet.groupedlayercontrol.min.js',
             'css': '/static/css/leaflet.groupedlayercontrol.min.css'
+        },
+        'markercluster': {
+            'js': '/static/js/leaflet.markercluster.js',
+            'css': [
+                '/static/css/MarkerCluster.css',
+                '/static/css/MarkerCluster.Default.css'
+            ]
+        },
+        'deflate': {
+            'js': '/static/js/L.Map.Deflate.js'
         }
     }
 }

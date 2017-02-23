@@ -25,9 +25,9 @@ class Dashboard(TemplateView):
         )
         context['leaflet_tiles'] = [
             {
-              'label': force_text(label),
-              'url': url,
-              'attrs': force_text(attrs)
+                'label': force_text(label),
+                'url': url,
+                'attrs': force_text(attrs)
             } for (label, url, attrs) in LEAFLET_CONFIG.get('TILES')]
         return context
 
