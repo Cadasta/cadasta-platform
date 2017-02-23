@@ -4,18 +4,14 @@
 
 {% load staticfiles %}
 
+{% load leaflet_tags %}
+
 {% block extra_head %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
-<link rel="stylesheet" href="{% static 'css/leaflet.groupedlayercontrol.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+{% leaflet_css plugins="groupedlayercontrol,markercluster" %}
 {% endblock %}
 
 {% block extra_script %}
-<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
-<script src="{% static '/js/leaflet.groupedlayercontrol.min.js' %}"></script>
-<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+{% leaflet_js plugins="groupedlayercontrol,markercluster,deflate" %}
 <script src="{% static 'js/smap/index.js' %}"></script>
 
 <script>
@@ -32,7 +28,6 @@
   var options = {
     projectExtent: projectExtent,
     trans: trans,
-    // SHOULD BE USED: fitBounds: '{{ boundary }}',
     fitBounds: 'project',
     project_slug: '{{ project.slug }}',
     org_slug: '{{ project.organization.slug }}'

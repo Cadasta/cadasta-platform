@@ -81,7 +81,7 @@ class SpatialUnitTiles(APIPermissionRequiredMixin,
         zoom = int(self.kwargs['z'])
 
         bbox = num2deg(xtile=x, ytile=y, zoom=zoom)
-        bbox.extend(num2deg(xtile=x+1, ytile=y+1, zoom=zoom))
+        bbox.extend(num2deg(xtile=x + 1, ytile=y + 1, zoom=zoom))
         bbox = Polygon.from_bbox(bbox)
         final_queryset = queryset.filter(
             geometry__intersects=bbox).exclude(

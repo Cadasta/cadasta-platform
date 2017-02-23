@@ -1,17 +1,18 @@
 import json
-from skivvy import ViewTestCase
-
-from django.http import HttpRequest
-from django.test import TestCase
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
-from tutelary.models import Role
-from organization.tests.factories import OrganizationFactory, ProjectFactory
+from django.http import HttpRequest
+from django.test import TestCase
+from django.utils.encoding import force_text
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+from skivvy import ViewTestCase
+from tutelary.models import Role
 
 from ..views.default import Dashboard, IndexPage, server_error
+from config.settings.default import LEAFLET_CONFIG
 
 
 class IndexPageTest(ViewTestCase, UserTestCase, TestCase):
@@ -49,6 +50,16 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         ProjectFactory.create(
             name='Archived Project', archived=True,
             organization=self.org, extent=extent)
+
+    def setup_template_context(self):
+        context = {}
+        context['leaflet_tiles'] = [
+            {
+                'label': force_text(label),
+                'url': url,
+                'attrs': force_text(attrs)
+            } for (label, url, attrs) in LEAFLET_CONFIG.get('TILES')]
+        return context
 
     def _render_geojson(self, projects):
         return json.dumps(ProjectGeometrySerializer(projects, many=True).data)
@@ -95,6 +106,7 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
 
 
 class ServerErrorTest(TestCase):
+
     def setUp(self):
         super().setUp()
         self.request = HttpRequest()

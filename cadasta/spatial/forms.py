@@ -20,7 +20,7 @@ class LocationForm(form_mixins.SanitizeFieldsForm,
     attributes_field = 'attributes'
 
     geometry = gisforms.GeometryField(
-        # widget=LeafletWidget(),
+        widget=LeafletWidget(),
         error_messages={
             'required': __('No map location was provided. Please use the '
                            'tools provided on the left side of the map to '
