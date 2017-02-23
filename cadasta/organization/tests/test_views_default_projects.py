@@ -220,9 +220,9 @@ class ProjectMapTest(ViewTestCase, UserTestCase, TestCase):
             'is_allowed_add_resource': False,
             'leaflet_tiles': [
                 {
-                  'label': force_text(label),
-                  'url': url,
-                  'attrs': force_text(attrs)
+                    'label': force_text(label),
+                    'url': url,
+                    'attrs': force_text(attrs)
                 } for (label, url, attrs) in LEAFLET_CONFIG.get('TILES')]
         }
 
@@ -305,6 +305,12 @@ class ProjectMapTest(ViewTestCase, UserTestCase, TestCase):
             '-4.8641967773437491 8.2278005261522775, '
             '-5.1031494140625000 8.1299292850467957))')
         self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_locations_extent(self):
+        SpatialUnitFactory.create_batch(2, project=self.project)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.expected_content

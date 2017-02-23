@@ -5,12 +5,23 @@
 {% block body-class %} map{% endblock %}
 {% block left-nav %}map{% endblock %}
 
+{% load leaflet_tags %}
+
 {% load staticfiles %}
 
+{% block extra_head %}
+{% leaflet_css plugins="groupedlayercontrol,markercluster" %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+<style type="text/css">
+  #project-map {
+    height: 600px;
+  }
+</style>
+{% endblock %}
+
 {% block extra_script %}
+{% leaflet_js plugins="groupedlayercontrol,markercluster,deflate"%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
-<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
   function locations_map_init(map, options) {
@@ -44,17 +55,7 @@
 </script>
 {% endblock %}
 
-{% block extra_head %}
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
-<style type="text/css">
-  #project-map {
-    height: 600px;
-  }
-</style>
-{% endblock %}
 
 {% block content %}
 
@@ -62,7 +63,7 @@
   <div class="row">
     <!-- Start overview map  -->
     <div class="col-sm-12 map">
-      
+
     </div>
   </div>
 </div>

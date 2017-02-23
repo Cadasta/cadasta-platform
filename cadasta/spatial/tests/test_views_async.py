@@ -195,3 +195,79 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
         response = self.request(user=user)
         assert response.status_code == 200
+
+
+class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
+    view_class = async.SpatialUnitTiles
+
+    def setup_models(self):
+        self.user = UserFactory.create()
+        assign_policies(self.user)
+        self.prj = ProjectFactory.create(slug='test-project', access='public')
+        # inside tile
+        SpatialUnitFactory.create(
+            project=self.prj, type='AP',
+            geometry='SRID=4326;POINT(11 53)')
+        # outside tile
+        SpatialUnitFactory.create(
+            project=self.prj, type='BU',
+            geometry='SRID=4326;POINT(11 54)')
+        # outside tile
+        SpatialUnitFactory.create(
+            project=self.prj, type='AP',
+            geometry='SRID=4326;POINT(9 53)')
+
+    def setup_url_kwargs(self):
+        return {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'x': 135,
+            'y': 83,
+            'z': 8
+        }
+
+    def test_num2deg(self):
+        lon_deg, lat_deg = async.num2deg(135, 83, 8)
+        assert lon_deg == 9.84375
+        assert lat_deg == 53.33087298301705
+
+    def test_deg2num(self):
+        xtile, ytile = async.deg2num(53.33087298301705, 9.84375, 8)
+        assert xtile == 135
+        assert ytile == 83
+
+    def test_get_with_archived_project(self):
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['features']) == 1
+
+    def test_get_with_private_project(self):
+        self.prj.access = 'private'
+        self.prj.save()
+        restricted_clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project.list'],
+                    'action': ['organization/*']
+                },
+                {
+                    'effect': 'allow',
+                    'object': ['project.view'],
+                    'action': ['project/*/*']
+                }
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        assign_user_policies(self.user, restricted_policy)
+        response = self.request(user=self.user)
+        assert response.status_code == 403
+
+    def test_get_with_public_project(self):
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['features']) == 1
