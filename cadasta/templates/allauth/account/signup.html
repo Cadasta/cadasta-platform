@@ -19,7 +19,7 @@
 </script>
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#showHide1").click(function () {
+    $("#showHide").click(function () {
        if ($("#id_password1").attr("type")=="password") {
          $("#id_password1").attr("type", "text");
         }
@@ -27,7 +27,7 @@
         $("#id_password1").attr("type", "password");
        }
    });
-   $("#showHide2").click(function () {
+   $("#showHide").click(function () {
        if ($("#id_password2").attr("type")=="password") {
          $("#id_password2").attr("type", "text");
         }
@@ -79,7 +79,7 @@
     <label class="control-label" for="id_password1">{% trans "Password" %}</label>
     {% render_field form.password1 class+="form-control input-lg" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" %}
     <br>
-    <input type="checkbox" id="showHide1"><label>Show Password</label>
+    <input type="checkbox" id="showHide"><label for="showHide">&nbsp;Show Password</label>
     <p class="help-block small hidden">{% trans "Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username or email address." %}</p>
     <div class="error-block">{{ form.password1.errors }}</div>
   </div>
@@ -87,8 +87,6 @@
   <div class="form-group{% if form.password2.errors %} has-error{% endif %}">
     <label class="control-label" for="id_password2">{% trans "Confirm password" %}</label>
     {% render_field form.password2 class+="form-control input-lg" data-parsley-equalto="#id_password1" %}
-    <br>
-    <input type="checkbox" id="showHide2"><label>Show Password</label>
     <div class="error-block">{{ form.password2.errors }}</div>
   </div>
 
