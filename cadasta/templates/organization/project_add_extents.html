@@ -1,19 +1,19 @@
 {% extends "organization/project_add_wrapper.html" %}
 
 {% load staticfiles %}
-<!-- {% load leaflet_tags %} -->
+{% load leaflet_tags %}
 {% load i18n %}
 
 {% block page_title %}| {% trans "Draw map" %}{% endblock %}
 {% block body-class %} map{% endblock %}
 
 {% block extra_head %}
-<!-- {% leaflet_css plugins="draw,forms" %} -->
+{% leaflet_css plugins="draw,forms" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 {% endblock %}
 
 {% block extra_script %}
-<!-- {% leaflet_js plugins="draw,forms" %} -->
+{% leaflet_js plugins="draw,forms" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
@@ -24,7 +24,7 @@
       } else {
         var map = e.originalEvent.detail.map;
       }
-      
+
       map = add_map_controls(map);
       map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
    });

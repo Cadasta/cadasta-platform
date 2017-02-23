@@ -2,20 +2,20 @@
 
 {% load staticfiles %}
 {% load i18n %}
-<!-- {% load leaflet_tags %} -->
+{% load leaflet_tags %}
 
 {% block page_title %}{% trans "Edit project boundary" %} | {% endblock %}
 {% block body-class %} map{% endblock %}
 
 
 {% block extra_head %}
-<!-- {% leaflet_css plugins="draw,forms" %} -->
+{% leaflet_css plugins="draw,forms" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 {% endblock %}
 
 {% block extra_script %}
 {{ block.super }}
-<!-- {% leaflet_js plugins="draw,forms" %} -->
+{% leaflet_js plugins="draw,forms" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
