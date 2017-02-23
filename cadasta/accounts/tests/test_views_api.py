@@ -50,11 +50,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         assert self.user.email_verified is True
 
     def test_update_username(self):
-        data = {'email': self.user.email, 'username': 'john'}
+        data = {'email': self.user.email, 'username': 'JOHN'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         self.user.refresh_from_db()
         assert response.status_code == 200
-        assert self.user.username == 'john'
+        assert self.user.username == 'JOHN'
         assert self.user.email_verified is True
 
     def test_update_with_existing_username(self):
@@ -82,6 +82,20 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         assert User.objects.count() == 1
         assert len(mail.outbox) == 1
 
+    def test_user_signs_up_case_insensitive_username(self):
+        data = {
+            'username': 'IMAgine71',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 201
+        assert User.objects.count() == 1
+        user = User.objects.get_from_username_or_email('imagine71')
+        assert user.username == 'IMAgine71'
+        assert len(mail.outbox) == 1
+
     def test_user_signs_up_with_invalid(self):
         """The server should respond with an 404 error code when a user tries
            to sign up with invalid data"""
@@ -107,6 +121,13 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""
         data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'auth_token' in response.content
+
+    def test_successful_login_username_case_insensitive(self):
+        """The view should return a token to authenticate API calls"""
+        data = {'username': 'IMAGINE71', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
         assert 'auth_token' in response.content
