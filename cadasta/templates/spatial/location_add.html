@@ -6,13 +6,14 @@
 {% block left-nav %}map{% endblock %}
 
 {% load staticfiles %}
+{% load leaflet_tags %}
 
 {% block page_title %}{% trans "Add location" %} | {% endblock %}
 
 {% block extra_head %}
+{% leaflet_css plugins="draw,forms,groupedlayercontrol,markercluster,deflate"%}
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
@@ -20,20 +21,19 @@
 
 {% block extra_script %}
 {{ block.super }}
-{% leaflet_js plugins="draw,forms,groupedlayercontrol" %}
-
+{% leaflet_js plugins="draw,forms,groupedlayercontrol,markercluster,deflate" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
-<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
 {% if get_current_language != "en-us" %}
 {% get_current_language as LANGUAGE_CODE %}
+{{ LANGUAGE_CODE }}
 <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
 {% endif %}
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
   $(document).ready(function () {
     $(window).on('map:init', function(e) {
+      console.log(e);
       if (e.detail) {
         var detail = e.detail;
       } else {
@@ -55,7 +55,7 @@
 
       renderFeatures(detail.map,
                      '{% url "async:spatial:list" object.organization.slug object.slug %}',
-                     {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
+                     {projectExtent: projectExtent, trans: trans, fitBounds: 'project'});
 
       var orgSlug = '{{ object.organization.slug }}';
       var projectSlug = '{{ object.slug }}';

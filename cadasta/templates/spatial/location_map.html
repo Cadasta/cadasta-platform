@@ -9,7 +9,6 @@
 
 {% block extra_script %}
 {{ block.super }}
-{% leaflet_js plugins="groupedlayercontrol"%}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
@@ -21,9 +20,6 @@
     var trans = {
       open: "{% trans 'Open location' %}"
     };
-    options.project_slug = '{{ object.slug }}'
-    options.org_slug = '{{ object.organization.slug }}'
-    options.trans = trans
 
     add_map_controls(map);
 
@@ -36,7 +32,7 @@
     {% endif %}
 
     renderFeatures(map,
-                   '{% url "async:spatial:tiled" object.organization.slug object.slug 0 0 0 %}',
+                   '{% url "async:spatial:list" object.organization.slug object.slug %}',
                    {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
 
     var orgSlug = '{{ object.organization.slug }}';

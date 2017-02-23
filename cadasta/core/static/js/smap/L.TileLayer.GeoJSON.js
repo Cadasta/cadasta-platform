@@ -3,8 +3,11 @@ L.TileLayer.Ajax = L.TileLayer.extend({
     _requests: [],
     _loadedfeatures: {},
     _tiles: {},
-    _addTile: function (tilePoint) {
-        var tile = { datum: null, processed: false };
+    _addTile: function(tilePoint) {
+        var tile = {
+            datum: null,
+            processed: false
+        };
         this._tiles[tilePoint.x + ':' + tilePoint.y] = {
             el: tile,
             coords: {
@@ -17,8 +20,8 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         this._loadTile(tile, tilePoint);
     },
     // XMLHttpRequest handler; closure over the XHR object, the layer, and the tile
-    _xhrHandler: function (req, layer, tile, tilePoint) {
-        return function () {
+    _xhrHandler: function(req, layer, tile, tilePoint) {
+        return function() {
             if (req.readyState !== 4) {
                 return;
             }
@@ -32,8 +35,8 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         };
     },
     // Load the requested tile via AJAX
-    _loadTile: function (tile, tilePoint) {
-        // **** 
+    _loadTile: function(tile, tilePoint) {
+        // ****
         // _update has been refactored is no longer required?
         // ****
         // this._update(tilePoint);
@@ -42,18 +45,22 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         this._requests.push(req);
         req.onreadystatechange = this._xhrHandler(req, layer, tile, tilePoint);
         req.open('GET', this.getTileUrl(tilePoint), true);
-        req.send();    
+        req.send();
     },
-    _reset: function () {
+    _reset: function() {
         L.TileLayer.prototype._reset.apply(this, arguments);
         for (var i = 0; i < this._requests.length; i++) {
             this._requests[i].abort();
         }
         this._requests = [];
     },
-    _update: function () {
-        if (this._map && this._map._panTransition && this._map._panTransition._inProgress) { return; }
-        if (this._tilesToLoad < 0) { this._tilesToLoad = 0; }
+    _update: function() {
+        if (this._map && this._map._panTransition && this._map._panTransition._inProgress) {
+            return;
+        }
+        if (this._tilesToLoad < 0) {
+            this._tilesToLoad = 0;
+        }
         L.TileLayer.prototype._update.apply(this, arguments);
     }
 });
@@ -66,24 +73,27 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     // Used to calculate svg path string for clip path elements
     _clipPathRectangles: {},
 
-    initialize: function (url, options, geojsonOptions) {
+    initialize: function(url, options, geojsonOptions) {
         L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
-        this.features = L.deflate({minSize: 20, markerCluster: true});
+        this.features = L.deflate({
+            minSize: 20,
+            markerCluster: true
+        });
     },
-    onAdd: function (map) {
+    onAdd: function(map) {
         this._lazyTiles = new Tile(0, 0, 0, map.maxZoom);
         this._map = map;
         L.TileLayer.Ajax.prototype.onAdd.call(this, map);
         map.addLayer(this.geojsonLayer);
         map.addLayer(this.features);
     },
-    onRemove: function (map) {
+    onRemove: function(map) {
         map.removeLayer(this.geojsonLayer);
         L.TileLayer.Ajax.prototype.onRemove.call(this, map);
         map.removeLayer(this.features);
     },
-    _reset: function () {
+    _reset: function() {
         this.geojsonLayer.clearLayers();
         this._keyLayers = {};
         this._removeOldClipPaths();
@@ -95,7 +105,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     },
 
     // Remove clip path elements from other earlier zoom levels
-    _removeOldClipPaths: function  () {
+    _removeOldClipPaths: function() {
         for (var clipPathId in this._clipPathRectangles) {
             var prefix = clipPathId.split('tileClipPath')[0];
             if (this._getUniqueId() === prefix) {
@@ -115,20 +125,23 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     },
 
     // Recurse LayerGroups and call func() on L.Path layer instances
-    _recurseLayerUntilPath: function (func, layer) {
+    _recurseLayerUntilPath: function(func, layer) {
         if (layer instanceof L.Path) {
             func(layer);
-        }
-        else if (layer instanceof L.LayerGroup) {
+        } else if (layer instanceof L.LayerGroup) {
             // Recurse each child layer
             layer.getLayers().forEach(this._recurseLayerUntilPath.bind(this, func), this);
         }
     },
 
-    _clipLayerToTileBoundary: function (layer, tilePoint) {
+    _clipLayerToTileBoundary: function(layer, tilePoint) {
         // Only perform SVG clipping if the browser is using SVG
-        if (!L.Path.SVG) { return; }
-        if (!this._map) { return; }
+        if (!L.Path.SVG) {
+            return;
+        }
+        if (!this._map) {
+            return;
+        }
 
         if (!this._map._pathRoot) {
             this._map._pathRoot = L.Path.prototype._createElement('svg');
@@ -141,8 +154,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         if (svg.getElementsByTagName('defs').length === 0) {
             defs = document.createElementNS(L.Path.SVG_NS, 'defs');
             svg.insertBefore(defs, svg.firstChild);
-        }
-        else {
+        } else {
             defs = svg.getElementsByTagName('defs')[0];
         }
 
@@ -155,10 +167,10 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
 
             // Create a hidden L.Rectangle to represent the tile's area
             var tileSize = this.options.tileSize,
-            nwPoint = tilePoint.multiplyBy(tileSize),
-            sePoint = nwPoint.add([tileSize, tileSize]),
-            nw = this._map.unproject(nwPoint),
-            se = this._map.unproject(sePoint);
+                nwPoint = tilePoint.multiplyBy(tileSize),
+                sePoint = nwPoint.add([tileSize, tileSize]),
+                nw = this._map.unproject(nwPoint),
+                se = this._map.unproject(sePoint);
             this._clipPathRectangles[clipPathId] = new L.Rectangle(new L.LatLngBounds([nw, se]), {
                 opacity: 0,
                 fillOpacity: 0,
@@ -168,7 +180,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
             this._map.addLayer(this._clipPathRectangles[clipPathId]);
 
             // Add a clip path element to the SVG defs element
-            // With a path element that has the hidden rectangle's SVG path string  
+            // With a path element that has the hidden rectangle's SVG path string
             var path = document.createElementNS(L.Path.SVG_NS, 'path');
             var pathString = this._clipPathRectangles[clipPathId].getPathString();
             path.setAttribute('d', pathString);
@@ -177,8 +189,8 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         }
 
         // Add the clip-path attribute to reference the id of the tile clipPath
-        this._recurseLayerUntilPath(function (pathLayer) {
-            pathLayer._container.setAttribute('clip-path', 'url(' + window.location.href + '#' + clipPathId + ')');          
+        this._recurseLayerUntilPath(function(pathLayer) {
+            pathLayer._container.setAttribute('clip-path', 'url(' + window.location.href + '#' + clipPathId + ')');
         }, layer);
     },
 
@@ -186,8 +198,8 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     // * If the options.unique function is specified, merge geometries into GeometryCollections
     // grouped by the key returned by options.unique(feature) for each GeoJSON feature
     // * If options.clipTiles is set, and the browser is using SVG, perform SVG clipping on each
-    // tile's GeometryCollection 
-    addTileData: function (geojson, tilePoint) {
+    // tile's GeometryCollection
+    addTileData: function(geojson, tilePoint) {
         var features = L.Util.isArray(geojson) ? geojson : geojson.features,
             i, len, feature;
         if (features) {
@@ -196,10 +208,10 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
                 // Only add this if geometry or geometries are set and not null
                 feature = features[i];
                 if (feature.geometries || feature.geometry || feature.features || feature.coordinates) {
-                    // **** 
+                    // ****
                     // Added to prevent reloading of already loaded SUs.
                     // ****
-                    if (!this._loadedfeatures[features[i]['id']]){
+                    if (!this._loadedfeatures[features[i]['id']]) {
                         this.addTileData(features[i], tilePoint);
                         this._loadedfeatures[features[i]['id']] = true;
                     }
@@ -211,7 +223,9 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
 
         var options = this.geojsonLayer.options;
 
-        if (options.filter && !options.filter(geojson)) { return; }
+        if (options.filter && !options.filter(geojson)) {
+            return;
+        }
 
         var parentLayer = this.geojsonLayer;
         var incomingLayer = null;
@@ -266,7 +280,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         if (options.onEachFeature) {
             options.onEachFeature(geojson, incomingLayer);
         }
-        // parentLayer.addLayer(incomingLayer);
+        parentLayer.addLayer(incomingLayer);
         this.features.addLayer(incomingLayer);
 
         // If options.clipTiles is set and the browser is using SVG
@@ -277,17 +291,19 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         return this;
     },
 
-    _tileLoaded: function (tile, tilePoint) {
-        // **** 
+    _tileLoaded: function(tile, tilePoint) {
+        // ****
         // _tileOnLoad has been refactored and requires a callback function
         // ****
         // L.TileLayer.Ajax.prototype._tileOnLoad.apply(this, tile);
-        if (tile.datum === null) { return null; }
+        if (tile.datum === null) {
+            return null;
+        }
         this.addTileData(tile.datum, tilePoint);
         this._lazyTiles.load(tilePoint.x, tilePoint.y, tilePoint.z);
     },
 
-    _loadTile: function (tile, tilePoint) {
+    _loadTile: function(tile, tilePoint) {
         if (!this._lazyTiles.isLoaded(tilePoint.x, tilePoint.y, tilePoint.z)) {
             L.TileLayer.Ajax.prototype._loadTile.call(this, tile, tilePoint);
         }
