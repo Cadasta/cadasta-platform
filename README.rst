@@ -11,10 +11,11 @@ Install:
 
 - `VirtualBox <https://www.virtualbox.org/>`_
 - `Vagrant <https://www.vagrantup.com/>`_
-- `Ansible <http://www.ansible.com/>`_ (version 2: install with PIP for a recent version)
+- `Ansible <http://www.ansible.com/>`_ (version 2: install with PIP for a recent version(recommended for Linux or a Mac))
+-(Windows isn’t supported for the control machine,For windows go through <a href="http://docs.ansible.com/ansible/intro_windows.html">Ansible Documentation</a>). 
 
 Clone the `repository <https://github.com/cadasta/cadasta-platform>`_ to your local machine and enter that directory.
-
+After cloning it go inside to cadasta-platform directory and run below command to provision the virtual machine.
 Provision the VM::
 
   vagrant up --provision
