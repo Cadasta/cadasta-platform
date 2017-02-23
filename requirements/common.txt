@@ -10,6 +10,7 @@ django-parsley==0.6
 django-formtools==1.0
 django-countries==3.4.1
 django-sass-processor==0.3.4
+django-leaflet-cadasta==0.21.0
 djangorestframework-gis==0.10.1
 jsonschema==2.5.1
 rfc3987==1.3.5

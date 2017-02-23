@@ -186,10 +186,6 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=True)
 
 
-# <<<<<<< HEAD
-# class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
-#                            TestCase):
-# =======
 class ProjectMapTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                      TestCase):
     view_class = default.ProjectMap
@@ -226,9 +222,9 @@ class ProjectMapTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             'is_allowed_add_resource': False,
             'leaflet_tiles': [
                 {
-                  'label': force_text(label),
-                  'url': url,
-                  'attrs': force_text(attrs)
+                    'label': force_text(label),
+                    'url': url,
+                    'attrs': force_text(attrs)
                 } for (label, url, attrs) in LEAFLET_CONFIG.get('TILES')]
         }
 
@@ -311,6 +307,12 @@ class ProjectMapTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             '-4.8641967773437491 8.2278005261522775, '
             '-5.1031494140625000 8.1299292850467957))')
         self.project.save()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_locations_extent(self):
+        SpatialUnitFactory.create_batch(2, project=self.project)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.expected_content
@@ -426,8 +428,8 @@ class ProjectMapTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == expected
 
 
-# >>>>>>> 2be592a... Single page map scaffolding view and html. Upgrade (kinda) to Leaflet1.0 (#1077)
-class ProjectDashboardTest(ViewTestCase, UserTestCase, TestCase):
+class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
+                           TestCase):
     view_class = default.ProjectDashboard
     template = 'organization/project_dashboard.html'
 
