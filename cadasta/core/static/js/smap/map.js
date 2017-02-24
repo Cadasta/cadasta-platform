@@ -1,10 +1,8 @@
-// var map = L.map('mapid');
-
 var SMap = function(map) {
   var layerscontrol = L.control.layers().addTo(map);
 
   var geojsonTileLayer = new L.TileLayer.GeoJSON(
-    url, 
+    1, options.locations_count, url, 
     {
       clipTiles: true,
       unique: function (feature) {return feature.id;}
@@ -16,7 +14,7 @@ var SMap = function(map) {
           layer.bindPopup("<div class=\"text-wrap\">" +
                       "<h2><span>Location</span>" +
                       feature.properties.type + "</h2></div>" +
-                      "<div class=\"btn-wrap\"><a href='#/" + feature.properties.url + "' id=\"spatial-pop-up\" class=\"btn btn-primary btn-sm btn-block\">" + options.trans.open + "</a>"  +
+                      "<div class=\"btn-wrap\"><a href='#/" + feature.properties.url + "/' id=\"spatial-pop-up\" class=\"btn btn-primary btn-sm btn-block\">" + options.trans.open + "</a>"  +
                       "</div>");
         }
       }
@@ -37,6 +35,7 @@ var SMap = function(map) {
 
   add_tile_layers();
   map.addLayer(geojsonTileLayer);
+  rm.setGeoJsonLayer(geojsonTileLayer);
 
   function load_project_extent() {
     if (options.projectExtent) {
@@ -67,7 +66,7 @@ var SMap = function(map) {
 
   load_project_extent();
 
-  // *** CURRENTLY DOES NOT WORK ***
+  /*** CURRENTLY DOES NOT WORK ***/
   function load_features() {
     if (options.fitBounds === 'locations') {
       var bounds = geojsonTileLayer.geojsonLayer.getBounds();
@@ -110,6 +109,12 @@ var SMap = function(map) {
   }
 
   function add_map_controls() {
+    map.removeControl(map.zoomControl);
+    map.addControl(L.control.zoom({
+      zoomInTitle: gettext("Zoom in"),
+      zoomOutTitle: gettext("Zoom out")
+    }));
+
     var geocoder = L.control.geocoder('search-QctWfva', {
       markers: false
     }).addTo(map);
@@ -139,10 +144,20 @@ var SMap = function(map) {
     });
 
     map.addControl(new Geolocate());
+
+    function add_popup_actions() {
+      map.on('popupopen', function() {
+        $('#spatial-pop-up').on('click', function() {
+          map.closePopup();
+        });
+      });
+    }
+
+    add_popup_actions();
+
     return map;
   }
 
-  return {
-    add_map_controls: add_map_controls,
-  };
+  add_map_controls();
+
 };

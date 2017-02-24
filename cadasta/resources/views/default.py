@@ -55,6 +55,20 @@ class ProjectResourcesAdd(LoginPermissionRequiredMixin,
     def get_object(self):
         return self.get_project()
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        url_kwargs = {
+            'organization': context['project'].organization.slug,
+            'project': context['project'].slug,
+        }
+        context['cancel_url'] = reverse('resources:project_list',
+                                        kwargs=url_kwargs)
+        context['upload_url'] = reverse('resources:project_add_new',
+                                        kwargs=url_kwargs)
+        context['submit_url'] = reverse('resources:project_add_existing',
+                                        kwargs=url_kwargs)
+        return context
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
@@ -74,6 +88,20 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
 
     def get_perms_objects(self):
         return [self.get_project()]
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        url_kwargs = {
+            'organization': context['object'].organization.slug,
+            'project': context['object'].slug,
+        }
+        context['cancel_url'] = reverse('resources:project_list',
+                                        kwargs=url_kwargs)
+        context['add_lib_url'] = reverse('resources:project_add_existing',
+                                         kwargs=url_kwargs)
+        context['submit_url'] = reverse('resources:project_add_new',
+                                        kwargs=url_kwargs)
+        return context
 
     def post(self, request, *args, **kwargs):
         try:

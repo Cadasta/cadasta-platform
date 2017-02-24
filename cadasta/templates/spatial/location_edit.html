@@ -3,9 +3,6 @@
 {% load staticfiles %}
 {% load leaflet_tags %}
 
-{% block page_title %}{% trans "Edit location" %} | {% endblock %}
-{% block body-class %} map{% endblock %}
-
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms,groupedlayercontrol,markercluster" %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
@@ -15,7 +12,6 @@
 {% endblock %}
 
 {% block extra_script %}
-{{ block.super }}
 {% leaflet_js plugins="draw,forms,groupedlayercontrol,markercluster,deflate" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
@@ -23,20 +19,7 @@
 {% get_current_language as LANGUAGE_CODE %}
 <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
 {% endif %}
-<script src="{% static 'js/map_utils.js' %}"></script>
-<script src="{% static 'js/form_submit_once.js' %}"></script>
-<!-- <script>
-  $(document).ready(function () {
-    $(window).on('map:init', function(e) {
-      if (e.detail) {
-        var detail = e.detail;
-      } else {
-        var detail = e.originalEvent.detail;
-      }
-      var map = detail.map;
-      var options = detail.options;
-      switch_layer_controls(map, options);
-</script> -->
+
 {% endblock %}
 
 {% block content %}

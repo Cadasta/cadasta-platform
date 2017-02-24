@@ -5,12 +5,13 @@ from django.core.urlresolvers import reverse
 from tutelary.mixins import APIPermissionRequiredMixin
 from rest_framework import generics
 # from rest_framework_gis.pagination import GeoJsonPagination
-from jsonattrs.mixins import JsonAttrsMixin
+from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 
-from core.mixins import LoginPermissionRequiredMixin, update_permissions
+from core import mixins as core_mixins
 from core.views import generic
 from organization.views import mixins as organization_mixins
 from party.messages import TENURE_REL_CREATE
+from questionnaires.models import Question, QuestionOption
 from resources.views import mixins as resource_mixins
 from resources.forms import AddResourceFromLibraryForm
 from . import mixins
@@ -74,7 +75,8 @@ class SpatialUnitTiles(APIPermissionRequiredMixin,
         return [self.get_project()]
 
 
-class LocationDetail(LoginPermissionRequiredMixin,
+class LocationDetail(core_mixins.LoginPermissionRequiredMixin,
+                     core_mixins.SpatialUnitCoords,
                      JsonAttrsMixin,
                      mixins.SpatialUnitObjectMixin,
                      organization_mixins.ProjectAdminCheckMixin,
@@ -133,34 +135,36 @@ class LocationDetail(LoginPermissionRequiredMixin,
         return context
 
 
-class LocationsAdd(LoginPermissionRequiredMixin,
+class LocationsAdd(core_mixins.LoginPermissionRequiredMixin,
                    mixins.SpatialQuerySetMixin,
                    organization_mixins.ProjectAdminCheckMixin,
                    generic.CreateView):
     form_class = forms.LocationForm
     template_name = 'spatial/location_add.html'
-    permission_required = update_permissions('spatial.add')
+    permission_required = core_mixins.update_permissions('spatial.add')
     permission_denied_message = error_messages.SPATIAL_CREATE
 
-    # def get(self, request, *args, **kwargs):
-    #     referrer = request.META.get('HTTP_REFERER', None)
-    #     if referrer:
-    #         current_url = reverse('async:spatial:add', kwargs=self.kwargs)
-    #         if current_url not in referrer:
-    #             request.session['cancel_add_location_url'] = referrer
-    #     else:
-    #         # In case the browser does not send any referrer
-    #         request.session['cancel_add_location_url'] = reverse(
-    #             'organization:project-dashboard', kwargs=self.kwargs)
-    #     return super().get(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        referrer = request.META.get('HTTP_REFERER', None)
+        if referrer:
+            current_url = reverse('organization:project-dashboard',
+                                  kwargs=self.kwargs)
+            if current_url not in referrer:
+                request.session['cancel_add_location_url'] = referrer
+        else:
+            # In case the browser does not send any referrer
+            request.session['cancel_add_location_url'] = (reverse(
+                'organization:project-dashboard', kwargs=self.kwargs) +
+                '#/overview/')
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        # cancel_url = self.request.session.get(
-        # 'cancel_add_location_url', None)
-        # context['cancel_url'] = cancel_url or reverse(
-        #             'organization:project-dashboard', kwargs=self.kwargs)
-        context['cancel_url'] = '#/overview'
+        cancel_url = self.request.session.get(
+            'cancel_add_location_url', None)
+        context['cancel_url'] = cancel_url or (reverse(
+                    'organization:project-dashboard', kwargs=self.kwargs) +
+                    '#/overview/')
         return context
 
     def get_perms_objects(self):
@@ -172,18 +176,20 @@ class LocationsAdd(LoginPermissionRequiredMixin,
         return kwargs
 
 
-class LocationEdit(LoginPermissionRequiredMixin,
+class LocationEdit(core_mixins.LoginPermissionRequiredMixin,
+                   core_mixins.SpatialUnitCoords,
                    mixins.SpatialUnitObjectMixin,
                    organization_mixins.ProjectAdminCheckMixin,
                    generic.UpdateView):
     template_name = 'spatial/location_edit.html'
     form_class = forms.LocationForm
-    permission_required = update_permissions('spatial.edit')
+    permission_required = core_mixins.update_permissions('spatial.edit')
     permission_denied_message = error_messages.SPATIAL_UPDATE
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['cancel_url'] = '#/records/location/' + context['location'].id
+        context['cancel_url'] = ('#/records/location/{}/'.format(
+                                  context['location'].id))
         return context
 
     def get_form_kwargs(self):
@@ -192,41 +198,51 @@ class LocationEdit(LoginPermissionRequiredMixin,
         return kwargs
 
 
-class LocationDelete(LoginPermissionRequiredMixin,
+class LocationDelete(core_mixins.LoginPermissionRequiredMixin,
+                     core_mixins.SpatialUnitCoords,
                      mixins.SpatialUnitObjectMixin,
                      organization_mixins.ProjectAdminCheckMixin,
                      generic.DeleteView):
     template_name = 'spatial/location_delete.html'
-    permission_required = update_permissions('spatial.delete')
+    permission_required = core_mixins.update_permissions('spatial.delete')
     permission_denied_message = error_messages.SPATIAL_DELETE
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['cancel_url'] = '#/records/location/' + context['location'].id
+        context['cancel_url'] = ('#/records/location/{}/'.format(
+                                  context['location'].id))
+        context['submit_url'] = reverse('async:spatial:delete', kwargs={
+            'organization': context['location'].project.organization.slug,
+            'project': context['location'].project.slug,
+            'location': context['location'].id
+        })
         return context
 
     def get_success_url(self):
         kwargs = self.kwargs
         del kwargs['location']
-        return reverse('async:locations:list', kwargs=self.kwargs)
+        return reverse('organization:project-dashboard', kwargs=self.kwargs)
 
 
-class LocationResourceAdd(LoginPermissionRequiredMixin,
+class LocationResourceAdd(core_mixins.LoginPermissionRequiredMixin,
+                          core_mixins.SpatialUnitCoords,
                           mixins.SpatialUnitResourceMixin,
                           base_generic.edit.FormMixin,
                           organization_mixins.ProjectAdminCheckMixin,
                           generic.DetailView):
     template_name = 'spatial/resources_add.html'
     form_class = AddResourceFromLibraryForm
-    permission_required = update_permissions('spatial.resources.add')
+    permission_required = core_mixins.update_permissions(
+                                'spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         location = context['location']
-        context['cancel_url'] = '#/records/location/' + context['location'].id
-        context['upload_url'] = ("#/records/location/" +
-                                 location.id + "/resources/new")
+        context['cancel_url'] = '#/records/location/{}/?tab=resources'.format(
+                                 location.id)
+        context['upload_url'] = ("#/records/location/{}/resources/new/".format(
+                                 location.id))
         context['submit_url'] = reverse(
             'async:spatial:resource_add',
             kwargs={
@@ -244,21 +260,26 @@ class LocationResourceAdd(LoginPermissionRequiredMixin,
             return self.form_valid(form)
 
 
-class LocationResourceNew(LoginPermissionRequiredMixin,
+class LocationResourceNew(core_mixins.LoginPermissionRequiredMixin,
+                          core_mixins.SpatialUnitCoords,
+                          core_mixins.FormErrorMixin,
                           mixins.SpatialUnitResourceMixin,
                           organization_mixins.ProjectAdminCheckMixin,
                           resource_mixins.HasUnattachedResourcesMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
-    permission_required = update_permissions('spatial.resources.add')
+    permission_required = core_mixins.update_permissions(
+                                    'spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         location = context['location']
-        context['cancel_url'] = '#/records/location/' + context['location'].id
-        context['add_lib_url'] = ("#/records/location/" +
-                                  location.id + "/resources/add")
+        context['cancel_url'] = '#/records/location/{}/?tab=resources'.format(
+                                location.id)
+        context['add_lib_url'] = (
+            "#/records/location/{}/resources/add/".format(
+                location.id))
 
         context['submit_url'] = reverse(
             'async:spatial:resource_new',
@@ -270,13 +291,15 @@ class LocationResourceNew(LoginPermissionRequiredMixin,
         return context
 
 
-class TenureRelationshipAdd(LoginPermissionRequiredMixin,
+class TenureRelationshipAdd(core_mixins.LoginPermissionRequiredMixin,
+                            core_mixins.SpatialUnitCoords,
+                            core_mixins.FormErrorMixin,
                             mixins.SpatialUnitRelationshipMixin,
                             organization_mixins.ProjectAdminCheckMixin,
                             generic.CreateView):
     template_name = 'spatial/relationship_add.html'
     form_class = forms.TenureRelationshipForm
-    permission_required = update_permissions('tenure_rel.create')
+    permission_required = core_mixins.update_permissions('tenure_rel.create')
     permission_denied_message = TENURE_REL_CREATE
 
     def get_perms_objects(self):
@@ -293,19 +316,21 @@ class TenureRelationshipAdd(LoginPermissionRequiredMixin,
         context = super().get_context_data(*args, **kwargs)
         location = context['location']
         context['submit_url'] = reverse(
-            'api:v1:relationship:tenure_rel_create',
+            'async:spatial:relationship_add',
             kwargs={
                 'organization': location.project.organization.slug,
                 'project': location.project.slug,
-                # 'location': location.id
+                'location': location.id
             })
+        context['cancel_url'] = (
+            '#/records/location/{}/?tab=relationships'.format(
+                self.kwargs['location']))
         return context
 
     def get_success_url(self):
-        return (reverse(
-            'organization:project-dashboard',
-            kwargs={
+        success_url = (reverse('organization:project-dashboard', kwargs={
                 'organization': self.kwargs['organization'],
                 'project': self.kwargs['project']
-            }) + '#/records/location/' + self.kwargs['location'])
-        # return '#'
+            }) + '#/records/location/{}/?tab=relationships'.format(
+            self.kwargs['location']))
+        return success_url
