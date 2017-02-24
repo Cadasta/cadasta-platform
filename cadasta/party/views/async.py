@@ -33,8 +33,26 @@ class PartyRelationshipEdit(LoginPermissionRequiredMixin,
     permission_required = update_permissions('tenure_rel.update')
     permission_denied_message = error_messages.TENURE_REL_UPDATE
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['submit_url'] = reverse(
+            'async:party:relationship_edit',
+            kwargs={
+              'organization': self.kwargs['organization'],
+              'project': self.kwargs['project'],
+              'relationship': self.kwargs['relationship']
+            }
+          )
+        return context
+
     def get_success_url(self):
-        return reverse('parties:relationship_detail', kwargs=self.kwargs)
+        return (reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.kwargs['organization'],
+                'project': self.kwargs['project']
+            }) + '#/records/relationship/' + self.kwargs['relationship'])
+        # return reverse('parties:relationship_detail', kwargs=self.kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -50,10 +68,22 @@ class PartyRelationshipDelete(LoginPermissionRequiredMixin,
     permission_required = update_permissions('tenure_rel.delete')
     permission_denied_message = error_messages.TENURE_REL_DELETE
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['submit_url'] = reverse(
+          'async:party:relationship_delete',
+          kwargs={
+              'organization': self.kwargs['organization'],
+              'project': self.kwargs['project'],
+              'relationship': self.kwargs['relationship']
+            }
+        )
+        return context
+
     def get_success_url(self):
         kwargs = self.kwargs
         del kwargs['relationship']
-        return reverse('locations:list', kwargs=self.kwargs)
+        return reverse('organization:project-dashboard', kwargs=self.kwargs)
 
 
 class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
@@ -65,6 +95,24 @@ class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
     permission_required = update_permissions('tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['cancel_url'] = ('#/records/relationship/' +
+                                 self.kwargs['relationship'])
+        context['add_lib_url'] = ("#/records/relationship/" +
+                                  self.kwargs['relationship'] +
+                                  "/resources/add")
+
+        context['submit_url'] = reverse(
+          'async:party:relationship_resource_new',
+          kwargs={
+              'organization': self.kwargs['organization'],
+              'project': self.kwargs['project'],
+              'relationship': self.kwargs['relationship']
+            }
+        )
+        return context
+
 
 class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
                                    mixins.PartyRelationshipResourceMixin,
@@ -75,6 +123,24 @@ class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
     form_class = AddResourceFromLibraryForm
     permission_required = update_permissions('tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['cancel_url'] = ('#/records/relationships/' +
+                                 self.kwargs['relationship'])
+        context['upload_url'] = ("#/records/relationships/" +
+                                 self.kwargs['relationship'] +
+                                 "/resources/new")
+
+        context['submit_url'] = reverse(
+          'async:party:relationship_resource_add',
+          kwargs={
+              'organization': self.kwargs['organization'],
+              'project': self.kwargs['project'],
+              'relationship': self.kwargs['relationship']
+            }
+        )
+        return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

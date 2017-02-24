@@ -1,13 +1,13 @@
 import pytest
 import json
 from importlib import import_module
-from django.http import HttpRequest, Http404
+from django.http import Http404
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from questionnaires.tests.factories import QuestionnaireFactory
-from skivvy import APITestCase, ViewTestCase, remove_csrf
+from skivvy import APITestCase, ViewTestCase
 
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -69,7 +69,6 @@ def assign_policies(user):
 class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.LocationsAdd
     template = 'spatial/location_add.html'
-    success_url_name = 'async:spatial:detail'
     post_data = {
         'geometry': '{"type": "Polygon","coordinates": [[[-0.1418137550354'
                     '004,51.55240622205599],[-0.14117002487182617,51.55167'
@@ -112,12 +111,11 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
             'project': self.project.slug
         }
 
-    def setup_success_url_kwargs(self):
-        return {
+    def get_success_url(self):
+        return (reverse('organization:project-dashboard', kwargs={
             'organization': self.project.organization.slug,
             'project': self.project.slug,
-            'location': self.location_created.id
-        }
+            }) + '#/records/location/{}'.format(self.location_created.id))
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -131,59 +129,59 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         'id="id_spatialunit::default::fname" '
         'name="spatialunit::default::fname" type="text" />' in response.content
 
-    def test_get_with_authorized_user_with_referrer(self):
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user,
-                                request_meta={'HTTP_REFERER': '/help/'})
-        assert response.status_code == 200
-        assert '<input class="form-control" '
-        'id="id_spatialunit::default::fname" '
-        'name="spatialunit::default::fname" type="text" />' in response.content
+    # def test_get_with_authorized_user_with_referrer(self):
+    #     user = UserFactory.create()
+    #     assign_policies(user)
+    #     response = self.request(user=user,
+    #                             request_meta={'HTTP_REFERER': '/help/'})
+    #     assert response.status_code == 200
+    #     assert '<input class="form-control" '
+    #     'id="id_spatialunit::default::fname" '
+    #   'name="spatialunit::default::fname" type="text" />' in response.content
 
-    def test_get_with_authorized_user_with_same_referrer(self):
-        user = UserFactory.create()
-        assign_policies(user)
-        referer = reverse('async:spatial:add', kwargs=self.setup_url_kwargs())
-        response = self.request(user=user,
-                                request_meta={'HTTP_REFERER': referer})
-        assert response.status_code == 200
-        assert '<input class="form-control" '
-        'id="id_spatialunit::default::fname" '
-        'name="spatialunit::default::fname" type="text" />' in response.content
+    # def test_get_with_authorized_user_with_same_referrer(self):
+    #     user = UserFactory.create()
+    #     assign_policies(user)
+    #   referer = reverse('async:spatial:add', kwargs=self.setup_url_kwargs())
+    #     response = self.request(user=user,
+    #                             request_meta={'HTTP_REFERER': referer})
+    #     assert response.status_code == 200
+    #     assert '<input class="form-control" '
+    #     'id="id_spatialunit::default::fname" '
+    #   'name="spatialunit::default::fname" type="text" />' in response.content
 
-    def test_get_with_authorized_user_with_same_referrer_with_session(self):
-        user = UserFactory.create()
-        assign_policies(user)
+    # def test_get_with_authorized_user_with_same_referrer_with_session(self):
+    #     user = UserFactory.create()
+    #     assign_policies(user)
 
-        # Manually construct our request to enable session reuse
-        request = HttpRequest()
-        self._request = request
-        setattr(request, 'method', 'GET')
-        setattr(request, 'user', user)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
-        setattr(request, 'session', SessionStore())
-        url_params = self._get_url_kwargs()
-        view = self.setup_view()
-        expected_content = self.render_content(cancel_url='/info/')
+    #     # Manually construct our request to enable session reuse
+    #     request = HttpRequest()
+    #     self._request = request
+    #     setattr(request, 'method', 'GET')
+    #     setattr(request, 'user', user)
+    #     request.META['SERVER_NAME'] = 'testserver'
+    #     request.META['SERVER_PORT'] = '80'
+    #     setattr(request, 'session', SessionStore())
+    #     url_params = self._get_url_kwargs()
+    #     view = self.setup_view()
+    #     expected_content = self.render_content(cancel_url='/info/')
 
-        # First request that should set the session
-        request.META['HTTP_REFERER'] = '/info/'
-        response = view(request, **url_params)
-        content = response.render().content.decode('utf-8')
-        assert response.status_code == 200
-        assert remove_csrf(content) == expected_content
-        assert request.session['cancel_add_location_url'] == '/info/'
+    #     # First request that should set the session
+    #     request.META['HTTP_REFERER'] = '/info/'
+    #     response = view(request, **url_params)
+    #     content = response.render().content.decode('utf-8')
+    #     assert response.status_code == 200
+    #     assert remove_csrf(content) == expected_content
+    #     assert request.session['cancel_add_location_url'] == '/info/'
 
-        # Second request to check that the session is being used
-        request.META['HTTP_REFERER'] = reverse(
-            'async:spatial:add', kwargs=self.setup_url_kwargs())
-        response = view(request, **url_params)
-        content = response.render().content.decode('utf-8')
-        assert response.status_code == 200
-        assert remove_csrf(content) == expected_content
-        assert request.session['cancel_add_location_url'] == '/info/'
+    #     # Second request to check that the session is being used
+    #     request.META['HTTP_REFERER'] = reverse(
+    #         'async:spatial:add', kwargs=self.setup_url_kwargs())
+    #     response = view(request, **url_params)
+    #     content = response.render().content.decode('utf-8')
+    #     assert response.status_code == 200
+    #     assert remove_csrf(content) == expected_content
+    #     assert request.session['cancel_add_location_url'] == '/info/'
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -344,9 +342,9 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
 
 
 class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
+
     view_class = async.LocationEdit
     template = 'spatial/location_edit.html'
-    success_url_name = 'async:spatial:detail'
     post_data = {
         'geometry': '{"type": "Polygon","coordinates": [[[-0.1418137550354'
                     '004,51.55240622205599],[-0.14117002487182617,51.55167'
@@ -390,6 +388,14 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
             'project': self.project.slug,
             'location': self.location.id
         }
+
+    def get_success_url(self):
+        return reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug
+            }) + '#/records/location/' + self.location.id
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -478,7 +484,7 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
 class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.LocationDelete
     template = 'spatial/location_delete.html'
-    success_url_name = 'async:spatial:list'
+    success_url_name = 'organization:project-dashboard'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
@@ -489,6 +495,13 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
+                'cancel_url': '#/records/location/{}'.format(self.location.id),
+                'submit_url': reverse(
+                    'async:spatial:delete',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug,
+                        'location': self.location.id}),
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -588,7 +601,7 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
 class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.LocationResourceAdd
     template = 'spatial/resources_add.html'
-    success_url_name = 'async:spatial:detail'
+    success_url_name = 'organization:project-dashboard'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
@@ -603,6 +616,15 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
+                'submit_url': reverse(
+                    'async:spatial:resource_add',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug,
+                        'location': self.location.id}),
+                'cancel_url': '#/records/location/{}'.format(self.location.id),
+                'upload_url': ("#/records/location/" +
+                               self.location.id + "/resources/new"),
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -610,6 +632,12 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.location.id
+        }
+
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
         }
 
     def setup_post_data(self):
@@ -665,7 +693,7 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
+                self.expected_success_url + '#/records/location/' +
                 self.location.id)
 
         location_resources = self.location.resources.all()
@@ -708,7 +736,7 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
                               FileStorageTestCase, TestCase):
     view_class = async.LocationResourceNew
     template = 'spatial/resources_new.html'
-    success_url_name = 'async:spatial:detail'
+    success_url_name = 'organization:project-dashboard'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
@@ -721,12 +749,27 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
             'location': self.location.id
         }
 
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+        }
+
     def setup_template_context(self):
         form = ResourceForm(content_object=self.location,
                             project_id=self.project.id)
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
+                'submit_url': reverse(
+                    'async:spatial:resource_new',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug,
+                        'location': self.location.id}),
+                'cancel_url': '#/records/location/{}'.format(self.location.id),
+                'add_lib_url': ("#/records/location/" +
+                                self.location.id + "/resources/add"),
                 'is_allowed_add_location': True}
 
     def setup_post_data(self):
@@ -788,7 +831,7 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
+                self.expected_success_url + '#/records/location/' +
                 self.location.id)
         assert self.location.resources.count() == 1
 
@@ -883,9 +926,15 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         )
 
     def setup_template_context(self):
+        submit_url = ('/async/organizations/{org}/projects/{prj}/records/'
+                      'location/{spatial_id}/relationships/new/'.format(
+                        org=self.project.organization.slug,
+                        prj=self.project.slug,
+                        spatial_id=self.spatial_unit.id))
         return {
             'object': self.project,
             'location': self.spatial_unit,
+            'submit_url': submit_url,
             'form': forms.TenureRelationshipForm(
                 project=self.project,
                 spatial_unit=self.spatial_unit,
@@ -901,6 +950,12 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.spatial_unit.id
+        }
+
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
         }
 
     def test_get_with_authorized_user(self):
@@ -950,7 +1005,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
+                self.expected_success_url + '#/records/location/' +
                 self.spatial_unit.id)
 
         assert TenureRelationship.objects.count() == 1
@@ -972,7 +1027,7 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                                 })
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
+                self.expected_success_url + '#/records/location/' +
                 self.spatial_unit.id)
 
         assert TenureRelationship.objects.count() == 1

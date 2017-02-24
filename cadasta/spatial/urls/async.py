@@ -24,7 +24,6 @@ urls = [
         r'^records/location/(?P<location>[-\w]+)/$',
         async.LocationDetail.as_view(),
         name='detail'),
-
     url(
         r'^records/location/(?P<location>[-\w]+)/resources/add/$',
         async.LocationResourceAdd.as_view(),

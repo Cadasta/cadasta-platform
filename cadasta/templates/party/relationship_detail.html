@@ -3,7 +3,7 @@
 {% block location_panel %}
   <section>
     <div class="page-title">
-      <h2><a href="#/records/location/{{ location.id }}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
+      <h2><a href="#/records/location/{{ location.id }}" id='current-location'><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
       <hr class="border-btm">
       <h3 class="inline">{% trans "Relationship Detail" %}</h3>
       <div class="top-btn pull-right">
@@ -44,7 +44,7 @@
         {% endif %}
           <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
       </div>
-      {% include 'resources/table_sm.html' %}
+      {% include 'resources/table_sm.html' with submit_url='true' %}
     {% else %}
       <div>
         <p>{% trans "This relationship does not have any attached resources. To attach a resource, select the button below." %}</p>
