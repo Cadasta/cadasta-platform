@@ -1,5 +1,3 @@
-// var map = L.map('mapid');
-
 var SMap = function(map) {
   var layerscontrol = L.control.layers().addTo(map);
 

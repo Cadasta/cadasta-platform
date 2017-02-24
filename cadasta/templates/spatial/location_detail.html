@@ -88,7 +88,7 @@
           {% endif %}
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
         </div>
-        {% include 'resources/table_sm.html' %}
+        {% include 'resources/table_sm.html' with submit_url="true"%}
       {% else %}
         <div>
           <p>{% trans "This location does not have any attached resources. To attach a resource, select the button below." %}</p>

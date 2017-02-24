@@ -6,6 +6,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -20,7 +21,7 @@ from tutelary.models import Policy, assign_user_policies
 from questionnaires.tests import factories as q_factories
 
 from .. import forms
-from ..models import Party, TenureRelationship, TenureRelationshipType
+from ..models import Party, TenureRelationship
 from ..views import default
 from .factories import PartyFactory, TenureRelationshipFactory
 
@@ -728,9 +729,18 @@ class PartyResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         form = AddResourceFromLibraryForm(content_object=self.party,
                                           project_id=self.project.id)
+        url_kwargs = {'organization': self.project.organization.slug,
+                      'project': self.project.slug,
+                      'party': self.party.id}
         return {'object': self.project,
                 'party': self.party,
-                'form': form}
+                'form': form,
+                'cancel_url': reverse('parties:detail',
+                                      kwargs=url_kwargs),
+                'upload_url': reverse('parties:resource_new',
+                                      kwargs=url_kwargs),
+                'submit_url': reverse('parties:resource_add',
+                                      kwargs=url_kwargs)}
 
     def setup_url_kwargs(self):
         return {
@@ -857,9 +867,18 @@ class PartyResourcesNewTest(ViewTestCase, UserTestCase, FileStorageTestCase,
     def setup_template_context(self):
         form = ResourceForm(content_object=self.party,
                             project_id=self.project.id)
+        url_kwargs = {'organization': self.project.organization.slug,
+                      'project': self.project.slug,
+                      'party': self.party.id}
         return {'object': self.project,
                 'party': self.party,
-                'form': form}
+                'form': form,
+                'cancel_url': reverse('parties:detail',
+                                      kwargs=url_kwargs),
+                'add_lib_url': reverse('parties:resource_add',
+                                       kwargs=url_kwargs),
+                'submit_url': reverse('parties:resource_new',
+                                      kwargs=url_kwargs)}
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
@@ -952,6 +971,7 @@ class PartyResourcesNewTest(ViewTestCase, UserTestCase, FileStorageTestCase,
                 in response.messages)
 
         assert self.party.resources.count() == 0
+<<<<<<< HEAD
 
 
 class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
@@ -1570,3 +1590,5 @@ class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase,
         assert ("You don't have permission to add resources to this tenure "
                 "relationship."
                 in response.messages)
+=======
+>>>>>>> 635e329... Added router_mixin to include all functions that update the state of the current page.
