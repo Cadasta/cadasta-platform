@@ -199,6 +199,7 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
                               core_mixins.CacheObjectMixin,
                               base_generic.edit.FormMixin,
                               generic.DetailView):
+    downgrade = None
     model = User
     slug_field = 'username'
     slug_url_kwarg = 'username'
@@ -209,6 +210,13 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
+        if self.downgrade:
+            return reverse(
+                 'organization:members_edit',
+                 kwargs={'slug': self.kwargs['slug'],
+                         'username': self.kwargs['username']},
+            )
+
         return reverse(
             'organization:members',
             kwargs={'slug': self.kwargs['slug']},
@@ -227,6 +235,9 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
                 self.get_object(),
                 self.request.user,
                 data=data)
+            if data:
+                if data.get('org_role') is 'M':
+                    self.downgrade = True
 
         return self.org_form
 
