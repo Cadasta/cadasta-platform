@@ -19,7 +19,7 @@ class CSVImporter(base.Importer):
             )
             head = next(reader)
         headers = [
-            h.lower() for h in head if not h.startswith(('_', 'meta/')) and
+            h.casefold() for h in head if not h.startswith(('_', 'meta/')) and
             h not in base.EXCLUDE_HEADERS
         ]
         return headers

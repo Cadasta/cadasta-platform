@@ -35,7 +35,7 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
         }
 
     def validate_username(self, username):
-        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
@@ -45,7 +45,7 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
 
         errors = []
         if self.initial_data.get('email'):
-            email = self.initial_data.get('email').lower().split('@')
+            email = self.initial_data.get('email').casefold().split('@')
             if len(email[0]) and email[0] in password:
                 errors.append(_("Passwords cannot contain your email."))
 
@@ -90,7 +90,7 @@ class UserSerializer(djoser_serializers.UserSerializer):
                 username != instance.username and
                     self.context['request'].user != instance):
                 raise ValidationError('Cannot update username')
-        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
@@ -117,6 +117,7 @@ class AccountLoginSerializer(djoser_serializers.LoginSerializer):
 
 class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
     def validate(self, attrs):
+
         if not self.context['request'].user.change_pw:
             raise ValidationError(_("The password for this user can not "
                                     "be changed."))
@@ -124,10 +125,20 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
 
     def validate_new_password(self, new_password):
         validate_password(new_password)
+        errors = []
 
         if (self.context['request'].user.username.casefold()
                 in new_password.casefold()):
-            raise ValidationError(
+            errors.append(
                 _("The password is too similar to the username."))
+
+        if (self.context['request'].user.email):
+            email = self.context['request'].user.email.casefold().split('@')
+            if email[0] in new_password:
+                errors.append(
+                    _("Passwords cannot contain your email."))
+
+        if errors:
+            raise ValidationError(errors)
 
         return new_password

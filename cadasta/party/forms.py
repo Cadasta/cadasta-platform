@@ -28,7 +28,7 @@ class PartyForm(AttributeModelForm):
         # which are not related to the current type
         party_type = self.cleaned_data.get('type', None)
         if party_type:
-            ptype = party_type.lower()
+            ptype = party_type.casefold()
             for name, field in self.fields.items():
                 if (name.startswith('party::') and not
                         name.startswith('party::%s' % ptype)):

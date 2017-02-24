@@ -60,7 +60,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
         for selector, attributes in attribute_map.items():
             for name, attr in attributes.items():
                 fieldname = '{}::{}::{}'.format(
-                    field_prefix, selector.lower(), name)
+                    field_prefix, selector.casefold(), name)
                 atype = attr.attr_type
 
                 field_kwargs = {
@@ -136,7 +136,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
         for k, v in self.cleaned_data.items():
             if k.startswith(key + '::'):
                 _, type, name = k.split('::')
-                if type in [entity_type.lower(), 'default']:
+                if type in [entity_type.casefold(), 'default']:
                     attributes[name] = v
         if hasattr(self, 'instance'):
             setattr(self.instance, self.attributes_field, attributes)

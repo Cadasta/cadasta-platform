@@ -30,7 +30,7 @@ class XLSImporter(base.Importer):
             for col in worksheet.columns.tolist():
                 if not (col.startswith(
                         ('_', 'meta/')) or col in EXCLUDE_HEADERS):
-                    heads.append(col.lower())
+                    heads.append(col.casefold())
         return headers
 
     def get_headers(self):
@@ -54,17 +54,17 @@ def get_csv_from_dataframe(df, entity_types):
             if not (locations.empty or
                     relationships.empty or parties.empty):
                 locations.rename(
-                    columns=lambda x: 'spatialunit::' + x.lower(), inplace=True
+                    columns=lambda x: 'spatialunit::' + x.casefold(), inplace=True
                 )
                 relationships.rename(
                     columns={'tenure_type.id': 'tenure_type'},
                     inplace=True
                 )
                 relationships.rename(
-                    columns=lambda x: 'tenurerelationship::' + x.lower(),
+                    columns=lambda x: 'tenurerelationship::' + x.casefold(),
                     inplace=True)
                 parties.rename(
-                    columns=lambda x: 'party::' + x.lower(), inplace=True
+                    columns=lambda x: 'party::' + x.casefold(), inplace=True
                 )
                 # join locations and relationships on spatial_id's
                 joined = pd.merge(
@@ -92,7 +92,7 @@ def get_csv_from_dataframe(df, entity_types):
             locations = df['locations']
             # rename location type
             locations.rename(
-                columns=lambda x: 'spatialunit::' + x.lower(), inplace=True
+                columns=lambda x: 'spatialunit::' + x.casefold(), inplace=True
             )
             drop_cols = ['spatialunit::id']
             locations.drop(drop_cols, inplace=True, axis=1)
@@ -100,7 +100,7 @@ def get_csv_from_dataframe(df, entity_types):
         elif 'SU' not in entity_types and 'PT' in entity_types:
             parties = df['parties']
             parties.rename(
-                columns=lambda x: 'party::' + x.lower(), inplace=True
+                columns=lambda x: 'party::' + x.casefold(), inplace=True
             )
             drop_cols = ['party::id']
             parties.drop(drop_cols, inplace=True, axis=1)

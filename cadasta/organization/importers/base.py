@@ -97,7 +97,7 @@ class Importer(SchemaSelectorMixin):
 
         # build list of attribute names not selected for import
         exclude_attrs = list(set([
-            name.lower() for content_type, selectors in project_attrs.items()
+            name.casefold() for content_type, selectors in project_attrs.items()
             for selector, attrs in selectors.items()
             for name, attr in attrs.items()
             if content_type not in selected_content_types
@@ -109,7 +109,7 @@ class Importer(SchemaSelectorMixin):
             for selector, attributes in selectors.items():
                 attr_map[selector] = {}
                 for attr_name, attr in attributes.items():
-                    name = attr_name.lower()
+                    name = attr_name.casefold()
                     if type == 'xls':
                         sheet = XLS_WORKSHEET_TO_CONTENT_TYPE.get(
                             content_type, None
@@ -166,7 +166,7 @@ class Importer(SchemaSelectorMixin):
                     csvfile, delimiter=self.delimiter,
                     quotechar=self.quotechar
                 )
-                headers = [h.lower() for h in next(reader)]
+                headers = [h.casefold() for h in next(reader)]
 
                 for row in reader:
                     content_types = dict(
@@ -276,7 +276,7 @@ class Importer(SchemaSelectorMixin):
                         if attr_label not in attributes:
                             continue
                         try:
-                            val = row[headers.index(attribute.name.lower())]
+                            val = row[headers.index(attribute.name.casefold())]
                         except:
                             val = row[headers.index(attr_label)]
                         if not attribute.required and val == '':

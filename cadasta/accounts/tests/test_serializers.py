@@ -305,7 +305,7 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         user = UserFactory.create(
             password=BASIC_TEST_DATA['password'],
             username=BASIC_TEST_DATA['username'],
-            change_pw=False
+            change_pw=True
         )
         request = APIRequestFactory().patch('/user/imagine71', {})
         force_authenticate(request, user=user)
@@ -326,7 +326,7 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         user = UserFactory.create(
             password=BASIC_TEST_DATA['password'],
             username=BASIC_TEST_DATA['username'],
-            change_pw=False
+            change_pw=True
         )
         request = APIRequestFactory().patch('/user/imagine71', {})
         force_authenticate(request, user=user)
@@ -342,3 +342,68 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         assert serializer.is_valid() is False
         assert (_("The password is too similar to the username.")
                 in serializer._errors['new_password'])
+
+    def test_new_password_contains_email(self):
+        user = UserFactory.create(
+            username=BASIC_TEST_DATA['username'],
+            email=BASIC_TEST_DATA['email'],
+            change_pw=True
+        )
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'email': BASIC_TEST_DATA['email'],
+            'current_password': BASIC_TEST_DATA['password'],
+            'new_password': 'johnisjustheBest!!',
+            're_new_password': 'johnisjustheBest!!'
+        }
+
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)})
+
+        assert serializer.is_valid() is False
+        assert (_("Passwords cannot contain your email.")
+                in serializer._errors['new_password'])
+
+    def test_new_password_contains_less_than_min_characters(self):
+        user = UserFactory.create(
+            username=BASIC_TEST_DATA['username'],
+            change_pw=True
+        )
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'password': BASIC_TEST_DATA['password'],
+            'new_password': 'yoko<3',
+            're_new_password': 'yoko<3'
+        }
+
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)})
+
+        assert serializer.is_valid() is False
+        assert (_("This password is too short."
+                  " It must contain at least 10 characters.")
+                in serializer._errors['new_password'])
+
+    def test_new_password_does_not_meet_unique_character_requirements(self):
+        user = UserFactory.create(
+            username=BASIC_TEST_DATA['username'],
+            change_pw=True
+        )
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'password': BASIC_TEST_DATA['password'],
+            'new_password': 'iloveyoko',
+            're_new_password': 'iloveyoko',
+        }
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)})
+
+        assert serializer.is_valid() is False
+        assert (_("Passwords must contain at least 3"
+                  " of the following 4 character types:\n"
+                  "lowercase characters, uppercase characters,"
+                  " special characters, and/or numerical character.\n"
+                  ) in serializer._errors['new_password'])
