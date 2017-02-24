@@ -300,3 +300,45 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         assert serializer.is_valid() is False
         assert ("The password for this user can not be changed."
                 in serializer.errors['non_field_errors'])
+
+    def test_new_password_contains_username(self):
+        user = UserFactory.create(
+            password=BASIC_TEST_DATA['password'],
+            username=BASIC_TEST_DATA['username'],
+            change_pw=False
+        )
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'current_password': BASIC_TEST_DATA['password'],
+            'new_password': 'Letsimagine71!',
+            're_new_password': 'Letsimagine71!',
+        }
+
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)})
+
+        assert serializer.is_valid() is False
+        assert (_("The password is too similar to the username.")
+                in serializer._errors['new_password'])
+
+    def test_new_password_contains_username_case_insensitive(self):
+        user = UserFactory.create(
+            password=BASIC_TEST_DATA['password'],
+            username=BASIC_TEST_DATA['username'],
+            change_pw=False
+        )
+        request = APIRequestFactory().patch('/user/imagine71', {})
+        force_authenticate(request, user=user)
+        data = {
+            'current_password': BASIC_TEST_DATA['password'],
+            'new_password': 'LetsIMAGINE71!',
+            're_new_password': 'LetsIMAGINE71!',
+        }
+
+        serializer = serializers.ChangePasswordSerializer(
+            user, data=data, context={'request': Request(request)})
+
+        assert serializer.is_valid() is False
+        assert (_("The password is too similar to the username.")
+                in serializer._errors['new_password'])

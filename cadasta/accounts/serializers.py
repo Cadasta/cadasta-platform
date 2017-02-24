@@ -87,8 +87,8 @@ class UserSerializer(djoser_serializers.UserSerializer):
         instance = self.instance
         if instance is not None:
             if (username is not None and
-               username != instance.username and
-               self.context['request'].user != instance):
+                username != instance.username and
+                    self.context['request'].user != instance):
                 raise ValidationError('Cannot update username')
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
@@ -99,7 +99,7 @@ class UserSerializer(djoser_serializers.UserSerializer):
         instance = self.instance
         if instance is not None:
             if (last_login is not None and
-               last_login != instance.last_login):
+                    last_login != instance.last_login):
                 raise ValidationError('Cannot update last_login')
         return last_login
 
@@ -121,3 +121,13 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
             raise ValidationError(_("The password for this user can not "
                                     "be changed."))
         return super().validate(attrs)
+
+    def validate_new_password(self, new_password):
+        validate_password(new_password)
+
+        if (self.context['request'].user.username.casefold()
+                in new_password.casefold()):
+            raise ValidationError(
+                _("The password is too similar to the username."))
+
+        return new_password
