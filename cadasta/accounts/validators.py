@@ -4,11 +4,11 @@ from django.utils.translation import ugettext as _
 
 
 DEFAULT_CHARACTER_TYPES = [
-            string.ascii_lowercase,
-            string.ascii_uppercase,
-            string.punctuation,
-            string.digits
-        ]
+    string.ascii_lowercase,
+    string.ascii_uppercase,
+    string.punctuation,
+    string.digits
+]
 
 
 class CharacterTypePasswordValidator(object):

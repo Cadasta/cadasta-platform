@@ -97,7 +97,8 @@ class Importer(SchemaSelectorMixin):
 
         # build list of attribute names not selected for import
         exclude_attrs = list(set([
-            name.casefold() for content_type, selectors in project_attrs.items()
+            name.casefold() for content_type, selectors
+            in project_attrs.items()
             for selector, attrs in selectors.items()
             for name, attr in attrs.items()
             if content_type not in selected_content_types
@@ -284,8 +285,8 @@ class Importer(SchemaSelectorMixin):
                         if attribute.attr_type.name == 'select_multiple':
                             val = [v.strip() for v in val.split(',')]
                         if attribute.attr_type.name in ['integer', 'decimal']:
-                                val = self._cast_to_type(
-                                    val, attribute.attr_type.name)
+                            val = self._cast_to_type(
+                                val, attribute.attr_type.name)
                         if content_type:
                             content_type['attributes'][attribute.name] = val
         return content_types
