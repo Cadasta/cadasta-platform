@@ -9,6 +9,12 @@ class Command(BaseCommand):
             and projects."""
 
     def add_arguments(self, parser):
+        parser.add_argument('--records',
+                            dest="records",
+                            help="""Number of records added to project
+                            London 2""",
+                            default=4000)
+
         parser.add_argument('--delete',
                             action='store_true',
                             dest='delete',
@@ -30,5 +36,5 @@ class Command(BaseCommand):
             data.add_test_users_and_roles()
             data.add_test_projects()
             data.add_test_spatial_units()
-            data.add_huge_project()
+            data.add_huge_project(max_num_records=int(options['records']))
             self.stdout.write(self.style.SUCCESS("All test data loaded."))
