@@ -46,10 +46,11 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
         errors = []
         if self.initial_data.get('email'):
             email = self.initial_data.get('email').lower().split('@')
-            if email[0] in password:
+            if len(email[0]) and email[0] in password:
                 errors.append(_("Passwords cannot contain your email."))
 
-        if self.initial_data.get('username') in password:
+        username = self.initial_data.get('username')
+        if len(username) and username in password:
             errors.append(
                 _("The password is too similar to the username."))
 

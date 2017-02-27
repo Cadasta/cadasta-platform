@@ -44,6 +44,6 @@ class EmailSimilarityValidator(object):
             return None
 
         email = user.email.lower().split('@')
-        if email[0] in password:
+        if len(email[0]) and email[0] in password:
             raise ValidationError(
                 _("Passwords cannot contain your email."))
