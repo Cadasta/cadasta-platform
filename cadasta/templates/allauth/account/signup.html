@@ -19,22 +19,16 @@
 </script>
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#showHide").click(function () {
-       if ($("#id_password1").attr("type")=="password") {
-         $("#id_password1").attr("type", "text");
-        }
-      else{
-        $("#id_password1").attr("type", "password");
-       }
-   });
-   $("#showHide").click(function () {
-       if ($("#id_password2").attr("type")=="password") {
-         $("#id_password2").attr("type", "text");
-        }
-      else{
-        $("#id_password2").attr("type", "password");
-       }
-   });
+     $('input[type="checkbox"]').click(function() {
+         if($(this). prop("checked") == true) {
+           $("#id_password1").attr("type", "text");
+           $("#id_password2").attr("type", "text");
+         }
+         else if($(this). prop("checked") == false) {
+          $("#id_password1").attr("type", "password");
+          $("#id_password2").attr("type", "password");
+         }
+    });
  });
 </script>
 <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
