@@ -75,7 +75,7 @@ class ShapeExporter(Exporter):
 
         for su in spatial_units:
             geom = ogr.CreateGeometryFromWkt(su.geometry.wkt)
-            layer_type = geom.GetGeometryName().casefold()
+            layer_type = geom.GetGeometryName().lower()
             layer = layers.get(layer_type, None)
             if layer is None:
                 layer = self.create_layer(ds, layer_type)

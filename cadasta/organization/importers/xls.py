@@ -30,7 +30,7 @@ class XLSImporter(base.Importer):
             for col in worksheet.columns.tolist():
                 if not (col.startswith(
                         ('_', 'meta/')) or col in EXCLUDE_HEADERS):
-                    heads.append(col.casefold())
+                    heads.append(col.lower())
         return headers
 
     def get_headers(self):
@@ -54,7 +54,7 @@ def get_csv_from_dataframe(df, entity_types):
             if not (locations.empty or
                     relationships.empty or parties.empty):
                 locations.rename(
-                    columns=lambda x: 'spatialunit::' + x.casefold(),
+                    columns=lambda x: 'spatialunit::' + x.lower(),
                     inplace=True
                 )
                 relationships.rename(
@@ -62,10 +62,10 @@ def get_csv_from_dataframe(df, entity_types):
                     inplace=True
                 )
                 relationships.rename(
-                    columns=lambda x: 'tenurerelationship::' + x.casefold(),
+                    columns=lambda x: 'tenurerelationship::' + x.lower(),
                     inplace=True)
                 parties.rename(
-                    columns=lambda x: 'party::' + x.casefold(), inplace=True
+                    columns=lambda x: 'party::' + x.lower(), inplace=True
                 )
                 # join locations and relationships on spatial_id's
                 joined = pd.merge(
@@ -93,7 +93,7 @@ def get_csv_from_dataframe(df, entity_types):
             locations = df['locations']
             # rename location type
             locations.rename(
-                columns=lambda x: 'spatialunit::' + x.casefold(), inplace=True
+                columns=lambda x: 'spatialunit::' + x.lower(), inplace=True
             )
             drop_cols = ['spatialunit::id']
             locations.drop(drop_cols, inplace=True, axis=1)
@@ -101,7 +101,7 @@ def get_csv_from_dataframe(df, entity_types):
         elif 'SU' not in entity_types and 'PT' in entity_types:
             parties = df['parties']
             parties.rename(
-                columns=lambda x: 'party::' + x.casefold(), inplace=True
+                columns=lambda x: 'party::' + x.lower(), inplace=True
             )
             drop_cols = ['party::id']
             parties.drop(drop_cols, inplace=True, axis=1)

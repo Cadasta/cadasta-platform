@@ -129,7 +129,7 @@ class TenureRelationshipForm(AttributeForm):
 
         party_type = self.cleaned_data.get('party_type', None)
         if party_type:
-            ptype = party_type.casefold()
+            ptype = party_type.lower()
             for name, field in self.fields.items():
                 if (name.startswith('party::') and not
                         name.startswith('party::%s' % ptype)):

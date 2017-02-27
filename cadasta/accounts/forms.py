@@ -23,7 +23,7 @@ class RegisterForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.data.get('username')
-        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise forms.ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
@@ -80,7 +80,7 @@ class ProfileForm(forms.ModelForm):
                 User.objects.filter(username=username).exists()):
             raise forms.ValidationError(
                 _("Another user with this username already exists"))
-        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise forms.ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username

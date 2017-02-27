@@ -35,7 +35,7 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
         }
 
     def validate_username(self, username):
-        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
@@ -45,7 +45,7 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
 
         errors = []
         if self.initial_data.get('email'):
-            email = self.initial_data.get('email').casefold().split('@')
+            email = self.initial_data.get('email').lower().split('@')
             if len(email[0]) and email[0] in password:
                 errors.append(_("Passwords cannot contain your email."))
 
@@ -90,7 +90,7 @@ class UserSerializer(djoser_serializers.UserSerializer):
                 username != instance.username and
                     self.context['request'].user != instance):
                 raise ValidationError('Cannot update username')
-        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
