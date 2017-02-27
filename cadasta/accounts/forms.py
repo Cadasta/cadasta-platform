@@ -116,7 +116,7 @@ class ChangePasswordMixin:
 
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
-        send_mail('Subject here','Password has changed','from@example.com',["adasd"],fail_silently=False,)
+        send_mail("Password Changed", "you have successfully changed password",settings.DEFAULT_FROM_EMAIL,[self.user], fail_silently=False)
         return password
 
 
