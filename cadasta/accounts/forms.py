@@ -120,7 +120,13 @@ class ChangePasswordMixin:
             userDetails = User.objects.get(username=self.user)
         except User.DoesNotExist:
             userDetails = None
-        send_mail("Password Changed","You have successfully changed your password.",settings.DEFAULT_FROM_EMAIL,[userDetails.email],fail_silently=False,)
+        send_mail(
+            'Password Changed',
+            'You have successfully changed your password.',
+            settings.DEFAULT_FROM_EMAIL,
+            [userDetails.email],
+            fail_silently=False,
+        )
         return password
 
 
