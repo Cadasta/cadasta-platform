@@ -118,15 +118,17 @@ class ChangePasswordMixin:
         validate_password(password, user=self.user)
         return password
 
+
 class ChangePasswordForm(ChangePasswordMixin,allauth_forms.ChangePasswordForm):
     def save(self): 
-        send_mail( 
+        send_mail(
             'Password Changed', 
             'You have successfully changed the password.', 
             settings.DEFAULT_FROM_EMAIL, 
             [self.user.email], 
             fail_silently=False,
         )
+
 
 class ResetPasswordKeyForm(ChangePasswordMixin,
                            allauth_forms.ResetPasswordKeyForm):
