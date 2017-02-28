@@ -378,6 +378,7 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
         assert self.org.name != 'Org'
         assert self.org.description != 'Some description'
 
+
 class OrganizationArchiveTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.OrganizationArchive
 
@@ -708,20 +709,20 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
     def test_post_org_role_downgraded(self):
         assign_policies(self.user)
         response = self.request(
-            method = 'POST', user=self.user, post_data={'org_role': 'M'})
+            method='POST', user=self.user, post_data={'org_role': 'M'})
 
         assert response.status_code == 302
-        assert ('/organizations/{}/members/{}/'.format(self.org.slug,self.member)
-               in response.location)
+        assert ('/organizations/{}/members/{}/'.format(
+                  self.org.slug, self.member) in response.location)
 
     def test_post_org_role_upgraded(self):
         assign_policies(self.user)
         response = self.request(
-            method = 'POST', user=self.user, post_data={'org_role': 'A'})
+            method='POST', user=self.user, post_data={'org_role': 'A'})
 
         assert response.status_code == 302
         assert ('/organizations/{}/members/'.format(self.org.slug)
-               in response.location)
+                in response.location)
 
     def test_post_org_role_with_unauthorized_user(self):
         self.user = UserFactory.create()
