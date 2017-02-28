@@ -20,11 +20,11 @@
 <script type="text/javascript">
   $(document).ready(function () {
      $('input[type="checkbox"]').click(function() {
-         if($(this). prop("checked") == true) {
+         if($(this).prop("checked")) {
            $("#id_password1").attr("type", "text");
            $("#id_password2").attr("type", "text");
          }
-         else if($(this). prop("checked") == false) {
+         else {
           $("#id_password1").attr("type", "password");
           $("#id_password2").attr("type", "password");
          }
