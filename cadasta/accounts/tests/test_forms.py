@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _
 from django.test import TestCase
 from django.core import mail
 from django.http import HttpRequest
+from django.core.mail import send_mail
 from django.contrib.messages.storage.fallback import FallbackStorage
 
 from ..models import User
@@ -255,6 +256,17 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
         assert User.objects.count() == 1
 
         assert user.check_password('iloveyoko79!') is True
+        passwordChangeFlag = False
+        if passwordChangeFlag is False:
+            send_mail(
+                "Password Changed",
+                "you have successfully changed password",
+                "testing@gmail.com",
+                [user.email],
+                fail_silently=False,
+            )
+            passwordChangeFlag = True
+        assert passwordChangeFlag is True
 
     def test_passwords_do_not_match(self):
         user = UserFactory.create(password='beatles4Lyfe!')

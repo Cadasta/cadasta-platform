@@ -113,21 +113,26 @@ class ChangePasswordMixin:
         if not self.user.change_pw:
             raise forms.ValidationError(_("The password for this user can not "
                                           "be changed."))
-
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
         return password
 
 
-class ChangePasswordForm(ChangePasswordMixin,allauth_forms.ChangePasswordForm):
-    def save(self): 
+class ChangePasswordForm(ChangePasswordMixin,
+                         allauth_forms.ChangePasswordForm):
+    def save(self):
+        password = self.cleaned_data['password1']
+        user = self.user
+        user.set_password(password)
+        user.save()
         send_mail(
-            'Password Changed', 
-            'You have successfully changed the password.', 
-            settings.DEFAULT_FROM_EMAIL, 
-            [self.user.email], 
+            "Password Changed",
+            "you have successfully changed password",
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
             fail_silently=False,
         )
+        return user
 
 
 class ResetPasswordKeyForm(ChangePasswordMixin,
