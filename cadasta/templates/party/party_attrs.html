@@ -7,7 +7,7 @@
 {% if field.name|slice:":7" == "party::" %}
   {% with type=field.name|slice:"7:"|slice:":2" %}
     <div class="form-group{% if field.errors %} has-error{% endif %} party-{{ type }} hidden">
-      <label class="control-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+      <label class="control-label" for="{{ field.id_for_label }}" {{ field.field.labels_xlang|safe }}>{{ field.label }}</label>
       {% if field|field_type == "datefield" %}
         {{ field|add_class:"form-control datepicker"|set_parsley_required }}
       {% else %}

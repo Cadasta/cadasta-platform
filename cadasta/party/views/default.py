@@ -1,12 +1,13 @@
 from core.views import generic
 import django.views.generic as base_generic
 from django.core.urlresolvers import reverse
-from jsonattrs.mixins import JsonAttrsMixin
+from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 
 from organization.views import mixins as organization_mixins
 from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
+from questionnaires.models import Question, QuestionOption
 from . import mixins
 from .. import forms
 from .. import messages as error_messages
@@ -20,6 +21,23 @@ class PartiesList(LoginPermissionRequiredMixin,
     permission_required = 'party.list'
     permission_denied_message = error_messages.PARTY_LIST
     no_jsonattrs_in_queryset = True
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        project = context['object']
+
+        if project.current_questionnaire:
+            party_type = Question.objects.get(
+                name='party_type',
+                questionnaire_id=project.current_questionnaire)
+            party_opts = QuestionOption.objects.filter(question=party_type)
+            party_opts = dict(party_opts.values_list('name', 'label_xlat'))
+
+            for party in context['object_list']:
+                party.type_labels = template_xlang_labels(
+                    party_opts.get(party.type))
+
+        return context
 
 
 class PartiesAdd(LoginPermissionRequiredMixin,
@@ -51,6 +69,29 @@ class PartiesDetail(LoginPermissionRequiredMixin,
     permission_denied_message = error_messages.PARTY_VIEW
     attributes_field = 'attributes'
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        project = context['object']
+        if project.current_questionnaire:
+            name = Question.objects.get(
+                name='party_name',
+                questionnaire_id=project.current_questionnaire)
+            context['name_labels'] = template_xlang_labels(name.label_xlat)
+
+            party_type = Question.objects.get(
+                name='party_type',
+                questionnaire_id=project.current_questionnaire)
+            context['type_labels'] = template_xlang_labels(
+                party_type.label_xlat)
+
+            option = QuestionOption.objects.get(question=party_type,
+                                                name=context['party'].type)
+            context['type_choice_labels'] = template_xlang_labels(
+                option.label_xlat)
+
+        return context
+
 
 class PartiesEdit(LoginPermissionRequiredMixin,
                   mixins.PartyObjectMixin,
@@ -65,6 +106,21 @@ class PartiesEdit(LoginPermissionRequiredMixin,
         kwargs = super().get_form_kwargs()
         kwargs['project'] = self.get_project()
         return kwargs
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        project = context['object']
+        if project.current_questionnaire:
+            party_type = Question.objects.get(
+                name='party_type',
+                questionnaire_id=project.current_questionnaire)
+            option = QuestionOption.objects.get(question=party_type,
+                                                name=context['party'].type)
+            context['type_choice_labels'] = template_xlang_labels(
+                option.label_xlat)
+
+        return context
 
 
 class PartiesDelete(LoginPermissionRequiredMixin,
@@ -120,6 +176,25 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
     permission_required = 'tenure_rel.view'
     permission_denied_message = error_messages.TENURE_REL_VIEW
     attributes_field = 'attributes'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        project = context['object']
+        if project.current_questionnaire:
+            tenure_type = Question.objects.get(
+                name='tenure_type',
+                questionnaire_id=project.current_questionnaire)
+            context['type_labels'] = template_xlang_labels(
+                tenure_type.label_xlat)
+
+            option = QuestionOption.objects.get(
+                question=tenure_type,
+                name=context['relationship'].tenure_type_id)
+            context['type_choice_labels'] = template_xlang_labels(
+                option.label_xlat)
+
+        return context
 
 
 class PartyRelationshipEdit(LoginPermissionRequiredMixin,

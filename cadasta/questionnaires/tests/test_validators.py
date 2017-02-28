@@ -163,7 +163,6 @@ class QuestionGroupTestCase(TestCase):
             }]
         }]
         errors = validators.validate_question_groups(data)
-        print(errors)
         assert errors == [{'name': ['This field is required.'],
                            'questions': [
                                 {'name': ['This field is required.']}],

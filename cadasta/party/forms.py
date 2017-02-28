@@ -19,6 +19,10 @@ class PartyForm(AttributeModelForm):
         self.project = project
         self.add_attribute_fields()
 
+        if self.project.current_questionnaire:
+            self.set_standard_field('party_name', field_name='name')
+            self.set_standard_field('party_type', field_name='type')
+
     def clean(self):
         # remove validation errors for required fields
         # which are not related to the current type
@@ -49,11 +53,16 @@ class TenureRelationshipEditForm(AttributeModelForm):
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project
-        tenuretypes = sorted([
-            (choice[0], _(choice[1])) for choice in
-            TenureRelationshipType.objects.values_list('id', 'label')
-        ])
-        self.fields['tenure_type'].choices = tenuretypes
+
+        if self.project.current_questionnaire:
+            self.set_standard_field('tenure_type')
+        else:
+            tenuretypes = sorted([
+                (choice[0], _(choice[1])) for choice in
+                TenureRelationshipType.objects.values_list('id', 'label')
+            ])
+            self.fields['tenure_type'].choices = tenuretypes
+
         self.add_attribute_fields()
 
     def save(self, *args, **kwargs):

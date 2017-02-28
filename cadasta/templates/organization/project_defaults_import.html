@@ -1,4 +1,4 @@
-{% extends "organization/project_import_wrapper.html" %} {% load i18n %} {% load widget_tweaks %} {% block extra_script %} {{ form.media }} {% endblock %} {% block step_content %} {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form
+{% extends "organization/project_import_wrapper.html" %} {% load i18n %} {% load widget_tweaks %} {% block extra_script %} {{ block.super }} {{ form.media }} {% endblock %} {% block step_content %} {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form
 }} {% for form in wizard.form.forms %} {{ form }} {% endfor %} {% else %}
 
 <div class="panel panel-default">

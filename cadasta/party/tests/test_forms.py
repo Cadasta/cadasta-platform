@@ -4,13 +4,34 @@ from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import PartyFactory
-from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.tests import factories as q_factories
 
 from .. import forms
 from ..models import Party, TenureRelationshipType
 
 
 class PartyFormTest(UserTestCase, TestCase):
+
+    def test_init_without_questionnaire(self):
+        project = ProjectFactory.create()
+        form = forms.PartyForm(project)
+        assert hasattr(form.fields['name'], 'labels_xlang') is False
+        assert hasattr(form.fields['type'], 'labels_xlang') is False
+
+    def test_init_with_questionnaire(self):
+        project = ProjectFactory.create()
+        questionnaire = q_factories.QuestionnaireFactory(project=project)
+        q_factories.QuestionFactory.create(
+            name='party_type',
+            questionnaire=questionnaire,
+            label={'en': 'Type', 'de': 'Typ'})
+        q_factories.QuestionFactory.create(
+            name='party_name',
+            questionnaire=questionnaire,
+            label={'en': 'Name', 'de': 'Name'})
+        form = forms.PartyForm(project)
+        assert hasattr(form.fields['name'], 'labels_xlang') is True
+        assert hasattr(form.fields['type'], 'labels_xlang') is True
 
     def test_create_party(self):
         data = {
@@ -130,7 +151,8 @@ class PartyFormTest(UserTestCase, TestCase):
             'party::in::homeowner': True
         }
         project = ProjectFactory.create()
-        questionnaire = QuestionnaireFactory.create(project=project)
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=project)
 
         content_type = ContentType.objects.get(
             app_label='party', model='party')
@@ -188,3 +210,14 @@ class TenureRelationshipEditFormTest(UserTestCase, TestCase):
         )
         assert len(tenuretypes) > 0
         assert list(form.fields['tenure_type'].choices) == list(tenuretypes)
+        assert hasattr(form.fields['tenure_type'], 'labels_xlang') is False
+
+    def test_init_with_form(self):
+        project = ProjectFactory.create()
+        questionnaire = q_factories.QuestionnaireFactory(project=project)
+        q_factories.QuestionFactory.create(
+            name='tenure_type',
+            questionnaire=questionnaire,
+            label={'en': 'Type', 'de': 'Typ'})
+        form = forms.TenureRelationshipEditForm(project)
+        assert hasattr(form.fields['tenure_type'], 'labels_xlang') is True

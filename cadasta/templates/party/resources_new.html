@@ -3,7 +3,8 @@
 
 {% block page_title %}{% trans "Upload new resource for party" %} | {% endblock %}
 
-{% block extra_script %}
+{% block extra_script %}  
+  {{ block.super }}
   {{ form.media }}
 {% endblock %}
 

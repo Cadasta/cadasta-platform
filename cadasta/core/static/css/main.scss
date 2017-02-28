@@ -775,7 +775,7 @@ img.org-logo, img#org-logo {
   margin-top: 10px;
   margin-bottom: 10px;
   .btn {
-    min-width: 140px;
+    min-width: 100px;
   }
   .btn-rt, .btn-action {
     min-width: 34px;
@@ -832,6 +832,8 @@ div.add-btn-btm { // add party link at bottom of table
   .top-btn {
     .btn {
       min-width: auto;
+      font-size: 13px;
+      color: black;
     }
   }
   #project-single .page-header,
@@ -841,6 +843,14 @@ div.add-btn-btm { // add party link at bottom of table
       margin-top: 0;
       .btn {
         min-width: auto;
+      }
+      .langs-select {
+        margin-right: 0;
+        width: 50px;
+        select {
+          font-size: 13px;
+          padding: 2px;
+        }
       }
     }
   }

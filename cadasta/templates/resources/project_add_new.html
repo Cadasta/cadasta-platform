@@ -4,6 +4,7 @@
 {% block page_title %}{% trans "Upload new resource for project" %} | {% endblock %}
 
 {% block extra_script %}
+  {{ block.super }}
   {{ form.media }}
 {% endblock %}
 

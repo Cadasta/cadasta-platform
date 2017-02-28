@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.tests import factories as q_factories
 
 from tutelary.models import Policy, assign_user_policies
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -20,7 +20,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
-from party.models import Party, TenureRelationship
+from party.models import Party, TenureRelationship, TenureRelationshipType
 
 from .factories import SpatialUnitFactory
 from ..views import default
@@ -121,7 +121,8 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        questionnaire = QuestionnaireFactory.create(project=self.project)
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         schema = Schema.objects.create(
@@ -357,6 +358,60 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
+    def test_get_with_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        location_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=location_type_question,
+            name=self.location.type,
+            label={'en': 'House', 'de': 'Haus'})
+
+        tenure_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='LH',
+            label={'en': 'Leasehold', 'de': 'Miete'})
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='WR',
+            label={'en': 'Water rights', 'de': 'Wasserecht'})
+        lh_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            spatial_unit=self.location,
+            project=self.project)
+        lh_ten.type_labels = ('data-label-de="Miete" '
+                              'data-label-en="Leasehold"')
+        wr_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            spatial_unit=self.location,
+            project=self.project)
+        wr_ten.type_labels = ('data-label-de="Wasserecht" '
+                              'data-label-en="Water rights"')
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            type_labels=('data-label-de="Parzelle Typ" '
+                         'data-label-en="Location type"'),
+            type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
+            relationships=[wr_ten, lh_ten],
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')]
+        )
+
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -398,7 +453,8 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        questionnaire = QuestionnaireFactory.create(project=self.project)
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         schema = Schema.objects.create(
@@ -870,7 +926,8 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        questionnaire = QuestionnaireFactory.create(project=self.project)
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project)
         self.spatial_unit = SpatialUnitFactory(project=self.project)
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')

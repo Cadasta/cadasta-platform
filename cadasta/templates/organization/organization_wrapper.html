@@ -15,19 +15,20 @@
 <!-- Single organization header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:list' %}">
-      <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-    </a>
-      <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
-        {{ organization.name }}
-        {% if organization.archived %}
-        <span class="label label-danger">
-          {% trans "Archived" %}
-        </span>
-        {% endif %}
-      </h1>
-
-    <div class="top-btn pull-right">
+    <div>
+      <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:list' %}">
+        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
+      </a>
+    </div>
+    <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
+      {{ organization.name }}
+      {% if organization.archived %}
+      <span class="label label-danger">
+        {% trans "Archived" %}
+      </span>
+      {% endif %}
+    </h1>
+    <div class="top-btn">
 
       <!-- More options menu -->
       {% if is_administrator %}
@@ -69,6 +70,7 @@
           <li><a href="{% url 'organization:members_add' organization.slug %}">{% trans "Add org member" %}</a></li>
         </ul>
       </div>
+
       <!-- Single add button for smaller screens-->
       <div class="dropdown pull-right visible-xs-inline">
         <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
@@ -84,6 +86,7 @@
         </ul>
       </div>
       {% endif %}
+
     </div>
   </div>
 </div>

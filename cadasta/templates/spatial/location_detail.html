@@ -29,13 +29,13 @@
         <table class="table table-location">
           <tbody>
             <tr>
-              <td class="col-md-4"><label>{% trans "Type" %}</label></td>
-              <td class="col-md-8">{{ location.get_type_display }}</td>
+              <td class="col-md-4"><label {{ type_labels|safe }}>{% trans "Type" %}</label></td>
+              <td class="col-md-8" {{ type_choice_labels|safe }}>{{ location.get_type_display }}</td>
             </tr>
             {% for attr in attributes %}
             <tr>
-              <td><label>{{ attr.0 }}</label></td>
-              <td>{{ attr.1 }}</td>
+              <td><label {{ attr.2|safe }}>{{ attr.0 }}</label></td>
+              <td {{ attr.3|safe }}>{{ attr.1 }}</td>
             </tr>
             {% endfor %}
           </tbody>
@@ -63,7 +63,7 @@
               {% for rel in relationships %}
               {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
               <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
-                <td><a href="{{ relationship_url }}">{{ rel.tenure_type_label }}</a></td>
+                <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
                 <td><a href="{% url 'parties:detail' object.organization.slug object.slug rel.party.id %}">{{ rel.party.name }}</a></td>
               </tr>
               {% endfor %}
