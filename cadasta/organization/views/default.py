@@ -213,8 +213,7 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         if self.downgrade:
             return reverse(
                  'organization:members_edit',
-                 kwargs={'slug': self.kwargs['slug'],
-                         'username': self.kwargs['username']},
+                 kwargs=self.kwargs,
             )
 
         return reverse(
@@ -235,8 +234,7 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
                 self.get_object(),
                 self.request.user,
                 data=data)
-            if data:
-                if data.get('org_role') is 'M':
+            if data and data.get('org_role') is 'M':
                     self.downgrade = True
 
         return self.org_form
