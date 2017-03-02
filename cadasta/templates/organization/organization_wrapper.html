@@ -15,9 +15,6 @@
 <!-- Single organization header -->
 <div class="header page-header">
   <div class="page-title">
-    <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:list' %}">
-      <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-    </a>
       <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
         {{ organization.name }}
         {% if organization.archived %}
