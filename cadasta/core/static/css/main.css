@@ -4847,6 +4847,9 @@ ul.resource-actions > li {
   ul.resource-actions > li + li {
     border-left: 1px solid #e7e8ea; }
 
+#delete_multiple_resources {
+  display: none; }
+
 /* =For styles only found in single project or organization pages
 -------------------------------------------------------------- */
 /* =Page header default
@@ -5381,6 +5384,9 @@ ul.resource-actions > li {
 
 #search-results.table h4 {
   margin-bottom: 12px; }
+
+#search-results.table img.thumb-60 {
+  margin-left: 24px; }
 
 #search-results.table img.thumb-60 ~ table {
   width: calc(100% - 100px); }

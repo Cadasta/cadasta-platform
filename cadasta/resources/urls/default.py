@@ -29,6 +29,10 @@ urls = [
         default.ResourceArchive.as_view(),
         name='archive'),
     url(
+        r'^resources/(?P<resource>.+)/multiplearchive/$',
+        default.MultipleResourceArchive.as_view(),
+        name='archive'),
+    url(
         r'^resources/(?P<resource>[-\w]+)/unarchive/$',
         default.ResourceUnarchive.as_view(),
         name='unarchive'),
