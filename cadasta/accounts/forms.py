@@ -120,21 +120,25 @@ class ChangePasswordMixin:
 
 class ChangePasswordForm(ChangePasswordMixin,
                          allauth_forms.ChangePasswordForm):
-    def save(self):
-        password = self.cleaned_data['password1']
-        user = self.user
-        user.set_password(password)
-        user.save()
+    def save(self, *args, **kwargs):
+        super(ChangePasswordForm, self).save(*args, **kwargs)
         send_mail(
             "Password Changed",
             "you have successfully changed password",
             settings.DEFAULT_FROM_EMAIL,
-            [user.email],
+            [self.user.email],
             fail_silently=False,
         )
-        return user
 
 
 class ResetPasswordKeyForm(ChangePasswordMixin,
                            allauth_forms.ResetPasswordKeyForm):
-    pass
+    def save(self, *args, **kwargs):
+        super(ResetPasswordKeyForm, self).save(*args, **kwargs)
+        send_mail(
+            "Password Changed",
+            "you have successfully changed password",
+            settings.DEFAULT_FROM_EMAIL,
+            [self.user.email],
+            fail_silently=False,
+        )
