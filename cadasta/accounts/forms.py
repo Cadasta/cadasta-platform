@@ -3,6 +3,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
+from django.core.mail import send_mail
 from allauth.account import forms as allauth_forms
 
 from .models import User, now_plus_48_hours
@@ -122,9 +123,25 @@ class ChangePasswordMixin:
 
 class ChangePasswordForm(ChangePasswordMixin,
                          allauth_forms.ChangePasswordForm):
-    pass
+    def save(self, *args, **kwargs):
+        super(ChangePasswordForm, self).save(*args, **kwargs)
+        send_mail(
+            "Password Changed",
+            "you have successfully changed password",
+            settings.DEFAULT_FROM_EMAIL,
+            [self.user.email],
+            fail_silently=False,
+        )
 
 
 class ResetPasswordKeyForm(ChangePasswordMixin,
                            allauth_forms.ResetPasswordKeyForm):
-    pass
+    def save(self, *args, **kwargs):
+        super(ResetPasswordKeyForm, self).save(*args, **kwargs)
+        send_mail(
+            "Password Changed",
+            "you have successfully changed password",
+            settings.DEFAULT_FROM_EMAIL,
+            [self.user.email],
+            fail_silently=False,
+        )
