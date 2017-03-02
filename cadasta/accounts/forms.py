@@ -93,6 +93,11 @@ class ProfileForm(forms.ModelForm):
             if User.objects.filter(email=email).exists():
                 raise forms.ValidationError(
                     _("Another user with this email already exists"))
+
+            current_email_set = self.instance.emailaddress_set.all()
+            if current_email_set.exists():
+                current_email_set.delete()
+
         return email
 
     def save(self, *args, **kwargs):

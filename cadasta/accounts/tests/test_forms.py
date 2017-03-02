@@ -5,6 +5,9 @@ from django.test import TestCase
 from django.core import mail
 from django.http import HttpRequest
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.db import IntegrityError
+from allauth.account.models import EmailAddress
+from allauth.account.utils import send_email_confirmation
 
 from ..models import User
 from .. import forms
@@ -264,6 +267,37 @@ class ProfileFormTest(UserTestCase, TestCase):
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
+
+    def test_signup_with_released_email(self):
+        user = UserFactory.create(username='user1',
+                                  email='user1@example.com',
+                                  email_verified=True)
+
+        EmailAddress.objects.create(user=user, email=user.email,
+                                    verified=True)
+        data = {
+            'username': 'user1',
+            'email': 'user1_email_change@example.com',
+        }
+
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = '80'
+
+        form = forms.ProfileForm(data, request=request, instance=user)
+        form.save()
+
+        user = UserFactory.create(username='user2',
+                                  email='user1@example.com')
+        try:
+            send_email_confirmation(request, user)
+        except IntegrityError:
+            assert False
+        else:
+            assert True
 
 
 class ChangePasswordFormTest(UserTestCase, TestCase):
