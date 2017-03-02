@@ -353,8 +353,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'Letsimagine71?',
-            'password2': 'Letsimagine71?',
+            'password1': 'Letsimagine71?12345',
+            'password2': 'Letsimagine71?12345',
         }
         form = forms.ChangePasswordForm(user, data)
 

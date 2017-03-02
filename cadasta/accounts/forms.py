@@ -36,12 +36,12 @@ class RegisterForm(forms.ModelForm):
         if password != self.data.get('password2'):
             raise forms.ValidationError(_("Passwords do not match"))
 
-        email = self.data.get('email').casefold().split('@')
-        if len(email[0]) and email[0] in password:
+        email = self.data.get('email').split('@')
+        if len(email[0]) and email[0].casefold() in password.casefold():
             errors.append(_("Passwords cannot contain your email."))
 
-        username = self.data.get('username').casefold()
-        if len(username) and username in password.casefold():
+        username = self.data.get('username')
+        if len(username) and username.casefold() in password.casefold():
             errors.append(
                 _("The password is too similar to the username."))
 
