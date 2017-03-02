@@ -1,0 +1,176 @@
+{% extends "core/base.html" %}
+
+{% load i18n %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block top-nav %}organization-single{% endblock %}
+
+{% block title %} | {% block page_title %}{% endblock %}{{ organization.name }} {% endblock %}
+
+{% block main-width %}{% if is_administrator %} show-sidebar{% endif %}{% endblock %}
+
+{% block page-header %}
+
+<!-- Single organization header -->
+<div class="header page-header">
+  <div class="page-title">
+      <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
+        {{ organization.name }}
+        {% if organization.archived %}
+        <span class="label label-danger">
+          {% trans "Archived" %}
+        </span>
+        {% endif %}
+      </h1>
+
+    <div class="top-btn pull-right">
+
+      <!-- More options menu -->
+      {% if is_administrator %}
+      <div class="dropdown pull-right btn-add">
+        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
+          <span class="more-menu glyphicon glyphicon-option-vertical"></span>
+        </a>
+        <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
+          <div class="visible-md-inline visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
+          <div class="visible-sm-inline">{% trans "More" %} <span class="caret"></span></div>   
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
+          {% if is_administrator %}
+          <li role="separator" class="divider"></li>
+          <li>
+            {% if organization.archived %}
+            <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
+            {% else %}
+            <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
+            {% endif %}
+          </li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <!-- Split add button -->
+      {% if add_allowed %}
+      <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block" aria-label="{% trans 'Add project' %}">
+        <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add project" %}
+        </a>
+        <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+          <span class="sr-only">{% trans "Toggle add" %}</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a href="{% url 'organization:members_add' organization.slug %}">{% trans "Add org member" %}</a></li>
+        </ul>
+      </div>
+      <!-- Single add button for smaller screens-->
+      <div class="dropdown pull-right visible-xs-inline">
+        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
+          <span class="glyphicon glyphicon-plus"></span>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li>
+            <a href="{% url 'organization:project-add' organization.slug %}">
+              {% trans "Add project" %}
+            </a>
+          </li>
+          <li><a href="{% url 'organization:members_add' organization.slug %}">{% trans "Add org member" %}</a></li>
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- / single organization header -->
+
+{% endblock %}
+
+{% block sub-nav %}
+
+{% if is_administrator %}
+<!-- Sidebar -->
+<div id="sidebar" class="{% block left-nav %}{% endblock %}">
+  <ul class="nav nav-sidebar">
+    <li class="overview">
+      <a href="{% url 'organization:dashboard' organization.slug %}">
+        <span class="icon"></span>
+        <span class="title">{% trans "Overview" %}</span>
+      </a>
+    </li><!-- needed to eliminate spacing issue on horizontal menus
+    --><li class="projects hidden">
+      <a href="#">
+        <span class="icon projects"></span>
+        <span class="title">{% trans "Projects" %}</span>
+      </a>
+    </li><!--
+    --><li class="members">
+      <a href="{% url 'organization:members' organization.slug %}">
+        <span class="icon members"></span>
+        <span class="title">{% trans "Members" %}</span>
+      </a>
+    </li>
+  </ul>
+</div>
+<!-- /.sidebar -->
+{% endif %}
+
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+{% block modals %}
+
+<div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Archive organization" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>{% trans "Are you sure you want to archive this organization?" %}</p>
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'organization:archive' organization.slug %}" class="btn btn-danger archive-final pull-right" role="button">
+          {% trans "Yes, archive this organization" %}
+        </a>
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="unarchive_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Unarchive organization" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Are you sure you want to unarchive this organization?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'organization:unarchive' organization.slug %}" class="btn btn-primary unarchive-final pull-right" role="button">
+          {% trans "Yes, unarchive this organization" %}
+        </a>
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+{% endblock %}
