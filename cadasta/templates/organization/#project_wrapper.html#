@@ -13,6 +13,7 @@
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
+   
     <h1 class="{% if is_administrator or is_allowed_add_location or is_allowed_add_resource %}short{% endif %}">
       {{ object.name }}
       {% if object.archived %}
