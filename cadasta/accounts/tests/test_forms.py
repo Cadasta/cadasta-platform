@@ -211,7 +211,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
         assert user.email_verified is False
-        assert len(mail.outbox) == 1
+        assert len(mail.outbox) == 2
 
     def test_display_name(self):
         user = UserFactory.create(username='imagine71',
