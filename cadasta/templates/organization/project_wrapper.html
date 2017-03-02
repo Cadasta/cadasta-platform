@@ -177,6 +177,11 @@
 'use strict';
 window.addEventListener('load', function() {
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
+    if(window.location.href.indexOf("?q=") > -1) {
+	    var url = window.location.href;
+	    url = url.substring(0, url.indexOf('/search'));
+        window.location = url;
+    }
     if (!$('#sidebar').hasClass('search')) {
       if ($('#sidebar-search-box').hasClass('disabled')) {
         $('#sidebar-search-box').removeClass('disabled');
