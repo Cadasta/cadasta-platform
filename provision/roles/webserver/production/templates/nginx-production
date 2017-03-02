@@ -2,6 +2,14 @@ upstream django {
     server unix:{{ uwsgi_socket }};
 }
 
+map $sent_http_content_type $expires {
+    default                     24h;
+    text/html                   epoch;
+    text/css                    24h;
+    application/javascript      24h;
+    ~image/                     24h;
+}
+
 server {
     listen      80; #force redirect to https for API URLs
     server_name {{ api_url }};
@@ -74,7 +82,20 @@ server {
     ssl_certificate     /etc/ssl/private/domain.crt;
     ssl_certificate_key /etc/ssl/private/domain.key;
 
+    expires $expires;
+    etag on;
+    add_header Cache-Control "private, must-revalidate";
+
     charset     utf-8;
+
+    gzip                on;
+    gzip_http_version   1.0;
+    gzip_disable        "msie6";
+    gzip_min_length     500;
+    gzip_buffers        16 8k;
+    gzip_proxied        expired no-cache no-store private;
+    gzip_types          *;
+    gzip_vary           on;
 
     client_max_body_size 75M;
 
