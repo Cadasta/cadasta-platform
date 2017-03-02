@@ -41,7 +41,7 @@ class RegisterForm(forms.ModelForm):
             errors.append(_("Passwords cannot contain your email."))
 
         username = self.data.get('username')
-        if len(username) and username.casefold() in password.casefold():
+        if len(username) and username in password:
             errors.append(
                 _("The password is too similar to the username."))
 
