@@ -3,6 +3,9 @@ cadasta-platform
 
 |build-status-image|
 
+Install for development
+-----------------------
+
 Install:
 
 - `VirtualBox <https://www.virtualbox.org/>`_
@@ -10,9 +13,7 @@ Install:
 - `Ansible <http://www.ansible.com/>`_ (For Windows(Windows isn’t supported for the control machine) go through `Ansible Documentation  <http://docs.ansible.com/ansible/intro_windows.html>`_ or this `Blog <https://www.jeffgeerling.com/blog/running-ansible-within-windows>`_.) 
 
 
-
-
-For Linux and Mac::
+For Linux::
 
   sudo apt-get update
   sudo apt-get install virtualbox
@@ -25,6 +26,13 @@ dkms (optional): "Ubuntu/Debian users might want to install the dkms package to 
 
 make sure your default python is aliased with python3.5 before going to next step.
 
+For Mac::
+
+  commands goes here
+  
+For Windows::
+
+  commands goes here
 
 Clone the `repository <https://github.com/cadasta/cadasta-platform>`_ to your local machine and enter that directory.
 After cloning it go inside to cadasta-platform directory and run below command to provision the virtual machine.
