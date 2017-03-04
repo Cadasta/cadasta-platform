@@ -4880,9 +4880,11 @@ ul.resource-actions > li {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
     max-width: 80%; }
     .page-title h1.short, .page-title h2.short {
-      width: 50%; }
+	width: 50%;
+	padding-left:5px;
+    }
     .page-title h1 .org-name, .page-title h2 .org-name {
-      font-size: 14px;
+      font-size: 16px;
       display: block;
       padding-bottom: 2px;
       text-transform: uppercase; }
