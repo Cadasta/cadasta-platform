@@ -12,6 +12,7 @@
 {% block extra_script %}
 {{ block.super }}
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/form_submit_once.js' %}"></script>
 {% if get_current_language != "en-us" %}
 {% get_current_language as LANGUAGE_CODE %}
 <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
@@ -41,7 +42,7 @@
 
             {% include "party/party_form.html" %}
 
-            <button type="submit" class="btn btn-primary" name="submit">
+            <button type="submit" class="btn btn-primary" name="submit-button">
               {% trans "Save" %}
             </button>
           </form>

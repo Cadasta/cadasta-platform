@@ -18,6 +18,7 @@
 {% block location_extra_script %}
   {{ form.media }}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+  <script src="{% static 'js/form_submit_once.js' %}"></script>
   <script src="{% static 'js/jquery-ui.min.js' %}"></script>
   {% if get_current_language != "en-us" %}
   {% get_current_language as LANGUAGE_CODE %}
@@ -123,7 +124,7 @@ $(document).ready(function() {
           </div>
 
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary pull-right" name="submit">
+            <button type="submit" class="btn btn-primary pull-right" name="submit-button">
               {% trans "Save" %}
             </button>
             <a class="btn btn-link cancel"

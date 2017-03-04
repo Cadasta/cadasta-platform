@@ -1,10 +1,12 @@
 {% extends "spatial/location_detail.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Upload new resource for location" %} | {% endblock %}
 
 {% block location_extra_script %}
   {{ form.media }}
+  <script src="{% static 'js/form_submit_once.js' %}"></script>
 {% endblock %}
 
 {% block modals %}
