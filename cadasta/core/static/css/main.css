@@ -935,9 +935,7 @@ address {
 
 @media (min-width: 992px) {
   .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12 {
-    float: left;
-  }
-
+    float: left; }
   .col-md-1 {
     width: 8.33333%; }
   .col-md-2 {
@@ -4771,9 +4769,8 @@ div.org-logo {
   height: 100%; }
 
 @media (max-width: 991px) {
-  .row-height, .col-height  {
+  .row-height, .col-height {
     display: block; }
-
   #organization-single .content-single > .row {
     margin-left: 0; }
   #organization-single .row-height {
@@ -5391,6 +5388,9 @@ ul.resource-actions > li {
 
 #search-results.table h4 {
   margin-bottom: 12px; }
+
+#search-results.table img.thumb-60 {
+  margin-left: 24px; }
 
 #search-results.table img.thumb-60 ~ table {
   width: calc(100% - 100px); }
@@ -6512,3 +6512,5 @@ h1 .label {
   display: block;
   text-transform: uppercase;
   padding-bottom: 2px; }
+
+/*# sourceMappingURL=../../../../../static/css/main.css.map */
