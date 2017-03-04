@@ -18,11 +18,19 @@
         </div>
       </div>
       <div class="panel panel-default">
-        <div class="panel-body">
-          <!-- Party information -->
-          <h3>{% trans "Details" %}</h3>
-          <div class="row">
-            <div class="col-md-6">
+        <div class="panel-body detail">
+
+          <h2><span>{% trans "Party" %} </span>{{ party.name }}</h2>
+
+          <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">{% trans "Overview" %}</a></li>
+            <li role="presentation"><a href="#relationships" aria-controls="relationships" role="tab" data-toggle="tab">{% trans "Relationships" %}</a></li>
+            <li role="presentation"><a  href="#resources" aria-controls="resources" role="tab" data-toggle="tab">{% trans "Resources" %}</a></li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Party information -->
+            <div role="tabpanel" class="tab-pane active" id="overview">
               <table class="table table-location">
                 <tbody>
                   <tr>
@@ -42,38 +50,86 @@
                 </tbody>
               </table>
             </div>
-          </div>
-          <!-- /party information -->
-          <!-- Party resources -->
-          <h3>{% trans "Resources" %}</h3>
-          {% if resource_list %}
-            <div class="top-btn pull-right top-add">
-              {% if has_unattached_resources %}
-              <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
-              {% else %}
-              <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
-              {% endif %}
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
+            <!-- /party information -->
+
+            <!-- Party relationships -->
+            <div role="tabpanel" class="tab-pane" id="relationships">
+              {% if relationships %}
+              <table class="table table-hover datatable" data-paging-type="simple">
+                <thead>
+                  <tr>
+                    <th>{% trans "Relationship" %}</th>
+                    <th>{% trans "Location Type" %}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for rel in relationships %}
+                  {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
+                  <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
+                    <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
+                    <td><a href="{% url 'locations:detail' object.organization.slug object.slug rel.spatial_unit.id %}" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.get_type_display }}</a></td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <div>
+                <p>{% trans "This party does not have any relationships and is not connected to any locations." %}</p>
+              </div>
+            {% endif %}
             </div>
-            {% include 'resources/table.html' %}
-          {% else %}
-            <div>
-              <p>{% trans "This party does not have any attached resources. To attach a resource, select the button below." %}</p>
-              <div class="btn-full">
+            <!-- /party relationships -->
+
+            <!-- Party resources -->
+            <div role="tabpanel" class="tab-pane" id="resources">
+            {% if resource_list %}
+              <div class="top-btn pull-right top-add">
                 {% if has_unattached_resources %}
-                <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
                 {% else %}
-                <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
+                <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
                 {% endif %}
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
               </div>
+              {% include 'resources/table.html' %}
+            {% else %}
+              <div>
+                <p>{% trans "This party does not have any attached resources. To attach a resource, select the button below." %}</p>
+                <div class="btn-full">
+                  {% if has_unattached_resources %}
+                  <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                  {% else %}
+                  <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
+                  {% endif %}
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
+                </div>
+              </div>
+            {% endif %}
             </div>
-          {% endif %}
-          <!-- /party resources -->
+            <!-- /party resources -->
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_script %}
+{{ block.super }}
+<script type="text/javascript">
+  $(document).ready(function() {
+    if(location.hash) {
+      $('a[href=' + location.hash + ']').tab('show');
+    }
+    $(document.body).on("click", "a[data-toggle]", function(event) {
+      location.hash = this.getAttribute("href");
+    });
+  });
+  $(window).on('popstate', function() {
+      var anchor = location.hash || $("a[data-toggle=tab]").first().attr("href");
+      $('a[href=' + anchor + ']').tab('show');
+  });
+</script>
 {% endblock %}
