@@ -103,4 +103,4 @@ LOGGING = {
     },
 }
 
-MOCK_ES = True
+ES_PORT = '8000'

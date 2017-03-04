@@ -5860,6 +5860,10 @@ a {
     color: #0e305e;
     outline: none; }
 
+kbd {
+  background: #d9dadb;
+  color: #595a5c; }
+
 /* =Page Content
 -------------------------------------------------------------- */
 #page-content {
