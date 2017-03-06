@@ -89,7 +89,6 @@ function performSearch(query, updateDocumentUrl) {
   $('#failed-results').addClass('hidden');
   $('#no-results').addClass('hidden');
   $('#results').addClass('hidden');
-  $( '.search').find('.search').click(function(){ window.scrollTo(0,0);});
 
   if (query === '') return;
 
@@ -132,6 +131,7 @@ function performSearch(query, updateDocumentUrl) {
     else {
       $('#no-results').addClass('hidden');
       $('#results').removeClass('hidden');
+      $( '.search').find('.search').click(function(){$('#results').scrollTop(0);});
       $('#total-results').text(response.results.length);
       $('#query-string').text(query);
       var t = $('#search-results').DataTable();
