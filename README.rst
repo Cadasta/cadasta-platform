@@ -9,18 +9,24 @@ Install for development
 
 Install:
 
-- `VirtualBox <https://www.virtualbox.org/>`_
-- `Vagrant <https://www.vagrantup.com/>`_
-- `Ansible <http://www.ansible.com/>`_ (For Linux and Mac, install Ansible 2 via pip. For Windows(Windows isn’t supported for the control machine) go through `Ansible Documentation  <http://docs.ansible.com/ansible/intro_windows.html>`_ or this `Blog <https://www.jeffgeerling.com/blog/running-ansible-within-windows>`_.) 
+* `VirtualBox <https://www.virtualbox.org/>`_
+    * Version 5.0.x
+* `Vagrant <https://www.vagrantup.com/>`_
+    * Version 1.8.1
+    * If you are behind a proxy, you may need to install and configure the `vagrant-proxyconf <https://rubygems.org/gems/vagrant-proxyconf/versions/1.5.2>`_ plugin
+* `Ansible <http://www.ansible.com/>`_
+    * Version 2.1.3.0
+    * For Linux and Mac, install Ansible 2 via pip
+    * For Windows (unsupported), go through `Ansible Documentation <http://docs.ansible.com/ansible/intro_windows.html>`_ or this `blog <https://www.jeffgeerling.com/blog/running-ansible-within-windows>`_
 
-Clone the `repository <https://github.com/cadasta/cadasta-platform>`_ to your local machine and enter that directory.
-After cloning it go inside to cadasta-platform directory and run below command to provision the virtual machine.
+Clone the `repository <https://github.com/cadasta/cadasta-platform>`_ to your local machine and enter the cadasta-platform directory.
+Run the following commands to access the virtual machine.
+
 Provision the VM::
 
   vagrant up --provision
 
-SSH into to the VM (this automatically activates the Python virtual
-environment)::
+SSH into the VM (automatically activates the Python virtual environment)::
 
   vagrant ssh
   
@@ -29,7 +35,7 @@ Enter the cadasta directory and start the server::
   cd cadasta
   ./runserver
 
-Open ``http://localhost:8000/`` in your local machine's browser, this will forward you to the port on the VM and you should see the front page of the platform site.
+Open ``http://localhost:8000/`` in your local machine's browser. This will forward you to the web server port on the VM and you should see the front page of the platform site.
 
 See the wiki (`here <https://devwiki.corp.cadasta.org/Installation>`_ and `here <https://devwiki.corp.cadasta.org/Run%20for%20development>`_) for detailed instructions on installation and running the platform for development.
 

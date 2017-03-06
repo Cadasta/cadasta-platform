@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.translation import ugettext as _
-from django.utils.translation import get_language_info
 from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
@@ -130,15 +129,8 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
         )
 
 
-# Python's builtin check_for_language does weird transformations of
-# locale names...
-
 def check_for_language(lang):
-    try:
-        get_language_info(lang)
-        return True
-    except:
-        return False
+    return lang in settings.FORM_LANGS.keys()
 
 
 def multilingual_label_check(children):
@@ -167,7 +159,7 @@ def fix_languages(node):
     if (isinstance(node, Element) and
        node.tagName == 'translation' and node.hasAttribute('lang')):
         iso_lang = node.getAttribute('lang')
-        local_lang = get_language_info(iso_lang)['name_local']
+        local_lang = settings.FORM_LANGS.get(iso_lang)
         node.setAttribute('lang', local_lang)
     else:
         for child in node.childNodes:
