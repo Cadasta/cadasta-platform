@@ -6,6 +6,7 @@
 
 {% block extra_head %}
 {% leaflet_css plugins="groupedlayercontrol"%}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
@@ -13,6 +14,7 @@
 {% block extra_script %}
 {{ block.super }}
 {% leaflet_js plugins="groupedlayercontrol"%}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
@@ -21,6 +23,8 @@
     var trans = {
       open: "{% trans 'Open location' %}"
     };
+
+    add_map_controls(map);
 
     switch_layer_controls(map, options);
 
