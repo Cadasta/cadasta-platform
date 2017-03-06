@@ -89,3 +89,15 @@ def assign_default_policy(sender, instance, **kwargs):
     if policy not in assigned_policies:
         assigned_policies.insert(0, policy)
     instance.assign_policies(*assigned_policies)
+
+
+@receiver(password_changed)
+def password_changed_(sender, request, user, **kwargs):
+    send_mail(
+        "Password Successfully Changed",
+        "You are receiving this email because someone has changed the password"\
+        " for your account at Cadasta Platform. If it wasn't you, please"\
+        " contact us immediately under security (at) cadasta (dot) org",
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email],
+        fail_silently = False)
