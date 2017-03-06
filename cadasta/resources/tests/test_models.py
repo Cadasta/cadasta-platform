@@ -64,8 +64,7 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
             mime_type='application/pdf'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/pdf.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/pdf.png')
 
     def test_thumbnail_mp3(self):
         resource = ResourceFactory.build(
@@ -73,32 +72,28 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
             mime_type='audio/mpeg3'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/mp3.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/mp3.png')
 
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.mp3',
             mime_type='audio/x-mpeg-3'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/mp3.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/mp3.png')
 
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.mp3',
             mime_type='video/mpeg'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/mp3.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/mp3.png')
 
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.mp3',
             mime_type='video/x-mpeg'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/mp3.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/mp3.png')
 
     def test_thumbnail_mp4(self):
         resource = ResourceFactory.build(
@@ -106,8 +101,7 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
             mime_type='video/mp4'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/mp4.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/mp4.png')
 
     def test_thumbnail_doc(self):
         resource = ResourceFactory.build(
@@ -115,8 +109,7 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
             mime_type='application/msword'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/doc.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/doc.png')
 
     def test_thumbnail_docx(self):
         resource = ResourceFactory.build(
@@ -125,8 +118,7 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
                        'wordprocessingml.document')
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/docx.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/docx.png')
 
     def test_thumbnail_xls(self):
         resource = ResourceFactory.build(
@@ -134,16 +126,14 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
             mime_type='application/msexcel'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/xls.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/xls.png')
 
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.doc',
             mime_type='application/vnd.ms-excel'
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/xls.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/xls.png')
 
     def test_thumbnail_xlsx(self):
         resource = ResourceFactory.build(
@@ -152,16 +142,14 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
                        '.spreadsheetml.sheet')
         )
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/xlsx.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/xlsx.png')
 
     def test_thumbnail_xml(self):
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.gpx',
             mime_type=('text/xml'))
         assert (resource.thumbnail ==
-                'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-'
-                'bucket/icons/xml.png')
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/xml.png')
 
     def test_thumbnail_other(self):
         resource = ResourceFactory.build(
