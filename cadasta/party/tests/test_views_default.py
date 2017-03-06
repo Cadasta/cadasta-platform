@@ -351,33 +351,40 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             name='WR',
             label={'en': 'Water rights', 'de': 'Wasserecht'})
 
-        lh_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='LH'),
-            party=self.party,
-            spatial_unit=SpatialUnitFactory(project=self.project, type='PA'),
-            project=self.project)
         q_factories.QuestionOptionFactory.create(
             question=location_type_question,
             name='PA',
             label={'en': 'Parcel', 'de': 'Parzelle'})
-        lh_ten.type_labels = ('data-label-de="Miete" '
-                              'data-label-en="Leasehold"')
-        lh_ten.location_labels = ('data-label-de="Parzelle" '
-                                  'data-label-en="Parcel"')
 
-        wr_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
-            party=self.party,
-            spatial_unit=SpatialUnitFactory(project=self.project, type='BU'),
-            project=self.project)
         q_factories.QuestionOptionFactory.create(
             question=location_type_question,
             name='BU',
             label={'en': 'Building', 'de': 'Haus'})
-        wr_ten.type_labels = ('data-label-de="Wasserecht" '
-                              'data-label-en="Water rights"')
-        wr_ten.location_labels = ('data-label-de="Haus" '
-                                  'data-label-en="Building"')
+
+        TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            party=self.party,
+            spatial_unit=SpatialUnitFactory(project=self.project, type='PA'),
+            project=self.project)
+
+        TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            party=self.party,
+            spatial_unit=SpatialUnitFactory(project=self.project, type='BU'),
+            project=self.project)
+
+        relationships = self.party.tenurerelationship_set.all()
+        for rel in relationships:
+            if rel.tenure_type_id == 'LH':
+                rel.type_labels = ('data-label-de="Miete" '
+                                   'data-label-en="Leasehold"')
+                rel.location_labels = ('data-label-de="Parzelle" '
+                                       'data-label-en="Parcel"')
+            elif rel.tenure_type_id == 'WR':
+                rel.type_labels = ('data-label-de="Wasserecht" '
+                                   'data-label-en="Water rights"')
+                rel.location_labels = ('data-label-de="Haus" '
+                                       'data-label-en="Building"')
 
         user = UserFactory.create()
         assign_policies(user)
@@ -392,7 +399,7 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
                                 'data-label-en="Individual"'),
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')],
-            relationships=[wr_ten, lh_ten])
+            relationships=relationships)
 
     def test_get_with_authorized_user_including_relationships(self):
         TenureRelationshipFactory.create_batch(2,
