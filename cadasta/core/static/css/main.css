@@ -4778,7 +4778,6 @@ div.org-logo {
     margin: 0 auto;
     background: #fff; }
   #organization-single .detail {
-    display: table-header-group;
     box-shadow: none; }
     #organization-single .detail section {
       padding: 20px; } }
