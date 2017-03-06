@@ -3,6 +3,8 @@ from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
+from django.core.mail import send_mail
+from allauth.account.signals import password_changed
 import django.contrib.auth.models as auth
 import django.contrib.auth.base_user as auth_base
 from tutelary.models import Policy
