@@ -96,8 +96,8 @@ class RegisterFormTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'password1': 'Isjohnreallythebest34?',
-            'password2': 'Isjohnreallythebest34?',
+            'password1': 'IsJOHNreallythebest34?',
+            'password2': 'IsJOHNreallythebest34?',
             'full_name': 'John Lennon',
         }
         form = forms.RegisterForm(data)
@@ -353,8 +353,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'Letsimagine71?12345',
-            'password2': 'Letsimagine71?12345',
+            'password1': 'Letsimagine71?',
+            'password2': 'Letsimagine71?',
         }
         form = forms.ChangePasswordForm(user, data)
 
@@ -383,8 +383,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'Isjohnreallythebest34?',
-            'password2': 'Isjohnreallythebest34?',
+            'password1': 'IsJOHNreallythebest34?',
+            'password2': 'IsJOHNreallythebest34?',
         }
         form = forms.ChangePasswordForm(user, data)
 
@@ -502,8 +502,8 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
             password='beatles4Lyfe!', email='john@thebeatles.uk')
 
         data = {
-            'password1': 'Isjohnreallythebest34?',
-            'password2': 'Isjohnreallythebest34?',
+            'password1': 'IsJOHNreallythebest34?',
+            'password2': 'IsJOHNreallythebest34?',
         }
         form = forms.ResetPasswordKeyForm(data, user=user)
 

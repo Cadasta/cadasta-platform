@@ -127,7 +127,17 @@ class ChangePasswordMixin:
 
 class ChangePasswordForm(ChangePasswordMixin,
                          allauth_forms.ChangePasswordForm):
-    pass
+    def clean_new_password(self):
+        password = self.data.get('new_password')
+        validate_password(password, user=self.user)
+        errors = []
+
+        username = self.data.get('username')
+        if len(username) and username.casefold() in password.casefold():
+            errors.append(_("The password is too similar to the username."))
+
+        if errors:
+            raise forms.ValidationError(errors)
 
 
 class ResetPasswordKeyForm(ChangePasswordMixin,

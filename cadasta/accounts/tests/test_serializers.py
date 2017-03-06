@@ -105,8 +105,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'yoko79',
             'email': 'john@beatles.uk',
-            'password': 'iloveYoKo79!',
-            'password_repeat': 'iloveYoKo79!',
+            'password': 'iloveYOKO79!',
+            'password_repeat': 'iloveYOKO79!',
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
@@ -345,8 +345,8 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
 
     def test_new_password_contains_email(self):
         user = UserFactory.create(
-            username=BASIC_TEST_DATA['username'],
             email=BASIC_TEST_DATA['email'],
+            password=BASIC_TEST_DATA['password'],
             change_pw=True
         )
         request = APIRequestFactory().patch('/user/imagine71', {})
