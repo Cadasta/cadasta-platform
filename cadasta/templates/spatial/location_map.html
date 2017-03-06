@@ -22,6 +22,8 @@
       open: "{% trans 'Open location' %}"
     };
 
+    add_map_controls(map);
+
     switch_layer_controls(map, options);
 
     {% if object.extent %}
