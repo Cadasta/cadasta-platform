@@ -350,8 +350,7 @@ ATTRIBUTE_GROUPS = {
     }
 }
 
-ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-platformprod'
-            '-bucket/icons/{}.png')
+ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-resources/icons/{}.png')
 
 ICON_LOOKUPS = {
     'application/pdf': 'pdf',
