@@ -65,6 +65,11 @@ class OrganizationDetail(APIPermissionRequiredMixin,
         'PUT': patch_actions
     }
 
+    def get_serializer(self, *args, **kwargs):
+        if not self.request.user.is_authenticated:
+            kwargs['hide_detail'] = True
+        return super().get_serializer(*args, **kwargs)
+
 
 class OrganizationUsers(APIPermissionRequiredMixin,
                         mixins.OrganizationRoles,
