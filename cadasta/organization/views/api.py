@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework import generics, filters, status
 from tutelary.mixins import APIPermissionRequiredMixin, PermissionsFilterMixin
 from core.mixins import update_permissions
@@ -33,6 +33,11 @@ class OrganizationList(PermissionsFilterMixin,
     permission_filter_queryset = (lambda self, view, o: ('org.view',)
                                   if o.archived is False
                                   else ('org.view_archived',))
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            raise NotAuthenticated
+        return super().post(request, *args, **kwargs)
 
 
 class OrganizationDetail(APIPermissionRequiredMixin,
