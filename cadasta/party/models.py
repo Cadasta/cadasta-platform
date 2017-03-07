@@ -1,6 +1,7 @@
 """Party models."""
 
 from core.models import RandomIDModel
+from core.validators import validate_no_emoji
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.gis.db import models
@@ -53,7 +54,7 @@ class Party(ResourceModelMixin, RandomIDModel):
     # All parties have a name: for individuals, this is the full name,
     # while for groups and corporate entities, it's whatever name is
     # conventionally used to identify the organisation.
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, validators=[validate_no_emoji])
 
     # Party type: used to manage range of allowed attributes.
     type = models.CharField(
