@@ -8,6 +8,7 @@ from allauth.account import forms as allauth_forms
 
 from .models import User, now_plus_48_hours
 from parsley.decorators import parsleyfy
+from django.template.loader import render_to_string
 
 
 @parsleyfy
@@ -121,7 +122,7 @@ class ChangePasswordMixin:
         return password
 
     def save(self, *args, **kwargs):
-	super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
         msg_subject = render_to_string(
                 'account/email/'
                 'password_changed_subject.txt'
@@ -147,4 +148,3 @@ class ChangePasswordForm(ChangePasswordMixin,
 class ResetPasswordKeyForm(ChangePasswordMixin,
                            allauth_forms.ResetPasswordKeyForm):
     pass
-    

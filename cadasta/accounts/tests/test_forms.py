@@ -297,7 +297,7 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
         assert form.is_valid() is True
         form.save()
 
-        assert len(mail.outbox) ==  1
+        assert len(mail.outbox) == 1
 
     def test_email_test(self):
         user = UserFactory.create(password='beatles4L1yfe!')
