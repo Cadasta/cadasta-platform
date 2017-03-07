@@ -97,9 +97,10 @@ def assign_default_policy(sender, instance, **kwargs):
 def password_changed_(sender, request, user, **kwargs):
     send_mail(
         "Password Successfully Changed",
-        "You are receiving this email because someone has changed the password"\
-        " for your account at Cadasta Platform. If it wasn't you, please"\
-        " contact us immediately under security (at) cadasta (dot) org",
+        "You are receiving this email because someone has changed the password"
+        " for your account at Cadasta Platform. If it wasn't you, please"
+        " contact us immediately under security@cadasta.org",
         settings.DEFAULT_FROM_EMAIL,
         [user.email],
-        fail_silently = False)
+        fail_silently=False
+    )
