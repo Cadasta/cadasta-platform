@@ -60,6 +60,20 @@ class RegisterFormTest(UserTestCase, TestCase):
                 form.errors.get('password1'))
         assert User.objects.count() == 0
 
+    def test_password_contains_blank_username(self):
+        data = {
+            'username': '',
+            'email': 'john@beatles.uk',
+            'password1': 'Letsimagine71things?',
+            'password2': 'Letsimagine71things?',
+            'full_name': 'John Lennon',
+        }
+        form = forms.RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert (form.errors.get('password1') is None)
+        assert User.objects.count() == 0
+
     def test_password_contains_email(self):
         data = {
             'username': 'imagine71',
@@ -73,6 +87,20 @@ class RegisterFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert (_("Passwords cannot contain your email.") in
                 form.errors.get('password1'))
+        assert User.objects.count() == 0
+
+    def test_password_contains_blank_email(self):
+        data = {
+            'username': 'imagine71',
+            'email': '',
+            'password1': 'Isjohnreallythebest34?',
+            'password2': 'Isjohnreallythebest34?',
+            'full_name': 'John Lennon',
+        }
+        form = forms.RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert (form.errors.get('password1') is None)
         assert User.objects.count() == 0
 
     def test_password_contains_less_than_min_characters(self):
@@ -254,6 +282,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         assert User.objects.count() == 1
 
+        assert user.check_password('iloveyoko79!') is True
+
     def test_email_test(self):
         user = UserFactory.create(password='beatles4L1yfe!')
 
@@ -267,7 +297,7 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
         assert form.is_valid() is True
         form.save()
 
-        self.assertEqual(len(mail.outbox), 1)
+        assert len(mail.outbox) ==  1
 
     def test_email_test(self):
         user = UserFactory.create(password='beatles4L1yfe!')
