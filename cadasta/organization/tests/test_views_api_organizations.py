@@ -218,14 +218,28 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.org = OrganizationFactory.create(name='Org', slug='org')
         self.project = ProjectFactory.create(organization=self.org)
 
-    def test_get_organization(self):
+    def test_get_organization_with_anonymous_user(self):
+        response = self.request()
+        assert response.status_code == 200
+        assert response.content['id'] == self.org.id
+        assert 'users' not in response.content
+
+    def test_get_organization_with_unauthorized_user(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content['id'] == self.org.id
-        assert 'users' in response.content
+        assert 'users' not in response.content
 
-    def test_get_organization_with_unauthorized_user(self):
-        response = self.request()
+    def test_get_organization_with_authorized_user(self):
+        clauses = {
+            'clause': [
+                clause('allow', ['org.*', 'org.*.*'], ['organization/*']),
+            ]
+        }
+        policy = Policy.objects.create(name='test-policy-1',
+                                       body=json.dumps(clauses))
+        assign_user_policies(self.user, policy)
+        response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content['id'] == self.org.id
         assert 'users' in response.content
