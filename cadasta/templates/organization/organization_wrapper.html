@@ -15,20 +15,16 @@
 <!-- Single organization header -->
 <div class="header page-header">
   <div class="page-title">
-    <div>
-      <a class="index-link visible-md-inline visible-lg-inline" href="{% url 'organization:list' %}">
-        <span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span>
-      </a>
-    </div>
-    <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
-      {{ organization.name }}
-      {% if organization.archived %}
-      <span class="label label-danger">
-        {% trans "Archived" %}
-      </span>
-      {% endif %}
-    </h1>
-    <div class="top-btn">
+      <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
+        {{ organization.name }}
+        {% if organization.archived %}
+        <span class="label label-danger">
+          {% trans "Archived" %}
+        </span>
+        {% endif %}
+      </h1>
+
+    <div class="top-btn pull-right">
 
       <!-- More options menu -->
       {% if is_administrator %}

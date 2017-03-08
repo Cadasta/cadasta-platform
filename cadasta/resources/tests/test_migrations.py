@@ -73,7 +73,7 @@ class TestFixImportedResourceUrls(MigrationTestCase):
         project = Project.objects.create(name='Test Proj', organization=org)
 
         base_path = (
-            'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-bucket/'
+            'https://s3-us-west-2.amazonaws.com/cadasta-resources/'
         )
 
         # cannot call custom save methods on models in migrations
@@ -97,7 +97,7 @@ class TestFixImportedResourceUrls(MigrationTestCase):
         resources = Resource.objects.filter(mime_type='text/csv')
         assert len(resources) == 10
         base_path = (
-            'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-bucket/'
+            'https://s3-us-west-2.amazonaws.com/cadasta-resources/'
         )
         resource = Resource.objects.get(name='test-resource-0')
         assert resource.file.url == base_path + 'resources/test_0.csv'
@@ -118,7 +118,7 @@ class TestRandomizeImportedFilenames(MigrationTestCase):
         project = Project.objects.create(name='Test Proj', organization=org)
 
         base_path = (
-            'https://s3-us-west-2.amazonaws.com/cadasta-platformprod-bucket/'
+            'https://s3-us-west-2.amazonaws.com/cadasta-resources/'
             'resources/'
         )
 
