@@ -126,4 +126,13 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
     def validate_new_password(self, password):
         user = self.context['request'].user
         validate_password(password, user=user)
+        errors = []
+
+        username = user.username
+        if len(username) and username.casefold() in password.casefold():
+            errors.append(_("The password is too similar to the username."))
+
+        if errors:
+            raise ValidationError(errors)
+
         return password

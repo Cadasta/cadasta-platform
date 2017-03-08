@@ -311,8 +311,8 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'current_password': BASIC_TEST_DATA['password'],
-            'new_password': 'Letsimagine71!',
-            're_new_password': 'Letsimagine71!',
+            'new_password': 'Letsimagine71!12345',
+            're_new_password': 'Letsimagine71!12345',
         }
         serializer = serializers.ChangePasswordSerializer(
             user, data=data, context={'request': Request(request)})
@@ -331,8 +331,8 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'current_password': BASIC_TEST_DATA['password'],
-            'new_password': 'LetsIMAGINE71!',
-            're_new_password': 'LetsIMAGINE71!',
+            'new_password': 'LetsIMAGINE71!12345',
+            're_new_password': 'LetsIMAGINE71!12345',
         }
         serializer = serializers.ChangePasswordSerializer(
             user, data=data, context={'request': Request(request)})

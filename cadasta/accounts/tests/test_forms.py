@@ -353,8 +353,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'Letsimagine71?',
-            'password2': 'Letsimagine71?',
+            'password1': 'Letsimagine71?1234567890',
+            'password2': 'Letsimagine71?1234567890',
         }
         form = forms.ChangePasswordForm(user, data)
 
@@ -368,8 +368,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'LetsIMAGINE71?',
-            'password2': 'LetsIMAGINE71?',
+            'password1': 'LetsIMAGINE71?1234567890',
+            'password2': 'LetsIMAGINE71?1234567890',
         }
         form = forms.ChangePasswordForm(user, data)
 
@@ -474,8 +474,8 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
             password='beatles4Lyfe!', username='imagine71')
 
         data = {
-            'password1': 'Letsimagine71?',
-            'password2': 'Letsimagine71?',
+            'password1': 'Letsimagine71?1234567890',
+            'password2': 'Letsimagine71?1234567890',
         }
         form = forms.ResetPasswordKeyForm(data, user=user)
 
@@ -488,8 +488,8 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
             password='beatles4Lyfe!', username='imagine71')
 
         data = {
-            'password1': 'LetsIMAGINE71?',
-            'password2': 'LetsIMAGINE71?',
+            'password1': 'LetsIMAGINE71?1234567890',
+            'password2': 'LetsIMAGINE71?1234567890',
         }
         form = forms.ResetPasswordKeyForm(data, user=user)
 
