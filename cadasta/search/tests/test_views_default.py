@@ -1,5 +1,7 @@
 import pytest
 import json
+
+from django.conf import settings
 from django.http import Http404
 from django.test import TestCase
 
@@ -40,6 +42,7 @@ class SearchTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {
             'object': self.project,
+            'max_num_results': settings.ES_MAX_RESULTS,
         }
 
     def setup_url_kwargs(self):
