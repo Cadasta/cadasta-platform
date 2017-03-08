@@ -220,8 +220,17 @@
             "sortAscending":  ": {% trans "activate to sort column ascending" %}",
             "sortDescending": ": {% trans "activate to sort column descending" %}"
           }
-        }
+        },
+
+        "fnDrawCallback": function(oSettings){
+            var rowCount = this.fnSettings().fnRecordsDisplay();
+            if(rowCount<=10){
+              $('.dataTables_length').hide();
+            }
+          }
+
       });
+
       $('.dropdown-toggle').dropdown();
       $('#language').change(function() { this.form.submit(); });
       $('[data-parsley-required="true"]')
@@ -233,6 +242,7 @@
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
     }, 5000);
     </script>
+
     <script>
       // User tracking
       window.inlineManualTracking = {
