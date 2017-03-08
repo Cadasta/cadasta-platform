@@ -10,6 +10,11 @@
                  "party.list", "party_rel.list",
                  "tenure_rel.list", "resource.list"],
       "object": ["project/$organization/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["org.users.list", "org.view"],
+      "object": ["organization/$organization"]
     }
   ]
 }

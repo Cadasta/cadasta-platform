@@ -261,7 +261,35 @@ class OrgAdminCheckMixin(SuperUserCheckMixin):
 
         return self._is_admin
 
+    def is_member(self):
+        if not hasattr(self, '_is_member'):
+            self._is_member = False
+
+            # Check if the user is anonymous: not an admin
+            if isinstance(self.request.user, AnonymousUser):
+                return False
+
+            # Check if the user is a superuser: is an admin
+            if self.is_superuser:
+                self._is_member = True
+
+            if hasattr(self, 'get_organization'):
+                org = self.get_organization()
+            else:
+                org = self.get_object()
+            try:
+                OrganizationRole.objects.get(
+                    organization=org,
+                    user=self.request.user,
+                )
+                self._is_member = True
+            except OrganizationRole.DoesNotExist:
+                pass
+
+        return self._is_member
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['is_administrator'] = self.is_administrator
+        context['is_member'] = self.is_member
         return context

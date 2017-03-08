@@ -184,7 +184,8 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             'projects': self.projs,
             'is_superuser': False,
             'add_allowed': False,
-            'is_administrator': False
+            'is_administrator': False,
+            'is_member': False,
         }
 
     def test_get_org_with_authorized_user(self):
@@ -206,7 +207,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             projects=Project.objects.all(),
-            show_members=True)
+            is_member=True)
 
     def test_get_org_with_new_org(self):
         new_org = OrganizationFactory.create()
@@ -228,7 +229,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=True,
             is_administrator=True,
             add_allowed=True,
-            show_members=True,
+            is_member=True,
             projects=self.all_projects)
 
     def test_get_org_with_org_admin(self):
@@ -245,7 +246,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=False,
             is_administrator=True,
             add_allowed=True,
-            show_members=True,
+            is_member=True,
             projects=self.all_projects)
 
     def test_get_archived_org_with_unauthorized_user(self):
@@ -280,7 +281,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
             is_superuser=False,
             is_administrator=True,
             add_allowed=True,
-            show_members=True,
+            is_member=True,
             projects=self.all_projects)
 
 
@@ -308,7 +309,7 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {
             'form': forms.OrganizationForm(instance=self.org),
-            'organization': self.org
+            'organization': self.org,
         }
 
     def test_get_with_authorized_user(self):
@@ -649,7 +650,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
             'project_role_form':
                 forms.EditOrganizationMemberProjectPermissionForm(
                 self.org, self.member, self.user, data=None),
-            'org_admin': False
+            'org_admin': False,
+            'is_member': False,
         }
 
     def test_get_with_authorized_user(self):
@@ -658,7 +660,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
 
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(is_member=True)
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.user)
@@ -681,7 +683,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.render_content(is_superuser=True,
                                                        is_administrator=True,
                                                        org_admin=False,
-                                                       add_allowed=True)
+                                                       add_allowed=True,
+                                                       is_member=True)
 
     def test_get_with_archived_organization(self):
         OrganizationRole.objects.create(organization=self.org, user=self.user)
@@ -782,7 +785,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                 self.org, self.member, self.user, {'org_role': 'X'},)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            org_role_form=form, project_role_form=prj_form)
+            org_role_form=form, project_role_form=prj_form,
+            is_member=True)
 
     def test_post_org_role_with_archived_organization(self):
         assign_policies(self.user)
@@ -840,7 +844,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                 self.org, self.member, self.user, {self.prj.id: 'X'},)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            project_role_form=form, org_role_form=org_form)
+            project_role_form=form, org_role_form=org_form,
+            is_member=True)
 
     def test_post_prj_role_with_archived_organization(self):
         assign_policies(self.user)
