@@ -138,11 +138,7 @@ class ChangePasswordMixin:
             settings.DEFAULT_FROM_EMAIL,
             [self.user.email],
             fail_silently=False,
-	)
-
-class ChangePasswordForm(ChangePasswordMixin,
-                         allauth_forms.ChangePasswordForm):
-    pass
+        )
 
 
 class ChangePasswordForm(ChangePasswordMixin,
