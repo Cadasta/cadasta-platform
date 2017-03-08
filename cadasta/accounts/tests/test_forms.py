@@ -60,6 +60,21 @@ class RegisterFormTest(UserTestCase, TestCase):
                 form.errors.get('password1'))
         assert User.objects.count() == 0
 
+    def test_password_contains_username_case_insensitive(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password1': 'LetsimaGIne71things?',
+            'password2': 'LetsimaGIne71things?',
+            'full_name': 'John Lennon',
+        }
+        form = forms.RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert (_("The password is too similar to the username.") in
+                form.errors.get('password1'))
+        assert User.objects.count() == 0
+
     def test_password_contains_blank_username(self):
         data = {
             'username': '',
@@ -80,6 +95,21 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': 'john@beatles.uk',
             'password1': 'Isjohnreallythebest34?',
             'password2': 'Isjohnreallythebest34?',
+            'full_name': 'John Lennon',
+        }
+        form = forms.RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert (_("Passwords cannot contain your email.") in
+                form.errors.get('password1'))
+        assert User.objects.count() == 0
+
+    def test_password_contains_email_case_insensitive(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password1': 'IsjoHNreallythebest34?',
+            'password2': 'IsjoHNreallythebest34?',
             'full_name': 'John Lennon',
         }
         form = forms.RegisterForm(data)
