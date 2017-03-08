@@ -10,7 +10,7 @@ from . import base, exceptions
 class XLSImporter(base.Importer):
 
     EXCLUDE_IDS = [
-        'id', 'party_id', 'spatial_unit_id', 'tenure_type.id',
+        'id', 'party_id', 'location_id', 'tenure_type.id',
         'tenure_type.label'
     ]
 
@@ -69,7 +69,7 @@ def get_csv_from_dataframe(df, entity_types):
                 # join locations and relationships on spatial_id's
                 joined = pd.merge(
                     locations, relationships, left_on='spatialunit::id',
-                    right_on='tenurerelationship::spatial_unit_id',
+                    right_on='tenurerelationship::location_id',
                     how='outer'
                 )
                 # then join to parties on party_id

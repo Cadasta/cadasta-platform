@@ -210,8 +210,8 @@ class Importer(SchemaSelectorMixin):
         spatial_ct = content_types['spatial.spatialunit']
 
         s_id = (
-            'tenurerelationship::spatial_unit_id'
-            if type == 'xls' else 'spatial_unit_id')
+            'tenurerelationship::location_id'
+            if type == 'xls' else 'location_id')
         p_id = (
             'tenurerelationship::party_id'
             if type == 'xls' else 'party_id'
