@@ -5453,6 +5453,15 @@ ul.resource-actions > li {
   #project-map .btn-wrap .btn-block {
     margin: 0 auto; }
 
+/* Clearing Search box text
+---------------------------------------------------------------- */
+.clearable.x {
+  background: url("/static/img/cross.png") no-repeat right 15px center;
+  background-color: white; }
+
+.clearable.on_x {
+  cursor: pointer; }
+
 /* =Forms
 -------------------------------------------------------------- */
 /* =Contacts form styling
