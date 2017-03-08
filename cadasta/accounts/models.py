@@ -99,8 +99,8 @@ def assign_default_policy(sender, instance, **kwargs):
 @receiver(password_reset)
 def password_changed_reset(sender, request, user, **kwargs):
     msg_body = get_template(
-    	"accounts/email/password_change_successful.txt"
-    	).render(Context({'user':user}))
+        "accounts/email/password_change_successful.txt"
+        ).render(Context({'user': user}))
     send_mail(
         _("Password Successfully Changed or Reset"),
         msg_body,
