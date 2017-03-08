@@ -706,7 +706,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                             user=self.member)
         assert role.admin is True
 
-    def test_post_org_role_downgraded(self):
+    def test_post_org_role_redirect(self):
         assign_policies(self.user)
         response = self.request(
             method='POST', user=self.user, post_data={'org_role': 'M'})
@@ -715,10 +715,10 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert ('/organizations/{}/members/{}/'.format(
                   self.org.slug, self.member) in response.location)
 
-    def test_post_org_role_upgraded(self):
+    def test_post_prj_role_redirect(self):
         assign_policies(self.user)
         response = self.request(
-            method='POST', user=self.user, post_data={'org_role': 'A'})
+            method='POST', user=self.user, post_data={self.prj.id: 'DC'})
 
         assert response.status_code == 302
         assert ('/organizations/{}/members/'.format(self.org.slug)
