@@ -219,19 +219,19 @@ class Importer(SchemaSelectorMixin):
 
         if spatial_ct:
             try:
-                spatial_unit_id = row[headers.index(s_id)]
-                if spatial_unit_id:
+                location_id = row[headers.index(s_id)]
+                if location_id:
                     created_su_id = self._locations_created.get(
-                        spatial_unit_id, None
+                        location_id, None
                     )
                     if created_su_id:
                         su = SpatialUnit.objects.get(id=created_su_id)
                     else:
                         su = SpatialUnit.objects.create(**spatial_ct)
-                        self._locations_created[spatial_unit_id] = su.pk
+                        self._locations_created[location_id] = su.pk
                 else:
                     su = SpatialUnit.objects.create(**spatial_ct)
-                    self._locations_created[spatial_unit_id] = su.pk
+                    self._locations_created[location_id] = su.pk
             except ValueError:
                 su = SpatialUnit.objects.create(**spatial_ct)
 
