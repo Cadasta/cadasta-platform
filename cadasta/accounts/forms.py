@@ -145,6 +145,11 @@ class ChangePasswordForm(ChangePasswordMixin,
     pass
 
 
+class ChangePasswordForm(ChangePasswordMixin,
+                         allauth_forms.ChangePasswordForm):
+    pass
+
+
 class ResetPasswordKeyForm(ChangePasswordMixin,
                            allauth_forms.ResetPasswordKeyForm):
     pass

@@ -299,21 +299,6 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         assert len(mail.outbox) == 1
 
-    def test_email_test(self):
-        user = UserFactory.create(password='beatles4L1yfe!')
-
-        data = {
-            'oldpassword': 'beatles4L1yfe!',
-            'password1': 'iloveyoko719!',
-            'password2': 'iloveyoko719!',
-        }
-
-        form = forms.ChangePasswordForm(user, data)
-        assert form.is_valid() is True
-        form.save()
-
-        assert len(mail.outbox) ==  1
-
     def test_passwords_do_not_match(self):
         user = UserFactory.create(password='beatles4Lyfe!')
 
