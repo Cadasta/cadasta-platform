@@ -5453,15 +5453,6 @@ ul.resource-actions > li {
   #project-map .btn-wrap .btn-block {
     margin: 0 auto; }
 
-/* Clearing Search box text
----------------------------------------------------------------- */
-.clearable.x {
-  background: url("/static/img/cross.png") no-repeat right 15px center;
-  background-color: white; }
-
-.clearable.on_x {
-  cursor: pointer; }
-
 /* =Forms
 -------------------------------------------------------------- */
 /* =Contacts form styling
@@ -5603,6 +5594,18 @@ ul.parsley-errors-list, ul.errorlist {
 
 .well ul.parsley-errors-list li, .well ul.errorlist li {
   background-color: transparent; }
+
+has-warning .input-group-addon,
+.has-warning .input-group-btn .btn {
+  color: #8a6d3b;
+  border-color: #8a6d3b;
+  background-color: #fcf8e3; }
+
+.has-error .input-group-addon,
+.has-error .input-group-btn .btn {
+  color: #a94442;
+  border-color: #a94442;
+  background-color: #f2dede; }
 
 /* =Exceptions
 -------------------------------------------------------------- */
