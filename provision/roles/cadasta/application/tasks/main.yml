@@ -23,6 +23,7 @@
       - libjpeg-dev
       - libgdal-dev
       - libmemcached-dev
+      - libffi-dev
 
 - name: dev locale
   become: yes

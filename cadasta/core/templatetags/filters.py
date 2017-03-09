@@ -1,5 +1,6 @@
 from django import template
-from django.forms import ChoiceField, FileField
+from django.forms import ChoiceField, FileField, CharField
+
 
 register = template.Library()
 
@@ -34,7 +35,12 @@ def display_choice_verbose(field):
 @register.filter(name='set_parsley_required')
 def set_parsley_required(field):
     if field.field.required:
-        field.field.widget.attrs = {
-            'data-parsley-required': 'true'
-        }
+        field.field.widget.attrs['data-parsley-required'] = 'true'
+    return field
+
+
+@register.filter(name='set_parsley_sanitize')
+def set_parsley_sanitize(field):
+    if type(field.field) == CharField:
+        field.field.widget.attrs['data-parsley-sanitize'] = '1'
     return field

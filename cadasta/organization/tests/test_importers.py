@@ -2,6 +2,7 @@ import pytest
 
 import pandas as pd
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
+from core.messages import SANITIZE_ERROR
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import LineString, Point, Polygon
 from django.core.exceptions import ValidationError
@@ -58,6 +59,46 @@ class BaseImporterTest(UserTestCase, TestCase):
         assert type(val) is float
         assert val == 0.0
 
+    def test_map_attrs_to_content_types_with_emoji(self):
+        project = ProjectFactory.create(current_questionnaire='123abc')
+        content_type = ContentType.objects.get(
+            app_label='party', model='party'
+        )
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, '123abc', ))
+        attr_type = AttributeType.objects.get(name='text')
+        party_hobby_attr = Attribute.objects.create(
+            schema=schema,
+            name='party_hobby', long_name='Party Hobby',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        headers = ['party_type', 'tenure_type', 'party_name', 'party_hobby']
+        row = ['IN', 'FH', 'John', 'I 💙 🍻']
+        contenttypes = {
+            'party.party': {
+                'type': 'IN',
+                'attributes': {},
+                'name': 'John',
+                'project': project}
+        }
+        attributes = ['party::party_hobby']
+        attr_map = {
+            'party.party': {
+                'DEFAULT': {
+                    'party_hobby': (party_hobby_attr, 'party.party', 'Party')
+                }
+            }
+        }
+        importer = Importer(project=project)
+        with pytest.raises(ValidationError) as e:
+            importer._map_attrs_to_content_types(
+                headers, row, contenttypes, attributes, attr_map)
+        assert e.value.message == SANITIZE_ERROR
+
 
 class ImportValidatorTest(TestCase):
 
@@ -87,6 +128,19 @@ class ImportValidatorTest(TestCase):
             validators.validate_row(
                 headers, row, config)
         assert e.value.message == "No 'party_name' column found."
+
+    def test_validate_party_name_field_with_emoji(self):
+        config = {
+            'party_name_field': 'party_name',
+            'party_type_field': 'party_type',
+            'type': 'csv'
+        }
+        headers = ['party_type', 'tenure_type', 'party_name']
+        row = ['IN', 'FH', 'I 💙 🍻']
+        with pytest.raises(ValidationError) as e:
+            validators.validate_row(
+                headers, row, config)
+        assert e.value.message == SANITIZE_ERROR
 
     def test_validate_party_type_field(self):
         config = {

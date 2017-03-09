@@ -1,29 +1,49 @@
+import pytest
 from django.test import TestCase
 from django.db import models
-from rest_framework.serializers import ModelSerializer
 
-from ..serializers import DetailSerializer, FieldSelectorSerializer
+from jsonattrs.fields import JSONAttributeField
+from rest_framework.serializers import ModelSerializer, ValidationError
+
+from ..messages import SANITIZE_ERROR
+from .. import serializers
 
 
 class SerializerModel(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=200)
+    number = models.IntegerField(null=True)
+    attributes = JSONAttributeField(null=True, blank=True)
 
     class Meta:
         app_label = 'core'
 
 
-class MyDetailSerializer(DetailSerializer, ModelSerializer):
+class MyDetailSerializer(serializers.DetailSerializer, ModelSerializer):
     class Meta:
         model = SerializerModel
         fields = ('name', 'description',)
         detail_only_fields = ('description',)
 
 
-class MyFieldSerializer(FieldSelectorSerializer, ModelSerializer):
+class MyFieldSerializer(serializers.FieldSelectorSerializer, ModelSerializer):
     class Meta:
         model = SerializerModel
         fields = ('name', 'description',)
+
+
+class MySanitizeFieldSerializer(serializers.SanitizeFieldSerializer,
+                                ModelSerializer):
+    class Meta:
+        model = SerializerModel
+        fields = ('name', 'description', 'number', 'attributes', )
+
+
+class MyJSONAttrsSerializerSerializer(serializers.JSONAttrsSerializer,
+                                      ModelSerializer):
+    class Meta:
+        model = SerializerModel
+        fields = ('attributes', )
 
 
 class DetailSerializerTest(TestCase):
@@ -80,3 +100,45 @@ class FieldSelectorSerializerTest(TestCase):
         serializer = MyFieldSerializer(model, fields=('name',))
         assert 'name' in serializer.data
         assert 'description' not in serializer.data
+
+
+class SanitizeFieldSerializerTest(TestCase):
+    def test_valid(self):
+        data = {
+            'name': 'Name',
+            'description': 'Description',
+            'number': 2,
+            'attributes': {'key': 'value'}
+        }
+        serializer = MySanitizeFieldSerializer(data=data)
+        assert serializer.validate(data) == data
+
+    def test_trim_whitespace(self):
+        data = {
+            'name': '   Name    ',
+            'number': 2
+        }
+        serializer = MySanitizeFieldSerializer(data=data)
+        assert serializer.validate(data)['name'] == 'Name'
+
+    def test_trim_tabs(self):
+        data = {
+            'name': '	Name	',
+            'number': 2
+        }
+        serializer = MySanitizeFieldSerializer(data=data)
+        assert serializer.validate(data)['name'] == 'Name'
+
+    def test_invalid(self):
+        data = {
+            'name': '<Name>',
+            'description': '<Description>',
+            'number': 2,
+            'attributes': {'key': '<value>'}
+        }
+        serializer = MySanitizeFieldSerializer(data=data)
+        with pytest.raises(ValidationError) as e:
+            serializer.validate(data)
+        assert SANITIZE_ERROR in e.value.detail['name']
+        assert SANITIZE_ERROR in e.value.detail['description']
+        assert SANITIZE_ERROR in e.value.detail['attributes']

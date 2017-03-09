@@ -13,6 +13,7 @@
 
 {% block extra_script %}
 {{ block.super }}
+{{ form.media }}
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
 {% if get_current_language != "en-us" %}
 {% get_current_language as LANGUAGE_CODE %}
@@ -53,7 +54,7 @@
             {% if field|field_type == "datefield" %}
               {{ field|add_class:"form-control datepicker"|set_parsley_required }}
             {% else %}
-              {{ field|add_class:"form-control"|set_parsley_required }}
+              {{ field|add_class:"form-control"|set_parsley_required|set_parsley_sanitize }}
             {% endif %}
             <div class="error-block">{{ field.errors }}</div>
           </div>

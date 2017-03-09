@@ -12,6 +12,8 @@ from spatial.models import SpatialUnit
 from xforms.exceptions import InvalidXMLSubmission
 from xforms.models import XFormSubmission
 from xforms.utils import odk_geom_to_wkt
+from core.messages import SANITIZE_ERROR
+from core.validators import sanitize_string
 
 
 def get_policy_instance(policy_name, variables=None):
@@ -249,6 +251,14 @@ class ModelHelper():
         except Exception as e:
             raise InvalidXMLSubmission(_("{}".format(e)))
 
+    def sanitize_submission(self, submission):
+        for value in list(submission.values()):
+            if isinstance(value, dict):
+                self.sanitize_submission(value)
+
+            elif not sanitize_string(value):
+                raise InvalidXMLSubmission(SANITIZE_ERROR)
+
     def upload_submission_data(self, request):
         if 'xml_submission_file' not in request.data.keys():
             raise InvalidXMLSubmission(_('XML submission not found'))
@@ -258,6 +268,7 @@ class ModelHelper():
             xml_submission_file.decode('utf-8')).get_dict()
 
         submission = full_submission[list(full_submission.keys())[0]]
+        self.sanitize_submission(submission)
 
         with transaction.atomic():
             (questionnaire,

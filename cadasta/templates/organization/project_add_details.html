@@ -78,7 +78,7 @@ $(document).ready(function () {
                   <div class="col-sm-8">
                     <div class="form-group{% if wizard.form.name.errors %} has-error{% endif %}">
                       <label class="control-label" for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
-                      {% render_field wizard.form.name class+="form-control" data-parsley-required="true" %}
+                      {% render_field wizard.form.name class+="form-control" data-parsley-required="true" data-parsley-sanitize="1" %}
                       <div class="error-block">{{ wizard.form.name.errors }}</div>
                     </div>
                   </div>
@@ -94,7 +94,7 @@ $(document).ready(function () {
               <div class="col-md-9">
                 <div class="form-group{% if wizard.form.description.errors %} has-error{% endif %}">
                   <label class="control-label" for="{{ wizard.form.description.id_for_label }}">{% trans "Project description" %}</label>
-                  {% render_field wizard.form.description class+="form-control" %}
+                  {% render_field wizard.form.description class+="form-control" data-parsley-sanitize="1" %}
                   <div class="error-block">{{ wizard.form.description.errors }}</div>
                 </div>
 

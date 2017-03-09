@@ -1,4 +1,5 @@
 from django.test import TestCase
+from core.messages import SANITIZE_ERROR
 from .. import validators
 
 
@@ -41,6 +42,9 @@ class ValidateSchemaTest(TestCase):
         'some_list': {
             'type': 'string',
             'enum': ['A', 'B', 'C']
+        },
+        'no_code': {
+            'type': 'string'
         }
     }
 
@@ -55,12 +59,14 @@ class ValidateSchemaTest(TestCase):
     def test_invalid_schema(self):
         data = {
             'id_string': 123,
-            'some_list': 'D'
+            'some_list': 'D',
+            'no_code': '<GotCode>'
         }
         errors = validators.validate_schema(self.SCHEMA, data)
         assert 'This field is required.' in errors['title']
         assert 'Value must be of type string.' in errors['id_string']
         assert 'D is not an accepted value.' in errors['some_list']
+        assert SANITIZE_ERROR in errors['no_code']
 
 
 class QuestionnaireTestCase(TestCase):

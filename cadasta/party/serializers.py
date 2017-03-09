@@ -4,11 +4,16 @@ from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
 from .models import Party, PartyRelationship, TenureRelationship
-from core.serializers import FieldSelectorSerializer
+from core import serializers as core_serializers
 from spatial.serializers import SpatialUnitSerializer
 
 
-class PartySerializer(FieldSelectorSerializer, serializers.ModelSerializer):
+class PartySerializer(core_serializers.JSONAttrsSerializer,
+                      core_serializers.SanitizeFieldSerializer,
+                      core_serializers.FieldSelectorSerializer,
+                      serializers.ModelSerializer):
+    attrs_selector = 'type'
+
     class Meta:
         model = Party
         fields = ('id', 'name', 'type', 'attributes', )
@@ -83,7 +88,10 @@ class TenureRelationshipReadSerializer(serializers.ModelSerializer):
         return 'tenure'
 
 
-class TenureRelationshipWriteSerializer(serializers.ModelSerializer):
+class TenureRelationshipWriteSerializer(
+        core_serializers.JSONAttrsSerializer,
+        core_serializers.SanitizeFieldSerializer,
+        serializers.ModelSerializer):
 
     class Meta:
         model = TenureRelationship
@@ -91,6 +99,8 @@ class TenureRelationshipWriteSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
     def validate(self, data):
+        data = super().validate(data)
+
         if self.instance:
             party = data.get('party', self.instance.party)
             spatial_unit = data.get('spatial_unit', self.instance.spatial_unit)

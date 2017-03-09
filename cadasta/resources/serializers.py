@@ -3,10 +3,11 @@ from buckets.serializers import S3Field
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
+from core.serializers import SanitizeFieldSerializer
 from .models import ContentObject, Resource, SpatialResource
 
 
-class ResourceSerializer(serializers.ModelSerializer):
+class ResourceSerializer(SanitizeFieldSerializer, serializers.ModelSerializer):
     file = S3Field()
 
     class Meta:

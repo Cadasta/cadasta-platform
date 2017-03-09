@@ -12,6 +12,7 @@ from jsonattrs.models import create_attribute_types
 
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory
+from core.messages import SANITIZE_ERROR
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
@@ -81,6 +82,86 @@ class XFormModelHelperTest(TestCase):
 
         OrganizationRole.objects.create(
             user=self.user, organization=self.project.organization)
+
+    def test_sanitize_submission(self):
+        geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0')
+        data = {
+            'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
+            'version': str(self.questionnaire.version),
+            'party_name': 'Party ⚽ One',
+            'party_type': 'IN',
+            'party_attributes_individual': {
+                'fname': False,
+                'fname_two': 'socks',
+            },
+            'party_photo': 'sad_birthday.png',
+            'party_resource_invite': 'invitation.pdf',
+            'location_type': 'BU',
+            'location_geometry': geoshape,
+            'location_attributes': {
+                'fname': False,
+                'fname_two': 'Location One',
+            },
+            'location_photo': 'resource_one.png',
+            'location_resource_invite': 'resource_two.pdf',
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure One'
+            },
+            'tenure_resource_photo': 'resource_three.png'
+        }
+
+        with pytest.raises(InvalidXMLSubmission) as e:
+            mh.sanitize_submission(mh(), data)
+        assert str(e.value) == SANITIZE_ERROR
+
+    def test_sanitize_submission_with_error_in_group(self):
+        geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0')
+        data = {
+            'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
+            'version': str(self.questionnaire.version),
+            'party_name': 'Party One',
+            'party_type': 'IN',
+            'party_attributes_individual': {
+                'fname': False,
+                'fname_two': 'soc⚽ks',
+            },
+            'party_photo': 'sad_birthday.png',
+            'party_resource_invite': 'invitation.pdf',
+            'location_type': 'BU',
+            'location_geometry': geoshape,
+            'location_attributes': {
+                'fname': False,
+                'fname_two': 'Location One',
+            },
+            'location_photo': 'resource_one.png',
+            'location_resource_invite': 'resource_two.pdf',
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure One'
+            },
+            'tenure_resource_photo': 'resource_three.png'
+        }
+
+        with pytest.raises(InvalidXMLSubmission) as e:
+            mh.sanitize_submission(mh(), data)
+        assert str(e.value) == SANITIZE_ERROR
 
     def test_create_models(self):
         geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'

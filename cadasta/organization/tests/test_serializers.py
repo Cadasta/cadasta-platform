@@ -11,6 +11,7 @@ from rest_framework.serializers import ValidationError
 from rest_framework.test import APIRequestFactory
 
 from core.tests.utils.cases import UserTestCase
+from core.messages import SANITIZE_ERROR
 from accounts.tests.factories import UserFactory
 from .. import serializers
 from ..models import OrganizationRole, ProjectRole, Project
@@ -146,6 +147,20 @@ class OrganizationSerializerTest(UserTestCase, TestCase):
         assert serializer.errors == {
             'name': ["Organization with this name already exists."]
         }
+
+    def test_sanitize_stings(self):
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        org_data = {'name': "<Test Organization>"}
+
+        serializer = serializers.OrganizationSerializer(
+            data=org_data,
+            context={'request': request}
+        )
+        assert serializer.is_valid() is False
+        assert SANITIZE_ERROR in serializer.errors['name']
 
 
 class ProjectSerializerTest(TestCase):
@@ -317,6 +332,18 @@ class ProjectSerializerTest(TestCase):
 
         project_instance = serializer.instance
         assert project_instance.slug == '東京プロジェクト-2016'
+
+    def test_sanitize_stings(self):
+        org = OrganizationFactory.create()
+        data = {
+            'name': "<Name>"
+        }
+        serializer = serializers.ProjectSerializer(
+            data=data,
+            context={'organization': org}
+        )
+        assert serializer.is_valid() is False
+        assert SANITIZE_ERROR in serializer.errors['name']
 
 
 class ProjectGeometrySerializerTest(TestCase):

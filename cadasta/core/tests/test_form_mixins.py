@@ -1,7 +1,7 @@
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.forms import CharField, ChoiceField
+from django.forms import CharField, ChoiceField, Form, IntegerField
 from jsonattrs.models import (Attribute, AttributeType, Schema,
                               create_attribute_type)
 from organization.tests.factories import ProjectFactory
@@ -9,12 +9,13 @@ from party.models import Party
 from party.tests.factories import PartyFactory
 from questionnaires.tests import factories as q_factories
 
-from ..form_mixins import AttributeForm, AttributeFormMixin, AttributeModelForm
+from .. import form_mixins
 from ..mixins import SchemaSelectorMixin
 from ..widgets import XLangSelect
+from ..messages import SANITIZE_ERROR
 
 
-class MockAttributeForm(AttributeForm):
+class MockAttributeForm(form_mixins.AttributeForm):
 
     def __init__(self, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,7 +25,7 @@ class MockAttributeForm(AttributeForm):
         self.add_attribute_fields(content_type)
 
 
-class MockAttributeModelForm(AttributeModelForm):
+class MockAttributeModelForm(form_mixins.AttributeModelForm):
 
     attributes_field = 'attributes'
 
@@ -107,7 +108,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         )
 
     def test_create_model_fields(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         schema_mixin = SchemaSelectorMixin()
         form_mixin.fields = {}
         attributes = schema_mixin.get_model_attributes(
@@ -141,7 +142,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         assert number.initial == '0'
 
     def test_create_model_fields_with_new_item(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         schema_mixin = SchemaSelectorMixin()
         form_mixin.fields = {}
         attributes = schema_mixin.get_model_attributes(
@@ -170,7 +171,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
             'party::in::number_of_something': '12',
             'party::in::homeowner': True
         }
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         schema_mixin = SchemaSelectorMixin()
         form_mixin.fields = {}
         attributes = schema_mixin.get_model_attributes(
@@ -186,7 +187,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         assert processed_attributes['number_of_something'] == '12'
 
     def test_set_standard_field(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         form_mixin.project = self.project
         form_mixin.fields = {'party_name': CharField()}
         questionnaire = q_factories.QuestionnaireFactory(project=self.project)
@@ -200,7 +201,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         assert 'de="Name"' in form_mixin.fields['party_name'].labels_xlang
 
     def test_set_standard_field_set_field_name(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         form_mixin.project = self.project
         form_mixin.fields = {'name': CharField()}
         questionnaire = q_factories.QuestionnaireFactory(project=self.project)
@@ -214,7 +215,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         assert 'de="Name"' in form_mixin.fields['name'].labels_xlang
 
     def test_set_standard_field_no_question(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         form_mixin.project = self.project
         form_mixin.fields = {'name': CharField()}
         questionnaire = q_factories.QuestionnaireFactory(project=self.project)
@@ -227,7 +228,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         assert hasattr(form_mixin.fields['name'], 'labels_xlang') is False
 
     def test_set_standard_field_with_options(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         form_mixin.project = self.project
         form_mixin.fields = {'building': ChoiceField(
             choices=(('barn', 'Barn'), ('house', 'House')))}
@@ -260,7 +261,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         }
 
     def test_set_standard_field_with_empty_choice(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         form_mixin.project = self.project
         form_mixin.fields = {'building': ChoiceField(
             choices=(('barn', 'Barn'), ('house', 'House')))}
@@ -298,7 +299,7 @@ class AttributeFormMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         }
 
     def test_set_standard_field_with_single_lang(self):
-        form_mixin = AttributeFormMixin()
+        form_mixin = form_mixins.AttributeFormMixin()
         form_mixin.project = self.project
         form_mixin.fields = {'building': ChoiceField(
             choices=(('barn', 'Barn'), ('house', 'House')))}
@@ -386,3 +387,47 @@ class AttributeModelFormTest(AttributeFormBaseTest):
         attr = form.fields.get('party::gr::homeowner')
         assert attr is not None
         assert attr.label == 'Homeowner'
+
+
+class MockSanitizeFieldsForm(form_mixins.SanitizeFieldsForm, Form):
+    name = CharField()
+    number = IntegerField()
+
+
+class SanitizeFieldsFormTest(TestCase):
+    def test_valid_form(self):
+        data = {
+            'name': 'Name',
+            'number': 1
+        }
+        form = MockSanitizeFieldsForm(data=data)
+        assert form.is_valid() is True
+
+    def test_invalid_form_with_code(self):
+        data = {
+            'name': '<Name>',
+            'number': 1
+        }
+        form = MockSanitizeFieldsForm(data=data)
+        assert form.is_valid() is False
+        assert SANITIZE_ERROR in form.errors['name']
+
+    def test_invalid_form_with_number(self):
+        data = {
+            'name': 'Name',
+            'number': 'text'
+        }
+        form = MockSanitizeFieldsForm(data=data)
+        assert form.is_valid() is False
+        assert form.errors.get('name') is None
+        assert form.errors.get('number') is not None
+
+    def test_invalid_form_with_code_and_number(self):
+        data = {
+            'name': '<Name>',
+            'number': 'text'
+        }
+        form = MockSanitizeFieldsForm(data=data)
+        assert form.is_valid() is False
+        assert SANITIZE_ERROR in form.errors['name']
+        assert form.errors.get('number') is not None

@@ -1,6 +1,8 @@
 import csv
 
 from core.mixins import SchemaSelectorMixin
+from core.messages import SANITIZE_ERROR
+from core.validators import sanitize_string
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -282,6 +284,10 @@ class Importer(SchemaSelectorMixin):
                             val = row[headers.index(attribute.name.lower())]
                         except:
                             val = row[headers.index(attr_label)]
+
+                        if not sanitize_string(val):
+                            raise ValidationError(SANITIZE_ERROR)
+
                         if not attribute.required and val == '':
                             continue
                         if attribute.attr_type.name == 'select_multiple':

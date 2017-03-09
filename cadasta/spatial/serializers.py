@@ -4,10 +4,12 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as geo_serializers
 
 from .models import SpatialUnit, SpatialRelationship
-from core.serializers import FieldSelectorSerializer
+from core import serializers as core_serializers
 
 
-class SpatialUnitSerializer(FieldSelectorSerializer,
+class SpatialUnitSerializer(core_serializers.JSONAttrsSerializer,
+                            core_serializers.SanitizeFieldSerializer,
+                            core_serializers.FieldSelectorSerializer,
                             geo_serializers.GeoFeatureModelSerializer):
 
     class Meta:

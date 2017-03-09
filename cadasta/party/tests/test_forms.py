@@ -199,6 +199,47 @@ class PartyFormTest(UserTestCase, TestCase):
         assert party.attributes.get('fname') == 'test'
         assert party.attributes.get('homeowner')
 
+    def test_field_sanitation(self):
+        data = {
+            'name': '<Cadasta>',
+            'type': 'IN',
+            'party::in::fname': '<FName>',
+            'party::in::age': 37
+        }
+        project = ProjectFactory.create()
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+
+        Attribute.objects.create(
+            schema=schema,
+            name='fname',
+            long_name='Test field',
+            attr_type=AttributeType.objects.get(name='text'),
+            index=0
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='homeowner',
+            long_name='Homeowner',
+            attr_type=AttributeType.objects.get(name='boolean'),
+            index=1
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='age',
+            long_name='Homeowner Age',
+            attr_type=AttributeType.objects.get(name='integer'),
+            index=2, required=True, default=0
+        )
+
+        form = forms.PartyForm(project=project, data=data)
+        assert form.is_valid() is False
+        assert form.errors.get('name') is not None
+        assert form.errors.get('party::in::fname') is not None
+
 
 class TenureRelationshipEditFormTest(UserTestCase, TestCase):
 
@@ -221,3 +262,36 @@ class TenureRelationshipEditFormTest(UserTestCase, TestCase):
             label={'en': 'Type', 'de': 'Typ'})
         form = forms.TenureRelationshipEditForm(project)
         assert hasattr(form.fields['tenure_type'], 'labels_xlang') is True
+
+    def test_field_sanitation(self):
+        data = {
+            'tenure_type': 'FH',
+            'tenurerelationship::default::fname': '<FName>',
+            'tenurerelationship::default::age': 37
+        }
+        project = ProjectFactory.create()
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+
+        Attribute.objects.create(
+            schema=schema,
+            name='fname',
+            long_name='Test field',
+            attr_type=AttributeType.objects.get(name='text'),
+            index=0
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='age',
+            long_name='Homeowner Age',
+            attr_type=AttributeType.objects.get(name='integer'),
+            index=1, required=True, default=0
+        )
+
+        form = forms.TenureRelationshipEditForm(project=project, data=data)
+        assert form.is_valid() is False
+        assert (form.errors.get('tenurerelationship::default::fname')
+                is not None)

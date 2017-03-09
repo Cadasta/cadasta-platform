@@ -1,7 +1,7 @@
 import pytest
 from django.test import TestCase
 from django.utils.translation import gettext as _
-from ..validators import validate_json, JsonValidationError
+from ..validators import validate_json, JsonValidationError, sanitize_string
 
 
 class ValidationTest(TestCase):
@@ -69,3 +69,25 @@ class ValidationTest(TestCase):
         assert (exc.value.errors['email'] ==
                 _("'{value}' is not a '{type}'").format(value='blah',
                                                         type='email'))
+
+    def test_is_sane(self):
+        assert sanitize_string(2) is True
+        assert sanitize_string('text') is True
+        assert sanitize_string('大家好') is True
+        assert sanitize_string('ф') is True
+        assert sanitize_string('Ξ') is True
+        assert sanitize_string('ß') is True
+        assert sanitize_string('œ') is True
+        assert sanitize_string(':what') is True
+        assert sanitize_string('İ') is True
+        assert sanitize_string('עזרא ברש') is True
+        assert sanitize_string('<script>') is False
+        assert sanitize_string('<script>blah</script>') is False
+        assert sanitize_string('=1+1') is False
+        assert sanitize_string('+1+1') is False
+        assert sanitize_string('-1+1') is False
+        assert sanitize_string('@1+1') is False
+        assert sanitize_string('🍺') is False
+        assert sanitize_string('te🍺xt') is False
+        assert sanitize_string('Me & you') is True
+        assert sanitize_string('🦄') is False

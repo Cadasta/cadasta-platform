@@ -47,11 +47,23 @@ class ResourceFormTest(UserTestCase, FileStorageTestCase, TestCase):
         form = ResourceForm(self.data,
                             instance=resource,
                             contributor=user)
+
         assert form.is_valid() is True
         form.save()
         assert self.project.resources.count() == 1
         assert self.project.resources.first().name == self.data['name']
         assert self.project.resources.first().contributor == user
+
+    def test_string_sanitation(self):
+        user = UserFactory.create()
+        data = self.data.copy()
+        data['name'] = '<name>'
+        form = ResourceForm(data,
+                            content_object=self.project,
+                            contributor=user,
+                            project_id=self.project.id)
+        assert form.is_valid() is False
+        assert form.errors['name'] is not None
 
 
 @pytest.mark.usefixtures('make_dirs')
