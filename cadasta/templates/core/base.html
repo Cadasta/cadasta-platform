@@ -197,7 +197,7 @@
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
     {% block extra_script %}{% endblock %}
     <script>
-    $(document).ready(function () {
+    var dataTableHook = function(){
       $('.datatable').DataTable({
         conditionalPaging: true,
         "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
@@ -228,6 +228,9 @@
         .closest('.form-group')
           .children('label.control-label')
             .addClass('required');
+    };
+    $(document).ready(function () {
+      dataTableHook();
     });
     window.setTimeout(function() {
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });

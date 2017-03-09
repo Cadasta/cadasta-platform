@@ -41,6 +41,8 @@ var CreateRoutes = function(){
       rm.updateCurrentLocationUrl();
     },
     function(){
+      // global function
+      dataTableHook();
       rm.formSubmission(this.el, rm.getCurrentLocationUrl());
       rm.detachFormSubmission(rm.getCurrentLocationUrl());
   });
@@ -100,6 +102,8 @@ var CreateRoutes = function(){
       rm.displayDetailPanel();
     },
     function() {
+      // global function
+      dataTableHook();
       rm.updateCurrentLocationUrl($("#current-location").attr('href'));
       rm.updateCurrentRelationshipUrl();
       rm.detachFormSubmission(rm.getCurrentRelationshipUrl());
