@@ -41,6 +41,24 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         assert user_obj.is_active
         assert not user_obj.email_verified
 
+    def test_case_insensitive_username(self):
+        usernames = ['UsErOne', 'useRtWo', 'uSERthReE']
+        users = [
+            UserFactory.create(username=username) for username in usernames]
+        for user in users:
+            TEST_DATA = BASIC_TEST_DATA.copy()
+            TEST_DATA['username'] = user.username.lower()
+            serializer = serializers.RegistrationSerializer(data=TEST_DATA)
+            assert serializer.is_valid() is False
+            assert (_("A user with that username already exists")
+                    in serializer._errors['username'])
+        TEST_DATA = BASIC_TEST_DATA.copy()
+        TEST_DATA['username'] = 'userFour'
+        serializer = serializers.RegistrationSerializer(data=TEST_DATA)
+        assert serializer.is_valid()
+        serializer.save()
+        assert User.objects.count() == 4
+
     def test_create_without_email(self):
         """Serialiser should be invalid when no email address is provided."""
 
@@ -220,6 +238,26 @@ class UserSerializerTest(UserTestCase, TestCase):
         )
         assert not serializer2.is_valid()
         assert serializer2.errors['username'] == ['Cannot update username']
+
+    def test_case_insensitive_username(self):
+        data = {
+            'username': 'USERtwO',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79',
+            'full_name': 'John Lennon'
+        }
+        usernames = ['UsErOne', 'useRtWo', 'uSERthReE']
+        users = [
+            UserFactory.create(username=username) for username in usernames]
+        request = APIRequestFactory().patch(
+            '/user/userone', data)
+        force_authenticate(request, user=users[0])
+        serializer = serializers.UserSerializer(
+            users[0], data, context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert serializer.errors['username'] == [
+            _("A user with that username already exists")
+        ]
 
     def test_update_last_login_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)

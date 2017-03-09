@@ -6,6 +6,7 @@ from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
 from .models import User, now_plus_48_hours
+from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
 
 
@@ -23,6 +24,7 @@ class RegisterForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.data.get('username')
+        check_username_case_insensitive(username)
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise forms.ValidationError(
                 _("Username cannot be “add” or “new”."))
@@ -76,10 +78,8 @@ class ProfileForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.data.get('username')
-        if (self.instance.username != username and
-                User.objects.filter(username=username).exists()):
-            raise forms.ValidationError(
-                _("Another user with this username already exists"))
+        if self.instance.username.casefold() != username.casefold():
+            check_username_case_insensitive(username)
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise forms.ValidationError(
                 _("Username cannot be “add” or “new”."))
@@ -102,7 +102,6 @@ class ProfileForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)
-
         if self._send_confirmation:
             send_email_confirmation(self.request, user)
             self._send_confirmation = False

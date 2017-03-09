@@ -8,6 +8,7 @@ from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 
 from .models import User
+from .validators import check_username_case_insensitive
 from .exceptions import EmailNotVerifiedError
 
 
@@ -35,6 +36,7 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
         }
 
     def validate_username(self, username):
+        check_username_case_insensitive(username)
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
@@ -90,6 +92,8 @@ class UserSerializer(djoser_serializers.UserSerializer):
                 username != instance.username and
                     self.context['request'].user != instance):
                 raise ValidationError('Cannot update username')
+            if instance.username.casefold() != username.casefold():
+                check_username_case_insensitive(username)
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
                 _("Username cannot be “add” or “new”."))
