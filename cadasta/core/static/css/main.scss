@@ -369,6 +369,10 @@ main.container-fluid {
         border-bottom: 0;
         padding-bottom: 6px;
       }
+      &.linked:hover {
+        cursor: pointer;
+        background-color: $table-bg-hover;
+      }
     }
     .nav-tabs {
       li > a {
