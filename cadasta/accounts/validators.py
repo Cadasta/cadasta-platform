@@ -43,7 +43,7 @@ class EmailSimilarityValidator(object):
         if not user:
             return None
 
-        email = user.email.lower().split('@')
+        email = user.email.split('@')
         if len(email[0]) and email[0].casefold() in password.casefold():
             raise ValidationError(
                 _("Passwords cannot contain your email."))

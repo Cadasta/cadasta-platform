@@ -121,14 +121,11 @@ class ChangePasswordMixin:
 
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
-        errors = []
 
         username = self.user.username
         if len(username) and username.casefold() in password.casefold():
-            errors.append(_("The password is too similar to the username."))
-
-        if errors:
-            raise forms.ValidationError(errors)
+            raise forms.ValidationError(
+                _("The password is too similar to the username."))
 
         return password
 
