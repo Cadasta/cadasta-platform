@@ -124,13 +124,11 @@ class ChangePasswordMixin:
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         msg_subject = render_to_string(
-                'account/email/'
-                'password_changed_subject.txt'
+                'accounts/email/password_changed_subject.txt'
             )
         msg_subject = msg_subject.replace(u'\n', u'')
         msg_body = render_to_string(
-                'account/email/'
-                'password_changed_message.txt'
+                'accounts/email/password_changed_message.txt'
             )
         send_mail(
             msg_subject,
