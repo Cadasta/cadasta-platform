@@ -43,7 +43,6 @@ var CreateRoutes = function(){
     function(){
       // global function
       dataTableHook();
-      rm.formSubmission(this.el, rm.getCurrentLocationUrl());
       rm.detachFormSubmission(rm.getCurrentLocationUrl());
   });
 
@@ -83,7 +82,7 @@ var CreateRoutes = function(){
     }, 
     function() {
       rm.uploadResourceHooks();
-      rm.formSubmission(this.el, rm.getCurrentLocationUrl());
+      rm.formSubmission(this.el, rm.getCurrentLocationUrl(), rm.uploadResourceHooks);
   });
 
   route('/records/location/relationships/new', 'modal',
@@ -92,7 +91,7 @@ var CreateRoutes = function(){
 
     }, function() {
       rm.relationshipHooks();
-      rm.formSubmission(this.el, rm.getCurrentLocationUrl());
+      rm.formSubmission(this.el, rm.getCurrentLocationUrl(), rm.relationshipHooks);
     });
 
 
@@ -136,7 +135,7 @@ var CreateRoutes = function(){
       rm.displayModal();
     }, function() {
       rm.uploadResourceHooks();
-      rm.formSubmission(this.el, rm.getCurrentRelationshipUrl());
+      rm.formSubmission(this.el, rm.getCurrentRelationshipUrl(), rm.uploadResourceHooks);
   });
 
   return routes;

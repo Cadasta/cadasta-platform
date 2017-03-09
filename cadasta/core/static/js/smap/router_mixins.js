@@ -178,6 +178,7 @@ var RouterMixins = {
   },
 
   relationshipHooks: function() {
+    console.log('relationshipHooks called');
     var template = function(party) {
       if (!party.id) {
         return party.text;
@@ -218,13 +219,81 @@ var RouterMixins = {
       target.addClass('info');
       $('input[name="id"]').val(relId);
     });
+  // },
+
+  // relationshipAddHooks: function() {
+    function disableConditionals() {
+      $('.party-co').addClass('hidden');
+      $('.party-gr').addClass('hidden');
+      $('.party-in').addClass('hidden');
+      $('.party-co .form-control').prop('disabled', 'disabled');
+      $('.party-gr .form-control').prop('disabled', 'disabled');
+      $('.party-in .form-control').prop('disabled', 'disabled');
+    }
+
+    function enableConditions(val) {
+      const types = ['co', 'gr', 'in'];
+      console.log(types);
+      types.splice(types.indexOf(val), 1);
+      $('.party-' + val).removeClass('hidden');
+      $('.party-' + val + ' .form-control').prop('disabled', '');
+      for (var i in types) {
+        $('.party-' + types[i]).addClass('hidden');
+        $('.party-' + types[i] +  '.form-control').prop('disabled', 'disabled');
+      }
+    }
+
+    function toggleParsleyRequired(val) {
+      const typeChoices = ['in', 'gr', 'co'];
+      $.each(typeChoices, function(idx, choice) {
+        if (val === choice) {
+          $.each($('.party-' + val + ' .form-control'), function(idx, value) {
+            if (value.hasAttribute('data-parsley-required')) {
+              $(value).attr('data-parsley-required', true);
+              $(value).prop('required', 'required');
+            }
+          });
+        } else {
+          $.each($('.party-' + choice + ' .form-control'), function(idx, value) {
+            if (value.hasAttribute('data-parsley-required')) {
+              $(value).attr('data-parsley-required', false);
+              $(value).prop('required', '');
+            }
+          });
+        }
+      });
+    }
+
+    function toggleStates(val) {
+      if (val === '') {
+        disableConditionals();
+      } else {
+        enableConditions(val);
+        toggleParsleyRequired(val);
+      }
+    }
+
+    // $().ready(function() {
+    var val = $('.party-type').val().toLowerCase();
+    toggleStates(val);
+    // });
+
+
+    $('select.party-type').on('change', function(e) {
+      const val = e.target.value.toLowerCase();
+      toggleStates(val);
+    });
+
+    $('select.party-select').on('change', function(e) {
+      toggleStates('');
+    });
   },
 
 
   /***************
   INTERCEPTING FORM SUBMISSIONS
   ****************/
-  formSubmission: function(form_type, success_url){
+  formSubmission: function(form_type, success_url, eventHook=null){
     form = state.forms[form_type] || form_type;
 
     $(form).submit(function(e){
@@ -247,6 +316,9 @@ var RouterMixins = {
           form_type = state.el[form_type] || 'detail';
           var el = document.getElementById(form_type);
           el.innerHTML = response;
+          if (eventHook) {
+            eventHook();
+          }
 
         } else {
           if (window.location.hash === success_url) {
