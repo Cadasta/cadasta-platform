@@ -174,6 +174,20 @@ ul.parsley-errors-list, ul.errorlist {
   background-color: transparent
 }
 
+has-warning .input-group-addon,
+.has-warning .input-group-btn .btn {
+    color: #8a6d3b;
+    border-color: #8a6d3b;
+    background-color: #fcf8e3; 
+}
+
+.has-error .input-group-addon,
+.has-error .input-group-btn .btn {
+    color: #a94442;
+    border-color: #a94442;
+    background-color: #f2dede; 
+}
+
 
 /* =Exceptions
 -------------------------------------------------------------- */
