@@ -51,7 +51,8 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
                     'error': 'unavailable',
                 })
 
-            num_hits = raw_results['hits']['total']
+            num_hits = min(raw_results['hits']['total'],
+                           settings.ES_MAX_RESULTS)
             results = raw_results['hits']['hits']
 
             if len(results) == 0:
