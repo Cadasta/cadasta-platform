@@ -63,7 +63,7 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
 
 
 class OrganizationDashboard(PermissionRequiredMixin,
-                            mixins.OrgAdminCheckMixin,
+                            mixins.OrgRoleCheckMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
@@ -89,7 +89,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
                 orgs = self.request.user.organizations.all()
                 for org in orgs:
                     if org.slug == self.kwargs['slug']:
-                        if self.is_administrator:
+                        if self.is_administrator():
                             projects = self.object.all_projects()
                         else:
                             projects = self.object.all_projects().filter(
@@ -144,7 +144,7 @@ class OrganizationUnarchive(OrgArchiveView):
 
 
 class OrganizationMembers(LoginPermissionRequiredMixin,
-                          mixins.OrgAdminCheckMixin,
+                          mixins.OrgRoleCheckMixin,
                           mixins.ProjectCreateCheckMixin,
                           core_mixins.CacheObjectMixin,
                           generic.DetailView):
@@ -186,7 +186,7 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
-                              mixins.OrgAdminCheckMixin,
+                              mixins.OrgRoleCheckMixin,
                               mixins.ProjectCreateCheckMixin,
                               core_mixins.CacheObjectMixin,
                               base_generic.edit.FormMixin,
