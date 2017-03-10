@@ -12,8 +12,12 @@
       <h2 class="short"><span>{% trans "Location" %} </span>{{ location.name }}</h2>
       <div class="top-btn pull-right">
         <!-- Action buttons -->
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:edit' object.organization.slug object.slug location.id %}" title="{% trans 'Edit location' %}" aria-label="{% trans 'Edit location' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:delete' object.organization.slug object.slug location.id %}" title="{% trans 'Delete location' %}" aria-label="{% trans 'Delete location' %}"><span class="glyphicon glyphicon-trash"></span></a>
+        {% if is_allowed_update_location %}
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:edit' object.organization.slug object.slug location.id %}" title="{% trans 'Edit location' %}" aria-label="{% trans 'Edit location' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+        {% endif %}
+        {% if is_allowed_delete_location %}
+          <a class="btn btn-default btn-action btn-sm" href="{% url 'locations:delete' object.organization.slug object.slug location.id %}" title="{% trans 'Delete location' %}" aria-label="{% trans 'Delete location' %}"><span class="glyphicon glyphicon-trash"></span></a>
+        {% endif %}
       </div>
     </div>
 
