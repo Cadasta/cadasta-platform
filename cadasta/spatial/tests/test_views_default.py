@@ -341,7 +341,9 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             'attributes': (('Test field', 'test', ),
                            ('Test field 2', 'Choice 2', ),
                            ('Test field 3', 'Choice 1, Choice 3', )),
-            'is_allowed_add_location': True
+            'is_allowed_add_location': True,
+            'is_allowed_update_location': True,
+            'is_allowed_delete_location': True,
         }
 
     def setup_url_kwargs(self):
@@ -584,7 +586,9 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
-                'is_allowed_add_location': True}
+                'is_allowed_add_location': True,
+                'is_allowed_update_location': True,
+                'is_allowed_delete_location': True}
 
     def setup_url_kwargs(self):
         return {
@@ -698,7 +702,9 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
-                'is_allowed_add_location': True}
+                'is_allowed_add_location': True,
+                'is_allowed_update_location': True,
+                'is_allowed_delete_location': True}
 
     def setup_url_kwargs(self):
         return {
@@ -820,7 +826,9 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
-                'is_allowed_add_location': True}
+                'is_allowed_add_location': True,
+                'is_allowed_update_location': True,
+                'is_allowed_delete_location': True}
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
@@ -985,7 +993,9 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                     'new_entity': not self.project.parties.exists(),
                 },
             ),
-            'is_allowed_add_location': True
+            'is_allowed_add_location': True,
+            'is_allowed_update_location': True,
+            'is_allowed_delete_location': True,
         }
 
     def setup_url_kwargs(self):
