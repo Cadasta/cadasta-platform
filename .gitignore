@@ -44,3 +44,4 @@ vagrant.retry
 /cadasta/geography/data
 /cadasta/core/media/
 /cadasta/core/static/css/main.css.map
+/cadasta/core/static/css/main.css
