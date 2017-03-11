@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
+from django.core.mail import send_mail
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
@@ -116,7 +117,7 @@ class ChangePasswordMixin:
 
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
-
+        send_mail('Subject here','Password has changed','from@example.com',["adasd"],fail_silently=False,)
         return password
 
 
