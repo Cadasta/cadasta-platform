@@ -224,7 +224,9 @@
 
         "fnDrawCallback": function(oSettings){
             var rowCount = this.fnSettings().fnRecordsDisplay();
-            if(rowCount<10){
+            if(rowCount>10){
+              $('.dataTables_length').show();
+            }else{
               $('.dataTables_length').hide();
             }
           }
