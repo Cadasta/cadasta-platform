@@ -130,7 +130,8 @@ label.required:after { // show asterisk
 }
 
 .input-group-btn:last-child > .btn {
-border: 1px solid $input-border;
+  background: $btn-default-bg;
+  border: 1px solid $input-border;
 }
 
 .has-error .input-group-btn .btn,

@@ -4778,7 +4778,6 @@ div.org-logo {
     margin: 0 auto;
     background: #fff; }
   #organization-single .detail {
-    display: table-footer-group;
     box-shadow: none; }
     #organization-single .detail section {
       padding: 20px; } }
@@ -5558,6 +5557,16 @@ label.required:after {
   border: 1px solid #d9534f;
   background: #fff url("/static/img/cross.png") calc(100% - 8px) 50% no-repeat;
   padding-right: 36px; }
+
+.input-group-btn:last-child > .btn {
+  background: #f2f4f7;
+  border: 1px solid #ccc; }
+
+.has-error .input-group-btn .btn,
+.has-warning .input-group-btn .btn {
+  color: #a94442;
+  border-color: #a94442;
+  background-color: #f2dede; }
 
 .has-success select,
 .has-error select {
