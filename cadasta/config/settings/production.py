@@ -63,6 +63,10 @@ DJOSER.update({  # NOQA
     'DOMAIN': os.environ['DOMAIN'],
 })
 
+SESSION_COOKIE_AGE = 7200
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 # Adding localhost here for uWSGI debugging!
 ALLOWED_HOSTS = [os.environ['API_HOST'], os.environ['DOMAIN'], 'localhost']
 
