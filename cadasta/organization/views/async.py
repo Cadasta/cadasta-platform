@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from core.mixins import PermissionRequiredMixin
 import core.views.generic as generic
 
@@ -35,7 +36,8 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
-
+        context['success_url'] = reverse('organization:project-dashboard',
+                                         kwargs=self.kwargs)
         return context
 
     def get_object(self, queryset=None):

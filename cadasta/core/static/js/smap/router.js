@@ -1,5 +1,6 @@
 // Based on http://joakim.beng.se/blog/posts/a-javascript-router-in-20-lines.html
 var SimpleRouter = function(map){
+  var rm = RouterMixins;
   routes = new CreateRoutes();
 
   function router() {
@@ -34,11 +35,20 @@ var SimpleRouter = function(map){
     }
 
     var el = document.getElementById(state.el[route.el]);
-    route.controller();
     $.get(async_url, function(response){
-      el.innerHTML = response;
-      if (route.eventHook) {
-        route.eventHook();
+      if (response.includes("alert-warning")) {
+        window.location.hash = "/overview";
+        if ($('.alert-warning').length === 0) {
+          $('#messages').append(rm.permissionDenied());
+        }
+      } else if (response.includes("!DOCTYPE")) {
+        window.location = "/account/login/?next=" + window.location.pathname;
+      } else {
+        route.controller();
+        el.innerHTML = response;
+        if (route.eventHook) {
+          route.eventHook();
+        }
       }
     });
   }

@@ -337,4 +337,16 @@ var RouterMixins = {
       parent.formSubmission(form, success_url);
     });
   },
+
+  /******************
+  ERROR MESSAGES
+  ******************/
+  permissionDenied: function(){
+    return "<div class='alert alert-dismissible alert-warning' role='alert'>" +
+           "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
+           "<span aria-hidden='true'>×</span>" +
+           "</button>" +
+           "You don't have permission to view this location." +
+           "</div>";
+  }
 };

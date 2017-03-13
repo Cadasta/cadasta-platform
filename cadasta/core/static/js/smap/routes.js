@@ -1,7 +1,7 @@
+var rm = RouterMixins;
 var CreateRoutes = function(){
   'use strict';
   var routes = {};
-  var rm = RouterMixins;
   rm.init();
 
   function route(path, el, controller, eventHook=null) {
