@@ -24,19 +24,20 @@
                 <button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                 <p class="small help-block">
                   {% blocktrans %}
-                  e.g., “Parcel”, “John White”, <a id="search-guidelines-link">more search guidelines</a>
+                  e.g., <kbd>Parcel</kbd>, <kbd>John White</kbd>; <a id="search-guidelines-link">more search guidelines</a>
                   {% endblocktrans %}
                 </p>
-                <div id="search-guidelines" class="hidden">
+                <div id="search-guidelines" class="hidden small">
                   {% blocktrans %}
                   <ul>
                     <li>Review your wording, make sure that there aren’t any typos in your search query</li>
-                    <li>If no results match your query, try removing some search terms (“John”, instead of “John White”)</li>
-                    <li>Search results are currently capped to 10 matches. If you want to narrow down your results, try including additional search terms or making the existing ones more restrictive (“John White Kansas”, instead of “John White”)</li>
+                    <li>If no results match your query, try removing some search terms (<kbd>John</kbd>, instead of <kbd>John White</kbd>)</li>
+                    <li>Search results are limited to a maximum of {{ max_num_results }} entries</li>
                   </ul>
                   {% endblocktrans%}
                 </div>
               </div>
+              {% csrf_token %}
             </form>
             <div id="last-update" class="hidden col-md-3 text-right">
               <p class="small help-block">{% trans "Last updated on" %} <span id="index-timestamp"></span></p>
@@ -63,16 +64,9 @@
                 Showing <span id="total-results"></span> result(s) for <strong><span id="query-string"></span></strong>
                 {% endblocktrans %}
               </h4>
-              <table id="search-results" class="table table-hover datatable" data-paging-type="simple">
-                <thead>
-                  <tr>
-                    <th class="entity-type hidden"></th>
-                    <th class="entity-main-label hidden"></th>
-                    <th class="col-md-12 entity-record">{% trans "Entity Record" %}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
+              <table id="search-results" class="table table-hover" data-paging-type="simple">
+                <thead class="hidden"><tr><th>{% trans "Search results" %}</th></tr></thead>
+                <tbody><tr><td>&nbsp;</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -92,57 +86,87 @@ function performSearch(query, updateDocumentUrl) {
 
   if (query === '') return;
 
-    if (updateDocumentUrl) {
+  if (updateDocumentUrl) {
       history.pushState(history.state, null,
-        window.location.href.split('?')[0] + '?q=' + encodeURIComponent(query)
+      window.location.href.split('?')[0] + '?q=' + encodeURIComponent(query)
       );
-    }
+  }
 
-  var url = $('#search-form')[0].dataset.searchAsyncUrl;
   $('#waiting-results').removeClass('hidden');
-
-  $.get(url + '?q=' + query, function(response) {
-
-    $('#waiting-results').addClass('hidden');
-
-    // Search error encountered
-    if (response.error) {
-      $('#failed-results').removeClass('hidden');
-      $('#last-update').addClass('hidden');
-      return;
+  $('#search-results').DataTable().destroy();
+  $('#search-results').DataTable({
+    conditionalPaging: true,
+    dom: 't<"table-entries"i><"table-num"l><"table-pagination"p>',
+    destroy: true,
+    ordering: false,
+    serverSide: true,
+    ajax: {
+      url: $('#search-form')[0].dataset.searchAsyncUrl,
+      method: 'POST',
+      headers: {'X-CSRFToken': $('#search-form input[name="csrfmiddlewaretoken"]')[0].value},
+      data: {q: query},
+    },
+    drawCallback: drawHandler,
+    language: {
+      info: 'Showing _START_ - _END_ of _TOTAL_',
+      lengthMenu: 'Show _MENU_ rows',
+      paginate: {
+        next: '<span class="glyphicon glyphicon-triangle-right"></span>',
+        previous: '<span class="glyphicon glyphicon-triangle-left"></span>',
+        first: 'First',
+        last: 'Last',
+      },
     }
-    $('#failed-results').addClass('hidden');
+ }).draw();
+}
 
-    // Show timestamp
-    var timestamp = response.timestamp;
-    timestamp = timestamp.replace(/T/, ' ');
-    timestamp = timestamp.replace(/:\d\d\.\d+Z/, ' UTC');
-    $('#last-update').removeClass('hidden');
-    $('#index-timestamp').text(timestamp);
+function drawHandler(settings) {
 
-    // No results
-    if (response.results.length === 0) {
-      $('#no-results').removeClass('hidden');
-      $('#results').addClass('hidden');
-      $('#failed-query-string').text(query);
-    }
+  var t = this.api();
+  var response = t.ajax.json();
 
-    // With results
-    else {
-      $('#no-results').addClass('hidden');
-      $('#results').removeClass('hidden');
-      $('#total-results').text(response.results.length);
-      $('#query-string').text(query);
-      var t = $('#search-results').DataTable();
-      t.column(0).visible(false);
-      t.column(1).visible(false);
-      if (t.rows().length !== 0) t.rows().remove();
-      t.rows.add(response.results).draw();
-    }
-  });
+  $('#waiting-results').addClass('hidden');
+
+  // Search error encountered
+  if (response.error) {
+    $('#failed-results').removeClass('hidden');
+    $('#last-update').addClass('hidden');
+    return;
+  }
+  $('#failed-results').addClass('hidden');
+
+  // Show timestamp
+  var timestamp = response.timestamp;
+  timestamp = timestamp.replace(/T/, ' ');
+  timestamp = timestamp.replace(/:\d\d\.\d+Z/, ' UTC');
+  $('#last-update').removeClass('hidden');
+  $('#index-timestamp').text(timestamp);
+
+  // No results
+  if (response.data.length === 0) {
+    $('#no-results').removeClass('hidden');
+    $('#results').addClass('hidden');
+    $('#failed-query-string').text($('#search-input')[0].value);
+  }
+
+  // With results
+  else {
+    $('#no-results').addClass('hidden');
+    $('#results').removeClass('hidden');
+    $('#total-results').text(response.recordsTotal);
+    $('#query-string').text($('#search-input')[0].value);
+  }
 }
 
 window.addEventListener('load', function () {
+
+  // Catch the specific error when ES is not available;
+  // otherwise, alert the message as per DataTable's default behavior
+  $.fn.dataTable.ext.errMode = function(settings, techNote, message) {
+    if (message !== 'DataTables warning: table id=search-results - unavailable') {
+      alert(message);
+    }
+  };
 
   // Toggle display of search guidelines
   $('#search-guidelines-link').bind('click', function(e) {

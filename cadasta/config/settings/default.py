@@ -350,8 +350,8 @@ ATTRIBUTE_GROUPS = {
     }
 }
 
-ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-platformprod'
-            '-bucket/icons/{}.png')
+ICON_URL = ('https://s3-us-west-2.amazonaws.com/cadasta-resources'
+            '/icons/{}.png')
 
 ICON_LOOKUPS = {
     'application/pdf': 'pdf',
@@ -523,3 +523,4 @@ IMPORTERS = {
 ES_SCHEME = 'http'
 ES_HOST = 'localhost'
 ES_PORT = '9200'
+ES_MAX_RESULTS = 10000

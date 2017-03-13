@@ -96,9 +96,25 @@ is the steps for getting ansible running on Windows:
 
    -  Download Jinja2:
 
+
       ::
 
           curl -O https://pypi.python.org/packages/source/J/Jinja2/Jinja2-2.6.tar.gz
+
+* `VirtualBox <https://www.virtualbox.org/>`_
+    * Version 5.0.x
+* `Vagrant <https://www.vagrantup.com/>`_
+    * Version 1.8.1
+    * If you are behind a proxy, you may need to install and configure the `vagrant-proxyconf <https://rubygems.org/gems/vagrant-proxyconf/versions/1.5.2>`_ plugin
+* `Ansible <http://www.ansible.com/>`_
+    * Version 2.1.3.0
+    * For Linux and Mac, install Ansible 2 via pip
+    * For Windows (unsupported), go through `Ansible Documentation <http://docs.ansible.com/ansible/intro_windows.html>`_ or this `blog <https://www.jeffgeerling.com/blog/running-ansible-within-windows>`_
+
+Clone the `repository <https://github.com/cadasta/cadasta-platform>`_ to your local machine and enter the cadasta-platform directory.
+Run the following commands to access the virtual machine.
+
+Provision the VM::
 
    -  Untar both downloads:
 
@@ -150,12 +166,20 @@ the virtual machine. Provision the VM:
 
     vagrant up --provision
 
+
 SSH into to the VM (this automatically activates the Python virtual
 environment):
 
+SSH into the VM (automatically activates the Python virtual environment)::
+
+
 ::
 
+
     vagrant ssh
+
+Open ``http://localhost:8000/`` in your local machine's browser. This will forward you to the web server port on the VM and you should see the front page of the platform site.
+
 
 Enter the cadasta directory and start the server:
 

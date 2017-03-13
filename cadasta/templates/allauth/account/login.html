@@ -1,6 +1,7 @@
 {% extends "account/base.html" %}
 
 {% load widget_tweaks %}
+{% load staticfiles %}
 {% load i18n %}
 {% load account socialaccount %}
 
@@ -8,6 +9,10 @@
 {% block body-class %}{% if not redirect_field_value %} tinted-bg{% endif %}{% endblock %}
 
 {% block title %} | {% trans "Sign In" %}{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/password_widget.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 
@@ -52,7 +57,14 @@
 
       <div class="form-group{% if form.password.errors %} has-error{% endif %}">
         <label class="control-label" for="id_password">{% trans "Password" %}</label>
-        {% render_field form.password class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
+        <div class="input-group input-group-lg">
+          {% render_field form.password class+="form-control" placeholder="" data-parsley-required="true" %}
+          <span class="input-group-btn">
+            <button class="btn" type="button">
+              <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+            </button>
+          </span>
+        </div>
         <div class="error-block">{{ form.password.errors }}</div>
       </div>
 

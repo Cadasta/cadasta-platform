@@ -48,7 +48,14 @@ def assign_policies(user):
 
 
 class SearchAPITest(APITestCase, UserTestCase, TestCase):
+
     view_class = async.Search
+    post_data = {
+        'q': 'searching',
+        'start': 10,
+        'length': 20,
+        'draw': 40,
+    }
 
     def setup_models(self):
         self.user = UserFactory.create()
@@ -100,10 +107,13 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
                     'default_operator': 'and',
                     'query': self.query,
                 }
-            }
+            },
+            'from': 10,
+            'size': 20,
+            'sort': {'_score': {'order': 'desc'}},
         }
-        self.es_endpoint = '{}/project-{}/_search'.format(api_url,
-                                                          self.project.id)
+        self.es_endpoint = '{}/project-{}/_search/'.format(api_url,
+                                                           self.project.id)
         self.es_body = json.dumps(self.query_body, sort_keys=True)
 
     def setup_url_kwargs(self):
@@ -114,7 +124,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_results(self, mock_post, mock_get):
+    def test_post_with_results(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             'hits': {
@@ -130,7 +140,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             },
         }
 
-        response = self.request(user=self.user, get_data={'q': self.query})
+        response = self.request(user=self.user, method='POST')
         expected_html = render_to_string(
             'search/search_result_item.html',
             context={'result': {
@@ -141,15 +151,62 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             }}
         )
         assert response.status_code == 200
-        assert response.content['results'] == [[
-            self.su.ui_class_name, "Apartment", expected_html]]
+        assert response.content['data'] == [[expected_html]]
+        assert response.content['recordsTotal'] == 100
+        assert response.content['recordsFiltered'] == 100
+        assert response.content['draw'] == 40
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
         mock_get.assert_not_called()
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_no_results(self, mock_post, mock_get):
+    def test_post_with_over_max_results(self, mock_post, mock_get):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {
+            'hits': {
+                'total': settings.ES_MAX_RESULTS + 1000,
+                'hits': [{
+                    '_type': 'spatial',
+                    '_source': {
+                        'id': self.su.id,
+                        'type': 'AP',
+                        '@timestamp': 'TIMESTAMP',
+                    },
+                }],
+            },
+        }
+
+        response = self.request(user=self.user, method='POST')
+        expected_html = render_to_string(
+            'search/search_result_item.html',
+            context={'result': {
+                'entity_type': self.su.ui_class_name,
+                'url': self.su.get_absolute_url(),
+                'main_label': "Apartment",
+                'attributes': {},
+            }}
+        )
+        assert response.status_code == 200
+        assert response.content['data'] == [[expected_html]]
+        assert response.content['recordsTotal'] == settings.ES_MAX_RESULTS
+        assert response.content['recordsFiltered'] == settings.ES_MAX_RESULTS
+        assert response.content['draw'] == 40
+        assert response.content['timestamp'] == 'TIMESTAMP'
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
+        mock_get.assert_not_called()
+
+    @patch('requests.get')
+    @patch('requests.post')
+    def test_post_with_no_results(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             'hits': {
@@ -168,18 +225,25 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             },
         }
 
-        response = self.request(user=self.user, get_data={'q': self.query})
+        response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
-        assert response.content['results'] == []
+        assert response.content['data'] == []
+        assert response.content['recordsTotal'] == 100
+        assert response.content['recordsFiltered'] == 100
+        assert response.content['draw'] == 40
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
         mock_get.assert_called_once_with(
-            '{}/project-{}/project/_search?q=*'.format(api_url,
-                                                       self.project.id))
+            '{}/project-{}/project/_search/?q=*'.format(api_url,
+                                                        self.project.id))
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_project_result(self, mock_post, mock_get):
+    def test_post_with_project_result(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             'hits': {
@@ -193,16 +257,23 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             },
         }
 
-        response = self.request(user=self.user, get_data={'q': self.query})
+        response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
-        assert response.content['results'] == []
+        assert response.content['data'] == []
+        assert response.content['recordsTotal'] == 100
+        assert response.content['recordsFiltered'] == 100
+        assert response.content['draw'] == 40
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
         mock_get.assert_not_called()
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_null_id(self, mock_post, mock_get):
+    def test_post_with_null_id(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {
             'hits': {
@@ -217,36 +288,56 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             },
         }
 
-        response = self.request(user=self.user, get_data={'q': self.query})
+        response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
-        assert response.content['results'] == []
+        assert response.content['data'] == []
+        assert response.content['recordsTotal'] == 100
+        assert response.content['recordsFiltered'] == 100
+        assert response.content['draw'] == 40
         assert response.content['timestamp'] == 'TIMESTAMP'
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
         mock_get.assert_not_called()
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_missing_query(self, mock_post, mock_get):
-        response = self.request(user=self.user)
+    def test_post_with_missing_query(self, mock_post, mock_get):
+        response = self.request(
+            user=self.user, method='POST', post_data={'q': None})
         assert response.status_code == 200
-        assert response.content['results'] == []
+        assert response.content['data'] == []
+        assert response.content['recordsTotal'] == 0
+        assert response.content['recordsFiltered'] == 0
+        assert response.content['draw'] == 40
         assert response.content['timestamp'] == ''
         mock_post.assert_not_called()
         mock_get.assert_not_called()
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_es_not_ok(self, mock_post, mock_get):
-        response = self.request(user=self.user, get_data={'q': self.query})
+    def test_post_with_es_not_ok(self, mock_post, mock_get):
+        response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
+        assert response.content['data'] == []
+        assert response.content['recordsTotal'] == 0
+        assert response.content['recordsFiltered'] == 0
+        assert response.content['draw'] == 40
         assert response.content['error'] == 'unavailable'
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
         mock_get.assert_not_called()
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_nonexistent_org(self, mock_post, mock_get):
+    def test_post_with_nonexistent_org(self, mock_post, mock_get):
         response = self.request(user=self.user,
+                                method='POST',
                                 url_kwargs={'organization': 'evil-corp'})
         assert response.status_code == 404
         assert response.content['detail'] == "Project not found."
@@ -255,8 +346,9 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_nonexistent_project(self, mock_post, mock_get):
+    def test_post_with_nonexistent_project(self, mock_post, mock_get):
         response = self.request(user=self.user,
+                                method='POST',
                                 url_kwargs={'project': 'world-domination'})
         assert response.status_code == 404
         assert response.content['detail'] == "Project not found."
@@ -265,8 +357,8 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
-    def test_get_with_unauthorized_user(self, mock_post, mock_get):
-        response = self.request()
+    def test_post_with_unauthorized_user(self, mock_post, mock_get):
+        response = self.request(method='POST')
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
         mock_post.assert_not_called()
@@ -282,17 +374,27 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             },
         }
 
-        raw_results = self.view_class().query_es(self.query, self.project.id)
+        raw_results = self.view_class().query_es(
+            self.project.id, self.query, 10, 20)
         assert raw_results == mock_post.return_value.json.return_value
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
 
     @patch('requests.post')
     def test_query_es_not_ok(self, mock_post):
         mock_post.return_value.status_code = 404
 
-        raw_results = self.view_class().query_es(self.query, self.project.id)
+        raw_results = self.view_class().query_es(
+            self.project.id, self.query, 10, 20)
         assert raw_results is None
-        mock_post.assert_called_once_with(self.es_endpoint, data=self.es_body)
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
 
     @patch('requests.get')
     def test_query_es_timestamp(self, mock_get):
@@ -310,8 +412,8 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         timestamp = self.view_class().query_es_timestamp(self.project.id)
         assert timestamp == 'TIMESTAMP'
         mock_get.assert_called_once_with(
-            '{}/project-{}/project/_search?q=*'.format(api_url,
-                                                       self.project.id))
+            '{}/project-{}/project/_search/?q=*'.format(api_url,
+                                                        self.project.id))
 
     @patch('requests.get')
     def test_query_es_timestamp_not_ok(self, mock_get):
@@ -320,8 +422,8 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         timestamp = self.view_class().query_es_timestamp(self.project.id)
         assert timestamp == "unknown"
         mock_get.assert_called_once_with(
-            '{}/project-{}/project/_search?q=*'.format(api_url,
-                                                       self.project.id))
+            '{}/project-{}/project/_search/?q=*'.format(api_url,
+                                                        self.project.id))
 
     def test_augment_result_location(self):
         augmented_result = self.view_class().augment_result(self.su_result)

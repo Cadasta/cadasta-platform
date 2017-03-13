@@ -4778,7 +4778,7 @@ div.org-logo {
     margin: 0 auto;
     background: #fff; }
   #organization-single .detail {
-    display: table-header-group;
+    display: table-footer-group;
     box-shadow: none; }
     #organization-single .detail section {
       padding: 20px; } }
@@ -4882,7 +4882,7 @@ ul.resource-actions > li {
     .page-title h1.short, .page-title h2.short {
       width: 50%; }
     .page-title h1 .org-name, .page-title h2 .org-name {
-      font-size: 14px;
+      font-size: 16px;
       display: block;
       padding-bottom: 2px;
       text-transform: uppercase; }
@@ -5076,6 +5076,7 @@ ul.resource-actions > li {
     #project-single .page-header .page-title h1, #project-single .page-header .page-title h2,
     #organization-single .page-header .page-title h1,
     #organization-single .page-header .page-title h2 {
+      padding-left: 24px;
       display: table-cell;
       vertical-align: middle; }
     #project-single .page-header .page-title .top-btn,
@@ -5859,6 +5860,10 @@ a {
   a:hover, a:focus {
     color: #0e305e;
     outline: none; }
+
+kbd {
+  background: #d9dadb;
+  color: #595a5c; }
 
 /* =Page Content
 -------------------------------------------------------------- */

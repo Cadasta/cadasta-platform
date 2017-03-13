@@ -29,18 +29,30 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
     def get_perms_objects(self):
         return [self.get_project()]
 
-    def get(self, request, *args, **kwargs):
-        query = request.query_params.get('q')
+    def post(self, request, *args, **kwargs):
+        query = request.data.get('q')
+        start_idx = int(request.data.get('start', 0))
+        page_size = int(request.data.get('length', 10))
+        dataTablesDraw = int(request.data['draw'])
+
         results_as_html = []
+        num_hits = 0
         timestamp = ''
 
         if query:
-            raw_results = self.query_es(query, self.get_project().id)
+            raw_results = self.query_es(
+                self.get_project().id, query, start_idx, page_size)
             if raw_results is None:
                 return Response({
+                    'draw': dataTablesDraw,
+                    'recordsTotal': 0,
+                    'recordsFiltered': 0,
+                    'data': [],
                     'error': 'unavailable',
                 })
 
+            num_hits = min(raw_results['hits']['total'],
+                           settings.ES_MAX_RESULTS)
             results = raw_results['hits']['hits']
 
             if len(results) == 0:
@@ -55,18 +67,17 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
                 if augmented_result is None:
                     continue
                 html = self.htmlize_result(augmented_result)
-                results_as_html.append([
-                    augmented_result['entity_type'],  # Column for filtering
-                    augmented_result['main_label'],   # Column for sorting
-                    html,                             # Column for display
-                ])
+                results_as_html.append([html])
 
         return Response({
-            'results': results_as_html,
+            'draw': dataTablesDraw,
+            'recordsTotal': num_hits,
+            'recordsFiltered': num_hits,
+            'data': results_as_html,
             'timestamp': timestamp,
         })
 
-    def query_es(self, query, project_id):
+    def query_es(self, project_id, query, start_idx, page_size):
         """Queries the ES API based on the UI query string and returns the
         raw ES JSON results."""
         body = {
@@ -75,10 +86,14 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
                     'default_operator': 'and',
                     'query': query,
                 }
-            }
+            },
+            'from': start_idx,
+            'size': page_size,
+            'sort': {'_score': {'order': 'desc'}},
         }
-        r = requests.post('{}/project-{}/_search'.format(api, project_id),
-                          data=json.dumps(body, sort_keys=True))
+        r = requests.post('{}/project-{}/_search/'.format(api, project_id),
+                          data=json.dumps(body, sort_keys=True),
+                          headers={'content-type': 'application/json'})
         if r.status_code == 200:
             return r.json()
         else:
@@ -87,7 +102,7 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
     def query_es_timestamp(self, project_id):
         """Queries the ES API project type to get the index timestamp."""
         r = requests.get(
-            '{}/project-{}/project/_search?q=*'.format(api, project_id))
+            '{}/project-{}/project/_search/?q=*'.format(api, project_id))
         if r.status_code == 200:
             return r.json()['hits']['hits'][0]['_source'].get('@timestamp')
         else:
