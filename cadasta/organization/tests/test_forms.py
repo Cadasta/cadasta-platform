@@ -1240,11 +1240,16 @@ class DownloadFormTest(UserTestCase, TestCase):
         assert mime == 'application/zip'
 
         with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 4
+            assert len(testzip.namelist()) == 8
+            print(testzip.namelist)
             assert res.original_file in testzip.namelist()
             assert 'resources.xlsx' in testzip.namelist()
-            assert 'data.xlsx' in testzip.namelist()
-            assert 'data-shp.zip' in testzip.namelist()
+            assert 'locations.csv' in testzip.namelist()
+            assert 'README.txt' in testzip.namelist()
+            assert 'point.shx' in testzip.namelist()
+            assert 'point.shp' in testzip.namelist()
+            assert 'point.prj' in testzip.namelist()
+            assert 'point.dbf' in testzip.namelist()
 
 
 class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):

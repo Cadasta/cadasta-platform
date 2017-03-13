@@ -489,15 +489,15 @@ class DownloadForm(forms.Form):
             path, mime = e.make_download(file_name + '-res')
         elif type == 'all':
             res_exporter = ResourceExporter(self.project)
-            xls_exporter = XLSExporter(self.project)
             shp_exporter = ShapeExporter(self.project)
-            path, mime = res_exporter.make_download(file_name + '-res')
-            data_path, _ = xls_exporter.make_download(file_name + '-xls')
-            shp_path, _ = shp_exporter.make_download(file_name + '-shp')
+            res_path, _ = res_exporter.make_download(file_name + '-res')
+            path, mime = shp_exporter.make_download(file_name + '-shp')
 
             with ZipFile(path, 'a') as myzip:
-                myzip.write(data_path, arcname='data.xlsx')
-                myzip.write(shp_path, arcname='data-shp.zip')
+                with ZipFile(res_path, 'r') as res_zip:
+                    for name in res_zip.namelist():
+                        myzip.writestr(name, res_zip.read(name))
+                    res_zip.close()
                 myzip.close()
 
         return path, mime
