@@ -1,5 +1,12 @@
 # Change Log
 
+## [v1.7.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.1) (2017-03-13)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0...v1.7.1)
+
+**Merged pull requests:**
+
+- Updating forms.scss for show/hide [\#1298](https://github.com/Cadasta/cadasta-platform/pull/1298) ([clash99](https://github.com/clash99))
+
 ## [v1.7.0](https://github.com/Cadasta/cadasta-platform/tree/v1.7.0) (2017-03-13)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0-alpha.4...v1.7.0)
 
