@@ -102,6 +102,12 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert 'dashboard' in response.location
 
+    def test_successful_login_username_case_insensitive(self):
+        data = {'login': 'IMAGINE71', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
     def test_successful_login_with_unverified_user(self):
         self.user.verify_email_by = datetime.datetime.now()
         self.user.save()

@@ -186,6 +186,22 @@ class RegisterFormTest(UserTestCase, TestCase):
                 in form.errors.get('username'))
         assert User.objects.count() == 0
 
+    def test_signup_with_existing_username(self):
+        UserFactory.create(username='dee')
+        data = {
+            'username': 'DEE',
+            'email': 'dee@firstpr.com',
+            'password1': 'Iloveyoko68!',
+            'password2': 'Iloveyoko68!',
+            'full_name': 'Delight Mawoyo',
+        }
+
+        form = forms.RegisterForm(data)
+        assert form.is_valid() is False
+        assert User.objects.count() == 1
+        assert (_("A user with that username already exists.")
+                in form.errors.get('username'))
+
 
 class ProfileFormTest(UserTestCase, TestCase):
     def test_update_user(self):
@@ -193,7 +209,7 @@ class ProfileFormTest(UserTestCase, TestCase):
                                   email='john@beatles.uk',
                                   email_verified=True)
         data = {
-            'username': 'imagine71',
+            'username': 'IMAGINE71',
             'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
         }
@@ -209,6 +225,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         form.save()
 
         user.refresh_from_db()
+        assert user.username == 'IMAGINE71'
         assert user.full_name == 'John Lennon'
         assert user.email_verified is False
         assert len(mail.outbox) == 1
@@ -235,6 +252,18 @@ class ProfileFormTest(UserTestCase, TestCase):
                                   email='john@beatles.uk')
         data = {
             'username': 'existing',
+            'email': 'john@beatles.uk',
+            'full_name': 'John Lennon',
+        }
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+
+    def test_update_user_with_existing_username_case_insensitive(self):
+        UserFactory.create(username='existing')
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk')
+        data = {
+            'username': 'Existing',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
         }

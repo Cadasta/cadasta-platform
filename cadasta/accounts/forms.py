@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
+from django.db.models.functions import Lower
 
 from .models import User, now_plus_48_hours
 from parsley.decorators import parsleyfy
@@ -23,7 +24,12 @@ class RegisterForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.data.get('username')
-        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if (self.instance.username.casefold() != username.casefold() and
+                User.objects.annotate(username_lower=Lower('username'))
+                .filter(username_lower=username.casefold()).exists()):
+            raise forms.ValidationError(
+                _("A user with that username already exists."))
+        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise forms.ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
@@ -76,11 +82,12 @@ class ProfileForm(forms.ModelForm):
 
     def clean_username(self):
         username = self.data.get('username')
-        if (self.instance.username != username and
-                User.objects.filter(username=username).exists()):
+        if (self.instance.username.casefold() != username.casefold() and
+                User.objects.annotate(username_lower=Lower('username'))
+                .filter(username_lower=username.casefold()).exists()):
             raise forms.ValidationError(
                 _("Another user with this username already exists"))
-        if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
+        if username.casefold() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise forms.ValidationError(
                 _("Username cannot be “add” or “new”."))
         return username
