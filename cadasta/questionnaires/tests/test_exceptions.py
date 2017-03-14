@@ -1,8 +1,8 @@
 from django.test import TestCase
-from ..exceptions import InvalidXLSForm
+from ..exceptions import InvalidQuestionnaire
 
 
-class InvalidXLSFormTest(TestCase):
+class InvalidQuestionnaireTest(TestCase):
     def test_str(self):
-        exc = InvalidXLSForm(errors=['E 1', 'E 2'])
+        exc = InvalidQuestionnaire(errors=['E 1', 'E 2'])
         assert str(exc) == 'E 1, E 2'

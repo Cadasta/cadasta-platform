@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import activate, get_language
 from organization.tests.factories import ProjectFactory
-from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidQuestionnaire
 from core.tests.utils.files import make_dirs  # noqa
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from jsonattrs.models import Attribute
@@ -163,7 +163,7 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-invalid.xlsx', 'rb')
         form = self.storage.save('xls-forms/xls-form-invalid.xlsx', file)
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             models.Questionnaire.objects.create_from_form(
                 xls_form=form,
                 project=ProjectFactory.create()
@@ -305,18 +305,18 @@ class MultilingualQuestionnaireTest(UserTestCase, FileStorageTestCase,
         )
 
     def test_no_default_language(self):
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             self._run('bad-no-default-language.xlsx')
         assert str(e.value) == ("Multilingual XLS forms must have "
                                 "a default_language setting")
 
     def test_bad_default_language(self):
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             self._run('bad-bad-default-language.xlsx')
         assert str(e.value) == "Default language code 'Bengali' unknown"
 
     def test_bad_label_language(self):
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             self._run('bad-bad-label-language.xlsx')
         assert str(e.value) == "Label language code 'English' unknown"
 

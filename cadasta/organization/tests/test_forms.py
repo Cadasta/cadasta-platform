@@ -14,7 +14,7 @@ from django.forms.utils import ErrorDict
 from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
-from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
@@ -638,7 +638,7 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         }
 
         form = forms.ProjectEditDetails(instance=project, data=data)
-        with raises(InvalidXLSForm):
+        with raises(InvalidQuestionnaire):
             form.save()
 
         project.refresh_from_db()

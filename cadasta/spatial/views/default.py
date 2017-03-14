@@ -82,25 +82,35 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
         project = context['object']
         if project.current_questionnaire:
-            question = Question.objects.get(
-                name='location_type',
-                questionnaire_id=project.current_questionnaire)
-            context['type_labels'] = template_xlang_labels(question.label_xlat)
+            try:
+                question = Question.objects.get(
+                    name='location_type',
+                    questionnaire_id=project.current_questionnaire)
+                context['type_labels'] = template_xlang_labels(
+                    question.label_xlat)
 
-            option = QuestionOption.objects.get(question=question,
-                                                name=context['location'].type)
-            context['type_choice_labels'] = template_xlang_labels(
-                option.label_xlat)
+                option = QuestionOption.objects.get(
+                    question=question,
+                    name=context['location'].type)
+                context['type_choice_labels'] = template_xlang_labels(
+                    option.label_xlat)
+            except Question.DoesNotExist:
+                pass
 
-            tenure_type = Question.objects.get(
-                name='tenure_type',
-                questionnaire_id=project.current_questionnaire)
-            tenure_opts = QuestionOption.objects.filter(question=tenure_type)
-            tenure_opts = dict(tenure_opts.values_list('name', 'label_xlat'))
+            try:
+                tenure_type = Question.objects.get(
+                    name='tenure_type',
+                    questionnaire_id=project.current_questionnaire)
+                tenure_opts = QuestionOption.objects.filter(
+                    question=tenure_type)
+                tenure_opts = dict(tenure_opts.values_list(
+                    'name', 'label_xlat'))
 
-            for rel in context['relationships']:
-                rel.type_labels = template_xlang_labels(
-                    tenure_opts.get(rel.tenure_type_id))
+                for rel in context['relationships']:
+                    rel.type_labels = template_xlang_labels(
+                        tenure_opts.get(rel.tenure_type_id))
+            except Question.DoesNotExist:
+                pass
 
         location = context['location']
         user = self.request.user

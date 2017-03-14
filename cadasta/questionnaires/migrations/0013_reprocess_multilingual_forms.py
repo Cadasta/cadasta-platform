@@ -14,7 +14,7 @@ from questionnaires.managers import (
     multilingual_label_check, check_for_language, fix_languages,
     ATTRIBUTE_GROUPS
 )
-from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidQuestionnaire
 
 
 def update_children(apps, children, errors=[], project=None,
@@ -144,14 +144,14 @@ def reprocess_multilingual_forms(apps, schema_editor):
         )
         if (has_default_language and
            not check_for_language(json['default_language'])):
-            raise InvalidXLSForm(
+            raise InvalidQuestionnaire(
                 ["Default language code '{}' unknown".format(
                     json['default_language']
                 )]
             )
         is_multilingual = multilingual_label_check(json['children'])
         if is_multilingual and not has_default_language:
-            raise InvalidXLSForm(["Multilingual XLS forms must have "
+            raise InvalidQuestionnaire(["Multilingual XLS forms must have "
                                   "a default_language setting"])
 
         # Skip monolingual forms.  No changes needed here.

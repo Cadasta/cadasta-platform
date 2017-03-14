@@ -10,7 +10,7 @@ from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
 from pyxform.xls2json import parse_file_to_json
-from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidQuestionnaire
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -140,7 +140,7 @@ def multilingual_label_check(children):
             has_multi = True
             for lang in c['label'].keys():
                 if lang != 'default' and not check_for_language(lang):
-                    raise InvalidXLSForm(
+                    raise InvalidQuestionnaire(
                         ["Label language code '{}' unknown".format(lang)]
                     )
         # Note the order of the short-cut "or" in the following two
@@ -185,15 +185,16 @@ class QuestionnaireManager(models.Manager):
                 )
                 if (has_default_language and
                    not check_for_language(json['default_language'])):
-                    raise InvalidXLSForm(
+                    raise InvalidQuestionnaire(
                         ["Default language code '{}' unknown".format(
                             json['default_language']
                         )]
                     )
                 is_multilingual = multilingual_label_check(json['children'])
                 if is_multilingual and not has_default_language:
-                    raise InvalidXLSForm(["Multilingual XLS forms must have "
-                                          "a default_language setting"])
+                    raise InvalidQuestionnaire(
+                        ["Multilingual XLS forms must have a default_language"
+                         " setting"])
                 instance.default_language = json['default_language']
                 if instance.default_language == 'default':
                     instance.default_language = ''
@@ -220,12 +221,12 @@ class QuestionnaireManager(models.Manager):
 
                 # all these errors handled by PyXForm so turning off for now
                 # if errors:
-                #     raise InvalidXLSForm(errors)
+                #     raise InvalidQuestionnaire(errors)
 
                 return instance
 
         except PyXFormError as e:
-            raise InvalidXLSForm([str(e)])
+            raise InvalidQuestionnaire([str(e)])
 
 
 class QuestionGroupManager(models.Manager):

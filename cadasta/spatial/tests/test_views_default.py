@@ -378,6 +378,17 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
                                        is_allowed_delete_location=False)
         assert response.content == expected
 
+    def test_get_with_incomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
     def test_get_with_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
         self.project.current_questionnaire = questionnaire.id

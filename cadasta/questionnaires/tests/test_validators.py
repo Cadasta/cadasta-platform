@@ -68,12 +68,14 @@ class QuestionnaireTestCase(TestCase):
         data = {
             'title': 'yx8sqx6488wbc4yysnkrbnfq',
             'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+            'default_language': 'en',
             'questions': [{
                 'name': "start",
                 'label': None,
                 'type': "ST",
                 'required': False,
-                'constraint': None
+                'constraint': None,
+                'index': 0
             }]
         }
         errors = validators.validate_questionnaire(data)
@@ -85,10 +87,12 @@ class QuestionnaireTestCase(TestCase):
                 'label': None,
                 'type': "ST",
                 'required': False,
-                'constraint': None
+                'constraint': None,
+                'index': 0
             }],
             'question_groups': [{
-                'label': 'A group'
+                'label': 'A group',
+                'index': 0
             }]
         }
         errors = validators.validate_questionnaire(data)
@@ -105,10 +109,12 @@ class QuestionGroupTestCase(TestCase):
             'name': "location_attributes",
             'label': "Location Attributes",
             'type': 'group',
+            'index': 0,
             'questions': [{
                 'name': "start",
                 'label': 'Start',
                 'type': "ST",
+                'index': 0
             }]
         }]
         errors = validators.validate_question_groups(data)
@@ -118,9 +124,11 @@ class QuestionGroupTestCase(TestCase):
         data = [{
             'label': "location attributes",
             'type': 'group',
+            'index': 0,
             'questions': [{
                 'label': 'Start',
                 'type': "ST",
+                'index': 0
             }]
         }]
         errors = validators.validate_question_groups(data)
@@ -135,15 +143,18 @@ class QuestionGroupTestCase(TestCase):
             'name': "location_attributes",
             'label': "Location Attributes",
             'type': 'repeat',
+            'index': 0,
             'question_groups': [{
                 'name': "location_attributes",
                 'label': "Location Attributes",
                 'type': 'group',
+                'index': 0,
             }],
             'questions': [{
                 'name': "start",
                 'label': 'Start',
                 'type': "ST",
+                'index': 0,
             }]
         }]
         errors = validators.validate_question_groups(data)
@@ -153,13 +164,16 @@ class QuestionGroupTestCase(TestCase):
         data = [{
             'label': "Location Attributes",
             'type': 'repeat',
+            'index': 0,
             'question_groups': [{
                 'name': "location_attributes",
-                'label': "Location Attributes"
+                'label': "Location Attributes",
+                'index': 0
             }],
             'questions': [{
                 'label': 'Start',
                 'type': "ST",
+                'index': 0
             }]
         }]
         errors = validators.validate_question_groups(data)
@@ -179,7 +193,8 @@ class QuestionTestCase(TestCase):
             'label': None,
             'type': "ST",
             'required': False,
-            'constraint': None
+            'constraint': None,
+            'index': 0
         }]
         errors = validators.validate_questions(data)
         assert errors == [{}]
@@ -190,13 +205,15 @@ class QuestionTestCase(TestCase):
             'label': None,
             'type': "ST",
             'required': False,
-            'constraint': None
+            'constraint': None,
+            'index': 0
         }, {
             'label': None,
             'type': "S1",
             'required': False,
             'constraint': None,
-            'options': [{'name': 'Name'}]
+            'options': [{'name': 'Name', 'index': 0}],
+            'index': 1
         }]
         errors = validators.validate_questions(data)
         assert errors == [{},
@@ -210,16 +227,21 @@ class QuestionOptionTestCase(TestCase):
         data = [{
             'name': "start",
             'label': "Start",
+            'index': 0
         }]
         errors = validators.validate_question_options(data)
+        print(errors)
         assert errors == [{}]
 
     def test_invalid_option(self):
         data = [{
             'name': "start",
             'label': "Start",
+            'index': 0
         }, {
-            'name': 'end'
+            'name': "end",
+            'index': 1
         }]
         errors = validators.validate_question_options(data)
+        print(errors)
         assert errors == [{}, {'label': ['This field is required.']}]
