@@ -43,6 +43,7 @@ var CreateRoutes = function(){
     function(){
       // global function
       dataTableHook();
+      rm.getCurrentActiveTab();
       rm.detachFormSubmission(rm.getCurrentLocationUrl());
   });
 
@@ -73,6 +74,7 @@ var CreateRoutes = function(){
       rm.displayModal();
     }, 
     function() {
+      rm.setCurrentActiveTab('resources');
       rm.formSubmission(this.el, rm.getCurrentLocationUrl());
   });
 
@@ -81,6 +83,7 @@ var CreateRoutes = function(){
       rm.displayModal();
     }, 
     function() {
+      rm.setCurrentActiveTab('resources');
       rm.uploadResourceHooks();
       rm.formSubmission(this.el, rm.getCurrentLocationUrl(), rm.uploadResourceHooks);
   });
@@ -90,6 +93,7 @@ var CreateRoutes = function(){
       rm.displayModal();
 
     }, function() {
+      rm.setCurrentActiveTab('relationships');
       rm.relationshipHooks();
       rm.formSubmission(this.el, rm.getCurrentLocationUrl(), rm.relationshipHooks);
     });
@@ -103,6 +107,7 @@ var CreateRoutes = function(){
     function() {
       // global function
       dataTableHook();
+      rm.setCurrentActiveTab('relationships');
       rm.updateCurrentLocationUrl($("#current-location").attr('href'));
       rm.updateCurrentRelationshipUrl();
       rm.detachFormSubmission(rm.getCurrentRelationshipUrl());

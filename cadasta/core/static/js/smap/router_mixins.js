@@ -4,6 +4,7 @@ var RouterMixins = {
   settings: {
     current_location: {url: null, bounds: null},
     current_relationship: {url: null},
+    current_active_tab: 'overview',
     el: {
       'detail': 'project-detail',
       'modal': 'additional-modals',
@@ -131,22 +132,48 @@ var RouterMixins = {
     }
   },
 
-  setCurrentLocation: function () {
+  setCurrentLocation: function() {
     var parent = this;
     map.on("popupopen", function(evt){
       currentPopup = evt.popup;
       $('#spatial-pop-up').click(function(e){
         parent.resetLocationStyle();
+        parent.setCurrentActiveTab('overview')
         state.current_location.bounds = currentPopup._source;
         map.closePopup();
       });
     });
   },
 
+  activateTab: function(tab) {
+    var tab_options = ['overview', 'resources', 'relationships']
+    tab_options.splice(tab_options.indexOf(tab), 1);
+
+    $('#' + tab + '-tab').addClass('active');
+    $($('#' + tab + '-tab').children()[0]).attr({'aria-expanded':"true"});
+    $('#' + tab).addClass('active');
+
+    for (var i in tab_options) {
+      $('#' + tab_options[i] + '-tab').removeClass('active');
+      $($('#' + tab_options[i] + '-tab').children()[0]).attr({'aria-expanded':"false"});
+      $('#' + tab_options[i]).removeClass('active');
+    }
+  },
+
+  setCurrentActiveTab: function(tab) {
+    if (state.current_active_tab !== tab) {
+      state.current_active_tab = tab;
+    }
+  },
+
+  getCurrentActiveTab: function() {
+    this.activateTab(state.current_active_tab);
+  },
 
   /***************
   ADDING EVENT HOOKS
   ****************/
+
   uploadResourceHooks: function() {
     original_file = $('input[name="original_file"]').val();
 
@@ -178,7 +205,6 @@ var RouterMixins = {
   },
 
   relationshipHooks: function() {
-    console.log('relationshipHooks called');
     var template = function(party) {
       if (!party.id) {
         return party.text;
@@ -219,7 +245,6 @@ var RouterMixins = {
       target.addClass('info');
       $('input[name="id"]').val(relId);
     });
-  // },
 
   // relationshipAddHooks: function() {
     function disableConditionals() {
@@ -297,9 +322,14 @@ var RouterMixins = {
   INTERCEPTING FORM SUBMISSIONS
   ****************/
   formSubmission: function(form_type, success_url, eventHook=null){
-    form = state.forms[form_type] || form_type;
+    var form = state.forms[form_type] || form_type;
+    var parent = this;
 
     $(form).submit(function(e){
+      // if form_type === form, then it was triggered by the detach form.
+      if (form_type === form) {
+        parent.setCurrentActiveTab('resources');
+      }
       e.preventDefault();
       var target = e.originalEvent || e.originalTarget;
       var formaction = $('.submit-btn', target.target ).attr('formAction');
@@ -328,6 +358,13 @@ var RouterMixins = {
             sr.router();
           } else {
             window.location.hash = success_url;
+            $('#overview-tab').removeClass('active');
+            $($('#overview-tab').children()[0]).attr({'aria-expanded':"false"})
+            $("#overview").removeClass('active')
+
+            $('#resource-tab').addClass('active');
+            $($('#resource-tab').children()[0]).attr({'aria-expanded':"true"})
+            $("#resource").addClass('active')
           }
         }
       });
