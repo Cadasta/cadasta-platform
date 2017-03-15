@@ -550,6 +550,7 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_import_with_wkb(self):
         self._run_import_test(self.test_wkb)
 
+
 class XLSImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def setUp(self):
