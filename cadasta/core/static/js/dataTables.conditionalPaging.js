@@ -51,6 +51,9 @@
                             else {
                                 $paging.css('visibility', 'hidden');
                             }
+                            if (api.page.info().recordsDisplay < 10) {
+                                $dropdown.css('visibility', 'hidden');
+                            }
                         }
                         else {
                             if (config.style === 'fade') {
@@ -58,6 +61,7 @@
                             }
                             else {
                                 $paging.css('visibility', '');
+                                $dropdown.css('visibility', '');
                             }
                         }
                     }
