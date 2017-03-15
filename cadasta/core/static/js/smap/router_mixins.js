@@ -233,7 +233,6 @@ var RouterMixins = {
 
     function enableConditions(val) {
       const types = ['co', 'gr', 'in'];
-      console.log(types);
       types.splice(types.indexOf(val), 1);
       $('.party-' + val).removeClass('hidden');
       $('.party-' + val + ' .form-control').prop('disabled', '');
@@ -251,6 +250,8 @@ var RouterMixins = {
             if (value.hasAttribute('data-parsley-required')) {
               $(value).attr('data-parsley-required', true);
               $(value).prop('required', 'required');
+              label = $(value)[0].labels[0];
+              $(label).addClass('required')
             }
           });
         } else {
@@ -258,6 +259,8 @@ var RouterMixins = {
             if (value.hasAttribute('data-parsley-required')) {
               $(value).attr('data-parsley-required', false);
               $(value).prop('required', '');
+              label = $(value)[0].labels[0];
+              $(label).addClass('required')
             }
           });
         }

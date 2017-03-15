@@ -4,6 +4,7 @@ import pytest
 from accounts.tests.factories import UserFactory
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from skivvy import ViewTestCase
 from tutelary.models import Policy, Role
@@ -56,7 +57,11 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             'is_allowed_add_location': False,
             'is_allowed_add_resource': False,
             'is_project_member': False,
-            'is_allowed_add_resource': False
+            'is_allowed_add_resource': False,
+            'success_url': reverse('organization:project-dashboard', kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug,
+                })
         }
 
     def setup_url_kwargs(self):
