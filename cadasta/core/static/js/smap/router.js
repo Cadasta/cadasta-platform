@@ -5,6 +5,11 @@ var SimpleRouter = function(map){
 
   function router() {
     var hash_path = location.hash.slice(1) || '/';
+    console.log(hash_path);
+    if (hash_path === '/search') {
+      return;
+    }
+
     var async_url = '/async' + location.pathname;
 
     if (hash_path !== '/') {
@@ -16,7 +21,7 @@ var SimpleRouter = function(map){
     // Removes record id from hash_path to match key in routes.
     if (!route) {
       var records = ['/records/location', '/records/relationship'];
-      var actions = ['/edit', '/delete', '/resources/new', '/resources/add', '/relationships/new'];
+      var actions = ['/edit', '/delete', '/resources/add', '/resources/new', '/relationships/new'];
       var new_hash_path;
 
       for (var i in records) {
@@ -34,7 +39,7 @@ var SimpleRouter = function(map){
       route = routes[new_hash_path];
     }
 
-    var el = document.getElementById(state.el[route.el]);
+    var el = document.getElementById(rm.getRouteElement(route.el));
     $.get(async_url, function(response){
       if (response.includes("alert-warning")) {
         window.location.hash = "/overview";

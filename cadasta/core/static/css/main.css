@@ -6087,6 +6087,9 @@ main.container-fluid {
       .content-single .detail ul.list-divider li:last-child {
         border-bottom: 0;
         padding-bottom: 6px; }
+      .content-single .detail ul.list-divider li.linked:hover {
+        cursor: pointer;
+        background-color: #f9fafe; }
     .content-single .detail .nav-tabs li > a {
       font-size: 13px;
       padding: 10px; }

@@ -38,6 +38,7 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_resources'] = num_resources
         context['success_url'] = reverse('organization:project-dashboard',
                                          kwargs=self.kwargs)
+
         return context
 
     def get_object(self, queryset=None):

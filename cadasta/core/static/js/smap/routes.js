@@ -37,11 +37,10 @@ var CreateRoutes = function(){
   route('/records/location', 'detail',
     function() {
       rm.displayDetailPanel();
-      rm.centerOnCurrentLocation();
-      rm.updateCurrentLocationUrl();
     },
     function(){
       // global function
+      rm.updateCurrentLocation();
       dataTableHook();
       rm.getCurrentActiveTab();
       rm.detachFormSubmission(rm.getCurrentLocationUrl());
@@ -108,7 +107,7 @@ var CreateRoutes = function(){
       // global function
       dataTableHook();
       rm.setCurrentActiveTab('relationships');
-      rm.updateCurrentLocationUrl($("#current-location").attr('href'));
+      rm.updateCurrentLocation($("#current-location").attr('href'));
       rm.updateCurrentRelationshipUrl();
       rm.detachFormSubmission(rm.getCurrentRelationshipUrl());
   });

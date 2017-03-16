@@ -29,7 +29,8 @@
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatial/tiled/{z}/{x}/{y}';
   var fetch_spatial_resources = '/api/v1/organizations/' +
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatialresources/';
-  var trans = {open: "{% trans 'Open location' %}"};
+  var trans = {open: "{% trans 'Open location' %}",
+               current_viewing: "{% trans 'Currently viewing' %}"};
   
   {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};

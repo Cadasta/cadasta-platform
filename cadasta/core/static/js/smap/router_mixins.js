@@ -18,7 +18,7 @@ var RouterMixins = {
 
   init: function() {
     state = this.settings;
-    this.setCurrentLocation();
+    // this.setCurrentLocation();
   },
 
 
@@ -79,7 +79,15 @@ var RouterMixins = {
   /***************
   UPDATING THE STATE
   ****************/
-  updateCurrentLocationUrl: function(url=null) {
+  setGeoJsonLayer: function(layer) {
+    state.geojsonlayer = layer;
+  },
+
+  getRouteElement: function(el) {
+    return state.el[el]
+  },
+
+  updateCurrentLocation: function(url=null) {
     if (url) {
       if (!state.current_location.url) {
         state.current_location.url = url;
@@ -88,6 +96,8 @@ var RouterMixins = {
     } else if (state.current_location.url !== window.location.hash) {
       state.current_location.url = window.location.hash;
     }
+
+    this.updateCurrentLocationBounds();
   },
 
   updateCurrentRelationshipUrl: function() {
@@ -126,26 +136,36 @@ var RouterMixins = {
     }
   },
 
-  resetLocationStyle: function() {
-    if (state.current_location.bounds && state.current_location.bounds.setStyle) {
-      state.current_location.bounds.setStyle({color: '#3388ff', fillColor: '#3388ff', weight: 2});
+  resetLocationStyle: function(feature) {
+    // before state.current_location is updated, the old state needs to be reset
+    if (state.current_location.bounds) {
+      if (state.current_location.bounds.setStyle) {
+        state.current_location.bounds.setStyle({color: '#3388ff', fillColor: '#3388ff', weight: 2});
+      }
+
+      feature = state.current_location.bounds.feature;
+      state.current_location.bounds._popup.setContent(this.nonActivePopup(feature));
     }
   },
 
-  setCurrentLocation: function() {
-    var parent = this;
-    map.on("popupopen", function(evt){
-      currentPopup = evt.popup;
-      $('#spatial-pop-up').click(function(e){
-        parent.resetLocationStyle();
-        parent.setCurrentActiveTab('overview')
-        state.current_location.bounds = currentPopup._source;
+  updateCurrentLocationBounds: function() {
+    var layers = state.geojsonlayer.geojsonLayer._layers
+    var url = state.current_location.url || window.location.hash
+
+    for (var i in layers) {
+      if (url.includes(layers[i]['feature']['id'])) {
+        this.resetLocationStyle();
+
+        state.current_location.bounds = layers[i];
+        this.centerOnCurrentLocation()
         map.closePopup();
-      });
-    });
+        layers[i]._popup.setContent(this.activePopup(layers[i].feature));
+      }
+    }
   },
 
   activateTab: function(tab) {
+    // For the location details page. Tabs are built using bootstrap
     var tab_options = ['overview', 'resources', 'relationships']
     tab_options.splice(tab_options.indexOf(tab), 1);
 
@@ -246,7 +266,6 @@ var RouterMixins = {
       $('input[name="id"]').val(relId);
     });
 
-  // relationshipAddHooks: function() {
     function disableConditionals() {
       $('.party-co').addClass('hidden');
       $('.party-gr').addClass('hidden');
@@ -301,10 +320,8 @@ var RouterMixins = {
       }
     }
 
-    // $().ready(function() {
     var val = $('.party-type').val().toLowerCase();
     toggleStates(val);
-    // });
 
 
     $('select.party-type').on('change', function(e) {
@@ -379,7 +396,7 @@ var RouterMixins = {
   },
 
   /******************
-  ERROR MESSAGES
+  EXTRA HTML INSERTS
   ******************/
   permissionDenied: function(){
     return "<div class='alert alert-dismissible alert-warning' role='alert'>" +
@@ -388,5 +405,25 @@ var RouterMixins = {
            "</button>" +
            "You don't have permission to view this location." +
            "</div>";
-  }
+  },
+
+  nonActivePopup: function(feature) {
+    return "<div class=\"text-wrap\"><h2><span>Location</span>" +
+              feature.properties.type +
+            "</h2></div>" +
+            "<div class=\"btn-wrap\"><a href='#/" +
+              feature.properties.url +
+            "' id='spatial-pop-up' class='btn btn-primary btn-sm btn-block'>" +
+              options.trans.open +
+            "</a></div>"
+  },
+
+  activePopup: function(feature) {
+    return "<div class=\"text-wrap\"><h2><span>Location</span>" +
+              feature.properties.type +
+            "</h2></div>" +
+            "<div class=\"btn-wrap\"><span class=\"btn-sm btn-block\">" +
+              options.trans.current_viewing +
+              "</span></div>"
+  },
 };
