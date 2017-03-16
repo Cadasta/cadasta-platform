@@ -9,12 +9,12 @@
 
 {% block extra_head %}
 {% leaflet_css plugins="draw,forms" %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 {% endblock %}
 
 {% block extra_script %}
 {% leaflet_js plugins="draw,forms" %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.4.0/leaflet-geocoder-mapzen.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
  $(document).ready(function () {

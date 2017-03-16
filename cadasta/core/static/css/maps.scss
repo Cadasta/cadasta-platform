@@ -45,38 +45,44 @@
 -------------------------------------------------------------- */
 
 .leaflet-control-geolocate {
-  width: 25px;
-  height: 25px;
+  width: 26px;
+  height: 26px;
   background-color: #fff;
   text-align: center;
+  -webkit-transition: width .1s, height .1s;
+  -moz-transition: width .1s, height .1s;
+  -ms-transition: width .1s, height .1s;
+  -o-transition: width .1s, height .1s;
+  transition: width .1s, height .1s;
+  z-index: 810; /* place above .leaflet-control; z-index is 7 in Leaflet v0.7, 800 in v1 */
+  box-sizing: content-box;
+  &:hover {
+    background-color: #f4f4f4;
+  }
+  span {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    vertical-align: middle;
+    cursor: pointer;
+  }
 }
 
-.leaflet-control-geolocate:hover {
-  background-color: #f4f4f4;
+/* For old IE, match other leaflet controls' appearance */
+.leaflet-oldie .leaflet-control-geolocate  {
+  border: 1px solid #999;
 }
 
-.leaflet-control-geolocate span {
-  display: inline-block;
-  width: 25px;
-  height: 25px;
-  line-height: 25px;
-  vertical-align: middle;
-  cursor: pointer;
+/* Match touch styles in Leaflet v1 */
+.leaflet-touch .leaflet-control-geolocate  {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
 }
 
 /* =Mobile
 -------------------------------------------------------------- */
-
-.leaflet-touch {
-  .leaflet-control-geolocate {
-    width: 34px !important;
-    height: 34px !important;
-  }
-  .leaflet-pelias-control {
-    width: 34px !important;
-    height: 34px !important;
-  }
-}
 
 @media (max-width: $screen-xs-max) {
   .leaflet-container .leaflet-control-attribution, .leaflet-container .leaflet-control-scale {
