@@ -175,6 +175,13 @@ class OrganizationCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert Organization.objects.count() == 0
         assert response.content['name'][0] == 'This field is required.'
 
+    def test_create_with_anonymous_user(self):
+        response = self.request(method='POST', post_data={'name': 'Org Name'})
+        assert response.status_code == 401
+        assert (response.content['detail'] == 
+                'Authentication credentials were not provided.')
+        assert Organization.objects.count() == 0
+
     def test_create_organization_with_unauthorized_user(self):
         clauses = {
             'clause': [
