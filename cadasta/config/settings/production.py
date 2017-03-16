@@ -66,7 +66,8 @@ DJOSER.update({  # NOQA
 # Adding localhost here for uWSGI debugging!
 ALLOWED_HOSTS = [os.environ['API_HOST'], os.environ['DOMAIN'], 'localhost']
 
-ADMINS = [('Cadasta platform admins', 'platform-admin@cadasta.org')]
+ADMINS = [('Cadasta platform admins', 'platform-admin@cadasta.org'),
+          ('Cadasta Platform Errors', os.environ['SLACK_HOOK'])]
 EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
@@ -121,7 +122,7 @@ LOGGING = {
         # Log errors from the Opbeat module to the console
         'opbeat.errors': {
             'level': 'ERROR',
-            'handlers': ['file', 'email_admins'],
+            'handlers': ['file'],
             'propagate': False,
         },
     },
