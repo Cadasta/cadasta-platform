@@ -108,7 +108,7 @@ class ProfileForm(forms.ModelForm):
         return user
 
 
-class LoginForm(allauth_forms.LoginForm, forms.Form):
+class LoginForm(allauth_forms.LoginForm):
     error_messages = {
         'username_email_password_mismatch':
         _("The username and/or password you specified are not correct.")
