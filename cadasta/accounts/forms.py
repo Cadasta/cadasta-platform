@@ -37,11 +37,11 @@ class RegisterForm(forms.ModelForm):
             raise forms.ValidationError(_("Passwords do not match"))
 
         email = self.data.get('email').lower().split('@')
-        if len(email[0]) and email[0] in password:
+        if len(email[0]) and email[0] in password.lower():
             errors.append(_("Passwords cannot contain your email."))
 
         username = self.data.get('username')
-        if len(username) and username in password:
+        if len(username) and username.lower() in password.lower():
             errors.append(
                 _("The password is too similar to the username."))
 
