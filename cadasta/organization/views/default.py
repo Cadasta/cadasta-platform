@@ -209,6 +209,12 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
+        if self.request.POST and self.request.POST.get('org_role'):
+            return reverse(
+                 'organization:members_edit',
+                 kwargs=self.kwargs,
+            )
+
         return reverse(
             'organization:members',
             kwargs={'slug': self.kwargs['slug']},
