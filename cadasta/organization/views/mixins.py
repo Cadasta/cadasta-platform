@@ -231,7 +231,6 @@ class ProjectCreateCheckMixin:
 
 
 class OrgRoleCheckMixin(SuperUserCheckMixin):
-    @property
     def get_roles(self):
         if not hasattr(self, '_is_member') or not hasattr(self, '_is_admin'):
             self._is_member = False
@@ -262,16 +261,18 @@ class OrgRoleCheckMixin(SuperUserCheckMixin):
 
         return self._is_member, self._is_admin
 
+    @property
     def is_administrator(self):
-        _, admin = self.get_roles
+        _, admin = self.get_roles()
         return admin
 
+    @property
     def is_member(self):
-        member, _ = self.get_roles
+        member, _ = self.get_roles()
         return member
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['is_member'] = self.is_member()
-        context['is_administrator'] = self.is_administrator()
+        context['is_member'] = self.is_member
+        context['is_administrator'] = self.is_administrator
         return context

@@ -89,7 +89,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
                 orgs = self.request.user.organizations.all()
                 for org in orgs:
                     if org.slug == self.kwargs['slug']:
-                        if self.is_administrator():
+                        if self.is_administrator:
                             projects = self.object.all_projects()
                         else:
                             projects = self.object.all_projects().filter(

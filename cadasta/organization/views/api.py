@@ -166,7 +166,7 @@ class OrganizationProjectList(PermissionsFilterMixin,
         if self.request.method == 'POST':
             return [self.get_organization()]
 
-        if self.is_administrator():
+        if self.is_administrator:
             return super().get_queryset().filter(
                 organization__slug=self.kwargs['organization']
             )
