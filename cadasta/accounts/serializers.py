@@ -45,12 +45,12 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
 
         errors = []
         if self.initial_data.get('email'):
-            email = self.initial_data.get('email').lower().split('@')
-            if len(email[0]) and email[0] in password:
+            email = self.initial_data.get('email').split('@')
+            if len(email[0]) and email[0].casefold() in password.casefold():
                 errors.append(_("Passwords cannot contain your email."))
 
         username = self.initial_data.get('username')
-        if len(username) and username in password:
+        if len(username) and username.casefold() in password.casefold():
             errors.append(
                 _("The password is too similar to the username."))
 
@@ -87,8 +87,8 @@ class UserSerializer(djoser_serializers.UserSerializer):
         instance = self.instance
         if instance is not None:
             if (username is not None and
-               username != instance.username and
-               self.context['request'].user != instance):
+                username != instance.username and
+                    self.context['request'].user != instance):
                 raise ValidationError('Cannot update username')
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
@@ -99,7 +99,7 @@ class UserSerializer(djoser_serializers.UserSerializer):
         instance = self.instance
         if instance is not None:
             if (last_login is not None and
-               last_login != instance.last_login):
+                    last_login != instance.last_login):
                 raise ValidationError('Cannot update last_login')
         return last_login
 
@@ -117,7 +117,19 @@ class AccountLoginSerializer(djoser_serializers.LoginSerializer):
 
 class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
     def validate(self, attrs):
+
         if not self.context['request'].user.change_pw:
             raise ValidationError(_("The password for this user can not "
                                     "be changed."))
         return super().validate(attrs)
+
+    def validate_new_password(self, password):
+        user = self.context['request'].user
+        validate_password(password, user=user)
+
+        username = user.username
+        if len(username) and username.casefold() in password.casefold():
+            raise ValidationError(
+                _("The password is too similar to the username."))
+
+        return password

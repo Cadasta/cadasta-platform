@@ -63,6 +63,21 @@ class RegisterFormTest(UserTestCase, TestCase):
                 form.errors.get('password1'))
         assert User.objects.count() == 0
 
+    def test_password_contains_username_case_insensitive(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password1': 'LetsIMAGINE71things?',
+            'password2': 'LetsIMAGINE71things?',
+            'full_name': 'John Lennon',
+        }
+        form = forms.RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert (_("The password is too similar to the username.") in
+                form.errors.get('password1'))
+        assert User.objects.count() == 0
+
     def test_password_contains_blank_username(self):
         data = {
             'username': '',
@@ -81,8 +96,8 @@ class RegisterFormTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'password1': 'Isjohnreallythebest34?',
-            'password2': 'Isjohnreallythebest34?',
+            'password1': 'IsJOHNreallythebest34?',
+            'password2': 'IsJOHNreallythebest34?',
             'full_name': 'John Lennon',
         }
         form = forms.RegisterForm(data)
@@ -338,8 +353,23 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'Letsimagine71?',
-            'password2': 'Letsimagine71?',
+            'password1': 'Letsimagine71?1234567890',
+            'password2': 'Letsimagine71?1234567890',
+        }
+        form = forms.ChangePasswordForm(user, data)
+
+        assert form.is_valid() is False
+        assert (_("The password is too similar to the username.") in
+                form.errors.get('password1'))
+
+    def test_password_contains_username_case_insensitive(self):
+        user = UserFactory.create(
+            password='beatles4Lyfe!', username='imagine71')
+
+        data = {
+            'oldpassword': 'beatles4Lyfe!',
+            'password1': 'LetsIMAGINE71?1234567890',
+            'password2': 'LetsIMAGINE71?1234567890',
         }
         form = forms.ChangePasswordForm(user, data)
 
@@ -353,8 +383,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         data = {
             'oldpassword': 'beatles4Lyfe!',
-            'password1': 'Isjohnreallythebest34?',
-            'password2': 'Isjohnreallythebest34?',
+            'password1': 'IsJOHNreallythebest34?',
+            'password2': 'IsJOHNreallythebest34?',
         }
         form = forms.ChangePasswordForm(user, data)
 
@@ -444,8 +474,22 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
             password='beatles4Lyfe!', username='imagine71')
 
         data = {
-            'password1': 'Letsimagine71?',
-            'password2': 'Letsimagine71?',
+            'password1': 'Letsimagine71?1234567890',
+            'password2': 'Letsimagine71?1234567890',
+        }
+        form = forms.ResetPasswordKeyForm(data, user=user)
+
+        assert form.is_valid() is False
+        assert (_("The password is too similar to the username.") in
+                form.errors.get('password1'))
+
+    def test_password_contains_username_case_insensitive(self):
+        user = UserFactory.create(
+            password='beatles4Lyfe!', username='imagine71')
+
+        data = {
+            'password1': 'LetsIMAGINE71?1234567890',
+            'password2': 'LetsIMAGINE71?1234567890',
         }
         form = forms.ResetPasswordKeyForm(data, user=user)
 
@@ -458,8 +502,8 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
             password='beatles4Lyfe!', email='john@thebeatles.uk')
 
         data = {
-            'password1': 'Isjohnreallythebest34?',
-            'password2': 'Isjohnreallythebest34?',
+            'password1': 'IsJOHNreallythebest34?',
+            'password2': 'IsJOHNreallythebest34?',
         }
         form = forms.ResetPasswordKeyForm(data, user=user)
 
