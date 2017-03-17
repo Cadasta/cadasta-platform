@@ -161,6 +161,7 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_FORMS = {
     'signup': 'accounts.forms.RegisterForm',
     'profile': 'accounts.forms.ProfileForm',
+    'login': 'accounts.forms.LoginForm'
 }
 ACCOUNT_ADAPTER = 'accounts.adapter.DefaultAccountAdapter'
 ACCOUNT_LOGOUT_ON_GET = True

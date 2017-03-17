@@ -108,6 +108,22 @@ class ProfileForm(forms.ModelForm):
         return user
 
 
+class LoginForm(allauth_forms.LoginForm, forms.Form):
+    error_messages = {
+        'account_inactive':
+        _("This account is currently inactive."),
+
+        'email_password_mismatch':
+        _("The e-mail address and/or password you specified are not correct."),
+
+        'username_password_mismatch':
+        _("The username and/or password you specified are not correct."),
+
+        'username_email_password_mismatch':
+        _("The username and/or password you specified are not correct.")
+    }
+
+
 class ChangePasswordMixin:
     def clean_password1(self):
         if not self.user.change_pw:
