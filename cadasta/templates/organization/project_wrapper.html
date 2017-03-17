@@ -71,9 +71,14 @@
       <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
-        <a class="btn btn-primary" href="#/records/location/new" aria-label="{% trans 'Add location' %}">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
-        </a>
+          {% ifnotequal request.path project_url %}
+            <a class="btn btn-primary" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}#/records/location/new" aria-label="{% trans 'Add location' %}"></span> {% trans "Add location" %}
+            </a>
+          {% else %}
+            <a class="btn btn-primary" href="#/records/location/new" aria-label="{% trans 'Add location' %}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
+            </a>
+          {% endifnotequal %}
         {% endif %}
         {% if is_allowed_add_resource or is_allowed_import %}
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -260,6 +265,6 @@ window.addEventListener('load', function() {
 </div><!-- /.modal -->
 
 
-<div class="modal fade" id="additional_modals" ></div>
+<div class="modal fade" id="additional-modals" ></div>
 
 {% endblock %}

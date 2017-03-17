@@ -3,12 +3,11 @@
 {% load i18n %}
 
 {% load staticfiles %}
-
 {% load leaflet_tags %}
+
 
 {% block extra_head %}
 {% leaflet_css plugins="groupedlayercontrol,markercluster" %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.7.1/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.9/select2-bootstrap.min.css" />
@@ -19,22 +18,19 @@
 
 {% block extra_script %}
 {% leaflet_js plugins="groupedlayercontrol,markercluster,deflate" %}
-<script src="{% static 'js/smap/index.js' %}"></script>
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+<script type="text/javascript" src="{% static 'buckets/js/script.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.7.1/leaflet-geocoder-mapzen.js"></script>
-<script src="{% static 'js/smap/index.js' %}"></script>
-<script src="{% static 'js/smap/lazytiles.js' %}"></script>
-<script src="{% static 'js/smap/L.TileLayer.GeoJSON.js' %}"></script>
-<script src="{% static 'js/smap/routes.js' %}"></script>
-<script src="{% static 'js/smap/router.js' %}"></script>
-<script src="{% static 'js/smap/map.js' %}"></script>
+
+
 <script>
   var url = '/async/organizations/' +
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatial/tiled/{z}/{x}/{y}';
   var fetch_spatial_resources = '/api/v1/organizations/' +
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatialresources/';
-  var trans = {open: "{% trans 'Open location' %}"};
+  var trans = {open: "{% trans 'Open location' %}",
+               current_viewing: "{% trans 'Currently viewing' %}"};
   
   {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};
@@ -48,17 +44,16 @@
     project_slug: '{{ project.slug }}',
     org_slug: '{{ project.organization.slug }}'
   }
-
   var layers = {{ leaflet_tiles|safe }}
 
-  function project_map_init(map, options) {
-    var smap = SMap(map);
-    var sr = new SimpleRouter(map);
-    sr.router();
-  }
-
-
 </script>
+<script src="{% static 'js/smap/lazytiles.js' %}"></script>
+<script src="{% static 'js/smap/L.TileLayer.GeoJSON.js' %}"></script>
+<script src="{% static 'js/smap/map.js' %}"></script>
+<script src="{% static 'js/smap/router_mixins.js' %}"></script>
+<script src="{% static 'js/smap/routes.js' %}"></script>
+<script src="{% static 'js/smap/router.js' %}"></script>
+<script src="{% static 'js/smap/index.js' %}"></script>
 {% endblock %}
 
 {% block page_title %}{% trans "Overview" %} | {% endblock %}
@@ -70,8 +65,7 @@
   <div class="row">
     <!-- Start overview map  -->
     <div class="col-md-8 map" id="project-map">
-      <!-- <div id="mapid"></div> -->
-      {% leaflet_map "project-map" callback="project_map_init" %}
+      <div id="mapid"></div>
     </div>
     <!-- / end overview map -->
     <!-- Overview detail  -->

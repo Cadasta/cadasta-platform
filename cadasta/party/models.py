@@ -316,14 +316,21 @@ class TenureRelationship(ResourceModelMixin, RandomIDModel):
         return _("Relationship")
 
     def get_absolute_url(self):
+        # return iri_to_uri(reverse(
+        #     'parties:relationship_detail',
+        #     kwargs={
+        #         'organization': self.project.organization.slug,
+        #         'project': self.project.slug,
+        #         'relationship': self.id,
+        #     },
+        # ))
         return iri_to_uri(reverse(
-            'parties:relationship_detail',
+            'organization:project-dashboard',
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
-                'relationship': self.id,
             },
-        ))
+        ) + "#/records/relationship/{}".format(self.id))
 
     @property
     def tenure_type_label(self):

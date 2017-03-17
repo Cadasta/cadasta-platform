@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<form method="POST" class="modal-backdrop">
+<form method="POST" class="modal-backdrop" id="modal-form">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -11,7 +11,7 @@
           <p>{% trans "Are you sure you want to delete this relationship?" %}</p>
         </div>
         <div class="modal-footer">
-          <button type="submit" value="Confirm" class="btn btn-danger archive-final pull-right">{% trans "Yes, delete this relationship" %}</button>
+          <button type="submit" value="Confirm" class="btn btn-danger submit-btn archive-final pull-right" formaction="{{ submit_url }}">{% trans "Yes, delete this relationship" %}</button>
           <a href="#/records/relationship/{{ relationship.id }}"  class="btn btn-link cancel">
             {% trans "Cancel" %}
           </a>

@@ -143,7 +143,12 @@ class PartyRelationshipResourceMixin(ResourceViewMixin,
         return kwargs
 
     def get_success_url(self):
-        return reverse('parties:relationship_detail', kwargs=self.kwargs)
+        # kwargs = self.kwargs
+        # kwargs['relationship'] = self.object.id
+        return (reverse('organization:project-dashboard', kwargs={
+            'organization': self.kwargs['organization'],
+            'project': self.kwargs['project']}
+            ) + '#/records/relationship/' + self.kwargs['relationship'])
 
 
 class TenureRelationshipQuerySetMixin(ProjectMixin):

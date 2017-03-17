@@ -59,7 +59,7 @@
   {% else %}
     <div class="alert alert-info alert-full clearfix row" role="alert">
       <div class="text-center">
-        <a href="{% url 'account_login' %}?next={{ request.path }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
+        <a href="{% url 'account_login' %}?next={{ success_url }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
       </div>
     </div>
   {% endif %}

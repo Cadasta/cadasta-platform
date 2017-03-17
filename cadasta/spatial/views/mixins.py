@@ -28,8 +28,10 @@ class SpatialQuerySetMixin(ProjectMixin):
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['location'] = self.object.id
-        return (reverse('organization:project-dashboard', kwargs=kwargs) +
-                '#/records/location/' + self.kwargs['location'].id)
+        return (reverse('organization:project-dashboard', kwargs={
+                'organization': kwargs['organization'],
+                'project': kwargs['project']
+                }) + '#/records/location/' + kwargs['location'])
 
 
 class SpatialRelationshipQuerySetMixin(ProjectMixin):

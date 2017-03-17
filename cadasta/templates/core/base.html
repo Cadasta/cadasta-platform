@@ -197,37 +197,45 @@
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
     {% block extra_script %}{% endblock %}
     <script>
-    $(document).ready(function () {
-      $('.datatable').DataTable({
-        conditionalPaging: true,
-        "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
-        "language": {
-          "emptyTable":     "{% trans "No data available in table" %}",
-          "info":           "{% trans "Showing _START_ - _END_ of _TOTAL_" %}",
-          "infoEmpty":      "{% trans "Showing 0 - 0 of 0" %}",
-          "infoFiltered":   "{% trans "(filtered from _MAX_ total rows)" %}",
-          "lengthMenu":     "{% trans "Show _MENU_ rows" %}",
-          "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
-          "searchPlaceholder": '{% trans "Search" %}',
-          "zeroRecords":    "{% trans "No matching records found" %}",
-          "paginate": {
-            "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
-            "previous": '<span class="glyphicon glyphicon-triangle-left"></span>',
-            "first":      "{% trans "First" %}",
-            "last":       "{% trans "Last" %}"
-          },
-          "aria": {
-            "sortAscending":  ": {% trans "activate to sort column ascending" %}",
-            "sortDescending": ": {% trans "activate to sort column descending" %}"
+    var dataTableHook = function(){
+      // console.log(!$.fn.DataTable.isDataTable('.datatable'));
+      if ( !$.fn.DataTable.isDataTable('.datatable') ) {
+        // console.log('initializing datatable');
+        $('.datatable').DataTable({
+          destroy: true,
+          conditionalPaging: true,
+          "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
+          "language": {
+            "emptyTable":     "{% trans 'No data available in table' %}",
+            "info":           "{% trans 'Showing _START_ - _END_ of _TOTAL_' %}",
+            "infoEmpty":      "{% trans 'Showing 0 - 0 of 0' %}",
+            "infoFiltered":   "{% trans '(filtered from _MAX_ total rows)' %}",
+            "lengthMenu":     "{% trans 'Show _MENU_ rows' %}",
+            "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
+            "searchPlaceholder": '{% trans "Search" %}',
+            "zeroRecords":    "{% trans 'No matching records found' %}",
+            "paginate": {
+              "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
+              "previous": '<span class="glyphicon glyphicon-triangle-left"></span>',
+              "first":      "{% trans 'First' %}",
+              "last":       "{% trans 'Last' %}"
+            },
+            "aria": {
+              "sortAscending":  ": {% trans 'activate to sort column ascending' %}",
+              "sortDescending": ": {% trans 'activate to sort column descending' %}"
+            }
           }
-        }
-      });
-      $('.dropdown-toggle').dropdown();
-      $('#language').change(function() { this.form.submit(); });
-      $('[data-parsley-required="true"]')
-        .closest('.form-group')
-          .children('label.control-label')
-            .addClass('required');
+        });
+        $('.dropdown-toggle').dropdown();
+        $('#language').change(function() { this.form.submit(); });
+        $('[data-parsley-required="true"]')
+          .closest('.form-group')
+            .children('label.control-label')
+              .addClass('required');
+      }
+    };
+    $(document).ready(function () {
+      dataTableHook();
     });
     window.setTimeout(function() {
       $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
@@ -238,7 +246,7 @@
       window.inlineManualTracking = {
         uid: "{{ user.id }}",
         username: "{{ user.username }}"
-      }
+      };
     </script>
     <script type="text/javascript" src="{% static 'js/inline-manual-player.js' %}"></script>
   </body>

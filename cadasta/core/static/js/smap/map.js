@@ -1,5 +1,3 @@
-// var map = L.map('mapid');
-
 var SMap = function(map) {
   var layerscontrol = L.control.layers().addTo(map);
 
@@ -37,6 +35,7 @@ var SMap = function(map) {
 
   add_tile_layers();
   map.addLayer(geojsonTileLayer);
+  rm.setGeoJsonLayer(geojsonTileLayer);
 
   function load_project_extent() {
     if (options.projectExtent) {

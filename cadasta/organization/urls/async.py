@@ -12,6 +12,10 @@ urls = [
         r'^$',
         async.ProjectDashboard.as_view(),
         name='project-dashboard'),
+    url(
+        r'^map/$',
+        async.ProjectDashboard.as_view(),
+        name='project-map'),
 ]
 
 
