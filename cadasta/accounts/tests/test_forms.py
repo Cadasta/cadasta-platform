@@ -474,16 +474,3 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert (_("The password for this user can not be changed.") in
                 form.errors.get('password1'))
-
-
-class LoginFormTest(UserTestCase, TestCase):
-    def test_login_error_message(self):
-        data = {
-            'login': 'imagine71',
-            'password': 'iloveyoko79!',
-        }
-        form = forms.LoginForm(data)
-
-        assert form.is_valid() is False
-        assert (_("The username and/or password you specified are not "
-                  "correct.") in form.non_field_errors())
