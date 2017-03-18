@@ -46,7 +46,7 @@ class ShapeExporter(Exporter):
         content_type = ContentType.objects.get(app_label='party',
                                                model='tenurerelationship')
         self.write_items(filename, relationships, content_type,
-                         ('id', 'party_id', 'spatial_unit_id',
+                         ('id', 'party_id', 'location_id',
                           'tenure_type.id', 'tenure_type.label'))
 
     def write_parties(self, filename):
