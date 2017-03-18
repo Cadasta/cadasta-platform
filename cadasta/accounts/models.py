@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+import os
 from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
@@ -7,11 +8,12 @@ import django.contrib.auth.models as auth
 import django.contrib.auth.base_user as auth_base
 from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
+
 from resources.utils import io,thumbnail
 from buckets.fields import S3FileField
 from simple_history.models import HistoricalRecords
 from .manager import UserManager
-import os
+from .validators import ACCEPTED_TYPES, validate_file_type
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -27,7 +29,7 @@ def abstract_user_field(name):
 
 def create_thumbnails(instance, created):
     if created or instance._original_url != instance.file.url:
-        if instance.file.url.split('.')[-1] == 'jpg':
+        if instance.file.url.split('.')[-1] in ['jpg', 'jpeg', 'gif']:
             io.ensure_dirs()
             file_name = instance.file.url.split('/')[-1]
             name = file_name[:file_name.rfind('.')]
@@ -41,10 +43,10 @@ def create_thumbnails(instance, created):
             file = instance.file.open()
             thumb = thumbnail.make(file, size)
             thumb.save(write_path)
-            #if instance.file.field.upload_to:
-                #name = instance.file.field.upload_to + '/' + name
-            #instance.file.storage.save(name + '-128x128.' + ext,
-                                       #open(write_path, 'rb').read())
+            if instance.file.field.upload_to:
+                name = instance.file.field.upload_to + '/' + name
+            instance.file.storage.save(name + '-128x128.' + ext,
+                                       open(write_path, 'rb').read())
 
 
 @permissioned_model
@@ -58,7 +60,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     verify_email_by = models.DateTimeField(default=now_plus_48_hours)
     change_pw = models.BooleanField(default=True)
-    file = S3FileField(blank = True, upload_to = 'users',accepted_types=['image/jpg','image/jpeg','image/gif'])
+    file = S3FileField(blank = True, upload_to = 'users', accepted_types= ACCEPTED_TYPES)
 
     objects = UserManager()
 
@@ -108,6 +110,20 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     @property
     def file_type(self):
         return self.file_name.split('.')[-1]
+
+    @property
+    def thumbnail(self):
+        if not hasattr(self, '_thumbnail'):
+            if self.file_type in ['jpg', 'jpeg', 'gif']:
+                ext = self.file_name.split('.')[-1]
+                base_url = self.file.url[:self.file.url.rfind('.')]
+                self._thumbnail = base_url + '-128x128.' + ext
+            elif icon:
+                self._thumbnail = settings.ICON_URL.format(icon)
+            else:
+                self._thumbnail = ''
+
+        return self._thumbnail
 
     def get_display_name(self):
         """
