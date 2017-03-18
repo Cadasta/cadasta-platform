@@ -58,14 +58,14 @@ class ResourceExporter():
             for r in resources:
                 res_data.append(self.pack_resource_data(r))
                 resource_name = r.original_file
-                filename, file_extension = os.path.splitext(resource_name)
+                filename, file_ext = os.path.splitext(resource_name)
                 if resource_name in files:
                     filename += "_" + str(files[resource_name])
                     files[resource_name] += 1
                 else:
                     files[resource_name] = 1
 
-                myzip.write(r.file.open().name, arcname=filename+file_extension)
+                myzip.write(r.file.open().name, arcname=filename+file_ext)
 
             resources_xls = self.make_resource_worksheet(f_name, res_data)
             myzip.write(resources_xls, arcname='resources.xlsx')
