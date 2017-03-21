@@ -8,7 +8,7 @@ urlpatterns = [
         api.UserAdminList.as_view(),
         name='list'),
     url(
-        r'^(?P<slug>[-\w]+)/$',
+        r'^(?P<username>[-\w]+)/$',
         api.UserAdminDetail.as_view(),
         name='detail'),
 ]
