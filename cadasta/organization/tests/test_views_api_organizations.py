@@ -228,7 +228,7 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request()
         assert response.status_code == 200
         assert response.content['id'] == self.org.id
-        assert 'users' in response.content
+        assert 'users' not in response.content
 
     def test_get_organization_that_does_not_exist(self):
         response = self.request(user=self.user,
