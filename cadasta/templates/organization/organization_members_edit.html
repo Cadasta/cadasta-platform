@@ -24,7 +24,11 @@
               <div class="panel panel-default member-panel">
                 <div class="panel-body member-info">
                   <div class="member-pic">
+		    {% if user.file.url %}
+		      <img class="avatar-lg thumbnail" src="{{user.file.url}}">
+		    {% else %}
                     <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+		    {% endif %}
                   </div>
                   <div class="member-detail">
                     <h4>{{ object.username }}</h4>

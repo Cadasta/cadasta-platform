@@ -118,8 +118,6 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                 ext = self.file_name.split('.')[-1]
                 base_url = self.file.url[:self.file.url.rfind('.')]
                 self._thumbnail = base_url + '-128x128.' + ext
-            elif icon:
-                self._thumbnail = settings.ICON_URL.format(icon)
             else:
                 self._thumbnail = ''
 

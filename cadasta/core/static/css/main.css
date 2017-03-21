@@ -3170,6 +3170,7 @@ table th[class*="col-"] {
   width: 0;
   height: 0;
   margin-left: 2px;
+  margin-bottom: 16px;
   vertical-align: middle;
   border-top: 4px dashed;
   border-top: 4px solid \9;
@@ -6504,6 +6505,11 @@ h1 .label {
 
 .inline {
   display: inline; }
+
+.user-profile-image{
+  border: 0.2px solid #122040;
+  margin-right: 6px; 
+  height: 32px; }
 
 @media (max-width: 991px) {
   .alert {
