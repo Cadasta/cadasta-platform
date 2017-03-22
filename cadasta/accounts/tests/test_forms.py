@@ -1,18 +1,17 @@
 import random
 
-from django.utils.translation import gettext as _
-from django.test import TestCase
+from core.tests.utils.cases import UserTestCase
+from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.http import HttpRequest
-from django.contrib.messages.storage.fallback import FallbackStorage
 from django.db import IntegrityError
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
+from django.test import TestCase
+from django.utils.translation import gettext as _
 
-from ..models import User
 from .. import forms
-from core.tests.utils.cases import UserTestCase
-
+from ..models import User
 from .factories import UserFactory
 
 
@@ -33,6 +32,37 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         user = User.objects.first()
         assert user.check_password('iloveyoko79!') is True
+
+    def test_case_insensitive_username(self):
+        chars = ['', 'İ', 'É', 'Ø', 'œ', 'ß', 'ss', 'Ξ', 'ф', '大家好']
+        usernames = ['UsEr%s' % c for c in chars]
+        users = [
+            UserFactory.create(username=username) for username in usernames]
+        for user in users:
+            data = {
+                'username': user.username.lower(),
+                'email': '%s@beatles.uk' % user.username,
+                'password1': 'iloveyoko79!',
+                'password2': 'iloveyoko79!',
+                'full_name': 'John Lennon',
+            }
+            form = forms.RegisterForm(data)
+            assert form.is_valid() is False
+            assert (_("A user with that username already exists") in
+                    form.errors.get('username'))
+
+        user = UserFactory.create(username='JohNlEnNoN')
+        data = {
+            'username': 'johnLennon',
+            'email': 'john@beatles.uk',
+            'password1': 'iloveyoko79!',
+            'password2': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+        }
+        form = forms.RegisterForm(data)
+        assert form.is_valid() is False
+        assert (_("A user with that username already exists") in
+                form.errors.get('username'))
 
     def test_passwords_do_not_match(self):
         data = {
@@ -258,6 +288,39 @@ class ProfileFormTest(UserTestCase, TestCase):
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
+
+    def test_case_insensitive_username(self):
+        existing_user = UserFactory.create(username='TestUser')
+        chars = ['', 'İ', 'É', 'Ø', 'œ', 'ß', 'ss', 'Ξ', 'ф', '大家好']
+        usernames = ['UsEr%s' % c for c in chars]
+        users = [
+            UserFactory.create(username=username) for username in usernames]
+        for user in users:
+            data = {
+                'username': user.username.lower(),
+                'email': '%s@beatles.uk' % user.username,
+                'full_name': 'John Lennon',
+            }
+            form = forms.ProfileForm(data, instance=existing_user)
+            assert form.is_valid() is False
+            assert (_("A user with that username already exists") in
+                    form.errors.get('username'))
+        existing_user.refresh_from_db()
+        assert existing_user.username == 'TestUser'
+
+        user = UserFactory.create(
+            username='JohNlEnNoN', email='john@beatles.uk')
+        data = {
+            'username': 'johnLennon',
+            'email': 'john@beatles.uk',
+            'full_name': 'John Lennon',
+        }
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is True
+        form.save()
+
+        user.refresh_from_db()
+        assert user.username == 'johnLennon'
 
     def test_update_user_with_existing_email(self):
         UserFactory.create(email='existing@example.com')
