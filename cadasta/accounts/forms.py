@@ -36,12 +36,12 @@ class RegisterForm(forms.ModelForm):
         if password != self.data.get('password2'):
             raise forms.ValidationError(_("Passwords do not match"))
 
-        email = self.data.get('email').lower().split('@')
-        if len(email[0]) and email[0] in password:
+        email = self.data.get('email').split('@')
+        if len(email[0]) and email[0].casefold() in password.casefold():
             errors.append(_("Passwords cannot contain your email."))
 
         username = self.data.get('username')
-        if len(username) and username in password:
+        if len(username) and username.casefold() in password.casefold():
             errors.append(
                 _("The password is too similar to the username."))
 
@@ -96,6 +96,11 @@ class ProfileForm(forms.ModelForm):
             if User.objects.filter(email=email).exists():
                 raise forms.ValidationError(
                     _("Another user with this email already exists"))
+
+            current_email_set = self.instance.emailaddress_set.all()
+            if current_email_set.exists():
+                current_email_set.delete()
+
         return email
 
     def save(self, *args, **kwargs):
@@ -119,6 +124,11 @@ class ChangePasswordMixin:
 
         password = self.cleaned_data['password1']
         validate_password(password, user=self.user)
+
+        username = self.user.username
+        if len(username) and username.casefold() in password.casefold():
+            raise forms.ValidationError(
+                _("The password is too similar to the username."))
 
         return password
 

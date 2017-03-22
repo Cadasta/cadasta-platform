@@ -40,6 +40,7 @@
                 speed = 'slow',
                 conditionalPaging = function(e) {
                     var $paging = $(api.table().container()).find('div.dataTables_paginate'),
+                        $dropdown = $(api.table().container()).find('div.dataTables_length'),
                         pages = api.page.info().pages;
 
                     if (e instanceof $.Event) {
@@ -50,6 +51,9 @@
                             else {
                                 $paging.css('visibility', 'hidden');
                             }
+                            if (api.page.info().recordsDisplay < 10) {
+                                $dropdown.css('visibility', 'hidden');
+                            }
                         }
                         else {
                             if (config.style === 'fade') {
@@ -57,15 +61,18 @@
                             }
                             else {
                                 $paging.css('visibility', '');
+                                $dropdown.css('visibility', '');
                             }
                         }
                     }
                     else if (pages <= 1) {
                         if (config.style === 'fade') {
                             $paging.css('opacity', 0);
+                            $dropdown.css('opacity', 0);
                         }
                         else {
                             $paging.css('visibility', 'hidden');
+                            $dropdown.css('visibility', 'hidden');
                         }
                     }
                 };

@@ -369,6 +369,10 @@ main.container-fluid {
         border-bottom: 0;
         padding-bottom: 6px;
       }
+      &.linked:hover {
+        cursor: pointer;
+        background-color: $table-bg-hover;
+      }
     }
     .nav-tabs {
       li > a {
@@ -458,11 +462,6 @@ main.container-fluid {
         }
       }
     }
-  }
-  .member-panel { // member edit page
-    border: 0;
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
   }
   .nav-tabs {
     margin-bottom: 20px;

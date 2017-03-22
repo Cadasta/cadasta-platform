@@ -6133,10 +6133,6 @@ main.container-fluid {
         margin-right: 20px; }
         .content-single .panel .panel-buttons .btn:last-child {
           margin-right: 0; }
-  .content-single .member-panel {
-    border: 0;
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important; }
   .content-single .nav-tabs {
     margin-bottom: 20px; }
 

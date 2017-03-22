@@ -180,7 +180,7 @@ class PartiesAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -412,13 +412,13 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.render_content(
             relationships=self.party.tenurerelationship_set.all())
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_party(self):
+    def test_get_non_existent_party(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -530,13 +530,13 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_party(self):
+    def test_get_non_existent_party(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -649,13 +649,13 @@ class PartiesDeleteTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_party(self):
+    def test_get_non_existent_party(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -755,13 +755,13 @@ class PartyResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_party(self):
+    def test_get_non_existent_party(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -880,13 +880,13 @@ class PartyResourcesNewTest(ViewTestCase, UserTestCase, FileStorageTestCase,
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_party(self):
+    def test_get_non_existent_party(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -1046,13 +1046,13 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')])
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_relationship(self):
+    def test_get_non_existent_relationship(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -1127,13 +1127,13 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
                 'name="tenurerelationship::default::fname" '
                 'type="text" value="test" />') in response.content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_relationship(self):
+    def test_get_non_existent_relationship(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -1245,13 +1245,13 @@ class PartyRelationshipDeleteTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_relationship(self):
+    def test_get_non_existent_relationship(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -1366,13 +1366,13 @@ class PartyRelationshipResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_relationship(self):
+    def test_get_non_existent_relationship(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -1496,13 +1496,13 @@ class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase,
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_relationship(self):
+    def test_get_non_existent_relationship(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):

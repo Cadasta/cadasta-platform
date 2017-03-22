@@ -111,7 +111,7 @@ $(document).ready(function() {
               <div class="form-group{% if field.errors %} has-error{% endif %}">
                 <label class="control-label" for="{{ field.id_for_label }}" {{ field.field.labels_xlang|safe }}>{{ field.label }}</label>
                 {% if field|field_type == "datefield" %}
-                  {{ field|add_class:"form-control datepicker"|set_parsley_required }}}
+                  {{ field|add_class:"form-control datepicker"|set_parsley_required }}
                 {% else %}
                   {{ field|add_class:"form-control"|set_parsley_required }}
                 {% endif %}
