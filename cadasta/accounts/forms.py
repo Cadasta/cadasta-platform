@@ -13,13 +13,12 @@ from parsley.decorators import parsleyfy
 @parsleyfy
 class RegisterForm(forms.ModelForm):
     email = forms.EmailField(required=True)
-    password1 = forms.CharField(widget=forms.PasswordInput())
-    password2 = forms.CharField(widget=forms.PasswordInput())
+    password = forms.CharField(widget=forms.PasswordInput())
     MIN_LENGTH = 10
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2',
+        fields = ['username', 'email', 'password',
                   'full_name']
 
     def clean_username(self):
@@ -30,13 +29,10 @@ class RegisterForm(forms.ModelForm):
                 _("Username cannot be “add” or “new”."))
         return username
 
-    def clean_password1(self):
-        password = self.data.get('password1')
+    def clean_password(self):
+        password = self.data.get('password')
         validate_password(password)
         errors = []
-
-        if password != self.data.get('password2'):
-            raise forms.ValidationError(_("Passwords do not match"))
 
         email = self.data.get('email').split('@')
         if len(email[0]) and email[0].casefold() in password.casefold():
@@ -60,8 +56,8 @@ class RegisterForm(forms.ModelForm):
         return email
 
     def save(self, *args, **kwargs):
-        user = super(RegisterForm, self).save(*args, **kwargs)
-        user.set_password(self.cleaned_data['password1'])
+        user = super().save(*args, **kwargs)
+        user.set_password(self.cleaned_data['password'])
         user.save()
         return user
 
@@ -113,12 +109,12 @@ class ProfileForm(forms.ModelForm):
 
 
 class ChangePasswordMixin:
-    def clean_password1(self):
+    def clean_password(self):
         if not self.user.change_pw:
             raise forms.ValidationError(_("The password for this user can not "
                                           "be changed."))
 
-        password = self.cleaned_data['password1']
+        password = self.cleaned_data['password']
         validate_password(password, user=self.user)
 
         username = self.user.username
@@ -128,15 +124,33 @@ class ChangePasswordMixin:
 
         return password
 
+    def save(self):
+        allauth_forms.get_adapter().set_password(
+            self.user, self.cleaned_data['password'])
+
 
 class ChangePasswordForm(ChangePasswordMixin,
-                         allauth_forms.ChangePasswordForm):
-    pass
+                         allauth_forms.UserForm):
+
+    oldpassword = allauth_forms.PasswordField(label=_("Current Password"))
+    password = allauth_forms.SetPasswordField(label=_("New Password"))
+
+    def clean_oldpassword(self):
+        if not self.user.check_password(self.cleaned_data.get('oldpassword')):
+            raise forms.ValidationError(_("Please type your current"
+                                          " password."))
+        return self.cleaned_data['oldpassword']
 
 
 class ResetPasswordKeyForm(ChangePasswordMixin,
-                           allauth_forms.ResetPasswordKeyForm):
-    pass
+                           forms.Form):
+
+    password = allauth_forms.SetPasswordField(label=_("New Password"))
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        self.temp_key = kwargs.pop('temp_key', None)
+        super().__init__(*args, **kwargs)
 
 
 class ResetPasswordForm(allauth_forms.ResetPasswordForm):

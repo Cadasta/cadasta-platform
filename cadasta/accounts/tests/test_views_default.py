@@ -79,8 +79,7 @@ class PasswordChangeTest(ViewTestCase, UserTestCase, TestCase):
     def test_password_change(self):
         self.user = UserFactory.create(password='Noonewillguess!')
         data = {'oldpassword': 'Noonewillguess!',
-                'password1': 'Someonemightguess?',
-                'password2': 'Someonemightguess?'}
+                'password': 'Someonemightguess?'}
         response = self.request(method='POST', post_data=data, user=self.user)
 
         assert response.status_code == 302
