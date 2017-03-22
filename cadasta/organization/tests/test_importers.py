@@ -219,6 +219,7 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.geoshape_csv = '/organization/tests/files/test_geoshape.csv'
         self.geotrace_csv = '/organization/tests/files/test_geotrace.csv'
         self.test_wkt = '/organization/tests/files/test_wkt.csv'
+        self.test_wkb = '/organization/tests/files/test_wkb.csv'
 
         self.project = ProjectFactory.create(name='Test CSV Import')
         xlscontent = self.get_file(
@@ -504,11 +505,11 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             if su.geometry is not None:
                 assert type(su.geometry) is LineString
 
-    def test_import_with_wkt(self):
+    def _run_import_test(self, filename):
         importer = csv.CSVImporter(
-            project=self.project, path=self.path + self.test_wkt)
+            project=self.project, path=self.path + filename)
         config = {
-            'file': self.path + self.test_wkt,
+            'file': self.path + filename,
             'entity_types': ['SU', 'PT'],
             'party_name_field': 'name_of_hh',
             'party_type_field': 'party_type',
@@ -518,11 +519,11 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'project': self.project
         }
         importer.import_data(config)
+
         assert Party.objects.all().count() == 10
         assert SpatialUnit.objects.all().count() == 10
         assert TenureRelationship.objects.all().count() == 10
 
-        # test wkt geom creation
         su1 = SpatialUnit.objects.filter(
             attributes__contains={'nid_number': '3913647224045'}).first()
         su2 = SpatialUnit.objects.filter(
@@ -542,6 +543,12 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert su4.geometry.geom_type == 'MultiPoint'
         assert su5.geometry.geom_type == 'MultiLineString'
         assert su6.geometry.geom_type == 'MultiPolygon'
+
+    def test_import_with_wkt(self):
+        self._run_import_test(self.test_wkt)
+
+    def test_import_with_wkb(self):
+        self._run_import_test(self.test_wkb)
 
 
 class XLSImportTest(UserTestCase, FileStorageTestCase, TestCase):
