@@ -14,5 +14,6 @@ class UserTest(TestCase):
         assert repr(user) == ('<User username=John'
                               ' full_name=John Lennon'
                               ' email=john@beatles.uk'
+                              ' file='
                               ' email_verified=True'
                               ' verify_email_by={}>').format(date)
