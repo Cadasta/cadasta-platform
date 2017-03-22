@@ -105,8 +105,10 @@
               <h3>{% trans "Members" %}</h3>
               <ul class="list-unstyled list-divider">
               {% for user in organization.users.all %}
-                <li>
-                  <strong>{{ user.username }}</strong>
+                <li class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
+                  <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">
+                    <strong>{{ user.username }}</strong>
+                  </a>
                   {% if user.full_name %}
                     <br />{{ user.full_name }}
                   {% endif %}

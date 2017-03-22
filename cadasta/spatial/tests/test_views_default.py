@@ -86,7 +86,7 @@ class LocationsListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -225,7 +225,7 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assert remove_csrf(content) == expected_content
         assert request.session['cancel_add_location_url'] == '/info/'
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -412,13 +412,13 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             form_langs=[('en', 'English'), ('de', 'German')]
         )
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_location(self):
+    def test_get_non_existent_location(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -495,13 +495,13 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         'id="id_spatialunit::default::fname" '
         'name="spatialunit::default::fname" type="text" />' in response.content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_location(self):
+    def test_get_non_existent_location(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -606,13 +606,13 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_location(self):
+    def test_get_non_existent_location(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -720,13 +720,13 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_location(self):
+    def test_get_non_existent_location(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
@@ -841,13 +841,13 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_from_non_existend_project(self):
+    def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):
             self.request(user=user, url_kwargs={'project': 'abc123'})
 
-    def test_get_non_existend_location(self):
+    def test_get_non_existent_location(self):
         user = UserFactory.create()
         assign_policies(user)
         with pytest.raises(Http404):

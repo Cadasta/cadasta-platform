@@ -4,11 +4,11 @@ from django.utils.translation import ugettext as _
 
 
 DEFAULT_CHARACTER_TYPES = [
-            string.ascii_lowercase,
-            string.ascii_uppercase,
-            string.punctuation,
-            string.digits
-        ]
+    string.ascii_lowercase,
+    string.ascii_uppercase,
+    string.punctuation,
+    string.digits
+]
 
 ACCEPTED_TYPES = ['image/jpg', 'image/jpeg', 'image/gif']
 
@@ -50,7 +50,7 @@ class EmailSimilarityValidator(object):
         if not user:
             return None
 
-        email = user.email.lower().split('@')
-        if len(email[0]) and email[0] in password:
+        email = user.email.split('@')
+        if len(email[0]) and email[0].casefold() in password.casefold():
             raise ValidationError(
                 _("Passwords cannot contain your email."))
