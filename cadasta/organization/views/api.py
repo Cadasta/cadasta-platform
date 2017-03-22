@@ -132,7 +132,7 @@ class UserAdminDetail(APIPermissionRequiredMixin,
 
 class OrganizationProjectList(PermissionsFilterMixin,
                               APIPermissionRequiredMixin,
-                              mixins.OrgAdminCheckMixin,
+                              mixins.OrgRoleCheckMixin,
                               mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
     org_lookup = 'organization'

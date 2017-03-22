@@ -8,7 +8,7 @@
 
 {% block title %} | {% block page_title %}{% endblock %}{{ organization.name }} {% endblock %}
 
-{% block main-width %}{% if is_administrator %} show-sidebar{% endif %}{% endblock %}
+{% block main-width %}{% if is_member %} show-sidebar{% endif %}{% endblock %}
 
 {% block page-header %}
 
@@ -92,7 +92,7 @@
 
 {% block sub-nav %}
 
-{% if is_administrator %}
+{% if is_member %}
 <!-- Sidebar -->
 <div id="sidebar" class="{% block left-nav %}{% endblock %}">
   <ul class="nav nav-sidebar">

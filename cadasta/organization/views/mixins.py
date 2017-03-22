@@ -230,38 +230,49 @@ class ProjectCreateCheckMixin:
         return context
 
 
-class OrgAdminCheckMixin(SuperUserCheckMixin):
-    @property
-    def is_administrator(self):
-        if not hasattr(self, '_is_admin'):
+class OrgRoleCheckMixin(SuperUserCheckMixin):
+    def get_roles(self):
+        if not hasattr(self, '_is_member') or not hasattr(self, '_is_admin'):
+            self._is_member = False
             self._is_admin = False
 
             # Check if the user is anonymous: not an admin
             if isinstance(self.request.user, AnonymousUser):
-                return False
+                return False, False
 
             # Check if the user is a superuser: is an admin
             if self.is_superuser:
+                self._is_member = True
                 self._is_admin = True
 
-            # Check if the user has the organization admin role: is an admin
             if hasattr(self, 'get_organization'):
                 org = self.get_organization()
             else:
                 org = self.get_object()
             try:
-                OrganizationRole.objects.get(
+                role = OrganizationRole.objects.get(
                     organization=org,
                     user=self.request.user,
-                    admin=True,
                 )
-                self._is_admin = True
+                self._is_member = True
+                self._is_admin = role.admin
             except OrganizationRole.DoesNotExist:
                 pass
 
-        return self._is_admin
+        return self._is_member, self._is_admin
+
+    @property
+    def is_administrator(self):
+        _, admin = self.get_roles()
+        return admin
+
+    @property
+    def is_member(self):
+        member, _ = self.get_roles()
+        return member
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        context['is_member'] = self.is_member
         context['is_administrator'] = self.is_administrator
         return context
