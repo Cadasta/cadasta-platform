@@ -1,11 +1,13 @@
 {% extends "party/party_detail.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Upload new resource for party" %} | {% endblock %}
 
-{% block extra_script %}  
+{% block extra_script %}
   {{ block.super }}
   {{ form.media }}
+  <script src="{% static 'js/form_submit_once.js' %}"></script>
 {% endblock %}
 
 {% block modals %}
