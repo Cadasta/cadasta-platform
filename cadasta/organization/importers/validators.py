@@ -1,9 +1,21 @@
+from functools import partial
+
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
+
 from party.models import TenureRelationshipType
 from spatial.choices import TYPE_CHOICES
 from xforms.utils import InvalidODKGeometryError, odk_geom_to_wkt
+
+
+def get_field_value(headers, row, header, field_name):
+    try:
+        return row[headers.index(header)]
+    except ValueError:
+        raise ValidationError(
+            _("No '{}' column found.".format(field_name))
+        )
 
 
 def validate_row(headers, row, config):
@@ -17,59 +29,40 @@ def validate_row(headers, row, config):
         raise ValidationError(
             _("Number of headers and columns do not match.")
         )
+
+    _get_field_value = partial(get_field_value, headers, row)
+
     if party_name_field and party_type_field:
-        try:
-            party_name = row[headers.index(party_name_field)]
-        except ValueError:
-            raise ValidationError(
-                _("No 'party_name' column found.")
-            )
-        try:
-            party_type = row[headers.index(party_type_field)]
-        except ValueError:
-            raise ValidationError(
-                _("No 'party_type' column found.")
-            )
+        party_name = _get_field_value(party_name_field, "party_name")
+        party_type = _get_field_value(party_type_field, "party_type")
+
     if geometry_field:
-        try:
-            coords = row[headers.index(geometry_field)]
-        except ValueError:
-            raise ValidationError(
-                _("No 'geometry_field' column found.")
-            )
-        try:
-            geometry = GEOSGeometry(coords)
-        except:
-            pass  # try ODK geom parser
-        if not geometry:
+        coords = _get_field_value(geometry_field, "geometry_field")
+        if coords == '':
+            geometry = None
+        else:
             try:
-                geometry = odk_geom_to_wkt(coords)
-            except InvalidODKGeometryError:
-                raise ValidationError(_("Invalid geometry."))
+                geometry = GEOSGeometry(coords)
+            except:
+                try:
+                    geometry = GEOSGeometry(odk_geom_to_wkt(coords))
+                except InvalidODKGeometryError:
+                    raise ValidationError(_("Invalid geometry."))
+
     if location_type_field:
-        try:
-            location_type = row[headers.index(location_type_field)]
-            type_choices = [choice[0] for choice in TYPE_CHOICES]
-            if location_type and location_type not in type_choices:
-                raise ValidationError(
-                    _("Invalid location_type: '%s'.") % location_type
-                )
-        except ValueError:
+        location_type = _get_field_value(location_type_field, "location_type")
+        type_choices = [choice[0] for choice in TYPE_CHOICES]
+        if location_type and location_type not in type_choices:
             raise ValidationError(
-                _("No 'location_type' column found.")
+                _("Invalid location_type: '%s'.") % location_type
             )
+
     if party_name_field and geometry_field:
-        try:
-            tenure_type = row[
-                headers.index(tenure_type_field)]
-            if tenure_type and not TenureRelationshipType.objects.filter(
-                    id=tenure_type).exists():
-                raise ValidationError(
-                    _("Invalid tenure_type: '%s'.") % tenure_type
-                )
-        except ValueError:
+        tenure_type = _get_field_value(tenure_type_field, 'tenure_type')
+        if tenure_type and not TenureRelationshipType.objects.filter(
+                id=tenure_type).exists():
             raise ValidationError(
-                _("No 'tenure_type' column found.")
+                _("Invalid tenure_type: '%s'.") % tenure_type
             )
 
     return (party_name, party_type, geometry, location_type, tenure_type)

@@ -170,6 +170,18 @@ class ImportValidatorTest(TestCase):
                 headers, row, config)
         assert e.value.message == "Invalid geometry."
 
+    def test_validate_empty_geometry(self):
+        config = {
+            'party_type_field': 'party_type',
+            'geometry_field': 'location_geometry',
+            'type': 'csv'
+        }
+        geometry = 'POLYGON EMPTY'
+        headers = ['party_type', 'location_geometry']
+        row = ['IN', geometry]
+        _, _, geo, _, _ = validators.validate_row(headers, row, config)
+        assert geo.empty is True
+
     def test_validate_location_type_choice(self):
         config = {
             'party_name_field': 'party_name',
