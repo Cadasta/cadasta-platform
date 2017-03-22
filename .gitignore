@@ -1,19 +1,28 @@
 # Vagrant
 .vagrant/
+*.box
 
 # Python
+.Python
 env/
 bin/
 build/
+dist/
 include/
 lib/
+lib64/
 local/
+parts/
+sdist/
+var/
+wheels/
 *.pyc
 .cache
 __pycache__/
 
 # Coverage
 .coverage
+.coverage.*
 htmlcov
 
 # JS
@@ -27,17 +36,21 @@ node_modules/
 .idea
 /.envrc
 /.virtualenv/
+.venv
+venv/
+ENV/
 
 functional_tests/screenshots
-ghostdriver.log
-npm-debug.log
-vagrant.retry
+*.log
+*.retry
 
 .sass-cache/
 .transifexrc
 
 .DS_Store
+*.swp
 /.tox/
+
 /cadasta_platform.egg-info/
 /pytest.txt
 
