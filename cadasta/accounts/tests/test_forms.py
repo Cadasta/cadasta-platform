@@ -438,7 +438,7 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
                 form.errors.get('password1'))
 
 
-class ResetPasswordFormTest(UserTestCase, TestCase):
+class ResetPasswordKeyFormTest(UserTestCase, TestCase):
     def test_valid_data(self):
         user = UserFactory.create(password='beatles4Lyfe!')
 
@@ -552,3 +552,24 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert (_("The password for this user can not be changed.") in
                 form.errors.get('password1'))
+
+
+class ResetPasswordFormTest(UserTestCase, TestCase):
+    def test_email_not_sent_reset(self):
+        data = {
+            'email': 'john@thebeatles.uk'
+        }
+
+        form = forms.ResetPasswordForm(data)
+        assert form.is_valid() is True
+
+    def test_email_sent_reset(self):
+        UserFactory.create(
+            password='beatles4Lyfe!', email='john@thebeatles.uk')
+
+        data = {
+            'email': 'john@thebeatles.uk'
+        }
+
+        form = forms.ResetPasswordForm(data)
+        assert form.is_valid() is True

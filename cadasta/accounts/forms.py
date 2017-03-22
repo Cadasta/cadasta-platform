@@ -138,3 +138,10 @@ class ChangePasswordForm(ChangePasswordMixin,
 class ResetPasswordKeyForm(ChangePasswordMixin,
                            allauth_forms.ResetPasswordKeyForm):
     pass
+
+
+class ResetPasswordForm(allauth_forms.ResetPasswordForm):
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        self.users = User.objects.filter(email=email)
+        return email

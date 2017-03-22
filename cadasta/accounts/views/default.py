@@ -12,29 +12,29 @@ from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 
 from ..models import User
-from ..forms import ProfileForm, ChangePasswordForm, ResetPasswordKeyForm
+from .. import forms
 
 
 class PasswordChangeView(LoginRequiredMixin,
                          SuperUserCheckMixin,
                          allauth_views.PasswordChangeView):
     success_url = reverse_lazy('account:profile')
-    form_class = ChangePasswordForm
+    form_class = forms.ChangePasswordForm
 
 
 class PasswordResetView(SuperUserCheckMixin,
                         allauth_views.PasswordResetView):
-    pass
+    form_class = forms.ResetPasswordForm
 
 
 class PasswordResetFromKeyView(SuperUserCheckMixin,
                                allauth_views.PasswordResetFromKeyView):
-    form_class = ResetPasswordKeyForm
+    form_class = forms.ResetPasswordKeyForm
 
 
 class AccountProfile(LoginRequiredMixin, UpdateView):
     model = User
-    form_class = ProfileForm
+    form_class = forms.ProfileForm
     template_name = 'accounts/profile.html'
     success_url = reverse_lazy('account:profile')
 
