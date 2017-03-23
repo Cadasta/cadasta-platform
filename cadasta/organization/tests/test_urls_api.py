@@ -145,7 +145,7 @@ class UserUrlsTest(TestCase):
 
     def test_user_detail(self):
         actual = reverse(version_ns('user:detail'),
-                        kwargs={'username': 'user-name'})
+                         kwargs={'username': 'user-name'})
 
         expected = version_url('/users/user-name/')
         assert actual == expected
