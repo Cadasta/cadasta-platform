@@ -5653,6 +5653,7 @@ textarea.form-control {
 
 .well {
   margin-bottom: 10px; }
+
 /* =Leaflet popups
 -------------------------------------------------------------- */
 .leaflet-container {
@@ -6070,6 +6071,9 @@ main.container-fluid {
       .content-single .detail ul.list-divider li:last-child {
         border-bottom: 0;
         padding-bottom: 6px; }
+      .content-single .detail ul.list-divider li.linked:hover {
+        cursor: pointer;
+        background-color: #f9fafe; }
     .content-single .detail .nav-tabs li > a {
       font-size: 13px;
       padding: 10px; }
@@ -6510,7 +6514,7 @@ h1 .label {
 
 /* =Map location details
 -------------------------------------------------------------- */
-.content-single .detail h2 span {
+.content-single h2 span {
   font-size: 14px;
   color: #a6a7a8;
   display: block;
