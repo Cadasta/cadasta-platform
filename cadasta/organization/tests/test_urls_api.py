@@ -136,16 +136,19 @@ class ProjectUrlTest(TestCase):
 
 class UserUrlsTest(TestCase):
     def test_user_list(self):
-        assert (reverse(version_ns('user:list')) ==
-                version_url('/users/'))
+        actual = reverse(version_ns('user:list'))
+        expected = version_url('/users/')
+        assert actual == expected
 
         resolved = resolve(version_url('/users/'))
         assert resolved.func.__name__ == api.UserAdminList.__name__
 
     def test_user_detail(self):
-        assert (reverse(version_ns('user:detail'),
-                        kwargs={'username': 'user-name'}) ==
-                version_url('/users/user-name/'))
+        actual = reverse(version_ns('user:detail'),
+                        kwargs={'username': 'user-name'})
+
+        expected = version_url('/users/user-name/')
+        assert actual == expected
 
         resolved = resolve(version_url('/users/user-name/'))
         assert resolved.func.__name__ == api.UserAdminDetail.__name__
