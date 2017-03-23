@@ -30,7 +30,7 @@ from ..models import SpatialUnit
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
 
-def assign_policies(user):
+def assign_policies(user, deny_edit_delete_permissions=False):
     clauses = {
         'clause': [
             {
@@ -50,6 +50,15 @@ def assign_policies(user):
             }
         ]
     }
+
+    if deny_edit_delete_permissions:
+        deny_clause = {
+                          'effect': 'deny',
+                          'object': ['spatial/*/*/*'],
+                          'action': ['spatial.update', 'spatial.delete']
+                       }
+        clauses['clause'].append(deny_clause)
+
     policy = Policy.objects.create(
         name='allow',
         body=json.dumps(clauses))
@@ -342,7 +351,7 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
                            ('Test field 2', 'Choice 2', ),
                            ('Test field 3', 'Choice 1, Choice 3', )),
             'is_allowed_add_location': True,
-            'is_allowed_update_location': True,
+            'is_allowed_edit_location': True,
             'is_allowed_delete_location': True,
         }
 
@@ -359,6 +368,15 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+
+    def test_does_not_show_buttons_when_no_edit_permissions(self):
+        user = UserFactory.create()
+        assign_policies(user, True)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        expected = self.render_content(is_allowed_edit_location=False,
+                                       is_allowed_delete_location=False)
+        assert response.content == expected
 
     def test_get_with_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
