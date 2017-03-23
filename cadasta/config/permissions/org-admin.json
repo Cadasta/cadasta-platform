@@ -14,7 +14,7 @@
       "effect": "allow",
       "action": ["project.*", "project.users.*", "questionnaire.*",
                  "resource.*", "spatial.*", "spatial_rel.*",
-                 "party.*", "party_rel.*", "tenure_rel.*"],
+                 "party.*", "party_rel.*", "tenure_rel.*", "pdfform.*"],
       "object": ["project/$organization/*"]
     },
 
@@ -42,6 +42,11 @@
       "effect": "allow",
       "action": ["tenure_rel.*", "tenure_rel.resources.*"],
       "object": ["tenure_rel/$organization/*/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["pdfform.*"],
+      "object": ["pdfform/$organization/*/*"]
     },
     {
       "effect": "allow",

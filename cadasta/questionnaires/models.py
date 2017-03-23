@@ -8,7 +8,6 @@ from django.utils.translation import get_language
 from django.contrib.postgres.fields import JSONField
 from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
-
 from . import managers, messages
 
 
@@ -202,3 +201,46 @@ class QuestionOption(MultilingualLabelsMixin, RandomIDModel):
         repr_string = ('<QuestionOption id={obj.id} name={obj.name}'
                        ' question={obj.question.id}>')
         return repr_string.format(obj=self)
+
+
+@permissioned_model
+class PDFForm(RandomIDModel):
+    name = models.CharField(max_length=100)
+    description = models.TextField(max_length=500, null=True, blank=True)
+    instructions = models.TextField(max_length=2500, null=True, blank=True)
+    last_updated = models.DateTimeField(auto_now=True)
+    file = S3FileField(upload_to='pdf-form-logos', null=True, blank=True)
+    project = models.ForeignKey('organization.Project',
+                                related_name='pdfforms')
+    contributor = models.ForeignKey('accounts.User')
+    questionnaire = models.ForeignKey(Questionnaire)
+
+    class Meta:
+        ordering = ('name',)
+
+    class TutelaryMeta:
+        perm_type = 'pdfform'
+        path_fields = ('project', 'pk')
+        actions = (
+            ('pdfform.add',
+             {'description': _("Add a pdf form to the project"),
+              'error_message': messages.QUESTIONNAIRE_PDF_FORM_ADD,
+              'permissions_object': 'project'}),
+            ('pdfform.edit',
+             {'description': _("Edit a pdf form"),
+              'error_message': messages.QUESTIONNAIRE_PDF_FORM_EDIT}),
+            ('pdfform.view',
+             {'description': _("View a pdf form"),
+              'error_message': messages.QUESTIONNAIRE_PDF_FORM_VIEW}),
+            ('pdfform.list',
+             {'description': _("List pdf forms"),
+              'error_message': messages.QUESTIONNAIRE_PDF_FORM_VIEW,
+              'permissions_object': 'project'}),
+            ('pdfform.delete',
+             {'description': _("Delete a pdf form"),
+              'error_message': messages.QUESTIONNAIRE_PDF_FORM_DELETE}),
+            ('pdfform.generate',
+             {'description': _("Generate a pdf form"),
+              'error_message': messages.QUESTIONNAIRE_PDF_FORM_GENERATE,
+              'permissions_object': 'project'}),
+        )

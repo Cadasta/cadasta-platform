@@ -1,0 +1,59 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Form detail:" %} {{ pdfform.name }} | {% endblock %}
+{% block left-nav %}forms{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Form detail" %}</h2>
+        <div class="top-btn pull-right">
+          <!-- Action buttons -->
+          {% if can_edit %}
+            <a class="btn btn-default btn-action btn-sm" href="{% url 'questionnaires:pdf_form_edit' object.organization.slug object.slug pdfform.id %}" title="{% trans 'Edit form' %}" aria-label="{% trans 'Edit form' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          {% endif %}
+          {% if can_delete %}
+            <a class="btn btn-default btn-action btn-sm" href="{% url 'questionnaires:pdf_form_delete' object.organization.slug object.slug pdfform.id %}" title="{% trans 'Delete form' %}" aria-label="{% trans 'Delete form' %}"><span class="glyphicon glyphicon-trash"></span></a>
+          {% endif %}    
+        </div>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <h2>
+            <span>{% trans "FORM" %}</span>
+            {{ pdfform.name }}
+          </h2>
+          <div class="row">
+          {% if pdfform.file.url is not None and pdfform.file.url != "" %}
+          <div class="col-md-2">
+            <img alt="Form Logo" src="{{ pdfform.file.url }}" class="thumb-128">
+          </div>
+          {% endif %}
+          <div class="col-md-10">
+            <p>{{ pdfform.description }}<br></p>
+            <p class="small">{% blocktrans with date=pdfform.last_updated user=pdfform.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+            <div id="instructions">
+              <strong>{% trans "Instructions" %}</strong><br>
+              <p>{{ pdfform.instructions }}</p>
+            </div>
+          </div>
+          </div>
+        </div>
+        {% if can_generate %}
+        <div class="panel-footer">
+          <form method="get" action="{% url 'questionnaires:pdf_form_download' object.organization.slug object.slug pdfform.id %}">
+          {% csrf_token %}
+           <button class="btn btn-primary" type="submit">{% trans "Generate PDF Form" %}</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

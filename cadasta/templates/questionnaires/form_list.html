@@ -1,0 +1,31 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Forms" %} | {% endblock %}
+{% block left-nav %}forms{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Forms" %}</h2>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="top-btn pull-right top-add">
+              <a class="btn btn-primary btn-sm" href="{% url 'questionnaires:pdf_form_add' project=object.slug organization=object.organization.slug %}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}</a>
+          </div>
+          {% include 'questionnaires/table.html' %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block form_modal %}
+{% endblock %}

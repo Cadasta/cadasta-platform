@@ -9,7 +9,7 @@
       "effect": "allow",
       "action": ["project.*", "project.users.*", "questionnaire.*",
                  "resource.*", "spatial.*", "spatial_rel.*",
-                 "party.*", "party_rel.*", "tenure_rel.*"],
+                 "party.*", "party_rel.*", "tenure_rel.*", "pdfform.*"],
       "object": ["project/$organization/$project"]
     },
     {
@@ -52,6 +52,11 @@
       "effect": "deny",
       "action": ["resource.unarchive"],
       "object": ["resource/$organization/$project/*"]
+    },
+    {
+      "effect": "allow",
+      "action": ["pdfform.*"],
+      "object": ["pdfform/$organization/$project"]
     }
   ]
 }
