@@ -26,7 +26,7 @@
 .page-title { // page title
   padding-top: 2px;
   padding-bottom: 24px;
-  clear: both;
+  @include clearfix;
   h1, h2 {
     text-transform: uppercase;
     display: inline-block;

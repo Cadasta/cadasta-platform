@@ -317,6 +317,7 @@ main.container-fluid {
   .page-title {
     padding-bottom: 0;
     padding-top: 0;
+    @include clearfix;
     .top-btn{
       margin-top: 0;
     }
@@ -970,10 +971,17 @@ h1 .label {
 /* =Map location details
 -------------------------------------------------------------- */
 
-.content-single .detail h2 span {
+.content-single h2 span {
   font-size: 14px;
   color: #a6a7a8;
   display: block;
   text-transform: uppercase;
   padding-bottom: 2px;
+  &.label {
+    display: inline-block;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: none;
+  }
 }
