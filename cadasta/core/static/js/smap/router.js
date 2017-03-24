@@ -39,19 +39,26 @@ var SimpleRouter = function(map){
     }
 
     var el = document.getElementById(rm.getRouteElement(route.el));
-    $.get(async_url, function(response){
-      if (response.includes("alert-warning")) {
-        window.location.hash = "/overview";
-        if ($('.alert-warning').length === 0) {
-          $('#messages').append(rm.permissionDenied());
-        }
-      } else if (response.includes("!DOCTYPE")) {
-        window.location = "/account/login/?next=" + window.location.pathname;
-      } else {
-        route.controller();
-        el.innerHTML = response;
-        if (route.eventHook) {
-          route.eventHook();
+    var geturl = $.ajax({
+      type: "GET",
+      url: async_url,
+      success: function (response, status, xhr) {
+        permission_error = geturl.getResponseHeader('Permission-Error');
+        anonymous_user = geturl.getResponseHeader('Anonymous-User');
+
+        if (permission_error) {
+          window.location.hash = "/overview";
+          if ($('.alert-warning').length === 0) {
+            $('#messages').append(rm.permissionDenied(permission_error));
+          }
+        } else if (anonymous_user) {
+          window.location = "/account/login/?next=" + window.location.pathname;
+        } else {
+          route.controller();
+          el.innerHTML = response;
+          if (route.eventHook) {
+            route.eventHook();
+          }
         }
       }
     });

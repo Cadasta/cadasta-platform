@@ -365,34 +365,39 @@ var RouterMixins = {
           return obj;
       }, {});
 
-      $.ajax({
+      var geturl = $.ajax({
         method: "POST",
         url: formaction,
-        data: data
+        data: data,
+        success: function(response, status, xhr) {
+          form_error = geturl.getResponseHeader('Form-Error');
+          if (form_error) {
+            form_type = state.el[form_type] || 'detail';
+            var el = document.getElementById(form_type);
+            el.innerHTML = response;
+
+            if (eventHook) {
+              eventHook();
+            }
+
+          } else {
+            if (window.location.hash === success_url) {
+              sr.router();
+            } else {
+              window.location.hash = success_url;
+              $('#overview-tab').removeClass('active');
+              $($('#overview-tab').children()[0]).attr({'aria-expanded':"false"});
+              $("#overview").removeClass('active');
+
+              $('#resource-tab').addClass('active');
+              $($('#resource-tab').children()[0]).attr({'aria-expanded':"true"});
+              $("#resource").addClass('active');
+            }
+          } 
+        }
       }).done(function(response) {
         // Is there a better way to tell if the form fails?
-        if (!response.includes('DOCTYPE')) {
-          form_type = state.el[form_type] || 'detail';
-          var el = document.getElementById(form_type);
-          el.innerHTML = response;
-          if (eventHook) {
-            eventHook();
-          }
-
-        } else {
-          if (window.location.hash === success_url) {
-            sr.router();
-          } else {
-            window.location.hash = success_url;
-            $('#overview-tab').removeClass('active');
-            $($('#overview-tab').children()[0]).attr({'aria-expanded':"false"});
-            $("#overview").removeClass('active');
-
-            $('#resource-tab').addClass('active');
-            $($('#resource-tab').children()[0]).attr({'aria-expanded':"true"});
-            $("#resource").addClass('active');
-          }
-        }
+        
       });
     });
   },
@@ -407,13 +412,11 @@ var RouterMixins = {
   /******************
   EXTRA HTML INSERTS
   ******************/
-  permissionDenied: function(){
+  permissionDenied: function(error){
     return "<div class='alert alert-dismissible alert-warning' role='alert'>" +
            "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
            "<span aria-hidden='true'>×</span>" +
-           "</button>" +
-           "You don't have permission to view this location." +
-           "</div>";
+           "</button>" + error + "</div>";
   },
 
   nonActivePopup: function(feature) {

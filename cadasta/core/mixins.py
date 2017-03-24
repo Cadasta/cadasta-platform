@@ -130,3 +130,12 @@ class SchemaSelectorMixin():
                 ContentType.objects.get(app_label=a, model=m)
             ] = v
         return content_type_to_selectors
+
+
+class FormErrorMixin():
+    def render_to_response(self, context, **kwargs):
+        render = super().render_to_response(context, **kwargs)
+        if (self.request.POST):
+            render['Form-Error'] = True
+
+        return render

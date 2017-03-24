@@ -2,7 +2,7 @@ from jsonattrs.mixins import JsonAttrsMixin
 from core.views import generic
 from django.core.urlresolvers import reverse
 import django.views.generic as base_generic
-from core.mixins import LoginPermissionRequiredMixin, update_permissions
+from core import mixins as core_mixins
 from organization.views import mixins as organization_mixins
 from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
@@ -11,7 +11,7 @@ from .. import forms
 from .. import messages as error_messages
 
 
-class PartyRelationshipDetail(LoginPermissionRequiredMixin,
+class PartyRelationshipDetail(core_mixins.LoginPermissionRequiredMixin,
                               JsonAttrsMixin,
                               mixins.PartyRelationshipObjectMixin,
                               organization_mixins.ProjectAdminCheckMixin,
@@ -24,13 +24,14 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
     attributes_field = 'attributes'
 
 
-class PartyRelationshipEdit(LoginPermissionRequiredMixin,
+class PartyRelationshipEdit(core_mixins.LoginPermissionRequiredMixin,
+                            core_mixins.FormErrorMixin,
                             mixins.PartyRelationshipObjectMixin,
                             organization_mixins.ProjectAdminCheckMixin,
                             generic.UpdateView):
     template_name = 'party/relationship_edit.html'
     form_class = forms.TenureRelationshipEditForm
-    permission_required = update_permissions('tenure_rel.update')
+    permission_required = core_mixins.update_permissions('tenure_rel.update')
     permission_denied_message = error_messages.TENURE_REL_UPDATE
 
     def get_context_data(self, *args, **kwargs):
@@ -60,12 +61,12 @@ class PartyRelationshipEdit(LoginPermissionRequiredMixin,
         return kwargs
 
 
-class PartyRelationshipDelete(LoginPermissionRequiredMixin,
+class PartyRelationshipDelete(core_mixins.LoginPermissionRequiredMixin,
                               mixins.PartyRelationshipObjectMixin,
                               organization_mixins.ProjectAdminCheckMixin,
                               generic.DeleteView):
     template_name = 'party/relationship_delete.html'
-    permission_required = update_permissions('tenure_rel.delete')
+    permission_required = core_mixins.update_permissions('tenure_rel.delete')
     permission_denied_message = error_messages.TENURE_REL_DELETE
 
     def get_context_data(self, *args, **kwargs):
@@ -86,13 +87,15 @@ class PartyRelationshipDelete(LoginPermissionRequiredMixin,
         return reverse('organization:project-dashboard', kwargs=self.kwargs)
 
 
-class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
+class PartyRelationshipResourceNew(core_mixins.LoginPermissionRequiredMixin,
+                                   core_mixins.FormErrorMixin,
                                    mixins.PartyRelationshipResourceMixin,
                                    organization_mixins.ProjectAdminCheckMixin,
                                    resource_mixins.HasUnattachedResourcesMixin,
                                    generic.CreateView):
     template_name = 'party/relationship_resources_new.html'
-    permission_required = update_permissions('tenure_rel.resources.add')
+    permission_required = core_mixins.update_permissions(
+                                    'tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
 
     def get_context_data(self, *args, **kwargs):
@@ -114,14 +117,15 @@ class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
         return context
 
 
-class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
+class PartyRelationshipResourceAdd(core_mixins.LoginPermissionRequiredMixin,
                                    mixins.PartyRelationshipResourceMixin,
                                    organization_mixins.ProjectAdminCheckMixin,
                                    base_generic.edit.FormMixin,
                                    generic.DetailView):
     template_name = 'party/relationship_resources_add.html'
     form_class = AddResourceFromLibraryForm
-    permission_required = update_permissions('tenure_rel.resources.add')
+    permission_required = core_mixins.update_permissions(
+                            'tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
 
     def get_context_data(self, *args, **kwargs):
