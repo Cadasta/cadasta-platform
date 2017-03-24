@@ -1,4 +1,6 @@
 from django.test import TestCase
+from core.tests.utils.cases import UserTestCase
+from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
 from . import factories
 
@@ -73,3 +75,15 @@ class QuestionOptionTest(TestCase):
                                                  question=question)
         assert repr(option) == ('<QuestionOption id=abc123 name=Option '
                                 'question=abc123>')
+
+
+class PDFFormTest(UserTestCase, TestCase):
+    def test_str(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+        pdfform = factories.PDFFormFactory.create(id='abc123',
+                                                  project=project,
+                                                  contributor=user)
+        assert pdfform.name is not None
+        assert pdfform.id == 'abc123'
+        assert pdfform.file.url == '/media/s3/uploads/pdf-form-logos/image.jpg'

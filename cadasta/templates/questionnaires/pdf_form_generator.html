@@ -1,0 +1,207 @@
+{% load i18n %}
+{% load staticfiles %}
+{% load sass_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
+<body>
+{% block content %}
+<style>
+  .custom-options input[type=checkbox]{
+    margin-left: 5px;
+    margin-right: 10px;
+    margin-bottom: 5px;
+  }
+
+  input:before{content:attr(value)}
+  select:before{content:attr(value)}
+  input[type=checkbox] {
+    background-clip: content-box;
+    border: 1px solid;
+    border-radius: 10px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+  }
+
+  input[type=checkbox][checked] {
+    background-color: red;
+  }
+
+   .pdf_form_fields {
+        page-break-inside: avoid;
+    }
+</style>
+<div class="col-md-8">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-8">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div>
+            <h3>Questionnaire Title : {{ questionnaire.title }}</h3>
+          </div>
+          <div class="col-md-8">
+              <div class="col-md-8">
+                  {% if pdfform.file.url is not None and pdfform.file.url != "" %}
+                    <img alt="Form Logo" src="{{ pdfform.file.url }}" class="thumb-128">
+                  {% endif %}
+              </div>
+              <div class="col-md-2">
+                  <p>
+                    <strong>{% trans "Name" %}</strong> : <br>
+                    {{ pdfform.name }}
+                  </p>
+                  <p>
+                      <strong>{% trans "Description" %}</strong> : <br>
+                      {{ pdfform.description }}
+                  </p>
+                  <p class="small">{% blocktrans with date=pdfform.last_updated user=pdfform.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+                  <div id="instructions">
+                      <strong>{% trans "Instructions" %}</strong><br>
+                      <p>{{ pdfform.instructions }}</p>
+                  </div>
+              </div>
+          </div>
+          <div id="available_questions">
+              <div id="questions">
+                  <h3><strong>{% trans "Questions" %}</strong><br></h3>
+              </div>
+              {% include 'questionnaires/fields/geo_point.html' %}
+              {% for question in questions_list %}
+                {% if "title" != question.name and "instanceID" != question.name %}
+                  {% if "IN" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "DE" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "TX" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "S1" == question.type %}
+                    {% include 'questionnaires/fields/select_one.html' %}
+                  {% endif %}
+                  {% if "SM" == question.type %}
+                    {% include 'questionnaires/fields/select_apply_all.html' %}
+                  {% endif %}
+                  {% if "NO" == question.type %}
+                    {% include 'questionnaires/fields/textarea.html' %}
+                  {% endif %}
+                  {% if "DA" == question.type %}
+                    {% include 'questionnaires/fields/date_input.html' %}
+                  {% endif %}
+                  {% if "TI" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "DT" == question.type %}
+                    {% include 'questionnaires/fields/date_input.html' %}
+                  {% endif %}
+                  {% if "CA" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "AC" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "PH" == question.type %}
+                    {% include 'questionnaires/fields/photo.html' %}
+                  {% endif %}
+                  {% if "AU" == question.type %}
+                    {% include 'questionnaires/fields/audio.html' %}
+                  {% endif %}
+                  {% if "VI" == question.type %}
+                    {% include 'questionnaires/fields/video.html' %}
+                  {% endif %}
+                  {% if "BC" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "SI" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "SS" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                  {% if "PN" == question.type %}
+                    {% include 'questionnaires/fields/input.html' %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {% for question_group in question_groups_list %}
+                {% if "meta" != question_group.name %}
+                    <div class="panel-body">
+                      <div>
+                         <h5><strong><i>Question Group : {% if question_group.label_xlat.en %} {{question_group.label_xlat.en}}
+                                                                {% else %}{{ question_group.name}}{% endif %}</i></strong></h5>
+                      </div>
+                      {% for question in question_group.questions.all %}
+                        {% if "title" != question.name and "instanceID" != question.name %}
+                          {% if "IN" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "DE" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "TX" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "S1" == question.type %}
+                            {% include 'questionnaires/fields/select_one.html' %}
+                          {% endif %}
+                          {% if "SM" == question.type %}
+                            {% include 'questionnaires/fields/select_apply_all.html' %}
+                          {% endif %}
+                          {% if "NO" == question.type %}
+                            {% include 'questionnaires/fields/textarea.html' %}
+                          {% endif %}
+                          {% if "DA" == question.type %}
+                            {% include 'questionnaires/fields/date_input.html' %}
+                          {% endif %}
+                          {% if "TI" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "DT" == question.type %}
+                            {% include 'questionnaires/fields/date_input.html' %}
+                          {% endif %}
+                          {% if "CA" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "AC" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "PH" == question.type %}
+                            {% include 'questionnaires/fields/photo.html' %}
+                          {% endif %}
+                          {% if "AU" == question.type %}
+                            {% include 'questionnaires/fields/audio.html' %}
+                          {% endif %}
+                          {% if "VI" == question.type %}
+                            {% include 'questionnaires/fields/video.html' %}
+                          {% endif %}
+                          {% if "BC" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "SI" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "SS" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                          {% if "PN" == question.type %}
+                            {% include 'questionnaires/fields/input.html' %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+</body>
+</html>

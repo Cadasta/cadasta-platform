@@ -1,7 +1,6 @@
 from django.utils.translation import ugettext as _
 from .models import Question
 
-
 QUESTIONNAIRE_SCHEMA = {
     'title': {'type': 'string', 'required': True},
     'id_string': {'type': 'string', 'required': True},
