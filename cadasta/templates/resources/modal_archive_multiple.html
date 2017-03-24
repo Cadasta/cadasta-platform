@@ -1,0 +1,31 @@
+{% load i18n %}
+
+<div class="modal fade" id="delete_multiple_resource_confirm" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Delete selected resources" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% blocktrans %}
+          Are you sure you want to delete selected resources?
+          Once deleted, resources can only be restored by a system administrator.
+          Deleting will also detach the resource from everything it is attached to.
+          {% endblocktrans %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a href="" class="btn btn-danger archive-final pull-right" id="confirm_multiple_delete" role="button">
+          {% trans "Yes, delete resources" %}
+        </a>
+        <button type="button" class="btn btn-link cancel" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

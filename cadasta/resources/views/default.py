@@ -145,6 +145,15 @@ class ResourceArchive(LoginPermissionRequiredMixin,
             return reverse('resources:project_list', kwargs=kwargs)
 
 
+class MultipleResourceArchive(LoginPermissionRequiredMixin,
+                      ArchiveMixin,
+                      mixins.ResourceObjectMixin,
+                      generic.UpdateView):
+    do_archive = True
+    permission_required = update_permissions('resource.archive')
+    permission_denied_message = error_messages.RESOURCE_ARCHIVE
+
+
 class ResourceUnarchive(LoginPermissionRequiredMixin,
                         ArchiveMixin,
                         mixins.ResourceObjectMixin,

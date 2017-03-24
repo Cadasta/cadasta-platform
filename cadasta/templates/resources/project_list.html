@@ -17,6 +17,7 @@
         <div class="panel-body">
           {% if is_allowed_add_resource %}
           <div class="top-btn pull-right top-add">
+            <a style="display: none;" class="btn btn-default btn-action btn-sm" id="delete_multiple_resources" href="#delete_multiple_resource_confirm" data-toggle="modal" title="{% trans 'Delete selected resources' %}" aria-label="{% trans 'Delete selected resource' %}"><span class="glyphicon glyphicon-trash"></span></a>
             {% if has_unattached_resources %}
             <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_existing' project=object.slug organization=object.organization.slug %}">
             {% else %}
@@ -35,5 +36,6 @@
 {% endblock %}
 
 {% block form_modal %}
-{% include 'resources/modal_unarchive.html' with unarchive_url="#" %}
+{% include 'resources/modal_archive_multiple.html' %}
+{% include 'resources/modal_unarchive.html' %}
 {% endblock %}
