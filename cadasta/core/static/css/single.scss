@@ -543,10 +543,23 @@
   }
 }
 
+@media (max-width: $screen-md-min) {
+  .content-single.detail-hidden {
+    .detail {
+      top: 500px;
+      left: 0px;
+      transition: all 0.5s ease-in-out;
+      padding: 10px;
+      height: 0px;
+    }
+  }
+}
+
 
 .content-single {
   .detail {
     left: 0px;
+    top: 0px;
     h2 {
       span {
         font-size: 11px;

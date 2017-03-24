@@ -67,6 +67,13 @@ class AccountLogin(LoginView):
 
         return super().form_valid(form)
 
+    def render_to_response(self, context, **kwargs):
+        render = super().render_to_response(context, **kwargs)
+        if ('next' in self.request.GET):
+            render['Anonymous-User'] = True
+
+        return render
+
 
 class ConfirmEmail(ConfirmEmailView):
     def post(self, *args, **kwargs):

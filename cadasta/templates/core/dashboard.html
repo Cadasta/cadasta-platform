@@ -37,6 +37,53 @@
       }
     });
     geoJson.addTo(features);
+
+    function geoLocate() {
+      return function(event) {
+        map.locate({ setView: true });
+      };
+    };
+
+    function add_map_controls() {
+      map.removeControl(map.zoomControl);
+      map.addControl(L.control.zoom({
+        zoomInTitle: gettext("Zoom in"),
+        zoomOutTitle: gettext("Zoom out")
+      }));
+
+      var geocoder = L.control.geocoder('search-QctWfva', {
+        markers: false
+      }).addTo(map);
+
+      geocoder.on('click', function (e) {
+        map.setZoomAround(e.latlng, 9);
+      });
+
+      var Geolocate = L.Control.extend({
+        options: {
+          position: 'topleft'
+        },
+
+        onAdd: function() {
+          var controlDiv = L.DomUtil.create(
+            'div', 'leaflet-bar leaflet-control leaflet-control-geolocate'
+          );
+          controlDiv.title = gettext('Go to my location');
+          L.DomEvent
+           .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+           .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+           .addListener(controlDiv, 'click', geoLocate(map));
+
+          L.DomUtil.create('span', 'glyphicon glyphicon-map-marker', controlDiv);
+
+          return controlDiv;
+        }
+      });
+
+      map.addControl(new Geolocate());
+    }
+
+    add_map_controls();
   }
 
   function add_tile_layers() {

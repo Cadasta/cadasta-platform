@@ -11,8 +11,8 @@
   <tbody>
   {% for resource in resource_list %}
     {% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id as resource_url %}
-    <tr class="linked" onclick="window.document.location='{{ resource_url }}';">
-      <td>
+    <tr class="linked">
+      <td onclick="window.document.location='{{ resource_url }}';">
         <div class="resource-60">
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
@@ -24,11 +24,19 @@
         </div>
       </td>
       <td>
-        <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}">
-          {% csrf_token %}
+      {% if submit_url %}
+        <form method="POST" class="detach-form">
+        {% csrf_token %}
+          <button type="submit" class="btn btn-danger btn-sm pull-right submit-btn" role="button" formaction="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
+          </button>
+      {% else %}
+        <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}" id="detail-form">
+        {% csrf_token %}
           <button type="submit" class="btn btn-danger btn-sm pull-right" role="button">
             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
           </button>
+      {% endif %}
         </form>
       </td>
     </tr>

@@ -1,5 +1,3 @@
-// var map = L.map('mapid');
-
 var SMap = function(map) {
   var layerscontrol = L.control.layers().addTo(map);
 
@@ -37,6 +35,7 @@ var SMap = function(map) {
 
   add_tile_layers();
   map.addLayer(geojsonTileLayer);
+  rm.setGeoJsonLayer(geojsonTileLayer);
 
   function load_project_extent() {
     if (options.projectExtent) {
@@ -110,6 +109,12 @@ var SMap = function(map) {
   }
 
   function add_map_controls() {
+    map.removeControl(map.zoomControl);
+    map.addControl(L.control.zoom({
+      zoomInTitle: gettext("Zoom in"),
+      zoomOutTitle: gettext("Zoom out")
+    }));
+
     var geocoder = L.control.geocoder('search-QctWfva', {
       markers: false
     }).addTo(map);
@@ -142,7 +147,6 @@ var SMap = function(map) {
     return map;
   }
 
-  return {
-    add_map_controls: add_map_controls,
-  };
+  add_map_controls();
+
 };
