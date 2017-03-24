@@ -3,11 +3,13 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
+from django.core.mail import send_mail
 from allauth.account import forms as allauth_forms
 
 from .models import User, now_plus_48_hours
 from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
+from django.template.loader import render_to_string
 
 
 @parsleyfy
@@ -127,6 +129,23 @@ class ChangePasswordMixin:
                 _("The password is too similar to the username."))
 
         return password
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        msg_subject = render_to_string(
+                'accounts/email/password_changed_subject.txt'
+            )
+        msg_subject = msg_subject.replace(u'\n', u'')
+        msg_body = render_to_string(
+                'accounts/email/password_changed_message.txt'
+            )
+        send_mail(
+            msg_subject,
+            msg_body,
+            settings.DEFAULT_FROM_EMAIL,
+            [self.user.email],
+            fail_silently=False,
+        )
 
 
 class ChangePasswordForm(ChangePasswordMixin,
