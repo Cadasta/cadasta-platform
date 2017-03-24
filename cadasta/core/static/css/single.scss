@@ -550,3 +550,14 @@
     }
   }
 }
+
+/* Clearing Search box text
+---------------------------------------------------------------- */
+
+  .clearable.x { 
+    background: url('/static/img/cross.png') no-repeat right 10px center;
+    background-color: white; 
+  }
+  .clearable.on_x { 
+     cursor: pointer; 
+  }

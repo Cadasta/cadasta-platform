@@ -5,6 +5,10 @@
 {% block page_title %}{% trans "Search" %} | {% endblock %}
 {% block left-nav %}search{% endblock %}
 
+{% block extra_script %}
+ <script src="{% static 'js/search_clear.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 
 <div class="col-md-12 content-single">
@@ -20,7 +24,7 @@
             <form action="#" id="search-form" class="inline" data-search-async-url="{% url 'async:search:search' object.organization.slug object.slug %}">
               <div class="form-group col-md-9">
                 <label class="control-label sr-only">{% trans "Search within project for" %}</label>
-                <input type="search" id="search-input" class="form-control input-lg pull-left" value="{{ search_query }}">
+                <input type="search" id="search-input" class="clearable form-control input-lg pull-left" value="{{ search_query }}">
                 <button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                 <p class="small help-block">
                   {% blocktrans %}
