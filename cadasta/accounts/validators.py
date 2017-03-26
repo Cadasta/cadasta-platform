@@ -2,7 +2,6 @@ import string
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
-
 DEFAULT_CHARACTER_TYPES = [
     string.ascii_lowercase,
     string.ascii_uppercase,
@@ -12,11 +11,13 @@ DEFAULT_CHARACTER_TYPES = [
 
 ACCEPTED_TYPES = ['image/jpg', 'image/jpeg', 'image/gif']
 
+
 def validate_file_type(type):
     if type not in ACCEPTED_TYPES:
         raise ValidationError(
             _("Files of type {mime} are not accepted.").format(mime=type)
         )
+
 
 class CharacterTypePasswordValidator(object):
     def __init__(self, character_types=DEFAULT_CHARACTER_TYPES,
@@ -53,4 +54,5 @@ class EmailSimilarityValidator(object):
         email = user.email.split('@')
         if len(email[0]) and email[0].casefold() in password.casefold():
             raise ValidationError(
-                _("Passwords cannot contain your email."))
+                _("Passwords cannot contain your email.")
+            )

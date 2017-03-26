@@ -70,7 +70,7 @@ class ProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'full_name','file']
+        fields = ['username', 'email', 'full_name', 'file']
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False

@@ -9,11 +9,11 @@ import django.contrib.auth.base_user as auth_base
 from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
 
-from resources.utils import io,thumbnail
+from resources.utils import io, thumbnail
 from buckets.fields import S3FileField
 from simple_history.models import HistoricalRecords
 from .manager import UserManager
-from .validators import ACCEPTED_TYPES, validate_file_type
+from .validators import ACCEPTED_TYPES
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -26,6 +26,7 @@ def abstract_user_field(name):
     for f in auth.AbstractUser._meta.fields:
         if f.name == name:
             return f
+
 
 def create_thumbnails(instance, created):
     if created or instance._original_url != instance.file.url:
@@ -60,7 +61,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     verify_email_by = models.DateTimeField(default=now_plus_48_hours)
     change_pw = models.BooleanField(default=True)
-    file = S3FileField(blank = True, upload_to = 'users', accepted_types= ACCEPTED_TYPES)
+    file = S3FileField(blank=True, upload_to='users',
+                       accepted_types=ACCEPTED_TYPES)
 
     objects = UserManager()
 
@@ -137,6 +139,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     def save(self, *args, **kwargs):
         create_thumbnails(self, (not self.id))
         super().save(*args, **kwargs)
+
 
 @receiver(models.signals.post_save, sender=User)
 def assign_default_policy(sender, instance, **kwargs):
