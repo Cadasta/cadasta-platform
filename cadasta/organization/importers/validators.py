@@ -43,7 +43,7 @@ def validate_row(headers, row, config):
         else:
             try:
                 geometry = GEOSGeometry(coords)
-            except:
+            except ValueError:
                 try:
                     geometry = GEOSGeometry(odk_geom_to_wkt(coords))
                 except InvalidODKGeometryError:

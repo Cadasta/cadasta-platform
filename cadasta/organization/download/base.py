@@ -17,15 +17,10 @@ class Exporter(SchemaSelectorMixin):
     def get_values(self, item, model_attrs, schema_attrs):
         values = OrderedDict()
         for attr in model_attrs:
-            if '.' in attr:
-                attr_items = attr.split('.')
-                value = None
-                for a in attr_items:
-                    value = (getattr(item, a)
-                             if not value else getattr(value, a))
-                values[attr] = value
-            else:
-                values[attr] = getattr(item, attr)
+            value = item
+            for a in attr.split('.'):
+                value = getattr(value, a, None)
+            values[attr] = value
 
         content_type = ContentType.objects.get_for_model(item)
         conditional_selector = self.get_conditional_selector(content_type)
