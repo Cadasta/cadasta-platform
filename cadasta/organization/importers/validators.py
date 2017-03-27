@@ -1,6 +1,6 @@
 from functools import partial
 
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, GEOSException
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
@@ -43,7 +43,7 @@ def validate_row(headers, row, config):
         else:
             try:
                 geometry = GEOSGeometry(coords)
-            except ValueError:
+            except (ValueError, GEOSException):
                 try:
                     geometry = GEOSGeometry(odk_geom_to_wkt(coords))
                 except InvalidODKGeometryError:
