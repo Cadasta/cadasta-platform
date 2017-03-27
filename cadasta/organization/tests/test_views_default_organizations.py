@@ -64,6 +64,28 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             'is_superuser': False,
         }
 
+    def test_should_only_active_projects_added_at_org_index(self):
+        for org in self.all_orgs:
+
+            num_all_projects = 0
+            num_archived_projects = 0
+            projs = ProjectFactory.create_batch(2, organization=org)
+            private_proj = ProjectFactory.create(
+                organization=org, access='private')
+            all_projects = projs + [private_proj]
+
+            for project in all_projects:
+                num_all_projects += 1
+
+            for project in all_projects:
+                if project.archived:
+                    num_archived_projects += 1
+            for project in all_projects:
+                if not project.archived:
+                    org.num_projects += 1
+
+            assert org.num_projects == (num_all_projects-num_archived_projects)
+
     def test_get_with_user(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
