@@ -489,15 +489,19 @@ class DownloadForm(forms.Form):
             path, mime = e.make_download(file_name + '-res')
         elif type == 'all':
             res_exporter = ResourceExporter(self.project)
+            xls_exporter = XLSExporter(self.project)
             shp_exporter = ShapeExporter(self.project)
-            res_path, _ = res_exporter.make_download(file_name + '-res')
-            path, mime = shp_exporter.make_download(file_name + '-shp')
-
+            path, mime = res_exporter.make_download(file_name + '-res')
+            data_path, _ = xls_exporter.make_download(file_name + '-xls')
+            shp_path, _ = shp_exporter.make_download(file_name + '-shp')
+            duplicates = ['locations.csv', 'parties.csv', 'relationships.csv.']
             with ZipFile(path, 'a') as myzip:
-                with ZipFile(res_path, 'r') as res_zip:
-                    for name in res_zip.namelist():
-                        myzip.writestr(name, res_zip.read(name))
-                    res_zip.close()
+                myzip.write(data_path, arcname='data.xlsx')
+                with ZipFile(shp_path, 'r') as shp_zip:
+                    for name in shp_zip.namelist():
+                        if name not in duplicates:
+                            myzip.writestr(name, shp_zip.read(name))
+                    shp_zip.close()
                 myzip.close()
 
         return path, mime
