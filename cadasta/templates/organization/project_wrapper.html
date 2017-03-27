@@ -175,9 +175,6 @@ window.addEventListener('load', function() {
 	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
-    if(window.location.href.indexOf("?q=") > -1) {
-	   $('.content-single').animate({ scrollTop: 0 }, 'fast');
-    }
     if (!$('#sidebar').hasClass('search')) {
       if ($('#sidebar-search-box').hasClass('disabled')) {
         $('#sidebar-search-box').removeClass('disabled');
