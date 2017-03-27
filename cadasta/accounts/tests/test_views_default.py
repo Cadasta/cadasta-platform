@@ -144,6 +144,27 @@ class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
         self.email_address.refresh_from_db()
         assert self.email_address.verified is True
 
+    def test_activate_changed_email(self):
+        self.email_address.email = 'john2@example.com'
+        self.email_address.save()
+
+        EmailConfirmation.objects.create(
+            email_address=self.email_address,
+            sent=datetime.datetime.now(),
+            key='456'
+        )
+        response = self.request(user=self.user, url_kwargs={'key': '456'})
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.email_verified is True
+        assert self.user.is_active is True
+        assert self.user.email == 'john2@example.com'
+
+        self.email_address.refresh_from_db()
+        assert self.email_address.verified is True
+
     def test_activate_with_invalid_token(self):
         response = self.request(user=self.user, url_kwargs={'key': 'abc'})
         assert response.status_code == 200

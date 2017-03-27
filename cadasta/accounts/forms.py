@@ -5,7 +5,8 @@ from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
-from .models import User, now_plus_48_hours
+from .utils import send_email_update_notification
+from .models import User
 from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
 
@@ -71,6 +72,7 @@ class ProfileForm(forms.ModelForm):
         self._send_confirmation = False
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        self.current_email = self.instance.email
 
     def clean_username(self):
         username = self.data.get('username')
@@ -84,8 +86,6 @@ class ProfileForm(forms.ModelForm):
     def clean_email(self):
         email = self.data.get('email')
         if self.instance.email != email:
-            self._send_confirmation = True
-
             if User.objects.filter(email=email).exists():
                 raise forms.ValidationError(
                     _("Another user with this email already exists"))
@@ -98,11 +98,10 @@ class ProfileForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)
-        if self._send_confirmation:
+        if self.current_email != user.email:
             send_email_confirmation(self.request, user)
-            self._send_confirmation = False
-            user.email_verified = False
-            user.verify_email_by = now_plus_48_hours()
+            send_email_update_notification(self.current_email)
+            user.email = self.current_email
 
         user.save()
         return user

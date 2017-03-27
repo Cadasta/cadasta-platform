@@ -26,9 +26,9 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         data = {'email': 'boss@beatles.uk', 'username': 'imagine71'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
-        assert len(mail.outbox) == 1
-        self.user.refresh_from_db()
-        assert self.user.email_verified is False
+        assert len(mail.outbox) == 2
+        assert 'boss@beatles.uk' in mail.outbox[0].to
+        assert 'john@beatles.uk' in mail.outbox[1].to
 
     def test_keep_email_address(self):
         """Service should not send a verification email when the user does not

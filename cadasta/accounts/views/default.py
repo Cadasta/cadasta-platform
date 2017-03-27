@@ -73,6 +73,7 @@ class ConfirmEmail(ConfirmEmailView):
         response = super().post(*args, **kwargs)
 
         user = self.get_object().email_address.user
+        user.email = self.get_object().email_address.email
         user.email_verified = True
         user.is_active = True
         user.save()
