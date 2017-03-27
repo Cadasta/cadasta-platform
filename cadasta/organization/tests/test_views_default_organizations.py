@@ -67,13 +67,17 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
     def test_should_only_active_projects_added_at_org_index(self):
         for org in self.all_orgs:
 
+            #initialize
             num_all_projects = 0
             num_archived_projects = 0
+
+            #retrive all the project
             projs = ProjectFactory.create_batch(2, organization=org)
             private_proj = ProjectFactory.create(
                 organization=org, access='private')
             all_projects = projs + [private_proj]
 
+            #counting
             for project in all_projects:
                 num_all_projects += 1
 

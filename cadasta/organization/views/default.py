@@ -38,7 +38,12 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
 
     # This queryset annotation is needed to avoid generating a query for each
     # organization in order to count the number of projects per org that not archived
-    queryset = Organization.objects.annotate(num_projects=Sum(Case(When(projects__archived=0,then=1),default=0,output_field=IntegerField())))
+    queryset = Organization.objects.annotate(num_projects=Sum(Case(When(projects__archived=0,then=1),
+                                                                   default=0,
+                                                                   output_field=IntegerField()
+                                                                   )
+                                                              )
+                                             )
 
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
