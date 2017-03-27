@@ -176,7 +176,7 @@ window.addEventListener('load', function() {
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
     if(window.location.href.indexOf("?q=") > -1) {
-	    $('html, body').animate({ scrollTop: 0 }, 'fast');
+	   $('.content-single').animate({ scrollTop: 0 }, 'fast');
     }
     if (!$('#sidebar').hasClass('search')) {
       if ($('#sidebar-search-box').hasClass('disabled')) {
