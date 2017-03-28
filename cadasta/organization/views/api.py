@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework import generics, filters, status
 from tutelary.mixins import APIPermissionRequiredMixin, PermissionsFilterMixin
+from tutelary.models import check_perms
 from core.mixins import update_permissions
 
 from accounts.models import User
@@ -70,6 +71,13 @@ class OrganizationDetail(APIPermissionRequiredMixin,
         'PUT': patch_actions
     }
 
+    def get_serializer(self, *args, **kwargs):
+        if not check_perms(self.request.user,
+                           ['org.users.list'],
+                           [self.get_object(), ]):
+            kwargs['hide_detail'] = True
+        return super().get_serializer(*args, **kwargs)
+
 
 class OrganizationUsers(APIPermissionRequiredMixin,
                         mixins.OrganizationRoles,
@@ -132,7 +140,7 @@ class UserAdminDetail(APIPermissionRequiredMixin,
 
 class OrganizationProjectList(PermissionsFilterMixin,
                               APIPermissionRequiredMixin,
-                              mixins.OrgAdminCheckMixin,
+                              mixins.OrgRoleCheckMixin,
                               mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
     org_lookup = 'organization'
@@ -241,6 +249,13 @@ class ProjectDetail(APIPermissionRequiredMixin,
     def get_queryset(self):
         return self.get_organization(
             lookup_kwarg='organization').projects.all()
+
+    def get_serializer(self, *args, **kwargs):
+        if not check_perms(self.request.user,
+                           ['project.users.list'],
+                           self.get_perms_objects()):
+            kwargs['hide_detail'] = True
+        return super().get_serializer(*args, **kwargs)
 
 
 class ProjectUsers(APIPermissionRequiredMixin,

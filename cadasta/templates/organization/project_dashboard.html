@@ -36,7 +36,7 @@
 
     renderFeatures(map,
                    '{% url "async:spatial:list" project.organization.slug project.slug %}',
-                   {projectExtent: projectExtent, trans: trans, fitBounds: 'locations'});
+                   {projectExtent: projectExtent, trans: trans, fitBounds: 'project'});
 
     var orgSlug = '{{ project.organization.slug }}';
     var projectSlug = '{{ project.slug }}';

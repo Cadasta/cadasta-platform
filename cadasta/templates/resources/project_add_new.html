@@ -1,11 +1,13 @@
 {% extends "resources/project_list.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Upload new resource for project" %} | {% endblock %}
 
 {% block extra_script %}
   {{ block.super }}
   {{ form.media }}
+  <script src="{% static 'js/form_submit_once.js' %}"></script>
 {% endblock %}
 
 {% block modals %}

@@ -81,8 +81,6 @@ urlpatterns = [
                 namespace='account')),
     url(r'^account/',
         include('allauth.urls')),
-    url('^',
-        include('django.contrib.auth.urls')),
     url(r'^organizations/',
         include('organization.urls.default.organizations',
                 namespace='organization')),

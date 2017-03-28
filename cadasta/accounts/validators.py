@@ -2,6 +2,8 @@ import string
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
+from .models import User
+
 DEFAULT_CHARACTER_TYPES = [
     string.ascii_lowercase,
     string.ascii_uppercase,
@@ -54,5 +56,15 @@ class EmailSimilarityValidator(object):
         email = user.email.split('@')
         if len(email[0]) and email[0].casefold() in password.casefold():
             raise ValidationError(
-                _("Passwords cannot contain your email.")
-            )
+                _("Passwords cannot contain your email."))
+
+
+def check_username_case_insensitive(username):
+    usernames = [
+        u.casefold() for u in
+        User.objects.values_list('username', flat=True)
+    ]
+    if username.casefold() in usernames:
+        raise ValidationError(
+            _("A user with that username already exists")
+        )

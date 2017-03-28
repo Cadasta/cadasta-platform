@@ -45,7 +45,7 @@
       {% csrf_token %}
 
       <div class="form-group{% if form.login.errors %} has-error{% endif %}">
-        <label class="control-label" for="id_login">{% trans "Username" %}</label>
+        <label class="control-label" for="id_login">{% trans "Username or email address" %}</label>
         {% render_field form.login class+="form-control input-lg" placeholder="" data-parsley-required="true" %}
         <div class="error-block">{{ form.login.errors }}</div>
       </div>

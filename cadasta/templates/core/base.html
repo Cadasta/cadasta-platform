@@ -201,10 +201,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/parsleyConfig.js' %}"></script>
-    <script src="{% static 'js/parsley.js' %}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
+    <script src="{% static 'js/parsleyConfig.js' %}"></script>
+    <script src="{% static 'js/parsley.js' %}"></script>
+
     {% block extra_script %}{% endblock %}
     <script>
     $(document).ready(function () {
