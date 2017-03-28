@@ -162,7 +162,12 @@ class Search(APIPermissionRequiredMixin, ProjectMixin, APIView):
                 id = source.get(model_map['id_field_name'])
                 if id:
                     try:
-                        return model_map['model'].objects.get(id=id)
+                        m_map = model_map['model']
+                        if m_map == Resource:
+                            if not m_map.objects.get(id=id).archived:
+                                return m_map.objects.get(id=id)
+                        else:
+                            return m_map.objects.get(id=id)
                     except ObjectDoesNotExist:
                         pass
         return None
