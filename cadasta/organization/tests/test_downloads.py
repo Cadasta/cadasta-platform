@@ -110,8 +110,7 @@ class BaseExporterTest(UserTestCase, TestCase):
                                                     'key_2': ['choice_1',
                                                               'choice_2']})
         model_attrs = ('id', 'party_id', 'spatial_unit_id',
-                       'tenure_type.label', 'missing_attr',
-                       'spatial_unit_id.missing_nested')
+                       'tenure_type.label')
         schema_attrs = exporter.get_schema_attrs(content_type)
         values = exporter.get_values(item, model_attrs, schema_attrs)
         assert values == {
@@ -119,8 +118,21 @@ class BaseExporterTest(UserTestCase, TestCase):
             'spatial_unit_id': item.spatial_unit_id,
             'tenure_type.label': 'Leasehold',
             'key': 'text', 'key_2': 'choice_1, choice_2',
-            'missing_attr': None, 'spatial_unit_id.missing_nested': None
         }
+
+
+    def test_get_values_null_geom(self):
+        project = ProjectFactory.create(current_questionnaire='123abc')
+        exporter = Exporter(project)
+        item = SpatialUnitFactory.create(
+            project=project,
+            geometry=None)
+        content_type = ContentType.objects.get(app_label='spatial',
+                                               model='spatialunit')
+        model_attrs = ('id', 'geometry.wkt')
+        schema_attrs = exporter.get_schema_attrs(content_type)
+        values = exporter.get_values(item, model_attrs, schema_attrs)
+        assert values == {'id': item.id, 'geometry.wkt': None}
 
     def test_get_values_with_conditional_selector(self):
         project = ProjectFactory.create(current_questionnaire='123abc')

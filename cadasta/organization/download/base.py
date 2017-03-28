@@ -17,9 +17,14 @@ class Exporter(SchemaSelectorMixin):
     def get_values(self, item, model_attrs, schema_attrs):
         values = OrderedDict()
         for attr in model_attrs:
+
+            if attr.split('.')[0] == 'geometry' and not item.geometry:
+                values[attr] = None
+                continue
+
             value = item
             for a in attr.split('.'):
-                value = getattr(value, a, None)
+                value = getattr(value, a)
             values[attr] = value
 
         content_type = ContentType.objects.get_for_model(item)
