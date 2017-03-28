@@ -28,18 +28,44 @@
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
-          <img src="{{ resource.thumbnail }}" class="thumb-128">
-          <h4>
+          <h5 class="short" style="margin-top: 0px; margin-bottom: 0px;">{% trans "RESOURCE" %}</h5>
+          <h2 class="resource-heading">
             {{ resource.name }}
             {% if resource.archived %}
               <span class="label label-danger">{% trans "Deleted" %}</span>
             {% endif %}
-          </h4>
-          <p>{{ resource.description }}<br><strong>{{ resource.original_file }}</strong></p>
-          <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+          </h2>
+          <img src="{{ resource.thumbnail }}" class="thumb-128">
+          <h4>{{ resource.description }}</h4><br>
+          <table class="table resource-description">
+            <tbody>
+              <tr>
+                <td>File name:</td>
+                <td>{{ resource.file_name }}</td>
+              </tr>
+              <tr>
+                <td>File type:</td>
+                <td>{{ resource.file_type }}</td>
+              </tr>
+              <tr>
+                <td>File size:</td>
+                <td>{{ resource.file_size }}</td>
+              </tr>
+              {% if 'image' in resource.mime_type and 'tif' not in resource.mime_type %}
+              <tr>
+                <td>Dimensions:</td>
+                <td>{{ resource.image_dimensions.0 }} x {{ resource.image_dimensions.1 }}</td>
+              </tr>
+              {% endif %}
+              <tr>
+                <td>Uploaded on:</td>
+                <td>{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="panel-footer panel-buttons">
-          <a href="{{ resource.file.url }}" class="btn btn-primary" download="{{ resource.original_file }}">{% trans "Download" %}</a>
+          <a href="{{ resource.file.url }}" class="btn btn-primary" download="{{ resource.original_file }}">{% trans "Download file" %} ({{ resource.file_size }})</a>
         </div>
       </div>
 
