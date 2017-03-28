@@ -128,3 +128,26 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 400
         assert 'auth_token' not in response.content
         assert len(mail.outbox) == 1
+
+
+class AccountSetPasswordViewTest(APITestCase, UserTestCase, TestCase):
+    view_class = api_views.SetPasswordView
+
+    def setup_models(self):
+        self.user = UserFactory.create(username='imagine71',
+                                       email='john@beatles.uk',
+                                       password='iloveyoko79!')
+
+    def test_change_password(self):
+        data = {
+            'new_password': 'iloveyoko80!',
+            're_new_password': 'iloveyoko80!',
+            'current_password': 'iloveyoko79!',
+        }
+        response = self.request(method='POST', post_data=data, user=self.user)
+        assert response.status_code == 204
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].subject == 'Password Changed'
+        assert 'john@beatles.uk' in mail.outbox[0].to
+        self.user.refresh_from_db()
+        assert self.user.check_password('iloveyoko80!') is True

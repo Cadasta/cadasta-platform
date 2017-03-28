@@ -8,6 +8,7 @@ from rest_framework import status
 
 from djoser import views as djoser_views
 from djoser import signals
+from allauth.account.signals import password_changed
 
 from .. import serializers
 from ..models import now_plus_48_hours
@@ -75,3 +76,12 @@ class AccountLogin(djoser_views.LoginView):
                 data={'detail': _("The email has not been verified.")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class SetPasswordView(djoser_views.SetPasswordView):
+    def _action(self, serializer):
+        response = super()._action(serializer)
+        password_changed.send(sender=self.request.user.__class__,
+                              request=self.request._request,
+                              user=self.request.user)
+        return response
