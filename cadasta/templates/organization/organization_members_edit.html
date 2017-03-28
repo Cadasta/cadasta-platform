@@ -16,13 +16,52 @@
       <div class="page-title">
         <h2>{% trans "Member" %}: <span class="text-capitalize">{{ object.get_display_name }}</span></h2>
       </div>
-      <div class="row">
-        <div class="col-md-3">
-          <!-- Member panel -->
-          <div class="panel panel-default member-panel">
-            <div class="panel-body member-info">
-              <div class="member-pic">
-                <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-3">
+              <!-- Member panel -->
+              <div class="panel panel-default member-panel">
+                <div class="panel-body member-info">
+                  <div class="member-pic">
+		    {% if user.file.url %}
+		      <img class="avatar-lg thumbnail" src="{{user.file.url}}">
+		    {% else %}
+                    <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+		    {% endif %}
+                  </div>
+                  <div class="member-detail">
+                    <h4>{{ object.username }}</h4>
+                    {{ object.full_name }}<br>
+                    {{ object.email }}<br>
+                    {% trans "Last login:" %} {{ object.last_login }}<br>
+                  </div>
+                    <form method="POST" action="" class="org-member-edit" id='organization_permissions' data-parsley-validate>
+                    {% csrf_token %}
+                    <div class="form-group member-role{% if org_role_form.org_role.errors %} has-error{% endif %}">
+                      <label class="control-label" for="{{ org_role_form.org_role.id_for_label }}">{% trans "Role" %}</label>
+                      {% if current_user %}
+                      <p><strong>{% trans "Administrator" %}</strong></p>
+                      {% else %}
+                      {% render_field org_role_form.org_role class+="form-control" data-parsley-required="true" %}
+                      {% endif %}
+                      <div class="error-block">{{ org_role_form.org_role.errors }}</div>
+                    </div>
+                    <div class="btn-full">
+                      <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin and current_user %} disabled{% endif %}>
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Remove member" %}</button>
+                      {% if current_user %}
+                      <div class="alert alert-full" role="alert">
+                        <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
+                        <div>{% trans "An organization administrator cannot remove themself." %}</div>
+                      </div>
+                      {% endif %}
+                    </form>
+                    </div>
+                  </div>
+                </div>
+                <!-- /member panel -->
+              
               </div>
               <div class="member-detail">
                 <h4>{{ object.username }}</h4>

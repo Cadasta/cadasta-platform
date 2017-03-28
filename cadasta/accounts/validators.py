@@ -11,6 +11,15 @@ DEFAULT_CHARACTER_TYPES = [
     string.digits
 ]
 
+ACCEPTED_TYPES = ['image/jpg', 'image/jpeg', 'image/gif']
+
+
+def validate_file_type(type):
+    if type not in ACCEPTED_TYPES:
+        raise ValidationError(
+            _("Files of type {mime} are not accepted.").format(mime=type)
+        )
+
 
 class CharacterTypePasswordValidator(object):
     def __init__(self, character_types=DEFAULT_CHARACTER_TYPES,
