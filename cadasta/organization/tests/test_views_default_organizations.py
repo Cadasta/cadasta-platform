@@ -40,7 +40,8 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
 
         # Annotate each org with the number of projects
         for org in self.all_orgs:
-            org.num_projects = Project.objects.filter(organization=org, archived=False).count
+            org.num_projects = Project.objects.filter(organization=org,
+                                                      archived=False).count
 
         clauses = {
             'clause': [
@@ -63,6 +64,8 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             'user': self.user,
             'is_superuser': False,
         }
+    # Unit test to test the org.num_projects count
+    # only the active project
 
     def test_should_only_active_projects_added_at_org_index(self):
         org_list = self.view_class.queryset
@@ -73,7 +76,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             ProjectFactory.create(organization=org_list[i])
             assert org_list[i].num_projects == num_init_proj[i]+1
 
-            ProjectFactory.create(organization=org_list[i],archived=True)
+            ProjectFactory.create(organization=org_list[i], archived=True)
             assert org_list[i].num_projects == num_init_proj[i]+1
 
     def test_get_with_user(self):

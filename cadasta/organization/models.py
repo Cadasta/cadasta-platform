@@ -108,9 +108,6 @@ class Organization(SlugModel, RandomIDModel):
     def public_projects(self):
         return self.projects.filter(access='public', archived=False)
 
-    def num_active_projects(self):
-        return self.projects.filter(archived=False).count()
-
     def all_projects(self):
         return self.projects.all()
 
