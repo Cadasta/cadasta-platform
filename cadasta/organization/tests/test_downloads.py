@@ -120,7 +120,6 @@ class BaseExporterTest(UserTestCase, TestCase):
             'key': 'text', 'key_2': 'choice_1, choice_2',
         }
 
-
     def test_get_values_null_geom(self):
         project = ProjectFactory.create(current_questionnaire='123abc')
         exporter = Exporter(project)
