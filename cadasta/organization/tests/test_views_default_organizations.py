@@ -69,8 +69,10 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         num_init_proj = []
         for i in range(org_list.count()):
             num_init_proj.append(org_list[i].num_projects)
+
             ProjectFactory.create(organization=org_list[i])
             assert org_list[i].num_projects == num_init_proj[i]+1
+
             ProjectFactory.create(organization=org_list[i],archived=True)
             assert org_list[i].num_projects == num_init_proj[i]+1
 
