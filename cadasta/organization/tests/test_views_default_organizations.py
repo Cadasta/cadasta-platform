@@ -94,6 +94,21 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.render_content(user=superuser,
                                                        is_superuser=True)
 
+    def test_show_only_active_projects_at_org_index(self):
+        for count, org in enumerate(self.all_orgs):
+            the_org = Organization.objects.get(name=org.name)
+            if count % 2:
+                ProjectFactory.create(organization=the_org)
+            else:
+                ProjectFactory.create(organization=the_org, archived=True)
+        queryset = default.OrganizationList().queryset
+        for org in queryset:
+            project = Project.objects.get(organization=org)
+            if project.archived:
+                assert org.num_projects == 0
+            else:
+                assert org.num_projects == 1
+
 
 class OrganizationAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.OrganizationAdd
