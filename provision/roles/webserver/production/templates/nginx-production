@@ -41,7 +41,7 @@ server {
 
     # alias favicon.* to static
     location ~ ^/favicon.(\w*)$ {
-        alias   {{ application_path }}cadasta/static/favicon.png;
+        alias   {{ application_path }}cadasta/static/img/favicon.png;
     }
 
     location /static/ {
