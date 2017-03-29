@@ -51,7 +51,6 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     )
 
 
-
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
     model = Organization
     form_class = forms.OrganizationForm
