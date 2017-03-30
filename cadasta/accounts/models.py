@@ -100,7 +100,7 @@ def password_changed_reset(sender, request, user, **kwargs):
     msg_body = render_to_string(
         'accounts/email/password_changed_notification.txt')
     send_mail(
-        _("Password Changed"),
+        _("Change of password at Cadasta Platform"),
         msg_body,
         settings.DEFAULT_FROM_EMAIL,
         [user.email],

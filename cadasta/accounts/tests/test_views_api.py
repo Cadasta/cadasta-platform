@@ -147,7 +147,8 @@ class AccountSetPasswordViewTest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='POST', post_data=data, user=self.user)
         assert response.status_code == 204
         assert len(mail.outbox) == 1
-        assert mail.outbox[0].subject == 'Password Changed'
+        assert (mail.outbox[0].subject ==
+                'Change of password at Cadasta Platform')
         assert 'john@beatles.uk' in mail.outbox[0].to
         self.user.refresh_from_db()
         assert self.user.check_password('iloveyoko80!') is True
