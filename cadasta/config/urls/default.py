@@ -115,5 +115,6 @@ urlpatterns = [
 
     url(r'^i18n/',
         include('django.conf.urls.i18n')),
+
     url(r'^jsi18n/', javascript_catalog, {}, name='javascript-catalog'),
 ]
