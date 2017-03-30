@@ -143,7 +143,16 @@ def reassign_spatial_geometry(instance):
 
 @receiver(models.signals.pre_save, sender=SpatialUnit)
 def check_extent(sender, instance, **kwargs):
-    if instance.geometry:
+    geom = instance.geometry
+    # Store 'POLYGON EMPTY' data as null to avoid libgeos bug
+    # (https://trac.osgeo.org/geos/ticket/680)
+    # TODO: Rm this check when we're using Django 1.11+ or libgeos 3.6.1+
+    # https://github.com/django/django/commit/b90d72facf1e4294df1c2e6b51b26f6879bf2992#diff-181a3ea304dfaf57f1e1d680b32d2b76R248
+    from django.contrib.gis.geos.polygon import Polygon
+    if isinstance(geom, Polygon) and geom.empty:
+        instance.geometry = None
+
+    if geom and not geom.empty:
         reassign_spatial_geometry(instance)
 
 

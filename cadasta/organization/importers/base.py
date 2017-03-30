@@ -221,6 +221,9 @@ class Importer(SchemaSelectorMixin):
         if spatial_ct:
             try:
                 spatial_unit_id = row[headers.index(s_id)]
+            except ValueError:
+                su = SpatialUnit.objects.create(**spatial_ct)
+            else:
                 if spatial_unit_id:
                     created_su_id = self._locations_created.get(
                         spatial_unit_id, None
@@ -233,12 +236,13 @@ class Importer(SchemaSelectorMixin):
                 else:
                     su = SpatialUnit.objects.create(**spatial_ct)
                     self._locations_created[spatial_unit_id] = su.pk
-            except ValueError:
-                su = SpatialUnit.objects.create(**spatial_ct)
 
         if party_ct:
             try:
                 party_id = row[headers.index(p_id)]
+            except ValueError:
+                party = Party.objects.create(**party_ct)
+            else:
                 if party_id:
                     created_party_id = self._parties_created.get(
                         party_id, None)
@@ -250,8 +254,6 @@ class Importer(SchemaSelectorMixin):
                 else:
                     party = Party.objects.create(**party_ct)
                     self._parties_created[party_id] = party.pk
-            except ValueError:
-                party = Party.objects.create(**party_ct)
 
         if party_ct and spatial_ct:
             tt = TenureRelationshipType.objects.get(id=tenure_type)

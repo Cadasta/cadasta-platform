@@ -1,5 +1,6 @@
 import pytest
 
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -43,6 +44,28 @@ class SpatialUnitTest(UserTestCase, TestCase):
             '11.36667 47.28333, '
             '11.36667 47.25000))')
         assert spatial_unit.geometry is not None
+
+    def test_empty_geometries(self):
+        geoms = (
+            "POINT EMPTY",
+            # "POLYGON EMPTY",  # Uncomment after Django 1.11 or libgeos 3.6.1
+            "LINESTRING EMPTY",
+            "MULTIPOINT EMPTY",
+            "MULTILINESTRING EMPTY",
+            "MULTIPOLYGON EMPTY",
+            "GEOMETRYCOLLECTION EMPTY",
+        )
+        for geom in geoms:
+            spatial_unit = SpatialUnitFactory.create(
+                geometry=GEOSGeometry(geom))
+            assert spatial_unit.geometry.wkt == geom
+
+    def test_empty_geometry(self):
+        # Temp workaround where 'POLYGON EMPTY' is cast to None. Should
+        # be removed when Django is 1.11+ or libgeos is 3.6.1+
+        spatial_unit = SpatialUnitFactory.create(
+            geometry=GEOSGeometry('POLYGON EMPTY'))
+        assert spatial_unit.geometry is None
 
     def test_reassign_extent(self):
         spatial_unit = SpatialUnitFactory.create(
