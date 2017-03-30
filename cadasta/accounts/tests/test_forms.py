@@ -232,6 +232,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
         assert user.email == 'john@beatles.uk'
+        assert user.email_verified is True
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to
