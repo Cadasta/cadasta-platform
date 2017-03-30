@@ -79,8 +79,7 @@ class PasswordChangeTest(ViewTestCase, UserTestCase, TestCase):
     def test_password_change(self):
         self.user = UserFactory.create(password='Noonewillguess!')
         data = {'oldpassword': 'Noonewillguess!',
-                'password1': 'Someonemightguess?',
-                'password2': 'Someonemightguess?'}
+                'password': 'Someonemightguess?'}
         response = self.request(method='POST', post_data=data, user=self.user)
 
         assert response.status_code == 302
@@ -155,3 +154,22 @@ class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
 
         self.email_address.refresh_from_db()
         assert self.email_address.verified is False
+
+
+class PasswordResetViewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.PasswordResetView
+
+    def setup_models(self):
+        self.user = UserFactory.create(email='john@example.com')
+
+    def test_mail_sent(self):
+        data = {'email': 'john@example.com'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert len(mail.outbox) == 1
+
+    def test_mail_not_sent(self):
+        data = {'email': 'abcd@example.com'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert len(mail.outbox) == 0

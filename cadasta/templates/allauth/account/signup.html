@@ -12,25 +12,12 @@
 {% block extra_script %}
 <script type="text/javascript">
   $(document).ready(function() {
-    $("input[name='password1']").on('focus', function() {
-      $(this).next(".help-block").removeClass("hidden");
+    $("input[name='password']").on('focus', function() {
+      $(this).parent().next(".help-block").removeClass("hidden");
     });
   });
 </script>
-<script type="text/javascript">
-  $(document).ready(function () {
-     $('input[type="checkbox"]').click(function() {
-         if($(this).prop("checked")) {
-           $("#id_password1").attr("type", "text");
-           $("#id_password2").attr("type", "text");
-         }
-         else {
-          $("#id_password1").attr("type", "password");
-          $("#id_password2").attr("type", "password");
-         }
-    });
- });
-</script>
+<script src="{% static 'js/password_widget.js' %}"></script>
 <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
 {% endblock %}
 
@@ -69,19 +56,18 @@
     <div class="error-block">{{ form.email.errors }}</div>
   </div>
 
-  <div class="form-group{% if form.password1.errors %} has-error{% endif %}">
-    <label class="control-label" for="id_password1">{% trans "Password" %}</label>
-    {% render_field form.password1 class+="form-control input-lg" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" %}
-    <br>
-    <input type="checkbox" id="showHide"><label for="showHide">&nbsp;Show Password</label>
+  <div class="form-group{% if form.password.errors %} has-error{% endif %}">
+    <label class="control-label" for="id_password">{% trans "Password" %}</label>
+    <div class="input-group input-group-lg">
+      {% render_field form.password class+="form-control" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" %}
+      <span class="input-group-btn">
+        <button class="btn" type="button">
+          <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+        </button>
+      </span>
+    </div>
     <p class="help-block small hidden">{% trans "Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username or email address." %}</p>
-    <div class="error-block">{{ form.password1.errors }}</div>
-  </div>
-
-  <div class="form-group{% if form.password2.errors %} has-error{% endif %}">
-    <label class="control-label" for="id_password2">{% trans "Confirm password" %}</label>
-    {% render_field form.password2 class+="form-control input-lg" data-parsley-equalto="#id_password1" %}
-    <div class="error-block">{{ form.password2.errors }}</div>
+    <div class="error-block">{{ form.password.errors }}</div>
   </div>
 
   <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">

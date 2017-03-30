@@ -132,3 +132,24 @@ class ProjectUrlTest(TestCase):
         assert resolved.kwargs['organization'] == 'habitat'
         assert resolved.kwargs['project'] == '123abc'
         assert resolved.kwargs['username'] == 'barbara-@+.'
+
+
+class UserUrlsTest(TestCase):
+    def test_user_list(self):
+        actual = reverse(version_ns('user:list'))
+        expected = version_url('/users/')
+        assert actual == expected
+
+        resolved = resolve(version_url('/users/'))
+        assert resolved.func.__name__ == api.UserAdminList.__name__
+
+    def test_user_detail(self):
+        actual = reverse(version_ns('user:detail'),
+                         kwargs={'username': 'user-name'})
+
+        expected = version_url('/users/user-name/')
+        assert actual == expected
+
+        resolved = resolve(version_url('/users/user-name/'))
+        assert resolved.func.__name__ == api.UserAdminDetail.__name__
+        assert resolved.kwargs['username'] == 'user-name'

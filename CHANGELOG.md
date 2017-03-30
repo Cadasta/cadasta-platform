@@ -1,5 +1,165 @@
 # Change Log
 
+## [v1.7.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.1) (2017-03-13)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0...v1.7.1)
+
+**Merged pull requests:**
+
+- Updating forms.scss for show/hide [\#1298](https://github.com/Cadasta/cadasta-platform/pull/1298) ([clash99](https://github.com/clash99))
+
+## [v1.7.0](https://github.com/Cadasta/cadasta-platform/tree/v1.7.0) (2017-03-13)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0-alpha.4...v1.7.0)
+
+**Fixed bugs:**
+
+- Unmentioned file types when uploading a new resource. [\#1271](https://github.com/Cadasta/cadasta-platform/issues/1271)
+- Incorrect text when adding a relationship through GUI [\#1257](https://github.com/Cadasta/cadasta-platform/issues/1257)
+- Show password field breaks layout error message [\#1217](https://github.com/Cadasta/cadasta-platform/issues/1217)
+- Focussing on password field does not show password criteria [\#1216](https://github.com/Cadasta/cadasta-platform/issues/1216)
+
+**Closed issues:**
+
+- Superusers do not have the permission `org.users.\*` [\#1283](https://github.com/Cadasta/cadasta-platform/issues/1283)
+- Show Password Should be Available on Reset Password/Change Pages Too [\#1236](https://github.com/Cadasta/cadasta-platform/issues/1236)
+- Implement a mock ES cluster for testing purposes [\#910](https://github.com/Cadasta/cadasta-platform/issues/910)
+
+**Merged pull requests:**
+
+- Removed show option from current password fields on login and change password [\#1292](https://github.com/Cadasta/cadasta-platform/pull/1292) ([clash99](https://github.com/clash99))
+- Added main.css to gitignore [\#1281](https://github.com/Cadasta/cadasta-platform/pull/1281) ([linzjax](https://github.com/linzjax))
+
+## [v1.7.0-alpha.4](https://github.com/Cadasta/cadasta-platform/tree/v1.7.0-alpha.4) (2017-03-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0-alpha.3...v1.7.0-alpha.4)
+
+**Fixed bugs:**
+
+- Error when uploading questionaires with accents in the name columns [\#1238](https://github.com/Cadasta/cadasta-platform/issues/1238)
+- Language Support Error Message \(on Staging\) [\#1234](https://github.com/Cadasta/cadasta-platform/issues/1234)
+- I can add a group with negative members [\#1230](https://github.com/Cadasta/cadasta-platform/issues/1230)
+- Delay between creating locations and viewing them on map or overview tab [\#1229](https://github.com/Cadasta/cadasta-platform/issues/1229)
+- Org header css adjustment - add buttons not aligned [\#1225](https://github.com/Cadasta/cadasta-platform/issues/1225)
+- Search pagination UI violates ES max limit [\#1223](https://github.com/Cadasta/cadasta-platform/issues/1223)
+- Newly added locations don't appear on the map [\#1222](https://github.com/Cadasta/cadasta-platform/issues/1222)
+- Positioning of action buttons on Organization Overview is off [\#1213](https://github.com/Cadasta/cadasta-platform/issues/1213)
+- Page refreshes multiple times on clicking inline manual icon [\#1187](https://github.com/Cadasta/cadasta-platform/issues/1187)
+- Search doesn't match on multiple terms/operators [\#1119](https://github.com/Cadasta/cadasta-platform/issues/1119)
+
+**Closed issues:**
+
+- Form Upload :: Form Does not show up on GeoODK \(staging\) [\#1253](https://github.com/Cadasta/cadasta-platform/issues/1253)
+- Minor responsive issue :: Change order of divs \(contact vs projects\) on org pages [\#1092](https://github.com/Cadasta/cadasta-platform/issues/1092)
+- Implement password strength indicator [\#967](https://github.com/Cadasta/cadasta-platform/issues/967)
+- Improve map interactions  [\#429](https://github.com/Cadasta/cadasta-platform/issues/429)
+
+**Merged pull requests:**
+
+- Fix \#1223: Cap search results to 10000 [\#1246](https://github.com/Cadasta/cadasta-platform/pull/1246) ([seav](https://github.com/seav))
+- Replace the `Show Password` checkbox with glyphicons. [\#1240](https://github.com/Cadasta/cadasta-platform/pull/1240) ([niharika1995](https://github.com/niharika1995))
+- Fix \#1213: Vertically centre action button [\#1215](https://github.com/Cadasta/cadasta-platform/pull/1215) ([niharika1995](https://github.com/niharika1995))
+
+## [v1.7.0-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.7.0-alpha.3) (2017-03-07)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0-alpha.2...v1.7.0-alpha.3)
+
+**Closed issues:**
+
+- Update password reset email text [\#1139](https://github.com/Cadasta/cadasta-platform/issues/1139)
+- Implement pagination for search results [\#1097](https://github.com/Cadasta/cadasta-platform/issues/1097)
+
+**Merged pull requests:**
+
+- Bugfix/\#1139: Fixed password reset email [\#1210](https://github.com/Cadasta/cadasta-platform/pull/1210) ([aklife97](https://github.com/aklife97))
+- Rename CONTRIBUTING -\> CONTRIBUTING.md for better readability [\#1209](https://github.com/Cadasta/cadasta-platform/pull/1209) ([oliverroick](https://github.com/oliverroick))
+- Fix intermittently failing test [\#1203](https://github.com/Cadasta/cadasta-platform/pull/1203) ([oliverroick](https://github.com/oliverroick))
+- Issue 1092 fix [\#1145](https://github.com/Cadasta/cadasta-platform/pull/1145) ([yoshi2095](https://github.com/yoshi2095))
+
+## [v1.7.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.7.0-alpha.2) (2017-03-06)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0-alpha.1...v1.7.0-alpha.2)
+
+**Fixed bugs:**
+
+- Hardcoded S3 paths [\#1155](https://github.com/Cadasta/cadasta-platform/issues/1155)
+- Remove "back" link on organization and project wrapper [\#1128](https://github.com/Cadasta/cadasta-platform/issues/1128)
+- Delete a party results in Map View of a Project [\#1073](https://github.com/Cadasta/cadasta-platform/issues/1073)
+
+**Closed issues:**
+
+- Show password option  [\#1087](https://github.com/Cadasta/cadasta-platform/issues/1087)
+- Malware Prevention for Documentation Files [\#80](https://github.com/Cadasta/cadasta-platform/issues/80)
+
+**Merged pull requests:**
+
+- Add proxyconf settings [\#1198](https://github.com/Cadasta/cadasta-platform/pull/1198) ([amplifi](https://github.com/amplifi))
+- Security/hardcoded s3 [\#1197](https://github.com/Cadasta/cadasta-platform/pull/1197) ([amplifi](https://github.com/amplifi))
+- issue 1128 fixed [\#1146](https://github.com/Cadasta/cadasta-platform/pull/1146) ([vvianle](https://github.com/vvianle))
+
+## [v1.7.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.0-alpha.1) (2017-03-04)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.6.0-alpha.4...v1.7.0-alpha.1)
+
+**Fixed bugs:**
+
+- Search textbox spans over so the map moves to right \(Chrome\) [\#1143](https://github.com/Cadasta/cadasta-platform/issues/1143)
+- Project wrapper buttons disappear on search page [\#1115](https://github.com/Cadasta/cadasta-platform/issues/1115)
+- Search text & css changes [\#1110](https://github.com/Cadasta/cadasta-platform/issues/1110)
+- API: unauthorizated users can edit organization [\#1104](https://github.com/Cadasta/cadasta-platform/issues/1104)
+- Add support for additional geometry types to download process [\#1098](https://github.com/Cadasta/cadasta-platform/issues/1098)
+- Update standard cadasta questionnaire in repo [\#1096](https://github.com/Cadasta/cadasta-platform/issues/1096)
+- Standard Questionnaire Lacks Corporation specific attributes [\#1052](https://github.com/Cadasta/cadasta-platform/issues/1052)
+- Incorrect password validation error [\#1045](https://github.com/Cadasta/cadasta-platform/issues/1045)
+- Tab key is not enabled for right drop-down menu in Organization page [\#1034](https://github.com/Cadasta/cadasta-platform/issues/1034)
+- Permissions issue: Public user role within an organization [\#961](https://github.com/Cadasta/cadasta-platform/issues/961)
+- Server error when uploading a questionnaire \(after trying to do so with a incorrect one\) [\#640](https://github.com/Cadasta/cadasta-platform/issues/640)
+- The 180th meridian problem [\#333](https://github.com/Cadasta/cadasta-platform/issues/333)
+
+**Closed issues:**
+
+- Password Reset Email Issue [\#1183](https://github.com/Cadasta/cadasta-platform/issues/1183)
+- Export :: Error when export "All Data" on project with around 100 locations [\#1160](https://github.com/Cadasta/cadasta-platform/issues/1160)
+- \(This is a work in progress... \) Cartography Considerations :: List of Items for Discussion and Improving \(WIP\) [\#1150](https://github.com/Cadasta/cadasta-platform/issues/1150)
+- SMAP: Address conflicts with L.Deflate/L.MarkerCluster and Leaflet 1.0 [\#1125](https://github.com/Cadasta/cadasta-platform/issues/1125)
+- SMAP: Upgrade the main dashboard to be compatible with Leaflet 1.0 [\#1123](https://github.com/Cadasta/cadasta-platform/issues/1123)
+- Options for user behaviour tracking [\#1068](https://github.com/Cadasta/cadasta-platform/issues/1068)
+- SMAP: Enable GeoJSON vector tiles [\#1058](https://github.com/Cadasta/cadasta-platform/issues/1058)
+- Selecting language dropdown: research and prototyping [\#1056](https://github.com/Cadasta/cadasta-platform/issues/1056)
+- Need an approach to have forms with languages in forms not supported in Django [\#1009](https://github.com/Cadasta/cadasta-platform/issues/1009)
+- Including relationship details in party detail page [\#1001](https://github.com/Cadasta/cadasta-platform/issues/1001)
+- pip upgrade needs root [\#971](https://github.com/Cadasta/cadasta-platform/issues/971)
+- Allow minimum changes in XLSForms  [\#957](https://github.com/Cadasta/cadasta-platform/issues/957)
+- Add config for caching of static assets [\#863](https://github.com/Cadasta/cadasta-platform/issues/863)
+- Need for a new drop-down button for selecting the language in labels [\#861](https://github.com/Cadasta/cadasta-platform/issues/861)
+- Party list and add party pages are unused [\#768](https://github.com/Cadasta/cadasta-platform/issues/768)
+- Browser geolocation not reliable? [\#581](https://github.com/Cadasta/cadasta-platform/issues/581)
+- Improve unregistered user experience with hopes to onboard them as registered users [\#575](https://github.com/Cadasta/cadasta-platform/issues/575)
+- Determine which modals should be converted into pages [\#572](https://github.com/Cadasta/cadasta-platform/issues/572)
+- Data Import [\#566](https://github.com/Cadasta/cadasta-platform/issues/566)
+- Warning Message on XLSForm Reupload [\#555](https://github.com/Cadasta/cadasta-platform/issues/555)
+- Add icons to "add contact" and "remove contact" [\#451](https://github.com/Cadasta/cadasta-platform/issues/451)
+- Adding duplicate resources [\#296](https://github.com/Cadasta/cadasta-platform/issues/296)
+- Anonymous Users Should Not Be Offered Lots of Buttons They Can't Use [\#274](https://github.com/Cadasta/cadasta-platform/issues/274)
+- CSS Modal fade/show [\#269](https://github.com/Cadasta/cadasta-platform/issues/269)
+- Big Map Shows Locations once zoomed in close enough [\#242](https://github.com/Cadasta/cadasta-platform/issues/242)
+- Add icon motion [\#230](https://github.com/Cadasta/cadasta-platform/issues/230)
+
+**Merged pull requests:**
+
+- Browser caching and compression [\#1170](https://github.com/Cadasta/cadasta-platform/pull/1170) ([amplifi](https://github.com/amplifi))
+- Fix \#1001 -- Add relationships to party detail page [\#1169](https://github.com/Cadasta/cadasta-platform/pull/1169) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1009 -- Customize list of accepted questionnaire languages [\#1168](https://github.com/Cadasta/cadasta-platform/pull/1168) ([oliverroick](https://github.com/oliverroick))
+- Adds contributing guidelines [\#1156](https://github.com/Cadasta/cadasta-platform/pull/1156) ([oliverroick](https://github.com/oliverroick))
+- Improvement in README document [\#1154](https://github.com/Cadasta/cadasta-platform/pull/1154) ([Divya063](https://github.com/Divya063))
+- Integrate django-leaflet-cadasta [\#1152](https://github.com/Cadasta/cadasta-platform/pull/1152) ([bjohare](https://github.com/bjohare))
+- Show password option-issue-1087 [\#1151](https://github.com/Cadasta/cadasta-platform/pull/1151) ([Shruti9520](https://github.com/Shruti9520))
+- Add more realistic test data [\#1141](https://github.com/Cadasta/cadasta-platform/pull/1141) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1045: Remove incorrect password validation error [\#1134](https://github.com/Cadasta/cadasta-platform/pull/1134) ([shailysangwan](https://github.com/shailysangwan))
+- Make dashboard and project maps deflatable [\#1133](https://github.com/Cadasta/cadasta-platform/pull/1133) ([oliverroick](https://github.com/oliverroick))
+- Add search pagination and mock ES [\#1132](https://github.com/Cadasta/cadasta-platform/pull/1132) ([seav](https://github.com/seav))
+- Update changelog for v1.6.0 [\#1126](https://github.com/Cadasta/cadasta-platform/pull/1126) ([amplifi](https://github.com/amplifi))
+- Fix \#1098: Add support for additional geometry types to downloads [\#1122](https://github.com/Cadasta/cadasta-platform/pull/1122) ([bjohare](https://github.com/bjohare))
+- Fix \#861 -- Add language dropdown [\#1120](https://github.com/Cadasta/cadasta-platform/pull/1120) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1115: Add missing mixin to search default view [\#1116](https://github.com/Cadasta/cadasta-platform/pull/1116) ([seav](https://github.com/seav))
+- Implement Vector Tiling for SMAP [\#1099](https://github.com/Cadasta/cadasta-platform/pull/1099) ([linzjax](https://github.com/linzjax))
+- Error response on mobile response string fix. [\#1081](https://github.com/Cadasta/cadasta-platform/pull/1081) ([jnordling](https://github.com/jnordling))
+- Fix \#961 -- Move view detail permissions into project user policy [\#1071](https://github.com/Cadasta/cadasta-platform/pull/1071) ([oliverroick](https://github.com/oliverroick))
+
 ## [v1.6.0](https://github.com/Cadasta/cadasta-platform/tree/v1.6.0) (2017-02-10)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.6.0-alpha.4...v1.6.0)
 

@@ -54,7 +54,8 @@ def get_csv_from_dataframe(df, entity_types):
             if not (locations.empty or
                     relationships.empty or parties.empty):
                 locations.rename(
-                    columns=lambda x: 'spatialunit::' + x.lower(), inplace=True
+                    columns=lambda x: 'spatialunit::' + x.lower(),
+                    inplace=True
                 )
                 relationships.rename(
                     columns={'tenure_type.id': 'tenure_type'},

@@ -97,7 +97,8 @@ class Importer(SchemaSelectorMixin):
 
         # build list of attribute names not selected for import
         exclude_attrs = list(set([
-            name.lower() for content_type, selectors in project_attrs.items()
+            name.lower() for content_type, selectors
+            in project_attrs.items()
             for selector, attrs in selectors.items()
             for name, attr in attrs.items()
             if content_type not in selected_content_types
@@ -220,6 +221,9 @@ class Importer(SchemaSelectorMixin):
         if spatial_ct:
             try:
                 spatial_unit_id = row[headers.index(s_id)]
+            except ValueError:
+                su = SpatialUnit.objects.create(**spatial_ct)
+            else:
                 if spatial_unit_id:
                     created_su_id = self._locations_created.get(
                         spatial_unit_id, None
@@ -232,12 +236,13 @@ class Importer(SchemaSelectorMixin):
                 else:
                     su = SpatialUnit.objects.create(**spatial_ct)
                     self._locations_created[spatial_unit_id] = su.pk
-            except ValueError:
-                su = SpatialUnit.objects.create(**spatial_ct)
 
         if party_ct:
             try:
                 party_id = row[headers.index(p_id)]
+            except ValueError:
+                party = Party.objects.create(**party_ct)
+            else:
                 if party_id:
                     created_party_id = self._parties_created.get(
                         party_id, None)
@@ -249,8 +254,6 @@ class Importer(SchemaSelectorMixin):
                 else:
                     party = Party.objects.create(**party_ct)
                     self._parties_created[party_id] = party.pk
-            except ValueError:
-                party = Party.objects.create(**party_ct)
 
         if party_ct and spatial_ct:
             tt = TenureRelationshipType.objects.get(id=tenure_type)
@@ -284,8 +287,8 @@ class Importer(SchemaSelectorMixin):
                         if attribute.attr_type.name == 'select_multiple':
                             val = [v.strip() for v in val.split(',')]
                         if attribute.attr_type.name in ['integer', 'decimal']:
-                                val = self._cast_to_type(
-                                    val, attribute.attr_type.name)
+                            val = self._cast_to_type(
+                                val, attribute.attr_type.name)
                         if content_type:
                             content_type['attributes'][attribute.name] = val
         return content_types

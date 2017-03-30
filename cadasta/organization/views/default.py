@@ -63,7 +63,7 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
 
 
 class OrganizationDashboard(PermissionRequiredMixin,
-                            mixins.OrgAdminCheckMixin,
+                            mixins.OrgRoleCheckMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
@@ -83,7 +83,6 @@ class OrganizationDashboard(PermissionRequiredMixin,
         context = self.get_context_data()
         if self.is_superuser:
             projects = self.object.all_projects()
-            show_members = True
         else:
             projects = self.object.public_projects()
             if hasattr(self.request.user, 'organizations'):
@@ -96,14 +95,7 @@ class OrganizationDashboard(PermissionRequiredMixin,
                             projects = self.object.all_projects().filter(
                                 archived=False)
 
-            if not self.request.user.is_anonymous():
-                show_members = OrganizationRole.objects.filter(
-                    user=self.request.user,
-                    organization=context['organization']).exists()
-            else:
-                show_members = False
         context['projects'] = projects
-        context['show_members'] = show_members
         return super(generic.DetailView, self).render_to_response(context)
 
 
@@ -152,7 +144,7 @@ class OrganizationUnarchive(OrgArchiveView):
 
 
 class OrganizationMembers(LoginPermissionRequiredMixin,
-                          mixins.OrgAdminCheckMixin,
+                          mixins.OrgRoleCheckMixin,
                           mixins.ProjectCreateCheckMixin,
                           core_mixins.CacheObjectMixin,
                           generic.DetailView):
@@ -194,7 +186,7 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
                               LoginPermissionRequiredMixin,
-                              mixins.OrgAdminCheckMixin,
+                              mixins.OrgRoleCheckMixin,
                               mixins.ProjectCreateCheckMixin,
                               core_mixins.CacheObjectMixin,
                               base_generic.edit.FormMixin,
@@ -209,6 +201,12 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
+        if self.request.POST and self.request.POST.get('org_role'):
+            return reverse(
+                 'organization:members_edit',
+                 kwargs=self.kwargs,
+            )
+
         return reverse(
             'organization:members',
             kwargs={'slug': self.kwargs['slug']},

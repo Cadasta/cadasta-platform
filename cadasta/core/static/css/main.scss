@@ -369,6 +369,10 @@ main.container-fluid {
         border-bottom: 0;
         padding-bottom: 6px;
       }
+      &.linked:hover {
+        cursor: pointer;
+        background-color: $table-bg-hover;
+      }
     }
     .nav-tabs {
       li > a {
@@ -458,11 +462,6 @@ main.container-fluid {
         }
       }
     }
-  }
-  .member-panel { // member edit page
-    border: 0;
-    -webkit-box-shadow: none !important;
-    box-shadow: none !important;
   }
   .nav-tabs {
     margin-bottom: 20px;
@@ -971,7 +970,7 @@ h1 .label {
 /* =Map location details
 -------------------------------------------------------------- */
 
-.content-single .detail h2 span {
+.content-single h2 span {
   font-size: 14px;
   color: #a6a7a8;
   display: block;

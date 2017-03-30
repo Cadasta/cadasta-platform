@@ -26,35 +26,24 @@ class RegistrationTest(FunctionalTest):
         fields = page.get_fields()
 
         # Try to submit an empty form and check for validation errors.
-        page.try_submit(err=['username', 'email', 'password1', 'password2'])
+        page.try_submit(err=['username', 'email', 'password'])
 
         # Fill in required fields one by one, try to submit and check
         # for errors.
         fields = page.get_fields()
         fields['username'].send_keys('user3')
-        page.try_submit(err=['email', 'password1', 'password2'],
+        page.try_submit(err=['email', 'password'],
                         ok=['username'],)
         fields = page.get_fields()
         fields['email'].send_keys('user3@example.net')
-        page.try_submit(err=['password1', 'password2'],
+        page.try_submit(err=['password'],
                         ok=['username', 'email'],)
-        fields = page.get_fields()
-        fields['password1'].send_keys('very_secret')
-        page.try_submit(err=['password2'],
-                        ok=['username', 'email', 'password1'],)
-        fields = page.get_fields()
-        fields['password2'].send_keys('not_very_secret')
-        page.try_submit(err=['password2'],
-                        ok=['username', 'email', 'password1'],
-                        message='This value should be the same.')
 
         # Fill in extra fields, fill in final required form and submit
         fields = page.get_fields()
         fields['full_name'].send_keys('User Three')
-        fields['password1'].clear()
-        fields['password1'].send_keys('very_secret')
-        fields['password2'].clear()
-        fields['password2'].send_keys('very_secret')
+        fields['password'].clear()
+        fields['password'].send_keys('very_secret')
         self.click_through(fields['register'], self.BY_DASHBOARD)
         self.assert_has_message('alert', "signed in")
 
@@ -80,11 +69,10 @@ class RegistrationTest(FunctionalTest):
 
         fields['username'].send_keys(self.test_data['users'][0]['username'])
         fields['email'].send_keys('b@lah.net')
-        fields['password1'].send_keys('password123')
-        fields['password2'].send_keys('password123')
+        fields['password'].send_keys('password123')
         fields['full_name'].send_keys('Jane Doe')
         page.try_submit(err=['username'],
-                        ok=['email', 'password1', 'password2',
+                        ok=['email', 'password',
                             'full_name'],
                         message='A user with that username already exists.')
         assert page.is_on_page()

@@ -165,6 +165,47 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
     @patch('requests.get')
     @patch('requests.post')
+    def test_post_with_over_max_results(self, mock_post, mock_get):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {
+            'hits': {
+                'total': settings.ES_MAX_RESULTS + 1000,
+                'hits': [{
+                    '_type': 'spatial',
+                    '_source': {
+                        'id': self.su.id,
+                        'type': 'AP',
+                        '@timestamp': 'TIMESTAMP',
+                    },
+                }],
+            },
+        }
+
+        response = self.request(user=self.user, method='POST')
+        expected_html = render_to_string(
+            'search/search_result_item.html',
+            context={'result': {
+                'entity_type': self.su.ui_class_name,
+                'url': self.su.get_absolute_url(),
+                'main_label': "Apartment",
+                'attributes': {},
+            }}
+        )
+        assert response.status_code == 200
+        assert response.content['data'] == [[expected_html]]
+        assert response.content['recordsTotal'] == settings.ES_MAX_RESULTS
+        assert response.content['recordsFiltered'] == settings.ES_MAX_RESULTS
+        assert response.content['draw'] == 40
+        assert response.content['timestamp'] == 'TIMESTAMP'
+        mock_post.assert_called_once_with(
+            self.es_endpoint,
+            data=self.es_body,
+            headers={'content-type': 'application/json'},
+        )
+        mock_get.assert_not_called()
+
+    @patch('requests.get')
+    @patch('requests.post')
     def test_post_with_no_results(self, mock_post, mock_get):
         mock_post.return_value.status_code = 200
         mock_post.return_value.json.return_value = {

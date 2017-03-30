@@ -30,15 +30,17 @@
                         {% blocktrans %}Select the <span class="highlight">Party type</span> field{% endblocktrans %}
                     </label>
                     <select id="party_type_field" class="form-control" name="select_defaults-party_type_field">
-                        {% for header in available_headers %}
-                        <option value="{{ header }}" {% if 'type' in header %} selected="selected" {% endif %}>
-                            {% if header == 'type' %}
-                                party_type
-                            {% else %}
-                                {{ header }}
-                            {% endif %}
-                        </option>
-                        {% endfor %}
+                      {% for header in available_headers %}
+                        {% if header == 'type' %}
+                           <option value="{{ header }}" selected="selected">
+                             party_type
+                           </option>
+                        {% else %}
+                           <option value="{{ header }}" {% if 'party_type' in header %} selected="selected" {% endif %}>
+                             {{ header }}
+                           </option>
+                        {% endif %}
+                      {% endfor %}
                     </select>
                 </div>
             </div>
@@ -69,15 +71,17 @@
                         {% blocktrans %}Select the <span class="highlight">Location type</span> field{% endblocktrans %}
                     </label>
                     <select id="location_type_field" class="form-control" name="select_defaults-location_type_field">
-                        {% for header in available_headers %}
-                        <option value="{{ header }}" {% if 'type' in header %} selected="selected" {% endif %}>
-                            {% if header == 'type' %}
-                                location_type
-                            {% else %}
-                                {{ header }}
-                            {% endif %}
-                        </option>
-                        {% endfor %}
+                      {% for header in available_headers %}
+                        {% if header == 'type' %}
+                           <option value="{{ header }}" selected="selected">
+                             location_type
+                           </option>
+                        {% else %}
+                           <option value="{{ header }}" {% if 'location_type' in header %} selected="selected" {% endif %}>
+                             {{ header }}
+                           </option>
+                        {% endif %}
+                      {% endfor %}
                     </select>
                 </div>
             </div>

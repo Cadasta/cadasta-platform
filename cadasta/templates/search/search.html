@@ -21,7 +21,8 @@
               <div class="form-group col-md-9">
                 <label class="control-label sr-only">{% trans "Search within project for" %}</label>
                 <input type="search" id="search-input" class="form-control input-lg pull-left" value="{{ search_query }}">
-                <button class="btn btn-primary btn-lg"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                <span id="search-clear" class="glyphicon glyphicon-remove-circle"></span>
+                <button class="btn btn-primary btn-lg" id="search-button"><span class="glyphicon glyphicon-search"></span></button>
                 <p class="small help-block">
                   {% blocktrans %}
                   e.g., <kbd>Parcel</kbd>, <kbd>John White</kbd>; <a id="search-guidelines-link">more search guidelines</a>
@@ -32,6 +33,7 @@
                   <ul>
                     <li>Review your wording, make sure that there aren’t any typos in your search query</li>
                     <li>If no results match your query, try removing some search terms (<kbd>John</kbd>, instead of <kbd>John White</kbd>)</li>
+                    <li>Search results are limited to a maximum of {{ max_num_results }} entries</li>
                   </ul>
                   {% endblocktrans%}
                 </div>
@@ -177,7 +179,11 @@ window.addEventListener('load', function () {
   query = query && decodeURIComponent(query[1].replace(/\+/g, ' '));
   if (query) {
     $('#search-input')[0].value = query;
+    $('#search-clear').addClass('search-clear-show');
     performSearch(query, false);
+  } else {
+    $('#search-clear').removeClass('search-clear-show');
+    $("#search-input").focus();
   }
 
   // Perform search when the search form is submitted
@@ -185,6 +191,25 @@ window.addEventListener('load', function () {
     var query = $('#search-input')[0].value;
     performSearch(query, true);
     return false;
+  });
+
+  // Update display of search-box clear option
+  $(document).on('input', function() {
+    if ($('#search-input').val()) {
+      $('#search-clear').addClass('search-clear-show');
+    } else {
+      $('#search-clear').removeClass('search-clear-show');
+    }
+  });
+  $('#search-clear').click(function(){
+    $('#search-input').val('');
+    $('#search-clear').removeClass('search-clear-show');
+  });
+  // Focusing search-input on search-button click if it is empty
+  $('#search-button').click(function(){
+    if ($('#search-input').val().length === 0) {
+      $("#search-input").focus();
+    }
   });
 });
 
