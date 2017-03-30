@@ -1,7 +1,7 @@
 {% load i18n %}{% autoescape off %}
 
 {% blocktrans %}
-You are receiving this email because someone changed the email address for the account previously linked to this email address.
+You are receiving this email because a user at Cadasta Platform changed the email address for the account previously linked to this email address.
 
 If it wasn't you who changed the email address, please contact us immediately under security@cadasta.org.
 {% endblocktrans %}

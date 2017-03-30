@@ -1,6 +1,6 @@
 {% load account %}{% load i18n %}{% autoescape off %}{% blocktrans %}
 
-You are receiving this email because a user at Cadasta platform has given yours as an email address to connect their account.
+You are receiving this email because a user at Cadasta Platform has given yours as an email address to connect their account.
 
 To confirm this is correct, go to {{ activate_url }}
 {% endblocktrans %}{% endautoescape %}
