@@ -106,7 +106,7 @@
   become_user: root
   cron: name="prune django media files" minute=5 hour=0
         user="root"
-        job="find {{ application_path }}cadasta/media/s3/* -type f -ctime +1  -exec rm {} \\; > /var/log/django/prune_media.log"
+        job="find {{ application_path }}cadasta/media -maxdepth 3 -type f -ctime +1 -exec rm {} \\; > /var/log/django/prune_media.log"
 
 - name: Copy uwsgi_params to base directory
   become: yes
