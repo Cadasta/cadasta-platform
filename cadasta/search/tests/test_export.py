@@ -31,6 +31,7 @@ from ..export.all import AllExporter
 from ..export.resource import ResourceExporter
 from ..export.shape import ShapeExporter
 from ..export.xls import XLSExporter
+from ..export.utils import convert_postgis_ewkb_to_ewkt
 
 
 test_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
@@ -132,7 +133,7 @@ class ExporterTest(BaseTestClass):
     def test_get_attr_values(self):
         location_data = {
             'id': 'ID',
-            'geometry': {'ewkt': 'GEOMETRY.EWKT'},
+            'geometry.ewkt': 'GEOMETRY.EWKT',
             'type': 'TYPE',
             'attributes': {
                 'quality': 'QUALITY',
@@ -175,10 +176,8 @@ class ExporterTest(BaseTestClass):
             'id': 'ID',
             'party_id': 'PARTY_ID',
             'spatial_unit_id': 'SPATIAL_UNIT_ID',
-            'tenure_type': {
-                'id': 'TENURE_TYPE.ID',
-                'label': 'TENURE_TYPE.LABEL',
-            },
+            'tenure_type.id': 'TENURE_TYPE.ID',
+            'tenure_type.label': 'TENURE_TYPE.LABEL',
             'attributes': {
                 'notes': ['1', '2', '3'],
             },
@@ -208,8 +207,32 @@ class ExporterTest(BaseTestClass):
         def callback(source, metadatum):
             assert metadatum == exporter.metadata['location']
             assert source['id'] == dummies[1].id
-            assert source['geometry']['ewkt'] == ('SRID=4326;POINT (1 1)')
-            assert source['geometry']['wkt'] == ('POINT (1 1)')
+            assert source['geometry.ewkt'] == 'SRID=4326;POINT (1 1)'
+            assert source['geometry.wkt'] == 'POINT (1 1)'
+            assert source['attributes']['name'] == "Long Island"
+            assert source['attributes']['acquired_how'] == 'LH'
+
+        exporter.process_entity(es_type_line, es_source_line, callback)
+
+    def test_process_location_entity_with_null_geometry(self):
+        es_type_line = '{"index": {"_type": "spatial"} }'
+        dummies = []
+        for _ in range(5):
+            obj = RandomIDModel()
+            obj.id = random_id()
+            dummies.append(obj)
+        raw_source = (
+            get_fake_es_api_results(*dummies)['hits']['hits'][1]['_source'])
+        raw_source['geometry'] = None
+        es_source_line = json.dumps(raw_source)
+
+        exporter = Exporter(self.project)
+
+        def callback(source, metadatum):
+            assert metadatum == exporter.metadata['location']
+            assert source['id'] == dummies[1].id
+            assert source['geometry.ewkt'] == ''
+            assert source['geometry.wkt'] == ''
             assert source['attributes']['name'] == "Long Island"
             assert source['attributes']['acquired_how'] == 'LH'
 
@@ -252,8 +275,8 @@ class ExporterTest(BaseTestClass):
             assert source['id'] == dummies[3].id
             assert source['spatial_unit_id'] == dummies[1].id
             assert source['party_id'] == dummies[2].id
-            assert source['tenure_type']['id'] == 'CU'
-            assert source['tenure_type']['label'] == 'Customary Rights'
+            assert source['tenure_type.id'] == 'CU'
+            assert source['tenure_type.label'] == 'Customary Rights'
             assert source['attributes']['rel_notes'] == "PBS is the best."
 
         exporter.process_entity(es_type_line, es_source_line, callback)
@@ -765,3 +788,14 @@ class AllExporterTest(BaseTestClass):
             sheetnames = wb.get_sheet_names()
             assert sheetnames == ['Sheet']
             assert wb['Sheet']['A1'].value is None
+
+
+class UtilsTest(TestCase):
+
+    def test_convert_postgis_ewkb_to_ewkt(self):
+        ewkb = '0101000020E6100000000000000000F03F000000000000F03F'
+        with pytest.raises(AssertionError):
+            convert_postgis_ewkb_to_ewkt('')
+        with pytest.raises(AssertionError):
+            convert_postgis_ewkb_to_ewkt(ewkb.lower())
+        assert convert_postgis_ewkb_to_ewkt(ewkb) == 'SRID=4326;POINT (1 1)'

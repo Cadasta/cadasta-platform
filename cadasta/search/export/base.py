@@ -59,14 +59,7 @@ class Exporter(SchemaSelectorMixin):
     def get_attr_values(self, item, metadatum):
         attr_values = {}
         for attr in metadatum['model_attrs']:
-            if '.' in attr:
-                attr_items = attr.split('.')
-                value = None
-                for a in attr_items:
-                    value = item[a] if not value else value[a]
-                attr_values[attr] = value
-            else:
-                attr_values[attr] = item[attr]
+            attr_values[attr] = item[attr]
 
         conditional_selector = self.get_conditional_selector(
             metadatum['content_type'])
@@ -75,11 +68,11 @@ class Exporter(SchemaSelectorMixin):
             attributes = metadatum['schema_attrs'].get(entity_type, {})
         else:
             attributes = metadatum['schema_attrs'].get('DEFAULT', {})
-        for key, attr in attributes.items():
-            attr_value = item['attributes'].get(key, '')
+        for attr, _ in attributes.items():
+            attr_value = item['attributes'].get(attr, '')
             if type(attr_value) == list:
                 attr_value = ', '.join(attr_value)
-            attr_values[key] = attr_value
+            attr_values[attr] = attr_value
 
         return attr_values
 
@@ -99,19 +92,24 @@ class Exporter(SchemaSelectorMixin):
             else:
                 metadatum = self.metadata['party']
 
-        # Reformat data to mimic model
+        # Reformat data to match model_attrs
         source['attributes'] = json.loads(source['attributes']['value'])
         if metadatum['model_name'] == 'SpatialUnit':
-            source['geometry']['ewkt'] = convert_postgis_ewkb_to_ewkt(
-                source['geometry']['value'])
-            source['geometry']['wkt'] = source['geometry']['ewkt'][10:]
+            if source['geometry'] is None:
+                ewkt = ''
+                wkt = ''
+            else:
+                ewkt = convert_postgis_ewkb_to_ewkt(
+                    source['geometry']['value'])
+                wkt = ewkt[10:]  # Remove SRID
+            source['geometry.ewkt'] = ewkt
+            source['geometry.wkt'] = wkt
         elif metadatum['model_name'] == 'TenureRelationship':
             source['id'] = source['tenure_id']
             source['party_id'] = source['tenure_partyid']
-            source['tenure_type'] = {
-                'id': source['tenure_type_id'],
-                'label': str(tenure_type_choices[source['tenure_type_id']]),
-            }
+            source['tenure_type.id'] = source['tenure_type_id']
+            source['tenure_type.label'] = str(
+                tenure_type_choices[source['tenure_type_id']])
             source['attributes'] = json.loads(
                 source['tenure_attributes']['value'])
 
