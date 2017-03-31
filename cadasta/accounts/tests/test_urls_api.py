@@ -25,3 +25,10 @@ class UserUrlsTest(TestCase):
 
         resolved = resolve(version_url('/account/login/'))
         assert resolved.func.__name__ == api.AccountLogin.__name__
+
+    def test_account_password(self):
+        assert (reverse(version_ns('accounts:password')) ==
+                version_url('/account/password/'))
+
+        resolved = resolve(version_url('/account/password/'))
+        assert resolved.func.__name__ == api.SetPasswordView.__name__
