@@ -2,10 +2,7 @@ import json
 from buckets.serializers import S3Field
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
-import os
-from django.conf import settings
-import magic
-from urllib.request import urlretrieve
+import mimetypes
 
 from .models import ContentObject, Resource, SpatialResource
 
@@ -44,21 +41,7 @@ class ResourceSerializer(serializers.ModelSerializer):
             return self.resource
         else:
             file_url = validated_data['file']
-            file_name = file_url.split("/")[-1]
-            file_path = os.path.join(settings.MEDIA_ROOT,
-                                     's3/uploads/resources/',
-                                     file_name)
-
-            file_path, headers = urlretrieve(file_url, file_path)
-            mime_type_headers = headers.get_content_type()
-
-            mime = magic.Magic(mime=True)
-            mime_type_magic = str(mime.from_file(file_path), 'utf-8')
-
-            if mime_type_magic == mime_type_headers:
-                mime_type = mime_type_magic
-            else:
-                raise serializers.ValidationError(_("Invalid file type"))
+            mime_type = mimetypes.MimeTypes().guess_type(file_url)
 
             return Resource.objects.create(
                 content_object=self.context['content_object'],
