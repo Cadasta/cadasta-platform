@@ -2,8 +2,8 @@ from django.utils.translation import ugettext_lazy as _
 
 
 ADMIN_CHOICES = (
-				 ('A', _('Administrator')),
-                 ('M', _('Member'))
+                    ('A', _('Administrator')),
+                    ('M', _('Member'))
                 )
 
 ROLE_CHOICES = (('PU', _('Project User')),
