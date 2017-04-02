@@ -29,7 +29,11 @@
       <header class="header" role="banner">
         <div class="container">
           <div id="logo" class="pull-left">
-            <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>
+            <a href="/">
+              <img src="{% static 'img/logo-white.png' %}" />
+                <span class="cadasta-tagline">
+                  Lorem ipsum dolor sit amet.
+                </span></a>
           </div>
           <div class="reg-links pull-right">
             {% if user.is_authenticated %}
