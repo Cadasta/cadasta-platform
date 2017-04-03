@@ -3,6 +3,7 @@ from .dev import *  # NOQA
 
 INSTALLED_APPS = (
     'debug_toolbar',
+    'django_extensions',
 ) + INSTALLED_APPS  # NOQA
 
 MIDDLEWARE_CLASSES = (
