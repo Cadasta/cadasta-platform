@@ -511,6 +511,7 @@ class ProjectResourcesEditTest(ViewTestCase, UserTestCase,
         form = ResourceForm(instance=self.resource)
         return {
             'object': self.project,
+            'resource': self.resource,
             'form': form,
             'cancel_url': reverse(
                 'resources:project_detail',

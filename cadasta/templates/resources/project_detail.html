@@ -28,15 +28,32 @@
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
-          <img src="{{ resource.thumbnail }}" class="thumb-128">
-          <h4>
-            {{ resource.name }}
+          <h2>
+            <span>{% trans "Resource" %} </span>{{ resource.name }}
             {% if resource.archived %}
-              <span class="label label-danger">{% trans "Deleted" %}</span>
+            <span class="label label-danger">{% trans "Deleted" %}</span>
             {% endif %}
-          </h4>
-          <p>{{ resource.description }}<br><strong>{{ resource.original_file }}</strong></p>
-          <p class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+          </h2>
+          <div class="row">
+            <div class="media col-md-6">
+              <div class="media-left">
+                <img src="{{ resource.thumbnail }}" class="thumb-128">
+              </div>
+              <div class="media-body">
+                <p class="media-heading">{{ resource.description }}</p>
+                <table class="table table-condensed table-media">
+                  <tr>
+                    <td class="small">{% trans "File name" %}:</td>
+                    <td class="small">{{ resource.original_file }}</td>
+                  </tr>
+                  <tr>
+                    <td class="small">{% trans "Uploaded on" %}:</td>
+                    <td class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}{{ date }} by {{ user }}{% endblocktrans %}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="panel-footer panel-buttons">
           <a href="{{ resource.file.url }}" class="btn btn-primary" download="{{ resource.original_file }}">{% trans "Download" %}</a>
