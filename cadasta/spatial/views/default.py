@@ -102,6 +102,13 @@ class LocationDetail(LoginPermissionRequiredMixin,
                 rel.type_labels = template_xlang_labels(
                     tenure_opts.get(rel.tenure_type_id))
 
+        location = context['location']
+        user = self.request.user
+        context['is_allowed_edit_location'] = user.has_perm('spatial.update',
+                                                            location)
+        context['is_allowed_delete_location'] = user.has_perm('spatial.delete',
+                                                              location)
+
         return context
 
 
