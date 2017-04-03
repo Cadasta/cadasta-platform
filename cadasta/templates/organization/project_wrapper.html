@@ -171,6 +171,9 @@
 <script>
 'use strict';
 window.addEventListener('load', function() {
+  $( '.search').find('.search').click( function(){ 
+	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
+  });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
     if (!$('#sidebar').hasClass('search')) {
       if ($('#sidebar-search-box').hasClass('disabled')) {
