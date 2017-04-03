@@ -20,11 +20,38 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_template_context(self):
         return {
-            'form': ProfileForm(instance=self.user)
+            'form': ProfileForm(instance=self.user),
+            'emails_to_verify': False
         }
 
     def test_get_profile(self):
         self.user = UserFactory.create()
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_profile_with_unverified_email(self):
+        self.user = UserFactory.create()
+        EmailAddress.objects.create(
+            user=self.user,
+            email='miles2@davis.co',
+            verified=False,
+            primary=True
+        )
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(emails_to_verify=True)
+
+    def test_get_profile_with_verified_email(self):
+        self.user = UserFactory.create()
+        EmailAddress.objects.create(
+            user=self.user,
+            email=self.user.email,
+            verified=True,
+            primary=True
+        )
         response = self.request(user=self.user)
 
         assert response.status_code == 200
