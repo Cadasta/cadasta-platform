@@ -368,10 +368,9 @@ TENURE_RELATIONSHIP_TYPES = (
 def load_tenure_relationship_types(force=False):
     if force:
         TenureRelationshipType.objects.all().delete()
-    for tr_type in TENURE_RELATIONSHIP_TYPES:
-        if not TenureRelationshipType.objects.filter(
-                id=tr_type[0], label=tr_type[1]
-        ).exists():
-            TenureRelationshipType.objects.create(
-                id=tr_type[0], label=tr_type[1]
-            )
+    existing_ids = TenureRelationshipType.objects.values_list('id', flat=True)
+    return TenureRelationshipType.objects.bulk_create([
+        TenureRelationshipType(id=tr_id, label=label)
+        for tr_id, label in TENURE_RELATIONSHIP_TYPES
+        if tr_id not in existing_ids
+    ])
