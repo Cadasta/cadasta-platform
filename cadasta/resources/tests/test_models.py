@@ -201,6 +201,18 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
             settings.MEDIA_ROOT, 's3/uploads/resources/thumb_test-128x128.jpg')
         )
 
+    def test_create_no_thumbnail_non_images(self):
+        file = self.get_file('/resources/tests/files/text.txt', 'rb')
+        file_name = self.storage.save('resources/text.txt', file)
+        contributor = UserFactory.create()
+        resource = ResourceFactory.create(file=file_name,
+                                          mime_type='text/plain',
+                                          contributor=contributor)
+        resource.save()
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/text-128x128.txt')
+        ) is False
+
     def test_create_spatial_resource(self):
         file = self.get_file('/resources/tests/files/deramola.xml', 'rb')
         file_name = self.storage.save('resources/deramola.xml', file)
