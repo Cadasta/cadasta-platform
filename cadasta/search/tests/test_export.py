@@ -301,12 +301,13 @@ class ShapeExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_basic.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test1.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-shp1.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = ShapeExporter(self.project)
         zip_path, mime_type = exporter.make_download(es_dump_path)
-        assert zip_path == os.path.join(test_dir, 'test1-shp.zip')
+
+        assert zip_path == os.path.join(test_dir, 'test-shp1-shp.zip')
         assert mime_type == ('application/zip')
 
         with ZipFile(zip_path) as myzip:
@@ -374,12 +375,13 @@ class ShapeExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_basic.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test2.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-shp2.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = ShapeExporter(self.project, is_standalone=False)
         dir_path = exporter.make_download(es_dump_path)
-        assert dir_path == os.path.join(test_dir, 'test2-shp-dir')
+
+        assert dir_path == os.path.join(test_dir, 'test-shp2-shp-dir')
 
         files = os.listdir(dir_path)
         assert len(files) == 5
@@ -395,13 +397,13 @@ class ShapeExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_empty.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test-empty1.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-shp3.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = ShapeExporter(self.project, True)
         zip_path, mime_type = exporter.make_download(es_dump_path)
 
-        assert zip_path == os.path.join(test_dir, 'test-empty1-shp.zip')
+        assert zip_path == os.path.join(test_dir, 'test-shp3-shp.zip')
         assert mime_type == ('application/zip')
         assert ZipFile(zip_path).namelist() == []
 
@@ -411,14 +413,46 @@ class ShapeExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_empty.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test-empty2.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-shp4.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = ShapeExporter(self.project, is_standalone=False)
         dir_path = exporter.make_download(es_dump_path)
 
-        assert dir_path == os.path.join(test_dir, 'test-empty2-shp-dir')
+        assert dir_path == os.path.join(test_dir, 'test-shp4-shp-dir')
         assert os.listdir(dir_path) == []
+
+    def test_make_download_with_null_geometry(self):
+        ensure_dirs()
+        original_es_dump_path = os.path.join(
+            os.path.dirname(settings.BASE_DIR),
+            'search/tests/files/test_es_dump_null_geometry.esjson'
+        )
+        es_dump_path = os.path.join(test_dir, 'test-shp5.esjson')
+        shutil.copy(original_es_dump_path, es_dump_path)
+
+        exporter = ShapeExporter(self.project, True)
+        zip_path, mime_type = exporter.make_download(es_dump_path)
+
+        assert zip_path == os.path.join(test_dir, 'test-shp5-shp.zip')
+        assert mime_type == ('application/zip')
+
+        with ZipFile(zip_path) as myzip:
+            files = myzip.namelist()
+            assert len(files) == 2
+            assert 'README.txt' in files
+            assert 'locations.csv' in files
+
+            with myzip.open('locations.csv') as csv_file:
+                rows = list(csv.reader(io.TextIOWrapper(csv_file)))
+                assert rows[0][0] == 'id'
+                assert rows[0][1] == 'type'
+                assert rows[0][2] == 'quality'
+                assert rows[0][3] == 'infrastructure'
+                assert rows[1][0] == 'ID0'
+                assert rows[1][1] == 'PA'
+                assert rows[1][2] == 'point'
+                assert rows[1][3] == 'food, electricity'
 
 
 @pytest.mark.usefixtures('clear_temp')
@@ -430,12 +464,13 @@ class XLSExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_basic.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-xls1.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = XLSExporter(self.project)
         xls_path, mime_type = exporter.make_download(es_dump_path)
-        assert xls_path == os.path.join(test_dir, 'test.xlsx')
+
+        assert xls_path == os.path.join(test_dir, 'test-xls1.xlsx')
         assert mime_type == ('application/vnd.openxmlformats-officedocument.'
                              'spreadsheetml.sheet')
 
@@ -495,12 +530,13 @@ class XLSExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_empty.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-xls2.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = XLSExporter(self.project)
         xls_path, mime_type = exporter.make_download(es_dump_path)
-        assert xls_path == os.path.join(test_dir, 'test.xlsx')
+
+        assert xls_path == os.path.join(test_dir, 'test-xls2.xlsx')
         assert mime_type == ('application/vnd.openxmlformats-officedocument.'
                              'spreadsheetml.sheet')
 
@@ -530,12 +566,12 @@ class ResourceExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_basic.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test3-orig.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-res1-orig.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         # Rewrite the ES dump file to inject the resource ID
         with open(es_dump_path, 'r') as infile:
-            es_dump_path = os.path.join(test_dir, 'test3.esjson')
+            es_dump_path = os.path.join(test_dir, 'test-res1.esjson')
             fwrite = open(es_dump_path, 'w')
             for line in infile:
                 fwrite.write(line.replace('ID3', res.id))
@@ -544,7 +580,7 @@ class ResourceExporterTest(BaseTestClass):
         exporter = ResourceExporter(self.project)
         zip_path, mime_type = exporter.make_download(es_dump_path)
 
-        assert zip_path == os.path.join(test_dir, 'test3-res.zip')
+        assert zip_path == os.path.join(test_dir, 'test-res1-res.zip')
         assert mime_type == ('application/zip')
 
         with ZipFile(zip_path) as myzip:
@@ -582,13 +618,13 @@ class ResourceExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_dupe_resources.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test4.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-res2.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = ResourceExporter(self.project)
         zip_path, mime_type = exporter.make_download(es_dump_path)
 
-        assert zip_path == os.path.join(test_dir, 'test4-res.zip')
+        assert zip_path == os.path.join(test_dir, 'test-res2-res.zip')
         assert mime_type == ('application/zip')
 
         with ZipFile(zip_path) as myzip:
@@ -631,13 +667,13 @@ class ResourceExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_empty.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test5.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-res3.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = ResourceExporter(self.project)
         zip_path, mime_type = exporter.make_download(es_dump_path)
 
-        assert zip_path == os.path.join(test_dir, 'test5-res.zip')
+        assert zip_path == os.path.join(test_dir, 'test-res3-res.zip')
         assert mime_type == ('application/zip')
         assert ZipFile(zip_path).namelist() == []
 
@@ -663,12 +699,12 @@ class AllExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_basic.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test6-orig.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-all1-orig.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         # Rewrite the ES dump file to inject the resource ID
         with open(es_dump_path, 'r') as infile:
-            es_dump_path = os.path.join(test_dir, 'test6.esjson')
+            es_dump_path = os.path.join(test_dir, 'test-all1.esjson')
             fwrite = open(es_dump_path, 'w')
             for line in infile:
                 fwrite.write(line.replace('ID3', res.id))
@@ -677,7 +713,7 @@ class AllExporterTest(BaseTestClass):
         exporter = AllExporter(self.project)
         zip_path, mime_type = exporter.make_download(es_dump_path)
 
-        assert zip_path == os.path.join(test_dir, 'test6-res.zip')
+        assert zip_path == os.path.join(test_dir, 'test-all1-res.zip')
         assert mime_type == ('application/zip')
 
         with ZipFile(zip_path) as myzip:
@@ -772,13 +808,13 @@ class AllExporterTest(BaseTestClass):
             os.path.dirname(settings.BASE_DIR),
             'search/tests/files/test_es_dump_empty.esjson'
         )
-        es_dump_path = os.path.join(test_dir, 'test7.esjson')
+        es_dump_path = os.path.join(test_dir, 'test-all2.esjson')
         shutil.copy(original_es_dump_path, es_dump_path)
 
         exporter = AllExporter(self.project)
         zip_path, mime_type = exporter.make_download(es_dump_path)
 
-        assert zip_path == os.path.join(test_dir, 'test7-res.zip')
+        assert zip_path == os.path.join(test_dir, 'test-all2-res.zip')
         assert mime_type == ('application/zip')
 
         with ZipFile(zip_path) as myzip:

@@ -98,6 +98,8 @@ class ShapeExporter(Exporter):
             self.write_shp_layer(entity)
 
     def write_shp_layer(self, loc_data):
+        if loc_data['geometry.wkt'] == '':
+            return
         geom = ogr.CreateGeometryFromWkt(loc_data['geometry.wkt'])
         layer_type = geom.GetGeometryName().lower()
         layer = self.shp_layers.get(layer_type, None)
