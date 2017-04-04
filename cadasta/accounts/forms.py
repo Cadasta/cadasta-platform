@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
-
+from django.core.mail import send_mail
 from .models import User, now_plus_48_hours
 from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
@@ -85,7 +85,14 @@ class ProfileForm(forms.ModelForm):
         email = self.data.get('email')
         if self.instance.email != email:
             self._send_confirmation = True
-
+            send_mail(
+                "Email Update",
+                "Email Changed to "+email+" for your cadasta account." +
+                "Let us know if it was not you at"+settings.DEFAULT_FROM_EMAIL,
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
             if User.objects.filter(email=email).exists():
                 raise forms.ValidationError(
                     _("Another user with this email already exists"))
@@ -103,7 +110,6 @@ class ProfileForm(forms.ModelForm):
             self._send_confirmation = False
             user.email_verified = False
             user.verify_email_by = now_plus_48_hours()
-
         user.save()
         return user
 
