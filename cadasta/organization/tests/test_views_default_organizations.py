@@ -85,6 +85,17 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(user=adminuser)
 
+    def test_num_projects_attribute(self):
+        # Add projects and annotate num_projects for self.orgs
+        for org in self.orgs:
+            ProjectFactory.create_batch(3, organization=org)
+            ProjectFactory.create_batch(2, organization=org, archived=True)
+            org.num_projects = 3
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(self.orgs, key=lambda p: p.slug))
+
     def test_get_with_superuser(self):
         superuser = UserFactory.create()
         self.superuser_role = Role.objects.get(name='superuser')
