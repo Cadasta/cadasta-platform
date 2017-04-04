@@ -130,7 +130,7 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = [
     'core.backends.Auth',
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend'
+    'accounts.backends.AuthenticationBackend'
 ]
 
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'

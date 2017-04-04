@@ -24,6 +24,7 @@
   <div class="form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
     {% render_field form.email class+="form-control input-lg" data-parsley-required="true" %}
+    {% if emails_to_verify %}<p class="help-block small">{% trans "The email for this account has been changed recently, but the new email address has not yet been verified. You should have received an email with a link to verify the new email address." %}</p>{% endif %}
     <div class="error-block">{{ form.email.errors }}</div>
   </div>
 

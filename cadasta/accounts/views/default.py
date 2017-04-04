@@ -10,6 +10,7 @@ from core.views.mixins import SuperUserCheckMixin
 import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
+from allauth.account.models import EmailAddress
 
 from ..models import User
 from .. import forms
@@ -40,6 +41,13 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
     def get_object(self, *args, **kwargs):
         return self.request.user
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        emails_to_verify = EmailAddress.objects.filter(
+            user=self.object, verified=False).exists()
+        context['emails_to_verify'] = emails_to_verify
+        return context
 
     def get_form_kwargs(self, *args, **kwargs):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
@@ -73,6 +81,7 @@ class ConfirmEmail(ConfirmEmailView):
         response = super().post(*args, **kwargs)
 
         user = self.get_object().email_address.user
+        user.email = self.get_object().email_address.email
         user.email_verified = True
         user.is_active = True
         user.save()

@@ -20,11 +20,38 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_template_context(self):
         return {
-            'form': ProfileForm(instance=self.user)
+            'form': ProfileForm(instance=self.user),
+            'emails_to_verify': False
         }
 
     def test_get_profile(self):
         self.user = UserFactory.create()
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_profile_with_unverified_email(self):
+        self.user = UserFactory.create()
+        EmailAddress.objects.create(
+            user=self.user,
+            email='miles2@davis.co',
+            verified=False,
+            primary=True
+        )
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(emails_to_verify=True)
+
+    def test_get_profile_with_verified_email(self):
+        self.user = UserFactory.create()
+        EmailAddress.objects.create(
+            user=self.user,
+            email=self.user.email,
+            verified=True,
+            primary=True
+        )
         response = self.request(user=self.user)
 
         assert response.status_code == 200
@@ -140,6 +167,27 @@ class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert self.user.email_verified is True
         assert self.user.is_active is True
+
+        self.email_address.refresh_from_db()
+        assert self.email_address.verified is True
+
+    def test_activate_changed_email(self):
+        self.email_address.email = 'john2@example.com'
+        self.email_address.save()
+
+        EmailConfirmation.objects.create(
+            email_address=self.email_address,
+            sent=datetime.datetime.now(),
+            key='456'
+        )
+        response = self.request(user=self.user, url_kwargs={'key': '456'})
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.email_verified is True
+        assert self.user.is_active is True
+        assert self.user.email == 'john2@example.com'
 
         self.email_address.refresh_from_db()
         assert self.email_address.verified is True
