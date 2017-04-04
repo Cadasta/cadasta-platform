@@ -284,5 +284,5 @@ class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
             '{}/project-{}/_data/?format=json&source={}'.format(
                 api_url, project_id, query_dsl_param
             )
-        ])
+        ]).check_returncode()
         return es_dump_path

@@ -47,13 +47,13 @@ class Exporter(SchemaSelectorMixin):
 
         # Create ordered dict of all attributes, conditional or not
         for metadatum in self.metadata.values():
-            attr_columns = OrderedDict()
-            for a in metadatum['model_attrs']:
-                attr_columns[a] = ''
-            for _, attrs in metadatum['schema_attrs'].items():
-                for a in attrs.values():
-                    if a.name not in attr_columns.keys():
-                        attr_columns[a.name] = None
+            attr_columns = OrderedDict(
+                (a, '') for a in metadatum['model_attrs'])
+            schema_columns = OrderedDict(
+                (a.name, '')
+                for attrs in metadatum['schema_attrs'].values()
+                for a in attrs.values())
+            attr_columns.update(schema_columns)
             metadatum['attr_columns'] = attr_columns
 
     def get_attr_values(self, item, metadatum):

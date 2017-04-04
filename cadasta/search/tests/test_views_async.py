@@ -4,6 +4,7 @@ import json
 import os
 import pytest
 import shutil
+import subprocess
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -585,6 +586,16 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert self.view_class().htmlize_result(augmented_result) == expected
 
 
+class MyCompletedProcess:
+
+    def __init__(self, returncode):
+        self.returncode = returncode
+
+    def check_returncode(self):
+        if self.returncode:
+            raise subprocess.CalledProcessError(6, 'curl')
+
+
 def mock_subprocess_run_curl(*args):
     assert args[0][0] == 'curl'
     ensure_dirs()
@@ -593,6 +604,11 @@ def mock_subprocess_run_curl(*args):
         'search/tests/files/test_es_dump_basic.esjson'
     )
     shutil.copy(original_es_dump_path, args[0][2])
+    return MyCompletedProcess(0)
+
+
+def mock_subprocess_run_curl_with_error(*args):
+    return MyCompletedProcess(1)
 
 
 @pytest.mark.usefixtures('clear_temp')
@@ -818,3 +834,8 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
                 api_url, query_dsl_param
             )
         ])
+
+    @patch('subprocess.run', new=mock_subprocess_run_curl_with_error)
+    def test_query_es_with_curl_error(self):
+        with pytest.raises(subprocess.CalledProcessError):
+            self.view_class().query_es('projectid', 'userid', 'query')
