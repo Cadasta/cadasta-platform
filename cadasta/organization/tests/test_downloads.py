@@ -863,6 +863,10 @@ class ResourcesTest(UserTestCase, TestCase):
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
         res = ResourceFactory.create(project=project)
+        res2 = ResourceFactory.create(
+            project=project,
+            original_file='image1.jpg',
+            archived=True)
 
         t = round(time.time() * 1000)
         path, mime = exporter.make_download('res-test-' + str(t))
@@ -873,4 +877,5 @@ class ResourcesTest(UserTestCase, TestCase):
         with ZipFile(path, 'r') as testzip:
             assert len(testzip.namelist()) == 2
             assert res.original_file in testzip.namelist()
+            assert res2.original_file not in testzip.namelist()
             assert 'resources.xlsx' in testzip.namelist()
