@@ -421,14 +421,20 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             tenure_type=TenureRelationshipType.objects.get(id='LH'),
             spatial_unit=self.location,
             project=self.project)
-        lh_ten.type_labels = ('data-label-de="Miete" '
-                              'data-label-en="Leasehold"')
+
         wr_ten = TenureRelationshipFactory.create(
             tenure_type=TenureRelationshipType.objects.get(id='WR'),
             spatial_unit=self.location,
             project=self.project)
-        wr_ten.type_labels = ('data-label-de="Wasserecht" '
-                              'data-label-en="Water rights"')
+
+        relationships = self.location.tenurerelationship_set.all()
+        for rel in relationships:
+            if lh_ten == rel:
+                rel.type_labels = ('data-label-de="Miete" '
+                                   'data-label-en="Leasehold"')
+            elif wr_ten == rel:
+                rel.type_labels = ('data-label-de="Wasserecht" '
+                                   'data-label-en="Water rights"')
 
         user = UserFactory.create()
         assign_policies(user)
@@ -438,7 +444,7 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             type_labels=('data-label-de="Parzelle Typ" '
                          'data-label-en="Location type"'),
             type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
-            relationships=[wr_ten, lh_ten],
+            relationships=relationships,
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')]
         )
