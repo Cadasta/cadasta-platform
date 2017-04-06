@@ -3,11 +3,11 @@ from buckets.serializers import S3Field
 from rest_framework import serializers
 
 from django.db import transaction
-from django.utils.translation import ugettext as _
 from django.db.utils import IntegrityError
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
+from .messages import MISSING_RELEVANT
 from .exceptions import InvalidQuestionnaire
 from .validators import validate_questionnaire
 from .managers import fix_labels
@@ -177,14 +177,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
                         selectors=selectors,
                         default_language=self.context['default_language'])
                 except IntegrityError:
-                    raise InvalidQuestionnaire(
-                        errors=[
-                            _("Unable to assign question group to model "
-                              "entitity. Make sure to add a 'relevant' clause "
-                              "to the question group definition when adding "
-                              "defining more than one question group for a "
-                              "model entity.")
-                        ])
+                    raise InvalidQuestionnaire(errors=[MISSING_RELEVANT])
 
                 for field in initial_data.get('questions', []):
                     if field['type'] == 'S1':
@@ -271,8 +264,6 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
                 instance = models.Questionnaire.objects.create(
                     project=project,
                     **validated_data)
-                project.current_questionnaire = instance.id
-                project.save()
 
                 context = {
                     'questionnaire_id': instance.id,
@@ -281,6 +272,9 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
                 }
                 create_questions(questions, context)
                 create_groups(question_groups, context)
+
+                project.current_questionnaire = instance.id
+                project.save()
 
                 return instance
 

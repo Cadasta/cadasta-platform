@@ -6,11 +6,13 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.translation import ugettext as _
+from django.db.utils import IntegrityError
 from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
 from pyxform.xls2json import parse_file_to_json
-from questionnaires.exceptions import InvalidQuestionnaire
+from .exceptions import InvalidQuestionnaire
+from .messages import MISSING_RELEVANT
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -83,9 +85,12 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
             selector = re.sub("'", '', clauses[1])
             selectors += (selector,)
 
-    schema_obj = Schema.objects.create(content_type=content_type,
-                                       selectors=selectors,
-                                       default_language=default_language)
+    try:
+        schema_obj = Schema.objects.create(content_type=content_type,
+                                           selectors=selectors,
+                                           default_language=default_language)
+    except IntegrityError:
+        raise InvalidQuestionnaire(errors=[MISSING_RELEVANT])
 
     for c in dict.get('children'):
         field = {}
@@ -209,7 +214,6 @@ class QuestionnaireManager(models.Manager):
                 instance.save()
 
                 project.current_questionnaire = instance.id
-                project.save()
 
                 create_children(
                     children=json.get('children'),
@@ -218,6 +222,7 @@ class QuestionnaireManager(models.Manager):
                     default_language=instance.default_language,
                     kwargs={'questionnaire': instance}
                 )
+                project.save()
 
                 # all these errors handled by PyXForm so turning off for now
                 # if errors:

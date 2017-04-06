@@ -172,12 +172,10 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
 
         assert response.status_code == 400
         assert Questionnaire.objects.filter(project=self.prj).count() == 0
-        print(response)
         assert response.content['non_field_errors'] == [
             "Unable to assign question group to model "
             "entitity. Make sure to add a 'relevant' clause "
             "to the question group definition when adding "
-            "defining more than one question group for a "
-            "model entity."]
+            "more than one question group for a model entity."]
         self.prj.refresh_from_db()
         assert self.prj.current_questionnaire is None

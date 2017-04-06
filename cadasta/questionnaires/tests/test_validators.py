@@ -230,7 +230,6 @@ class QuestionOptionTestCase(TestCase):
             'index': 0
         }]
         errors = validators.validate_question_options(data)
-        print(errors)
         assert errors == [{}]
 
     def test_invalid_option(self):
@@ -243,5 +242,4 @@ class QuestionOptionTestCase(TestCase):
             'index': 1
         }]
         errors = validators.validate_question_options(data)
-        print(errors)
         assert errors == [{}, {'label': ['This field is required.']}]

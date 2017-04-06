@@ -8,10 +8,12 @@ from questionnaires.exceptions import InvalidQuestionnaire
 from core.tests.utils.files import make_dirs  # noqa
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from jsonattrs.models import Attribute
+from jsonattrs.models import create_attribute_types
 
 from . import factories
 from .. import models
 from ..managers import create_children, create_options
+from ..messages import MISSING_RELEVANT
 
 
 class CreateChildrenTest(TestCase):
@@ -169,6 +171,24 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
                 project=ProjectFactory.create()
             )
         assert "Unknown question type 'interger'." in e.value.errors
+
+        assert models.Questionnaire.objects.exists() is False
+        assert models.QuestionGroup.objects.exists() is False
+        assert models.Question.objects.exists() is False
+
+    def test_create_from_invald_form_missing_relevant_clause(self):
+        create_attribute_types()
+        file = self.get_file(
+            '/questionnaires/tests/files/'
+            't_questionnaire_missing_relevant.xlsx', 'rb')
+        form = self.storage.save(
+            'xls-forms/t_questionnaire_missing_relevant.xlsx', file)
+        with pytest.raises(InvalidQuestionnaire) as e:
+            models.Questionnaire.objects.create_from_form(
+                xls_form=form,
+                project=ProjectFactory.create()
+            )
+        assert MISSING_RELEVANT in e.value.errors
 
         assert models.Questionnaire.objects.exists() is False
         assert models.QuestionGroup.objects.exists() is False
