@@ -26,9 +26,9 @@
               </div>
               <div class="member-detail">
                 <h4>{{ object.username }}</h4>
-                {{ object.full_name }}<br>
+                <p>{{ object.full_name }}<br>
                 {{ object.email }}<br>
-                {% trans "Last login:" %} {{ object.last_login }}<br>
+                <span class="small help-block">{% trans "Last login:" %} {{ object.last_login }}</span></p>
               </div>
               <form method="POST" action="" class="org-member-edit" id='organization_permissions' data-parsley-validate>
                 {% csrf_token %}
