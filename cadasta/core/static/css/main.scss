@@ -886,6 +886,12 @@ div.add-btn-btm { // add party link at bottom of table
     display: table-cell;
     vertical-align: top;
     padding: 2px;
+    > span.glyphicon {
+      padding-right: 10px;
+    }
+    ul {
+      padding-top: 6px;
+    }
   }
 }
 .form-narrow, .narrow {
