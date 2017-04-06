@@ -1,5 +1,4 @@
 from django.utils.translation import ugettext as _
-from django.contrib.messages.api import MessageFailure
 from allauth.account.utils import send_email_confirmation
 
 from rest_framework.serializers import ValidationError
@@ -26,10 +25,8 @@ class AccountUser(djoser_views.UserView):
         if user.email != new_email:
             updated = serializer.save(email=old_email)
             updated.email = new_email
-            try:
-                send_email_confirmation(self.request._request, updated)
-            except MessageFailure:
-                pass
+
+            send_email_confirmation(self.request._request, updated)
             send_email_update_notification(old_email)
 
         else:
@@ -44,10 +41,7 @@ class AccountRegister(djoser_views.RegistrationView):
         signals.user_registered.send(sender=self.__class__, user=user,
                                      request=self.request)
 
-        try:
-            send_email_confirmation(self.request._request, user)
-        except MessageFailure:
-            pass
+        send_email_confirmation(self.request._request, user)
 
 
 class AccountLogin(djoser_views.LoginView):
@@ -68,10 +62,7 @@ class AccountLogin(djoser_views.LoginView):
             user.is_active = False
             user.save()
 
-            try:
-                send_email_confirmation(self.request._request, user)
-            except MessageFailure:
-                pass
+            send_email_confirmation(self.request._request, user)
 
             return Response(
                 data={'detail': _("The email has not been verified.")},
