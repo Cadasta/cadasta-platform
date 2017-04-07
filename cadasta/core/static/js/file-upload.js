@@ -14,6 +14,8 @@ $(function() {
         $('a.file-link').attr('download', file.name);
     });
 
+    var name = file.name.substr(0, file.name.lastIndexOf('.')).replace(/_/, " ");
+    $('input[name="name"][prefill="true"]').val(name);
     $('input[name="original_file"]').val(file.name);
     $('input[name="details-original_file"]').val(file.name);
 

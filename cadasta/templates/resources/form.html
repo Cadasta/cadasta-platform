@@ -15,7 +15,7 @@
     <hr class="divider">
     <div class="form-group{% if form.name.errors %} has-error{% endif %}">
       <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
-      {% render_field form.name class+="form-control" data-parsley-required="true" data-parsley-sanitize="1" %}
+      {% render_field form.name class+="form-control" prefill="true" data-parsley-required="true" data-parsley-sanitize="1" %}
       <div class="error-block">{{ form.name.errors }}</div>
     </div>
     <div class="form-group{% if form.description.errors %} has-error{% endif %}">
