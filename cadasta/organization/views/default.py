@@ -653,6 +653,12 @@ class ProjectEditDetails(ProjectEdit, generic.UpdateView):
                 form.add_error('questionnaire', err)
             return self.form_invalid(form)
 
+    def form_invalid(self, form):
+        project = self.get_project()
+        project.refresh_from_db(fields=('current_questionnaire', ))
+        context = self.get_context_data(object=project, form=form)
+        return self.render_to_response(context)
+
 
 class ProjectEditPermissions(ProjectEdit, generic.UpdateView):
     form_class = forms.ProjectEditPermissions
