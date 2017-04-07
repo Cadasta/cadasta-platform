@@ -201,13 +201,18 @@
     $(document).ready(function () {
       $('.datatable').DataTable({
         conditionalPaging: true,
-        "dom": '<"table-search clearfix"f>t<"table-entries"i><"table-num"l><"table-pagination"p>',
+        "dom": '<"table-search clearfix"f>t<"table-pagination"p><"table-entries"i><"table-num"l>',
         "language": {
           "emptyTable":     "{% trans "No data available in table" %}",
           "info":           "{% trans "Showing _START_ - _END_ of _TOTAL_" %}",
           "infoEmpty":      "{% trans "Showing 0 - 0 of 0" %}",
           "infoFiltered":   "{% trans "(filtered from _MAX_ total rows)" %}",
-          "lengthMenu":     "{% trans "Show _MENU_ rows" %}",
+          "lengthMenu":     '<select class="form-control input-sm">'+
+                            ' <option value="10">{% trans "10 per page" %}</option>'+
+                            ' <option value="25">{% trans "25 per page" %}</option>'+
+                            ' <option value="50">{% trans "50 per page" %}</option>'+
+                            ' <option value="100">{% trans "100 per page" %}</option>'+
+                            '</select>',
           "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
           "searchPlaceholder": '{% trans "Search" %}',
           "zeroRecords":    "{% trans "No matching records found" %}",

@@ -513,6 +513,9 @@ body.map .content-single {
 
 .dataTables_wrapper {
   clear: both;
+  div.dataTables_info {
+    padding-top: 10px !important;
+  }
   .table-search { // search
     label {
       float: left;
@@ -527,7 +530,7 @@ body.map .content-single {
     font-size: 12px;
     float: left;
     display: inline-block;
-    padding-right: 10px;
+    padding-right: 20px;
     opacity: 0.8;
   }
   .table-num { // select number of entries per page
@@ -535,14 +538,13 @@ body.map .content-single {
     float: left;
     display: inline-block;
     padding-top: 3px;
-    padding-left: 10px;
-    border-left: 1px solid $table-border-color;
+    padding-right: 20px;
     opacity: 0.8;
     .input-sm {
-      padding: 5px;
+      padding: 2px;
     }
     select {
-      width: 55px !important;
+      width: 100px !important;
     }
   }
   .table-pagination { // pagination
@@ -580,8 +582,10 @@ body.map .content-single {
   }
 }
 
-.detail div.dataTables_wrapper div.dataTables_filter input {
-  max-width: 100px;
+.detail div.dataTables_wrapper {
+  div.dataTables_filter input {
+    max-width: 100px;
+  }
 }
 
 @media (max-width: 500px) {
@@ -607,13 +611,7 @@ body.map .content-single {
     }
     .table-num { // select number of entries per page
       font-size: 10px;
-      padding-top: 0;
-      padding-left: 5px;
-      .input-sm {
-        padding: 2px;
-      }
       select {
-        width: 50px !important;
         font-size: 10px;
       }
     }
