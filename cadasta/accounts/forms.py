@@ -64,22 +64,17 @@ class RegisterForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput(), required=False)
+    password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
         model = User
         fields = ['username', 'email', 'full_name']
-
-    class Media:
-        js = ('js/profile.js', )
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.current_email = self.instance.email
-        if self.current_email != self.data.get('email', self.current_email):
-            self.fields['password'].required = True
 
     def clean_username(self):
         username = self.data.get('username')

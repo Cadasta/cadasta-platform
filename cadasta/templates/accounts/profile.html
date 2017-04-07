@@ -7,11 +7,6 @@
 
 {% block title %} | {% trans "Profile" %}{% endblock %}
 
-{% block extra_script %}
-  {{ block.super }}
-  {{ form.media }}
-{% endblock %}
-
 {% block content %}
 
 <form class="profile-form form-narrow" method="POST"
@@ -33,16 +28,17 @@
     <div class="error-block">{{ form.email.errors }}</div>
   </div>
 
-  <div class="form-group{% if form.password.errors %} has-error{% else %} hide{% endif %}" id="group_password">
-    <label class="control-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
-    {% render_field form.password class+="form-control input-lg" %}
-    <div class="error-block">{{ form.password.errors }}</div>
-  </div>
-
   <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}</label>
     {% render_field form.full_name class+="form-control input-lg" %}
     <div class="error-block">{{ form.full_name.errors }}</div>
+  </div>
+
+  <div class="well form-group {% if form.password.errors %} has-error{% endif %}">
+    <label class="control-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+    <p class="help-block small">{% trans "Please enter your password to verify your identity." %}</p>
+    {% render_field form.password class+="form-control input-lg" data-parsley-required="true" %}
+    <div class="error-block">{{ form.password.errors }}</div>
   </div>
 
   <button name="update" type="submit"

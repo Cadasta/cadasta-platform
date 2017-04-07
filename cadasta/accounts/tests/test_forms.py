@@ -198,7 +198,7 @@ class RegisterFormTest(UserTestCase, TestCase):
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
             'password': 'Iloveyoko68!',
-            'full_name': 'John Lennon',
+            'full_name': 'John Lennon'
         }
         form = forms.RegisterForm(data)
 
@@ -209,43 +209,6 @@ class RegisterFormTest(UserTestCase, TestCase):
 
 
 class ProfileFormTest(UserTestCase, TestCase):
-    def test_password_required_when_changing_email(self):
-        user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk',
-                                  email_verified=True,
-                                  password='sgt-pepper')
-        data = {
-            'username': 'imagine71',
-            'email': 'john2@beatles.uk',
-            'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
-        }
-        form = forms.ProfileForm(data, instance=user)
-        assert form.fields['password'].required is True
-
-    def test_password_not_required_when_not_changing_email(self):
-        user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk',
-                                  email_verified=True,
-                                  password='sgt-pepper')
-        data = {
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
-        }
-        form = forms.ProfileForm(data, instance=user)
-        assert form.fields['password'].required is False
-
-    def test_password_not_required_without_data(self):
-        user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk',
-                                  email_verified=True,
-                                  password='sgt-pepper')
-
-        form = forms.ProfileForm(instance=user)
-        assert form.fields['password'].required is False
-
     def test_update_user(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
@@ -278,13 +241,15 @@ class ProfileFormTest(UserTestCase, TestCase):
 
     def test_display_name(self):
         user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk')
+                                  email='john@beatles.uk',
+                                  password='sgt-pepper')
         assert user.get_display_name() == 'imagine71'
 
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
+            'password': 'sgt-pepper'
         }
         form = forms.ProfileForm(data, instance=user)
         form.save()
@@ -295,11 +260,13 @@ class ProfileFormTest(UserTestCase, TestCase):
     def test_update_user_with_existing_username(self):
         UserFactory.create(username='existing')
         user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk')
+                                  email='john@beatles.uk',
+                                  password='sgt-pepper')
         data = {
             'username': 'existing',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
+            'password': 'sgt-pepper'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -323,12 +290,14 @@ class ProfileFormTest(UserTestCase, TestCase):
         existing_user.refresh_from_db()
         assert existing_user.username == 'TestUser'
 
-        user = UserFactory.create(
-            username='JohNlEnNoN', email='john@beatles.uk')
+        user = UserFactory.create(username='JohNlEnNoN',
+                                  email='john@beatles.uk',
+                                  password='sgt-pepper')
         data = {
             'username': 'johnLennon',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
+            'password': 'sgt-pepper'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is True
@@ -340,11 +309,13 @@ class ProfileFormTest(UserTestCase, TestCase):
     def test_update_user_with_existing_email(self):
         UserFactory.create(email='existing@example.com')
         user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk')
+                                  email='john@beatles.uk',
+                                  password='sgt-pepper')
         data = {
             'username': 'imagine71',
             'email': 'existing@example.com',
             'full_name': 'John Lennon',
+            'password': 'sgt-pepper'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -357,6 +328,7 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
+            'password': 'sgt-pepper'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -394,25 +366,6 @@ class ProfileFormTest(UserTestCase, TestCase):
         else:
             assert True
 
-    def test_update_email_with_correct_password(self):
-        user = UserFactory.create(email='john@beatles.uk',
-                                  password='imagine71')
-        data = {
-            'username': 'imagine71',
-            'email': 'john2@beatles.uk',
-            'full_name': 'John Lennon',
-            'password': 'imagine71'
-        }
-        request = HttpRequest()
-        setattr(request, 'session', 'session')
-        self.messages = FallbackStorage(request)
-        setattr(request, '_messages', self.messages)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
-
-        form = forms.ProfileForm(data, request=request, instance=user)
-        assert form.is_valid() is True
-
     def test_update_email_with_incorrect_password(self):
         user = UserFactory.create(email='john@beatles.uk',
                                   password='imagine71')
@@ -422,18 +375,11 @@ class ProfileFormTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
             'password': 'stg-pepper'
         }
-        request = HttpRequest()
-        setattr(request, 'session', 'session')
-        self.messages = FallbackStorage(request)
-        setattr(request, '_messages', self.messages)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
 
-        form = forms.ProfileForm(data, request=request, instance=user)
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
-        assert form.is_valid() is False
-        assert EmailAddress.objects.filter(user=user).count() == 0
 
 
 class ChangePasswordFormTest(UserTestCase, TestCase):

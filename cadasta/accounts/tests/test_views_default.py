@@ -58,11 +58,13 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.expected_content
 
     def test_update_profile(self):
-        user = UserFactory.create(username='John')
+        user = UserFactory.create(username='John',
+                                  password='sgt-pepper')
         post_data = {
             'username': 'John',
             'email': user.email,
-            'full_name': 'John Lennon'
+            'full_name': 'John Lennon',
+            'password': 'sgt-pepper'
         }
         response = self.request(method='POST', post_data=post_data, user=user)
         response.status_code == 200
