@@ -64,6 +64,8 @@ class RegisterForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput())
+
     class Meta:
         model = User
         fields = ['username', 'email', 'full_name']
@@ -83,6 +85,12 @@ class ProfileForm(forms.ModelForm):
                 _("Username cannot be “add” or “new”."))
         return username
 
+    def clean_password(self):
+        if (self.fields['password'].required and
+                not self.instance.check_password(self.data.get('password'))):
+            raise forms.ValidationError(
+                _("Please provide the correct password for your account."))
+
     def clean_email(self):
         email = self.data.get('email')
         if self.instance.email != email:
@@ -90,15 +98,15 @@ class ProfileForm(forms.ModelForm):
                 raise forms.ValidationError(
                     _("Another user with this email already exists"))
 
-            current_email_set = self.instance.emailaddress_set.all()
-            if current_email_set.exists():
-                current_email_set.delete()
-
         return email
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)
         if self.current_email != user.email:
+            current_email_set = self.instance.emailaddress_set.all()
+            if current_email_set.exists():
+                current_email_set.delete()
+
             send_email_confirmation(self.request, user)
             send_email_update_notification(self.current_email)
             user.email = self.current_email
