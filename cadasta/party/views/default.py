@@ -156,6 +156,7 @@ class PartiesDelete(LoginPermissionRequiredMixin,
     permission_denied_message = error_messages.PARTY_DELETE
 
     def get_success_url(self):
+
         kwargs = self.kwargs
         del kwargs['party']
         return reverse('parties:list', kwargs=self.kwargs)

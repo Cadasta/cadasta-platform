@@ -14,7 +14,7 @@ from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Sum, When, Case, IntegerField
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from questionnaires.exceptions import InvalidXLSForm
@@ -37,8 +37,18 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
                                   else ('org.view_archived',))
 
     # This queryset annotation is needed to avoid generating a query for each
-    # organization in order to count the number of projects per org
-    queryset = Organization.objects.annotate(num_projects=Count('projects'))
+    # organization in order to count the number of projects
+    # per org that not archived
+    queryset = Organization.objects.annotate(
+        num_projects=Sum
+        (Case
+         (When
+          (projects__archived=0, then=1),
+          default=0,
+          output_field=IntegerField()
+          )
+         )
+    )
 
 
 class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
