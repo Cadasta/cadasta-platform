@@ -863,14 +863,19 @@ class ResourcesTest(UserTestCase, TestCase):
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
         res = ResourceFactory.create(project=project)
+        res2 = ResourceFactory.create(project=project)
 
         t = round(time.time() * 1000)
         path, mime = exporter.make_download('res-test-' + str(t))
         assert path == os.path.join(settings.MEDIA_ROOT,
                                     'temp/res-test-{}.zip'.format(t))
         assert mime == 'application/zip'
-
         with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 2
-            assert res.original_file in testzip.namelist()
+            assert len(testzip.namelist()) == 3
+            assert res.original_file == res2.original_file
+            filename, file_ext = os.path.splitext(res.original_file)
+            original_name = "{}{}".format(filename, file_ext)
+            modified_dup_name = "{}_1{}".format(filename, file_ext)
+            assert original_name in testzip.namelist()
+            assert modified_dup_name in testzip.namelist()
             assert 'resources.xlsx' in testzip.namelist()

@@ -52,8 +52,19 @@ class ResourceExporter():
         resources = Resource.objects.filter(project=self.project)
         res_data = []
 
+        files = {}
+
         with ZipFile(path, 'a') as myzip:
             for r in resources:
+                resource_name = r.original_file
+                filename, file_ext = os.path.splitext(resource_name)
+                if resource_name in files:
+                    filename += "_" + str(files[resource_name])
+                    files[resource_name] += 1
+                else:
+                    files[resource_name] = 1
+
+                r.original_file = filename + file_ext
                 res_data.append(self.pack_resource_data(r))
                 myzip.write(r.file.open().name, arcname=r.original_file)
 
