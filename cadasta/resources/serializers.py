@@ -12,8 +12,9 @@ class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
         fields = ('id', 'name', 'description', 'file', 'original_file',
-                  'archived',)
+                  'archived', 'mime_type', )
         read_only_fields = ('id', )
+        extra_kwargs = {'mime_type': {'required': False}}
 
     def is_valid(self, raise_exception=False):
         data = self.initial_data

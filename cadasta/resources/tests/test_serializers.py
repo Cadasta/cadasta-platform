@@ -1,5 +1,7 @@
 import pytest
+import os
 from django.test import TestCase
+from django.conf import settings
 from rest_framework.serializers import ValidationError
 
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
@@ -26,7 +28,7 @@ class ResourceSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_create_project_resource(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('image.jpg', file)
+        file_name = self.storage.save('resources/image.jpg', file)
 
         project = ProjectFactory.create()
         user = UserFactory.create()
@@ -34,19 +36,50 @@ class ResourceSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
             'name': 'New resource',
             'description': '',
             'file': file_name,
-            'original_file': 'image.png'
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
         }
         serializer = ResourceSerializer(
             data=data,
             context={'content_object': project,
                      'contributor': user,
                      'project_id': project.id})
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         serializer.save()
 
         assert project.resources.count() == 1
         assert project.resources.first().name == data['name']
         assert project.resources.first().contributor == user
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/image-128x128.jpg')
+        )
+
+    def test_create_project_resource_without_mime_type(self):
+        file = self.get_file('/resources/tests/files/text.txt', 'rb')
+        file_name = self.storage.save('resources/text.txt', file)
+
+        project = ProjectFactory.create()
+        user = UserFactory.create()
+        data = {
+            'name': 'New resource',
+            'description': '',
+            'file': file_name,
+            'original_file': 'text.txt'
+        }
+        serializer = ResourceSerializer(
+            data=data,
+            context={'content_object': project,
+                     'contributor': user,
+                     'project_id': project.id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        assert project.resources.count() == 1
+        assert project.resources.first().name == data['name']
+        assert project.resources.first().contributor == user
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/resources/text-128x128.txt')
+        ) is False
 
     def test_assign_existing_resource(self):
         project = ProjectFactory.create()
