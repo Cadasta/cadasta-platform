@@ -31,7 +31,8 @@ from ..export.all import AllExporter
 from ..export.resource import ResourceExporter
 from ..export.shape import ShapeExporter
 from ..export.xls import XLSExporter
-from ..export.utils import convert_postgis_ewkb_to_ewkt
+from ..export.utils import (convert_postgis_ewkb_to_ewkt,
+                            NotWgs84EwkbValueError)
 
 
 test_dir = os.path.join(settings.MEDIA_ROOT, 'temp')
@@ -830,8 +831,8 @@ class UtilsTest(TestCase):
 
     def test_convert_postgis_ewkb_to_ewkt(self):
         ewkb = '0101000020E6100000000000000000F03F000000000000F03F'
-        with pytest.raises(AssertionError):
+        with pytest.raises(NotWgs84EwkbValueError):
             convert_postgis_ewkb_to_ewkt('')
-        with pytest.raises(AssertionError):
+        with pytest.raises(NotWgs84EwkbValueError):
             convert_postgis_ewkb_to_ewkt(ewkb.lower())
         assert convert_postgis_ewkb_to_ewkt(ewkb) == 'SRID=4326;POINT (1 1)'

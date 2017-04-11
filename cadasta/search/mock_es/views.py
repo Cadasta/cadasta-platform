@@ -112,6 +112,8 @@ class BaseAllEsTypes(APIView):
         query = query_dsl['query']['simple_query_string']['query'].lower()
         if query == 'error':
             return Response({}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        if query == 'bulkerror' and self.bulk:
+            return Response({}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         entities = []
         page = []

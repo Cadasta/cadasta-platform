@@ -363,22 +363,27 @@ class DumpAllEsTypesTest(ViewTestCase, UserTestCase, TestCase):
         assert content[0]['index']['_type'] == 'resource'
         assert content[1]['id'] == self.resource.id
 
-    def test_post_with_paging_out_of_range(self):
+    def test_get_with_paging_out_of_range(self):
         query = self.query_format.format(q='test', f='6', s='10')
         response = self.request(get_data={'source': query})
         assert response.status_code == 200
         assert response.headers['content-type'][1] == 'text/plain'
         assert response.content == ''
 
-    def test_post_with_none_query(self):
+    def test_get_with_none_query(self):
         query = self.query_format.format(q='NONE', f='0', s='10')
         response = self.request(get_data={'source': query})
         assert response.status_code == 200
         assert response.headers['content-type'][1] == 'text/plain'
         assert response.content == ''
 
-    def test_post_with_error_query(self):
+    def test_get_with_error_query(self):
         query = self.query_format.format(q='ERROR', f='0', s='10')
+        response = self.request(get_data={'source': query})
+        assert response.status_code != 200
+
+    def test_get_with_bulkerror_query(self):
+        query = self.query_format.format(q='BULKERROR', f='0', s='10')
         response = self.request(get_data={'source': query})
         assert response.status_code != 200
 
