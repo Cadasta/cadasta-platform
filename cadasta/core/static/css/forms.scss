@@ -94,6 +94,12 @@ tr.contacts-error {
   }
 }
 
+@media (max-width: $screen-sm-max) {
+  .langs-select select {
+    font-size: 11px;
+  }
+}
+
 /* =Required field label
 -------------------------------------------------------------- */
 
