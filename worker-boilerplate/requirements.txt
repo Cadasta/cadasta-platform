@@ -1,0 +1,4 @@
+git+https://github.com/celery/kombu.git@master#egg=kombu  # Pending 4.0.3 which should include https://github.com/celery/kombu/pull/693 which supports FIFO queues and Python 3.4+
+celery==4.0.2
+boto3==1.4.4
+pycurl==7.43.0

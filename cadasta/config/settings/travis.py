@@ -39,3 +39,8 @@ CACHES = {
         'LOCATION': 'jsonattrs'
     }
 }
+
+# Async Tooling
+CELERY_ALWAYS_EAGER = True
+CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
+CELERY_BROKER_TRANSPORT = 'memory'
