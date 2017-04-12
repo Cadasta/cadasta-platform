@@ -201,15 +201,11 @@ class TransformTest(UserTestCase, TestCase):
         ]
 
 
-class AllEsTypesTest(APITestCase, UserTestCase, TestCase):
+class SearchTest(APITestCase, UserTestCase, TestCase):
 
-    view_class = views.AllEsTypes
+    view_class = views.Search
     post_data = {
-        'query': {
-            'simple_query_string': {
-                'query': 'test',
-            },
-        },
+        'query': {'bool': {'should': [{'multi_match': {'query': 'test'}}]}},
         'from': 0,
         'size': 10,
     }
@@ -230,7 +226,10 @@ class AllEsTypesTest(APITestCase, UserTestCase, TestCase):
         self.resource = ResourceFactory.create(project=self.project)
 
     def setup_url_kwargs(self):
-        return {'projectid': self.project.id}
+        return {
+            'projectid': self.project.id,
+            'type': 'spatial,party,resource',
+        }
 
     def test_post_with_results(self):
         response = self.request(method='POST')
@@ -271,7 +270,11 @@ class AllEsTypesTest(APITestCase, UserTestCase, TestCase):
     def test_post_with_none_query(self):
         response = self.request(
             method='POST',
-            post_data={'query': {'simple_query_string': {'query': 'NONE'}}}
+            post_data={
+                'query': {
+                    'bool': {'should': [{'multi_match': {'query': 'NONE'}}]}
+                }
+            }
         )
         assert response.status_code == 200
         assert response.content['hits']['total'] == 0
@@ -280,14 +283,22 @@ class AllEsTypesTest(APITestCase, UserTestCase, TestCase):
     def test_post_with_error_query(self):
         response = self.request(
             method='POST',
-            post_data={'query': {'simple_query_string': {'query': 'ERROR'}}}
+            post_data={
+                'query': {
+                    'bool': {'should': [{'multi_match': {'query': 'ERROR'}}]}
+                }
+            }
         )
         assert response.status_code != 200
 
     def test_post_with_limited_query(self):
         response = self.request(
             method='POST',
-            post_data={'query': {'simple_query_string': {'query': 'LIMITED'}}}
+            post_data={
+                'query': {
+                    'bool': {'should': [{'multi_match': {'query': 'LIMITED'}}]}
+                }
+            }
         )
         assert response.status_code == 200
         assert response.content['hits']['total'] == 4
@@ -304,10 +315,22 @@ class AllEsTypesTest(APITestCase, UserTestCase, TestCase):
         assert hits[3]['_type'] == 'resource'
         assert hits[3]['_source']['id'] == self.resource.id
 
+    def test_get_with_project_type(self):
+        response = self.request(url_kwargs={'type': 'project'})
+        assert response.status_code == 200
+        hits = response.content['hits']['hits']
+        assert len(hits) == 1
+        assert hits[0]['_source']['@timestamp'] == '2017-01-01T01:23:45.678Z'
 
-class DumpAllEsTypesTest(ViewTestCase, UserTestCase, TestCase):
+    def test_get_with_nonproject_type(self):
+        response = self.request(url_kwargs={'type': 'foo'})
+        assert response.status_code == 200
+        assert response.content == {}
 
-    view_class = views.DumpAllEsTypes
+
+class DumpTest(ViewTestCase, UserTestCase, TestCase):
+
+    view_class = views.Dump
 
     def setup_models(self):
         self.project = ProjectFactory.create(slug='test-project')
@@ -325,12 +348,16 @@ class DumpAllEsTypesTest(ViewTestCase, UserTestCase, TestCase):
         self.resource = ResourceFactory.create(project=self.project)
 
         self.query_format = (
-            '{{"query": {{"simple_query_string": {{"query": "{q}"}}}},'
+            '{{"query": {{"bool": {{"should": ['
+            '{{"multi_match": {{"query": "{q}"}}}}]}}}},'
             ' "from": {f}, "size": {s}}}'
         )
 
     def setup_url_kwargs(self):
-        return {'projectid': self.project.id}
+        return {
+            'projectid': self.project.id,
+            'type': 'spatial,party,resource',
+        }
 
     def test_get_with_results(self):
         query = self.query_format.format(q='test', f='0', s='10')
@@ -404,21 +431,3 @@ class DumpAllEsTypesTest(ViewTestCase, UserTestCase, TestCase):
         assert content[5]['tenure_id'] == self.tenure_rel.id
         assert content[6]['index']['_type'] == 'resource'
         assert content[7]['id'] == self.resource.id
-
-
-class SingleEsTypeTest(APITestCase, TestCase):
-
-    view_class = views.SingleEsType
-    url_kwargs = {'projectid': 'foobar', 'type': 'project'}
-
-    def test_get_with_project_type(self):
-        response = self.request()
-        assert response.status_code == 200
-        hits = response.content['hits']['hits']
-        assert len(hits) == 1
-        assert hits[0]['_source']['@timestamp'] == '2017-01-01T01:23:45.678Z'
-
-    def test_get_with_nonproject_type(self):
-        response = self.request(url_kwargs={'type': 'foo'})
-        assert response.status_code == 200
-        assert response.content == {}

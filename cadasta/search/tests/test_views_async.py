@@ -3,6 +3,7 @@ import io
 import json
 import os
 import pytest
+import requests
 import shutil
 import subprocess
 
@@ -37,6 +38,7 @@ from resources.utils.io import ensure_dirs
 from questionnaires.managers import create_attrs_schema
 from questionnaires.tests import attr_schemas
 from questionnaires.tests.factories import QuestionnaireFactory
+from ..parser import parse_query
 from ..views import async
 from .fake_results import get_fake_es_api_results
 
@@ -60,6 +62,10 @@ def assign_policies(user):
         name='test-policy',
         body=json.dumps(clauses))
     assign_user_policies(user, policy)
+
+
+def mock_request_with_exception(*args, **kwargs):
+    raise requests.exceptions.ConnectionError
 
 
 class SearchAPITest(APITestCase, UserTestCase, TestCase):
@@ -122,18 +128,13 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
 
         self.query = 'searching'
         self.query_body = {
-            'query': {
-                'simple_query_string': {
-                    'default_operator': 'and',
-                    'query': self.query,
-                }
-            },
+            'query': parse_query(self.query),
             'from': 10,
             'size': 20,
             'sort': {'_score': {'order': 'desc'}},
         }
-        self.es_endpoint = '{}/project-{}/_search/'.format(api_url,
-                                                           self.project.id)
+        url = '{}/project-{}/spatial,party,resource/_search/'
+        self.es_endpoint = url.format(api_url, self.project.id)
         self.es_body = json.dumps(self.query_body, sort_keys=True)
 
     def setup_url_kwargs(self):
@@ -180,6 +181,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
         mock_get.assert_not_called()
 
@@ -221,6 +223,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
         mock_get.assert_not_called()
 
@@ -256,10 +259,14 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
         mock_get.assert_called_once_with(
-            '{}/project-{}/project/_search/?q=*'.format(api_url,
-                                                        self.project.id))
+            '{}/project-{}/project/_search/?q=*'.format(
+                api_url, self.project.id
+            ),
+            timeout=10,
+        )
 
     @patch('requests.get')
     @patch('requests.post')
@@ -288,6 +295,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
         mock_get.assert_not_called()
 
@@ -319,6 +327,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
         mock_get.assert_not_called()
 
@@ -350,7 +359,20 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
+        mock_get.assert_not_called()
+
+    @patch('requests.get')
+    @patch('requests.post', new=mock_request_with_exception)
+    def test_post_with_es_connection_not_ok(self, mock_get):
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 200
+        assert response.content['data'] == []
+        assert response.content['recordsTotal'] == 0
+        assert response.content['recordsFiltered'] == 0
+        assert response.content['draw'] == 40
+        assert response.content['error'] == 'unavailable'
         mock_get.assert_not_called()
 
     @patch('requests.get')
@@ -401,6 +423,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
 
     @patch('requests.post')
@@ -414,7 +437,14 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10,
         )
+
+    @patch('requests.post', new=mock_request_with_exception)
+    def test_query_es_connection_not_ok(self):
+        raw_results = self.view_class().query_es(
+            self.project.id, self.query, 10, 20)
+        assert raw_results is None
 
     @patch('requests.get')
     def test_query_es_timestamp(self, mock_get):
@@ -432,8 +462,11 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         timestamp = self.view_class().query_es_timestamp(self.project.id)
         assert timestamp == 'TIMESTAMP'
         mock_get.assert_called_once_with(
-            '{}/project-{}/project/_search/?q=*'.format(api_url,
-                                                        self.project.id))
+            '{}/project-{}/project/_search/?q=*'.format(
+                api_url, self.project.id
+            ),
+            timeout=10,
+        )
 
     @patch('requests.get')
     def test_query_es_timestamp_not_ok(self, mock_get):
@@ -442,8 +475,16 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         timestamp = self.view_class().query_es_timestamp(self.project.id)
         assert timestamp == "unknown"
         mock_get.assert_called_once_with(
-            '{}/project-{}/project/_search/?q=*'.format(api_url,
-                                                        self.project.id))
+            '{}/project-{}/project/_search/?q=*'.format(
+                api_url, self.project.id
+            ),
+            timeout=10,
+        )
+
+    @patch('requests.get', new=mock_request_with_exception)
+    def test_query_es_timestamp_connection_not_ok(self):
+        timestamp = self.view_class().query_es_timestamp(self.project.id)
+        assert timestamp == "unknown"
 
     def test_augment_result_location(self):
         augmented_result = self.view_class().augment_result(self.su_result)
@@ -812,12 +853,7 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
             'temp/projectid-userid-'
         )
         query_dsl = {
-            'query': {
-                'simple_query_string': {
-                    'default_operator': 'and',
-                    'query': 'query',
-                }
-            },
+            'query': parse_query('query'),
             'from': 0,
             'size': settings.ES_MAX_RESULTS,
             'sort': {'_score': {'order': 'desc'}},
@@ -830,9 +866,10 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
             '-o', es_dump_path,
             '-f',
             '-XGET',
-            '{}/project-projectid/_data/?format=json&source={}'.format(
-                api_url, query_dsl_param
-            )
+            (
+                '{}/project-projectid/spatial,party,resource/_data/'
+                '?format=json&source={}'
+            ).format(api_url, query_dsl_param)
         ])
 
     @patch('subprocess.run', new=mock_subprocess_run_curl_with_error)

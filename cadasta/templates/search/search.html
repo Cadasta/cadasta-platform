@@ -33,9 +33,12 @@
                 <div id="search-guidelines" class="hidden small">
                   {% blocktrans %}
                   <ul>
-                    <li>Review your wording, make sure that there aren’t any typos in your search query</li>
-                    <li>If no results match your query, try removing some search terms (<kbd>John</kbd>, instead of <kbd>John White</kbd>)</li>
-                    <li>Search results are limited to a maximum of {{ max_num_results }} entries</li>
+                    <li>By default, search results are required to only match at least one of the provided terms.
+                      To force a term to be required, prefix it with a plus sign (ex. <kbd>+wanted</kbd>).
+                      To force a term to be excluded, prefix it with a hyphen (ex. <kbd>-unwanted</kbd>).</li>
+                    <li>To search for exact phrases, use quotation marks (ex. <kbd>"John White"</kbd>).</li>
+                    <li>Review your wording, make sure that there aren’t any typos in your search terms.</li>
+                    <li>Search results are limited to a maximum of {{ max_num_results }} entries.</li>
                   </ul>
                   {% endblocktrans%}
                 </div>
@@ -56,7 +59,7 @@
               <p><strong>{% trans "Search tips:" %}</strong></p>
               <ul>
                 <li>{% trans "Double check your spelling for typos." %}</li>
-                <li>{% trans "Use fewer keywords." %}</li>
+                <li>{% trans "Add more keywords." %}</li>
                 <li>{% trans "Refer to our search guidelines for more tips." %}</li>
               </ul>
             </div>
@@ -130,7 +133,7 @@ function performSearch(query, updateDocumentUrl) {
         last: 'Last',
       },
     }
- }).draw();
+ });
 }
 
 function drawHandler(settings) {
