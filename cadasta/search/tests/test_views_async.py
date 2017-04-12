@@ -38,7 +38,6 @@ from questionnaires.managers import create_attrs_schema
 from questionnaires.tests import attr_schemas
 from questionnaires.tests.factories import QuestionnaireFactory
 from ..views import async
-from ..exceptions import ESNotAvailableError
 from .fake_results import get_fake_es_api_results
 
 
@@ -839,5 +838,5 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
 
     @patch('subprocess.run', new=mock_subprocess_run_curl_with_error)
     def test_query_es_with_curl_error(self):
-        with pytest.raises(ESNotAvailableError):
+        with pytest.raises(subprocess.CalledProcessError):
             self.view_class().query_es('projectid', 'userid', 'query')

@@ -23,7 +23,6 @@ from spatial.models import SpatialUnit
 from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from resources.models import Resource
-from ..exceptions import ESNotAvailableError
 from ..export.all import AllExporter
 from ..export.resource import ResourceExporter
 from ..export.shape import ShapeExporter
@@ -278,16 +277,13 @@ class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
             settings.MEDIA_ROOT,
             'temp/{}-{}-{}.esjson'.format(project_id, user_id, t)
         )
-        try:
-            subprocess.run([
-                'curl',
-                '-o', es_dump_path,
-                '-f',
-                '-XGET',
-                '{}/project-{}/_data/?format=json&source={}'.format(
-                    api_url, project_id, query_dsl_param
-                )
-            ]).check_returncode()
-        except subprocess.CalledProcessError:
-            raise ESNotAvailableError
+        subprocess.run([
+            'curl',
+            '-o', es_dump_path,
+            '-f',
+            '-XGET',
+            '{}/project-{}/_data/?format=json&source={}'.format(
+                api_url, project_id, query_dsl_param
+            )
+        ]).check_returncode()
         return es_dump_path

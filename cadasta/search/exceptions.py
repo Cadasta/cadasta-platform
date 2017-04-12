@@ -1,10 +1,3 @@
-class ESNotAvailableError(Exception):
-
-    def __init__(self):
-        super().__init__("Elasticsearch API is not available "
-                         "or returns an error")
-
-
 class NotWgs84EwkbValueError(Exception):
 
     def __init__(self, value):
