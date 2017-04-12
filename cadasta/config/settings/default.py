@@ -53,6 +53,7 @@ INSTALLED_APPS = (
     'party',
     'xforms',
     'search',
+    'tasks',
 
     'crispy_forms',
     'parsley',
@@ -534,3 +535,9 @@ ES_SCHEME = 'http'
 ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
+
+CELERY_TASK_ROUTES = {
+    'export.*': {'queue': 'export'},
+    'import.*': {'queue': 'import'},
+}
+CELERY_RESULT_QUEUE = 'result.fifo'
