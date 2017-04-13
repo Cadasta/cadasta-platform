@@ -154,7 +154,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
         create_questions(initial_data.get('questions', []), context)
 
         project = self.context['project']
-        attribute_group = validated_data.get('name')
+        attribute_group = validated_data['name']
         for attr_group in ATTRIBUTE_GROUPS.keys():
             if attribute_group.startswith(attr_group):
                 selectors = (project.organization.pk, project.pk,
