@@ -97,7 +97,7 @@ function performSearch(query, updateDocumentUrl) {
   $('#search-results').DataTable().destroy();
   $('#search-results').DataTable({
     conditionalPaging: true,
-    dom: 't<"table-entries"i><"table-num"l><"table-pagination"p>',
+    dom: 't<"table-pagination"p><"table-entries"i><"table-num"l>',
     destroy: true,
     ordering: false,
     serverSide: true,
@@ -110,7 +110,12 @@ function performSearch(query, updateDocumentUrl) {
     drawCallback: drawHandler,
     language: {
       info: 'Showing _START_ - _END_ of _TOTAL_',
-      lengthMenu: 'Show _MENU_ rows',
+      lengthMenu: '<select class="form-control input-sm">'+
+                  ' <option value="10">{% trans "10 per page" %}</option>'+
+                  ' <option value="25">{% trans "25 per page" %}</option>'+
+                  ' <option value="50">{% trans "50 per page" %}</option>'+
+                  ' <option value="100">{% trans "100 per page" %}</option>'+
+                  '</select>',
       paginate: {
         next: '<span class="glyphicon glyphicon-triangle-right"></span>',
         previous: '<span class="glyphicon glyphicon-triangle-left"></span>',
