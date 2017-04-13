@@ -91,9 +91,9 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
         return self._formatMessageResponse(request, e, status)
 
     def _formatMessageResponse(self, request, message, status):
-        tempate_data = {'message': message}
+        template_data = {'message': message}
         content = render_to_string('xforms/submission_response.xml',
-                                   tempate_data)
+                                   template_data)
         headers = self.get_openrosa_headers(request,
                                             location=False,
                                             content_length=False)
