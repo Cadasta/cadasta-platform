@@ -49,7 +49,9 @@ class ResourceExporter():
         path = os.path.join(settings.MEDIA_ROOT,
                             'temp/{}.zip'.format(f_name))
 
-        resources = Resource.objects.filter(project=self.project)
+        resources = Resource.objects.filter(
+            project=self.project,
+            archived=False)
         res_data = []
 
         with ZipFile(path, 'a') as myzip:
