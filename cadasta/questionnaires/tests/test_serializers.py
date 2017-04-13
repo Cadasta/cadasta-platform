@@ -1118,6 +1118,29 @@ class QuestionGroupSerializerTest(UserTestCase, TestCase):
             elif group.name == 'another_group':
                 assert group.questions.first().name == 'end'
 
+    def test_create_numeric_attribute_with_default_0(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        data = {
+            'label': 'Location Attributes',
+            'name': 'location_attributes',
+            'questions': [{
+                'name': "number",
+                'label': 'Number',
+                'type': "IN",
+                'default': 0,
+                'index': 0
+            }]
+        }
+        serializer = serializers.QuestionGroupSerializer(
+            data=data,
+            context={'questionnaire_id': questionnaire.id,
+                     'project': questionnaire.project,
+                     'default_language': 'en'})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        assert questionnaire.question_groups.count() == 1
+        assert Attribute.objects.get(name='number').default == '0'
+
 
 class QuestionSerializerTest(TestCase):
     def test_serialize(self):

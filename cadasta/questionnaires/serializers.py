@@ -191,6 +191,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
                     choices = [c.get('name') for c in field.get('options', [])]
                     choice_labels = [fix_labels(c.get('label'))
                                      for c in field.get('options', [])]
+                    default = field.get('default', '')
 
                     Attribute.objects.create(
                         schema=schema_obj,
@@ -200,7 +201,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
                         index=field['index'],
                         choices=choices,
                         choice_labels=choice_labels if choice_labels else None,
-                        default=field.get('default') or '',
+                        default=(default if default is not None else ''),
                         required=field.get('required', False),
                         omit=field.get('omit', False),
                     )
