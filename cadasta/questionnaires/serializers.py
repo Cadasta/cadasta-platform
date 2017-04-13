@@ -95,7 +95,7 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
         initial_data = self.find_initial_data(validated_data['name'])
         validated_data['label_xlat'] = initial_data['label']
         question = models.Question.objects.create(
-            questionnaire_id=self.context.get('questionnaire_id'),
+            questionnaire_id=self.context['questionnaire_id'],
             question_group_id=self.context.get('question_group_id'),
             **validated_data)
 
@@ -140,14 +140,14 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
         initial_data = self.find_initial_data(validated_data['name'])
         validated_data['label_xlat'] = initial_data['label']
         group = models.QuestionGroup.objects.create(
-            questionnaire_id=self.context.get('questionnaire_id'),
+            questionnaire_id=self.context['questionnaire_id'],
             question_group_id=self.context.get('question_group_id'),
             **validated_data)
 
         context = {
             'question_group_id': group.id,
-            'questionnaire_id': self.context.get('questionnaire_id'),
-            'project': self.context.get('project')
+            'questionnaire_id': self.context['questionnaire_id'],
+            'project': self.context['project']
         }
 
         create_groups(initial_data.get('question_groups', []), context)
