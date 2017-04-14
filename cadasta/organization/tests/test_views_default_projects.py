@@ -22,6 +22,7 @@ from party.models import Party, TenureRelationship
 from party.tests.factories import PartyFactory
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.messages import MISSING_RELEVANT
 from resources.models import Resource
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
@@ -1094,6 +1095,26 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         form.is_valid()
         form.add_error('questionnaire',
                        "Unknown question type 'interger'.")
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(form=form)
+
+    def test_update_missing_relevant(self):
+        question = self.get_form('t_questionnaire_missing_relevant')
+        user = UserFactory.create()
+        assign_policies(user)
+
+        response = self.request(user=user, method='POST',
+                                post_data={'questionnaire': question})
+        post_data = self.post_data.copy()
+        post_data.update({'questionnaire': question})
+        form = forms.ProjectEditDetails(
+            instance=self.project,
+            initial={'questionnaire': question},
+            data=post_data
+        )
+        form.is_valid()
+        form.add_error('questionnaire', MISSING_RELEVANT)
 
         assert response.status_code == 200
         assert response.content == self.render_content(form=form)

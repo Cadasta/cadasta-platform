@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from .models import Question
 
@@ -5,27 +6,33 @@ from .models import Question
 QUESTIONNAIRE_SCHEMA = {
     'title': {'type': 'string', 'required': True},
     'id_string': {'type': 'string', 'required': True},
+    'default_language': {'type': 'string',
+                         'required': True,
+                         'enum': settings.FORM_LANGS.keys()},
 }
 
 QUESTION_SCHEMA = {
-      'name': {'type': 'string', 'required': True},
-      'label': {'type': 'string'},
-      'type': {'type': 'string',
-               'required': True,
-               'enum': [c[0] for c in Question.TYPE_CHOICES]},
-      'required': {'type': 'boolean'},
-      'constraint': {'type': 'string'}
+    'name': {'type': 'string', 'required': True},
+    'label': {'type': 'string'},
+    'type': {'type': 'string',
+             'required': True,
+             'enum': [c[0] for c in Question.TYPE_CHOICES]},
+    'required': {'type': 'boolean'},
+    'constraint': {'type': 'string'},
+    'index': {'type': 'integer', 'required': True}
 }
 
 QUESTION_GROUP_SCHEMA = {
     'name': {'type': 'string', 'required': True},
     'label': {'type': 'string'},
     'type': {'type': 'string', 'required': True},
+    'index': {'type': 'integer', 'required': True}
 }
 
 QUESTION_OPTION_SCHEMA = {
     'name': {'type': 'string', 'required': True},
     'label': {'type': 'string', 'required': True},
+    'index': {'type': 'integer', 'required': True}
 }
 
 
@@ -33,8 +40,10 @@ def validate_type(type, value):
     if type == 'string':
         return isinstance(value, str)
     elif type == 'number':
-        return ((not isinstance(value, bool) and
-                 isinstance(value, (int, float))))
+        return (not isinstance(value, bool) and
+                isinstance(value, (int, float)))
+    elif type == 'integer':
+        return not isinstance(value, bool) and isinstance(value, int)
     elif type == 'boolean':
         return isinstance(value, bool)
     elif type == 'array':
@@ -47,7 +56,7 @@ def validate_schema(schema, json):
         item_errors = []
         item = json.get(key, None)
 
-        if reqs.get('required', False) and not item:
+        if reqs.get('required', False) and item is None:
             item_errors.append(_("This field is required."))
         elif item:
             if not validate_type(reqs.get('type'), item):

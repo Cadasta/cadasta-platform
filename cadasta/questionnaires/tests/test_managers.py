@@ -4,14 +4,16 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import activate, get_language
 from organization.tests.factories import ProjectFactory
-from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidQuestionnaire
 from core.tests.utils.files import make_dirs  # noqa
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from jsonattrs.models import Attribute
+from jsonattrs.models import create_attribute_types
 
 from . import factories
 from .. import models
 from ..managers import create_children, create_options
+from ..messages import MISSING_RELEVANT
 
 
 class CreateChildrenTest(TestCase):
@@ -163,12 +165,30 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-invalid.xlsx', 'rb')
         form = self.storage.save('xls-forms/xls-form-invalid.xlsx', file)
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             models.Questionnaire.objects.create_from_form(
                 xls_form=form,
                 project=ProjectFactory.create()
             )
         assert "Unknown question type 'interger'." in e.value.errors
+
+        assert models.Questionnaire.objects.exists() is False
+        assert models.QuestionGroup.objects.exists() is False
+        assert models.Question.objects.exists() is False
+
+    def test_create_from_invald_form_missing_relevant_clause(self):
+        create_attribute_types()
+        file = self.get_file(
+            '/questionnaires/tests/files/'
+            't_questionnaire_missing_relevant.xlsx', 'rb')
+        form = self.storage.save(
+            'xls-forms/t_questionnaire_missing_relevant.xlsx', file)
+        with pytest.raises(InvalidQuestionnaire) as e:
+            models.Questionnaire.objects.create_from_form(
+                xls_form=form,
+                project=ProjectFactory.create()
+            )
+        assert MISSING_RELEVANT in e.value.errors
 
         assert models.Questionnaire.objects.exists() is False
         assert models.QuestionGroup.objects.exists() is False
@@ -305,18 +325,18 @@ class MultilingualQuestionnaireTest(UserTestCase, FileStorageTestCase,
         )
 
     def test_no_default_language(self):
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             self._run('bad-no-default-language.xlsx')
         assert str(e.value) == ("Multilingual XLS forms must have "
                                 "a default_language setting")
 
     def test_bad_default_language(self):
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             self._run('bad-bad-default-language.xlsx')
         assert str(e.value) == "Default language code 'Bengali' unknown"
 
     def test_bad_label_language(self):
-        with pytest.raises(InvalidXLSForm) as e:
+        with pytest.raises(InvalidQuestionnaire) as e:
             self._run('bad-bad-label-language.xlsx')
         assert str(e.value) == "Label language code 'English' unknown"
 

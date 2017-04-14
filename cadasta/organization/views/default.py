@@ -17,7 +17,7 @@ from django.db import transaction
 from django.db.models import Sum, When, Case, IntegerField
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from questionnaires.exceptions import InvalidXLSForm
+from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.models import Questionnaire
 from resources.models import ContentObject, Resource
 
@@ -570,7 +570,7 @@ class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
                         original_file=original_file,
                         xls_form=questionnaire
                     )
-        except InvalidXLSForm as e:
+        except InvalidQuestionnaire as e:
             details_form = form_dict['details']
             details_form.add_error('questionnaire', e)
             raise self.RevalidationError('details', details_form, **kwargs)
@@ -647,11 +647,17 @@ class ProjectEditDetails(ProjectEdit, generic.UpdateView):
     def post(self, *args, **kwargs):
         try:
             return super().post(*args, **kwargs)
-        except InvalidXLSForm as e:
+        except InvalidQuestionnaire as e:
             form = self.get_form()
             for err in e.errors:
                 form.add_error('questionnaire', err)
             return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        project = self.get_project()
+        project.refresh_from_db(fields=('current_questionnaire', ))
+        context = self.get_context_data(object=project, form=form)
+        return self.render_to_response(context)
 
 
 class ProjectEditPermissions(ProjectEdit, generic.UpdateView):

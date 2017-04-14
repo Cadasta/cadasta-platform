@@ -378,6 +378,17 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
                                        is_allowed_delete_location=False)
         assert response.content == expected
 
+    def test_get_with_incomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
     def test_get_with_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
         self.project.current_questionnaire = questionnaire.id
@@ -410,14 +421,20 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             tenure_type=TenureRelationshipType.objects.get(id='LH'),
             spatial_unit=self.location,
             project=self.project)
-        lh_ten.type_labels = ('data-label-de="Miete" '
-                              'data-label-en="Leasehold"')
+
         wr_ten = TenureRelationshipFactory.create(
             tenure_type=TenureRelationshipType.objects.get(id='WR'),
             spatial_unit=self.location,
             project=self.project)
-        wr_ten.type_labels = ('data-label-de="Wasserecht" '
-                              'data-label-en="Water rights"')
+
+        relationships = self.location.tenurerelationship_set.all()
+        for rel in relationships:
+            if lh_ten == rel:
+                rel.type_labels = ('data-label-de="Miete" '
+                                   'data-label-en="Leasehold"')
+            elif wr_ten == rel:
+                rel.type_labels = ('data-label-de="Wasserecht" '
+                                   'data-label-en="Water rights"')
 
         user = UserFactory.create()
         assign_policies(user)
@@ -427,7 +444,7 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             type_labels=('data-label-de="Parzelle Typ" '
                          'data-label-en="Location type"'),
             type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
-            relationships=[wr_ten, lh_ten],
+            relationships=relationships,
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')]
         )

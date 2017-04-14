@@ -105,6 +105,17 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')])
 
+    def test_get_with_incomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -251,7 +262,6 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.party = PartyFactory.create(project=self.project)
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         schema = Schema.objects.create(
@@ -310,7 +320,18 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_with_with_questionnaire(self):
+    def test_get_with_incomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
         self.project.current_questionnaire = questionnaire.id
         self.project.save()
@@ -487,6 +508,17 @@ class PartiesEditTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def test_get_with_authorized_user(self):
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert '<div class="form-group party-gr hidden">' in response.content
+
+    def test_get_with_inclomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
         user = UserFactory.create()
         assign_policies(user)
         response = self.request(user=user)
@@ -1019,7 +1051,18 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
 
-    def test_get_with_with_questionnaire(self):
+    def test_get_with_incomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
         self.project.current_questionnaire = questionnaire.id
         self.project.save()

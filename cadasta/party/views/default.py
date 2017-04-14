@@ -27,15 +27,18 @@ class PartiesList(LoginPermissionRequiredMixin,
         project = context['object']
 
         if project.current_questionnaire:
-            party_type = Question.objects.get(
-                name='party_type',
-                questionnaire_id=project.current_questionnaire)
-            party_opts = QuestionOption.objects.filter(question=party_type)
-            party_opts = dict(party_opts.values_list('name', 'label_xlat'))
+            try:
+                party_type = Question.objects.get(
+                    name='party_type',
+                    questionnaire_id=project.current_questionnaire)
+                party_opts = QuestionOption.objects.filter(question=party_type)
+                party_opts = dict(party_opts.values_list('name', 'label_xlat'))
 
-            for party in context['object_list']:
-                party.type_labels = template_xlang_labels(
-                    party_opts.get(party.type))
+                for party in context['object_list']:
+                    party.type_labels = template_xlang_labels(
+                        party_opts.get(party.type))
+            except Question.DoesNotExist:
+                pass
 
         return context
 
@@ -76,41 +79,57 @@ class PartiesDetail(LoginPermissionRequiredMixin,
 
         project = context['object']
         if project.current_questionnaire:
-            name = Question.objects.get(
-                name='party_name',
-                questionnaire_id=project.current_questionnaire)
-            context['name_labels'] = template_xlang_labels(name.label_xlat)
+            try:
+                name = Question.objects.get(
+                    name='party_name',
+                    questionnaire_id=project.current_questionnaire)
+                context['name_labels'] = template_xlang_labels(name.label_xlat)
+            except Question.DoesNotExist:
+                pass
 
-            party_type = Question.objects.get(
-                name='party_type',
-                questionnaire_id=project.current_questionnaire)
-            context['type_labels'] = template_xlang_labels(
-                party_type.label_xlat)
+            try:
+                party_type = Question.objects.get(
+                    name='party_type',
+                    questionnaire_id=project.current_questionnaire)
+                context['type_labels'] = template_xlang_labels(
+                    party_type.label_xlat)
 
-            option = QuestionOption.objects.get(question=party_type,
-                                                name=context['party'].type)
-            context['type_choice_labels'] = template_xlang_labels(
-                option.label_xlat)
+                option = QuestionOption.objects.get(question=party_type,
+                                                    name=context['party'].type)
+                context['type_choice_labels'] = template_xlang_labels(
+                    option.label_xlat)
+            except Question.DoesNotExist:
+                pass
 
-            tenure_type = Question.objects.get(
-                name='tenure_type',
-                questionnaire_id=project.current_questionnaire)
-            tenure_opts = QuestionOption.objects.filter(question=tenure_type)
-            tenure_opts = dict(tenure_opts.values_list('name', 'label_xlat'))
+            try:
+                tenure_type = Question.objects.get(
+                    name='tenure_type',
+                    questionnaire_id=project.current_questionnaire)
+                tenure_opts = QuestionOption.objects.filter(
+                    question=tenure_type)
+                tenure_opts = dict(tenure_opts.values_list(
+                    'name', 'label_xlat'))
+            except Question.DoesNotExist:
+                tenure_opts = None
 
-            location_type = Question.objects.get(
-                name='location_type',
-                questionnaire_id=project.current_questionnaire)
-            location_opts = QuestionOption.objects.filter(
-                question=location_type)
-            location_opts = dict(
-                location_opts.values_list('name', 'label_xlat'))
+            try:
+                location_type = Question.objects.get(
+                    name='location_type',
+                    questionnaire_id=project.current_questionnaire)
+                location_opts = QuestionOption.objects.filter(
+                    question=location_type)
+                location_opts = dict(
+                    location_opts.values_list('name', 'label_xlat'))
+            except Question.DoesNotExist:
+                location_opts = None
 
             for rel in context['relationships']:
-                rel.type_labels = template_xlang_labels(
-                    tenure_opts.get(rel.tenure_type_id))
-                rel.location_labels = template_xlang_labels(
-                    location_opts.get(rel.spatial_unit.type))
+                if tenure_opts:
+                    rel.type_labels = template_xlang_labels(
+                        tenure_opts.get(rel.tenure_type_id))
+                if location_opts:
+                    rel.location_labels = template_xlang_labels(
+                        location_opts.get(rel.spatial_unit.type))
 
         return context
 
@@ -136,13 +155,16 @@ class PartiesEdit(LoginPermissionRequiredMixin,
 
         project = context['object']
         if project.current_questionnaire:
-            party_type = Question.objects.get(
-                name='party_type',
-                questionnaire_id=project.current_questionnaire)
-            option = QuestionOption.objects.get(question=party_type,
-                                                name=context['party'].type)
-            context['type_choice_labels'] = template_xlang_labels(
-                option.label_xlat)
+            try:
+                party_type = Question.objects.get(
+                    name='party_type',
+                    questionnaire_id=project.current_questionnaire)
+                option = QuestionOption.objects.get(question=party_type,
+                                                    name=context['party'].type)
+                context['type_choice_labels'] = template_xlang_labels(
+                    option.label_xlat)
+            except Question.DoesNotExist:
+                pass
 
         return context
 
@@ -206,17 +228,20 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
 
         project = context['object']
         if project.current_questionnaire:
-            tenure_type = Question.objects.get(
-                name='tenure_type',
-                questionnaire_id=project.current_questionnaire)
-            context['type_labels'] = template_xlang_labels(
-                tenure_type.label_xlat)
+            try:
+                tenure_type = Question.objects.get(
+                    name='tenure_type',
+                    questionnaire_id=project.current_questionnaire)
+                context['type_labels'] = template_xlang_labels(
+                    tenure_type.label_xlat)
 
-            option = QuestionOption.objects.get(
-                question=tenure_type,
-                name=context['relationship'].tenure_type_id)
-            context['type_choice_labels'] = template_xlang_labels(
-                option.label_xlat)
+                option = QuestionOption.objects.get(
+                    question=tenure_type,
+                    name=context['relationship'].tenure_type_id)
+                context['type_choice_labels'] = template_xlang_labels(
+                    option.label_xlat)
+            except Question.DoesNotExist:
+                pass
 
         return context
 

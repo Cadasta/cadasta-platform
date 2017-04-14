@@ -8,7 +8,7 @@ from tutelary.mixins import APIPermissionRequiredMixin
 from organization.models import Project
 from ..models import Questionnaire
 from ..serializers import QuestionnaireSerializer
-from ..exceptions import InvalidXLSForm
+from ..exceptions import InvalidQuestionnaire
 
 
 class QuestionnaireDetail(APIPermissionRequiredMixin,
@@ -44,8 +44,10 @@ class QuestionnaireDetail(APIPermissionRequiredMixin,
         return self.project_object
 
     def handle_exception(self, exc):
-        if isinstance(exc, InvalidXLSForm):
-            return Response({'xls_form': exc.errors},
+        if isinstance(exc, InvalidQuestionnaire):
+            err_key = ('xls_form' if 'xls_form' in self.request.data.keys()
+                       else 'non_field_errors')
+            return Response({err_key: exc.errors},
                             status=status.HTTP_400_BAD_REQUEST)
         else:
             return super().handle_exception(exc)

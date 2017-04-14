@@ -104,16 +104,19 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
         data = {
             'title': 'yx8sqx6488wbc4yysnkrbnfq',
             'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+            'default_language': 'en',
             'questions': [{
                 'name': "start",
                 'label': "Start",
                 'type': "ST",
                 'required': False,
-                'constraint': None
+                'constraint': None,
+                'index': 0
             }, {
                 'name': "end",
                 'label': "end",
                 'type': "EN",
+                'index': 1
             }]
         }
         response = self.request(method='PUT', post_data=data, user=self.user)
@@ -133,5 +136,46 @@ class QuestionnaireDetailTest(APITestCase, UserTestCase,
         assert response.status_code == 400
         assert Questionnaire.objects.filter(project=self.prj).count() == 0
         assert response.content['title'] == ['This field is required.']
+        self.prj.refresh_from_db()
+        assert self.prj.current_questionnaire is None
+
+    def test_create_invalid_question_groups(self):
+        data = {
+            'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+            'title': 'wa6hrqr4e4vcf49q6kxjc443',
+            'default_language': 'en',
+            'question_groups': [{
+                'label': 'A group',
+                'name': 'party_attributes_individual',
+                'index': 0,
+                'type': 'group',
+                'questions': [{
+                    'name': "start",
+                    'label': 'Start',
+                    'type': "TX",
+                    'index': 0
+                }]
+            }, {
+                'label': 'Another group',
+                'name': 'party_attributes_default',
+                'index': 1,
+                'type': 'group',
+                'questions': [{
+                    'name': "end",
+                    'label': 'End',
+                    'type': "TX",
+                    'index': 1
+                }]
+            }]
+        }
+        response = self.request(method='PUT', post_data=data, user=self.user)
+
+        assert response.status_code == 400
+        assert Questionnaire.objects.filter(project=self.prj).count() == 0
+        assert response.content['non_field_errors'] == [
+            "Unable to assign question group to model "
+            "entitity. Make sure to add a 'relevant' clause "
+            "to the question group definition when adding "
+            "more than one question group for a model entity."]
         self.prj.refresh_from_db()
         assert self.prj.current_questionnaire is None

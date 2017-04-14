@@ -6,11 +6,13 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.utils.translation import ugettext as _
+from django.db.utils import IntegrityError
 from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
 from pyxform.xls2json import parse_file_to_json
-from questionnaires.exceptions import InvalidXLSForm
+from .exceptions import InvalidQuestionnaire
+from .messages import MISSING_RELEVANT
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -83,9 +85,12 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
             selector = re.sub("'", '', clauses[1])
             selectors += (selector,)
 
-    schema_obj = Schema.objects.create(content_type=content_type,
-                                       selectors=selectors,
-                                       default_language=default_language)
+    try:
+        schema_obj = Schema.objects.create(content_type=content_type,
+                                           selectors=selectors,
+                                           default_language=default_language)
+    except IntegrityError:
+        raise InvalidQuestionnaire(errors=[MISSING_RELEVANT])
 
     for c in dict.get('children'):
         field = {}
@@ -140,7 +145,7 @@ def multilingual_label_check(children):
             has_multi = True
             for lang in c['label'].keys():
                 if lang != 'default' and not check_for_language(lang):
-                    raise InvalidXLSForm(
+                    raise InvalidQuestionnaire(
                         ["Label language code '{}' unknown".format(lang)]
                     )
         # Note the order of the short-cut "or" in the following two
@@ -185,15 +190,16 @@ class QuestionnaireManager(models.Manager):
                 )
                 if (has_default_language and
                    not check_for_language(json['default_language'])):
-                    raise InvalidXLSForm(
+                    raise InvalidQuestionnaire(
                         ["Default language code '{}' unknown".format(
                             json['default_language']
                         )]
                     )
                 is_multilingual = multilingual_label_check(json['children'])
                 if is_multilingual and not has_default_language:
-                    raise InvalidXLSForm(["Multilingual XLS forms must have "
-                                          "a default_language setting"])
+                    raise InvalidQuestionnaire(
+                        ["Multilingual XLS forms must have a default_language"
+                         " setting"])
                 instance.default_language = json['default_language']
                 if instance.default_language == 'default':
                     instance.default_language = ''
@@ -208,7 +214,6 @@ class QuestionnaireManager(models.Manager):
                 instance.save()
 
                 project.current_questionnaire = instance.id
-                project.save()
 
                 create_children(
                     children=json.get('children'),
@@ -217,15 +222,16 @@ class QuestionnaireManager(models.Manager):
                     default_language=instance.default_language,
                     kwargs={'questionnaire': instance}
                 )
+                project.save()
 
                 # all these errors handled by PyXForm so turning off for now
                 # if errors:
-                #     raise InvalidXLSForm(errors)
+                #     raise InvalidQuestionnaire(errors)
 
                 return instance
 
         except PyXFormError as e:
-            raise InvalidXLSForm([str(e)])
+            raise InvalidQuestionnaire([str(e)])
 
 
 class QuestionGroupManager(models.Manager):
