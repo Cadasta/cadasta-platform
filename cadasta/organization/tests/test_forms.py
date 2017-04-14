@@ -65,7 +65,7 @@ class OrganizationTest(UserTestCase, TestCase):
         self.data['description'] = 'Org description #2'
         form = forms.OrganizationForm(self.data, user=UserFactory.create())
         assert form.is_valid() is False
-        assert ("Organization with this Name already exists."
+        assert ("Organization with this name already exists."
                 in form.errors['name'])
         assert Organization.objects.count() == 1
 

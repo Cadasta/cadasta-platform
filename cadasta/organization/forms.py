@@ -135,6 +135,11 @@ class OrganizationForm(forms.ModelForm):
         if slugify(name, allow_unicode=True) in invalid_names:
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
+
+        if Organization.objects.filter(name=name).exists():
+            raise forms.ValidationError(
+                _("Organization with this name already exists."))
+
         return name
 
     def save(self, *args, **kwargs):

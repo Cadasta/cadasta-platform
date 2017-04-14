@@ -8,6 +8,9 @@ $(document).ready(function() {
         if (formIsValid) {
             button.form.submit();
             button.disabled = true;
+        } else {
+           $(".error-block").html(""); // removes previous django validation errors 
         };
     });
+
 });

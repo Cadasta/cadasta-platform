@@ -18,7 +18,7 @@
 {% block location_extra_script %}
   {{ form.media }}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
-  <script src="{% static 'js/form_submit_once.js' %}"></script>
+  <script src="{% static 'js/form_submit.js' %}"></script>
   <script src="{% static 'js/jquery-ui.min.js' %}"></script>
   {% if get_current_language != "en-us" %}
   {% get_current_language as LANGUAGE_CODE %}

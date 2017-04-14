@@ -1,6 +1,7 @@
 {% extends "organization/organization_list.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
 
 {% block title %} | {% trans "Add organization" %}{% endblock %}
 
@@ -39,4 +40,5 @@
 
 {% block extra_script %}
   {{ form.media }}
+  <script src="{% static 'js/form_submit.js' %}"></script>
 {% endblock %}
