@@ -1,19 +1,6 @@
 @import "variables";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/mixins";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/utilities";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/normalize";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/scaffolding";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/type";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/grid";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/alerts";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/buttons";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/forms";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/modals";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/tables";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/glyphicons";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/dropdowns";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/navs";
-@import "bootstrap-sass/assets/stylesheets/bootstrap/responsive-utilities";
+@import "bootstrap-sass/assets/stylesheets/bootstrap";
+@import "datatables";
 @import "wizard";
 @import "widgets";
 @import "reg";
@@ -383,7 +370,7 @@ main.container-fluid {
     color: $gray-darker;
   }
   > thead > tr > th {
-    border-bottom: 2px solid $table-border-color;
+    border-bottom: 1px solid $table-border-color;
     font-weight: 500;
     text-transform: uppercase;
     font-size: 12px;
@@ -710,7 +697,7 @@ h1 .label {
 }
 
 .border-btm {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   margin-top: 0;
   border: 0;
   border-bottom: 1px solid #eee;
@@ -731,4 +718,3 @@ h1 .label {
     font-size: 12px;
   }
 }
-

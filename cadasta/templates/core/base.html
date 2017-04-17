@@ -13,8 +13,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cadasta{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" type="text/css"
-          href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css"/>
     <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
     {% if LANGUAGE_BIDI %}
     <link rel="stylesheet" type="text/css"
@@ -188,11 +186,9 @@
     </div>
     {% block modals %} {% endblock %}
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static 'js/parsleyConfig.js' %}"></script>
     <script src="{% static 'js/parsley.js' %}"></script>
 
