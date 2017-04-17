@@ -1,4 +1,3 @@
-import itertools
 import json
 import os
 import subprocess
@@ -32,7 +31,7 @@ class ResourceExporter():
 
         # Create zip file and start processing
         zip_path = base_path + '-res.zip'
-        filenames = set()
+        filenames = {}
         with ZipFile(zip_path, 'a') as myzip:
 
             f = open(es_dump_path, encoding='utf-8')
@@ -57,15 +56,14 @@ class ResourceExporter():
                     'curl', '-o', temp_resource_path, '-XGET', source['file']
                 ])
                 filename = source['original_file']
-                if filename in filenames:
+                if filename not in filenames:
+                    filenames[filename] = 1
+                else:
+                    filenames[filename] += 1
                     basename, ext = os.path.splitext(filename)
-                    for x in itertools.count(2):
-                        trial = '{} ({}){}'.format(basename, x, ext)
-                        if trial not in filenames:
-                            filename = trial
-                            source['original_file'] = trial
-                            break
-                filenames.add(filename)
+                    filename = '{} ({}){}'.format(
+                        basename, filenames[filename], ext)
+                    source['original_file'] = filename
                 myzip.write(temp_resource_path,
                             arcname='resources/' + filename)
 
