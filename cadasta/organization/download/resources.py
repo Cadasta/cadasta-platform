@@ -53,12 +53,23 @@ class ResourceExporter():
             project=self.project,
             archived=False)
         res_data = []
+        file_names = dict()
+        file_names['resources.xlsx'] = 1
 
         with ZipFile(path, 'a') as myzip:
             for r in resources:
-                res_data.append(self.pack_resource_data(r))
-                myzip.write(r.file.open().name, arcname=r.original_file)
+                if r.original_file not in file_names:
+                    zip_fname = r.original_file
+                    file_names[r.original_file] = 1
+                else:
+                    name, ext = os.path.splitext(r.original_file)
+                    counter = str(file_names[r.original_file])
+                    zip_fname = '{}_{}{}'.format(name, counter, ext)
+                    file_names[r.original_file] += 1
+                    r.original_file = zip_fname
 
+                res_data.append(self.pack_resource_data(r))
+                myzip.write(r.file.open().name, arcname=zip_fname)
             resources_xls = self.make_resource_worksheet(f_name, res_data)
             myzip.write(resources_xls, arcname='resources.xlsx')
             myzip.close()

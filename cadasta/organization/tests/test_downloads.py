@@ -862,8 +862,11 @@ class ResourcesTest(UserTestCase, TestCase):
         ensure_dirs()
         project = ProjectFactory.create()
         exporter = ResourceExporter(project)
-        res = ResourceFactory.create(project=project)
-        res2 = ResourceFactory.create(
+
+        ResourceFactory.create(project=project, original_file='res.png')
+        ResourceFactory.create(project=project, original_file='res.png')
+        ResourceFactory.create(project=project, original_file='resources.xlsx')
+        deleted = ResourceFactory.create(
             project=project,
             original_file='image1.jpg',
             archived=True)
@@ -875,7 +878,9 @@ class ResourcesTest(UserTestCase, TestCase):
         assert mime == 'application/zip'
 
         with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 2
-            assert res.original_file in testzip.namelist()
-            assert res2.original_file not in testzip.namelist()
+            assert len(testzip.namelist()) == 4
+            assert 'res.png' in testzip.namelist()
+            assert 'res_1.png' in testzip.namelist()
+            assert 'resources_1.xlsx' in testzip.namelist()
             assert 'resources.xlsx' in testzip.namelist()
+            assert deleted.original_file not in testzip.namelist()
