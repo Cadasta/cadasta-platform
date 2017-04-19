@@ -616,10 +616,6 @@ def mock_subprocess_run_curl_with_error(*args):
 class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
 
     view_class = async.SearchExport
-    post_data = {
-        'q': 'searching',
-        'type': 'all',
-    }
 
     def setup_models(self):
         self.user = UserFactory.create()
@@ -654,7 +650,7 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
         f.write(response.content)
         f.close()
 
-        # Sanity content checks (full checking is done in text_export.py)
+        # Sanity content checks (full checking is done in test_export.py)
         with ZipFile(zip_path) as myzip:
             files = myzip.namelist()
             assert len(files) == 8
@@ -687,7 +683,7 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
         f.write(response.content)
         f.close()
 
-        # Sanity content checks (full checking is done in text_export.py)
+        # Sanity content checks (full checking is done in test_export.py)
         wb = load_workbook(xls_path)
         assert wb.get_sheet_names() == [
             'locations', 'parties', 'relationships']
@@ -714,7 +710,7 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
         f.write(response.content)
         f.close()
 
-        # Sanity content checks (full checking is done in text_export.py)
+        # Sanity content checks (full checking is done in test_export.py)
         with ZipFile(zip_path) as myzip:
             files = myzip.namelist()
             assert len(files) == 2
@@ -748,7 +744,7 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
         f.write(response.content)
         f.close()
 
-        # Sanity content checks (full checking is done in text_export.py)
+        # Sanity content checks (full checking is done in test_export.py)
         with ZipFile(zip_path) as myzip:
             files = myzip.namelist()
             assert len(files) == 8
@@ -779,30 +775,33 @@ class SearchExportAPITest(ViewTestCase, UserTestCase, TestCase):
     def test_post_with_missing_query(self):
         response = self.request(user=self.user,
                                 method='POST',
-                                post_data={'q': None})
+                                post_data={'type': 'all'})
         assert response.status_code == 400
 
     def test_post_with_invalid_type(self):
         response = self.request(user=self.user,
                                 method='POST',
-                                post_data={'type': 'nonsense'})
+                                post_data={'q': 'test', 'type': 'nonsense'})
         assert response.status_code == 400
 
     def test_post_with_nonexistent_org(self):
         with pytest.raises(Http404):
             self.request(user=self.user,
                          method='POST',
-                         url_kwargs={'organization': 'evil-corp'})
+                         url_kwargs={'organization': 'evil-corp'},
+                         post_data={'q': 'test', 'type': 'all'})
 
     def test_post_with_nonexistent_project(self):
         with pytest.raises(Http404):
             self.request(user=self.user,
                          method='POST',
-                         url_kwargs={'project': 'world-domination'})
+                         url_kwargs={'project': 'world-domination'},
+                         post_data={'q': 'test', 'type': 'all'})
 
     def test_post_with_unauthorized_user(self):
         with pytest.raises(PermissionDenied):
-            self.request(method='POST')
+            self.request(method='POST',
+                         post_data={'q': 'test', 'type': 'all'})
 
     @patch('subprocess.run')
     def test_query_es(self, mock_run):
