@@ -128,6 +128,8 @@ class OrganizationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        self.fields['name'].error_messages['unique'] = _(
+            "Organization with this name already exists.")
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -135,10 +137,6 @@ class OrganizationForm(forms.ModelForm):
         if slugify(name, allow_unicode=True) in invalid_names:
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
-
-        if Organization.objects.filter(name=name).exists():
-            raise forms.ValidationError(
-                _("Organization with this name already exists."))
 
         return name
 
