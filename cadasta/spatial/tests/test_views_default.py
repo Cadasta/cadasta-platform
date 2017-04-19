@@ -449,6 +449,61 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             form_langs=[('en', 'English'), ('de', 'German')]
         )
 
+    def test_get_with_questionnaire_but_missing_option(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+
+        tenure_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='LH',
+            label={'en': 'Leasehold', 'de': 'Miete'})
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='WR',
+            label={'en': 'Water rights', 'de': 'Wasserecht'})
+        lh_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            spatial_unit=self.location,
+            project=self.project)
+
+        wr_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            spatial_unit=self.location,
+            project=self.project)
+
+        relationships = self.location.tenurerelationship_set.all()
+        for rel in relationships:
+            if lh_ten == rel:
+                rel.type_labels = ('data-label-de="Miete" '
+                                   'data-label-en="Leasehold"')
+            elif wr_ten == rel:
+                rel.type_labels = ('data-label-de="Wasserecht" '
+                                   'data-label-en="Water rights"')
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            type_labels=('data-label-de="Parzelle Typ" '
+                         'data-label-en="Location type"'),
+            relationships=relationships,
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')]
+        )
+
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
         assign_policies(user)

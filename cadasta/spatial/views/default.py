@@ -88,14 +88,17 @@ class LocationDetail(LoginPermissionRequiredMixin,
                     questionnaire_id=project.current_questionnaire)
                 context['type_labels'] = template_xlang_labels(
                     question.label_xlat)
-
-                option = QuestionOption.objects.get(
-                    question=question,
-                    name=context['location'].type)
-                context['type_choice_labels'] = template_xlang_labels(
-                    option.label_xlat)
             except Question.DoesNotExist:
                 pass
+            else:
+                try:
+                    option = QuestionOption.objects.get(
+                        question=question,
+                        name=context['location'].type)
+                    context['type_choice_labels'] = template_xlang_labels(
+                        option.label_xlat)
+                except QuestionOption.DoesNotExist:
+                    pass
 
             try:
                 tenure_type = Question.objects.get(

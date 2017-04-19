@@ -422,6 +422,91 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             form_langs=[('en', 'English'), ('de', 'German')],
             relationships=relationships)
 
+    def test_get_with_questionnaire_but_missing_option(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='party_name',
+            label={'en': 'Party name', 'de': 'Name der Party'},
+            type='TX')
+
+        q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='party_type',
+            label={'en': 'Party type', 'de': 'Party Typ'},
+            type='S1')
+
+        location_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+
+        tenure_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='LH',
+            label={'en': 'Leasehold', 'de': 'Miete'})
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='WR',
+            label={'en': 'Water rights', 'de': 'Wasserecht'})
+
+        q_factories.QuestionOptionFactory.create(
+            question=location_type_question,
+            name='PA',
+            label={'en': 'Parcel', 'de': 'Parzelle'})
+
+        q_factories.QuestionOptionFactory.create(
+            question=location_type_question,
+            name='BU',
+            label={'en': 'Building', 'de': 'Haus'})
+
+        TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            party=self.party,
+            spatial_unit=SpatialUnitFactory(project=self.project, type='PA'),
+            project=self.project)
+
+        TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            party=self.party,
+            spatial_unit=SpatialUnitFactory(project=self.project, type='BU'),
+            project=self.project)
+
+        relationships = self.party.tenurerelationship_set.all()
+        for rel in relationships:
+            if rel.tenure_type_id == 'LH':
+                rel.type_labels = ('data-label-de="Miete" '
+                                   'data-label-en="Leasehold"')
+                rel.location_labels = ('data-label-de="Parzelle" '
+                                       'data-label-en="Parcel"')
+            elif rel.tenure_type_id == 'WR':
+                rel.type_labels = ('data-label-de="Wasserecht" '
+                                   'data-label-en="Water rights"')
+                rel.location_labels = ('data-label-de="Haus" '
+                                       'data-label-en="Building"')
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            name_labels=('data-label-de="Name der Party" '
+                         'data-label-en="Party name"'),
+            type_labels=('data-label-de="Party Typ" '
+                         'data-label-en="Party type"'),
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')],
+            relationships=relationships)
+
     def test_get_with_authorized_user_including_relationships(self):
         TenureRelationshipFactory.create_batch(2,
                                                party=self.party,
@@ -1086,6 +1171,27 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
                          'data-label-en="Tenure type"'),
             type_choice_labels=('data-label-de="Ein Typ" '
                                 'data-label-en="Some type"'),
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')])
+
+    def test_get_with_questionnaire_but_missing_option(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Tenure type', 'de': 'Anrecht'},
+            type='S1')
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            type_labels=('data-label-de="Anrecht" '
+                         'data-label-en="Tenure type"'),
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')])
 
