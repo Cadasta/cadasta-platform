@@ -1,5 +1,181 @@
 # Change Log
 
+## [v1.7.3](https://github.com/Cadasta/cadasta-platform/tree/v1.7.3) (2017-04-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.3-alpha.3...v1.7.3)
+
+## [v1.7.3-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.7.3-alpha.3) (2017-04-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.3-alpha.2...v1.7.3-alpha.3)
+
+**Closed issues:**
+
+- No password verification when changing account's mail address [\#1376](https://github.com/Cadasta/cadasta-platform/issues/1376)
+
+**Merged pull requests:**
+
+- Adds mime\_type field to resource serializer [\#1363](https://github.com/Cadasta/cadasta-platform/pull/1363) ([oliverroick](https://github.com/oliverroick))
+
+## [v1.7.3-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.7.3-alpha.2) (2017-04-08)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.3-alpha.1...v1.7.3-alpha.2)
+
+**Fixed bugs:**
+
+- Public Users can still view `records/locations` and `records/parties` [\#1384](https://github.com/Cadasta/cadasta-platform/issues/1384)
+- Search showing duplicate entries [\#1382](https://github.com/Cadasta/cadasta-platform/issues/1382)
+- CSS: Long email spills outside of member profile [\#1379](https://github.com/Cadasta/cadasta-platform/issues/1379)
+- Notification text not updated for  [\#1374](https://github.com/Cadasta/cadasta-platform/issues/1374)
+- Hide location edit and delete buttons for project users [\#1233](https://github.com/Cadasta/cadasta-platform/issues/1233)
+- "Leave this site" confirmation box [\#875](https://github.com/Cadasta/cadasta-platform/issues/875)
+
+**Closed issues:**
+
+- Users with inactive account/unverified email should not be added to any organization [\#1389](https://github.com/Cadasta/cadasta-platform/issues/1389)
+- Upgrade Django: Security vulns [\#1387](https://github.com/Cadasta/cadasta-platform/issues/1387)
+- Improve field messaging, define criteria [\#561](https://github.com/Cadasta/cadasta-platform/issues/561)
+
+**Merged pull requests:**
+
+- Update Django to 1.10.7 [\#1388](https://github.com/Cadasta/cadasta-platform/pull/1388) ([amplifi](https://github.com/amplifi))
+- Fix \#1376 -- Require password when user updates email [\#1386](https://github.com/Cadasta/cadasta-platform/pull/1386) ([oliverroick](https://github.com/oliverroick))
+- Fixed long email issue [\#1381](https://github.com/Cadasta/cadasta-platform/pull/1381) ([clash99](https://github.com/clash99))
+- Update password reset notification text [\#1375](https://github.com/Cadasta/cadasta-platform/pull/1375) ([amplifi](https://github.com/amplifi))
+
+## [v1.7.3-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.3-alpha.1) (2017-04-04)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.2-alpha.2...v1.7.3-alpha.1)
+
+**Fixed bugs:**
+
+- Sign in username/email texts  [\#1323](https://github.com/Cadasta/cadasta-platform/issues/1323)
+- Typo in flash message after incorrect login. [\#1308](https://github.com/Cadasta/cadasta-platform/issues/1308)
+- Needs Investigation :: Overview Map Zooms to Extent of One Particular Polygon [\#1289](https://github.com/Cadasta/cadasta-platform/issues/1289)
+- Import Issue :: Party file imports successfully but does not associate with location id [\#1285](https://github.com/Cadasta/cadasta-platform/issues/1285)
+- AssertionError at /api/v1/users/\<user-name\>/ [\#1284](https://github.com/Cadasta/cadasta-platform/issues/1284)
+- User session has no expiry [\#1273](https://github.com/Cadasta/cadasta-platform/issues/1273)
+- Password reset should not confirm or deny existence of account [\#1272](https://github.com/Cadasta/cadasta-platform/issues/1272)
+- 403 after sign in [\#1250](https://github.com/Cadasta/cadasta-platform/issues/1250)
+- I can see members on Organization Overview but "View all" members tells me no [\#1241](https://github.com/Cadasta/cadasta-platform/issues/1241)
+- Sample questionnaires still contain the Project Extent location type [\#1226](https://github.com/Cadasta/cadasta-platform/issues/1226)
+- Search add location icon not working with Internet Explorer [\#1165](https://github.com/Cadasta/cadasta-platform/issues/1165)
+- Importing these Files Exceptions Is Not Caught [\#1113](https://github.com/Cadasta/cadasta-platform/issues/1113)
+- Possible to Create Duplicate Resource Entries [\#1107](https://github.com/Cadasta/cadasta-platform/issues/1107)
+- API: Non-permissioned users can view an organizations users [\#1042](https://github.com/Cadasta/cadasta-platform/issues/1042)
+- Make usernames case insensitive [\#946](https://github.com/Cadasta/cadasta-platform/issues/946)
+- Longer-term solution for intermittent functional test failures [\#919](https://github.com/Cadasta/cadasta-platform/issues/919)
+
+**Closed issues:**
+
+- \[ui\] \[enhancement\] Make header "add dropdown buttons" contextual  [\#1346](https://github.com/Cadasta/cadasta-platform/issues/1346)
+- Pending migration not bundled [\#1334](https://github.com/Cadasta/cadasta-platform/issues/1334)
+- Browser Incompatibility: User dropdown does not work in Safari on Project pages [\#1333](https://github.com/Cadasta/cadasta-platform/issues/1333)
+- Wrong style used in party detail page [\#1331](https://github.com/Cadasta/cadasta-platform/issues/1331)
+- Adding forgot username functionality. [\#1319](https://github.com/Cadasta/cadasta-platform/issues/1319)
+- Emails from Cadasta should have a human readable name [\#1269](https://github.com/Cadasta/cadasta-platform/issues/1269)
+- Remove confirm password fields [\#1242](https://github.com/Cadasta/cadasta-platform/issues/1242)
+- Readme does not shows what this project does. [\#1196](https://github.com/Cadasta/cadasta-platform/issues/1196)
+- Importer :: Ability to import WKB formatted coordinates [\#1159](https://github.com/Cadasta/cadasta-platform/issues/1159)
+- Search: clicking on search panel should go to the top of the page? [\#1148](https://github.com/Cadasta/cadasta-platform/issues/1148)
+- Search: Clear textbox  [\#1147](https://github.com/Cadasta/cadasta-platform/issues/1147)
+- Change of email process security updates [\#1140](https://github.com/Cadasta/cadasta-platform/issues/1140)
+- Send an email when a user changes the password [\#724](https://github.com/Cadasta/cadasta-platform/issues/724)
+
+**Merged pull requests:**
+
+- Add required options and helpful output to management commands [\#1366](https://github.com/Cadasta/cadasta-platform/pull/1366) ([alukach](https://github.com/alukach))
+- Extend pruning for media/temp/ [\#1362](https://github.com/Cadasta/cadasta-platform/pull/1362) ([amplifi](https://github.com/amplifi))
+- Use Django Extensions in dev qa mode [\#1361](https://github.com/Cadasta/cadasta-platform/pull/1361) ([alukach](https://github.com/alukach))
+- Fixes \#724 -- Send confirmation email after password change and reset [\#1353](https://github.com/Cadasta/cadasta-platform/pull/1353) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1140 -- Update change-email process [\#1348](https://github.com/Cadasta/cadasta-platform/pull/1348) ([oliverroick](https://github.com/oliverroick))
+- Add tests to check pending migrations [\#1347](https://github.com/Cadasta/cadasta-platform/pull/1347) ([niharika1995](https://github.com/niharika1995))
+- Bugfix/\#1113 [\#1344](https://github.com/Cadasta/cadasta-platform/pull/1344) ([alukach](https://github.com/alukach))
+- More botlist updates [\#1341](https://github.com/Cadasta/cadasta-platform/pull/1341) ([amplifi](https://github.com/amplifi))
+- Fix static serving of favicon in nginx config [\#1340](https://github.com/Cadasta/cadasta-platform/pull/1340) ([amplifi](https://github.com/amplifi))
+- Remove main.css \(ignored for SASS compilation\) [\#1339](https://github.com/Cadasta/cadasta-platform/pull/1339) ([amplifi](https://github.com/amplifi))
+- Fix bold markup in PR review template [\#1338](https://github.com/Cadasta/cadasta-platform/pull/1338) ([amplifi](https://github.com/amplifi))
+- Remove broken django.contrib.auth url endpoints [\#1337](https://github.com/Cadasta/cadasta-platform/pull/1337) ([alukach](https://github.com/alukach))
+- Fixed \#1331: Wrong style used in party detail page [\#1336](https://github.com/Cadasta/cadasta-platform/pull/1336) ([rishabhiitbhu](https://github.com/rishabhiitbhu))
+- Remove confirm password fields \(resolves \#1242\) [\#1332](https://github.com/Cadasta/cadasta-platform/pull/1332) ([alukach](https://github.com/alukach))
+- Update Ansible roles manifest [\#1330](https://github.com/Cadasta/cadasta-platform/pull/1330) ([amplifi](https://github.com/amplifi))
+- Update gitignore [\#1329](https://github.com/Cadasta/cadasta-platform/pull/1329) ([amplifi](https://github.com/amplifi))
+- Bugfix \#1284: Assertion error at /api/v1/users/\<user-name\>/ [\#1325](https://github.com/Cadasta/cadasta-platform/pull/1325) ([rishabhiitbhu](https://github.com/rishabhiitbhu))
+- Fix \#1323: Add email to login page text. [\#1324](https://github.com/Cadasta/cadasta-platform/pull/1324) ([khantaalaman](https://github.com/khantaalaman))
+- Fixed search box on map in IE [\#1307](https://github.com/Cadasta/cadasta-platform/pull/1307) ([clash99](https://github.com/clash99))
+- Show whole project extent on overview and map project pages [\#1304](https://github.com/Cadasta/cadasta-platform/pull/1304) ([clash99](https://github.com/clash99))
+- Add a test for WKB importing [\#1301](https://github.com/Cadasta/cadasta-platform/pull/1301) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Fix \#1042: Hide user details for unauthorized users [\#1287](https://github.com/Cadasta/cadasta-platform/pull/1287) ([niharika1995](https://github.com/niharika1995))
+- Bugfix/\#1272 and added tests for same [\#1279](https://github.com/Cadasta/cadasta-platform/pull/1279) ([aklife97](https://github.com/aklife97))
+- Add explicit cookie config [\#1278](https://github.com/Cadasta/cadasta-platform/pull/1278) ([amplifi](https://github.com/amplifi))
+- Fix \#946: Make usernames case insensitive [\#1276](https://github.com/Cadasta/cadasta-platform/pull/1276) ([bjohare](https://github.com/bjohare))
+- Hide location action buttons unless user has permission to do the action [\#1268](https://github.com/Cadasta/cadasta-platform/pull/1268) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Added is\_member to OrgAdminCheckMixin. Updated org\_member permissions. [\#1251](https://github.com/Cadasta/cadasta-platform/pull/1251) ([linzjax](https://github.com/linzjax))
+- Fix of bug \#1107 \*Possible to Create Duplicate Resource Entries\* [\#1191](https://github.com/Cadasta/cadasta-platform/pull/1191) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Bugfix \#1188:Add 'forgotten password' link to the 'change password' page. [\#1189](https://github.com/Cadasta/cadasta-platform/pull/1189) ([rjain111](https://github.com/rjain111))
+- Fixed \#1148 [\#1175](https://github.com/Cadasta/cadasta-platform/pull/1175) ([iharsh234](https://github.com/iharsh234))
+- Search: Clear search textbox. [\#1171](https://github.com/Cadasta/cadasta-platform/pull/1171) ([khantaalaman](https://github.com/khantaalaman))
+
+## [v1.7.2](https://github.com/Cadasta/cadasta-platform/tree/v1.7.2) (2017-03-21)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.2-alpha.2...v1.7.2)
+
+## [v1.7.2-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.7.2-alpha.2) (2017-03-21)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.2-alpha.1...v1.7.2-alpha.2)
+
+**Fixed bugs:**
+
+- Unclear Error \(QuestionOption matching query\) when Click on Location In Imported Project [\#1321](https://github.com/Cadasta/cadasta-platform/issues/1321)
+- Weird "}" symbol when including more than one relationship fields in a xlsform [\#1309](https://github.com/Cadasta/cadasta-platform/issues/1309)
+
+**Closed issues:**
+
+- Search not working [\#1318](https://github.com/Cadasta/cadasta-platform/issues/1318)
+- Change Password: User gets password updated even if new password is same as old password. [\#1286](https://github.com/Cadasta/cadasta-platform/issues/1286)
+- Rework Member Profile page into two sections [\#1256](https://github.com/Cadasta/cadasta-platform/issues/1256)
+
+**Merged pull requests:**
+
+- Update Ansible template for uWSGI config [\#1320](https://github.com/Cadasta/cadasta-platform/pull/1320) ([amplifi](https://github.com/amplifi))
+- Removed extra bracket from relationship\_add.html [\#1313](https://github.com/Cadasta/cadasta-platform/pull/1313) ([linzjax](https://github.com/linzjax))
+- Bugfix \#1269: Add a human readable name to email sent from platform@c… [\#1290](https://github.com/Cadasta/cadasta-platform/pull/1290) ([rjain111](https://github.com/rjain111))
+- Add security checks to PR review checklist [\#1274](https://github.com/Cadasta/cadasta-platform/pull/1274) ([amplifi](https://github.com/amplifi))
+
+## [v1.7.2-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.2-alpha.1) (2017-03-17)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.1...v1.7.2-alpha.1)
+
+**Fixed bugs:**
+
+- Incorrect rendering at Location Details page [\#1306](https://github.com/Cadasta/cadasta-platform/issues/1306)
+- The 'x' on the location delete modal isn't working [\#1299](https://github.com/Cadasta/cadasta-platform/issues/1299)
+- Logout doesn't appear to be working [\#1227](https://github.com/Cadasta/cadasta-platform/issues/1227)
+- Datatables should not show row filter drop-down if \<= 10 results [\#1221](https://github.com/Cadasta/cadasta-platform/issues/1221)
+- API: Can created an organization with no users [\#1114](https://github.com/Cadasta/cadasta-platform/issues/1114)
+- Changing user from admin should leave you on the Member Permissions Page [\#1106](https://github.com/Cadasta/cadasta-platform/issues/1106)
+- Usernames should be case insensitive when checked in password [\#1105](https://github.com/Cadasta/cadasta-platform/issues/1105)
+- Registering with an email that is no longer associated with an account throws an error [\#1102](https://github.com/Cadasta/cadasta-platform/issues/1102)
+- Minor Import Annoyance :: "Location\_type" wants to map to "party\_type" [\#1090](https://github.com/Cadasta/cadasta-platform/issues/1090)
+- Inconsistent Overview/Map Location Display [\#590](https://github.com/Cadasta/cadasta-platform/issues/590)
+- Adding geometries does not work from touchscreens [\#299](https://github.com/Cadasta/cadasta-platform/issues/299)
+
+**Closed issues:**
+
+- Typo in test classes [\#1291](https://github.com/Cadasta/cadasta-platform/issues/1291)
+- Link members on Organizational Overview page directly to member profile [\#1262](https://github.com/Cadasta/cadasta-platform/issues/1262)
+- Include Search and Go-To-My-Location in Overview and Map pages [\#1002](https://github.com/Cadasta/cadasta-platform/issues/1002)
+- Review Map Zooms [\#701](https://github.com/Cadasta/cadasta-platform/issues/701)
+
+**Merged pull requests:**
+
+- Provisioning hooks update [\#1305](https://github.com/Cadasta/cadasta-platform/pull/1305) ([amplifi](https://github.com/amplifi))
+- Bugfix \#1299: Fix the closing of location-delete modal. [\#1300](https://github.com/Cadasta/cadasta-platform/pull/1300) ([khantaalaman](https://github.com/khantaalaman))
+- Update changelog for v1.7.1 [\#1297](https://github.com/Cadasta/cadasta-platform/pull/1297) ([amplifi](https://github.com/amplifi))
+- fixing typo in test classes bugfix\#1291 [\#1293](https://github.com/Cadasta/cadasta-platform/pull/1293) ([kwateng](https://github.com/kwateng))
+- Fixed-1271: Unmentioned file types when uploading a new resource. [\#1275](https://github.com/Cadasta/cadasta-platform/pull/1275) ([Shruti9520](https://github.com/Shruti9520))
+- Fix \#1221: Hide row filter dropdown when the search is one page long. [\#1265](https://github.com/Cadasta/cadasta-platform/pull/1265) ([niharika1995](https://github.com/niharika1995))
+- Fix \#1262: Add links to member profiles from OrganizationDashboard page [\#1263](https://github.com/Cadasta/cadasta-platform/pull/1263) ([niharika1995](https://github.com/niharika1995))
+- Fix \#1256: Rework member profile page into two sections. [\#1258](https://github.com/Cadasta/cadasta-platform/pull/1258) ([khantaalaman](https://github.com/khantaalaman))
+- Bugfix/\#1114 [\#1235](https://github.com/Cadasta/cadasta-platform/pull/1235) ([niharika1995](https://github.com/niharika1995))
+- issue-1002-fixed [\#1201](https://github.com/Cadasta/cadasta-platform/pull/1201) ([yoshi2095](https://github.com/yoshi2095))
+- Fix issue \#1090 [\#1199](https://github.com/Cadasta/cadasta-platform/pull/1199) ([Sanny26](https://github.com/Sanny26))
+- Fix: \#1102 Remove IntegrityError when using a released email to register [\#1176](https://github.com/Cadasta/cadasta-platform/pull/1176) ([py-geek](https://github.com/py-geek))
+- Fix bug \#1106 [\#1158](https://github.com/Cadasta/cadasta-platform/pull/1158) ([Sanny26](https://github.com/Sanny26))
+- Fixed \#1105 Case Insensitive username and password comparison [\#1149](https://github.com/Cadasta/cadasta-platform/pull/1149) ([valaparthvi](https://github.com/valaparthvi))
+
 ## [v1.7.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.1) (2017-03-13)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.0...v1.7.1)
 
