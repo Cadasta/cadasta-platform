@@ -33,7 +33,7 @@
 {% block location_panel %}
 
 <div class="col-md-4 detail detail-edit">
-  <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
+  <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</a></h2>
   <hr class="border-btm">
   <h3>{% trans "Edit Relationship" %}</h3>
   <div class="panel panel-default">

@@ -257,257 +257,6 @@ main.container-fluid {
   }
 }
 
-.content-single {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 900;
-  padding: 0;
-  overflow: hidden;
-  overflow-y: scroll;
-  height: 100%;
-  height: -webkit-calc(100% - 30px);
-  height: -moz-calc(100% - 30px);
-  height: calc(100% - 30px);
-  > .row { // for map to expand need height
-    height: 100%;
-    margin-right: 0;
-  }
-  h2 {
-    color: $brand-darkblue;
-    text-transform: uppercase;
-    margin-top: 0;
-    padding-bottom: 6px;
-    text-shadow: none;
-    &.short { // provides room for admin buttons on right
-      width: 70%;
-    }
-    a {
-      color: #0e305e;
-      text-decoration: none;
-    }
-    a:hover {
-      color: #2e51a3;
-    }
-  }
-  h3 {
-    font-family: $font-family-sans-serif-alt;
-    text-transform: uppercase;
-    font-weight: 300;
-    letter-spacing: 0;
-    color: #0e305e;
-  }
-  h4 span.small { // small entity title above link in results tables
-    font-size: 11px;
-    color: $gray-medium;
-    display: block;
-    text-transform: uppercase;
-    padding-bottom: 2px;
-    font-weight: normal;
-    letter-spacing: 0;
-  }
-  .divider-thick {
-    border-top: solid 7px $table-border-color;
-    margin: 20px auto;
-  }
-  .btn-block {
-    margin: 24px auto;
-  }
-  .page-title {
-    padding-bottom: 0;
-    padding-top: 0;
-    .top-btn{
-      margin-top: 0;
-    }
-  }
-  .map { // main panel map
-    height: 100%;
-    min-height: 100%;
-    padding-right: 0;
-    #project-map, #id_extent_map, #id_extents_extent_map {
-      height: 100%;
-      min-height: 100%;
-    }
-  }
-  #id_geometry_map {
-    height: 100%;
-    min-height: 100%;
-  }
-  .main-text {
-    padding: 30px 40px 50px 50px;
-  }
-  .detail { // right panel detail
-    height: 100%;
-    min-height: 100%;
-    position: relative;
-    background: #fff;
-    margin: 0 auto;
-    padding: 24px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
-    -moz-box-shadow: 0 0 6px rgba(0,0,0,.3);
-    box-shadow: 0 0 6px rgba(0,0,0,.3);
-    z-index: 300;
-    .more-menu {
-      width: auto !important;
-    }
-    .org-logo { // large org logo
-      margin: 10px auto 20px;
-      float: none;
-      text-align: center;
-      img {
-        width: 90%;
-        max-width: 200px;
-      }
-    }
-    ul.list-divider li { // lists with lines between
-      border-bottom: 1px solid $table-border-color;
-      padding: 12px 2px;
-      &:last-child {
-        border-bottom: 0;
-        padding-bottom: 6px;
-      }
-      &.linked:hover {
-        cursor: pointer;
-        background-color: $table-bg-hover;
-      }
-    }
-    .nav-tabs {
-      li > a {
-        font-size: 13px;
-        padding: 10px;
-      }
-      li.active > a, li.active > a:hover, li.active > a:focus {
-        border-color: $table-border-color;
-        border-bottom-color: transparent;
-      }
-    }
-    section > p:first-child {
-      padding-top: 20px;
-    }
-    h4 {
-      font-family: $font-family-sans-serif-alt;
-      text-transform: uppercase;
-      opacity: 0.8;
-      letter-spacing: 0;
-      padding-top: 10px;
-    }
-    .glyphicon-globe, .glyphicon-envelope, .glyphicon-earphone { // url and contacts in overview
-      opacity: 0.7;
-      padding-right: 12px;
-    }
-    dl.contacts { // contacts in overview
-      dt {
-        border-top: dotted 1px $table-border-color;
-        padding-top: 10px;
-        padding-bottom: 6px;
-        padding-left: 30px;
-        &:first-child {
-          border-top: none;
-          padding-top: 0;
-        }
-      }
-      dd {
-        padding-bottom: 10px;
-        padding-left: 30px;
-        a {
-          display: block;
-          font-size: 13px;
-          padding-bottom: 4px;
-        }
-      }
-    }
-  }
-  .row-height .detail { // columns fixed to match heights like org overview
-    padding-top: 0;
-  }
-  .detail-edit { // edit on right
-    background: $body-bg;
-    .panel-footer {
-      background: transparent;
-    }
-  }
-  .panel { // content box in main panel
-    border: 1px solid $table-border-color;
-    clear: both;
-    .panel-heading {
-      background: transparent;
-      h3 {
-        margin: 4px auto;
-      }
-    }
-    .panel-body {
-      > h3 {
-        margin-bottom: 10px;
-        margin-top: 4px;
-        padding-bottom: 10px;
-        border-bottom: solid 1px $gray-light;
-      }
-      .top-add {
-        margin-bottom: -30px;
-      }
-    }
-    .panel-footer {
-      background: lighten($body-bg, 2%);
-    }
-    .panel-buttons { // holds buttons at bottom of panels containing forms
-      padding: 20px 15px;
-      .btn {
-        min-width: 110px;
-        margin-right: 20px;
-        &:last-child {
-          margin-right: 0;
-        }
-      }
-    }
-  }
-  .nav-tabs {
-    margin-bottom: 20px;
-  }
-}
-
-body.map .content-single {
-  overflow-y: hidden;
-}
-
-@media (max-width: $screen-sm-max) {
-  .content-single {
-    position: relative;
-    .map {
-      height: 300px;
-      min-height: 300px;
-    }
-    .main-text {
-      padding: 15px;
-    }
-  }
-}
-
-@media (max-width: $screen-xs-max) {
-  .content-single {
-    .panel {
-      .panel-buttons .btn {
-        width: 100%;
-        margin-bottom: 10px;
-        margin-right: 0;
-      }
-      .panel-body {
-        font-size: 12px;
-      }
-    }
-    .detail {
-      .nav-tabs li > a {
-        font-size: 12px;
-      }
-      .tab-content {
-        font-size: 12px;
-      }
-    }
-  }
-}
-
 /* =Table for sort and filter
 -------------------------------------------------------------- */
 
@@ -933,10 +682,20 @@ div.add-btn-btm { // add party link at bottom of table
   font-size: 11px;
   font-weight: 500;
   vertical-align: middle;
+  text-transform: none !important;
 }
 
 h1 .label {
   font-size: 16px;
+}
+
+.entity { // small entity title above link 
+  font-size: 11px;
+  font-weight: normal;
+  color: $gray-medium;
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 .highlight { // for emphasis for inline text
@@ -967,14 +726,3 @@ h1 .label {
   }
 }
 
-
-/* =Map location details
--------------------------------------------------------------- */
-
-.content-single .panel h2 span {
-  font-size: 14px;
-  color: #a6a7a8;
-  display: block;
-  text-transform: uppercase;
-  padding-bottom: 2px;
-}

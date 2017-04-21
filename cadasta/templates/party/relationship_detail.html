@@ -6,7 +6,7 @@
 <div class="col-md-4 detail">
   <section>
     <div class="page-title">
-      <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
+      <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</a></h2>
       <hr class="border-btm">
       <h3 class="inline">{% trans "Relationship Detail" %}</h3>
       <div class="top-btn pull-right">

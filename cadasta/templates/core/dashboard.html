@@ -32,7 +32,7 @@
     var geoJson = L.geoJson(null, {
       onEachFeature: function(feature, layer) {
         layer.bindPopup("<div class=\"text-wrap\">" +
-                       "<h2><span>" + feature.properties.org + "</span>" +
+                       "<h2><span class=\"entity\">" + feature.properties.org + "</span>" +
                        feature.properties.name + "</h2></div>" +
                        "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">{% trans 'Open project' %}</a>"  +
                        "</div>");
