@@ -1,15 +1,21 @@
-// $(window).load(function () {
-//   var js_files = [
-//     'lazytiles.js',
-//     // 'L.TileLayer.GeoJSON.js',
-//     // 'map.js',
-//     'routes.js',
-//     'router.js'
-//   ];
-//   var body = $('body');
-//   for (var i in js_files) {
-//     body.append($('<script src="/static/js/smap/' + js_files[i] + '"></script>'));
-//   }
-//   // var sr = new SimpleRouter();
-//   // sr.router();
-// });
+var map = L.map('mapid');
+var sr = new SimpleRouter(map);
+sr.router();
+
+/*****************
+EVENT LISTENERS
+*****************/
+window.addEventListener('hashchange', function() {
+    sr.router();
+});
+window.addEventListener('load', function() {
+    sr.router();
+});
+map.on('endtileload', function() {
+    rm.updateState({
+        'check_location_coords': true,
+    });
+});
+
+SMap(map);
+var hash = new L.Hash(map);

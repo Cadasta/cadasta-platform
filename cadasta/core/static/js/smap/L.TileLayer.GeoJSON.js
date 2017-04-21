@@ -1,9 +1,29 @@
+// set up webworker object.
+var WebWorker = {};
+WebWorker.addTileData = function(data, callback) {
+    var features = data.geojson.features;
+    var new_layer = [];
+    if (features) {
+        for (var i = 0, f_len = features.length; i < f_len; i++) {
+            if (features[i].geometries || features[i].geometry || features[i].features || features[i].coordinates) {
+                if (!data._loadedfeatures[features[i].id]) {
+                    new_layer.push(features[i]);
+                    data._loadedfeatures[features[i].id] = true;
+                }
+            }
+        }
+    }
+    data.new_layer = new_layer;
+    callback(data);
+};
+
 // Load data tiles from an AJAX data source
 L.TileLayer.Ajax = L.TileLayer.extend({
     _requests: [],
     _loadedfeatures: {},
     _tiles: {},
     _ticker: 1,
+    _original_request_len: null,
     _addTile: function(tilePoint) {
         var tile = {
             datum: null,
@@ -37,10 +57,6 @@ L.TileLayer.Ajax = L.TileLayer.extend({
     },
     // Load the requested tile via AJAX
     _loadTile: function(tile, tilePoint) {
-        // ****
-        // _update has been refactored is no longer required?
-        // ****
-        // this._update(tilePoint);
         if (tilePoint.x < 0 || tilePoint.y < 0) {
             return;
         }
@@ -51,14 +67,14 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         req.open('GET', this.getTileUrl(tilePoint), true);
         req.send();
 
-        // *** DELETE THIS ***
         req.addEventListener("loadend", this._loadEnd.bind(this));
-        // *******************
     },
     _loadEnd: function() {
-        if (this._ticker < this._requests.length) {
+        this._original_request_len = this._original_request_len || this._requests.length;
+        if (this._ticker < this._original_request_len) {
             this._ticker++;
         } else {
+            map.fire('endtileload');
             $('#messages #loading').addClass('hidden');
         }
     },
@@ -88,26 +104,57 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     // Used to calculate svg path string for clip path elements
     _clipPathRectangles: {},
 
-    initialize: function(url, options, geojsonOptions) {
+    initialize: function(numWorkers, numLocations, url, options, geojsonOptions) {
+        this.numWorkers = numWorkers;
+        this.numLocations = numLocations;
+        this._workers = new Array(this.numWorkers);
+        this.messages = {};
+        this.queue = { total: numWorkers };
+
         $('#messages #loading').removeClass('hidden');
+
         L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
+
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
-        this.features = L.deflate({
-            minSize: 20,
-            markerCluster: true
-        });
     },
     onAdd: function(map) {
+        var parent = this;
+        var i = 0;
+        this.queue.free = [];
+        this.queue.len = 0;
+        this.queue.tiles = [];
+
+        while (i < this.numWorkers) {
+            this.queue.free.push(i);
+            this._workers[i] = catiline(WebWorker);
+            i++;
+        }
+
+        map.on("zoomstart", function() {
+            this.queue.len = 0;
+            this.queue.tiles = [];
+        }, this);
+
+
         this._lazyTiles = new Tile(0, 0, 0, map.maxZoom);
         this._map = map;
         L.TileLayer.Ajax.prototype.onAdd.call(this, map);
         map.addLayer(this.geojsonLayer);
-        map.addLayer(this.features);
+        // map.addLayer(this.features);
     },
     onRemove: function(map) {
-        map.removeLayer(this.geojsonLayer);
+        this.messages = {};
+        var len = this._workers.length;
+        var i = 0;
+        while (i < len) {
+            this._workers[i]._close();
+            i++;
+        }
+
         L.TileLayer.Ajax.prototype.onRemove.call(this, map);
-        map.removeLayer(this.features);
+
+        map.removeLayer(this.geojsonLayer);
+        // map.removeLayer(this.features);
     },
     _reset: function() {
         this.geojsonLayer.clearLayers();
@@ -210,115 +257,52 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         }, layer);
     },
 
-    // Add a geojson object from a tile to the GeoJSON layer
-    // * If the options.unique function is specified, merge geometries into GeometryCollections
-    // grouped by the key returned by options.unique(feature) for each GeoJSON feature
-    // * If options.clipTiles is set, and the browser is using SVG, perform SVG clipping on each
-    // tile's GeometryCollection
-    addTileData: function(geojson, tilePoint) {
-        var features = L.Util.isArray(geojson) ? geojson : geojson.features,
-            i, len, feature;
-        if (features) {
-            for (i = 0, len = features.length; i < len; i++) {
-                // Only add this if geometry or geometries are set and not null
-                feature = features[i];
-                if (feature.geometries || feature.geometry || feature.features || feature.coordinates) {
-                    // ****
-                    // Added to prevent reloading of already loaded SUs.
-                    // ****
-                    if (!this._loadedfeatures[features[i]['id']]) {
-                        this.addTileData(features[i], tilePoint);
-                        this._loadedfeatures[features[i]['id']] = true;
-                    }
-                }
-            }
-            return this;
-        }
+    _renderTileData: function(geojson, tilePoint, workerID) {
+        var parent = this;
 
-        var options = this.geojsonLayer.options;
+        var msg = {
+            geojson: geojson,
+            _loadedfeatures: this._loadedfeatures,
+            workerID: workerID,
+        };
 
-        if (options.filter && !options.filter(geojson)) {
-            return;
-        }
-
-        var parentLayer = this.geojsonLayer;
-        var incomingLayer = null;
-        if (this.options.unique && typeof(this.options.unique) === 'function') {
-            var key = this.options.unique(geojson);
-
-            // When creating the layer for a unique key,
-            // Force the geojson to be a geometry collection
-            if (!(key in this._keyLayers && geojson.geometry.type !== 'GeometryCollection')) {
-                geojson.geometry = {
-                    type: 'GeometryCollection',
-                    geometries: [geojson.geometry]
-                };
+        this._workers[workerID].addTileData(msg).then(function(data) {
+            if (data.new_layer.length !== 0) {
+                parent._loadedfeatures = data._loadedfeatures;
+                parent.geojsonLayer.addData(data.new_layer);
             }
 
-            // Transform the geojson into a new Layer
-            try {
-                incomingLayer = L.GeoJSON.geometryToLayer(geojson, options.pointToLayer, options.coordsToLatLng);
-            }
-            // Ignore GeoJSON objects that could not be parsed
-            catch (e) {
-                return this;
+
+            if (parent.queue.len) {
+                parent.queue.len--;
+                next = parent.queue.tiles.shift();
+                parent._renderTileData(next[0], next[1], data.workerID);
+            } else {
+                parent.queue.free.push(data.workerID);
             }
 
-            incomingLayer.feature = L.GeoJSON.asFeature(geojson);
-            // Add the incoming Layer to existing key's GeometryCollection
-            if (key in this._keyLayers) {
-                parentLayer = this._keyLayers[key];
-                parentLayer.feature.geometry.geometries.push(geojson.geometry);
-            }
-            // Convert the incoming GeoJSON feature into a new GeometryCollection layer
-            else {
-                this._keyLayers[key] = incomingLayer;
-            }
-        }
-        // Add the incoming geojson feature to the L.GeoJSON Layer
-        else {
-            // Transform the geojson into a new layer
-            try {
-                incomingLayer = L.GeoJSON.geometryToLayer(geojson, options.pointToLayer, options.coordsToLatLng);
-            }
-            // Ignore GeoJSON objects that could not be parsed
-            catch (e) {
-                return this;
-            }
-            incomingLayer.feature = L.GeoJSON.asFeature(geojson);
-        }
-        incomingLayer.defaultOptions = incomingLayer.options;
-
-        this.geojsonLayer.resetStyle(incomingLayer);
-
-        if (options.onEachFeature) {
-            options.onEachFeature(geojson, incomingLayer);
-        }
-        parentLayer.addLayer(incomingLayer);
-        this.features.addLayer(incomingLayer);
-
-        // If options.clipTiles is set and the browser is using SVG
-        // then clip the layer using SVG clipping
-        if (this.options.clipTiles) {
-            this._clipLayerToTileBoundary(incomingLayer, tilePoint);
-        }
-        return this;
+        }, function(e) {console.log(a);});
     },
 
     _tileLoaded: function(tile, tilePoint) {
-        // ****
-        // _tileOnLoad has been refactored and requires a callback function
-        // ****
-        // L.TileLayer.Ajax.prototype._tileOnLoad.apply(this, tile);
-        if (tile.datum === null) {
+        if (tile.datum === null || this.numLocations === Object.keys(this._loadedfeatures).length) {
             return null;
         }
-        this.addTileData(tile.datum, tilePoint);
-        this._lazyTiles.load(tilePoint.x, tilePoint.y, tilePoint.z);
+
+        if (!this.queue.free.length) {
+            this.queue.tiles.push([tile, tilePoint]);
+            this.queue.len++;
+        } else {
+            this._renderTileData(tile.datum, tilePoint, this.queue.free.pop());
+            this._lazyTiles.load(tilePoint.x, tilePoint.y, tilePoint.z);
+        }
     },
 
     _loadTile: function(tile, tilePoint) {
         if (!this._lazyTiles.isLoaded(tilePoint.x, tilePoint.y, tilePoint.z)) {
+
+
+
             L.TileLayer.Ajax.prototype._loadTile.call(this, tile, tilePoint);
         }
     },
