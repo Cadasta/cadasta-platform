@@ -36,8 +36,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         OrganizationFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert 'users' not in response.content[0]
+        assert len(response.content['results']) == 2
+        assert 'users' not in response.content['results'][0]
 
     def test_list_only_one_organization_is_authorized(self):
         """
@@ -57,8 +57,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
 
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert response.content[0]['slug'] != 'unauthorized'
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
 
     def test_full_list_with_unauthorized_user(self):
         """
@@ -67,8 +67,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         OrganizationFactory.create_batch(2)
         response = self.request()
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert 'users' not in response.content[0]
+        assert len(response.content['results']) == 2
+        assert 'users' not in response.content['results'][0]
 
     def test_filter_active(self):
         """
@@ -81,8 +81,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
                                         admin=True)
         response = self.request(user=self.user, get_data={'archived': True})
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert response.content[0]['archived'] is True
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['archived'] is True
 
     def test_search_filter(self):
         """
@@ -95,8 +95,9 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'search': 'match'})
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert not any([org['name'] == 'Excluded' for org in response.content])
+        assert len(response.content['results']) == 2
+        assert not any([org['name'] == 'Excluded' for org in
+                        response.content['results']])
 
     def test_ordering(self):
         OrganizationFactory.create_from_kwargs([
@@ -105,8 +106,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [org['name'] for org in response.content]
+        assert len(response.content['results']) == 3
+        names = [org['name'] for org in response.content['results']]
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
@@ -116,8 +117,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [org['name'] for org in response.content]
+        assert len(response.content['results']) == 3
+        names = [org['name'] for org in response.content['results']]
         assert(names == sorted(names, reverse=True))
 
     def test_permission_filter(self):
@@ -138,8 +139,8 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'permissions': 'project.create'})
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert response.content[0]['slug'] != 'unauthorized'
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
 
 
 class OrganizationCreateAPITest(APITestCase, UserTestCase, TestCase):
@@ -403,9 +404,9 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
         other_user = UserFactory.create()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
         assert (other_user.username not in
-                [u['username'] for u in response.content])
+                [u['username'] for u in response.content['results']])
 
     def test_get_users_with_unauthorized_user(self):
         response = self.request()

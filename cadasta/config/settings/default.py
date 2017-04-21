@@ -98,9 +98,12 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_VERSIONING_CLASS':
-    'rest_framework.versioning.NamespaceVersioning',
+        'rest_framework.versioning.NamespaceVersioning',
     'DEFAULT_VERSION': 'v1',
-    'EXCEPTION_HANDLER': 'core.views.api.exception_handler'
+    'EXCEPTION_HANDLER': 'core.views.api.exception_handler',
+    'DEFAULT_PAGINATION_CLASS':
+        'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 100
 }
 
 SITE_NAME = 'Cadasta'
