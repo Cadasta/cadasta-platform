@@ -11,7 +11,5 @@
 {% endblock %}
 
 {% block modals %}
-{% url 'parties:detail' object.organization.slug object.slug party.id as cancel_url %}
-{% url 'parties:resource_add' object.organization.slug object.slug party.id as add_lib_url %}
 {% include 'resources/modal_upload.html' %}
 {% endblock %}

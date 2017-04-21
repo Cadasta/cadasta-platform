@@ -274,7 +274,8 @@ class TenureRelationshipTest(UserTestCase, TestCase):
     def test_get_absolute_url(self):
         tenurerel = TenureRelationshipFactory.create()
         assert tenurerel.get_absolute_url() == (
-            '/organizations/{org}/projects/{prj}/relationships/{id}/'.format(
+            '/organizations/{org}/projects/{prj}/'
+            '#/records/relationship/{id}'.format(
                 org=tenurerel.project.organization.slug,
                 prj=tenurerel.project.slug,
                 id=tenurerel.id))

@@ -108,9 +108,8 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
-                # 'location': self.id,
             },
-        ) + '#/records/location/' + self.id)
+        ) + '#/records/location/{}/'.format(self.id))
 
     @cached_property
     def location_type_label(self):

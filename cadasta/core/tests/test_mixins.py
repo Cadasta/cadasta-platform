@@ -78,7 +78,7 @@ class PermissionRequiredMixinTest(UserTestCase, TestCase):
         assign_user_policies(user, *[])
         project = ProjectFactory.create()
 
-        view = org_views.ProjectDashboard.as_view()
+        view = org_views.ProjectMap.as_view()
 
         request = HttpRequest()
         request.META['HTTP_REFERER'] = '/account/login/'

@@ -4,7 +4,7 @@
   <div class="modal show" data-backdrop="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <form method="POST" data-parsley-validate>
+        <form method="POST" id="modal-form" data-parsley-validate>
           <div class="modal-header">
             <a class="close" href="{{ cancel_url }}{{ cancel_url_hash }}">
               <span aria-hidden="true">&times;</span>
@@ -21,7 +21,7 @@
           </div>
 
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary pull-right" name="submit" formaction="{{ submit_url }}">
+            <button type="submit" class="btn btn-primary pull-right submit-btn" name="submit" formaction="{{ submit_url }}">
               {% trans "Save" %}
             </button>
              <a class="btn btn-link cancel" href="{{ cancel_url }}{{ cancel_url_hash }}">

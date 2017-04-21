@@ -1,62 +1,89 @@
 // Based on http://joakim.beng.se/blog/posts/a-javascript-router-in-20-lines.html
 var SimpleRouter = function(map){
-  routes = new CreateRoutes(map);
+  var rm = RouterMixins;
+  var routes = new CreateRoutes();
 
-  var el = null;
-  function router() {
-    var hash_path = location.hash.slice(1) || '/';
-    var view_url = '/async' + location.pathname;
+  function router(force_reload=false) {
+      var async_url = '/async' + location.pathname;
+      var hash_path = location.hash.slice(1) || '/';
 
-    if (hash_path !== '/') {
-      view_url = view_url + hash_path.substr(1) + '/';
-    }
+      // first_load will only be true if the first page landed on is a record without coordinates
+      if (!hash_path.includes('/records/') || hash_path.includes('coords=')) {
+        rm.setFirstLoad(false);
+      }
 
-    var route = routes[hash_path] ? routes[hash_path] : null;
+      if (hash_path.includes('coords=')) {
+        hash_path = hash_path.substr(0, hash_path.indexOf('coords=') - 1) || '/';
+      }
 
-    // Removes record id from hash_path to match key in routes.
-    if (!route) {
-      var records = ['/records/location', '/records/relationship']
-      var actions = ['/edit', '/delete', '/resources/add', '/resources/new', '/relationships/new']
-      var new_hash_path;
-
-      for (var i in records) {
-        if (hash_path.includes(records[i])) {
-          new_hash_path = records[i];
+      // Prevents router from reloading every time the coords changes.
+      // force_reload is only true when a detach form is submitted
+      if (force_reload === false) {
+        if (rm.getLastHashPath() === hash_path || hash_path === '/search') {
+          return;
         }
       }
 
-      for (var i in actions) {
-        if (hash_path.includes(actions[i])) {
-          new_hash_path = new_hash_path + actions[i]
+      if (hash_path !== '/') {
+        async_url = async_url + hash_path.substr(1);
+      }
+
+      // Fail safe in case a hashpath does not contain the final backslash
+      if (hash_path.substr(-1) !== '/' && !hash_path.includes('?')) {
+        console.log(hash_path, 'was missing the final backslash.');
+        hash_path += '/';
+      }
+
+      var route = routes[hash_path] || null;
+
+      // If route is null, there is an ID in the hash. Remove the record id from hash_path to match key in routes.
+      if (!route) {
+        var new_hash_path = hash_path.split('/');
+        new_hash_path.splice(3, 1);
+        new_hash_path = new_hash_path.join('/');
+        route = routes[new_hash_path];
+      }
+
+      var el = document.getElementById(rm.getRouteElement(route.el));
+      var geturl = $.ajax({
+        type: "GET",
+        url: async_url,
+        success: function (response, status, xhr) {
+          var permission_error = geturl.getResponseHeader('Permission-Error');
+          var anonymous_user = geturl.getResponseHeader('Anonymous-User');
+          var location_coords = geturl.getResponseHeader('Coordinates');
+
+          if (location_coords && rm.getFirstLoad()) {
+            rm.setCurrentLocationCoords(location_coords);
+          }
+
+          if (permission_error) {
+            if (rm.getLastHashPath() && rm.getLastHashPath() !== '/' && rm.getLastHashPath() !== '/overview/') {
+              history.back();
+            } else if (!window.location.hash.includes('/overview.')) {
+              window.location.hash = "/overview/";
+            }
+            if ($('.alert-warning').length === 0) {
+              $('#messages').append(rm.permissionDenied(permission_error));
+            }
+            return;
+
+          } else if (anonymous_user) {
+            window.location = "/account/login/?next=" + window.location.pathname;
+
+          } else {
+            route.controller();
+            el.innerHTML = response;
+            if (route.eventHook) {
+              route.eventHook();
+            }
+          }
+          rm.setLastHashPath(hash_path);
         }
-      }
-      route = routes[new_hash_path];
-      console.log(new_hash_path);
-      console.log(view_url);
-    }
-
-
-    el = route.controller() || document.getElementById('project-detail');
-
-    $.get(view_url, function(response){
-      el.innerHTML = response;
-      if (route.eventHook) {
-        route.eventHook(view_url);
-      }
-    });
-  }
-
+        });
+    } // end router()
   return {
     router: router,
   };
-};
-
-$(window).on('map:init', function (e) {
-  var detail = e.originalEvent ?
-               e.originalEvent.detail : e.detail;
-  console.log(detail.map);
-  var sr = new SimpleRouter(detail.map);
-  window.addEventListener('hashchange', sr.router);
-  window.addEventListener('load', sr.router);
-});
+}; // end SimpleRouter()
 
