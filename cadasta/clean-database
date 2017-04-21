@@ -1,0 +1,8 @@
+#!/bin/bash
+
+sudo -u postgres psql <<EOF
+drop database cadasta;
+create database cadasta with owner cadasta;
+EOF
+./manage.py migrate
+./manage.py loadfixtures
