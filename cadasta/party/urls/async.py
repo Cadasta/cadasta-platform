@@ -16,6 +16,7 @@ urls = [
         r'^records/relationship/(?P<relationship>[-\w]+)/delete/$',
         async.PartyRelationshipDelete.as_view(),
         name='relationship_delete'),
+
     url(
         r'^records/relationship/(?P<relationship>[-\w]+)/resources/add/$',
         async.PartyRelationshipResourceAdd.as_view(),

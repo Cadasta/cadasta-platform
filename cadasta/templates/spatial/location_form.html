@@ -2,7 +2,9 @@
 {% load widget_tweaks %}
 {% load filters %}
 
-<h2><span class="entity">{% trans "Location" %} </span>{% if add == 'yes' %}{% trans "Add location" %}{% else %}{% trans "Edit details" %}{% endif %}</h2>
+<form method="POST" id="location-wizard" data-parsley-validate data-parsley-excluded=":hidden, [disabled]">
+  {% csrf_token %}
+  <h2><span class="entity">{% trans "Location" %} </span>{% if add == 'yes' %}{% trans "Add location" %}{% else %}{% trans "Edit details" %}{% endif %}</h2>
   <div class="panel panel-default">
     <div class="panel-body">
       <h3>{% trans "Draw location on map" %}</h3>
@@ -36,3 +38,4 @@
       <a class="btn btn-default cancel" href="{{ cancel_url }}">{% trans "Cancel" %}</a>
     </div>
   </div>
+</form>

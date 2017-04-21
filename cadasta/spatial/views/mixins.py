@@ -28,8 +28,10 @@ class SpatialQuerySetMixin(ProjectMixin):
     def get_success_url(self):
         kwargs = self.kwargs
         kwargs['location'] = self.object.id
-        return (reverse('organization:project-dashboard', kwargs=kwargs) +
-                '#/records/location/' + self.kwargs['location'].id)
+        return (reverse('organization:project-dashboard', kwargs={
+                'organization': kwargs['organization'],
+                'project': kwargs['project']
+                }) + '#/records/location/{}/'.format(kwargs['location']))
 
 
 class SpatialRelationshipQuerySetMixin(ProjectMixin):
@@ -73,7 +75,7 @@ class SpatialUnitResourceMixin(ResourceViewMixin, SpatialUnitObjectMixin):
             kwargs={
                 'organization': self.kwargs['organization'],
                 'project': self.kwargs['project']
-            }) + '#/records/location/' + self.kwargs['location'])
+            }) + '#/records/location/{}/'.format(self.kwargs['location']))
 
     def get_model_context(self):
         context = super().get_model_context()

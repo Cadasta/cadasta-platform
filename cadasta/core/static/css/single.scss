@@ -769,6 +769,18 @@
 body.map .content-single {
   overflow-y: hidden;
 }
+
+@media (max-width: $screen-md-min) {
+  .content-single.detail-hidden {
+    .detail {
+      top: 500px;
+      left: 0px;
+      transition: all 0.5s ease-in-out;
+      padding: 10px;
+      height: 0px;
+    }
+  }
+}
     
 
 @media (max-width: $screen-xs-max) {
@@ -808,6 +820,7 @@ body.map .content-single {
 .content-single {
   .detail {
     left: 0px;
+    top: 0px;
     h2 {
       span {
         font-size: 11px;

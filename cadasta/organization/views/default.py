@@ -15,6 +15,7 @@ from core.views import mixins as core_mixins
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
+from django.contrib.messages import get_messages
 from django.db import transaction
 from django.db.models import Sum, When, Case, IntegerField
 from django.http import HttpResponse
@@ -442,9 +443,20 @@ class ProjectMap(PermissionRequiredMixin,
     permission_required = {'GET': get_actions}
     permission_denied_message = error_messages.PROJ_VIEW
 
+    def render_to_response(self, context, **kwargs):
+        render = super().render_to_response(context, **kwargs)
+        storage = get_messages(self.request)
+        for message in storage:
+            render['Permission-Error'] = message
+        return render
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['project'] = self.get_object()
+
+        num_locations = context['project'].spatial_units.count()
+        context['locations_count'] = num_locations
+
         if self.prj.spatial_units.count() > 0:
             context['boundary'] = 'locations'
         else:
