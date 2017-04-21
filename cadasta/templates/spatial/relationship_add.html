@@ -12,7 +12,7 @@
       <div class="modal-content">
         <form method="POST" data-parsley-validate data-parsley-excluded=":hidden, disabled" id="modal-form">
           <div class="modal-header">
-            <a class="close" href="#/records/location/{{location.id}}">
+            <a class="close" href="{{ cancel_url }}">
               <span aria-hidden="true">&times;</span>
             </a>
             <h3 class="modal-title">{% trans "Add relationship" %}</h3>
@@ -77,11 +77,11 @@
           </div>
 
           <div class="modal-footer">
-            <button type="submit" class="btn btn-primary pull-right" name="submit-button">
+            <button type="submit" class="btn btn-primary pull-right submit-btn" name="submit-button" formaction="{{ submit_url }}">
               {% trans "Save" %}
             </button>
             <a class="btn btn-link cancel"
-              href="#/records/location/{{location.id}}">
+              href="{{ cancel_url }}">
               {% trans "Cancel" %}
             </a>
           </div>

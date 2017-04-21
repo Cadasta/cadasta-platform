@@ -9,14 +9,14 @@
 {% block title %} | {% trans "Dashboard" %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-<script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
@@ -37,6 +37,53 @@
       }
     });
     geoJson.addTo(features);
+
+    function geoLocate() {
+      return function(event) {
+        map.locate({ setView: true });
+      };
+    };
+
+    function add_map_controls() {
+      map.removeControl(map.zoomControl);
+      map.addControl(L.control.zoom({
+        zoomInTitle: gettext("Zoom in"),
+        zoomOutTitle: gettext("Zoom out")
+      }));
+
+      var geocoder = L.control.geocoder('search-QctWfva', {
+        markers: false
+      }).addTo(map);
+
+      geocoder.on('click', function (e) {
+        map.setZoomAround(e.latlng, 9);
+      });
+
+      var Geolocate = L.Control.extend({
+        options: {
+          position: 'topleft'
+        },
+
+        onAdd: function() {
+          var controlDiv = L.DomUtil.create(
+            'div', 'leaflet-bar leaflet-control leaflet-control-geolocate'
+          );
+          controlDiv.title = gettext('Go to my location');
+          L.DomEvent
+           .addListener(controlDiv, 'click', L.DomEvent.stopPropagation)
+           .addListener(controlDiv, 'click', L.DomEvent.preventDefault)
+           .addListener(controlDiv, 'click', geoLocate(map));
+
+          L.DomUtil.create('span', 'glyphicon glyphicon-map-marker', controlDiv);
+
+          return controlDiv;
+        }
+      });
+
+      map.addControl(new Geolocate());
+    }
+
+    add_map_controls();
   }
 
   function add_tile_layers() {

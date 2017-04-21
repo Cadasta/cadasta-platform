@@ -6,11 +6,11 @@
 
 {% block location_panel %}
 <section>
-  <h2><a href="#/records/location/{{location.id}}"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
+  <h2><a href="#/records/location/{{location.id}}/" id="current-location"><span>{% trans "Location" %} </span>{{ location.name }}</a></h2>
   <hr class="border-btm">
   <h3>{% trans "Edit Relationship" %}</h3>
   <div class="panel panel-default">
-    <form method="POST" data-parsley-validate>
+    <form method="POST" id='detail-form' data-parsley-validate>
     {% csrf_token %}
       <div class="panel-body">
         <h4>{% trans "Details" %}</h4>
@@ -34,8 +34,8 @@
         {% endfor %}
       </div>
       <div class="panel-footer panel-buttons">
-        <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
-        <a href="#/records/relationship/{{ relationship.id }}" class="btn btn-default">{% trans "Cancel" %}</a>
+        <button type="submit" class="btn btn-primary submit-btn" formaction="{{ submit_url }}">{% trans "Save" %}</button>
+        <a href="{{ cancel_url }}" class="btn btn-default">{% trans "Cancel" %}</a>
       </div>
     </form>
   </div>

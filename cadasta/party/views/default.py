@@ -193,6 +193,20 @@ class PartyResourcesAdd(LoginPermissionRequiredMixin,
     permission_required = update_permissions('party.resources.add')
     permission_denied_message = error_messages.PARTY_RESOURCES_ADD
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        url_kwargs = {
+            'organization': context['party'].project.organization.slug,
+            'project': context['party'].project.slug,
+            'party': context['party'].id
+        }
+        context['cancel_url'] = reverse('parties:detail', kwargs=url_kwargs)
+        context['upload_url'] = reverse('parties:resource_new',
+                                        kwargs=url_kwargs)
+        context['submit_url'] = reverse('parties:resource_add',
+                                        kwargs=url_kwargs)
+        return context
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         form = self.get_form()
@@ -209,3 +223,17 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
     template_name = 'party/resources_new.html'
     permission_required = update_permissions('party.resources.add')
     permission_denied_message = error_messages.PARTY_RESOURCES_ADD
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        url_kwargs = {
+            'organization': context['party'].project.organization.slug,
+            'project': context['party'].project.slug,
+            'party': context['party'].id
+        }
+        context['cancel_url'] = reverse('parties:detail', kwargs=url_kwargs)
+        context['add_lib_url'] = reverse('parties:resource_add',
+                                         kwargs=url_kwargs)
+        context['submit_url'] = reverse('parties:resource_new',
+                                        kwargs=url_kwargs)
+        return context
