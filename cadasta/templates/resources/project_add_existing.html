@@ -8,11 +8,9 @@
 {{ block.super }}
 <script src="{% static 'js/dataTables.forms.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
-{% include 'resources/script_add_lib.html' %}
+<script src="{% static 'js/script_add_lib.js' %}"></script>
 {% endblock %}
 
 {% block modals %}
-{% url 'resources:project_list' object.organization.slug object.slug as cancel_url %}
-{% url 'resources:project_add_new' object.organization.slug object.slug as upload_url %}
 {% include 'resources/modal_add_lib.html' %}
 {% endblock %}

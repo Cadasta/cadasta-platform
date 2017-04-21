@@ -71,9 +71,14 @@
       <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
-        <a class="btn btn-primary" href="#/records/location/new" aria-label="{% trans 'Add location' %}">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
-        </a>
+          {% ifnotequal request.path project_url %}
+            <a class="btn btn-primary" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}#/records/location/new/" aria-label="{% trans 'Add location' %}"></span> {% trans "Add location" %}
+            </a>
+          {% else %}
+            <a class="btn btn-primary" href="#/records/location/new/" aria-label="{% trans 'Add location' %}">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
+            </a>
+          {% endifnotequal %}
         {% endif %}
         {% if is_allowed_add_resource or is_allowed_import %}
         <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -96,7 +101,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           {% if is_allowed_add_location %}
-          <li><a href="#/records/location/new">{% trans "Add location" %}</a></li>
+          <li><a href="#/records/location/new/">{% trans "Add location" %}</a></li>
           {% endif %}
           <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
           {% if is_allowed_add_resource %}
@@ -137,7 +142,7 @@
     {% ifnotequal request.path project_url %}
       <a href='{{ project_url }}'>
     {% else %}
-      <a href="#/overview">
+      <a href="#/overview/">
     {% endifnotequal %}
         <span class="icon"></span>
         <span class="title">{% trans "Overview" %}</span>
@@ -147,7 +152,7 @@
       {% ifnotequal request.path project_url %}
         <a href='{{ project_url }}#/map'>
       {% else %}
-        <a href="#/map">
+        <a href="#/map/">
       {% endifnotequal %}
         <span class="icon map"></span>
         <span class="title">{% trans "Map" %}</span>
@@ -263,6 +268,6 @@ window.addEventListener('load', function() {
 </div><!-- /.modal -->
 
 
-<div class="modal fade" id="additional_modals" ></div>
+<div class="modal fade" id="additional-modals" ></div>
 
 {% endblock %}

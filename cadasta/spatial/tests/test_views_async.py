@@ -20,7 +20,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
-from party.models import Party, TenureRelationship
+from party.models import Party, TenureRelationship, TenureRelationshipType
 
 from .factories import SpatialUnitFactory
 from .. import forms
@@ -79,7 +79,6 @@ def assign_policies(user, deny_edit_delete_permissions=False):
 class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.LocationsAdd
     template = 'spatial/location_add.html'
-    success_url_name = 'async:spatial:detail'
     post_data = {
         'geometry': '{"type": "Polygon","coordinates": [[[-0.1418137550354'
                     '004,51.55240622205599],[-0.14117002487182617,51.55167'
@@ -114,7 +113,7 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         return {
             'object': self.project,
             'is_allowed_add_location': True,
-            'form': forms.LocationForm(project=self.project)
+            'form': forms.LocationForm(project=self.project),
         }
 
     def setup_url_kwargs(self):
@@ -123,12 +122,11 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
             'project': self.project.slug
         }
 
-    def setup_success_url_kwargs(self):
-        return {
+    def get_success_url(self):
+        return (reverse('organization:project-dashboard', kwargs={
             'organization': self.project.organization.slug,
             'project': self.project.slug,
-            'location': self.location_created.id
-        }
+            }) + '#/records/location/{}/'.format(self.location_created.id))
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -136,7 +134,8 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         expected_content = self.render_content(cancel_url=reverse(
-            'organization:project-dashboard', kwargs=self.setup_url_kwargs()))
+            'organization:project-dashboard', kwargs=self.setup_url_kwargs()) +
+            '#/overview/')
         assert response.content == expected_content
         assert '<input class="form-control" '
         'id="id_spatialunit::default::fname" '
@@ -303,7 +302,8 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
                 'fname': 'test',
                 'fname_2': 'two',
                 'fname_3': ['one', 'three']
-            })
+            },
+            geometry=('SRID=4326;POINT(11 53)'))
 
     def setup_template_context(self):
         return {
@@ -330,6 +330,81 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+        assert 'coordinates' in response.headers
+
+    def test_does_not_show_buttons_when_no_edit_permissions(self):
+        user = UserFactory.create()
+        assign_policies(user, True)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        expected = self.render_content(is_allowed_edit_location=False,
+                                       is_allowed_delete_location=False)
+        assert response.content == expected
+
+    def test_get_with_incomplete_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_questionnaire(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        self.project.current_questionnaire = questionnaire.id
+        self.project.save()
+
+        location_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=location_type_question,
+            name=self.location.type,
+            label={'en': 'House', 'de': 'Haus'})
+
+        tenure_type_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            label={'en': 'Location type', 'de': 'Parzelle Typ'},
+            type='S1')
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='LH',
+            label={'en': 'Leasehold', 'de': 'Miete'})
+        q_factories.QuestionOptionFactory.create(
+            question=tenure_type_question,
+            name='WR',
+            label={'en': 'Water rights', 'de': 'Wasserecht'})
+        lh_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            spatial_unit=self.location,
+            project=self.project)
+        lh_ten.type_labels = ('data-label-de="Miete" '
+                              'data-label-en="Leasehold"')
+        wr_ten = TenureRelationshipFactory.create(
+            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            spatial_unit=self.location,
+            project=self.project)
+        wr_ten.type_labels = ('data-label-de="Wasserecht" '
+                              'data-label-en="Water rights"')
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            type_labels=('data-label-de="Parzelle Typ" '
+                         'data-label-en="Location type"'),
+            type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
+            relationships=[wr_ten, lh_ten],
+            form_lang_default='en',
+            form_langs=[('en', 'English'), ('de', 'German')]
+        )
 
     def test_does_not_show_buttons_when_no_edit_permissions(self):
         user = UserFactory.create()
@@ -492,9 +567,9 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
 
 
 class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
+
     view_class = async.LocationEdit
     template = 'spatial/location_edit.html'
-    success_url_name = 'async:spatial:detail'
     post_data = {
         'geometry': '{"type": "Polygon","coordinates": [[[-0.1418137550354'
                     '004,51.55240622205599],[-0.14117002487182617,51.55167'
@@ -525,7 +600,8 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
             required=False, omit=False
         )
         self.location = SpatialUnitFactory.create(
-            project=self.project, attributes={'fname': 'test'})
+            project=self.project, attributes={'fname': 'test'},
+            geometry=('SRID=4326;POINT(11 53)'))
 
     def setup_template_context(self):
         return {'object': self.project,
@@ -540,6 +616,14 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
             'location': self.location.id
         }
 
+    def get_success_url(self):
+        return reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug
+            }) + '#/records/location/{}/'.format(self.location.id)
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
@@ -548,6 +632,7 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
         assert '<input class="form-control" '
         'id="id_spatialunit::default::fname" '
         'name="spatialunit::default::fname" type="text" />' in response.content
+        assert 'coordinates' in response.headers
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -627,17 +712,27 @@ class LocationEditTest(ViewTestCase, UserTestCase, TestCase):
 class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.LocationDelete
     template = 'spatial/location_delete.html'
-    success_url_name = 'async:spatial:list'
+    success_url_name = 'organization:project-dashboard'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.location = SpatialUnitFactory.create(project=self.project)
+        self.location = SpatialUnitFactory.create(
+            project=self.project,
+            geometry=('SRID=4326;POINT(11 53)'))
         TenureRelationshipFactory.create(
             project=self.project, spatial_unit=self.location)
 
     def setup_template_context(self):
         return {'object': self.project,
                 'location': self.location,
+                'cancel_url': '#/records/location/{}/'.format(
+                    self.location.id),
+                'submit_url': reverse(
+                    'async:spatial:delete',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug,
+                        'location': self.location.id}),
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -659,6 +754,7 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+        assert 'coordinates' in response.headers
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -737,11 +833,13 @@ class LocationDeleteTest(ViewTestCase, UserTestCase, TestCase):
 class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.LocationResourceAdd
     template = 'spatial/resources_add.html'
-    success_url_name = 'async:spatial:detail'
+    success_url_name = 'organization:project-dashboard'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.location = SpatialUnitFactory.create(project=self.project)
+        self.location = SpatialUnitFactory.create(
+            project=self.project,
+            geometry=('SRID=4326;POINT(11 53)'))
         self.attached = ResourceFactory.create(project=self.project,
                                                content_object=self.location)
         self.unattached = ResourceFactory.create(project=self.project)
@@ -752,6 +850,16 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
+                'submit_url': reverse(
+                    'async:spatial:resource_add',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug,
+                        'location': self.location.id}),
+                'cancel_url': '#/records/location/{}/?tab=resources'.format(
+                    self.location.id),
+                'upload_url': ("#/records/location/" +
+                               self.location.id + "/resources/new/"),
                 'is_allowed_add_location': True}
 
     def setup_url_kwargs(self):
@@ -759,6 +867,12 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
             'organization': self.project.organization.slug,
             'project': self.project.slug,
             'location': self.location.id
+        }
+
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
         }
 
     def setup_post_data(self):
@@ -773,6 +887,7 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+        assert 'coordinates' in response.headers
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -814,8 +929,8 @@ class LocationResourceAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
-                self.location.id)
+                self.expected_success_url +
+                '#/records/location/{}/'.format(self.location.id))
 
         location_resources = self.location.resources.all()
         assert len(location_resources) == 2
@@ -857,11 +972,13 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
                               FileStorageTestCase, TestCase):
     view_class = async.LocationResourceNew
     template = 'spatial/resources_new.html'
-    success_url_name = 'async:spatial:detail'
+    success_url_name = 'organization:project-dashboard'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.location = SpatialUnitFactory.create(project=self.project)
+        self.location = SpatialUnitFactory.create(
+            project=self.project,
+            geometry=('SRID=4326;POINT(11 53)'))
 
     def setup_url_kwargs(self):
         return {
@@ -870,12 +987,28 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
             'location': self.location.id
         }
 
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+        }
+
     def setup_template_context(self):
         form = ResourceForm(content_object=self.location,
                             project_id=self.project.id)
         return {'object': self.project,
                 'location': self.location,
                 'form': form,
+                'submit_url': reverse(
+                    'async:spatial:resource_new',
+                    kwargs={
+                        'organization': self.project.organization.slug,
+                        'project': self.project.slug,
+                        'location': self.location.id}),
+                'cancel_url': '#/records/location/{}/?tab=resources'.format(
+                    self.location.id),
+                'add_lib_url': ("#/records/location/{}/resources/add/".format(
+                    self.location.id)),
                 'is_allowed_add_location': True}
 
     def setup_post_data(self):
@@ -896,6 +1029,7 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+        assert 'coordinates' in response.headers
 
     def test_get_from_non_existend_project(self):
         user = UserFactory.create()
@@ -937,8 +1071,8 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
-                self.location.id)
+                self.expected_success_url +
+                '#/records/location/{}/'.format(self.location.id))
         assert self.location.resources.count() == 1
 
     def test_post_with_unauthorized_user(self):
@@ -966,6 +1100,22 @@ class LocationResourceNewTest(ViewTestCase, UserTestCase,
                 "add resources to this location." in response.messages)
         assert self.location.resources.count() == 0
 
+    def test_post_with_bad_data(self):
+        post_data = {
+            'name': '',
+            'description': '',
+            'file': 'not a file',
+            'original_file': 'image.png',
+            'mime_type': 'image/jpeg'
+        }
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user,
+                                post_data=post_data)
+        assert response.status_code == 200
+        assert 'form-error' in response.headers
+
 
 class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = async.TenureRelationshipAdd
@@ -986,7 +1136,9 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         self.project = ProjectFactory.create()
         questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project)
-        self.spatial_unit = SpatialUnitFactory(project=self.project)
+        self.spatial_unit = SpatialUnitFactory(
+            project=self.project,
+            geometry=('SRID=4326;POINT(11 53)'))
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         schema = Schema.objects.create(
@@ -1033,9 +1185,15 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         )
 
     def setup_template_context(self):
+        submit_url = ('/async/organizations/{org}/projects/{prj}/records/'
+                      'location/{spatial_id}/relationships/new/'.format(
+                        org=self.project.organization.slug,
+                        prj=self.project.slug,
+                        spatial_id=self.spatial_unit.id))
         return {
             'object': self.project,
             'location': self.spatial_unit,
+            'submit_url': submit_url,
             'form': forms.TenureRelationshipForm(
                 project=self.project,
                 spatial_unit=self.spatial_unit,
@@ -1043,7 +1201,9 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                     'new_entity': not self.project.parties.exists(),
                 },
             ),
-            'is_allowed_add_location': True
+            'is_allowed_add_location': True,
+            'cancel_url': '#/records/location/{}/?tab=relationships'.format(
+                self.spatial_unit.id)
         }
 
     def setup_url_kwargs(self):
@@ -1053,12 +1213,19 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
             'location': self.spatial_unit.id
         }
 
+    def setup_success_url_kwargs(self):
+        return {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+        }
+
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+        assert 'coordinates' in response.headers
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
@@ -1100,8 +1267,9 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
-                self.spatial_unit.id)
+                self.expected_success_url +
+                '#/records/location/{}/?tab=relationships'.format(
+                    self.spatial_unit.id))
 
         assert TenureRelationship.objects.count() == 1
         rel = TenureRelationship.objects.first()
@@ -1122,8 +1290,9 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                                 })
         assert response.status_code == 302
         assert (response.location ==
-                self.expected_success_url + '#/records/locations/' +
-                self.spatial_unit.id)
+                self.expected_success_url +
+                '#/records/location/{}/?tab=relationships'.format(
+                    self.spatial_unit.id))
 
         assert TenureRelationship.objects.count() == 1
         rel = TenureRelationship.objects.first()
@@ -1201,6 +1370,18 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
                 "this project." in response.messages)
         assert TenureRelationship.objects.count() == 0
         assert Party.objects.count() == 0
+
+    def test_post_with_bad_data(self):
+        post_data = {
+            'tenure_type': 'Not a tenure type'
+        }
+
+        user = UserFactory.create()
+        assign_policies(user)
+        response = self.request(method='POST', user=user,
+                                post_data=post_data)
+        assert response.status_code == 200
+        assert 'form-error' in response.headers
 
 
 class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):

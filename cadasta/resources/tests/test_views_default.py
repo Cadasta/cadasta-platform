@@ -184,9 +184,19 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         form = AddResourceFromLibraryForm(content_object=self.project,
                                           project_id=self.project.id)
+        url_kwargs = {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+        }
         return {'object': self.project,
                 'form': form,
-                'is_allowed_add_resource': True}
+                'is_allowed_add_resource': True,
+                'cancel_url': reverse('resources:project_list',
+                                      kwargs=url_kwargs),
+                'upload_url': reverse('resources:project_add_new',
+                                      kwargs=url_kwargs),
+                'submit_url': reverse('resources:project_add_existing',
+                                      kwargs=url_kwargs)}
 
     def setup_post_data(self):
         return {
@@ -291,9 +301,19 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase,
 
     def setup_template_context(self):
         form = ResourceForm()
+        url_kwargs = {
+            'organization': self.project.organization.slug,
+            'project': self.project.slug,
+        }
         return {'object': self.project,
                 'form': form,
-                'is_allowed_add_resource': True}
+                'is_allowed_add_resource': True,
+                'cancel_url': reverse('resources:project_list',
+                                      kwargs=url_kwargs),
+                'add_lib_url': reverse('resources:project_add_existing',
+                                       kwargs=url_kwargs),
+                'submit_url': reverse('resources:project_add_new',
+                                      kwargs=url_kwargs)}
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
