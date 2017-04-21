@@ -10,6 +10,7 @@
           <h3>{% trans "Draw location on map" %}</h3>
           <div class="clearfix form-group{% if form.geometry.errors %} has-error{% endif %}">
             <label class="control-label required">{% trans "Use the tools provided on the left side of the map to mark your new location." %}</label>
+            <textarea name="geometry" class="form-control hidden" data-parsley-required="true">{{ form.geometry.value }}</textarea>
             <div class="error-block">{{ form.geometry.errors }}</div>
           </div>
           <h3>{% trans "Overview" %}</h3>
@@ -34,7 +35,10 @@
           {% endfor %}
         </div>
         <div class="panel-footer panel-buttons">
-          <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}"/>
+            <button type="submit" class="btn btn-primary pull-left submit-btn" name="submit-button" formaction="{{ submit_url }}">
+              {% trans "Save" %}
+            </button>
+          <!-- <input class="btn btn-primary" type="submit" value="{% trans 'Save' %}" formaction="{{ submit_url }}"/> -->
           <a class="btn btn-default cancel" href="{{ cancel_url }}">{% trans "Cancel" %}</a>
         </div>
       </div>

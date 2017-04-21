@@ -1,17 +1,18 @@
 var map = L.map('mapid');
+new LocationEditor(map);
 var sr = new SimpleRouter(map);
 sr.router();
 
 /*****************
 EVENT LISTENERS
 *****************/
-window.addEventListener('hashchange', function() {
+window.addEventListener('hashchange', function () {
     sr.router();
 });
-window.addEventListener('load', function() {
+window.addEventListener('load', function () {
     sr.router();
 });
-map.on('endtileload', function() {
+map.on('endtileload', function () {
     rm.updateState({
         'check_location_coords': true,
     });

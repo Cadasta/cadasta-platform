@@ -1,23 +1,23 @@
 import math
-import django.views.generic as base_generic
-from django.contrib.gis.geos import Polygon
-from django.core.urlresolvers import reverse
-from tutelary.mixins import APIPermissionRequiredMixin
-from rest_framework import generics
-# from rest_framework_gis.pagination import GeoJsonPagination
-from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 
+import django.views.generic as base_generic
 from core import mixins as core_mixins
 from core.views import generic
+from django.contrib.gis.geos import Polygon
+from django.core.urlresolvers import reverse
+# from rest_framework_gis.pagination import GeoJsonPagination
+from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 from organization.views import mixins as organization_mixins
 from party.messages import TENURE_REL_CREATE
 from questionnaires.models import Question, QuestionOption
-from resources.views import mixins as resource_mixins
 from resources.forms import AddResourceFromLibraryForm
+from resources.views import mixins as resource_mixins
+from rest_framework import generics
+from tutelary.mixins import APIPermissionRequiredMixin
+
 from . import mixins
-from .. import forms
 from .. import messages as error_messages
-from .. import serializers
+from .. import forms, serializers
 
 
 def deg2num(lat_deg, lon_deg, zoom):
@@ -26,7 +26,7 @@ def deg2num(lat_deg, lon_deg, zoom):
     xtile = int((lon_deg + 180.0) / 360.0 * n)
     ytile = int(
         (1.0 - math.log(math.tan(lat_rad) +
-         (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
+                        (1 / math.cos(lat_rad))) / math.pi) / 2.0 * n)
     return [xtile, ytile]
 
 
@@ -160,11 +160,18 @@ class LocationsAdd(core_mixins.LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        project = self.get_project()
         cancel_url = self.request.session.get(
             'cancel_add_location_url', None)
+        context['submit_url'] = reverse(
+            'async:spatial:add',
+            kwargs={
+                'organization': project.organization.slug,
+                'project': project.slug
+            })
         context['cancel_url'] = cancel_url or (reverse(
-                    'organization:project-dashboard', kwargs=self.kwargs) +
-                    '#/overview/')
+            'organization:project-dashboard', kwargs=self.kwargs) +
+            '#/overview/')
         return context
 
     def get_perms_objects(self):
@@ -188,8 +195,17 @@ class LocationEdit(core_mixins.LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['cancel_url'] = ('#/records/location/{}/'.format(
-                                  context['location'].id))
+        location = context['location']
+        context['submit_url'] = reverse(
+            'async:spatial:edit',
+            kwargs={
+                'organization': location.project.organization.slug,
+                'project': location.project.slug,
+                'location': location.id
+            })
+        context['cancel_url'] = (
+            '#/records/location/{}/'.format(location.id))
+
         return context
 
     def get_form_kwargs(self):
@@ -209,12 +225,13 @@ class LocationDelete(core_mixins.LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['cancel_url'] = ('#/records/location/{}/'.format(
-                                  context['location'].id))
+        location = context['location']
+        context['cancel_url'] = (
+            '#/records/location/{}/'.format(location.id))
         context['submit_url'] = reverse('async:spatial:delete', kwargs={
-            'organization': context['location'].project.organization.slug,
-            'project': context['location'].project.slug,
-            'location': context['location'].id
+            'organization': location.project.organization.slug,
+            'project': location.project.slug,
+            'location': location.id
         })
         return context
 
@@ -233,14 +250,14 @@ class LocationResourceAdd(core_mixins.LoginPermissionRequiredMixin,
     template_name = 'spatial/resources_add.html'
     form_class = AddResourceFromLibraryForm
     permission_required = core_mixins.update_permissions(
-                                'spatial.resources.add')
+        'spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         location = context['location']
-        context['cancel_url'] = '#/records/location/{}/?tab=resources'.format(
-                                 location.id)
+        context['cancel_url'] = (
+            '#/records/location/{}/?tab=resources'.format(location.id))
         context['upload_url'] = ("#/records/location/{}/resources/new/".format(
                                  location.id))
         context['submit_url'] = reverse(
@@ -269,7 +286,7 @@ class LocationResourceNew(core_mixins.LoginPermissionRequiredMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
     permission_required = core_mixins.update_permissions(
-                                    'spatial.resources.add')
+        'spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
 
     def get_context_data(self, *args, **kwargs):
@@ -329,8 +346,8 @@ class TenureRelationshipAdd(core_mixins.LoginPermissionRequiredMixin,
 
     def get_success_url(self):
         success_url = (reverse('organization:project-dashboard', kwargs={
-                'organization': self.kwargs['organization'],
-                'project': self.kwargs['project']
-            }) + '#/records/location/{}/?tab=relationships'.format(
+            'organization': self.kwargs['organization'],
+            'project': self.kwargs['project']
+        }) + '#/records/location/{}/?tab=relationships'.format(
             self.kwargs['location']))
         return success_url
