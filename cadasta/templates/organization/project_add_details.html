@@ -21,6 +21,12 @@ $(document).ready(function () {
     }
   });
 });
+// any visible error message to be cleared upon clicking Next
+$('#submit_details').click(function() {
+  $('.error-block').html('');
+  $('.parsley-errors-list').remove();
+  return true;
+});
 </script>
 {% endblock %}
 
@@ -145,7 +151,7 @@ $(document).ready(function () {
 
 {% block step_content_buttons %}
 <div class="btn-group btn-reverse" role="group">
-  <button class="btn btn-primary pull-right" type="submit">
+  <button class="btn btn-primary pull-right" type="submit" id="submit_details">
     {% trans 'Next' %}
     <span class="glyphicon glyphicon-triangle-right"></span>
   </button>

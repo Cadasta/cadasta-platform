@@ -39,4 +39,12 @@
 
 {% block extra_script %}
   {{ form.media }}
+  <script>
+    // Any visible error message to be clear upon form submission
+    $('.modal-organization-add').submit(function() {
+      $('.error-block').html('');
+      $('.parsley-errors-list').remove();
+      return true;
+    });
+  </script>
 {% endblock %}
