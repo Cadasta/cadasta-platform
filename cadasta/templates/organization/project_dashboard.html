@@ -51,7 +51,7 @@
     {% endif %}
     {% if is_allowed_add_location %}
     <div class="btn-full">
-      <a class="btn btn-primary" href="#/records/location/new">
+      <a class="btn btn-primary" href="#/records/location/new/">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
       </a>
     </div>
@@ -59,7 +59,7 @@
   {% else %}
     <div class="alert alert-info alert-full clearfix row" role="alert">
       <div class="text-center">
-        <a href="{% url 'account_login' %}?next={{ request.path }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
+        <a href="{% url 'account_login' %}?next={{ success_url }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
       </div>
     </div>
   {% endif %}

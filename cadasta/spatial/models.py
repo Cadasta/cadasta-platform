@@ -106,9 +106,8 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
             kwargs={
                 'organization': self.project.organization.slug,
                 'project': self.project.slug,
-                # 'location': self.id,
             },
-        ) + '#/records/location/' + self.id)
+        ) + '#/records/location/{}/'.format(self.id))
 
 
 def reassign_spatial_geometry(instance):

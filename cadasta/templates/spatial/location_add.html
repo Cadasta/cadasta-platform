@@ -15,9 +15,7 @@
 <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
 {% endblock %}
 
-{% block body-class %}map{% endblock %}
 {% block extra_script %}
-{{ block.super }}
 {% leaflet_js plugins="draw,forms,groupedlayercontrol,markercluster,deflate" %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
