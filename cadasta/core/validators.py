@@ -1,5 +1,7 @@
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
+from emoji import UNICODE_EMOJI
 from jsonschema import Draft4Validator, FormatChecker
 from .exceptions import JsonValidationError
 
@@ -28,3 +30,9 @@ def validate_json(value, schema):
 
     if message_dict:
         raise JsonValidationError(message_dict)
+
+
+def validate_no_emoji(value):
+    if any(s in UNICODE_EMOJI for s in value):
+        raise ValidationError(
+            _("Please do not include any emoji."))

@@ -16,6 +16,7 @@ from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
 
 from core.models import RandomIDModel, SlugModel
+from core.validators import validate_no_emoji
 from geography.models import WorldBorder
 from resources.mixins import ResourceModelMixin
 from .validators import validate_contact
@@ -33,7 +34,8 @@ def get_policy_instance(policy_name, variables):
 
 @permissioned_model
 class Organization(SlugModel, RandomIDModel):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200, unique=True,
+                            validators=[validate_no_emoji])
     slug = models.SlugField(max_length=50, unique=True)
     description = models.TextField(null=True, blank=True)
     archived = models.BooleanField(default=False)
@@ -167,7 +169,7 @@ def remove_org_permissions(sender, instance, **kwargs):
 
 @permissioned_model
 class Project(ResourceModelMixin, SlugModel, RandomIDModel):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, validators=[validate_no_emoji])
     slug = models.SlugField(max_length=50, unique=True, null=True)
     organization = models.ForeignKey(Organization, related_name='projects')
     country = CountryField(null=True)
