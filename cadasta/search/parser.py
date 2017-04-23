@@ -56,32 +56,31 @@ def transform_to_dsl(terms, has_fuzziness=True):
     for term in terms:
         # Exact phrase clause
         if term[0] == '"' and term[-1] == '"':
-            dsl.append({
+            dsl.append({'multi_match': {
                 'query': term[1:-1],
                 'fields': fields,
                 'type': 'phrase',
                 'boost': 10 if has_fuzziness else 1,
-            })
+            }})
 
         # Fuzzy term
         else:
             # Exact match clause
-            dsl.append({
+            dsl.append({'multi_match': {
                 'query': term,
                 'fields': fields,
                 'boost': 10 if has_fuzziness else 1,
-            })
+            }})
 
             # Fuzzy match clause
             if has_fuzziness and len(term) > 1:
-                dsl.append({
+                dsl.append({'multi_match': {
                     'query': term,
                     'fields': fields,
                     'fuzziness': get_fuzziness(term),
                     'prefix_length': 1,
-                })
-
-    return [{'multi_match': x} for x in dsl]
+                }})
+    return dsl
 
 
 def get_fuzziness(term):
