@@ -1,19 +1,17 @@
 {% load i18n %}
 
-<div class="search-result-item">
-  <h4>
-    <span class="entity">{{ result.entity_type }}</span>
-    <a href="{{ result.url }}">{{ result.main_label }}</a>
-  </h4>
-  {% if result.image %}
-  <img src="{{ result.image }}" class="thumb-60 pull-left">
-  {% endif %}
-  <table class="table entity-attributes">
-    {% for attr in result.attributes %}
-    <tr>
-      <td class="col-md-3"><strong>{{ attr.0 }}</strong></td>
-      <td class="col-md-9">{{ attr.1 }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
+<h4>
+  <span class="entity">{{ result.entity_type }}</span>
+  <a href="{{ result.url }}">{{ result.main_label }}</a>
+</h4>
+{% if result.image %}
+<img src="{{ result.image }}" class="thumb-60 pull-left">
+{% endif %}
+<table class="table entity-attributes">
+  {% for attr in result.attributes %}
+  <tr>
+    <td class="col-md-3"><strong>{{ attr.0 }}</strong></td>
+    <td class="col-md-9">{{ attr.1 }}</td>
+  </tr>
+  {% endfor %}
+</table>
