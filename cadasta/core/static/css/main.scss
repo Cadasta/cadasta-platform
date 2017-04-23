@@ -690,12 +690,16 @@ h1 .label {
 }
 
 .entity { // small entity title above link 
-  font-size: 11px;
+  font-size: 14px;
   font-weight: normal;
   color: $gray-medium;
   display: block;
   text-transform: uppercase;
   letter-spacing: 0;
+}
+
+.text-wrap .entity { // map popovers 
+  font-size: 11px;
 }
 
 .highlight { // for emphasis for inline text
