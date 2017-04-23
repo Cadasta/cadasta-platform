@@ -26,3 +26,15 @@ ul.resource-actions > li {
     border-left: 1px solid $table-border-color;
   }
 }
+
+table.resource-description {
+  width: 50%;
+}
+
+table.resource-description > tbody > tr > td {
+    padding: 5px 5px;
+}
+
+h2.resource-heading {
+  color: #0e3o5e;
+}

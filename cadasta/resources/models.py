@@ -18,6 +18,7 @@ from django.utils.encoding import iri_to_uri
 from jsonattrs.fields import JSONAttributeField
 from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
+from PIL import Image
 
 from . import messages
 from .exceptions import InvalidGPXFile
@@ -137,6 +138,37 @@ class Resource(RandomIDModel):
                 'resource': self.id,
             },
         ))
+
+    @property
+    def file_size(self):
+        """
+        this function will return the file size
+        """
+        file_name = self.file.url.split('/')[-1]
+        name = file_name[:file_name.rfind('.')]
+        ext = file_name.split('.')[-1]
+        url = os.path.join(settings.MEDIA_ROOT,
+                                      's3', 'uploads', 'resources',
+                                      name + '.' + ext)
+        file_info = os.stat(url)
+        size = file_info.st_size
+        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+            if size < 1024.0:
+                return "%3.1f %s" % (size, x)
+            size /= 1024.0
+        return size
+
+    @property
+    def image_dimensions(self):
+        file_name = self.file.url.split('/')[-1]
+        name = file_name[:file_name.rfind('.')]
+        ext = file_name.split('.')[-1]
+        url = os.path.join(settings.MEDIA_ROOT,
+                                      's3', 'uploads', 'resources',
+                                      name + '.' + ext)
+        im = Image.open(url)
+        self._image_dimensions = list(im.size)
+        return self._image_dimensions
 
 
 @receiver(models.signals.pre_save, sender=Resource)
