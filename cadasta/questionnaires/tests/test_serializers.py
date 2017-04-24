@@ -1,8 +1,9 @@
 import pytest
 from django.db import transaction
 from django.test import TestCase
+from django.contrib.contenttypes.models import ContentType
 from rest_framework.serializers import ValidationError
-from jsonattrs.models import Attribute
+from jsonattrs.models import Attribute, Schema
 from organization.tests.factories import ProjectFactory
 from questionnaires.exceptions import InvalidQuestionnaire
 from core.tests.utils.files import make_dirs  # noqa
@@ -189,6 +190,51 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert Questionnaire.objects.count() == 0
         assert QuestionGroup.objects.count() == 0
         assert Attribute.objects.count() == 0
+
+    def test_create_attributes_for_default_group(self):
+        project = ProjectFactory.create()
+
+        data = {
+            'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+            'title': 'wa6hrqr4e4vcf49q6kxjc443',
+            'default_language': 'en',
+            'question_groups': [{
+                'label': 'Location Attributes',
+                'name': 'location_attributes',
+                'type': 'group',
+                'index': 0,
+                'questions': [{
+                    'name': "number",
+                    'label': 'Number',
+                    'type': "IN",
+                    'default': 0,
+                    'index': 0
+                }]
+            }]
+        }
+
+        serializer = serializers.QuestionnaireSerializer(
+            data=data,
+            context={'project': project}
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        project.refresh_from_db()
+        assert project.current_questionnaire
+
+        content_type = ContentType.objects.get(app_label='spatial',
+                                               model='spatialunit')
+        schema = Schema.objects.get(
+            content_type=content_type,
+            selectors=(
+                project.organization.id,
+                project.id,
+                project.current_questionnaire,
+            ),
+            default_language='en')
+        assert Attribute.objects.filter(schema=schema).count() == 1
 
     def test_huge(self):
         data = {

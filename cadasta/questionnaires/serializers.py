@@ -266,6 +266,8 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
                     project=project,
                     **validated_data)
 
+                project.current_questionnaire = instance.id
+
                 context = {
                     'questionnaire_id': instance.id,
                     'project': project,
@@ -274,7 +276,6 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
                 create_questions(questions, context)
                 create_groups(question_groups, context)
 
-                project.current_questionnaire = instance.id
                 project.save()
 
                 return instance
