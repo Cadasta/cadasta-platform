@@ -22,6 +22,13 @@
       {% csrf_token %}
         <div class="panel panel-default">
           <div class="panel-body">
+            <h2>
+              <span class="entity">{% trans "Resource" %}</span>
+              {{ resource.name }}
+              {% if resource.archived %}
+              <span class="label label-danger">{% trans "Deleted" %}</span>
+              {% endif %}
+            </h2>
             {% include "resources/form.html" %}
           </div>
           <div class="panel-footer panel-buttons">
