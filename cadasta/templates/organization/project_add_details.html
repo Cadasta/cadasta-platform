@@ -1,12 +1,14 @@
 {% extends "organization/project_add_wrapper.html" %}
 
-{% load widget_tweaks %}
+{% load staticfiles %}
 {% load i18n %}
+{% load widget_tweaks %}
 
 {% block page_title %}| {% trans "Add details" %}{% endblock %}
 
 {% block extra_script %}
 {{ form.media }}
+<script src="{% static 'js/form_submit.js' %}"></script>
 <script>
 $(document).ready(function () {
   var logos = {{ org_logos|safe }};
