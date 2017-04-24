@@ -68,9 +68,10 @@ var EditorToolbars = function () {
             type: L.Editable.PolygonEditor,
         },
         addHooks: function () {
-            if (this.editor.location.layer.editor) {
-                if (this.editor.location.layer.editor.enabled() &&
-                    this.editor.location.layer.editor instanceof L.Editable.PolygonEditor) {
+            var currentEditor = this.editor.location.layer.editor;
+            if (currentEditor) {
+                if (currentEditor.enabled() &&
+                    currentEditor instanceof this.options.type) {
                     this.tooltip.innerHTML = 'Update the multipolygon.';
                     this.editor.addMulti();
                 }
@@ -80,33 +81,6 @@ var EditorToolbars = function () {
             }
         },
     });
-
-    // not currently used
-    var MultiGeomControl = DrawControl.extend({
-        options: {
-            toolbarIcon: {
-                html: '<span class="">▰▰</span>',
-                className: 'add-multi',
-                tooltip: 'Add a Multipolygon or Multilinestring',
-            },
-            subToolbar: new SubToolbar({
-                className: 'cancel-add-multi leaflet-subtoolbar',
-                actions: [CancelAction],
-            })
-        },
-        addHooks: function () {
-            this.tooltip.innerHTML = 'Click on the map to add a multipolygon or multilinestring.';
-            this.editor.startMulti();
-        },
-        enable: function () {
-            if (this.editor.location.layer.editEnabled() &&
-                this.editor.hasEditableLayer() &&
-                (this.editor.location.layer.editor instanceof L.Editable.PolygonEditor ||
-                    this.editor.location.layer.editor instanceof L.Editable.PolylineEditor)) {
-                DrawControl.prototype.enable.call(this);
-            }
-        }
-    })
 
     var MarkerControl = DrawControl.extend({
         options: {
@@ -139,9 +113,10 @@ var EditorToolbars = function () {
             type: L.Editable.PolylineEditor,
         },
         addHooks: function () {
-            if (this.editor.location.layer.editor) {
-                if (this.editor.location.layer.editor.enabled() &&
-                    this.editor.location.layer.editor instanceof L.Editable.PolylineEditor) {
+            var currentEditor = this.editor.location.layer.editor;
+            if (currentEditor) {
+                if (currentEditor.enabled() &&
+                    currentEditor instanceof this.options.type) {
                     this.tooltip.innerHTML = 'Add a new a new line.';
                     this.editor.addMulti();
                 }
@@ -167,6 +142,12 @@ var EditorToolbars = function () {
         addHooks: function () {
             this.tooltip.innerHTML = 'Click and drag on the map to create a rectangle.';
             this.editor.startRectangle();
+        },
+        enable: function () {
+            if (this.editor.deleting()) return;
+            var currentEditor = this.editor.location.layer.editor;
+            if (currentEditor && currentEditor instanceof this.options.type) return;
+            DrawControl.prototype.enable.call(this);
         }
     });
 

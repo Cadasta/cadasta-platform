@@ -118,9 +118,9 @@ var Location = L.Editable.extend({
         } else {
             this._createNew(e.layer);
         }
-        // console.log(this.featuresLayer.toGeoJSON());
         this.featuresLayer.clearLayers();
-        this.layer.enableEdit(this.map);
+        this.layer.disableEdit();
+        this.layer.dragging.disable();
         this._deleted = false;
         this._deleting = false;
     },
@@ -402,6 +402,7 @@ var LocationEditor = L.Evented.extend({
         this._cancelDraw();
         this.location.layer.on('click', this.onLayerClick, this);
         this._enableEditToolbar();
+        Styles.setSelectedStyle(this.location.layer);
     },
 
     _vertexNew: function (e) {
@@ -485,7 +486,7 @@ var LocationEditor = L.Evented.extend({
         this.toolbars.forEach(function (toolbar) {
             toolbar.addTo(map);
         });
-        this._enableEditToolbar();
+        this._enableEditToolbar(active = true);
     },
 
     _removeEditControls: function () {
@@ -499,7 +500,7 @@ var LocationEditor = L.Evented.extend({
         this._removeTooltip();
     },
 
-    _enableEditToolbar: function (active = true) {
+    _enableEditToolbar: function (active = false) {
         var editLink = $('a.edit-action').get(0);
         var deleteLink = $('a.delete-action').get(0);
         editLink.href = window.location.href;
