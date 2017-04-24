@@ -69,9 +69,9 @@ Styles = {
                 fillColor: 'blue',
                 stroke: true,
                 fill: true,
-                strokeWidth: 3,
-                fillOpacity: 0.3,
-                opacity: .5
+                strokeWidth: 2,
+                fillOpacity: 0.2,
+                opacity: 1
             });
         }
         if (layer instanceof L.Polyline) {
@@ -79,7 +79,8 @@ Styles = {
                 weight: 2,
                 color: 'blue',
                 stroke: true,
-                strokeWidth: 3
+                strokeWidth: 2,
+                opacity: 1,
             });
         }
     }

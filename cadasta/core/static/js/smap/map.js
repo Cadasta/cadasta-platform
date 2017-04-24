@@ -2,11 +2,11 @@ var SMap = function (map) {
     var layerscontrol = L.control.layers().addTo(map);
 
     var geojsonTileLayer = new L.TileLayer.GeoJSON(
-        1, options.locations_count, url, {
+        1, options.num_locations, url, {
             clipTiles: true,
             unique: function (feature) { return feature.id; }
         }, {
-            style: { weight: 2 },
+            style: { color: 'blue', weight: 2 },
             onEachFeature: function (feature, layer) {
                 layer.on('click', function (e) {
                     map.locationEditor.onLayerClick(e);
@@ -158,16 +158,5 @@ var SMap = function (map) {
     }
 
     add_map_controls();
-
-    // location form cancel and save events TODO: refactor
-
-    $(document).on('click', 'a#cancel-edit', function () {
-        $(document).trigger('location:editstop');
-    });
-
-    $(document).on('click', 'input#save-location', function () {
-        $(document).trigger('location:editstop');
-        window.location.href = "#/" + location.layer.feature.properties.url;
-    });
 
 };

@@ -55,56 +55,11 @@ var EditorToolbars = function () {
         }
     });
 
-    var PolygonControl = DrawControl.extend({
-        options: {
-            toolbarIcon: {
-                html: '<span class="">▰</span>',
-                tooltip: 'Draw a polygon',
-            },
-            subToolbar: new SubToolbar({
-                className: 'cancel-draw-poly leaflet-subtoolbar',
-                actions: [CancelAction],
-            }),
-            type: L.Editable.PolygonEditor,
-        },
-        addHooks: function () {
-            var currentEditor = this.editor.location.layer.editor;
-            if (currentEditor) {
-                if (currentEditor.enabled() &&
-                    currentEditor instanceof this.options.type) {
-                    this.tooltip.innerHTML = 'Update the multipolygon.';
-                    this.editor.addMulti();
-                }
-            } else {
-                this.tooltip.innerHTML = 'Click on the map to start a new polygon.';
-                this.editor.startPolygon();
-            }
-        },
-    });
-
-    var MarkerControl = DrawControl.extend({
-        options: {
-            toolbarIcon: {
-                html: '<span class="glyphicon glyphicon-map-marker"></span>',
-                tooltip: 'Draw marker',
-            },
-            subToolbar: new SubToolbar({
-                className: 'cancel-draw-marker leaflet-subtoolbar',
-                actions: [CancelAction],
-            }),
-            type: L.Editable.MarkerEditor,
-        },
-        addHooks: function () {
-            this.tooltip.innerHTML = 'Click on the map to add a marker.';
-            this.editor.startMarker();
-        }
-    });
-
     var LineControl = DrawControl.extend({
         options: {
             toolbarIcon: {
-                html: '<span>\/</span>',
                 tooltip: 'Draw line',
+                className: 'cadasta-toolbar draw-polyline',
             },
             subToolbar: new SubToolbar({
                 className: 'cancel-draw-line leaflet-subtoolbar',
@@ -117,12 +72,40 @@ var EditorToolbars = function () {
             if (currentEditor) {
                 if (currentEditor.enabled() &&
                     currentEditor instanceof this.options.type) {
-                    this.tooltip.innerHTML = 'Add a new a new line.';
+                    this.tooltip.innerHTML = 'Click on the map to update the multilinestring.';
                     this.editor.addMulti();
                 }
             } else {
-                this.tooltip.innerHTML = 'Click on the map to start a line.';
+                this.tooltip.innerHTML = 'Click on the map to start a new line.';
                 this.editor.startPolyline();
+            }
+        },
+    });
+
+    var PolygonControl = DrawControl.extend({
+        options: {
+            toolbarIcon: {
+                // html: '<span class="draw-polygon">▰</span>',
+                tooltip: 'Draw a polygon',
+                className: 'cadasta-toolbar draw-polygon',
+            },
+            subToolbar: new SubToolbar({
+                className: 'cancel-draw-poly leaflet-subtoolbar',
+                actions: [CancelAction],
+            }),
+            type: L.Editable.PolygonEditor,
+        },
+        addHooks: function () {
+            var currentEditor = this.editor.location.layer.editor;
+            if (currentEditor) {
+                if (currentEditor.enabled() &&
+                    currentEditor instanceof this.options.type) {
+                    this.tooltip.innerHTML = 'Click on the map update the multipolygon.';
+                    this.editor.addMulti();
+                }
+            } else {
+                this.tooltip.innerHTML = 'Click on the map to start a new polygon.';
+                this.editor.startPolygon();
             }
         },
     });
@@ -130,8 +113,8 @@ var EditorToolbars = function () {
     var RectangleControl = DrawControl.extend({
         options: {
             toolbarIcon: {
-                html: '<span>⬛</span>',
                 tooltip: 'Draw a rectangle',
+                className: 'cadasta-toolbar draw-rectangle',
             },
             subToolbar: new SubToolbar({
                 className: 'cancel-draw-rect leaflet-subtoolbar',
@@ -151,13 +134,33 @@ var EditorToolbars = function () {
         }
     });
 
+    var MarkerControl = DrawControl.extend({
+        options: {
+            toolbarIcon: {
+                tooltip: 'Draw marker',
+                className: 'cadasta-toolbar draw-marker'
+            },
+            subToolbar: new SubToolbar({
+                className: 'cancel-draw-marker leaflet-subtoolbar',
+                actions: [CancelAction],
+            }),
+            type: L.Editable.MarkerEditor,
+        },
+        addHooks: function () {
+            this.tooltip.innerHTML = 'Click on the map to add a marker.';
+            this.editor.startMarker();
+        }
+    });
+
+
+
     // edit tools
 
     var SaveEdit = SubAction.extend({
         options: {
             toolbarIcon: {
                 html: 'Save',
-                tooltip: 'Save edits'
+                tooltip: 'Save edits',
             }
         },
         addHooks: function () {

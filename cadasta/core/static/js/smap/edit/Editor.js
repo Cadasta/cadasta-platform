@@ -6,6 +6,7 @@ var Location = L.Editable.extend({
     _deleting: false,
     _deleted: false,
     _new: false,
+    _dirty: false,
 
     layer: null,
     feature: null,
@@ -23,6 +24,7 @@ var Location = L.Editable.extend({
         if (this.layer) {
             this._backupLayer();
             this.layer.enableEdit(this.map);
+            this.layer._dirty = true;
         }
     },
 
@@ -40,6 +42,7 @@ var Location = L.Editable.extend({
         this._backupLayer();
         var gj = JSON.stringify(geom);
         $('textarea[name="geometry"]').html(gj);
+        this.layer._dirty = false;
     },
 
     _undoEdit: function () {
@@ -96,7 +99,6 @@ var Location = L.Editable.extend({
         if (this._deleted) {
             $('textarea[name="geometry"]').html('');
             this.featuresLayer.clearLayers();
-            this._deleting = false;
             this._clearBackup();
         }
         this._deleting = false;
@@ -104,11 +106,7 @@ var Location = L.Editable.extend({
 
     // draw functions
 
-    _drawStart: function (e) {
-        if (!this.layer) {
-            this._new = true;
-        }
-    },
+    _drawStart: function (e) {},
 
     _drawEnd: function (e) {
         if (!this._hasDrawnFeature()) return;
@@ -135,14 +133,15 @@ var Location = L.Editable.extend({
         this.layer = layer;
         this._backupLayer();
         this._replaceGeoJSONFeature(this.layer);
+        this.layer._dirty = true;
     },
 
     _createNew: function (lyr) {
-        this._new = true;
+        this.layer._new = true;
         var feature = lyr.toGeoJSON();
         var layer = LatLngUtil.copyLayer(lyr);
         feature.id = L.stamp(layer);
-        feature.properties.url = 'records/location/new';
+        // feature.properties.url = 'records/location/new';
         layer.feature = feature;
         this.layer = layer;
         this._backupLayer();
@@ -212,8 +211,6 @@ var Location = L.Editable.extend({
 var LocationEditor = L.Evented.extend({
 
     _editing: false,
-    _dirty: false,
-    _new: false,
 
     initialize: function (map, options) {
         this.map = map;
@@ -227,14 +224,10 @@ var LocationEditor = L.Evented.extend({
 
         this._addRouterEvents();
         this._addEditableEvents();
-        this._addMapEvents();
-
-        // $(window).on('hashchange', this, this._checkDirty);
-        // $(window).on('beforeunload', this, this._checkDirty);
     },
 
     onLayerClick: function (e) {
-        if (this._dirty && !this.deleting()) return;
+        if (this.dirty() && !this.deleting()) return;
         var feature = e.target.feature;
         var layer = e.layer || e.target
         if (this.editing() && feature.id !== this.location.layer.feature.id) return;
@@ -271,8 +264,6 @@ var LocationEditor = L.Evented.extend({
     cancelEdit: function () {
         this._removeTooltip();
         this.location._undoEdit();
-        this._editing = false;
-        this._dirty = false;
     },
 
     editing: function () {
@@ -280,11 +271,9 @@ var LocationEditor = L.Evented.extend({
     },
 
     dirty: function () {
-        return this._dirty;
-    },
-
-    _setEditing: function () {
-        this._dirty = true;
+        if (this.location.layer) {
+            return this.location.layer._dirty;
+        }
     },
 
     _editStart: function (e) {
@@ -304,7 +293,6 @@ var LocationEditor = L.Evented.extend({
         this.location._saveDelete();
         if (this.location._deleted) {
             this._disableEditToolbar();
-            this._dirty = false;
         } else {
             Styles.setSelectedStyle(this.location.layer);
         }
@@ -313,7 +301,6 @@ var LocationEditor = L.Evented.extend({
     cancelDelete: function () {
         this._removeTooltip();
         this.location._undoDelete();
-        this._dirty = false;
         Styles.setSelectedStyle(this.location.layer);
     },
 
@@ -346,7 +333,6 @@ var LocationEditor = L.Evented.extend({
 
     _addNew: function () {
         if (this._resetView()) {
-            this._new = true;
             this.location._reset();
             this._addEditControls();
             this._disableEditToolbar();
@@ -354,7 +340,9 @@ var LocationEditor = L.Evented.extend({
     },
 
     isNew: function () {
-        return this._new;
+        if (this.location.layer) {
+            return this.location.layer._new;
+        }
     },
 
     // draw functions
@@ -401,7 +389,7 @@ var LocationEditor = L.Evented.extend({
         this._removeTooltip();
         this._cancelDraw();
         this.location.layer.on('click', this.onLayerClick, this);
-        this._enableEditToolbar();
+        this._enableEditToolbar(active = false);
         Styles.setSelectedStyle(this.location.layer);
     },
 
@@ -441,8 +429,6 @@ var LocationEditor = L.Evented.extend({
         this._removeTooltip();
         this.location._saveEdit();
         this._editing = false;
-        this._dirty = false;
-        this._new = false;
     },
 
     // editor toolbars
@@ -507,6 +493,7 @@ var LocationEditor = L.Evented.extend({
         deleteLink.href = window.location.href;
         if (active) {
             editLink.click();
+            Styles.setEditStyle(this.location.layer);
         }
         $('span#edit, span#delete').removeClass('smap-edit-disable');
     },
@@ -541,25 +528,11 @@ var LocationEditor = L.Evented.extend({
         });
     },
 
-    _checkDirty: function (e) {
-        var editor = e.data;
-        if (editor.dirty() && editor.editing()) {
-            $('unsaved-edits').modal('show');
-            return false;
-        }
-    },
-
     _resetView: function () {
-        // if (this.editing() && this._dirty) {
-        //     $("#unsaved-edits").modal('show');
-        //     var url = '#/' + this.location.feature.properties.url + '/edit';
-        //     window.location.href = url;
-        //     return false;
-        // }
+        this._editing = false;
         this._removeEditControls();
         Styles.resetStyle(this.location.layer);
         this.location._reset();
-        return true;
     },
 
     // tooltips
@@ -582,14 +555,6 @@ var LocationEditor = L.Evented.extend({
         this.tooltip.style.top = e.containerPoint.y + 'px';
     },
 
-    // map events
-
-    _zoomStart: function (e) {},
-
-    _zoomEnd: function (e) {},
-
-    _zoomChange: function (e) {},
-
     // events
 
     _addRouterEvents: function () {
@@ -603,19 +568,12 @@ var LocationEditor = L.Evented.extend({
     _addEditableEvents: function () {
         // edit events
         this.location.on('editable:enable', this._editStart, this);
-        this.location.on('editable:editing', this._setEditing, this);
         this.location.on('editable:disable', this._editStop, this);
         this.location.on('editable:drawing:start', this._drawStart, this);
         this.location.on('editable:drawing:end', this._drawEnd, this);
         this.location.on('editable:vertex:drag', this._vertexDrag, this);
         this.location.on('editable:vertex:dragend', this._vertexDragend, this);
         this.location.on('editable:drawing:click', this._vertexNew, this);
-    },
-
-    _addMapEvents: function () {
-        this.map.on('zoomstart', this._zoomStart, this);
-        this.map.on('zoomend', this._zoomEnd, this);
-        this.map.on('zoomlevelschange', this._zoomChange, this);
-    },
+    }
 
 });

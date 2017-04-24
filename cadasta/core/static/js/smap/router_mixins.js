@@ -43,7 +43,10 @@ var RouterMixins = {
         }
 
         if (kwargs.reset_current_location) {
-            this.resetPreviousLocationStyle();
+            // this.resetPreviousLocationStyle();
+            if (state.current_location.feature) {
+                Styles.resetStyle(state.current_location.feature);
+            }
         }
     },
 
@@ -243,7 +246,7 @@ var RouterMixins = {
 
         if (state.current_location.feature) {
             if (url.includes(state.current_location.feature.feature.id)) {
-                this.setCurrentLocationStyle();
+                Styles.setSelectedStyle(state.current_location.feature);
                 return;
             }
         }
@@ -254,11 +257,13 @@ var RouterMixins = {
         for (var i in layers) {
             if (url.includes(layers[i].feature.id)) {
                 found = true;
-                this.resetPreviousLocationStyle();
+                // this.resetPreviousLocationStyle();
+                Styles.resetStyle(state.current_location.feature);
 
                 state.current_location.feature = layers[i];
 
-                this.setCurrentLocationStyle();
+                // this.setCurrentLocationStyle();
+                Styles.setSelectedStyle(layers[i]);
                 // layers[i]._popup.setContent(this.activePopup(layers[i].feature));
                 return;
             }
@@ -282,25 +287,25 @@ var RouterMixins = {
         }
     },
 
-    setCurrentLocationStyle: function () {
-        var location = state.current_location.feature;
-        if (location.setStyle) {
-            location.setStyle({ color: '#edaa00', fillColor: '#edaa00', weight: 3 });
-        }
-    },
+    // setCurrentLocationStyle: function () {
+    //     var location = state.current_location.feature;
+    //     if (location.setStyle) {
+    //         location.setStyle({ color: '#edaa00', fillColor: '#edaa00', weight: 3 });
+    //     }
+    // },
 
-    resetPreviousLocationStyle: function () {
-        // before state.current_location is updated, the old state needs to be reset
-        var location = state.current_location.feature;
-        if (location) {
-            if (location.setStyle) {
-                location.setStyle({ color: '#3388ff', fillColor: '#3388ff', weight: 2 });
-            }
-
-            feature = location.feature;
-            // location._popup.setContent(this.nonActivePopup(feature));
-        }
-    },
+    // resetPreviousLocationStyle: function () {
+    //     // before state.current_location is updated, the old state needs to be reset
+    //     var location = state.current_location.feature;
+    //     if (location) {
+    //         if (location.setStyle) {
+    //             location.setStyle({ color: '#3388ff', fillColor: '#3388ff', weight: 2 });
+    //         }
+    //
+    //         feature = location.feature;
+    //         // location._popup.setContent(this.nonActivePopup(feature));
+    //     }
+    // },
 
     // Checked to prevent router from firing with each coords change.
     setLastHashPath: function (hash) {

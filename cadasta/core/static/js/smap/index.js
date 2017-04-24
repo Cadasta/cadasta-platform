@@ -1,5 +1,5 @@
 var map = L.map('mapid');
-new LocationEditor(map);
+var editor = new LocationEditor(map);
 var sr = new SimpleRouter(map);
 sr.router();
 
@@ -20,3 +20,26 @@ map.on('endtileload', function () {
 
 SMap(map);
 var hash = new L.Hash(map);
+
+// handle location form navigation
+
+$(document).on('click', 'a, button[type="submit"]', function (e) {
+    if (editor.dirty() && (editor.editing() || editor.deleting())) {
+        if (e.currentTarget.hash === '#/search') return;
+        if ((e.currentTarget.hash && e.currentTarget.hash != window.location.hash) || e.currentTarget.form) {
+            var go = confirm('Your form has unsaved edits. Do you want to continue ? ');
+            if (go) {
+                editor.location._undoEdit();
+                editor._resetView();
+            } else {
+                e.preventDefault();
+            }
+        }
+    }
+});
+
+$(window).on('beforeunload', this, function (e) {
+    if (editor.dirty() && editor.editing()) {
+        return "Your form has unsaved changes."
+    }
+});

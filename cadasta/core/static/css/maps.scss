@@ -131,8 +131,30 @@ label[for="id_extents-location"] {
     cursor: hand;
 }
 
-.leaflet-control-toolbar span {
+.cadasta-toolbar {
     color: #000 !important;
+    background-image: url('/static/img/spritesheet.png');
+    background-repeat: no-repeat;
+}
+
+.draw-polygon {
+  background-position: -31px -2px;
+}
+
+.draw-polyline {
+  background-position: -2px -2px;
+}
+
+.draw-rectangle {
+  background-position: -62px -2px;
+}
+
+.draw-marker {
+  background-position: -122px -2px;
+}
+
+.edit-action span, .delete-action span {
+  color: #464646 !important;
 }
 
 .leaflet-subtoolbar {
