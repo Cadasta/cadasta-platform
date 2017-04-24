@@ -5,7 +5,9 @@ from rest_framework import serializers
 
 from .models import Party, PartyRelationship, TenureRelationship
 from core import serializers as core_serializers
+from .choices import TENURE_RELATIONSHIP_TYPES
 from spatial.serializers import SpatialUnitSerializer
+from core.form_mixins import get_types
 
 
 class PartySerializer(core_serializers.JSONAttrsSerializer,
@@ -97,6 +99,18 @@ class TenureRelationshipWriteSerializer(
         model = TenureRelationship
         fields = ('id', 'party', 'spatial_unit', 'tenure_type', 'attributes')
         read_only_fields = ('id',)
+
+    def validate_tenure_type(self, value):
+        prj = self.context['project']
+        allowed_types = get_types('tenure_types',
+                                  TENURE_RELATIONSHIP_TYPES,
+                                  questionnaire_id=prj.current_questionnaire)
+
+        if value not in allowed_types:
+            msg = "'{}' is not a valid choice for field 'tenure_type'."
+            raise serializers.ValidationError(msg.format(value))
+
+        return value
 
     def validate(self, data):
         data = super().validate(data)

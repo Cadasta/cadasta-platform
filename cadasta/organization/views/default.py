@@ -20,6 +20,9 @@ from django.shortcuts import get_object_or_404, redirect
 from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.models import Questionnaire
 from resources.models import ContentObject, Resource
+from core.form_mixins import get_types
+from party.choices import TENURE_RELATIONSHIP_TYPES
+from spatial.choices import TYPE_CHOICES
 
 from . import mixins
 from .. import messages as error_messages
@@ -870,6 +873,15 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         map_attrs_data = self.storage.get_step_data('map_attributes')
         project = self.get_project()
         org = project.organization
+        allowed_tenure_types = get_types(
+            'tenure_types',
+            TENURE_RELATIONSHIP_TYPES,
+            questionnaire_id=project.current_questionnaire)
+        allowed_location_types = get_types(
+            'location_types',
+            TYPE_CHOICES,
+            questionnaire_id=project.current_questionnaire)
+
         config_dict = {
             'project': project,
             'file': path,
@@ -880,6 +892,8 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             'location_type_field': form_data[2]['location_type_field'],
             'geometry_field': form_data[2]['geometry_field'],
             'attributes': map_attrs_data.getlist('attributes', None),
+            'allowed_tenure_types': allowed_tenure_types,
+            'allowed_location_types': allowed_location_types
         }
 
         importer = self._get_importer(type, path)

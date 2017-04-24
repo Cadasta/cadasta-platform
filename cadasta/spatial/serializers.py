@@ -5,6 +5,8 @@ from rest_framework_gis import serializers as geo_serializers
 
 from .models import SpatialUnit, SpatialRelationship
 from core import serializers as core_serializers
+from core.form_mixins import get_types
+from .choices import TYPE_CHOICES
 
 
 class SpatialUnitSerializer(core_serializers.JSONAttrsSerializer,
@@ -19,6 +21,18 @@ class SpatialUnitSerializer(core_serializers.JSONAttrsSerializer,
         id_field = False
         fields = ('id', 'geometry', 'type', 'attributes', )
         read_only_fields = ('id', )
+
+    def validate_type(self, value):
+        prj = self.context['project']
+        allowed_types = get_types('location_type',
+                                  TYPE_CHOICES,
+                                  questionnaire_id=prj.current_questionnaire)
+
+        if value not in allowed_types:
+            msg = "'{}' is not a valid choice for field 'type'."
+            raise serializers.ValidationError(msg.format(value))
+
+        return value
 
     def create(self, validated_data):
         project = self.context['project']
@@ -44,7 +58,7 @@ class SpatialUnitGeoJsonSerializer(geo_serializers.GeoFeatureModelSerializer):
                     'location': location.id})
 
     def get_type(self, location):
-        return location.get_type_display()
+        return location.name
 
 
 class SpatialRelationshipReadSerializer(serializers.ModelSerializer):

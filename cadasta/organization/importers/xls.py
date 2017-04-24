@@ -58,10 +58,6 @@ def get_csv_from_dataframe(df, entity_types):
                     inplace=True
                 )
                 relationships.rename(
-                    columns={'tenure_type.id': 'tenure_type'},
-                    inplace=True
-                )
-                relationships.rename(
                     columns=lambda x: 'tenurerelationship::' + x.lower(),
                     inplace=True)
                 parties.rename(
@@ -81,7 +77,7 @@ def get_csv_from_dataframe(df, entity_types):
                 # drop unused columns
                 drop_cols = [
                     'spatialunit::id', 'party::id',
-                    'tenurerelationship::tenure_type.label'
+                    'tenurerelationship::tenure_type_label'
                 ]
                 merged.drop(drop_cols, inplace=True, axis=1)
 

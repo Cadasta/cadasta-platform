@@ -2,6 +2,7 @@
 
 import pytest
 
+from django.utils.translation import activate
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.db.utils import IntegrityError
@@ -10,10 +11,11 @@ from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from resources.tests.factories import ResourceFactory
 from resources.models import ContentObject
-from party.models import Party, TenureRelationshipType, TenureRelationship
+from party.models import Party, TenureRelationship
 from party.tests.factories import (PartyFactory, PartyRelationshipFactory,
                                    TenureRelationshipFactory)
 from spatial.tests.factories import SpatialUnitFactory
+from questionnaires.tests import factories as q_factories
 
 from .. import exceptions
 
@@ -191,19 +193,20 @@ class PartyRelationshipTest(UserTestCase, TestCase):
 
 
 class TenureRelationshipTest(UserTestCase, TestCase):
+    def tearDown(self):
+        activate('en')
 
     def test_str(self):
         project = ProjectFactory.build(name='TestProject')
-        tenure_type = TenureRelationshipType(id='LS', label="Leasehold")
         relationship = TenureRelationshipFactory.build(
             project=project,
             party__project=project,
             party__name='Family',
             spatial_unit__project=project,
             spatial_unit__type='PA',
-            tenure_type=tenure_type)
+            tenure_type='LS')
         assert str(relationship) == (
-            "<TenureRelationship: <Family> Leasehold <Parcel>>")
+            "<TenureRelationship: <Family> LS <Parcel>>")
 
     def test_repr(self):
         project = ProjectFactory.build(slug='prj')
@@ -214,7 +217,7 @@ class TenureRelationshipTest(UserTestCase, TestCase):
             project=project,
             party=party,
             spatial_unit=su,
-            tenure_type=TenureRelationshipType(id='CR'))
+            tenure_type='CR')
         assert repr(relationship) == ('<TenureRelationship id=abc123'
                                       ' party=abc123 spatial_unit=def456'
                                       ' project=prj tenure_type=CR>')
@@ -261,8 +264,8 @@ class TenureRelationshipTest(UserTestCase, TestCase):
         tenurerel = TenureRelationshipFactory.create()
         assert tenurerel.name == "<{party}> {type} <{su}>".format(
             party=tenurerel.party.name,
-            type=tenurerel.tenure_type_label,
-            su=tenurerel.spatial_unit.get_type_display())
+            type=tenurerel.tenure_type,
+            su='Parcel')
 
     def test_ui_class_name(self):
         tenurerel = TenureRelationshipFactory.create()
@@ -275,10 +278,6 @@ class TenureRelationshipTest(UserTestCase, TestCase):
                 org=tenurerel.project.organization.slug,
                 prj=tenurerel.project.slug,
                 id=tenurerel.id))
-
-    def test_tenure_type_label(self):
-        tenurerel = TenureRelationshipFactory.create()
-        assert tenurerel.tenure_type_label == tenurerel.tenure_type.label
 
     def test_detach_tenure_relationship_resources(self):
         project = ProjectFactory.create()
@@ -313,20 +312,63 @@ class TenureRelationshipTest(UserTestCase, TestCase):
             object_id=tenure.id, resource=resource).exists()
         assert TenureRelationship.objects.all().count() == 0
 
+    def test_tenure_type_label_standard(self):
+        tenure = TenureRelationshipFactory.create(tenure_type='FH')
+        assert tenure.tenure_type_label == 'Freehold'
 
-class TenureRelationshipTypeTest(UserTestCase, TestCase):
-    """Test TenureRelationshipType."""
+    def test_tenure_type_label_questionnaire_default_lang(self):
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='en')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FREE',
+            label={'en': 'Freehold', 'de': 'Eigentum'}
+        )
+        tenure = TenureRelationshipFactory.create(
+            project=questionnaire.project,
+            tenure_type='FREE')
+        assert tenure.tenure_type_label == 'Freehold'
 
-    def test_repr(self):
-        tenure_type = TenureRelationshipType(id='FH', label='Freehold')
-        assert repr(tenure_type) == ('<TenureRelationshipType id=FH'
-                                     ' label=Freehold>')
+    def test_tenure_type_label_questionnaire_selected_lang(self):
+        activate('es')
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='en')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FREE',
+            label={'en': 'Freehold', 'es': 'Eigentum'}
+        )
+        tenure = TenureRelationshipFactory.create(
+            project=questionnaire.project,
+            tenure_type='FREE')
+        assert tenure.tenure_type_label == 'Eigentum'
 
-    def test_tenure_relationship_types(self):
-        tenure_types = TenureRelationshipType.objects.all()
-        assert 18 == len(tenure_types)
-        freehold = TenureRelationshipType.objects.get(id='FH')
-        assert freehold.label == 'Freehold'
+    def test_tenure_type_label_questionnaire_single_lang(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FREE',
+            label='Eigentum'
+        )
+        tenure = TenureRelationshipFactory.create(
+            project=questionnaire.project,
+            tenure_type='FREE')
+        assert tenure.tenure_type_label == 'Eigentum'
 
 
 class PartyTenureRelationshipsTest(UserTestCase, TestCase):

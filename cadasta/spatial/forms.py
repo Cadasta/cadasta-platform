@@ -7,7 +7,8 @@ from django.utils.translation import ugettext_lazy as __
 from leaflet.forms.widgets import LeafletWidget
 from core import form_mixins
 from core.util import ID_FIELD_LENGTH
-from party.models import Party, TenureRelationship, TenureRelationshipType
+from party.models import Party, TenureRelationship
+from party.choices import TENURE_RELATIONSHIP_TYPES
 
 from .models import TYPE_CHOICES, SpatialUnit
 from .widgets import NewEntityWidget, SelectPartyWidget
@@ -62,7 +63,9 @@ class TenureRelationshipForm(form_mixins.SanitizeFieldsForm,
     id = forms.CharField(required=False, max_length=ID_FIELD_LENGTH)
     name = forms.CharField(required=False, max_length=200)
     party_type = forms.ChoiceField(required=False, choices=[])
-    tenure_type = forms.ChoiceField(required=True, choices=[])
+    tenure_type = forms.ChoiceField(choices=[
+        ('', _("Please select a relationship type"))] +
+        sorted(list(TENURE_RELATIONSHIP_TYPES)))
 
     class Media:
         js = ('/static/js/rel_tenure.js',
@@ -76,11 +79,6 @@ class TenureRelationshipForm(form_mixins.SanitizeFieldsForm,
         self.fields['id'].widget = SelectPartyWidget(project.id)
         self.fields['party_type'].choices = (
             [('', _("Please select a party type"))] + list(Party.TYPE_CHOICES))
-        self.fields['tenure_type'].choices = (
-            [('', _("Please select a relationship type"))] +
-            sorted([
-                (choice[0], _(choice[1])) for choice in
-                TenureRelationshipType.objects.values_list('id', 'label')]))
 
         if self.project.current_questionnaire:
             self.set_standard_field('party_name',
@@ -162,7 +160,7 @@ class TenureRelationshipForm(form_mixins.SanitizeFieldsForm,
         tenurerelationship = TenureRelationship.objects.create(
             party=party,
             spatial_unit=self.spatial_unit,
-            tenure_type_id=self.cleaned_data['tenure_type'],
+            tenure_type=self.cleaned_data['tenure_type'],
             project=self.project,
             attributes=self.process_attributes(
                 self.tenure_ct.model, self.cleaned_data['tenure_type']

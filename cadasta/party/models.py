@@ -1,6 +1,7 @@
 """Party models."""
 
 from core.models import RandomIDModel
+from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.gis.db import models
@@ -8,6 +9,7 @@ from django.contrib.postgres.fields import JSONField
 from django.utils.encoding import iri_to_uri
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy as __
+from django.utils.translation import get_language
 
 from jsonattrs.decorators import fix_model_for_attributes
 from jsonattrs.fields import JSONAttributeField
@@ -15,11 +17,13 @@ from organization.models import Project
 from organization.validators import validate_contact
 from simple_history.models import HistoricalRecords
 
+from questionnaires.models import Question
 from resources.mixins import ResourceModelMixin
 from spatial.models import SpatialUnit
 from tutelary.decorators import permissioned_model
 
 from . import managers, messages
+from .choices import TENURE_RELATIONSHIP_TYPES
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -222,28 +226,6 @@ class TenureRelationship(ResourceModelMixin,
     Governs relationships between Party and SpatialUnit.
     """
 
-    CONTRACTUAL_SHARE_CROP = 'CS'
-    CUSTOMARY_ARRANGEMENT = 'CA'
-    GIFT = 'GF'
-    HOMESTEAD = 'HS'
-    INFORMAL_OCCUPANT = 'IO'
-    INHERITANCE = 'IN'
-    LEASEHOLD = 'LH'
-    PURCHASED_FREEHOLD = 'PF'
-    RENTAL = 'RN'
-    OTHER = 'OT'
-
-    ACQUIRED_CHOICES = ((CONTRACTUAL_SHARE_CROP, _('Contractual/Share Crop')),
-                        (CUSTOMARY_ARRANGEMENT, _('Customary Arrangement')),
-                        (GIFT, _('Gift')),
-                        (HOMESTEAD, _('Homestead')),
-                        (INFORMAL_OCCUPANT, _('Informal Occupant')),
-                        (INHERITANCE, _('Inheritance')),
-                        (LEASEHOLD, _('Leasehold')),
-                        (PURCHASED_FREEHOLD, _('Purchased Freehold')),
-                        (RENTAL, _('Rental')),
-                        (OTHER, _('Other')))
-
     # All tenure relationships are associated with a single project
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name='tenure_relationships')
@@ -255,10 +237,7 @@ class TenureRelationship(ResourceModelMixin,
     spatial_unit = models.ForeignKey(SpatialUnit, on_delete=models.CASCADE)
 
     # Tenure relationships type: used to manage range of allowed attributes
-    tenure_type = models.ForeignKey(
-        'TenureRelationshipType',
-        related_name='tenure_type', null=False, blank=False
-    )
+    tenure_type = models.CharField(max_length=10)
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
@@ -301,7 +280,7 @@ class TenureRelationship(ResourceModelMixin,
                        ' party={obj.party.id}'
                        ' spatial_unit={obj.spatial_unit.id}'
                        ' project={obj.project.slug}'
-                       ' tenure_type={obj.tenure_type.id}>')
+                       ' tenure_type={obj.tenure_type}>')
         return repr_string.format(obj=self)
 
     @property
@@ -309,7 +288,7 @@ class TenureRelationship(ResourceModelMixin,
         return "<{party}> {type} <{su}>".format(
             party=self.party.name,
             su=self.spatial_unit.name,
-            type=self.tenure_type_label,
+            type=self.tenure_type,
         )
 
     @property
@@ -326,52 +305,20 @@ class TenureRelationship(ResourceModelMixin,
             },
         ))
 
-    @property
+    @cached_property
     def tenure_type_label(self):
-        return _(self.tenure_type.label)
+        if not self.project.current_questionnaire:
+            return dict(TENURE_RELATIONSHIP_TYPES)[self.tenure_type]
 
-
-class TenureRelationshipType(models.Model):
-    """Defines allowable tenure types."""
-
-    id = models.CharField(max_length=2, primary_key=True)
-    label = models.CharField(max_length=200)
-
-    history = HistoricalRecords()
-
-    def __repr__(self):
-        repr_string = '<TenureRelationshipType id={obj.id} label={obj.label}>'
-        return repr_string.format(obj=self)
-
-
-TENURE_RELATIONSHIP_TYPES = (
-    ('CR', __('Carbon Rights')),
-    ('CO', __('Concessionary Rights')),
-    ('CU', __('Customary Rights')),
-    ('EA', __('Easement')),
-    ('ES', __('Equitable Servitude')),
-    ('FH', __('Freehold')),
-    ('GR', __('Grazing Rights')),
-    ('HR', __('Hunting/Fishing/Harvest Rights')),
-    ('IN', __('Indigenous Land Rights')),
-    ('JT', __('Joint Tenancy')),
-    ('LH', __('Leasehold')),
-    ('LL', __('Longterm Leasehold')),
-    ('MR', __('Mineral Rights')),
-    ('OC', __('Occupancy (No Documented Rights)')),
-    ('TN', __('Tenancy (Documented Sub-lease)')),
-    ('TC', __('Tenancy In Common')),
-    ('UC', __('Undivided Co-ownership')),
-    ('WR', __('Water Rights'))
-)
-
-
-def load_tenure_relationship_types(force=False):
-    if force:
-        TenureRelationshipType.objects.all().delete()
-    existing_ids = TenureRelationshipType.objects.values_list('id', flat=True)
-    return TenureRelationshipType.objects.bulk_create([
-        TenureRelationshipType(id=tr_id, label=label)
-        for tr_id, label in TENURE_RELATIONSHIP_TYPES
-        if tr_id not in existing_ids
-    ])
+        question = Question.objects.get(
+            questionnaire_id=self.project.current_questionnaire,
+            name='tenure_type'
+        )
+        label = question.options.get(name=self.tenure_type).label_xlat
+        if label is None or isinstance(label, str):
+            return label
+        else:
+            return label.get(
+                get_language(),
+                label[question.questionnaire.default_language]
+            )

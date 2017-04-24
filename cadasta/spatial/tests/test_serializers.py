@@ -24,7 +24,8 @@ class SpatialUnitSerializerTest(UserTestCase, TestCase):
         spatial_data = {
             'properties': {
                 'name': 'Spatial',
-                'project': project
+                'project': project,
+                'type': 'PA'
             }
         }
         serializer = serializers.SpatialUnitSerializer(
@@ -36,6 +37,17 @@ class SpatialUnitSerializerTest(UserTestCase, TestCase):
 
         spatial_instance = serializer.instance
         assert spatial_instance.project == project
+
+    def test_invalid_location_type(self):
+        project = ProjectFactory.create()
+        data = {'type': 'BOO'}
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is False
+        assert ("'BOO' is not a valid choice for field 'type'." in
+                serializer.errors['type'])
 
     def test_update_spatial_unit(self):
         project = ProjectFactory.create()

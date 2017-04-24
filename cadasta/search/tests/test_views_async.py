@@ -31,6 +31,7 @@ from organization.tests.factories import ProjectFactory
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
 from party.models import Party, TenureRelationship
+from party.choices import TENURE_RELATIONSHIP_TYPES
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from resources.models import Resource
 from resources.tests.factories import ResourceFactory
@@ -38,7 +39,7 @@ from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 from questionnaires.managers import create_attrs_schema
 from questionnaires.tests import attr_schemas
-from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.tests import factories as q_factories
 from ..parser import parse_query
 from ..views import async
 from .fake_results import get_fake_es_api_results
@@ -83,7 +84,8 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
         self.project = ProjectFactory.create(slug='test-project')
-        QuestionnaireFactory.create(project=self.project)
+        self.questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project)
 
         content_type = ContentType.objects.get(
             app_label='party', model='party')
@@ -504,7 +506,20 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert ("Type", "Group") in attributes
 
     def test_augment_result_tenure_rel(self):
-        augmented_result = self.view_class().augment_result(
+        question = q_factories.QuestionFactory.create(
+            questionnaire=self.questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='CB',
+            label={'en': 'House', 'es': 'Haus'}
+        )
+
+        view = self.view_class()
+        view.tenure_types = dict(TENURE_RELATIONSHIP_TYPES)
+        augmented_result = view.augment_result(
             self.tenure_rel_result)
         assert augmented_result['entity_type'] == "Relationship"
         assert augmented_result['url'] == self.tenure_rel.get_absolute_url()
@@ -567,7 +582,9 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             Party, self.party_result['_source']) == "Party in the USA"
 
     def test_get_main_label_tenure_rel(self):
-        assert self.view_class().get_main_label(
+        view = self.view_class()
+        view.tenure_types = dict(TENURE_RELATIONSHIP_TYPES)
+        assert view.get_main_label(
             TenureRelationship, self.tenure_rel_result['_source']
         ) == "Customary Rights"
 
@@ -584,8 +601,10 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             SpatialUnit, {'type': 'XX'}) == "—"
 
     def test_get_main_label_invalid_tenure_rel_type(self):
-        assert self.view_class().get_main_label(
-            TenureRelationship, {'tenure_type_id': 'XX'}) == "—"
+        view = self.view_class()
+        view.tenure_types = dict(TENURE_RELATIONSHIP_TYPES)
+        assert view.get_main_label(
+            TenureRelationship, {'tenure_type': 'XX'}) == "—"
 
     def test_get_attributes_location(self):
         assert self.view_class().get_attributes(
@@ -598,6 +617,17 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         assert ("Type", "Group") in attributes
 
     def test_get_attributes_tenure_rel(self):
+        question = q_factories.QuestionFactory.create(
+            questionnaire=self.questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='CB',
+            label={'en': 'House', 'es': 'Haus'}
+        )
+
         attributes = self.view_class().get_attributes(
             self.tenure_rel, self.tenure_rel_result['_source'])
         assert len(attributes) == 2

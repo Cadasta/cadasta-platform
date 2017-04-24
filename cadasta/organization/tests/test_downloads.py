@@ -14,7 +14,6 @@ from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from openpyxl import Workbook, load_workbook
 from organization.tests.factories import ProjectFactory
-from party.models import TenureRelationshipType
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from resources.models import ContentObject
 from resources.tests.factories import ResourceFactory
@@ -22,6 +21,7 @@ from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 from spatial.tests.factories import SpatialUnitFactory
 from spatial.models import SpatialUnit
+from questionnaires.tests import factories as q_factories
 
 from ..download.base import Exporter
 from ..download.resources import ResourceExporter
@@ -79,6 +79,17 @@ class BaseExporterTest(UserTestCase, TestCase):
 
     def test_get_values(self):
         project = ProjectFactory.create(current_questionnaire='123abc')
+        questionnaire = q_factories.QuestionnaireFactory.create(id='123abc')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='LH',
+            label='Miete'
+        )
         exporter = Exporter(project)
         content_type = ContentType.objects.get(app_label='party',
                                                model='tenurerelationship')
@@ -102,21 +113,21 @@ class BaseExporterTest(UserTestCase, TestCase):
             required=False, omit=False
         )
 
-        ttype = TenureRelationshipType.objects.get(id='LH')
         item = TenureRelationshipFactory.create(project=project,
-                                                tenure_type=ttype,
+                                                tenure_type='LH',
                                                 attributes={
                                                     'key': 'text',
                                                     'key_2': ['choice_1',
                                                               'choice_2']})
-        model_attrs = ('id', 'party_id', 'spatial_unit_id',
-                       'tenure_type.label')
+        model_attrs = ('id', 'party_id', 'spatial_unit_id', 'tenure_type',
+                       'tenure_type_label')
         schema_attrs = exporter.get_schema_attrs(content_type)
         values = exporter.get_values(item, model_attrs, schema_attrs)
         assert values == {
             'id': item.id, 'party_id': item.party_id,
             'spatial_unit_id': item.spatial_unit_id,
-            'tenure_type.label': 'Leasehold',
+            'tenure_type': 'LH',
+            'tenure_type_label': 'Miete',
             'key': 'text', 'key_2': 'choice_1, choice_2',
         }
 
@@ -208,6 +219,17 @@ class ShapeTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create(current_questionnaire='123abc')
+        questionnaire = q_factories.QuestionnaireFactory.create(id='123abc')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='CR',
+            label='Eigentum'
+        )
         self.spatial_content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit'
         )
@@ -297,10 +319,9 @@ class ShapeTest(UserTestCase, TestCase):
         )
         self.parties = [party_in, party_gr]
 
-        tenure_type = TenureRelationshipType.objects.get(id='CR')
         self.tenurerelationship = TenureRelationshipFactory.create(
             project=self.project, party=self.parties[0],
-            spatial_unit=self.spatialunit_1, tenure_type=tenure_type
+            spatial_unit=self.spatialunit_1, tenure_type='CR'
         )
 
     def test_init(self):
@@ -506,11 +527,11 @@ class ShapeTest(UserTestCase, TestCase):
             for i, row in enumerate(csvreader):
                 if i == 0:
                     assert row == ['id', 'party_id', 'spatial_unit_id',
-                                   'tenure_type.id', 'tenure_type.label']
+                                   'tenure_type', 'tenure_type_label']
                 else:
                     assert row == [
                         self.tenurerelationship.id, self.parties[0].id,
-                        self.spatialunit_1.id, 'CR', 'Carbon Rights']
+                        self.spatialunit_1.id, 'CR', 'Eigentum']
 
         # remove this so other tests pass
         os.remove(filename)
@@ -615,6 +636,17 @@ class XLSTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         self.project = ProjectFactory.create(current_questionnaire='123abc')
+        questionnaire = q_factories.QuestionnaireFactory.create(id='123abc')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='tenure_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FREE',
+            label='Eigentum'
+        )
         self.spatial_content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit'
         )
@@ -702,7 +734,8 @@ class XLSTest(UserTestCase, TestCase):
 
         TenureRelationshipFactory.create(
             project=self.project, party=self.parties[0],
-            spatial_unit=self.spatialunit_1
+            spatial_unit=self.spatialunit_1,
+            tenure_type='FREE'
         )
 
     def test_init(self):

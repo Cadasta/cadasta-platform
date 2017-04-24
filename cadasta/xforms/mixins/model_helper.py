@@ -4,7 +4,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType
 from tutelary.models import Policy
-from party.models import Party, TenureRelationship, TenureRelationshipType
+from party.models import Party, TenureRelationship
 from pyxform.xform2json import XFormToDict
 from questionnaires.models import Questionnaire
 from resources.models import Resource
@@ -206,8 +206,7 @@ class ModelHelper():
                         project=project,
                         party=party,
                         spatial_unit=location,
-                        tenure_type=TenureRelationshipType.objects.get(
-                            id=tenure_group[t]['tenure_type']),
+                        tenure_type=tenure_group[t]['tenure_type'],
                         attributes=self._get_attributes(
                             tenure_group[t],
                             'tenure_relationship')

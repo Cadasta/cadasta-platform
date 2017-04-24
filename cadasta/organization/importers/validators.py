@@ -6,8 +6,6 @@ from django.utils.translation import ugettext as _
 
 from core.validators import sanitize_string
 from core.messages import SANITIZE_ERROR
-from party.models import TenureRelationshipType
-from spatial.choices import TYPE_CHOICES
 from xforms.utils import InvalidODKGeometryError, odk_geom_to_wkt
 
 
@@ -53,7 +51,7 @@ def validate_row(headers, row, config):
 
     if location_type_field:
         location_type = _get_field_value(location_type_field, "location_type")
-        type_choices = [choice[0] for choice in TYPE_CHOICES]
+        type_choices = config['allowed_location_types']
         if location_type and location_type not in type_choices:
             raise ValidationError(
                 _("Invalid location_type: '%s'.") % location_type
@@ -61,8 +59,8 @@ def validate_row(headers, row, config):
 
     if party_name_field and geometry_field:
         tenure_type = _get_field_value(tenure_type_field, 'tenure_type')
-        if tenure_type and not TenureRelationshipType.objects.filter(
-                id=tenure_type).exists():
+
+        if tenure_type and tenure_type not in config['allowed_tenure_types']:
             raise ValidationError(
                 _("Invalid tenure_type: '%s'.") % tenure_type
             )

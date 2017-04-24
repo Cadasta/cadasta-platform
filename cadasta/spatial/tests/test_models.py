@@ -1,5 +1,6 @@
 import pytest
 
+from django.utils.translation import activate
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
@@ -12,9 +13,12 @@ from party import exceptions
 from spatial.models import SpatialUnit
 from spatial.tests.factories import (SpatialUnitFactory,
                                      SpatialRelationshipFactory)
+from questionnaires.tests import factories as q_factories
 
 
 class SpatialUnitTest(UserTestCase, TestCase):
+    def tearDown(self):
+        activate('en')
 
     def test_str(self):
         spatial_unit = SpatialUnitFactory.create(type='PA')
@@ -87,13 +91,13 @@ class SpatialUnitTest(UserTestCase, TestCase):
     def test_default_type_is_parcel(self):
         spatial_unit = SpatialUnitFactory.create()
         assert spatial_unit.type == 'PA'
-        assert spatial_unit.get_type_display() == 'Parcel'
+        assert spatial_unit.name == 'Parcel'
 
     def test_setting_type(self):
         spatial_unit = SpatialUnitFactory.create(
             type="RW")
         assert spatial_unit.type == 'RW'
-        assert spatial_unit.get_type_display() == 'Right-of-way'
+        assert spatial_unit.name == 'Right-of-way'
 
     def test_adding_attributes(self):
         # add attribute schema
@@ -113,7 +117,65 @@ class SpatialUnitTest(UserTestCase, TestCase):
 
     def test_name(self):
         su = SpatialUnitFactory.create(type="RW")
-        assert su.name == "Right-of-way"
+        assert su.location_type_label == "Right-of-way"
+
+    def test_location_type_label_standard(self):
+        su = SpatialUnitFactory.create(type="RW")
+        assert su.location_type_label == "Right-of-way"
+
+    def test_location_type_label_questionnaire_default_lang(self):
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='en')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='HOUSE',
+            label={'en': 'House', 'de': 'Hause'}
+        )
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='HOUSE')
+        assert su.location_type_label == 'House'
+
+    def test_location_type_label_questionnaire_selected_lang(self):
+        activate('es')
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='en')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FREE',
+            label={'en': 'House', 'es': 'Haus'}
+        )
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='FREE')
+        assert su.location_type_label == 'Haus'
+
+    def test_location_type_label_questionnaire_single_lang(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='HOUSE',
+            label='Haus'
+        )
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='HOUSE')
+        assert su.location_type_label == 'Haus'
 
     def test_ui_class_name(self):
         su = SpatialUnitFactory.create()

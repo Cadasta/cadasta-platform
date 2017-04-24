@@ -10,6 +10,7 @@ class SpatialUnitFactory(ExtendedFactory):
         model = SpatialUnit
 
     project = factory.SubFactory(ProjectFactory)
+    type = 'PA'
 
 
 class SpatialRelationshipFactory(ExtendedFactory):

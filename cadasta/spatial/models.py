@@ -1,10 +1,12 @@
 from core.models import RandomIDModel
+from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
 from django.contrib.gis.db.models import GeometryField
 from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.encoding import iri_to_uri
 from django.dispatch import receiver
+from django.utils.translation import get_language
 from organization.models import Project
 from tutelary.decorators import permissioned_model
 from simple_history.models import HistoricalRecords
@@ -16,6 +18,7 @@ from .choices import TYPE_CHOICES
 from resources.mixins import ResourceModelMixin
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
+from questionnaires.models import Question
 
 
 @fix_model_for_attributes
@@ -32,8 +35,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
                                 related_name='spatial_units')
 
     # Spatial unit type: used to manage range of allowed attributes.
-    type = models.CharField(max_length=2,
-                            choices=TYPE_CHOICES, default='PA')
+    type = models.CharField(max_length=10)
 
     # Spatial unit geometry is optional: some spatial units may only
     # have a textual description of their location.
@@ -94,7 +96,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
     @property
     def name(self):
-        return self.get_type_display()
+        return self.location_type_label
 
     @property
     def ui_class_name(self):
@@ -109,6 +111,24 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
                 'location': self.id,
             },
         ))
+
+    @cached_property
+    def location_type_label(self):
+        if not self.project.current_questionnaire:
+            return dict(TYPE_CHOICES)[self.type]
+
+        question = Question.objects.get(
+            questionnaire_id=self.project.current_questionnaire,
+            name='location_type'
+        )
+        label = question.options.get(name=self.type).label_xlat
+        if label is None or isinstance(label, str):
+            return label
+        else:
+            return label.get(
+                get_language(),
+                label[question.questionnaire.default_language]
+            )
 
 
 def reassign_spatial_geometry(instance):
@@ -218,7 +238,7 @@ class SpatialRelationship(RandomIDModel):
 
     def __str__(self):
         return "<SpatialRelationship: <{su1}> {type} <{su2}>>".format(
-            su1=self.su1.get_type_display(), su2=self.su2.get_type_display(),
+            su1=self.su1.name, su2=self.su2.name,
             type=dict(self.TYPE_CHOICES).get(self.type))
 
     def __repr__(self):
