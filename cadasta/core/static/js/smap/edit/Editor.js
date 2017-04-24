@@ -367,10 +367,8 @@ var LocationEditor = L.Evented.extend({
         this.location.startPolygon();
     },
 
-    startMulti: function () {
-        if (this.location.layer.editEnabled()) {
-            this.location.layer.editor.newShape();
-        }
+    addMulti: function () {
+        this.location.layer.editor.newShape();
     },
 
     startPolyline: function () {

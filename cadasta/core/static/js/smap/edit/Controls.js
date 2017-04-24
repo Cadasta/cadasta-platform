@@ -44,7 +44,14 @@ var EditorToolbars = function () {
     var DrawControl = BaseToolbarAction.extend({
         enable: function () {
             if (this.editor.deleting()) return;
-            BaseToolbarAction.prototype.enable.call(this);
+            var currentEditor = this.editor.location.layer.editor;
+            if (currentEditor) {
+                if (currentEditor instanceof this.options.type) {
+                    BaseToolbarAction.prototype.enable.call(this);
+                }
+            } else {
+                BaseToolbarAction.prototype.enable.call(this);
+            }
         }
     });
 
@@ -57,14 +64,24 @@ var EditorToolbars = function () {
             subToolbar: new SubToolbar({
                 className: 'cancel-draw-poly leaflet-subtoolbar',
                 actions: [CancelAction],
-            })
+            }),
+            type: L.Editable.PolygonEditor,
         },
         addHooks: function () {
-            this.tooltip.innerHTML = 'Click on the map to start a polygon.';
-            this.editor.startPolygon();
-        }
+            if (this.editor.location.layer.editor) {
+                if (this.editor.location.layer.editor.enabled() &&
+                    this.editor.location.layer.editor instanceof L.Editable.PolygonEditor) {
+                    this.tooltip.innerHTML = 'Update the multipolygon.';
+                    this.editor.addMulti();
+                }
+            } else {
+                this.tooltip.innerHTML = 'Click on the map to start a new polygon.';
+                this.editor.startPolygon();
+            }
+        },
     });
 
+    // not currently used
     var MultiGeomControl = DrawControl.extend({
         options: {
             toolbarIcon: {
@@ -90,6 +107,7 @@ var EditorToolbars = function () {
             }
         }
     })
+
     var MarkerControl = DrawControl.extend({
         options: {
             toolbarIcon: {
@@ -99,7 +117,8 @@ var EditorToolbars = function () {
             subToolbar: new SubToolbar({
                 className: 'cancel-draw-marker leaflet-subtoolbar',
                 actions: [CancelAction],
-            })
+            }),
+            type: L.Editable.MarkerEditor,
         },
         addHooks: function () {
             this.tooltip.innerHTML = 'Click on the map to add a marker.';
@@ -116,12 +135,21 @@ var EditorToolbars = function () {
             subToolbar: new SubToolbar({
                 className: 'cancel-draw-line leaflet-subtoolbar',
                 actions: [CancelAction],
-            })
+            }),
+            type: L.Editable.PolylineEditor,
         },
         addHooks: function () {
-            this.tooltip.innerHTML = 'Click on the map to start a line.';
-            this.editor.startPolyline();
-        }
+            if (this.editor.location.layer.editor) {
+                if (this.editor.location.layer.editor.enabled() &&
+                    this.editor.location.layer.editor instanceof L.Editable.PolylineEditor) {
+                    this.tooltip.innerHTML = 'Add a new a new line.';
+                    this.editor.addMulti();
+                }
+            } else {
+                this.tooltip.innerHTML = 'Click on the map to start a line.';
+                this.editor.startPolyline();
+            }
+        },
     });
 
     var RectangleControl = DrawControl.extend({
@@ -133,7 +161,8 @@ var EditorToolbars = function () {
             subToolbar: new SubToolbar({
                 className: 'cancel-draw-rect leaflet-subtoolbar',
                 actions: [CancelAction],
-            })
+            }),
+            type: L.Editable.RectangleEditor,
         },
         addHooks: function () {
             this.tooltip.innerHTML = 'Click and drag on the map to create a rectangle.';
@@ -262,7 +291,7 @@ var EditorToolbars = function () {
         position: 'topleft',
         className: 'leaflet-smap-draw',
         actions: [
-            LineControl, PolygonControl, MultiGeomControl,
+            LineControl, PolygonControl,
             RectangleControl, MarkerControl
         ]
     }));
