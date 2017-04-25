@@ -139,10 +139,10 @@ var Location = L.Editable.extend({
 
     _createNew: function (lyr) {
         this.layer._new = true;
+        this.layer._dirty = true;
         var feature = lyr.toGeoJSON();
         var layer = LatLngUtil.copyLayer(lyr);
         feature.id = L.stamp(layer);
-        // feature.properties.url = 'records/location/new';
         layer.feature = feature;
         this.layer = layer;
         this._backupLayer();
@@ -387,11 +387,13 @@ var LocationEditor = L.Evented.extend({
     },
 
     _drawEnd: function (e) {
-        this._removeTooltip();
         this._cancelDraw();
-        this.location.layer.on('click', this.onLayerClick, this);
-        this._enableEditToolbar(active = false);
-        Styles.setSelectedStyle(this.location.layer);
+        this._removeTooltip();
+        if (!this.location.layer._events.hasOwnProperty('click')) {
+            this.location.layer.on('click', this.onLayerClick, this);
+        }
+        this._enableEditToolbar(active = true);
+        Styles.setEditStyle(this.location.layer);
     },
 
     _vertexNew: function (e) {
