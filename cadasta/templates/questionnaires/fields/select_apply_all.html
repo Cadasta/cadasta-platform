@@ -1,10 +1,17 @@
-<div class="form-group col-md-10 pdf_form_fields">
-    <label class="control-label"><strong>{% if question.label_xlat.en %} {{question.label_xlat.en}} {% else %}{{ question.name}}{% endif %}</strong><i>(Select all options that apply)</i></label>
-    <br/>
-    {% for option in question.options.all %}
-        <div class="form-group col-md-8">
-            <input type='checkbox' class="form-control" id='{{ option.name }}' name='{{ option.name }}'>
-            <label>{% if option.label_xlat.en %} {{option.label_xlat.en}} {% else %}{{ option.name}}{% endif %}</label>
-        </div>
-    {% endfor %}
+<div class="form-horizontal">
+	<div class="form-group pdf_form_fields">
+		<label class="col-left control-label">
+			<strong>{% if question.label_xlat.en %} {{ question.label_xlat.en }} {% else %} {{ question.name }} {% endif %} </strong> 
+			<i>(Select all options that apply)</i>
+		</label>
+		<div class="col-right">
+			{% for option in question.options.all %}
+			<label>
+				<input type="checkbox" class="form-control" id="{{ option.name }}" name="{{ option.name }}">
+				{% if option.label_xlat.en %} {{ option.label_xlat.en }} {% else %} {{ option.name }} {% endif %}
+			</label>
+			{% endfor %}
+		</div>
+	</div>
 </div>
+<div class="hr"></div>

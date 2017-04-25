@@ -674,7 +674,7 @@ h1 .label {
   font-size: 16px;
 }
 
-.entity { // small entity title above link 
+.entity { // small entity title above link
   font-size: 14px;
   font-weight: normal;
   color: $gray-medium;
@@ -683,7 +683,7 @@ h1 .label {
   letter-spacing: 0;
 }
 
-.text-wrap .entity { // map popovers 
+.text-wrap .entity { // map popovers
   font-size: 11px;
 }
 
@@ -717,4 +717,15 @@ h1 .label {
   h1 .label {
     font-size: 12px;
   }
+}
+
+/* =Map location details
+-------------------------------------------------------------- */
+
+.content-single h2 span {
+  font-size: 14px;
+  color: #a6a7a8;
+  display: block;
+  text-transform: uppercase;
+  padding-bottom: 2px;
 }

@@ -1,4 +1,11 @@
-<div class="form-group col-md-10 pdf_form_fields">
-  <label class="control-label"><strong>{% if question.label_xlat.en %} {{question.label_xlat.en}} {% else %}{{ question.name}}{% endif %}</strong></label>
-  <textarea class="form-control" style="height: 400px" id="{{ question.name }}" name="{{ question.name }}"></textarea>
+<div class="form-horizontal">
+	<div class="form-group pdf_form_fields">
+		<label class="col-left control-label">
+			<strong>{% if question.label_xlat.en %} {{ question.label_xlat.en }} {% else %} {{ question.name }} {% endif %}</strong>
+		</label>
+		<div class="col-right">
+			<textarea class="form-control" style="height: 400px" id="{{ question.name }}" name="{{ question.name }}"></textarea>
+		</div>
+	</div>
 </div>
+<div class="hr"></div>

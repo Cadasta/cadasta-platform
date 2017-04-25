@@ -28,20 +28,21 @@
             <span>{% trans "FORM" %}</span>
             {{ pdfform.name }}
           </h2>
-          <div class="row">
-          {% if pdfform.file.url is not None and pdfform.file.url != "" %}
-          <div class="col-md-2">
-            <img alt="Form Logo" src="{{ pdfform.file.url }}" class="thumb-128">
-          </div>
-          {% endif %}
-          <div class="col-md-10">
-            <p>{{ pdfform.description }}<br></p>
-            <p class="small">{% blocktrans with date=pdfform.last_updated user=pdfform.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
-            <div id="instructions">
-              <strong>{% trans "Instructions" %}</strong><br>
-              <p>{{ pdfform.instructions }}</p>
+          <div class="media">
+            {% if pdfform.file.url is not None and pdfform.file.url != "" %}
+            <div class="media-left">
+              <img alt="Form Logo" src="{{ pdfform.file.url }}" class="thumb-128">
             </div>
-          </div>
+            {% endif %}
+            <div class="media-body">
+              {% if pdfform.description is not None and pdfform.description != "" %}
+              <p>{{ pdfform.description }}</p>
+              {% endif %}
+              {% if pdfform.instructions is not None and pdfform.instructions != "" %}
+              <p><strong>Instructions</strong><br>{{ pdfform.instructions }}</p>
+              {% endif %}
+              <p class="small">{% blocktrans with date=pdfform.last_updated user=pdfform.contributor.full_name %}Added on {{ date }} by {{ user }}{% endblocktrans %}</p>
+            </div>
           </div>
         </div>
         {% if can_generate %}

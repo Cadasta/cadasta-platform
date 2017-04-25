@@ -4,6 +4,15 @@
 <div class="row">
   <div class="col-md-6">
     {% csrf_token %}
+    <div class="form-group{% if form.file.errors %} has-error{% endif %}">
+      <label class="control-label" for="{{ form.file.id_for_label }}">{% trans "Select the logo to upload (to be displayed on top of the form)" %}</label>
+      <div class="well file-well">
+        {{ form.file }}
+        <p class="help-block">{% trans "Accepted file types: jpg, png, gif, tiff" %}</p>
+      </div>
+      <div class="error-block">{{ form.file.errors }}</div>
+    </div>
+    <hr class="divider">
     <div class="form-group{% if form.name.errors %} has-error{% endif %}">
       <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Name" %}</label>
       {% render_field form.name class+="form-control" data-parsley-required="true" %}
@@ -18,14 +27,6 @@
       <label class="control-label" for="{{ form.description.id_for_label }}">{% trans "Instructions" %}</label>
       {% render_field form.instructions class+="form-control" %}
       <div class="error-block">{{ form.instructions.errors }}</div>
-    </div>
-    <div class="form-group{% if form.file.errors %} has-error{% endif %}">
-      <label class="control-label" for="{{ form.file.id_for_label }}">{% trans "Select the logo to upload" %}</label>
-      <div class="well file-well">
-        {{ form.file }}
-        <p class="help-block">{% trans "Accepted file types: jpg, png" %}</p>
-      </div>
-      <div class="error-block">{{ form.file.errors }}</div>
     </div>
   </div>
 </div>

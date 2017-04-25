@@ -1,6 +1,6 @@
 from questionnaires.models import Questionnaire
 from django.template.loader import render_to_string
-from weasyprint import HTML, CSS
+from weasyprint import HTML
 import logging
 
 EXCLUDE_GEO_FIELDS = [
@@ -40,11 +40,6 @@ class PDFGenerator():
                                                 EXCLUDE_GEO_FIELDS,
                                             'pdfform': self.pdfform})
             html = HTML(string=html_string, base_url=absolute_uri)
-            pdf = html.write_pdf(stylesheets=[
-                CSS(string='@page { size: A4; margin: 2cm };'
-                           '* { float: none !important; };'
-                           '@media print '
-                           '{ nav { display: none; } }')
-            ])
+            pdf = html.write_pdf()
 
         return pdf

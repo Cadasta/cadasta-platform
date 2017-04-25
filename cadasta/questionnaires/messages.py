@@ -7,7 +7,6 @@ QUESTIONNAIRE_ADD = _("You don't have permission to add a questionnaire to "
 QUESTIONNAIRE_EDIT = _("You don't have permission to edit the "
                        "questionnaire of this project")
 
-
 MISSING_RELEVANT = _("Unable to assign question group to model entitity. Make "
                      "sure to add a 'relevant' clause to the question group "
                      "definition when adding more than one question group for "
