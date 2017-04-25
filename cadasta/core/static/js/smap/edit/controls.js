@@ -44,9 +44,14 @@ var EditorToolbars = function () {
     var DrawControl = BaseToolbarAction.extend({
         enable: function () {
             if (this.editor.deleting()) return;
-            var currentEditor = this.editor.location.layer.editor;
-            if (currentEditor) {
-                if (currentEditor instanceof this.options.type) {
+            var layer = this.editor.location.layer;
+            if (layer) {
+                var currentEditor = layer.editor;
+                if (currentEditor) {
+                    if (currentEditor instanceof this.options.type) {
+                        BaseToolbarAction.prototype.enable.call(this);
+                    }
+                } else {
                     BaseToolbarAction.prototype.enable.call(this);
                 }
             } else {
@@ -68,15 +73,18 @@ var EditorToolbars = function () {
             type: L.Editable.PolylineEditor,
         },
         addHooks: function () {
-            var currentEditor = this.editor.location.layer.editor;
-            if (currentEditor) {
-                if (currentEditor.enabled() &&
-                    currentEditor instanceof this.options.type) {
-                    this.tooltip.innerHTML = 'Click on the map to update the multilinestring.';
-                    this.editor.addMulti();
+            var layer = this.editor.location.layer;
+            if (layer) {
+                var currentEditor = layer.editor;
+                if (currentEditor) {
+                    if (currentEditor.enabled() &&
+                        currentEditor instanceof this.options.type) {
+                        this.editor.addMulti(this.options.type);
+                    }
+                } else {
+                    this.editor.startPolyline();
                 }
             } else {
-                this.tooltip.innerHTML = 'Click on the map to start a new line.';
                 this.editor.startPolyline();
             }
         },
@@ -96,15 +104,18 @@ var EditorToolbars = function () {
             type: L.Editable.PolygonEditor,
         },
         addHooks: function () {
-            var currentEditor = this.editor.location.layer.editor;
-            if (currentEditor) {
-                if (currentEditor.enabled() &&
-                    currentEditor instanceof this.options.type) {
-                    this.tooltip.innerHTML = 'Click on the map update the multipolygon.';
-                    this.editor.addMulti();
+            var layer = this.editor.location.layer;
+            if (layer) {
+                var currentEditor = layer.editor;
+                if (currentEditor) {
+                    if (currentEditor.enabled() &&
+                        currentEditor instanceof this.options.type) {
+                        this.editor.addMulti(this.options.type);
+                    }
+                } else {
+                    this.editor.startPolygon();
                 }
             } else {
-                this.tooltip.innerHTML = 'Click on the map to start a new polygon.';
                 this.editor.startPolygon();
             }
         },
@@ -123,14 +134,18 @@ var EditorToolbars = function () {
             type: L.Editable.RectangleEditor,
         },
         addHooks: function () {
-            this.tooltip.innerHTML = 'Click and drag on the map to create a rectangle.';
             this.editor.startRectangle();
         },
         enable: function () {
             if (this.editor.deleting()) return;
-            var currentEditor = this.editor.location.layer.editor;
-            if (currentEditor && currentEditor instanceof this.options.type) return;
-            DrawControl.prototype.enable.call(this);
+            var layer = this.editor.location.layer;
+            if (layer) {
+                var currentEditor = layer.editor;
+                if (currentEditor && currentEditor instanceof this.options.type) return;
+                DrawControl.prototype.enable.call(this);
+            } else {
+                DrawControl.prototype.enable.call(this);
+            }
         }
     });
 
@@ -147,7 +162,6 @@ var EditorToolbars = function () {
             type: L.Editable.MarkerEditor,
         },
         addHooks: function () {
-            this.tooltip.innerHTML = 'Click on the map to add a marker.';
             this.editor.startMarker();
         }
     });
@@ -230,9 +244,6 @@ var EditorToolbars = function () {
         },
         enable: function (e) {
             if (this.editor.hasEditableLayer() && !this.editor.deleting()) {
-                this.tooltip.innerHTML = 'Click cancel to undo changes. <br/>' +
-                    'Drag handles, or marker to edit feature. <br/>' +
-                    'Click on a handle to delete it.'
                 L.ToolbarAction.prototype.enable.call(this);
             }
         }
@@ -251,7 +262,6 @@ var EditorToolbars = function () {
             })
         },
         addHooks: function () {
-            this.tooltip.innerHTML = 'Click on a feature to remove.';
             this.editor.startDelete();
         },
         enable: function () {

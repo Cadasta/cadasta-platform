@@ -138,8 +138,6 @@ var Location = L.Editable.extend({
     },
 
     _createNew: function (lyr) {
-        this.layer._new = true;
-        this.layer._dirty = true;
         var feature = lyr.toGeoJSON();
         var layer = LatLngUtil.copyLayer(lyr);
         feature.id = L.stamp(layer);
@@ -147,6 +145,8 @@ var Location = L.Editable.extend({
         this.layer = layer;
         this._backupLayer();
         this.map.geojsonLayer.addLayer(this.layer);
+        this.layer._new = true;
+        this.layer._dirty = true;
     },
 
     _checkValid: function (layer) {
@@ -220,8 +220,7 @@ var LocationEditor = L.Evented.extend({
         map.editTools = this.location;
         this.toolbars = new EditorToolbars();
 
-        this.tooltip = L.DomUtil.create(
-            'div', 'editor-tooltip', L.DomUtil.get('mapid'));
+        this.tooltip = new Tooltip(map);
 
         this._addRouterEvents();
         this._addEditableEvents();
@@ -255,7 +254,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     edit: function () {
-        this._addTooltip();
+        this.tooltip.update(this.tooltip.EDIT_ENABLED);
         if (this.editing()) {
             return;
         }
@@ -263,7 +262,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     cancelEdit: function () {
-        this._removeTooltip();
+        this.tooltip.remove();
         this.location._undoEdit();
     },
 
@@ -290,7 +289,7 @@ var LocationEditor = L.Evented.extend({
     // delete functions
 
     delete: function () {
-        this._removeTooltip();
+        this.tooltip.remove();
         this.location._saveDelete();
         if (this.location._deleted) {
             this._disableEditToolbar();
@@ -300,13 +299,13 @@ var LocationEditor = L.Evented.extend({
     },
 
     cancelDelete: function () {
-        this._removeTooltip();
+        this.tooltip.remove();
         this.location._undoDelete();
         Styles.setSelectedStyle(this.location.layer);
     },
 
     startDelete: function () {
-        this._addTooltip();
+        this.tooltip.update(this.tooltip.START_DELETE);
         if (this.location.layer) {
             this.location._startDelete();
             Styles.setDeleteStyle(this.location.layer);
@@ -322,7 +321,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     deleteLayer: function (layer, e) {
-        this.tooltip.innerHTML = 'Click cancel to undo or save to save deletion.'
+        this.tooltip.update(this.tooltip.CONTINUE_DELETE);
         var currentLayer = this.location.layer;
         if (currentLayer.feature.id !== layer.feature.id) {
             return;
@@ -333,11 +332,9 @@ var LocationEditor = L.Evented.extend({
     // new location functions
 
     _addNew: function () {
-        if (this._resetView()) {
-            this.location._reset();
-            this._addEditControls();
-            this._disableEditToolbar();
-        }
+        this._resetView()
+        this._addEditControls();
+        this._disableEditToolbar();
     },
 
     isNew: function () {
@@ -349,22 +346,31 @@ var LocationEditor = L.Evented.extend({
     // draw functions
 
     startRectangle: function () {
+        this.tooltip.update(this.tooltip.ADD_RECTANGLE);
         this.location.startRectangle();
     },
 
     startPolygon: function () {
+        this.tooltip.update(this.tooltip.ADD_POLYGON);
         this.location.startPolygon();
     },
 
-    addMulti: function () {
+    addMulti: function (type) {
+        if (type instanceof L.Editable.PolygonEditor) {
+            this.tooltip.update(this.tooltip.UPDATE_MULTIPOLYGON);
+        } else {
+            this.tooltip.update(this.tooltip.UPDATE_MULTILINESTRING);
+        }
         this.location.layer.editor.newShape();
     },
 
     startPolyline: function () {
+        this.tooltip.update(this.tooltip.ADD_LINESTRING);
         this.location.startPolyline();
     },
 
     startMarker: function () {
+        this.tooltip.update(this.tooltip.ADD_MARKER);
         this.location.startMarker();
     },
 
@@ -383,12 +389,12 @@ var LocationEditor = L.Evented.extend({
     },
 
     _drawStart: function (e) {
-        this._addTooltip();
+        // this._addTooltip();
     },
 
     _drawEnd: function (e) {
         this._cancelDraw();
-        this._removeTooltip();
+        this.tooltip.remove();
         if (!this.location.layer._events.hasOwnProperty('click')) {
             this.location.layer.on('click', this.onLayerClick, this);
         }
@@ -400,36 +406,34 @@ var LocationEditor = L.Evented.extend({
         if (e.layer.editor instanceof L.Editable.PolylineEditor) {
             var latlngs = e.layer._latlngs;
             if (latlngs.length >= 1) {
-                this.tooltip.innerHTML = 'Click on last point to finish line.';
+                this.tooltip.update(this.tooltip.FINISH_LINE);
             } else {
-                this.tooltip.innerHTML = 'Click to continue line.';
+                this.tooltip.update(this.tooltip.CONTINUE_LINE);
             }
         }
         if (e.layer.editor instanceof L.Editable.PolygonEditor) {
             var latlngs = e.layer._latlngs[0];
             if (latlngs.length < 2) {
-                this.tooltip.innerHTML = 'Click to continue adding vertices.';
+                this.tooltip.update(this.tooltip.CONTINUE_POLYGON);
             }
             if (latlngs.length >= 2 && e.layer.editor instanceof L.Editable.PolygonEditor) {
-                this.tooltip.innerHTML = 'Click to continue adding vertices.<br/>' +
-                    'Click last point to finish polygon.</span>';
+                this.tooltip.update(this.tooltip.FINISH_POLYGON);
             }
         }
     },
 
     _vertexDrag: function (e) {
-        this.tooltip.innerHTML = 'Release mouse to finish drawing.';
-        this._addTooltip();
+        this.tooltip.update(this.tooltip.VERTEX_DRAG);
     },
 
     _vertexDragend: function (e) {
-        this._removeTooltip();
+        this.tooltip.update(this.tooltip.EDIT_ENABLED);
     },
 
     // saving
 
     save: function () {
-        this._removeTooltip();
+        this.tooltip.remove();
         this.location._saveEdit();
         this._editing = false;
     },
@@ -486,7 +490,7 @@ var LocationEditor = L.Evented.extend({
             }
         });
         this.location._stopEdit();
-        this._removeTooltip();
+        this.tooltip.remove();
     },
 
     _enableEditToolbar: function (active = false) {
@@ -536,26 +540,6 @@ var LocationEditor = L.Evented.extend({
         this._removeEditControls();
         Styles.resetStyle(this.location.layer);
         this.location._reset();
-    },
-
-    // tooltips
-
-    _addTooltip: function () {
-        L.DomEvent.on(this.map, 'mousemove', this._moveTooltip, this);
-    },
-
-    _removeTooltip: function () {
-        this.tooltip.innerHTML = '';
-        this.tooltip.style.display = 'none';
-        L.DomEvent.off(this.map, 'mousemove', this._moveTooltip, this);
-    },
-
-    _moveTooltip: function (e) {
-        if (this.tooltip.style.display === 'none') {
-            this.tooltip.style.display = 'block';
-        }
-        this.tooltip.style.left = e.containerPoint.x + 'px';
-        this.tooltip.style.top = e.containerPoint.y + 'px';
     },
 
     // events
