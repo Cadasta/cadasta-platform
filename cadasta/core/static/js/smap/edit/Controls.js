@@ -228,8 +228,8 @@ var EditorToolbars = function () {
         addHooks: function () {
             this.editor.edit();
         },
-        enable: function () {
-            if (this.editor.hasEditableLayer()) {
+        enable: function (e) {
+            if (this.editor.hasEditableLayer() && !this.editor.deleting()) {
                 this.tooltip.innerHTML = 'Click cancel to undo changes. <br/>' +
                     'Drag handles, or marker to edit feature. <br/>' +
                     'Click on a handle to delete it.'
@@ -260,7 +260,7 @@ var EditorToolbars = function () {
             }
         },
         disable: function () {
-            if (this.editor.location._deleting && this.editor.location._deleted) return;
+            if (this.editor.deleting()) return;
             L.ToolbarAction.prototype.disable.call(this);
         }
     });

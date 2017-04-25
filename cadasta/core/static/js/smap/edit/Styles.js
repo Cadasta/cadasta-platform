@@ -5,7 +5,7 @@ Styles = {
             layer.setStyle({
                 fillColor: '#f06eaa',
                 color: '#f06eaa',
-                weight: 4,
+                weight: 5,
                 fillOpacity: 0.2,
                 fill: true,
                 opacity: 0.5,
@@ -29,9 +29,9 @@ Styles = {
                 fillColor: '#f06eaa',
                 dashArray: '10, 10',
                 color: '#fe57a1',
-                weight: 4,
-                opacity: 0.5,
-                fillOpacity: 0.2,
+                weight: 5,
+                opacity: 0.6,
+                fillOpacity: 0.1,
                 clickable: true
             });
         }
@@ -39,8 +39,8 @@ Styles = {
             layer.setStyle({
                 dashArray: '10, 10',
                 color: '#fe57a1',
-                weight: 4,
-                opacity: 0.5,
+                weight: 5,
+                opacity: 0.6,
             });
         }
     },
@@ -69,9 +69,9 @@ Styles = {
                 fillColor: 'blue',
                 stroke: true,
                 fill: true,
-                strokeWidth: 2,
                 fillOpacity: 0.2,
-                opacity: 1
+                opacity: 1,
+                dashArray: null,
             });
         }
         if (layer instanceof L.Polyline) {
@@ -79,8 +79,8 @@ Styles = {
                 weight: 2,
                 color: 'blue',
                 stroke: true,
-                strokeWidth: 2,
                 opacity: 1,
+                dashArray: null,
             });
         }
     }

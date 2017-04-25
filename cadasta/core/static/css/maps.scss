@@ -153,7 +153,7 @@ label[for="id_extents-location"] {
   background-position: -122px -2px;
 }
 
-.edit-action span, .delete-action span {
+.edit-action span, .delete-action span   {
   color: #464646 !important;
 }
 
@@ -170,31 +170,30 @@ label[for="id_extents-location"] {
 }
 
 .editor-tooltip {
-  display: none;
+  display: inline;
   position: absolute;
   background: #666;
   color: white;
   opacity: 0.8;
   padding: 5px;
-  border: 1px dashed #999;
+  border: 1px solid #999;
   font-family: sans-serif;
   line-height: 15px;
   font-size: 12px;
   z-index: 1000;
-  overflow: hidden;
-  border-radius: 4px;
+  overflow: visible;
+  border-radius: 5px;
   margin-left: 20px;
   margin-top: -30px;
   white-space: nowrap;
 }
 
-// .editor-tooltip::before {
-// 	border-right: 6px solid black;
-// 	border-right-color: rgba(0, 0, 0, 0.5);
-// 	border-top: 6px solid transparent;
-// 	border-bottom: 6px solid transparent;
-// 	content: '';
-// 	position: absolute;
-// 	top: 7px;
-// 	left: -7px;
-// }
+.editor-tooltip:before {
+	border-right: 7px solid #666;
+	border-top: 7px solid transparent;
+	border-bottom: 7px solid transparent;
+	content: '';
+	position: absolute;
+	top: 7px;
+	left: -6px;
+}

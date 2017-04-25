@@ -23,7 +23,7 @@ var hash = new L.Hash(map);
 
 // handle location form navigation
 
-$(document).on('click', 'a, button[type="submit"]', function (e) {
+$(document).on('click', 'a', function (e) {
     if (editor.dirty() && (editor.editing() || editor.deleting())) {
         if (e.currentTarget.hash === '#/search') return;
         if ((e.currentTarget.hash && e.currentTarget.hash != window.location.hash) || e.currentTarget.form) {

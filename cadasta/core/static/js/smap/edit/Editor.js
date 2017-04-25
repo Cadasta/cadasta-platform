@@ -47,6 +47,7 @@ var Location = L.Editable.extend({
 
     _undoEdit: function () {
         this._undo();
+        this.layer._dirty = false;
     },
 
     _undo: function () {
