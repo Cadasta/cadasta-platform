@@ -24,6 +24,7 @@ var CreateRoutes = function (map) {
                 'display_modal': false,
                 'active_sidebar': 'map',
             });
+            map.locationEditor.fire('route:map');
         });
 
     /*********************

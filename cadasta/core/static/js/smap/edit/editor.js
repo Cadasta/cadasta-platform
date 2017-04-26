@@ -47,21 +47,23 @@ var Location = L.Editable.extend({
 
     _undoEdit: function () {
         this._undo();
-        this.layer._dirty = false;
+        if (this.layer) this.layer._dirty = false;
     },
 
     _undo: function () {
         if (this.layer) {
             this.layer.disableEdit();
             latLngs = this._undoBuffer[this.layer._leaflet_id];
-            if (this.layer instanceof L.Marker) {
-                this.layer.setLatLng(latLngs.latlngs);
-                this.map.geojsonLayer.removeLayer(this.layer);
-                this.map.geojsonLayer.addLayer(this.layer);
-            } else {
-                this.layer.setLatLngs(latLngs.latlngs);
+            if (latLngs && latLngs.latlngs) {
+                if (this.layer instanceof L.Marker) {
+                    this.layer.setLatLng(latLngs.latlngs);
+                    this.map.geojsonLayer.removeLayer(this.layer);
+                    this.map.geojsonLayer.addLayer(this.layer);
+                } else {
+                    this.layer.setLatLngs(latLngs.latlngs);
+                }
+                this._clearBackup();
             }
-            this._clearBackup();
         }
     },
 
@@ -177,6 +179,16 @@ var Location = L.Editable.extend({
         }, this);
     },
 
+    _findLayer: function (fid) {
+        var layer = null;
+        this.map.geojsonLayer.eachLayer(function (l) {
+            if (l.feature.id === fid) {
+                layer = l;
+            }
+        });
+        return layer;
+    },
+
     _backupLayer: function () {
         this._undoBuffer = {};
         if (this.layer instanceof L.Polyline || this.layer instanceof L.Polygon || this.layer instanceof L.Rectangle) {
@@ -222,6 +234,7 @@ var LocationEditor = L.Evented.extend({
 
         this.tooltip = new Tooltip(map);
 
+        this._addDeleteEvent();
         this._addRouterEvents();
         this._addEditableEvents();
     },
@@ -327,6 +340,13 @@ var LocationEditor = L.Evented.extend({
             return;
         }
         this.location._setDeleted(e);
+    },
+
+    _removeLayer: function () {
+        var hash_path = window.location.hash.slice(1) || '/';
+        var fid = hash_path.split('/')[3];
+        var layer = this.location._findLayer(fid);
+        if (layer) layer.remove();
     },
 
     // new location functions
@@ -445,29 +465,19 @@ var LocationEditor = L.Evented.extend({
 
     // editor toolbars
 
-    _findLayer: function (fid) {
-        var layer = null;
-        this.map.geojsonLayer.eachLayer(function (l) {
-            if (l.feature.id === fid) {
-                layer = l;
-            }
-        });
-        return layer;
-    },
-
     _setUpEditor: function (e) {
         if (!this.location.layer) {
             var hash_path = window.location.hash.slice(1) || '/';
             var fid = hash_path.split('/')[3];
             if (this.map.geojsonLayer.getLayers().length > 0) {
-                var layer = this._findLayer(fid);
+                var layer = this.location._findLayer(fid);
                 this.location.layer = layer;
                 Styles.setSelectedStyle(this.location.layer);
                 this.edit();
                 this._addEditControls();
             } else {
                 this.map.on('endtileload', function () {
-                    var layer = this._findLayer(fid);
+                    var layer = this.location._findLayer(fid);
                     this.location.layer = layer;
                     Styles.setSelectedStyle(this.location.layer);
                     this.edit();
@@ -549,12 +559,17 @@ var LocationEditor = L.Evented.extend({
 
     // events
 
+    _addDeleteEvent: function () {
+        this.on('location:delete', this._removeLayer, this);
+    },
+
     _addRouterEvents: function () {
         // router events
         this.on('route:location:edit', this._setUpEditor, this);
         this.on('route:location:new', this._addNew, this);
         this.on('route:location:detail', this._removeEditControls, this);
         this.on('route:overview', this._resetView, this);
+        this.on('route:map', this._resetView, this);
     },
 
     _addEditableEvents: function () {

@@ -43,6 +43,10 @@ $(document).on('click', 'a', function (e) {
     }
 });
 
+$(document).on('click', '#delete-location', function (e) {
+    editor.fire('location:delete');
+})
+
 $(document).on('click', 'button[name="submit-button"]', function (e) {
     if (editor.dirty()) {
         e.preventDefault();
