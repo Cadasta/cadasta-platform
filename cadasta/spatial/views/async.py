@@ -137,6 +137,7 @@ class LocationDetail(core_mixins.LoginPermissionRequiredMixin,
 
 class LocationsAdd(core_mixins.LoginPermissionRequiredMixin,
                    mixins.SpatialQuerySetMixin,
+                   core_mixins.FormErrorMixin,
                    organization_mixins.ProjectAdminCheckMixin,
                    generic.CreateView):
     form_class = forms.LocationForm
@@ -186,6 +187,7 @@ class LocationsAdd(core_mixins.LoginPermissionRequiredMixin,
 class LocationEdit(core_mixins.LoginPermissionRequiredMixin,
                    core_mixins.SpatialUnitCoords,
                    mixins.SpatialUnitObjectMixin,
+                   core_mixins.FormErrorMixin,
                    organization_mixins.ProjectAdminCheckMixin,
                    generic.UpdateView):
     template_name = 'spatial/location_edit.html'

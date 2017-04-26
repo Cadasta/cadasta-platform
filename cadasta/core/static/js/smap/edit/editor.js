@@ -48,6 +48,7 @@ var Location = L.Editable.extend({
     _undoEdit: function () {
         this._undo();
         if (this.layer) this.layer._dirty = false;
+        this._deleting = this._deleted = false;
     },
 
     _undo: function () {
@@ -249,7 +250,7 @@ var LocationEditor = L.Evented.extend({
             return;
         }
         if (!this.editing()) {
-            window.location.href = "#/" + feature.properties.url;
+            window.location.href = "#/" + feature.properties.url + '/';
         }
         this.setEditable(feature, layer);
     },
