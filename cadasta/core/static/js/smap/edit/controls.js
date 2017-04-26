@@ -93,7 +93,6 @@ var EditorToolbars = function () {
     var PolygonControl = DrawControl.extend({
         options: {
             toolbarIcon: {
-                // html: '<span class="draw-polygon">▰</span>',
                 tooltip: 'Draw a polygon',
                 className: 'cadasta-toolbar draw-polygon',
             },
@@ -103,14 +102,14 @@ var EditorToolbars = function () {
             }),
             type: L.Editable.PolygonEditor,
         },
-        addHooks: function () {
+        addHooks: function (e) {
             var layer = this.editor.location.layer;
             if (layer) {
                 var currentEditor = layer.editor;
                 if (currentEditor) {
                     if (currentEditor.enabled() &&
                         currentEditor instanceof this.options.type) {
-                        this.editor.addMulti(this.options.type);
+                        this.editor.addMulti(e, this.options.type);
                     }
                 } else {
                     this.editor.startPolygon();

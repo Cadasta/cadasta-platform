@@ -451,7 +451,7 @@ var RouterMixins = {
 
         $(form).submit(function (e) {
             e.preventDefault();
-            var target = e.originalEvent || e.originalTarget;
+            var target = e.originalEvent || e.originalTarget || e.target;
             var formaction = $('.submit-btn', target.target).attr('formaction');
             $('.submit-btn', target.target).prop({ 'disabled': true });
 

@@ -355,7 +355,7 @@ var LocationEditor = L.Evented.extend({
         this.location.startPolygon();
     },
 
-    addMulti: function (type) {
+    addMulti: function (e, type) {
         if (type instanceof L.Editable.PolygonEditor) {
             this.tooltip.update(this.tooltip.UPDATE_MULTIPOLYGON);
         } else {
@@ -386,6 +386,11 @@ var LocationEditor = L.Evented.extend({
 
     cancelDrawing: function () {
         this.location.stopDrawing();
+    },
+
+    dispose: function () {
+        this.cancelEdit();
+        this._resetView();
     },
 
     _drawStart: function (e) {

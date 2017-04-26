@@ -26,20 +26,35 @@ var hash = new L.Hash(map);
 $(document).on('click', 'a', function (e) {
     if (editor.dirty() && (editor.editing() || editor.deleting())) {
         if (e.currentTarget.hash === '#/search') return;
-        if ((e.currentTarget.hash && e.currentTarget.hash != window.location.hash) || e.currentTarget.form) {
-            var go = confirm('Your form has unsaved edits. Do you want to continue ? ');
-            if (go) {
-                editor.location._undoEdit();
-                editor._resetView();
-            } else {
-                e.preventDefault();
-            }
+        if (e.currentTarget.hash === '#archive_confirm') return;
+        var path = e.currentTarget.hash || e.currentTarget.href;
+        if ((path && path != window.location.hash) || e.currentTarget.form) {
+            e.preventDefault();
+            var modal = $('#unsaved_edits').modal({
+                keyboard: false,
+                background: true,
+            }, 'show');
+            modal.one('click', '.forget-changes', function (e) {
+                editor.dispose();
+                modal.hide();
+                window.location.href = path;
+            });
         }
     }
 });
 
-$(window).on('beforeunload', this, function (e) {
-    if (editor.dirty() && editor.editing()) {
-        return "Your form has unsaved changes."
+$(document).on('click', 'button[name="submit-button"]', function (e) {
+    if (editor.dirty()) {
+        e.preventDefault();
+        var $form = $('#location-wizard');
+        var modal = $('#unsaved_edits').modal({
+            keyboard: false,
+            background: true,
+        }, 'show');
+        modal.one('click', '.forget-changes', function (e) {
+            editor.cancelEdit();
+            $form.trigger('submit');
+            modal.hide();
+        });
     }
 });
