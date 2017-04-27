@@ -202,10 +202,12 @@ textarea.form-control {
 
 .file-well {
   padding: 10px 0 10px 10px;
+  word-break: break-all;
 }
+
 .s3-buckets {
-  width: 90%;
-  max-width: 90%;
+  width: 94%;
+  max-width: 94%;
 }
 
 .file-input, #id_select_file-file { // browse for file
@@ -213,6 +215,11 @@ textarea.form-control {
   height: 34px;
   padding: 0;
   cursor: pointer;
+  max-width: 100%;
+}
+
+.file-remove {
+  white-space: nowrap;
 }
 
 .spacing-lg { // for radio or checkboxes needing more space between items

@@ -506,8 +506,6 @@ img.org-logo, img#org-logo {
 .thumb-60 {
   width: 60px;
   height: 60px;
-  float: left;
-  margin-right: 10px;
 }
 
 .thumb-128 {
@@ -700,6 +698,10 @@ h1 .label {
 
 .text-wrap .entity { // map popovers 
   font-size: 11px;
+}
+
+.name-break {
+  word-break: break-all;
 }
 
 .highlight { // for emphasis for inline text

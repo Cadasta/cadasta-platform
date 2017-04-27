@@ -16,10 +16,10 @@
   {% for resource in resource_list %}
     <tr class="linked linked-resource" data-link-url="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}">
       <td>
-        <div class="resource-60">
+        <div class="media-left">
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
-        <div class="resource-text">
+        <div class="media-body resource-text">
           <p>
             <a href="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}"><strong>{{ resource.name }}</strong></a>
             {% if resource.archived %}
