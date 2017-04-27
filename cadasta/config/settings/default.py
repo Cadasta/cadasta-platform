@@ -71,6 +71,7 @@ INSTALLED_APPS = (
     'sass_processor',
     'simple_history',
     'jsonattrs',
+    'compressor',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -299,6 +300,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'sass_processor.finders.CssFinder',
+    'compressor.finders.CompressorFinder',
 )
 
 JSONATTRS_SCHEMA_SELECTORS = {
