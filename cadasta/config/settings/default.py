@@ -253,18 +253,18 @@ LEAFLET_CONFIG = {
             'js': '/static/leaflet/draw/leaflet.draw.js'
         },
         'groupedlayercontrol': {
-            'js': '/static/js/leaflet.groupedlayercontrol.min.js',
+            'js': '/static/js/vendor/leaflet.groupedlayercontrol.min.js',
             'css': '/static/css/leaflet.groupedlayercontrol.min.css'
         },
         'markercluster': {
-            'js': '/static/js/leaflet.markercluster.js',
+            'js': '/static/js/vendor/leaflet.markercluster.js',
             'css': [
                 '/static/css/MarkerCluster.css',
                 '/static/css/MarkerCluster.Default.css'
             ]
         },
         'deflate': {
-            'js': '/static/js/L.Map.Deflate.js'
+            'js': '/static/js/vendor/L.Map.Deflate.js'
         }
     }
 }

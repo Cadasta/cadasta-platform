@@ -61,7 +61,7 @@ var Location = L.Editable.extend({
         if (this.layer) {
             this.layer.disableEdit();
             var latLngs_dict = cancel_form ? this._original_state : this._undoBuffer;
-            latLngs = latLngs_dict[this.layer._leaflet_id]
+            latLngs = latLngs_dict[this.layer._leaflet_id];
 
             if (latLngs && latLngs.latlngs) {
                 if (this.layer instanceof L.Marker) {
@@ -79,7 +79,7 @@ var Location = L.Editable.extend({
             }
 
             if (cancel_form) {
-                this._original_state = {}
+                this._original_state = {};
             }
         }
     },
@@ -186,9 +186,9 @@ var Location = L.Editable.extend({
         if (layer instanceof L.Polygon || layer instanceof L.Rectangle || layer instanceof L.Polyline) {
             // check if a feature has been drawn
             if (!layer.getBounds().isValid()) return false;
-            var bounds = layer.getBounds(),
-                nw = bounds.getNorthWest(),
-                se = bounds.getSouthEast();
+            var bounds = layer.getBounds();
+            var nw = bounds.getNorthWest();
+            var se = bounds.getSouthEast();
             if (nw.lat === se.lat && nw.lng === se.lng) {
                 this.featuresLayer.removeLayer(layer);
                 return false;
@@ -231,7 +231,7 @@ var Location = L.Editable.extend({
             if (initial_edit && Object.keys(this._original_state).length === 0) {
                 this._original_state[this.layer._leaflet_id] = {
                     latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
-                }
+                };
             }
         }
         if (this.layer instanceof L.Marker) {
@@ -241,7 +241,7 @@ var Location = L.Editable.extend({
             if (initial_edit && Object.keys(this._original_state).length === 0) {
                 this._original_state[this.layer._leaflet_id] = {
                     latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLngs()),
-                }
+                };
             }
         }
     },
@@ -549,7 +549,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     _addEditControls: function () {
-        const map = this.map;
+        var map = this.map;
         this.toolbars.forEach(function (toolbar) {
             toolbar.addTo(map);
         });
@@ -557,7 +557,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     _removeEditControls: function () {
-        const map = this.map;
+        var map = this.map;
         this.toolbars.forEach(function (toolbar) {
             if (toolbar) {
                 map.removeControl(toolbar);
@@ -568,7 +568,8 @@ var LocationEditor = L.Evented.extend({
         this.tooltip.remove();
     },
 
-    _enableEditToolbar: function (active = false) {
+    _enableEditToolbar: function (active) {
+        active = active || false;
         var editLink = $('a.edit-action').get(0);
         var deleteLink = $('a.delete-action').get(0);
         editLink.href = window.location.href;
@@ -580,7 +581,8 @@ var LocationEditor = L.Evented.extend({
         $('span#edit, span#delete').removeClass('smap-edit-disable');
     },
 
-    _disableEditToolbar: function (deactivate = false) {
+    _disableEditToolbar: function (deactivate) {
+        deactivate = deactivate || false;
         var edit = $('ul.leaflet-smap-edit a').prop('disabled', 'disabled');
         $('span#edit, span#delete').addClass('smap-edit-disable');
         if (deactivate) {
@@ -590,7 +592,8 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
-    _cancelEdit: function (reset = true) {
+    _cancelEdit: function (reset) {
+        reset = reset || true;
         var cancelEdit = $('a.cancel-edit'),
             cancelDelete = $('a.cancel-delete');
         if (cancelEdit.is(':visible')) {

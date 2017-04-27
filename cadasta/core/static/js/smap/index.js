@@ -1,6 +1,6 @@
 var map = L.map('mapid');
 var editor = new LocationEditor(map);
-var sr = new SimpleRouter(map);
+var sr = SimpleRouter(map);
 sr.router();
 
 /*****************

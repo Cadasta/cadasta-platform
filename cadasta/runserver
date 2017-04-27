@@ -16,4 +16,4 @@ then
     export DJANGO_SETTINGS_MODULE=config.settings.dev_debug
 fi
 
-exec ./manage.py runserver 0.0.0.0:8000
+exec ./manage.py gruntserver 0.0.0.0:8000
