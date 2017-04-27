@@ -289,10 +289,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 SASS_PROCESSOR_INCLUDE_DIRS = (
     os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
 )
+# Required for bootstrap-sass
+# https://github.com/jrief/django-sass-processor
+SASS_PRECISION = 8
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 MEDIA_URL = '/media/'
