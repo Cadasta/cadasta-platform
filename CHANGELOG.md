@@ -1,5 +1,51 @@
 # Change Log
 
+## [v1.7.4-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.4-alpha.1) (2017-04-24)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.3-alpha.3...v1.7.4-alpha.1)
+
+**Fixed bugs:**
+
+- Added an Org on Demo and Don't have permissions to access members [\#1405](https://github.com/Cadasta/cadasta-platform/issues/1405)
+- Duplicate Project Name Slug Causes Server Error [\#1396](https://github.com/Cadasta/cadasta-platform/issues/1396)
+- Deleted resources are included in the project data download [\#1380](https://github.com/Cadasta/cadasta-platform/issues/1380)
+- Remove language around Standard and Minimal Questionnaire \(or questionnaires in general\) [\#1365](https://github.com/Cadasta/cadasta-platform/issues/1365)
+- When trying to delete party, the 'x' button on top right of delete confirmation box is not working [\#1360](https://github.com/Cadasta/cadasta-platform/issues/1360)
+- Resource detail different than other detail pages [\#1342](https://github.com/Cadasta/cadasta-platform/issues/1342)
+- Resources with the same filename cannot be exported correctly [\#1303](https://github.com/Cadasta/cadasta-platform/issues/1303)
+- A resource with the filename "resources.xlsx" cannot be exported correctly [\#1302](https://github.com/Cadasta/cadasta-platform/issues/1302)
+- Number of project listed on org index includes active AND archived projects [\#1270](https://github.com/Cadasta/cadasta-platform/issues/1270)
+- Formatting issue with dataTables and lots of resources [\#1259](https://github.com/Cadasta/cadasta-platform/issues/1259)
+- Review location geometry creation via imports and ODK [\#1254](https://github.com/Cadasta/cadasta-platform/issues/1254)
+- Questionnaires with select\_one questions MUST have default or be required [\#592](https://github.com/Cadasta/cadasta-platform/issues/592)
+
+**Closed issues:**
+
+- wrote up with wrong account [\#1411](https://github.com/Cadasta/cadasta-platform/issues/1411)
+- Change cluster tolerance \(increase the threshold that clusters require to bring in points\) [\#1084](https://github.com/Cadasta/cadasta-platform/issues/1084)
+- Rework "Add location" and "More actions" button in project and org wrappers  [\#1027](https://github.com/Cadasta/cadasta-platform/issues/1027)
+- Add platform tagline to right of logo [\#975](https://github.com/Cadasta/cadasta-platform/issues/975)
+- Project Creation Wizard Wireframes [\#954](https://github.com/Cadasta/cadasta-platform/issues/954)
+
+**Merged pull requests:**
+
+- Create Attributes with correct schema selector [\#1417](https://github.com/Cadasta/cadasta-platform/pull/1417) ([oliverroick](https://github.com/oliverroick))
+- Modified questionnaire text  [\#1410](https://github.com/Cadasta/cadasta-platform/pull/1410) ([clash99](https://github.com/clash99))
+- Clearing server-side validation errors upon submit [\#1407](https://github.com/Cadasta/cadasta-platform/pull/1407) ([clash99](https://github.com/clash99))
+- Update changelog for v1.7.3 [\#1406](https://github.com/Cadasta/cadasta-platform/pull/1406) ([amplifi](https://github.com/amplifi))
+- CSS adjustments for language dropdown on responsive screen [\#1404](https://github.com/Cadasta/cadasta-platform/pull/1404) ([clash99](https://github.com/clash99))
+- Async router and functionality added to SMap. Map position coords now stored in URL. [\#1403](https://github.com/Cadasta/cadasta-platform/pull/1403) ([linzjax](https://github.com/linzjax))
+- Upgrade django-skivvy and django-buckets [\#1402](https://github.com/Cadasta/cadasta-platform/pull/1402) ([oliverroick](https://github.com/oliverroick))
+- Fixes \#592 -- Bump jsonattrs; small style fixes [\#1401](https://github.com/Cadasta/cadasta-platform/pull/1401) ([oliverroick](https://github.com/oliverroick))
+- Reworked data tables footer [\#1391](https://github.com/Cadasta/cadasta-platform/pull/1391) ([clash99](https://github.com/clash99))
+- Adding header to resource detail [\#1390](https://github.com/Cadasta/cadasta-platform/pull/1390) ([clash99](https://github.com/clash99))
+- Bugfix/\#1380: Archived resources removed from project data download. [\#1385](https://github.com/Cadasta/cadasta-platform/pull/1385) ([khantaalaman](https://github.com/khantaalaman))
+- Improvements to questionnaires handling [\#1372](https://github.com/Cadasta/cadasta-platform/pull/1372) ([oliverroick](https://github.com/oliverroick))
+- Added clearfix to page title to avoid overlapping buttons [\#1371](https://github.com/Cadasta/cadasta-platform/pull/1371) ([clash99](https://github.com/clash99))
+- Bugfix \#1360: Fix closing of party-delete modal. [\#1364](https://github.com/Cadasta/cadasta-platform/pull/1364) ([khantaalaman](https://github.com/khantaalaman))
+- Bugfix \#1270: Fix the property `num\_projects` of an organization. [\#1358](https://github.com/Cadasta/cadasta-platform/pull/1358) ([niharika1995](https://github.com/niharika1995))
+- Rename resources to avoid deletion during download process [\#1317](https://github.com/Cadasta/cadasta-platform/pull/1317) ([Sanny26](https://github.com/Sanny26))
+- 'All data' export option: Remove records that occur twice. [\#1295](https://github.com/Cadasta/cadasta-platform/pull/1295) ([Sanny26](https://github.com/Sanny26))
+
 ## [v1.7.3](https://github.com/Cadasta/cadasta-platform/tree/v1.7.3) (2017-04-10)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.3-alpha.3...v1.7.3)
 
