@@ -417,6 +417,11 @@ class ShapeTest(UserTestCase, TestCase):
                      'MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),'
                      '((15 5, 40 10, 10 20, 5 10, 15 5)))',
             attributes={'geom_type': 'multipolygon'})
+        su7 = SpatialUnitFactory.create(
+            project=project,
+            geometry='SRID=4326;'
+                     'POLYGON EMPTY',
+            attributes={'geom_type': 'empty'})
 
         dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file4')
         ds = exporter.create_datasource(dst_dir)
@@ -430,6 +435,9 @@ class ShapeTest(UserTestCase, TestCase):
             feature = layer.GetNextFeature()
             assert geom.equals(GEOSGeometry(feature.geometry().ExportToWkt()))
             assert feature.GetFieldAsString('id') == su.id
+
+            # Ensuring empty polygons are not added to shape
+            assert su.id != su7.id
         ds.Destroy()
 
         with open(filename) as csvfile:
@@ -449,6 +457,8 @@ class ShapeTest(UserTestCase, TestCase):
                     assert row == [su5.id, su5.type, 'multilinestring']
                 if i == 6:
                     assert row == [su6.id, su6.type, 'multipolygon']
+                if i == 7:
+                    assert row == [su7.id, su7.type, 'empty']
 
         # remove this so other tests pass
         os.remove(filename)
