@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 21:47+0000\n"
+"POT-Creation-Date: 2017-04-28 18:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Language-Team: Swahili (https://www.transifex.com/cadasta/teams/61422/sw/)\n"
 "MIME-Version: 1.0\n"
@@ -16,6 +16,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sw\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/static/js/dataTables.selectFiltering.js:11
+msgid "Active"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:12
+msgid "Archived"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:13
+msgid "All"
+msgstr ""
 
 #: core/static/js/map_utils.js:10
 msgid "Zoom in"
@@ -127,10 +139,10 @@ msgid ""
 "characters."
 msgstr ""
 
-#: core/static/js/parsleyAddValidator.js:27
+#: core/static/js/parsleyAddValidator.js:26
 msgid "Your password cannot contain your username."
 msgstr ""
 
-#: core/static/js/parsleyAddValidator.js:37
+#: core/static/js/parsleyAddValidator.js:36
 msgid "Your password cannot contain your email mailbox name."
 msgstr ""

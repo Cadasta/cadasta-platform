@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 21:47+0000\n"
+"POT-Creation-Date: 2017-04-28 18:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Emir Hartato <emir.hartato@gmail.com>, 2016\n"
 "Language-Team: Indonesian (https://www.transifex.com/cadasta/teams/61422/id/)\n"
@@ -17,6 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: core/static/js/dataTables.selectFiltering.js:11
+msgid "Active"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:12
+msgid "Archived"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:13
+msgid "All"
+msgstr ""
 
 #: core/static/js/map_utils.js:10
 msgid "Zoom in"
@@ -130,10 +142,10 @@ msgstr ""
 "password Anda harus berisi minimal 3 hal berikut: karakter huruf kecil, "
 "karakter huruf besar, karakter khusus, dan / atau karakter numerik."
 
-#: core/static/js/parsleyAddValidator.js:27
+#: core/static/js/parsleyAddValidator.js:26
 msgid "Your password cannot contain your username."
 msgstr "Sandi Anda tidak dapat berisi nama pengguna."
 
-#: core/static/js/parsleyAddValidator.js:37
+#: core/static/js/parsleyAddValidator.js:36
 msgid "Your password cannot contain your email mailbox name."
 msgstr "password Anda tidak bisa berisi nama kotak surat email Anda."
