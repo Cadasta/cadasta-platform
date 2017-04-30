@@ -170,9 +170,13 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
     history = HistoricalRecords()
 
     def __repr__(self):
-        repr_string = ('<Question id={obj.id} name={obj.name}'
-                       ' questionnaire={obj.questionnaire.id}'
-                       ' question_group={obj.question_group.id}>')
+        repr_string = (
+            '<Question id={obj.id} name={obj.name}'
+            ' questionnaire={obj.questionnaire.id}'
+            ' question_group=' +
+            ('{obj.question_group.id}' if self.question_group else 'None') +
+            '>'
+        )
         return repr_string.format(obj=self)
 
     @property
