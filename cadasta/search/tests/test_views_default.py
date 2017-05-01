@@ -72,7 +72,8 @@ class SearchTest(ViewTestCase, UserTestCase, TestCase):
                                                is_allowed_add_location=True,
                                                is_allowed_add_resource=True,
                                                is_project_member=True,
-                                               is_allowed_import=True)
+                                               is_allowed_import=True,
+                                               is_allowed_download=True)
         assert response.content == expected_content
 
     def test_get_from_non_existent_project(self):

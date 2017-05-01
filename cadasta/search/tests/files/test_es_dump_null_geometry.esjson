@@ -1,0 +1,2 @@
+{"index": {"_type": "spatial"}}
+{"id": "ID0", "type": "PA", "geometry": null, "attributes": {"value": "{\"quality\": \"point\", \"infrastructure\": [\"food\", \"electricity\"]}"}}

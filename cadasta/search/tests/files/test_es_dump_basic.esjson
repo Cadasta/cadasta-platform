@@ -1,0 +1,8 @@
+{"index": {"_type": "spatial"}}
+{"id": "ID0", "type": "PA", "geometry": {"value": "0101000020E6100000000000000000F03F000000000000F03F"}, "attributes": {"value": "{\"quality\": \"point\", \"infrastructure\": [\"food\", \"electricity\"]}"}}
+{"index": {"_type": "party"}}
+{"id": "ID1", "type": "IN", "name": "Cadastanaut", "attributes": {"value": "{\"gender\": \"m\", \"homeowner\": \"yes\", \"dob\": \"1951-05-05\"}"}, "tenure_id": null}
+{"index": {"_type": "party"}}
+{"id": "ID1", "type": "IN", "name": "Cadastanaut", "attributes": {"value": "{\"gender\": \"m\", \"homeowner\": \"yes\", \"dob\": \"1951-05-05\"}"}, "tenure_id": "ID2", "tenure_partyid": "ID1", "spatial_unit_id": "ID0", "tenure_type_id": "CU", "tenure_attributes": {"value": "{\"notes\": \"The best relationship!\"}"}}
+{"index": {"_type": "resource"}}
+{"id": "ID3", "name": "Goat", "description": "Let's pretend there's a description.", "file": "https://example.com/text.csv", "original_file": "baby_goat.jpeg", "mime_type": "text/csv", "archived": false}

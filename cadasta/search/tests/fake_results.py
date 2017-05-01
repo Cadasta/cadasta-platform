@@ -50,7 +50,8 @@ def get_fake_es_api_results(proj, su, party, tenure_rel, resource):
                         "id": su.id,
                         "geometry": {
                             "type": "geometry",
-                            "value": "SOMEVALUE",
+                            "value": ("0101000020E6100000000000000000F03F"
+                                      "000000000000F03F"),
                         },
                         "type": "AP",
                         "attributes": {

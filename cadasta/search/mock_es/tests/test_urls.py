@@ -15,7 +15,7 @@ class MockEsUrlsTest(TestCase):
         assert actual == expected
 
         resolved = resolve('/project-123abc/_search/')
-        assert resolved.func.__name__ == views.EsAllTypes.__name__
+        assert resolved.func.__name__ == views.AllEsTypes.__name__
         assert resolved.kwargs['projectid'] == '123abc'
 
     def test_type(self):
@@ -28,6 +28,18 @@ class MockEsUrlsTest(TestCase):
         assert actual == expected
 
         resolved = resolve('/project-foo/bar/_search/')
-        assert resolved.func.__name__ == views.EsSingleType.__name__
+        assert resolved.func.__name__ == views.SingleEsType.__name__
         assert resolved.kwargs['projectid'] == 'foo'
         assert resolved.kwargs['type'] == 'bar'
+
+    def test_dump_all(self):
+        actual = reverse('mock_es:dump_all',
+                         kwargs={
+                            'projectid': '123abc',
+                         })
+        expected = '/project-123abc/_data/'
+        assert actual == expected
+
+        resolved = resolve('/project-123abc/_data/')
+        assert resolved.func.__name__ == views.DumpAllEsTypes.__name__
+        assert resolved.kwargs['projectid'] == '123abc'

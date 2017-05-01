@@ -1,0 +1,4 @@
+{"index": {"_type": "resource"}}
+{"id": "ID3", "name": "File 1", "description": "Description 1", "file": "https://example.com/text1.csv", "original_file": "text.csv", "mime_type": "text/csv", "archived": false}
+{"index": {"_type": "resource"}}
+{"id": "ID4", "name": "File 2", "description": "Description 2", "file": "https://example.com/text2.csv", "original_file": "text.csv", "mime_type": "text/csv", "archived": false}
