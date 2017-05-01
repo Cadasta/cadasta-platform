@@ -5,20 +5,16 @@ from . import views
 urls = [
     url(
         r'^_search/$',
-        views.AllEsTypes.as_view(),
-        name='all'),
-    url(
-        r'^(?P<type>[-\w]+)/_search/$',
-        views.SingleEsType.as_view(),
-        name='type'),
+        views.Search.as_view(),
+        name='search'),
     url(
         r'^_data/$',
-        views.DumpAllEsTypes.as_view(),
-        name='dump_all'),
+        views.Dump.as_view(),
+        name='dump'),
 ]
 
 urlpatterns = [
     url(
-        r'^project-(?P<projectid>[-\w]+)/',
+        r'^project-(?P<projectid>[-\w]+)/(?P<type>[-\w,]+)/',
         include(urls, namespace='mock_es')),
 ]

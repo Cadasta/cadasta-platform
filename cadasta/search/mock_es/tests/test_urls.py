@@ -6,40 +6,30 @@ from .. import views
 
 class MockEsUrlsTest(TestCase):
 
-    def test_all(self):
-        actual = reverse('mock_es:all',
+    def test_search(self):
+        actual = reverse('mock_es:search',
                          kwargs={
                             'projectid': '123abc',
+                            'type': '456def',
                          })
-        expected = '/project-123abc/_search/'
+        expected = '/project-123abc/456def/_search/'
         assert actual == expected
 
-        resolved = resolve('/project-123abc/_search/')
-        assert resolved.func.__name__ == views.AllEsTypes.__name__
+        resolved = resolve('/project-123abc/456def/_search/')
+        assert resolved.func.__name__ == views.Search.__name__
         assert resolved.kwargs['projectid'] == '123abc'
+        assert resolved.kwargs['type'] == '456def'
 
-    def test_type(self):
-        actual = reverse('mock_es:type',
-                         kwargs={
-                            'projectid': 'foo',
-                            'type': 'bar',
-                         })
-        expected = '/project-foo/bar/_search/'
-        assert actual == expected
-
-        resolved = resolve('/project-foo/bar/_search/')
-        assert resolved.func.__name__ == views.SingleEsType.__name__
-        assert resolved.kwargs['projectid'] == 'foo'
-        assert resolved.kwargs['type'] == 'bar'
-
-    def test_dump_all(self):
-        actual = reverse('mock_es:dump_all',
+    def test_dump(self):
+        actual = reverse('mock_es:dump',
                          kwargs={
                             'projectid': '123abc',
+                            'type': '456def',
                          })
-        expected = '/project-123abc/_data/'
+        expected = '/project-123abc/456def/_data/'
         assert actual == expected
 
-        resolved = resolve('/project-123abc/_data/')
-        assert resolved.func.__name__ == views.DumpAllEsTypes.__name__
+        resolved = resolve('/project-123abc/456def/_data/')
+        assert resolved.func.__name__ == views.Dump.__name__
         assert resolved.kwargs['projectid'] == '123abc'
+        assert resolved.kwargs['type'] == '456def'

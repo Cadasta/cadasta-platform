@@ -23,6 +23,7 @@ from spatial.models import SpatialUnit
 from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from resources.models import Resource
+from ..parser import parse_query
 from ..export.all import AllExporter
 from ..export.resource import ResourceExporter
 from ..export.shape import ShapeExporter
@@ -93,31 +94,36 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
         """Queries the ES API based on the UI query string and returns the
         raw ES JSON results."""
         body = {
-            'query': {
-                'simple_query_string': {
-                    'default_operator': 'and',
-                    'query': query,
-                }
-            },
+            'query': parse_query(query),
             'from': start_idx,
             'size': page_size,
             'sort': {'_score': {'order': 'desc'}},
         }
-        r = requests.post('{}/project-{}/_search/'.format(api_url, project_id),
-                          data=json.dumps(body, sort_keys=True),
-                          headers={'content-type': 'application/json'})
-        if r.status_code == 200:
-            return r.json()
-        else:
+        try:
+            url = '{}/project-{}/spatial,party,resource/_search/'
+            r = requests.post(
+                url.format(api_url, project_id),
+                data=json.dumps(body, sort_keys=True),
+                headers={'content-type': 'application/json'},
+                timeout=10,
+            )
+            if r.status_code == 200:
+                return r.json()
+            else:
+                return None
+        except requests.exceptions.RequestException:
             return None
 
     def query_es_timestamp(self, project_id):
         """Queries the ES API project type to get the index timestamp."""
-        r = requests.get(
-            '{}/project-{}/project/_search/?q=*'.format(api_url, project_id))
-        if r.status_code == 200:
-            return r.json()['hits']['hits'][0]['_source'].get('@timestamp')
-        else:
+        try:
+            url = '{}/project-{}/project/_search/?q=*'
+            r = requests.get(url.format(api_url, project_id), timeout=10)
+            if r.status_code == 200:
+                return r.json()['hits']['hits'][0]['_source'].get('@timestamp')
+            else:
+                return _("unknown")
+        except requests.exceptions.RequestException:
             return _("unknown")
 
     def augment_result(self, result):
@@ -261,12 +267,7 @@ class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
         """Run a curl command to ES and dump the results into a temp file."""
 
         query_dsl = {
-            'query': {
-                'simple_query_string': {
-                    'default_operator': 'and',
-                    'query': query,
-                }
-            },
+            'query': parse_query(query),
             'from': 0,
             'size': settings.ES_MAX_RESULTS,
             'sort': {'_score': {'order': 'desc'}},
@@ -282,8 +283,9 @@ class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
             '-o', es_dump_path,
             '-f',
             '-XGET',
-            '{}/project-{}/_data/?format=json&source={}'.format(
-                api_url, project_id, query_dsl_param
-            )
+            (
+                '{}/project-{}/spatial,party,resource/_data/'
+                '?format=json&source={}'
+            ).format(api_url, project_id, query_dsl_param)
         ]).check_returncode()
         return es_dump_path

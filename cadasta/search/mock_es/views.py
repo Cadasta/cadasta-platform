@@ -101,7 +101,7 @@ def transform(entity, bulk=False):
             return {'_type': 'resource', '_source': source}
 
 
-class BaseAllEsTypes(APIView):
+class BaseSearch(APIView):
 
     authentication_classes = []
     permission_classes = (AllowAny,)
@@ -109,15 +109,18 @@ class BaseAllEsTypes(APIView):
 
     def search(self, query_dsl):
 
-        query = query_dsl['query']['simple_query_string']['query'].lower()
-        if query == 'error':
+        magic_word = ''
+        if 'should' in query_dsl['query']['bool']:
+            temp = query_dsl['query']['bool']['should'][0]
+            magic_word = temp['multi_match']['query'].lower()
+        if magic_word == 'error':
             return Response({}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-        if query == 'bulkerror' and self.bulk:
+        if magic_word == 'bulkerror' and self.bulk:
             return Response({}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
         entities = []
         page = []
-        if query != 'none':
+        if magic_word != 'none':
             project = Project.objects.get(id=self.kwargs['projectid'])
             locations = list(SpatialUnit.objects.filter(project=project))
             parties = list(Party.objects.filter(project=project))
@@ -135,7 +138,7 @@ class BaseAllEsTypes(APIView):
                     entities.append(rels.pop(0))
                 if len(resources) > 0:
                     entities.append(resources.pop(0))
-                if query == 'limited':
+                if magic_word == 'limited':
                     break
 
             start_idx = query_dsl.get('from', 0)
@@ -159,28 +162,10 @@ class BaseAllEsTypes(APIView):
             })
 
 
-class AllEsTypes(BaseAllEsTypes):
+class Search(BaseSearch):
 
     def __init__(self):
         self.bulk = False
-
-    def post(self, request, *args, **kwargs):
-        return self.search(request.data)
-
-
-class DumpAllEsTypes(BaseAllEsTypes):
-
-    def __init__(self):
-        self.bulk = True
-
-    def get(self, request, *args, **kwargs):
-        return self.search(json.loads(request.query_params['source']))
-
-
-class SingleEsType(APIView):
-
-    authentication_classes = []
-    permission_classes = (AllowAny,)
 
     def get(self, request, *args, **kwargs):
         if self.kwargs['type'] == 'project':
@@ -195,3 +180,17 @@ class SingleEsType(APIView):
         else:
             # TODO: No search by type yet
             return Response({})
+
+    def post(self, request, *args, **kwargs):
+        assert self.kwargs['type'] == 'spatial,party,resource'
+        return self.search(request.data)
+
+
+class Dump(BaseSearch):
+
+    def __init__(self):
+        self.bulk = True
+
+    def get(self, request, *args, **kwargs):
+        assert self.kwargs['type'] == 'spatial,party,resource'
+        return self.search(json.loads(request.query_params['source']))
