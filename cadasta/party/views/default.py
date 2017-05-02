@@ -93,13 +93,17 @@ class PartiesDetail(LoginPermissionRequiredMixin,
                     questionnaire_id=project.current_questionnaire)
                 context['type_labels'] = template_xlang_labels(
                     party_type.label_xlat)
-
-                option = QuestionOption.objects.get(question=party_type,
-                                                    name=context['party'].type)
-                context['type_choice_labels'] = template_xlang_labels(
-                    option.label_xlat)
             except Question.DoesNotExist:
                 pass
+            else:
+                try:
+                    option = QuestionOption.objects.get(
+                        question=party_type,
+                        name=context['party'].type)
+                    context['type_choice_labels'] = template_xlang_labels(
+                        option.label_xlat)
+                except QuestionOption.DoesNotExist:
+                    pass
 
             try:
                 tenure_type = Question.objects.get(
@@ -234,14 +238,17 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
                     questionnaire_id=project.current_questionnaire)
                 context['type_labels'] = template_xlang_labels(
                     tenure_type.label_xlat)
-
-                option = QuestionOption.objects.get(
-                    question=tenure_type,
-                    name=context['relationship'].tenure_type_id)
-                context['type_choice_labels'] = template_xlang_labels(
-                    option.label_xlat)
             except Question.DoesNotExist:
                 pass
+            else:
+                try:
+                    option = QuestionOption.objects.get(
+                        question=tenure_type,
+                        name=context['relationship'].tenure_type_id)
+                    context['type_choice_labels'] = template_xlang_labels(
+                        option.label_xlat)
+                except QuestionOption.DoesNotExist:
+                    pass
 
         return context
 
