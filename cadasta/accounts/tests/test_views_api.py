@@ -117,7 +117,7 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
         """The view should return a token to authenticate API calls"""
         data = {'username': 'imagine71', 'password': 'iloveyoko78!'}
         response = self.request(method='POST', post_data=data)
-        assert response.status_code == 400
+        assert response.status_code == 401
 
     def test_login_with_unverified_email(self):
         """The view should return an error message if the User.verify_email_by
@@ -127,7 +127,7 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
         self.user.save()
         data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data, user=self.user)
-        assert response.status_code == 400
+        assert response.status_code == 401
         assert 'auth_token' not in response.content
         assert len(mail.outbox) == 1
 

@@ -55,7 +55,7 @@ class AccountLogin(djoser_views.LoginView):
         except ValidationError:
             return Response(
                 data=serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_401_UNAUTHORIZED,
             )
         except EmailNotVerifiedError:
             user = serializer.user
@@ -66,7 +66,7 @@ class AccountLogin(djoser_views.LoginView):
 
             return Response(
                 data={'detail': _("The email has not been verified.")},
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_401_UNAUTHORIZED,
             )
 
 
