@@ -22,4 +22,15 @@ class Migration(migrations.Migration):
             name='tenure_type',
             field=models.CharField(max_length=10),
         ),
+
+        migrations.RemoveField(
+            model_name='historicaltenurerelationshiptype',
+            name='history_user',
+        ),
+        migrations.DeleteModel(
+            name='TenureRelationshipType',
+        ),
+        migrations.DeleteModel(
+            name='HistoricalTenureRelationshipType',
+        ),
     ]
