@@ -24,20 +24,17 @@ def get_types(question_name, default, questionnaire_id=None,
         except Question.DoesNotExist:
             pass
         else:
-            types = []
             options = QuestionOption.objects.filter(
                 question=question).values_list('name', 'label_xlat')
 
             lang = get_language()
             default_lang = question.questionnaire.default_language
 
-            for o in options:
-                label = o[1]
-
+            for key, label in options:
                 if isinstance(label, dict):
                     label = label.get(lang, label.get(default_lang))
 
-                types.append((o[0], label))
+                types.append((key, label))
 
     if not types:
         types = default
@@ -45,7 +42,7 @@ def get_types(question_name, default, questionnaire_id=None,
     if include_labels:
         return types
     else:
-        return [t[0] for t in types]
+        return [key for key, _ in types]
 
 
 class SuperUserCheck:
