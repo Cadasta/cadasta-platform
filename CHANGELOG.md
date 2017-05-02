@@ -1,5 +1,49 @@
 # Change Log
 
+## [v1.8.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.8.0-alpha.1) (2017-05-02)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.4-alpha.1...v1.8.0-alpha.1)
+
+**Fixed bugs:**
+
+- Catch and ignore QuestionOption.DoesNotExist [\#1397](https://github.com/Cadasta/cadasta-platform/issues/1397)
+- Archived resources are also shown in search results. [\#1354](https://github.com/Cadasta/cadasta-platform/issues/1354)
+- Error messages during organization creation are not cleared [\#1220](https://github.com/Cadasta/cadasta-platform/issues/1220)
+- Search only matches on exact strings [\#1118](https://github.com/Cadasta/cadasta-platform/issues/1118)
+- "All data" export option contains the records twice [\#923](https://github.com/Cadasta/cadasta-platform/issues/923)
+- Geometry "persistence" when scrolling map view [\#587](https://github.com/Cadasta/cadasta-platform/issues/587)
+
+**Closed issues:**
+
+- User Invites [\#1448](https://github.com/Cadasta/cadasta-platform/issues/1448)
+- No notification email is sent after adding a user to an organization. [\#1422](https://github.com/Cadasta/cadasta-platform/issues/1422)
+- Project Creation Wizard Requirements [\#966](https://github.com/Cadasta/cadasta-platform/issues/966)
+- Export results from records search query in xlsx format [\#830](https://github.com/Cadasta/cadasta-platform/issues/830)
+- Update "e-mail" to "email" in text in transifex files [\#744](https://github.com/Cadasta/cadasta-platform/issues/744)
+- Use marker clustering on GPX imported waypoints [\#663](https://github.com/Cadasta/cadasta-platform/issues/663)
+- Determine Migration Rules for Schemas [\#654](https://github.com/Cadasta/cadasta-platform/issues/654)
+- Use unique location id in place of generic "Location" [\#560](https://github.com/Cadasta/cadasta-platform/issues/560)
+- Consider using an alternate map tileset [\#493](https://github.com/Cadasta/cadasta-platform/issues/493)
+- Improve dashboard as far as showing project existence geographically [\#460](https://github.com/Cadasta/cadasta-platform/issues/460)
+- How to handle duplicate party names? [\#448](https://github.com/Cadasta/cadasta-platform/issues/448)
+- Should uploaded xls forms be deleted from storage when project is deleted? [\#384](https://github.com/Cadasta/cadasta-platform/issues/384)
+- Further work on entity attributes [\#376](https://github.com/Cadasta/cadasta-platform/issues/376)
+- Locations should not be created outside project geometry [\#343](https://github.com/Cadasta/cadasta-platform/issues/343)
+- General Localization Guidelines [\#245](https://github.com/Cadasta/cadasta-platform/issues/245)
+- Add spatial filtering to locations/spatial units [\#208](https://github.com/Cadasta/cadasta-platform/issues/208)
+- Date formating [\#157](https://github.com/Cadasta/cadasta-platform/issues/157)
+- Provide attribution for the country borders dataset [\#152](https://github.com/Cadasta/cadasta-platform/issues/152)
+- Management of roles and policies for organisations and projects [\#30](https://github.com/Cadasta/cadasta-platform/issues/30)
+- Feature Toggling [\#18](https://github.com/Cadasta/cadasta-platform/issues/18)
+
+**Merged pull requests:**
+
+- Return 401 responses on failed login [\#1442](https://github.com/Cadasta/cadasta-platform/pull/1442) ([alukach](https://github.com/alukach))
+- CSS to allow long file name to wrap [\#1437](https://github.com/Cadasta/cadasta-platform/pull/1437) ([clash99](https://github.com/clash99))
+- Update changelog for v1.7.4-alpha.1 [\#1428](https://github.com/Cadasta/cadasta-platform/pull/1428) ([amplifi](https://github.com/amplifi))
+- Fixes \#1397 -- Catch and ignore QuestionOption.DoesNotExist [\#1420](https://github.com/Cadasta/cadasta-platform/pull/1420) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1118 and other issues [\#1415](https://github.com/Cadasta/cadasta-platform/pull/1415) ([seav](https://github.com/seav))
+- Resolve \#830: Implement search export [\#1356](https://github.com/Cadasta/cadasta-platform/pull/1356) ([seav](https://github.com/seav))
+
 ## [v1.7.4-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.7.4-alpha.1) (2017-04-24)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.3-alpha.3...v1.7.4-alpha.1)
 
