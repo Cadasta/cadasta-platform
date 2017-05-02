@@ -43,11 +43,11 @@
                 <p class="media-heading">{{ resource.description }}</p>
                 <table class="table table-condensed table-media">
                   <tr>
-                    <td class="small">{% trans "File name" %}:</td>
-                    <td class="small">{{ resource.original_file }}</td>
+                    <td class="small text-nowrap">{% trans "File name" %}:</td>
+                    <td class="small name-break">{{ resource.original_file }}</td>
                   </tr>
                   <tr>
-                    <td class="small">{% trans "Uploaded on" %}:</td>
+                    <td class="small text-nowrap">{% trans "Uploaded on" %}:</td>
                     <td class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}{{ date }} by {{ user }}{% endblocktrans %}</td>
                   </tr>
                 </table>

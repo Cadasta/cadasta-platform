@@ -39,10 +39,14 @@ class ResourceWidgetTest(UserTestCase, TestCase):
     def test_render(self):
         expected_html = (
             '  <td>'
-            '    <img src="{thumbnail}"'
-            '         class="thumb-60">'
-            '    <label for="file"><strong>Resource Name</strong></label>'
-            '    <br>file.txt'
+            '    <div class="media-left">'
+            '       <img src="{thumbnail}"'
+            '           class="thumb-60">'
+            '    </div>'
+            '    <div class="media-body resource-text">'
+            '       <label for="file"><strong>Resource Name</strong></label>'
+            '       <br>file.txt'
+            '    </div>'
             '  </td>'
             '  <td class="hidden-xs hidden-sm">txt</td>'
             '  <td class="hidden-xs hidden-sm">'

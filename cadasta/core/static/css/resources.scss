@@ -1,13 +1,8 @@
 /* =Resources
 -------------------------------------------------------------- */
 
- div.resource-60 {
- }
-
 div.resource-text {
-  display: table-cell;
-  margin-left: 80px;
-  word-wrap: break-word;
+  word-break: break-all;
 }
 
 .panel-body h4 {
