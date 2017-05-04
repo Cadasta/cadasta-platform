@@ -60,7 +60,7 @@ class XLSExporter(Exporter):
         content_type = ContentType.objects.get(app_label='party',
                                                model='tenurerelationship')
         self.write_items(worksheet, relationships, content_type,
-                         ['party_id', 'spatial_unit_id', 'tenure_type.id',
+                         ['party_id', 'location_id', 'tenure_type.id',
                           'tenure_type.label'])
 
     def make_download(self, f_name):
