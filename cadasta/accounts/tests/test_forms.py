@@ -399,6 +399,20 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
         assert user.check_password('iloveyoko79!') is True
 
+    def test_email_test(self):
+        user = UserFactory.create(password='beatles4Lyfe!')
+
+        data = {
+            'oldpassword': 'beatles4Lyfe!',
+            'password': 'iloveyoko79!',
+        }
+
+        form = forms.ChangePasswordForm(user, data)
+        assert form.is_valid() is True
+        form.save()
+
+        assert len(mail.outbox) == 1
+
     def test_password_incorrect(self):
         user = UserFactory.create(
             password='beatles4Lyfe!', username='imagine71')
@@ -514,6 +528,20 @@ class ResetPasswordKeyFormTest(UserTestCase, TestCase):
         assert User.objects.count() == 1
 
         assert user.check_password('iloveyoko79!') is True
+
+    def test_email_test(self):
+        user = UserFactory.create(password='beatles4Lyfe!')
+
+        data = {
+            'password': 'iloveyoko79!',
+        }
+
+        form = forms.ResetPasswordKeyForm(data, user=user)
+
+        assert form.is_valid() is True
+        form.save()
+
+        assert len(mail.outbox) == 1
 
     def test_password_contains_username(self):
         user = UserFactory.create(
