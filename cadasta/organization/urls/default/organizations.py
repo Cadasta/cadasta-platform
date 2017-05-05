@@ -61,10 +61,10 @@ urlpatterns = [
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/unarchive/$',
         default.ProjectUnarchive.as_view(),
         name='project-unarchive'),
-    url(
-        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/download/$',
-        default.ProjectDataDownload.as_view(),
-        name='project-download'),
+    # url(
+    #     r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/download/$',
+    #     default.ProjectDataDownload.as_view(),
+    #     name='project-download'),
     url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/import/$',
         default.ProjectDataImportWizard.as_view(),
