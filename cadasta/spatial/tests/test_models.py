@@ -91,13 +91,13 @@ class SpatialUnitTest(UserTestCase, TestCase):
     def test_default_type_is_parcel(self):
         spatial_unit = SpatialUnitFactory.create()
         assert spatial_unit.type == 'PA'
-        assert spatial_unit.name == 'Parcel'
+        assert spatial_unit.location_type_label == 'Parcel'
 
     def test_setting_type(self):
         spatial_unit = SpatialUnitFactory.create(
             type="RW")
         assert spatial_unit.type == 'RW'
-        assert spatial_unit.name == 'Right-of-way'
+        assert spatial_unit.location_type_label == 'Right-of-way'
 
     def test_adding_attributes(self):
         # add attribute schema
@@ -117,7 +117,7 @@ class SpatialUnitTest(UserTestCase, TestCase):
 
     def test_name(self):
         su = SpatialUnitFactory.create(type="RW")
-        assert su.location_type_label == "Right-of-way"
+        assert su.name == "Right-of-way"
 
     def test_location_type_label_standard(self):
         su = SpatialUnitFactory.create(type="RW")

@@ -51,12 +51,21 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
         dataTablesDraw = int(request.data['draw'])
 
         project = self.get_project()
-        types = get_types('tenure_type',
-                          TENURE_RELATIONSHIP_TYPES,
-                          questionnaire_id=project.current_questionnaire,
-                          include_labels=True)
+        tenure_types = get_types(
+            'tenure_type',
+            TENURE_RELATIONSHIP_TYPES,
+            questionnaire_id=project.current_questionnaire,
+            include_labels=True)
+        self.tenure_types = dict(tenure_types)
 
-        self.tenure_types = dict(types)
+        spatial_types = get_types(
+            'location_type',
+            SPATIAL_TYPE_CHOICES,
+            questionnaire_id=project.current_questionnaire,
+            include_labels=True)
+        self.spatial_types = dict(spatial_types)
+
+        SPATIAL_TYPE_CHOICES
 
         results_as_html = []
         num_hits = 0
@@ -198,7 +207,7 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
     def get_main_label(self, model, source):
         """Returns the search result's main UI label."""
         if model == SpatialUnit:
-            return spatial_type_choices.get(source['type'], '—')
+            return self.spatial_types.get(source['type'], '—')
         elif model == TenureRelationship:
             return self.tenure_types.get(source['tenure_type'], '—')
         else:  # Party or Resource

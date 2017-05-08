@@ -874,11 +874,11 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         project = self.get_project()
         org = project.organization
         allowed_tenure_types = get_types(
-            'tenure_types',
+            'tenure_type',
             TENURE_RELATIONSHIP_TYPES,
             questionnaire_id=project.current_questionnaire)
         allowed_location_types = get_types(
-            'location_types',
+            'location_type',
             TYPE_CHOICES,
             questionnaire_id=project.current_questionnaire)
 

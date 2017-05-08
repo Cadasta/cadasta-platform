@@ -21,7 +21,7 @@ from organization.models import OrganizationRole, Project, ProjectRole
 from party.models import Party, TenureRelationship
 from party.tests.factories import PartyFactory
 from questionnaires.models import Questionnaire
-from questionnaires.tests.factories import QuestionnaireFactory
+from questionnaires.tests import factories as q_factories
 from questionnaires.messages import MISSING_RELEVANT
 from resources.models import Resource
 from resources.tests.factories import ResourceFactory
@@ -950,8 +950,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def setup_models(self):
         self.project = ProjectFactory.create(current_questionnaire='abc')
-        self.questionnaire = QuestionnaireFactory.create(project=self.project,
-                                                         id='abc')
+        self.questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project, id='abc')
 
     def setup_url_kwargs(self):
         return {
@@ -1003,7 +1003,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         assert 'Select the questionnaire' not in self.expected_content
 
     def test_get_with_authorized_user_include_questionnaire(self):
-        questionnaire = QuestionnaireFactory.create(project=self.project)
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project)
         user = UserFactory.create()
         assign_policies(user)
 
@@ -1480,6 +1481,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         )
 
         self.valid_csv = '/organization/tests/files/test.csv'
+        self.valid_csv_custom = '/organization/tests/files/test_custom.csv'
         self.invalid_csv = '/organization/tests/files/test_invalid.csv'
         self.geoshape_csv = '/organization/tests/files/test_geoshape.csv'
         self.geotrace_csv = '/organization/tests/files/test_geotrace.csv'
@@ -1649,6 +1651,82 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         # test resource creation
         resource = Resource.objects.filter(project_id=proj.pk).first()
         assert resource.original_file == 'test.csv'
+        assert resource.mime_type == 'text/csv'
+        random_filename = resource.file.url[resource.file.url.rfind('/'):]
+        assert random_filename.endswith('.csv')
+        assert len(random_filename.split('.')[0].strip('/')) == 24
+
+    def test_full_flow_valid_custom_types(self):
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=self.project)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='AA',
+            label='AA Label')
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='location_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='BB',
+            label='BB Label')
+
+        self.client.force_login(self.user)
+        csvfile = self.get_file(self.valid_csv_custom, 'rb')
+        file = SimpleUploadedFile('test_custom.csv', csvfile, 'text/csv')
+        post_data = self.SELECT_FILE_POST_DATA.copy()
+        post_data['select_file-file'] = file
+        post_data['select_file-is_resource'] = True
+        select_file_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            post_data
+        )
+        assert select_file_response.status_code == 200
+
+        map_attributes_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.MAP_ATTRIBUTES_POST_DATA
+        )
+        assert map_attributes_response.status_code == 200
+
+        select_defaults_response = self.client.post(
+            reverse('organization:project-import',
+                    kwargs={
+                        'organization': self.org.slug,
+                        'project': self.project.slug}),
+            self.SELECT_DEFAULTS_POST_DATA
+        )
+        assert select_defaults_response.status_code == 302
+
+        assert ('/organizations/test-org/projects/test-imports/' in
+                select_defaults_response['location'])
+
+        proj = Project.objects.get(
+            organization=self.org, name='Test Imports')
+        assert Party.objects.filter(project_id=proj.pk).count() == 10
+        assert SpatialUnit.objects.filter(project_id=proj.pk).count() == 10
+        assert Resource.objects.filter(project_id=proj.pk).count() == 1
+        assert TenureRelationship.objects.filter(
+            project_id=proj.pk).count() == 10
+
+        for su in SpatialUnit.objects.filter(project_id=proj.pk).all():
+            if su.geometry is not None:
+                assert type(su.geometry) is Point
+
+        # test resource creation
+        resource = Resource.objects.filter(project_id=proj.pk).first()
+        assert resource.original_file == 'test_custom.csv'
         assert resource.mime_type == 'text/csv'
         random_filename = resource.file.url[resource.file.url.rfind('/'):]
         assert random_filename.endswith('.csv')

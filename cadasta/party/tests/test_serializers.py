@@ -8,6 +8,7 @@ from jsonattrs.models import Attribute, AttributeType, Schema
 from core.tests.utils.cases import UserTestCase
 from core.messages import SANITIZE_ERROR
 from organization.tests.factories import ProjectFactory
+from questionnaires.tests import factories as q_factories
 from spatial.tests.factories import SpatialUnitFactory
 from party import serializers
 
@@ -272,6 +273,62 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
             context={'project': project})
         assert serializer.is_valid() is False
         assert ("'BOO' is not a valid choice for field 'tenure_type'." in
+                serializer.errors['tenure_type'])
+
+    def test_valid_custom_tenure_type(self):
+        project = ProjectFactory.create()
+
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=project)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FU',
+            label='FU Label')
+
+        su = SpatialUnitFactory.create(project=project)
+        party = PartyFactory.create(project=project)
+        data = {
+            'tenure_type': 'FU',
+            'spatial_unit': su.id,
+            'party': party.id
+        }
+
+        serializer = serializers.TenureRelationshipWriteSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is True
+
+    def test_invalid_custom_tenure_type(self):
+        project = ProjectFactory.create()
+
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=project)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FU',
+            label='FU Label')
+
+        su = SpatialUnitFactory.create(project=project)
+        party = PartyFactory.create(project=project)
+        data = {
+            'tenure_type': 'FH',
+            'spatial_unit': su.id,
+            'party': party.id
+        }
+
+        serializer = serializers.TenureRelationshipWriteSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is False
+        assert ("'FH' is not a valid choice for field 'tenure_type'." in
                 serializer.errors['tenure_type'])
 
     def test_invalid_attributes(self):

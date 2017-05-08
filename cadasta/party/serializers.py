@@ -102,7 +102,7 @@ class TenureRelationshipWriteSerializer(
 
     def validate_tenure_type(self, value):
         prj = self.context['project']
-        allowed_types = get_types('tenure_types',
+        allowed_types = get_types('tenure_type',
                                   TENURE_RELATIONSHIP_TYPES,
                                   questionnaire_id=prj.current_questionnaire)
 
