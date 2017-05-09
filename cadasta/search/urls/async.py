@@ -7,10 +7,10 @@ urls = [
         r'^$',
         async.Search.as_view(),
         name='search'),
-    # url(
-    #     r'^export/$',
-    #     async.SearchExport.as_view(),
-    #     name='export'),
+    url(
+        r'^export/$',
+        async.SearchExport.as_view(),
+        name='export'),
 ]
 
 urlpatterns = [

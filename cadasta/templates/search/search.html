@@ -65,9 +65,9 @@
             </div>
             <div id="results" class="hidden col-md-9">
               {% if is_allowed_download %}
-              <!-- a id="export-btn" class="btn btn-default btn-action btn-sm pull-right" href="#search_export_modal" data-toggle="modal">
+              <a id="export-btn" class="btn btn-default btn-action btn-sm pull-right" href="#search_export_modal" data-toggle="modal">
                 <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> {% trans "Export" %}
-              </a -->
+              </a>
               {% endif %}
               <h4>
                 {% blocktrans %}
@@ -237,7 +237,7 @@ window.addEventListener('load', function () {
 <div class="modal fade" id="search_export_modal" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="search_export_form" action="{ % url 'async:search:export' object.organization.slug object.slug % }" method="POST">
+      <form id="search_export_form" action="{% url 'async:search:export' object.organization.slug object.slug %}" method="POST">
         {% csrf_token %}
         <input id="search_export_form_query" type="hidden" name="q" value="">
         <div class="modal-header">
@@ -263,7 +263,7 @@ window.addEventListener('load', function () {
                 <small>{% trans "A single XLS spreadsheet containing result locations, relationships, and parties." %}</small>
               </label>
             </li>
-            <li class="radio">
+            <!-- li class="radio">
               <label>
                 <input type="radio" name="type" id="data_res" value="res">
                 {% trans "Resources" %}
@@ -276,7 +276,7 @@ window.addEventListener('load', function () {
                 {% trans "All data" %}
                 <small>{% trans "A zip file containing result data XLS and SHP files and resources." %}</small>
               </label>
-            </li>
+            </li -->
           </ul>
         </div>
         <div class="modal-footer">

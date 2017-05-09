@@ -24,8 +24,8 @@ from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from resources.models import Resource
 from ..parser import parse_query
-from ..export.all import AllExporter
-from ..export.resource import ResourceExporter
+# from ..export.all import AllExporter
+# from ..export.resource import ResourceExporter
 from ..export.shape import ShapeExporter
 from ..export.xls import XLSExporter
 
@@ -239,8 +239,8 @@ class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
     exporters = {
         'shp': ShapeExporter,
         'xls': XLSExporter,
-        'res': ResourceExporter,
-        'all': AllExporter,
+        # 'res': ResourceExporter,
+        # 'all': AllExporter,
     }
 
     def get_perms_objects(self):

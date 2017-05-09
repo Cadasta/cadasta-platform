@@ -21,7 +21,7 @@ class SearchUrlTest(TestCase):
         assert resolved.kwargs['organization'] == 'habitat'
         assert resolved.kwargs['project'] == '123'
 
-    def xtest_search_export(self):
+    def test_search_export(self):
         actual = reverse('async:search:export',
                          kwargs={
                             'organization': 'habitat',
