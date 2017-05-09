@@ -165,25 +165,25 @@ def reassign_spatial_geometry(instance):
     else:
         instance.geometry = dumps(Point(geometry))
 
+
 def calculate_geometry_details(instance):
     poly = instance.geometry
-    p = poly.transform(3857,clone=True)
-    area = p.area
-    areha = area/10000
-    area_ft2 = area  * 10.764
-    area_ac = area * 0.00024711
-    data = {
-        'area':{
-            'm2':format(area,'.2f'),
-            'ha':format(areha,'.2f'),
-            'ft2':format(area_ft2,'.2f'),
-            'ac':format(area_ac,'.2f')
+    if(poly):
+        p = poly.transform(3857, clone=True)
+        area = p.area
+        areha = area/10000
+        area_ft2 = area * 10.764
+        area_ac = area * 0.00024711
+        data = {
+            'area': {
+                'm2': format(area, '.2f'),
+                'ha': format(areha, '.2f'),
+                'ft2': format(area_ft2, '.2f'),
+                'ac': format(area_ac, '.2f')
+            }
         }
-    }
 
-    instance.geometry_details = data
-    print(instance.__dict__)
-    
+        instance.geometry_details = data
 
 
 @receiver(models.signals.pre_save, sender=SpatialUnit)
@@ -199,6 +199,7 @@ def check_extent(sender, instance, **kwargs):
 
     if geom and not geom.empty:
         reassign_spatial_geometry(instance)
+
 
 @receiver(models.signals.pre_save, sender=SpatialUnit)
 def define_geometry_details(sender, instance, **kwargs):

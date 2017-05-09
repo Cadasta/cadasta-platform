@@ -21,7 +21,7 @@ from xforms.renderers import XFormListRenderer
 from xforms.serializers import XFormListSerializer, XFormSubmissionSerializer
 from xforms.exceptions import InvalidXMLSubmission
 from questionnaires.serializers import QuestionnaireSerializer
-from ..renderers import XFormRenderer
+from xforms.renderers import XFormRenderer
 from django.template.loader import render_to_string
 
 logger = logging.getLogger('xform.submissions')
