@@ -12,6 +12,7 @@ from tutelary.decorators import permissioned_model
 from simple_history.models import HistoricalRecords
 from shapely.geometry import Point, Polygon, LineString
 from shapely.wkt import dumps
+from django.contrib.postgres.fields import JSONField
 
 from . import messages, managers
 from .choices import TYPE_CHOICES
@@ -40,6 +41,10 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     # Spatial unit geometry is optional: some spatial units may only
     # have a textual description of their location.
     geometry = GeometryField(null=True)
+
+    # Spatial unit area is optional: some spatial units may only
+    # have a textual description of their location.
+    geometry_details = JSONField(null=True)
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
@@ -160,6 +165,26 @@ def reassign_spatial_geometry(instance):
     else:
         instance.geometry = dumps(Point(geometry))
 
+def calculate_geometry_details(instance):
+    poly = instance.geometry
+    p = poly.transform(3857,clone=True)
+    area = p.area
+    areha = area/10000
+    area_ft2 = area  * 10.764
+    area_ac = area * 0.00024711
+    data = {
+        'area':{
+            'm2':format(area,'.2f'),
+            'ha':format(areha,'.2f'),
+            'ft2':format(area_ft2,'.2f'),
+            'ac':format(area_ac,'.2f')
+        }
+    }
+
+    instance.geometry_details = data
+    print(instance.__dict__)
+    
+
 
 @receiver(models.signals.pre_save, sender=SpatialUnit)
 def check_extent(sender, instance, **kwargs):
@@ -174,6 +199,10 @@ def check_extent(sender, instance, **kwargs):
 
     if geom and not geom.empty:
         reassign_spatial_geometry(instance)
+
+@receiver(models.signals.pre_save, sender=SpatialUnit)
+def define_geometry_details(sender, instance, **kwargs):
+    calculate_geometry_details(instance)
 
 
 @fix_model_for_attributes

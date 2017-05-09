@@ -10,6 +10,18 @@
   <section>
     <div class="page-title">
       <h2 class="short"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</h2>
+      {% if location.geometry_details.area.m2 %}
+        <p>{{location.geometry_details.area.m2 }} m <sup>2</sup></p>
+      {% endif %}
+      {% if location.geometry_details.area.ha %}
+        <p>{{location.geometry_details.area.ha }} ha</p>
+      {% endif %}
+      {% if location.geometry_details.area.ft2 %}
+        <p>{{location.geometry_details.area.ft2 }} ft <sup>2</sup></p>
+      {% endif %}
+      {% if location.geometry_details.area.ac %}
+        <p>{{location.geometry_details.area.ac }} ac</p>
+      {% endif %}
       <div class="top-btn pull-right">
         <!-- Action buttons -->
         {% if is_allowed_edit_location %}
