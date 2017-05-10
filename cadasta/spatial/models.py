@@ -166,24 +166,24 @@ def reassign_spatial_geometry(instance):
         instance.geometry = dumps(Point(geometry))
 
 
-# def calculate_polygon_area(instance):
-#     # Referece for metric conversions equations
-#     # http://www.metric-conversions.org/area/square-meters-to-hectares.htm
-#     poly = instance.geometry
-#     p = poly.transform(3857, clone=True)
-#     area = p.area
-#     areha = area/10000
-#     area_ft2 = area * 10.764
-#     area_ac = area * 0.00024711
-#     data = {
-#         'area': {
-#             'm2': format(area, '.2f'),
-#             'ha': format(areha, '.2f'),
-#             'ft2': format(area_ft2, '.2f'),
-#             'ac': format(area_ac, '.2f')
-#         }
-#     }
-#     instance.geometry_details = data
+def calculate_polygon_area(instance):
+    # Referece for metric conversions equations
+    # http://www.metric-conversions.org/area/square-meters-to-hectares.htm
+    poly = instance.geometry
+    p = poly.transform(3857, clone=True)
+    area = p.area
+    areha = area/10000
+    area_ft2 = area * 10.764
+    area_ac = area * 0.00024711
+    data = {
+        'area': {
+            'm2': format(area, '.2f'),
+            'ha': format(areha, '.2f'),
+            'ft2': format(area_ft2, '.2f'),
+            'ac': format(area_ac, '.2f')
+        }
+    }
+    instance.geometry_details = data
 
 
 @receiver(models.signals.pre_save, sender=SpatialUnit)
@@ -201,12 +201,12 @@ def check_extent(sender, instance, **kwargs):
         reassign_spatial_geometry(instance)
 
 
-# @receiver(models.signals.pre_save, sender=SpatialUnit)
-# def define_geometry_details(sender, instance, **kwargs):
-#     geom = instance.geometry
-#     from django.contrib.gis.geos.polygon import Polygon
-#     if geom and isinstance(geom, Polygon) and geom.valid:
-#         calculate_polygon_area(instance)
+@receiver(models.signals.pre_save, sender=SpatialUnit)
+def define_geometry_details(sender, instance, **kwargs):
+    geom = instance.geometry
+    from django.contrib.gis.geos.polygon import Polygon
+    if geom and isinstance(geom, Polygon) and geom.valid:
+        calculate_polygon_area(instance)
 
 
 @fix_model_for_attributes

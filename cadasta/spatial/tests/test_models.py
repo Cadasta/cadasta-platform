@@ -84,16 +84,28 @@ class SpatialUnitTest(UserTestCase, TestCase):
             (-148.63333, 47.25), (-148.58333, 47.25), (-148.58333, 47.28333),
             (-148.63333, 47.28333), (-148.63333, 47.25))
 
-    # def test_geometry_details_exist(self):
-    #     spatial_unit = SpatialUnitFactory.create(
-    #         geometry='SRID=4326;POLYGON(('
-    #         '211.36667 47.25000, '
-    #         '211.41667 47.25000, '
-    #         '211.41667 47.28333, '
-    #         '211.36667 47.28333, '
-    #         '211.36667 47.25000))'
-    #     )
-    #     assert spatial_unit.geometry_details != None
+    def test_geometry_details_exist(self):
+        spatial_unit = SpatialUnitFactory.create(
+            geometry='SRID=4326;POLYGON(('
+            '211.36667 47.25000, '
+            '211.41667 47.25000, '
+            '211.41667 47.28333, '
+            '211.36667 47.28333, '
+            '211.36667 47.25000))'
+        )
+        assert spatial_unit.geometry_details is not None
+        assert spatial_unit.geometry_details['area'] is not None
+        assert spatial_unit.geometry_details['area']['m2'] == '30432816.02'
+        assert spatial_unit.geometry_details['area']['ha'] == '3043.28'
+        assert spatial_unit.geometry_details['area']['ft2'] == '327578831.61'
+        assert spatial_unit.geometry_details['area']['ac'] == '7520.25'
+
+    def test_geometry_details_do_no_exist(self):
+        spatial_unit = SpatialUnitFactory.create(
+            geometry='SRID=4326;POINT('
+            '-108.0972 40.9508)'
+            )
+        assert spatial_unit.geometry_details is None
 
     def test_defaults_no_geometry(self):
         spatial_unit = SpatialUnitFactory.create()
