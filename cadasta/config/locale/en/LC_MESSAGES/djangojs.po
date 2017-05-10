@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 21:47+0000\n"
+"POT-Creation-Date: 2017-04-28 18:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,18 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: core/static/js/dataTables.selectFiltering.js:11
+msgid "Active"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:12
+msgid "Archived"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:13
+msgid "All"
+msgstr ""
 
 #: core/static/js/map_utils.js:10
 msgid "Zoom in"
@@ -126,10 +138,10 @@ msgid ""
 "characters."
 msgstr ""
 
-#: core/static/js/parsleyAddValidator.js:27
+#: core/static/js/parsleyAddValidator.js:26
 msgid "Your password cannot contain your username."
 msgstr ""
 
-#: core/static/js/parsleyAddValidator.js:37
+#: core/static/js/parsleyAddValidator.js:36
 msgid "Your password cannot contain your email mailbox name."
 msgstr ""

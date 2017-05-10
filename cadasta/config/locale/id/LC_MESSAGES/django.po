@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 21:46+0000\n"
-"PO-Revision-Date: 2016-12-12 22:55+0000\n"
+"POT-Creation-Date: 2017-04-28 18:59+0000\n"
+"PO-Revision-Date: 2017-04-28 19:02+0000\n"
 "Last-Translator: Chandra Lash <clash@cadasta.org>\n"
 "Language-Team: Indonesian (http://www.transifex.com/cadasta/cadasta-platform/language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -20,37 +20,55 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: accounts/forms.py:29 accounts/forms.py:85 accounts/serializers.py:40
-#: accounts/serializers.py:94 accounts/tests/test_forms.py:157
-#: accounts/tests/test_serializers.py:90
-#: accounts/tests/test_serializers.py:217
+#: accounts/forms.py:30 accounts/forms.py:85 accounts/serializers.py:42
+#: accounts/serializers.py:99 accounts/tests/test_forms.py:206
+#: accounts/tests/test_serializers.py:106
+#: accounts/tests/test_serializers.py:290
 msgid "Username cannot be “add” or “new”."
 msgstr "Nama pengguna tidak dapat \"ditambah\" atau \"dibuat\"."
 
-#: accounts/forms.py:38 accounts/tests/test_forms.py:45
-msgid "Passwords do not match"
-msgstr "Kata kunci tidak sama"
-
-#: accounts/forms.py:42 accounts/serializers.py:50
-#: accounts/tests/test_forms.py:74 accounts/tests/test_forms.py:300
-#: accounts/tests/test_forms.py:392 accounts/tests/test_serializers.py:116
-#: accounts/validators.py:49
+#: accounts/forms.py:40 accounts/serializers.py:52
+#: accounts/tests/test_forms.py:115 accounts/tests/test_forms.py:455
+#: accounts/tests/test_forms.py:554 accounts/tests/test_serializers.py:157
+#: accounts/tests/test_serializers.py:399 accounts/validators.py:50
 msgid "Passwords cannot contain your email."
 msgstr "password Anda tidak bisa berisi nama kotak surat email Anda."
 
-#: accounts/forms.py:46 accounts/serializers.py:54
-#: accounts/tests/test_forms.py:59 accounts/tests/test_forms.py:285
-#: accounts/tests/test_forms.py:378 accounts/tests/test_serializers.py:103
+#: accounts/forms.py:45 accounts/forms.py:130 accounts/serializers.py:57
+#: accounts/serializers.py:137 accounts/tests/test_forms.py:74
+#: accounts/tests/test_forms.py:88 accounts/tests/test_forms.py:427
+#: accounts/tests/test_forms.py:441 accounts/tests/test_forms.py:528
+#: accounts/tests/test_forms.py:541 accounts/tests/test_serializers.py:119
+#: accounts/tests/test_serializers.py:132
+#: accounts/tests/test_serializers.py:359
+#: accounts/tests/test_serializers.py:379
 msgid "The password is too similar to the username."
 msgstr "Sandi terlalu mirip dengan nama pengguna."
 
-#: accounts/forms.py:57 accounts/forms.py:95 accounts/tests/test_forms.py:141
+#: accounts/forms.py:56 accounts/forms.py:99 accounts/tests/test_forms.py:191
 msgid "Another user with this email already exists"
 msgstr "Nama pengguna dengan email ini sudah tersedia"
 
-#: accounts/forms.py:82
-msgid "Another user with this username already exists"
-msgstr "Nama pengguna ini sudah dipakai oleh pengguna lain"
+#: accounts/forms.py:92
+msgid "Please provide the correct password for your account."
+msgstr ""
+
+#: accounts/forms.py:121 accounts/serializers.py:126
+#: accounts/tests/test_forms.py:497 accounts/tests/test_forms.py:593
+msgid "The password for this user can not be changed."
+msgstr ""
+
+#: accounts/forms.py:142
+msgid "Current Password"
+msgstr ""
+
+#: accounts/forms.py:143 accounts/forms.py:155
+msgid "New Password"
+msgstr ""
+
+#: accounts/forms.py:147 accounts/tests/test_forms.py:413
+msgid "Please type your current password."
+msgstr ""
 
 #: accounts/manager.py:16 organization/serializers.py:157
 msgid "User with username or email {} does not exist"
@@ -60,111 +78,407 @@ msgstr "Pengguna dengan nama pengguna atau email {} tidak tersedia"
 msgid "More than one user found for username or email {}"
 msgstr "Lebih dari satu pengguna dengan nama pengguna atau email {} telah ditemukan"
 
-#: accounts/models.py:31
+#: accounts/models.py:34
 msgid "full name"
 msgstr "nama lengkap"
 
-#: accounts/models.py:48
+#: accounts/models.py:52
 msgid "user"
 msgstr "pengguna"
 
-#: accounts/models.py:49
+#: accounts/models.py:53
 msgid "users"
 msgstr "pengguna"
 
-#: accounts/models.py:59 organization/messages.py:33
+#: accounts/models.py:63 organization/messages.py:33
 msgid "You don't have permission to view user details"
 msgstr "Anda tidak memiliki izin untuk melihat rincian dari pengguna"
 
-#: accounts/models.py:62 organization/messages.py:34
+#: accounts/models.py:66 organization/messages.py:34
 msgid "You don't have permission to update user details"
 msgstr "Anda tidak memiliki izin untuk memperbarui rincian pengguna"
 
-#: accounts/serializers.py:18 accounts/serializers.py:66
-#: accounts/tests/test_serializers.py:75
+#: accounts/models.py:103
+msgid "Change of password at Cadasta Platform"
+msgstr ""
+
+#: accounts/serializers.py:19 accounts/serializers.py:69
+#: accounts/tests/test_serializers.py:91
 msgid "Another user is already registered with this email address"
 msgstr "Pengguna lain sudah terdaftar dengan alamat email ini"
 
-#: accounts/tests/test_forms.py:89 accounts/tests/test_forms.py:314
-#: accounts/tests/test_forms.py:405 accounts/tests/test_serializers.py:129
+#: accounts/tests/test_forms.py:49 accounts/tests/test_forms.py:61
+#: accounts/tests/test_forms.py:288 accounts/tests/test_serializers.py:53
+#: accounts/tests/test_serializers.py:259 accounts/validators.py:60
+msgid "A user with that username already exists"
+msgstr ""
+
+#: accounts/tests/test_forms.py:142 accounts/tests/test_forms.py:468
+#: accounts/tests/test_forms.py:566 accounts/tests/test_serializers.py:182
+#: accounts/tests/test_serializers.py:420
 msgid "This password is too short. It must contain at least 10 characters."
 msgstr "Password ini terlalu pendek. Ini harus berisi minimal 10 karakter."
 
-#: accounts/tests/test_forms.py:105 accounts/tests/test_forms.py:122
-#: accounts/tests/test_forms.py:329 accounts/tests/test_forms.py:419
-#: accounts/tests/test_serializers.py:143
+#: accounts/tests/test_forms.py:157 accounts/tests/test_forms.py:173
+#: accounts/tests/test_forms.py:482 accounts/tests/test_forms.py:579
+#: accounts/tests/test_serializers.py:196
+#: accounts/tests/test_serializers.py:442
 msgid ""
 "Passwords must contain at least 3 of the following 4 character types:\n"
 "lowercase characters, uppercase characters, special characters, and/or numerical character.\n"
 msgstr "Password harus berisi minimal 3 dari 4 jenis karakter berikut: \nhuruf kecil, karakter huruf besar, karakter khusus, dan / atau character. \n numerik\n"
 
-#: accounts/tests/test_forms.py:270 accounts/tests/test_forms.py:364
-msgid "You must type the same password each time."
-msgstr "Anda harus mengetikkan password yang sama setiap kali."
+#: accounts/utils.py:11
+msgid "Change of email at Cadasta Platform"
+msgstr ""
 
-#: accounts/validators.py:22
+#: accounts/validators.py:23
 #, python-brace-format
 msgid ""
 "Passwords must contain at least {unique_types} of the following {character_types} character types:\n"
 "lowercase characters, uppercase characters, special characters, and/or numerical character.\n"
 msgstr "Password harus berisi minimal {unique_types} dari {character_types} jenis karakter berikut: \nhuruf kecil, karakter huruf besar, karakter khusus, dan / atau character.\n numerik\n"
 
-#: accounts/views/api.py:73
+#: accounts/views/api.py:68
 msgid "The email has not been verified."
 msgstr "Email belum diverifikasi."
 
-#: accounts/views/default.py:50
+#: accounts/views/default.py:59
 msgid "Successfully updated profile information"
 msgstr "Informasi profil telah sukses diperbarui"
 
-#: accounts/views/default.py:55
+#: accounts/views/default.py:64
 msgid "Failed to update profile information"
 msgstr "Gagal untuk memperbarui informasi profil"
 
-#: config/settings/default.py:194
+#: config/settings/default.py:201
 msgid ""
 "Base map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> "
 "contributors under <a "
 "href=\"http://opendatacommons.org/licenses/odbl/\">ODbL</a>"
 msgstr "Data peta dasar &copy; Kontributor  <a href=\"http://openstreetmap.org\">OpenStreetMap</a> dibawah lisensi  <a href=\"http://opendatacommons.org/licenses/odbl/\">ODbL</a>"
 
-#: config/settings/default.py:198
+#: config/settings/default.py:205
 msgid "Imagery &copy; DigitalGlobe"
 msgstr "Citra satelit &copy; DigitalGlobe"
 
-#: config/settings/default.py:209
+#: config/settings/default.py:216
 msgid "OpenStreetMap"
 msgstr "OpenStreetMap"
 
-#: config/settings/default.py:215
+#: config/settings/default.py:222
 msgid "+Vivid imagery"
 msgstr "+Vivid imagery"
 
-#: config/settings/default.py:221
+#: config/settings/default.py:228
 msgid "Recent imagery"
 msgstr "Citra satelit terkini"
 
-#: config/settings/default.py:227
+#: config/settings/default.py:234
 msgid "+Vivid imagery with OpenStreetMap"
 msgstr "+Vivid imagery dengan OpenStreetMap"
 
-#: config/settings/default.py:233
+#: config/settings/default.py:240
 msgid "Recent imagery with OpenStreetMap"
 msgstr "Citra satelit terkni dengan OpenStreetMap"
 
-#: config/settings/default.py:265
+#: config/settings/default.py:272 config/settings/languages.py:19
 msgid "English"
 msgstr "Bahasa Inggris"
 
-#: config/settings/default.py:269
+#: config/settings/default.py:273 config/settings/languages.py:26
+msgid "French"
+msgstr ""
+
+#: config/settings/default.py:275 config/settings/languages.py:21
+msgid "Spanish"
+msgstr ""
+
+#: config/settings/default.py:276 config/settings/languages.py:36
 msgid "Indonesian"
 msgstr "bahasa Indonesia"
 
-#: config/settings/default.py:270
+#: config/settings/default.py:277 config/settings/languages.py:61
 msgid "Portuguese"
 msgstr "Bahasa Portugis"
 
-#: core/mixins.py:14
+#: config/settings/languages.py:5
+msgid "Afrikaans"
+msgstr ""
+
+#: config/settings/languages.py:6
+msgid "Arabic"
+msgstr ""
+
+#: config/settings/languages.py:7
+msgid "Azerbaijani"
+msgstr ""
+
+#: config/settings/languages.py:8
+msgid "Belarusian"
+msgstr ""
+
+#: config/settings/languages.py:9
+msgid "Bulgarian"
+msgstr ""
+
+#: config/settings/languages.py:10
+msgid "Bengali"
+msgstr ""
+
+#: config/settings/languages.py:11
+msgid "Breton"
+msgstr ""
+
+#: config/settings/languages.py:12
+msgid "Bosnian"
+msgstr ""
+
+#: config/settings/languages.py:13
+msgid "Catalan"
+msgstr ""
+
+#: config/settings/languages.py:14
+msgid "Czech"
+msgstr ""
+
+#: config/settings/languages.py:15
+msgid "Welsh"
+msgstr ""
+
+#: config/settings/languages.py:16
+msgid "Danish"
+msgstr ""
+
+#: config/settings/languages.py:17
+msgid "German"
+msgstr ""
+
+#: config/settings/languages.py:18
+msgid "Greek"
+msgstr ""
+
+#: config/settings/languages.py:20
+msgid "Esperanto"
+msgstr ""
+
+#: config/settings/languages.py:22
+msgid "Estonian"
+msgstr ""
+
+#: config/settings/languages.py:23
+msgid "Basque"
+msgstr ""
+
+#: config/settings/languages.py:24
+msgid "Persian (Farsi)"
+msgstr ""
+
+#: config/settings/languages.py:25
+msgid "Finnish"
+msgstr ""
+
+#: config/settings/languages.py:27
+msgid "Western Frisian"
+msgstr ""
+
+#: config/settings/languages.py:28
+msgid "Irish"
+msgstr ""
+
+#: config/settings/languages.py:29
+msgid "Scottish Gaelic"
+msgstr ""
+
+#: config/settings/languages.py:30
+msgid "Galician"
+msgstr ""
+
+#: config/settings/languages.py:31
+msgid "Hebrew"
+msgstr ""
+
+#: config/settings/languages.py:32
+msgid "Hindi"
+msgstr ""
+
+#: config/settings/languages.py:33
+msgid "Croatian"
+msgstr ""
+
+#: config/settings/languages.py:34
+msgid "Hungarian"
+msgstr ""
+
+#: config/settings/languages.py:35
+msgid "Interlingua"
+msgstr ""
+
+#: config/settings/languages.py:37
+msgid "Ido"
+msgstr ""
+
+#: config/settings/languages.py:38
+msgid "Icelandic"
+msgstr ""
+
+#: config/settings/languages.py:39
+msgid "Italian"
+msgstr ""
+
+#: config/settings/languages.py:40
+msgid "Japanese"
+msgstr ""
+
+#: config/settings/languages.py:41
+msgid "Georgian"
+msgstr ""
+
+#: config/settings/languages.py:42
+msgid "Kazakh"
+msgstr ""
+
+#: config/settings/languages.py:43
+msgid "Khmer"
+msgstr ""
+
+#: config/settings/languages.py:44
+msgid "Kannada"
+msgstr ""
+
+#: config/settings/languages.py:45
+msgid "Korean"
+msgstr ""
+
+#: config/settings/languages.py:46
+msgid "Luxembourgish"
+msgstr ""
+
+#: config/settings/languages.py:47
+msgid "Lithuanian"
+msgstr ""
+
+#: config/settings/languages.py:48
+msgid "Latvian"
+msgstr ""
+
+#: config/settings/languages.py:49
+msgid "Macedonian"
+msgstr ""
+
+#: config/settings/languages.py:50
+msgid "Malayalam"
+msgstr ""
+
+#: config/settings/languages.py:51
+msgid "Mongolian"
+msgstr ""
+
+#: config/settings/languages.py:52
+msgid "Marathi"
+msgstr ""
+
+#: config/settings/languages.py:53
+msgid "Burmese"
+msgstr ""
+
+#: config/settings/languages.py:54
+msgid "Norwegian (Bokmål)"
+msgstr ""
+
+#: config/settings/languages.py:55
+msgid "Nepali"
+msgstr ""
+
+#: config/settings/languages.py:56
+msgid "Dutch"
+msgstr ""
+
+#: config/settings/languages.py:57
+msgid "Norwegian (Nynorsk)"
+msgstr ""
+
+#: config/settings/languages.py:58
+msgid "Ossetian"
+msgstr ""
+
+#: config/settings/languages.py:59
+msgid "Eastern Punjabi"
+msgstr ""
+
+#: config/settings/languages.py:60
+msgid "Polish"
+msgstr ""
+
+#: config/settings/languages.py:62
+msgid "Romanian"
+msgstr ""
+
+#: config/settings/languages.py:63
+msgid "Russian"
+msgstr ""
+
+#: config/settings/languages.py:64
+msgid "Slovak"
+msgstr ""
+
+#: config/settings/languages.py:65
+msgid "Slovene"
+msgstr ""
+
+#: config/settings/languages.py:66
+msgid "Albanian"
+msgstr ""
+
+#: config/settings/languages.py:67
+msgid "Serbian"
+msgstr ""
+
+#: config/settings/languages.py:68
+msgid "Swedish"
+msgstr ""
+
+#: config/settings/languages.py:69
+msgid "Swahili"
+msgstr ""
+
+#: config/settings/languages.py:70
+msgid "Tamil"
+msgstr ""
+
+#: config/settings/languages.py:71
+msgid "Telugu"
+msgstr ""
+
+#: config/settings/languages.py:72
+msgid "Thai"
+msgstr ""
+
+#: config/settings/languages.py:73
+msgid "Turkish"
+msgstr ""
+
+#: config/settings/languages.py:74
+msgid "Tatar"
+msgstr ""
+
+#: config/settings/languages.py:75
+msgid "Ukrainian"
+msgstr ""
+
+#: config/settings/languages.py:76
+msgid "Urdu"
+msgstr ""
+
+#: config/settings/languages.py:77
+msgid "Vietnamese"
+msgstr ""
+
+#: config/settings/languages.py:78
+msgid "S'gaw Karen"
+msgstr ""
+
+#: core/mixins.py:19
 msgid "You don't have permission for this action."
 msgstr "Anda tidak memiliki izin untuk tindakan ini"
 
@@ -178,8 +492,8 @@ msgstr "Mohon lengkapi dengan nama atau deskripsi"
 
 #: core/tests/test_validators.py:55 core/validators.py:24
 #: organization/tests/test_validators.py:29
-#: organization/tests/test_validators.py:62 questionnaires/validators.py:51
-#: spatial/forms.py:85 spatial/forms.py:93 spatial/forms.py:101
+#: organization/tests/test_validators.py:61 questionnaires/validators.py:60
+#: spatial/forms.py:100 spatial/forms.py:108 spatial/forms.py:116
 msgid "This field is required."
 msgstr "Baris ini diperlukan."
 
@@ -194,34 +508,34 @@ msgstr "Batal menggambar"
 
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:7
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:68
-#: templates/organization/organization_add.html:29
-#: templates/organization/organization_edit.html:31
+#: templates/organization/organization_add.html:30
+#: templates/organization/organization_edit.html:32
 #: templates/organization/organization_members_add.html:33
-#: templates/organization/organization_members_edit.html:89
-#: templates/organization/organization_members_edit.html:157
-#: templates/organization/organization_members_edit.html:183
-#: templates/organization/organization_members_edit.html:209
-#: templates/organization/organization_wrapper.html:142
-#: templates/organization/organization_wrapper.html:168
+#: templates/organization/organization_members_edit.html:87
+#: templates/organization/organization_members_edit.html:153
+#: templates/organization/organization_members_edit.html:179
+#: templates/organization/organization_members_edit.html:205
+#: templates/organization/organization_wrapper.html:145
+#: templates/organization/organization_wrapper.html:171
 #: templates/organization/project_add_wrapper.html:54
-#: templates/organization/project_attrs_import.html:118
-#: templates/organization/project_defaults_import.html:97
-#: templates/organization/project_edit_details.html:98
-#: templates/organization/project_edit_geometry.html:68
+#: templates/organization/project_attrs_import.html:121
+#: templates/organization/project_defaults_import.html:101
+#: templates/organization/project_edit_details.html:107
+#: templates/organization/project_edit_geometry.html:78
 #: templates/organization/project_edit_permissions.html:41
-#: templates/organization/project_select_import.html:100
-#: templates/organization/project_wrapper.html:159
-#: templates/organization/project_wrapper.html:185
-#: templates/party/party_delete.html:23 templates/party/party_edit.html:54
+#: templates/organization/project_select_import.html:101
+#: templates/organization/project_wrapper.html:222
+#: templates/organization/project_wrapper.html:248
+#: templates/party/party_delete.html:21 templates/party/party_edit.html:56
 #: templates/party/relationship_delete.html:20
-#: templates/party/relationship_edit.html:62 templates/resources/edit.html:28
+#: templates/party/relationship_edit.html:65 templates/resources/edit.html:36
 #: templates/resources/modal_add_lib.html:28
 #: templates/resources/modal_archive.html:26
 #: templates/resources/modal_unarchive.html:22
 #: templates/resources/modal_upload.html:30
-#: templates/spatial/location_delete.html:24
-#: templates/spatial/location_form.html:44
-#: templates/spatial/relationship_add.html:142
+#: templates/spatial/location_delete.html:22
+#: templates/spatial/location_form.html:47
+#: templates/spatial/relationship_add.html:132
 msgid "Cancel"
 msgstr "Batal"
 
@@ -302,19 +616,19 @@ msgid "Save changes."
 msgstr "Simpan perubahan."
 
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:64
-#: templates/organization/organization_add.html:26
-#: templates/organization/organization_edit.html:27
+#: templates/organization/organization_add.html:27
+#: templates/organization/organization_edit.html:28
 #: templates/organization/organization_members_add.html:32
-#: templates/organization/organization_members_edit.html:88
-#: templates/organization/project_edit_details.html:97
-#: templates/organization/project_edit_geometry.html:67
+#: templates/organization/organization_members_edit.html:86
+#: templates/organization/project_edit_details.html:106
+#: templates/organization/project_edit_geometry.html:77
 #: templates/organization/project_edit_permissions.html:40
-#: templates/party/party_add.html:45 templates/party/party_edit.html:50
-#: templates/party/relationship_edit.html:61 templates/resources/edit.html:27
+#: templates/party/party_add.html:46 templates/party/party_edit.html:52
+#: templates/party/relationship_edit.html:64 templates/resources/edit.html:35
 #: templates/resources/modal_add_lib.html:25
 #: templates/resources/modal_upload.html:27
-#: templates/spatial/location_form.html:43
-#: templates/spatial/relationship_add.html:138
+#: templates/spatial/location_form.html:46
+#: templates/spatial/relationship_add.html:128
 msgid "Save"
 msgstr "Simpan"
 
@@ -370,7 +684,7 @@ msgstr "{name} tidak ditemukan."
 
 #: organization/choices.py:4 organization/widgets.py:26
 #: organization/widgets.py:57
-#: templates/organization/organization_members_edit.html:40
+#: templates/organization/organization_members_edit.html:38
 msgid "Administrator"
 msgstr "Administrator"
 
@@ -419,107 +733,102 @@ msgstr "Alamat email tidak valid."
 msgid "Please provide either an email address or a phone number."
 msgstr "Mohon lengkapi dengan sebuah alamat email atau nomor telepon. "
 
-#: organization/forms.py:136 organization/serializers.py:33
+#: organization/forms.py:132
+msgid "Organization with this name already exists."
+msgstr ""
+
+#: organization/forms.py:139 organization/serializers.py:33
 msgid "Organization name cannot be “Add” or “New”."
 msgstr "Nama organisasi tidak dapat \"ditambah\" atau \"dibuat\"."
 
-#: organization/forms.py:174
+#: organization/forms.py:178
 msgid "User is already a member of the organization."
 msgstr "Pengguna ini sudah menjadi anggota organisasi."
 
-#: organization/forms.py:180
+#: organization/forms.py:184
 msgid "The role could not be assigned because the data didn't validate."
 msgstr "Peran tidak dapat ditentukan karena data tidak valid."
 
-#: organization/forms.py:211
+#: organization/forms.py:215
 msgid ""
 "Organization administrators cannot change their own role in the "
 "organization."
 msgstr "Administrator organisasi tidak dapat merubah peran mereka sendiri dalam organisasi."
 
-#: organization/forms.py:296
+#: organization/forms.py:300
 msgid "Please select an organization"
 msgstr "Mohon pilih sebuah organisasi"
 
-#: organization/forms.py:306 organization/forms.py:372
+#: organization/forms.py:310 organization/forms.py:387
 #: organization/serializers.py:69
 msgid "Project name cannot be “Add” or “New”."
 msgstr "Proyek tidak dapat \"ditambah\" atau \"diubah\"."
 
-#: organization/forms.py:318 organization/forms.py:383
+#: organization/forms.py:322 organization/forms.py:398
 #: organization/serializers.py:88
 msgid "Project with this name already exists in this organization."
 msgstr "Nama proyek ini sudah dipakai oleh organisasi ini. "
 
-#: organization/forms.py:535
+#: organization/forms.py:359
+#: templates/organization/project_edit_details.html:91
+msgid ""
+"Data has already been contributed to this project. To ensure data integrity,"
+" uploading a new questionnaire is disabled for this project."
+msgstr "Data telah memberikan kontribusi untuk proyek ini. Untuk memastikan integritas data, meng-upload kuesioner baru dinonaktifkan untuk proyek ini."
+
+#: organization/forms.py:554
 msgid "File too large, max size 512kb"
 msgstr "File terlalu besar, max ukuran 512KB"
 
-#: organization/forms.py:545
+#: organization/forms.py:564
 msgid "Invalid file type"
 msgstr "Tipe berkas tidak valid"
 
-#: organization/forms.py:557
+#: organization/forms.py:576
 msgid "Select at least one data type."
 msgstr "Pilih setidaknya satu jenis data."
 
 #: organization/importers/exceptions.py:11
 #, python-format
 msgid "Error importing file at line %d: %s"
-msgstr "Terdapat kesalahan saat mengimpor file pada baris %d: %s"
+msgstr ""
 
 #: organization/importers/exceptions.py:15
 #, python-format
 msgid "Error importing file: %s"
 msgstr "Kesalahan berkas mengimpor: %s"
 
-#: organization/importers/validators.py:18
+#: organization/importers/validators.py:17
+msgid "No '{}' column found."
+msgstr ""
+
+#: organization/importers/validators.py:30
 msgid "Number of headers and columns do not match."
 msgstr "Jumlah header dan kolom tidak cocok."
 
-#: organization/importers/validators.py:25
-msgid "No 'party_name' column found."
-msgstr "Tidak ada kolom 'party_name' ditemukan."
-
-#: organization/importers/validators.py:31
-msgid "No 'party_type' column found."
-msgstr "Tidak ada kolom 'party_type' ditemukan."
-
-#: organization/importers/validators.py:38
-msgid "No 'geometry_field' column found."
-msgstr "Tidak ada 'geometry_field' kolom ditemukan."
-
-#: organization/importers/validators.py:48
+#: organization/importers/validators.py:50
 msgid "Invalid geometry."
 msgstr "geometri tidak valid."
 
-#: organization/importers/validators.py:55
+#: organization/importers/validators.py:57
 #, python-format
 msgid "Invalid location_type: '%s'."
 msgstr "Location_type tidak valid: '%s'."
 
-#: organization/importers/validators.py:59
-msgid "No 'location_type' column found."
-msgstr "Tidak ada kolom 'location_type' ditemukan."
-
-#: organization/importers/validators.py:68
+#: organization/importers/validators.py:65
 #, python-format
 msgid "Invalid tenure_type: '%s'."
 msgstr "Valid tenure_type: '%s'."
 
-#: organization/importers/validators.py:72
-msgid "No 'tenure_type' column found."
-msgstr "Kolom 'tenure_type' tidak ditemukan"
-
-#: organization/importers/xls.py:90
+#: organization/importers/xls.py:91
 msgid "Empty worksheet."
 msgstr "worksheet kosong."
 
-#: organization/importers/xls.py:110
+#: organization/importers/xls.py:111
 msgid "Unsupported import format."
 msgstr "Format impor tidak didukung."
 
-#: organization/importers/xls.py:113
+#: organization/importers/xls.py:114
 #, python-format
 msgid "Missing '%s' worksheet."
 msgstr "Hilang '%s' worksheet."
@@ -596,109 +905,109 @@ msgstr "Anda tidak memiliki izin untuk mendownload data dari proyek ini"
 msgid "You don't have permission to import data to this project"
 msgstr "Anda tidak memiliki izin untuk mengimpor data untuk proyek ini"
 
-#: organization/models.py:63
+#: organization/models.py:64
 msgid "List existing organizations"
 msgstr "Daftar organisasi yang tersedia"
 
-#: organization/models.py:66
+#: organization/models.py:67
 msgid "Create organizations"
 msgstr "Buat organisasi"
 
-#: organization/models.py:69
+#: organization/models.py:70
 msgid "View existing organizations"
 msgstr "Lihat organisasi yang tersedia"
 
-#: organization/models.py:72
+#: organization/models.py:73
 msgid "View archived organization"
 msgstr "Lihat orgnasiasi yang ter-arsip"
 
-#: organization/models.py:75
+#: organization/models.py:76
 msgid "Update an existing organization"
 msgstr "Perbarui sebuah organisasi yang tersedia"
 
-#: organization/models.py:78
+#: organization/models.py:79
 msgid "Archive an existing organization"
 msgstr "Arsipkan sebuah organisasi yang tersedia"
 
-#: organization/models.py:81
+#: organization/models.py:82
 msgid "Unarchive an existing organization"
 msgstr "Pulihkan arsip dari organisasi yang tersedia"
 
-#: organization/models.py:84
+#: organization/models.py:85
 msgid "List members of an organization"
 msgstr "Daftar anggota dari sebuah organisasi"
 
-#: organization/models.py:87
+#: organization/models.py:88
 msgid "Add a member to an organization"
 msgstr "Tambahkan seorang anggota ke sebuah organisasi"
 
-#: organization/models.py:90
+#: organization/models.py:91
 msgid "Edit a member of an organization"
 msgstr "Ubah seorang anggota dari sebuah organisasi"
 
-#: organization/models.py:93
+#: organization/models.py:94
 msgid "Remove a member from an organization"
 msgstr "Hapus seorang anggota dari sebuah organisasi"
 
-#: organization/models.py:203
+#: organization/models.py:201
 msgid "List existing projects in an organization"
 msgstr "Daftar proyek yang tersedia dalam sebuah organisasi"
 
-#: organization/models.py:206
+#: organization/models.py:204
 msgid "Create projects in an organization"
 msgstr "Buat proyek dalam sebuah organisasi"
 
-#: organization/models.py:209
+#: organization/models.py:207
 msgid "View existing projects"
 msgstr "Lihat proyek yang tersedia"
 
-#: organization/models.py:212
+#: organization/models.py:210
 msgid "View private projects"
 msgstr "Lihat proyek pribadi"
 
-#: organization/models.py:215
+#: organization/models.py:213
 msgid "View archived projects"
 msgstr "Lihat proyek yang ter-arsip"
 
-#: organization/models.py:218
+#: organization/models.py:216
 msgid "Update an existing project"
 msgstr "Perbarui sebuah proyek yang tersedia"
 
-#: organization/models.py:221
+#: organization/models.py:219
 msgid "Archive an existing project"
 msgstr "Arsipkan proyek yang tersedia"
 
-#: organization/models.py:224
+#: organization/models.py:222
 msgid "Unarchive an existing project"
 msgstr "Pulihkan arsip sebuah proyek yang tersedia"
 
-#: organization/models.py:227
+#: organization/models.py:225
 msgid "List users within a project"
 msgstr "Daftar pengguna dalam sebuah proyek"
 
-#: organization/models.py:230
+#: organization/models.py:228
 msgid "Add user to a project"
 msgstr "Tambahkan pengguna ke sebuah proyek"
 
-#: organization/models.py:233
+#: organization/models.py:231
 msgid "Edit roles of user in a project"
 msgstr "Ubah peran pengguna dalam sebuah proyek"
 
-#: organization/models.py:236
+#: organization/models.py:234
 msgid "Remove user from a project"
 msgstr "Hapus pengguna dari proyek"
 
-#: organization/models.py:239
+#: organization/models.py:237
 msgid "Download data from a project"
 msgstr "Download data dari sebuah proyek"
 
-#: organization/models.py:242
+#: organization/models.py:240
 msgid "Import data to a project"
 msgstr "Impor data ke dalam sebuah proyek"
 
-#: organization/models.py:259
-#: templates/organization/organization_dashboard.html:24
-#: templates/organization/organization_members_edit.html:73
+#: organization/models.py:257
+#: templates/organization/organization_dashboard.html:28
+#: templates/organization/organization_members_edit.html:71
 #: templates/organization/project_list.html:41
 msgid "Project"
 msgstr "Proyek"
@@ -738,26 +1047,26 @@ msgstr "Lebih dari satu pengguna dengan nama pengguna atau email {email} telah d
 msgid "Project visibility"
 msgstr "Keterbukaan proyek"
 
-#: organization/widgets.py:162 templates/party/party_detail.html:37
+#: organization/widgets.py:168 templates/party/party_detail.html:37
 #: templates/party/party_form.html:6 templates/party/party_list.html:21
 #: templates/resources/form.html:17
 msgid "Name"
 msgstr "Nama"
 
-#: organization/widgets.py:163
+#: organization/widgets.py:169
 msgid "Phone"
 msgstr "Telepon"
 
-#: organization/widgets.py:164 templates/accounts/profile.html:25
+#: organization/widgets.py:170 templates/accounts/profile.html:25
 #: templates/accounts/snippets/registration_form.html:18
 #: templates/allauth/account/email.html:59
-#: templates/allauth/account/signup.html:53
+#: templates/allauth/account/signup.html:54
 #: templates/organization/organization_members.html:30
 #: templates/organization/user_list.html:33
 msgid "Email"
 msgstr "Email"
 
-#: organization/widgets.py:165
+#: organization/widgets.py:171
 msgid "Add contact"
 msgstr "Tambah kontak"
 
@@ -839,18 +1148,6 @@ msgid ""
 "You don't have permission to add resources to this tenure relationship."
 msgstr "Anda tidak memiliki izin untuk menambahkan sumber daya untuk hubungan kepemilikan ini."
 
-#: party/models.py:44
-msgid "Individual"
-msgstr "Individual"
-
-#: party/models.py:45
-msgid "Corporation"
-msgstr "Korporat"
-
-#: party/models.py:46
-msgid "Group"
-msgstr "Grup"
-
 #: party/models.py:94
 msgid "List existing parties of a project"
 msgstr "Daftar kelompok yang tersedia dalam sebuah proyek"
@@ -875,170 +1172,103 @@ msgstr "Hapus sebuah kelompok yang tersedia"
 msgid "Add resources to the party"
 msgstr "Tambahkan sumber daya ke dalam kelompok"
 
-#: party/models.py:126 spatial/forms.py:51
+#: party/models.py:126 search/views/async.py:199
 #: templates/organization/project_defaults_import.html:10
-#: templates/organization/project_select_import.html:63
-#: templates/party/relationship_detail.html:33
-#: templates/spatial/location_detail.html:67
+#: templates/organization/project_select_import.html:64
+#: templates/party/party_detail.html:23
+#: templates/party/relationship_detail.html:27
+#: templates/spatial/location_detail.html:63
 msgid "Party"
 msgstr "Kelompok"
 
-#: party/models.py:184
+#: party/models.py:183
 msgid "List existing party relationships of a project"
 msgstr "Daftar hubungan kelompok yang tersedia dalam sebuah proyek"
 
-#: party/models.py:189
+#: party/models.py:188
 msgid "Add a party relationship to a project"
 msgstr "Tambahkan sebuah hubungan kelompok dalam sebuah proyek"
 
-#: party/models.py:193
+#: party/models.py:192
 msgid "View an existing party relationship"
 msgstr "Lihat sebuah hubungan kelompok yang tersedia"
 
-#: party/models.py:196
+#: party/models.py:195
 msgid "Update an existing party relationship"
 msgstr "Perbarui sebuah hubungan kelompok yang tersedia"
 
-#: party/models.py:199
+#: party/models.py:198
 msgid "Delete an existing party relationship"
 msgstr "Hapus sebuah hubungan kelompok yang tersedia"
 
-#: party/models.py:236
+#: party/models.py:235
 msgid "Contractual/Share Crop"
 msgstr "Kontraktual/Bagi Hasil"
 
-#: party/models.py:237
+#: party/models.py:236
 msgid "Customary Arrangement"
 msgstr "Pengaturan Adat"
 
-#: party/models.py:238
+#: party/models.py:237
 msgid "Gift"
 msgstr "Hibah"
 
-#: party/models.py:239
+#: party/models.py:238
 msgid "Homestead"
 msgstr "Rumah tinggal"
 
-#: party/models.py:240
+#: party/models.py:239
 msgid "Informal Occupant"
 msgstr "Penghuni informal"
 
-#: party/models.py:241
+#: party/models.py:240
 msgid "Inheritance"
 msgstr "Warisan"
 
-#: party/models.py:242 party/models.py:355
+#: party/models.py:241
 msgid "Leasehold"
 msgstr "Kontrak"
 
-#: party/models.py:243
+#: party/models.py:242
 msgid "Purchased Freehold"
 msgstr "Pembelian Hak Milik"
 
-#: party/models.py:244
+#: party/models.py:243
 msgid "Rental"
 msgstr "Sewa"
 
-#: party/models.py:245
+#: party/models.py:244
 msgid "Other"
 msgstr "Lainnya"
 
-#: party/models.py:274
+#: party/models.py:273
 msgid "List existing tenure relationships of a project"
 msgstr "Daftar hubungan kepemilikan yang tersedia dalam sebuah proyek"
 
-#: party/models.py:279
+#: party/models.py:278
 msgid "Add a tenure relationship to a project"
 msgstr "Tambahkan sebuah hubungan kepemilikan dalam sebuah proyek"
 
-#: party/models.py:283
+#: party/models.py:282
 msgid "View an existing tenure relationship"
 msgstr "Lihat sebuah hubungan kepemilikan yang tersedia"
 
-#: party/models.py:286
+#: party/models.py:285
 msgid "Update an existing tenure relationship"
 msgstr "Perbarui sebuah hubungan kepemilikan yang tersedia"
 
-#: party/models.py:289
+#: party/models.py:288
 msgid "Delete an existing tenure relationship"
 msgstr "Hapus sebuah hubungan kepemilikan yang tersedia"
 
-#: party/models.py:292
+#: party/models.py:291
 msgid "Add a resource to a tenure relationship"
 msgstr "Tambahkan sumber daya ke sebuah hubungan kepemilikan"
 
-#: party/models.py:317 templates/party/relationship_detail.html:9
-#: templates/spatial/location_detail.html:66
+#: party/models.py:316 templates/party/party_detail.html:61
+#: templates/spatial/location_detail.html:62
 msgid "Relationship"
 msgstr "Hubungan"
-
-#: party/models.py:345
-msgid "Carbon Rights"
-msgstr "Hak Karbon"
-
-#: party/models.py:346
-msgid "Concessionary Rights"
-msgstr "Hak Konsesi"
-
-#: party/models.py:347
-msgid "Customary Rights"
-msgstr "Hak Adat"
-
-#: party/models.py:348
-msgid "Easement"
-msgstr "Hak Pakai (Easement)"
-
-#: party/models.py:349
-msgid "Equitable Servitude"
-msgstr "Hak Pakai (Equitable Servitude)"
-
-#: party/models.py:350
-msgid "Freehold"
-msgstr "Hak Milik"
-
-#: party/models.py:351
-msgid "Grazing Rights"
-msgstr "Hak Guna Usaha (Ternak)"
-
-#: party/models.py:352
-msgid "Hunting/Fishing/Harvest Rights"
-msgstr "Hak Guna Usaha (Berburu/Memancing/Pertanian)"
-
-#: party/models.py:353
-msgid "Indigenous Land Rights"
-msgstr "Hak Atas Tanah Adat"
-
-#: party/models.py:354
-msgid "Joint Tenancy"
-msgstr "Hak Bersama"
-
-#: party/models.py:356
-msgid "Longterm Leasehold"
-msgstr "Kontrak Jangka Panjang"
-
-#: party/models.py:357
-msgid "Mineral Rights"
-msgstr "Hak Mineral"
-
-#: party/models.py:358
-msgid "Occupancy (No Documented Rights)"
-msgstr "Kependudukan (Tanpa Dokumen Hak)"
-
-#: party/models.py:359
-msgid "Tenancy (Documented Sub-lease)"
-msgstr "Kontrak (Sub-kontrak Terdaftar)"
-
-#: party/models.py:360
-msgid "Tenancy In Common"
-msgstr "Hak Milik (Bersama)"
-
-#: party/models.py:361
-msgid "Undivided Co-ownership"
-msgstr "Hak Milik Bersama (Tak Terbagi)"
-
-#: party/models.py:362
-msgid "Water Rights"
-msgstr "Hak Air"
 
 #: party/serializers.py:54
 msgid "The parties must be different"
@@ -1052,11 +1282,11 @@ msgstr "Proyek 'party1' ({}) harus setara dengan proyek 'party2' ({})"
 msgid "'party' project ({}) should be equal to 'spatial_unit' project ({})"
 msgstr "Proyek 'party' ({}) harus setara dengan proyek 'spatial_unit' ({})"
 
-#: party/views/api.py:118
+#: party/views/api.py:120
 msgid "Relationship class is unknown"
 msgstr "Kelas hubungan tidak dikenal"
 
-#: questionnaires/managers.py:60
+#: questionnaires/managers.py:61
 #, python-brace-format
 msgid "Please provide at least one option for field '{field_name}'"
 msgstr "Mohon lengkapi dengan salah satu pilihan pada baris '{field_name}'"
@@ -1073,6 +1303,13 @@ msgstr "Anda tidak memiliki izin untuk menambahkan kuesioner untuk proyek ini."
 msgid "You don't have permission to edit the questionnaire of this project"
 msgstr "Anda tidak memiliki izin untuk mengubah kuesioner dari proyek ini"
 
+#: questionnaires/messages.py:10
+msgid ""
+"Unable to assign question group to model entitity. Make sure to add a "
+"'relevant' clause to the question group definition when adding more than one"
+" question group for a model entity."
+msgstr ""
+
 #: questionnaires/models.py:66
 msgid "View the questionnaire of the project"
 msgstr "Lihat kuesioner proyek"
@@ -1085,11 +1322,11 @@ msgstr "Tambahkan sebuah kuesioner ke sebuah proyek"
 msgid "Edit an existing questionnaire"
 msgstr "Ubah sebuah kuesioner yang tersedia"
 
-#: questionnaires/validators.py:55
+#: questionnaires/validators.py:64
 msgid "Value must be of type {}."
 msgstr "Nilai harus dari jenis {}."
 
-#: questionnaires/validators.py:58
+#: questionnaires/validators.py:67
 msgid "{} is not an accepted value."
 msgstr "{} Bukan merupakan nilai yang diterima."
 
@@ -1117,45 +1354,52 @@ msgstr "Anda tidak memiliki izin untuk menghapus sumber daya ini."
 msgid "You don't have permission to restore this resource."
 msgstr "Anda tidak memiliki izin untuk mengembalikan sumber daya ini."
 
-#: resources/models.py:58 resources/models.py:224
+#: resources/models.py:60 resources/models.py:241
 msgid "List resources"
 msgstr "Daftar sumber daya"
 
-#: resources/models.py:62
-msgid "Add new resources"
-msgstr "Tambah sumber daya baru"
+#: resources/models.py:64
+msgid "Add resources"
+msgstr ""
 
-#: resources/models.py:66 resources/models.py:228
+#: resources/models.py:68 resources/models.py:245
 msgid "View resource"
 msgstr "Lihat sumber daya"
 
-#: resources/models.py:69 templates/resources/edit.html:4
-#: templates/resources/project_detail.html:30
+#: resources/models.py:71 templates/resources/edit.html:4
+#: templates/resources/project_detail.html:18
 msgid "Edit resource"
 msgstr "Ubah sumber daya"
 
-#: resources/models.py:72 resources/models.py:231
+#: resources/models.py:74 resources/models.py:248
 msgid "Archive resource"
 msgstr "Arsipkan sumber daya"
 
-#: resources/models.py:75 resources/models.py:234
+#: resources/models.py:77 resources/models.py:251
 msgid "Unarchive resource"
 msgstr "Pulihkan arsip sumber daya"
 
-#: resources/models.py:183 resources/tests/test_models.py:230
+#: resources/models.py:129 templates/resources/edit.html:26
+#: templates/resources/project_detail.html:32 templates/resources/table.html:7
+#: templates/resources/table_add_lib.html:8
+#: templates/resources/table_sm.html:7
+msgid "Resource"
+msgstr "Sumber daya"
+
+#: resources/models.py:200 resources/tests/test_models.py:254
 msgid "Invalid GPX file"
 msgstr "Berkas GPX tidak valid"
 
-#: resources/models.py:192
+#: resources/models.py:209
 #, python-brace-format
 msgid "Invalid GPX mime type: {error}"
 msgstr "Tipe mime GPX tidak valid: {error}"
 
-#: resources/serializers.py:27
+#: resources/serializers.py:28
 msgid "Resource not found"
 msgstr "Sumber daya tidak ditemukan"
 
-#: resources/tests/test_models.py:218
+#: resources/tests/test_models.py:242
 msgid "Invalid GPX mime type: audio/mpeg"
 msgstr "Tipe mime GPX tidak valid: audio/mpeg"
 
@@ -1176,6 +1420,31 @@ msgstr "Terikat dengan 1 entitas lain"
 #, python-brace-format
 msgid "Attached to {number} other entities"
 msgstr "Terikat dengan {number} entitas lain"
+
+#: search/views/async.py:109
+msgid "unknown"
+msgstr ""
+
+#: search/views/async.py:196 templates/party/party_detail.html:41
+#: templates/party/party_form.html:13 templates/party/party_form.html:19
+#: templates/party/party_list.html:22
+#: templates/party/relationship_detail.html:23
+#: templates/resources/table.html:8 templates/resources/table_add_lib.html:9
+#: templates/spatial/location_detail.html:36
+msgid "Type"
+msgstr "Tipe"
+
+#: search/views/async.py:200
+msgid "Location type"
+msgstr ""
+
+#: search/views/async.py:204
+msgid "Original file"
+msgstr ""
+
+#: search/views/async.py:205 templates/resources/form.html:22
+msgid "Description"
+msgstr "Deskripsi"
 
 #: spatial/choices.py:4
 msgid "Parcel"
@@ -1213,32 +1482,15 @@ msgstr "Batas taman nasional"
 msgid "Miscellaneous"
 msgstr "Lain-lain"
 
-#: spatial/forms.py:21
-msgid ""
-"No map location was provided. Please use the tools provided on the left side"
-" of the map to mark your new location."
-msgstr "Tidak ada lokasi peta yang disediakan. Mohon gunakan fungsi yang telah disediakan pada sisi kiri peta untuk menandakan lokasi baru Anda."
-
-#: spatial/forms.py:27
+#: spatial/forms.py:45
 msgid "Please select a location type"
 msgstr "Mohon pilih tipe lokasi"
 
-#: spatial/forms.py:49
-msgid "Please select"
-msgstr "Mohon pilih"
-
-#: spatial/forms.py:50 spatial/models.py:101
-#: templates/organization/project_defaults_import.html:49
-#: templates/organization/project_select_import.html:69
-#: templates/spatial/location_detail.html:12
-msgid "Location"
-msgstr "Lokasi"
-
-#: spatial/forms.py:71
+#: spatial/forms.py:72 spatial/forms.py:83
 msgid "Please select a party type"
 msgstr "Mohon pilih sebuah tipe kelompok"
 
-#: spatial/forms.py:74 spatial/tests/test_forms.py:170
+#: spatial/forms.py:74 spatial/forms.py:85 spatial/tests/test_forms.py:154
 msgid "Please select a relationship type"
 msgstr "Mohon pilih sebuah tipe hubungan"
 
@@ -1312,23 +1564,33 @@ msgstr "Hapus unit spasial yang tersedia"
 msgid "Add resources to this spatial unit"
 msgstr "Tambahkan sumber daya pada unit spasial ini"
 
-#: spatial/models.py:192
+#: spatial/models.py:101
+#: templates/organization/project_defaults_import.html:51
+#: templates/organization/project_select_import.html:70
+#: templates/party/relationship_detail.html:9
+#: templates/party/relationship_edit.html:36
+#: templates/spatial/location_detail.html:12
+#: templates/spatial/location_form.html:16
+msgid "Location"
+msgstr "Lokasi"
+
+#: spatial/models.py:200
 msgid "List existing spatial relationships of a project"
 msgstr "Daftar hubungan spasial yang tersedia dalam sebuah peroyek"
 
-#: spatial/models.py:197
+#: spatial/models.py:205
 msgid "Add a spatial relationship to a project"
 msgstr "Tambahkan sebuah hubungan spasial untuk sebuah proyek"
 
-#: spatial/models.py:201
+#: spatial/models.py:209
 msgid "View an existing spatial relationship"
 msgstr "Lihat sebuah hubungan spasial yang tersedia"
 
-#: spatial/models.py:204
+#: spatial/models.py:212
 msgid "Update an existing spatial relationship"
 msgstr "Ubah sebuah hubungan spasial yang tersedia"
 
-#: spatial/models.py:207
+#: spatial/models.py:215
 msgid "Delete an existing spatial relationship"
 msgstr "Hapus sebuah hubungan spasial yang tersedia"
 
@@ -1354,8 +1616,8 @@ msgstr "Proyek tidak ditemukan"
 msgid "Please select a party"
 msgstr "Mohon pilih sebuah kelompok"
 
-#: spatial/widgets.py:42 templates/organization/project_wrapper.html:85
-#: templates/party/party_add.html:36
+#: spatial/widgets.py:42 templates/organization/project_wrapper.html:101
+#: templates/party/party_add.html:37
 msgid "Add party"
 msgstr "Tambah kelompok"
 
@@ -1419,6 +1681,25 @@ msgstr "Tim %(site_name)s"
 msgid "Change of email on %(site_name)s"
 msgstr "Ubah email pada %(site_name)s"
 
+#: templates/accounts/email/email_changed_notification.txt:3
+msgid ""
+"\n"
+"You are receiving this email because a user at Cadasta Platform changed the email address for the account previously linked to this email address.\n"
+"\n"
+"If it wasn't you who changed the email address, please contact us immediately under security@cadasta.org.\n"
+msgstr ""
+
+#: templates/accounts/email/email_changed_notification.txt:9
+msgid "The Cadasta Team. "
+msgstr ""
+
+#: templates/accounts/email/password_changed_notification.txt:2
+msgid ""
+"You are receiving this email because a user at Cadasta Platform has changed "
+"or reset the password for your account. If it wasn't you, please contact us "
+"immediately under security@cadasta.org"
+msgstr ""
+
 #: templates/accounts/email/password_reset.txt:2
 #, python-format
 msgid ""
@@ -1444,48 +1725,59 @@ msgstr "Perbarui profil anda"
 
 #: templates/accounts/profile.html:19
 #: templates/accounts/snippets/registration_form.html:11
-#: templates/allauth/account/login.html:48
 #: templates/organization/organization_members.html:29
 msgid "Username"
 msgstr "Nama pengguna"
 
-#: templates/accounts/profile.html:31
+#: templates/accounts/profile.html:27
+msgid ""
+"The email for this account has been changed recently, but the new email "
+"address has not yet been verified. You should have received an email with a "
+"link to verify the new email address."
+msgstr ""
+
+#: templates/accounts/profile.html:32
 #: templates/accounts/snippets/registration_form.html:32
-#: templates/allauth/account/signup.html:72
+#: templates/allauth/account/signup.html:74
 msgid "Full name"
 msgstr "Nama lengkap"
 
 #: templates/accounts/profile.html:38
+#: templates/accounts/snippets/registration_form.html:25
+#: templates/allauth/account/login.html:54
+#: templates/allauth/account/signup.html:60
+msgid "Password"
+msgstr "Kata kunci"
+
+#: templates/accounts/profile.html:39
+msgid "Please enter your password to verify your identity."
+msgstr ""
+
+#: templates/accounts/profile.html:46
 msgid "Update profile"
 msgstr "Perbarui profil"
 
-#: templates/accounts/profile.html:41
+#: templates/accounts/profile.html:49
 msgid "Password options"
 msgstr "Pilihan kata kunci"
 
-#: templates/accounts/profile.html:45
-#: templates/allauth/account/password_change.html:45
-#: templates/allauth/account/password_reset_from_key.html:34
+#: templates/accounts/profile.html:53
+#: templates/allauth/account/password_change.html:51
+#: templates/allauth/account/password_reset_from_key.html:39
 #: templates/allauth/account/password_reset_from_key_done.html:9
 msgid "Change password"
 msgstr "Ubah kata kunci"
 
-#: templates/accounts/profile.html:50
+#: templates/accounts/profile.html:58
 #: templates/allauth/account/password_reset.html:27
 msgid "Reset password"
 msgstr "Reset kata kunci"
 
 #: templates/accounts/snippets/registration_form.html:3
 #: templates/allauth/account/signup.html:10
-#: templates/allauth/account/signup.html:82 templates/core/base.html:65
+#: templates/allauth/account/signup.html:84 templates/core/base.html:66
 msgid "Register"
 msgstr "Daftar"
-
-#: templates/accounts/snippets/registration_form.html:25
-#: templates/allauth/account/login.html:54
-#: templates/allauth/account/signup.html:59
-msgid "Password"
-msgstr "Kata kunci"
 
 #: templates/accounts/snippets/registration_form.html:36
 msgid "Submit"
@@ -1583,10 +1875,10 @@ msgstr "Apakah Anda ingin menghapus alamat email yang dipilih?"
 msgid ""
 "\n"
 "\n"
-"You're receiving this email because user %(user_display)s at Cadasta Platform has given yours as an email address to connect their account.\n"
+"You are receiving this email because a user at Cadasta Platform has given yours as an email address to connect their account.\n"
 "\n"
 "To confirm this is correct, go to %(activate_url)s\n"
-msgstr "\n\nAnda menerima email ini karena pengguna %(user_display)s pada Platform Cadasta telah memberikan alamat email Anda untuk menghubungkan alamat email tersebut dengan akun. \n\nUntuk konfirmasi kebenaran, kunjungi %(activate_url)s\n"
+msgstr ""
 
 #: templates/allauth/account/email/email_confirmation_message.txt:8
 msgid "Thank you from Cadasta."
@@ -1600,19 +1892,16 @@ msgstr "Mohon Konfirmasi Alamat Email Anda"
 msgid ""
 "\n"
 "\n"
-"You're receiving this email because you or someone else has requested a password for your user account at Cadasta Platform.\n"
+"You're receiving this email because you or someone else has requested a password reset for your user account at Cadasta Platform.\n"
 "\n"
-"It can be safely ignored if you did not request a password reset. Click the link below to reset your password."
-msgstr "\n\nAnda menerima email ini karena Anda atau orang lain telah meminta kata kunci untuk akun pengguna Anda pada Cadasta Platform.\n\nAnda dapat mengabaikan email ini jika Anda tidak meminta untuk melakukan reset kata kunci. Klik tautan di bawah ini untuk melakukan reset kata kunci.."
+"Click the link below to reset your password."
+msgstr ""
 
 #: templates/allauth/account/email/password_reset_key_message.txt:9
-#, python-format
-msgid "In case you forgot, your username is %(username)s."
-msgstr "Jika Anda lupa, nama pengguna Anda adalah %(username)s."
-
-#: templates/allauth/account/email/password_reset_key_message.txt:11
-msgid "Thank you for using Cadasta Platform!\n"
-msgstr "Terima kasih telah menggunakan Platform Cadasta!\n"
+msgid ""
+"\n"
+"If you did not request a password reset, please contact us immediately at security@cadasta.org\n"
+msgstr ""
 
 #: templates/allauth/account/email/password_reset_key_subject.txt:3
 msgid "Password Reset Email"
@@ -1634,8 +1923,8 @@ msgid ""
 msgstr "Mohon konfirmasi bahwa <a href=\"mailto:%(email)s\">%(email)s</a> adalah sebuah alamat email untuk pengguna %(user_display)s."
 
 #: templates/allauth/account/email_confirm.html:23
-#: templates/organization/organization_members_edit.html:180
-#: templates/organization/organization_members_edit.html:206
+#: templates/organization/organization_members_edit.html:176
+#: templates/organization/organization_members_edit.html:202
 msgid "Confirm"
 msgstr "Konfirmasi"
 
@@ -1679,7 +1968,12 @@ msgstr "Buat akun sekarang."
 msgid "Sign in to your account"
 msgstr "Masuk ke akun Anda"
 
+#: templates/allauth/account/login.html:48
+msgid "Username or email address"
+msgstr ""
+
 #: templates/allauth/account/login.html:61
+#: templates/allauth/account/password_change.html:31
 msgid "Forgotten password?"
 msgstr "Lupa kata kunci?"
 
@@ -1760,34 +2054,29 @@ msgstr "Alamat email utama Anda harus diverifikasi."
 msgid "Change Password"
 msgstr "Ubah Kata Kunci"
 
-#: templates/allauth/account/password_change.html:18
-#: templates/allauth/account/password_reset_from_key.html:11
+#: templates/allauth/account/password_change.html:19
+#: templates/allauth/account/password_reset_from_key.html:15
 msgid "Change your password"
 msgstr "Ubah kata kunci Anda"
 
-#: templates/allauth/account/password_change.html:25
+#: templates/allauth/account/password_change.html:26
 msgid "Current password"
 msgstr "Kata kunci saat ini"
 
-#: templates/allauth/account/password_change.html:31
-#: templates/allauth/account/password_reset_from_key.html:22
+#: templates/allauth/account/password_change.html:36
+#: templates/allauth/account/password_reset_from_key.html:26
 msgid "Enter a new password"
 msgstr "Masukan kata kunci baru"
 
-#: templates/allauth/account/password_change.html:33
-#: templates/allauth/account/password_reset_from_key.html:24
-#: templates/allauth/account/signup.html:61
+#: templates/allauth/account/password_change.html:45
+#: templates/allauth/account/password_reset_from_key.html:35
+#: templates/allauth/account/signup.html:69
 msgid ""
 "Passwords must have a minimum of 10 characters and contain at least 3 of the"
 " following: lowercase characters, uppercase characters, special characters, "
 "and/or numerical characters.  Passwords cannot contain the username or email"
 " address."
 msgstr "Password harus memiliki minimal 10 karakter dan mengandung setidaknya 3 hal berikut: karakter huruf kecil, karakter huruf besar, karakter khusus, dan / atau karakter numerik. Password tidak dapat berisi username atau alamat email."
-
-#: templates/allauth/account/password_change.html:38
-#: templates/allauth/account/password_reset_from_key.html:29
-msgid "Confirm the new password"
-msgstr "Konfirmasi kata kunci baru"
 
 #: templates/allauth/account/password_reset.html:7
 #: templates/allauth/account/password_reset_done.html:6
@@ -1808,16 +2097,18 @@ msgstr "Kata kunci di-reset."
 
 #: templates/allauth/account/password_reset_done.html:18
 msgid ""
-"We have sent you an email. Please <a "
-"href=\"mailto:support@cadasta.org\">contact us</a> if you do not receive it "
-"within a few minutes."
-msgstr "Kami telah mengirimkan email untuk Anda. Mohon <a href=\"mailto:support@cadasta.org\">hubungi kami</a> jika Anda tidak menerimanya dalam beberapa menit."
+"Your email address has been submitted. If it matches your account on the "
+"Cadasta Platform, you will receive an email shortly with instructions for "
+"resetting your password. Please <a "
+"href=\"mailto:support@cadasta.org\">contact us</a> if you require "
+"assistance."
+msgstr ""
 
-#: templates/allauth/account/password_reset_from_key.html:11
+#: templates/allauth/account/password_reset_from_key.html:15
 msgid "Bad token"
 msgstr "Token buruk"
 
-#: templates/allauth/account/password_reset_from_key.html:15
+#: templates/allauth/account/password_reset_from_key.html:19
 #, python-format
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
@@ -1825,7 +2116,7 @@ msgid ""
 "reset</a>."
 msgstr "Tautan untuk reset kata kunci tidak valid, kemungkinan karena telah digunakan sebelumnya. Mohon meminta <a href=\"%(passwd_reset_url)s\">reset kata kunci yang baru</a>."
 
-#: templates/allauth/account/password_reset_from_key.html:38
+#: templates/allauth/account/password_reset_from_key.html:43
 #: templates/allauth/account/password_reset_from_key_done.html:10
 msgid "Your password is now changed."
 msgstr "Kata kunci Anda telah diubah."
@@ -1839,19 +2130,15 @@ msgstr "Atur Kata Kunci"
 msgid "Set password"
 msgstr "Atur kata kunci"
 
-#: templates/allauth/account/signup.html:42
+#: templates/allauth/account/signup.html:43
 msgid "Register for a free account"
 msgstr "Daftar untuk sebuah akun gratis"
 
-#: templates/allauth/account/signup.html:47
+#: templates/allauth/account/signup.html:48
 msgid "Choose your username"
 msgstr "Pilih nama pengguna"
 
-#: templates/allauth/account/signup.html:66
-msgid "Confirm password"
-msgstr "Konfirmasi kata kunci"
-
-#: templates/allauth/account/signup.html:86
+#: templates/allauth/account/signup.html:88
 #, python-format
 msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
 msgstr "Sudah memiliki akun?  <a href=\"%(login_url)s\">Masuk</a>"
@@ -1991,115 +2278,129 @@ msgid ""
 "%(site_name)s. As a final step, please complete the following form:"
 msgstr "Anda akan menggunakan akun %(provider_name)s untuk masuk ke\n%(site_name)s. Untuk langkah akhir, mohon lengkapi form berikut:"
 
-#: templates/core/base.html:52
+#: templates/core/base.html:53
 msgid "Edit profile"
 msgstr "Edit profil"
 
-#: templates/core/base.html:56
+#: templates/core/base.html:57
 msgid "Logout"
 msgstr "Keluar"
 
-#: templates/core/base.html:64
-#: templates/organization/project_dashboard.html:120
+#: templates/core/base.html:65
+#: templates/organization/project_dashboard.html:125
 msgid "Sign in"
 msgstr "Masuk"
 
-#: templates/core/base.html:77 templates/core/base.html:99
-#: templates/organization/organization_dashboard.html:17
+#: templates/core/base.html:78 templates/core/base.html:100
+#: templates/organization/organization_dashboard.html:22
 #: templates/organization/organization_list.html:41
-#: templates/organization/organization_wrapper.html:105
-#: templates/organization/project_list.html:7
-#: templates/organization/project_list.html:15
+#: templates/organization/organization_wrapper.html:108
+#: templates/organization/project_list.html:8
+#: templates/organization/project_list.html:20
 msgid "Projects"
 msgstr "Proyek"
 
-#: templates/core/base.html:82 templates/core/base.html:100
-#: templates/organization/organization_list.html:8
-#: templates/organization/organization_list.html:16
+#: templates/core/base.html:83 templates/core/base.html:101
+#: templates/organization/organization_list.html:9
+#: templates/organization/organization_list.html:21
 #: templates/organization/user_list.html:36
 msgid "Organizations"
 msgstr "Organisasi"
 
-#: templates/core/base.html:88 templates/core/base.html:101
+#: templates/core/base.html:89 templates/core/base.html:102
 #: templates/organization/user_list.html:7
 #: templates/organization/user_list.html:15
 msgid "Users"
 msgstr "Pengguna"
 
-#: templates/core/base.html:103
+#: templates/core/base.html:104
 msgid "Help"
 msgstr "Membantu"
 
-#: templates/core/base.html:125
+#: templates/core/base.html:126
 msgid "Loading locations..."
 msgstr "Loading locations..."
 
-#: templates/core/base.html:138
+#: templates/core/base.html:139
 #, python-format
 msgid "Copyright %(copydate)s Cadasta. <span>All Rights Reserved.</span> "
 msgstr "Hak cipta %(copydate)s Cadasta. <span>Seluruh hak dilindungi.</span> "
 
-#: templates/core/base.html:158
+#: templates/core/base.html:159
 msgid "About Us"
 msgstr "Tentang Kami"
 
-#: templates/core/base.html:163
+#: templates/core/base.html:164
 msgid "Privacy"
 msgstr "Privasi"
 
-#: templates/core/base.html:168
+#: templates/core/base.html:169
 msgid "Terms of Use"
 msgstr "Syarat Penggunaan"
 
-#: templates/core/base.html:173
+#: templates/core/base.html:174
 msgid "Code of Conduct"
 msgstr "Kode Etik"
 
-#: templates/core/base.html:178
+#: templates/core/base.html:179
 msgid "Visit us on Github"
 msgstr "Kunjungi kami di Github"
 
-#: templates/core/base.html:209
+#: templates/core/base.html:206
 msgid "No data available in table"
 msgstr "Data tidak tersedia dalam tabel"
 
-#: templates/core/base.html:210
+#: templates/core/base.html:207
 msgid "Showing _START_ - _END_ of _TOTAL_"
 msgstr "Menunjukan _START_ - _END_ dari _TOTAL_"
 
-#: templates/core/base.html:211
+#: templates/core/base.html:208
 msgid "Showing 0 - 0 of 0"
 msgstr "Menunjukan 0 - 0 dari 0"
 
-#: templates/core/base.html:212
+#: templates/core/base.html:209
 msgid "(filtered from _MAX_ total rows)"
 msgstr "(disaring dari _MAX_ jumlah baris)"
 
-#: templates/core/base.html:213
-msgid "Show _MENU_ rows"
-msgstr "Tunjukan _MENU_ baris"
+#: templates/core/base.html:211 templates/search/search.html:114
+msgid "10 per page"
+msgstr ""
 
-#: templates/core/base.html:215
+#: templates/core/base.html:212 templates/search/search.html:115
+msgid "25 per page"
+msgstr ""
+
+#: templates/core/base.html:213 templates/search/search.html:116
+msgid "50 per page"
+msgstr ""
+
+#: templates/core/base.html:214 templates/search/search.html:117
+msgid "100 per page"
+msgstr ""
+
+#: templates/core/base.html:217
+#: templates/organization/project_wrapper.html:131
+#: templates/search/search.html:5 templates/search/search.html:15
 msgid "Search"
 msgstr "Cari"
 
-#: templates/core/base.html:216
+#: templates/core/base.html:218
 msgid "No matching records found"
 msgstr "Arsip tidak ditemukan"
 
-#: templates/core/base.html:220
+#: templates/core/base.html:222
 msgid "First"
 msgstr "Pertama"
 
-#: templates/core/base.html:221
+#: templates/core/base.html:223
 msgid "Last"
 msgstr "Terakhir"
 
-#: templates/core/base.html:224
+#: templates/core/base.html:226
 msgid "activate to sort column ascending"
 msgstr "aktifkan untuk mengatur kolom dari rendah ke tinggi"
 
-#: templates/core/base.html:225
+#: templates/core/base.html:227
 msgid "activate to sort column descending"
 msgstr "aktifkan untuk mengatur kolom dari tinggi ke rendah"
 
@@ -2119,10 +2420,16 @@ msgid ""
 "\n"
 "Besides this README, the ZIP archive contains the shape files and CSV files containing the project data.\n"
 "\n"
-"Shape files can only store geometries of a single type: either point, line or polygon. Because of this, you will find three shape files (%(project_slug)s-point.shp, %(project_slug)s-line.shp, and %(project_slug)s-polygon.shp) containing the geometries of all locations in project \"%(project_name)s\", along with the corresponding *.shx, *.prj and *.dbf files.  The attribute table of each shapefile contains only the location ID.\n"
+"Shape files can only store geometries of a single type: either point, line, polygon or multigeometry variants of these.\n"
+"Because of this, you will find a shape file for each type of geometry in project \"%(project_name)s\".\n"
+"We currently support point, linestring, polygon, multipoint, multilinestring and multipolygon geometries.\n"
+"All shape files are provided with their corresponding *.shx, *.prj and *.dbf files.\n"
 "\n"
-"The attributes for locations, parties and relationships are provided in CSV files called locations.csv, parties.csv and relationships.csv.  We use CSV instead of dBase files to avoid certain restrictions of the dBase format that would cause some data to be truncated.\n"
-msgstr "\nAnda telah mendownload seluruh data dari proyek \"%(project_name)s\" dalam format shapefile.\n\nSelain README ini, arsip ZIP terdiri dari shape files dan berkas CSV yang mengandung data proyek.\n\nShape files hanya dapat menyimpan salah satu bentuk geometri: titik, garis, atau bentuk. Karena hal ini, Anda akan menemukan tiga shape files: (%(project_slug)s-point.shp, %(project_slug)s-line.shp, and %(project_slug)s-polygon.shp) yang mengandung geometri di seluruh lokasi proyek \"%(project_name)s\", dengan file *.shx, *.prj dan *.dbf yang sesuai.  Tabel atribut dari setiap shapefile hanya mengandung ID lokasi.\n\nAtribut dari lokasi, kelompok, dan hubungan telah disediakan di berkas CSV yang bernama locations.csv, parties.csv dan relationships.csv.  Kami menggunakan CSV daripada format dBase yang dapat menyebabkan beberapa data menjadi cacat. \n"
+"The attribute table of each shapefile contains only the location ID.\n"
+"\n"
+"The attributes for locations, parties and relationships are provided in CSV files called locations.csv, parties.csv and relationships.csv.\n"
+"We use CSV instead of dBase files to avoid certain restrictions of the dBase format that would cause some data to be truncated.\n"
+msgstr ""
 
 #: templates/organization/email/org_invite.txt:2
 #, python-format
@@ -2135,62 +2442,43 @@ msgstr "Anda menerima email ini karena Anda telah ditambahkan ke %(organization)
 msgid "Did you not want to be added to this organization, click here:"
 msgstr "Anda tidak berminat untuk ditambahkan dalam organisasi ini, klik disini:"
 
-#: templates/organization/organization_add.html:5
-msgid "Add new organization"
-msgstr "Tambahkan organisasi baru"
-
-#: templates/organization/organization_add.html:19
+#: templates/organization/organization_add.html:6
+#: templates/organization/organization_add.html:20
 msgid "Add organization"
 msgstr "Tambahkan organisasi"
 
-#: templates/organization/organization_dashboard.html:5
-#: templates/organization/organization_wrapper.html:99
-#: templates/organization/project_dashboard.html:45
-#: templates/organization/project_wrapper.html:109
-#: templates/party/resources_list.html:16
-#: templates/spatial/location_detail.html:29
+#: templates/organization/organization_dashboard.html:6
+#: templates/organization/organization_wrapper.html:102
+#: templates/organization/project_dashboard.html:50
+#: templates/organization/project_wrapper.html:137
+#: templates/party/party_detail.html:26 templates/party/resources_list.html:16
+#: templates/spatial/location_detail.html:25
+#: templates/spatial/location_form.html:24
 msgid "Overview"
 msgstr "Ringkasan"
 
-#: templates/organization/organization_dashboard.html:15
+#: templates/organization/organization_dashboard.html:20
 msgid "Organization Overview"
 msgstr "Ringkasan Organisasi"
 
-#: templates/organization/organization_dashboard.html:23
-#: templates/organization/organization_dashboard.html:41
-#: templates/organization/organization_list.html:36
-#: templates/organization/organization_list.html:38
-#: templates/organization/organization_list.html:61
-#: templates/organization/organization_wrapper.html:25
-#: templates/organization/project_list.html:37
-#: templates/organization/project_list.html:39
-#: templates/organization/project_list.html:58
-#: templates/organization/project_wrapper.html:26
-msgid "Archived"
-msgstr "Arsip"
-
-#: templates/organization/organization_dashboard.html:25
+#: templates/organization/organization_dashboard.html:29
 #: templates/organization/project_list.html:43
 msgid "Country"
 msgstr "Negara"
 
-#: templates/organization/organization_dashboard.html:26
+#: templates/organization/organization_dashboard.html:30
 #: templates/organization/project_list.html:44
 #: templates/resources/table.html:10 templates/resources/table_add_lib.html:11
 msgid "Last updated"
 msgstr "Terakhir diperbarui"
 
-#: templates/organization/organization_dashboard.html:33
-#: templates/organization/organization_list.html:47
-#: templates/organization/project_list.html:50
-msgid "True"
-msgstr "Benar"
-
-#: templates/organization/organization_dashboard.html:35
-#: templates/organization/organization_list.html:49
-#: templates/organization/project_list.html:52
-msgid "False"
-msgstr "Salah"
+#: templates/organization/organization_dashboard.html:40
+#: templates/organization/organization_list.html:57
+#: templates/organization/organization_wrapper.html:22
+#: templates/organization/project_list.html:54
+#: templates/organization/project_wrapper.html:24
+msgid "Archived"
+msgstr "Arsip"
 
 #: templates/organization/organization_dashboard.html:54
 msgid "You're ready to go"
@@ -2207,30 +2495,30 @@ msgid "Add a new project"
 msgstr "Tambahkan sebuah proyek baru"
 
 #: templates/organization/organization_dashboard.html:63
-msgid "Add new members"
-msgstr "Tambahkan anggota baru"
+msgid "Add members"
+msgstr ""
 
 #: templates/organization/organization_dashboard.html:68
 msgid "This organization does not have any public projects."
 msgstr "Organisasi ini tidak memiliki proyek publik."
 
-#: templates/organization/organization_dashboard.html:104
+#: templates/organization/organization_dashboard.html:105
 #: templates/organization/organization_members.html:4
 #: templates/organization/organization_members.html:15
-#: templates/organization/organization_wrapper.html:111
+#: templates/organization/organization_wrapper.html:114
 msgid "Members"
 msgstr "Anggota"
 
-#: templates/organization/organization_dashboard.html:117
+#: templates/organization/organization_dashboard.html:120
 msgid "View all"
 msgstr "Lihat semua"
 
-#: templates/organization/organization_edit.html:6
+#: templates/organization/organization_edit.html:7
 msgid "Edit"
 msgstr "Ubah"
 
-#: templates/organization/organization_edit.html:20
-#: templates/organization/organization_wrapper.html:39
+#: templates/organization/organization_edit.html:21
+#: templates/organization/organization_wrapper.html:40
 msgid "Edit organization"
 msgstr "Ubah organisasi"
 
@@ -2250,10 +2538,10 @@ msgstr "URL Organisasi"
 msgid "Contacts"
 msgstr "Kontak"
 
-#: templates/organization/organization_list.html:19
+#: templates/organization/organization_list.html:24
 #: templates/organization/organization_members.html:18
-#: templates/organization/project_list.html:19
-#: templates/spatial/location_detail.html:60
+#: templates/organization/project_list.html:24
+#: templates/spatial/location_detail.html:56
 msgid "Add"
 msgstr "Tambah"
 
@@ -2280,181 +2568,198 @@ msgstr "Masukan nama pengguna dan email anggota baru"
 msgid "Edit member"
 msgstr "Ubah anggota"
 
-#: templates/organization/organization_members_edit.html:33
+#: templates/organization/organization_members_edit.html:31
 msgid "Last login:"
 msgstr "Masuk terakhir:"
 
-#: templates/organization/organization_members_edit.html:38
+#: templates/organization/organization_members_edit.html:36
 msgid "Role"
 msgstr "Peran"
 
-#: templates/organization/organization_members_edit.html:48
+#: templates/organization/organization_members_edit.html:46
 msgid "Remove member"
 msgstr "Hapus anggota"
 
-#: templates/organization/organization_members_edit.html:52
+#: templates/organization/organization_members_edit.html:50
 msgid "An organization administrator cannot remove themself."
 msgstr "Seorang administrator organisasi tidak dapat menghapus dirinya sendiri."
 
-#: templates/organization/organization_members_edit.html:67
+#: templates/organization/organization_members_edit.html:65
 msgid "Member Permissions"
 msgstr "Izin Anggota"
 
-#: templates/organization/organization_members_edit.html:74
+#: templates/organization/organization_members_edit.html:72
 #: templates/organization/project_add_permissions.html:44
 #: templates/organization/project_edit_permissions.html:31
 msgid "Permissions"
 msgstr "Izin"
 
-#: templates/organization/organization_members_edit.html:149
+#: templates/organization/organization_members_edit.html:145
 msgid "Remove Member"
 msgstr "Hapus Anggota"
 
-#: templates/organization/organization_members_edit.html:152
+#: templates/organization/organization_members_edit.html:148
 msgid ""
 "Removing this member will remove the member's project permissions for this "
 "organization."
 msgstr "Menghapus anggota ini akan menghapus izin proyek anggota untuk organisasi ini."
 
-#: templates/organization/organization_members_edit.html:153
+#: templates/organization/organization_members_edit.html:149
 msgid "Are you sure you want to remove this member?"
 msgstr "Apakah Anda yakin ingin menghapus anggota ini?"
 
-#: templates/organization/organization_members_edit.html:156
+#: templates/organization/organization_members_edit.html:152
 msgid "Yes, remove this member"
 msgstr "Ya, hapus anggota ini"
 
-#: templates/organization/organization_members_edit.html:171
-#: templates/organization/organization_members_edit.html:197
+#: templates/organization/organization_members_edit.html:167
+#: templates/organization/organization_members_edit.html:193
 msgid "Confirm Role Change"
 msgstr "Konfirmasi Peran Perubahan"
 
-#: templates/organization/organization_members_edit.html:175
+#: templates/organization/organization_members_edit.html:171
 msgid ""
 "Changing this role to administrator will remove project-level permissions "
 "and grant full access. Are you sure you want to change the role from member "
 "to administrator?"
 msgstr "Mengubah peran ini untuk administrator akan menghapus izin tingkat proyek dan memberikan akses penuh. Apakah Anda yakin ingin mengubah peran dari anggota ke administrator?"
 
-#: templates/organization/organization_members_edit.html:201
+#: templates/organization/organization_members_edit.html:197
 msgid ""
 "Changing this role to member will remove full access and permissions will "
 "need to be assigned on a project level. Are you sure you want to change the "
 "role from administrator to member?"
 msgstr "Mengubah peran ini untuk anggota akan menghapus akses penuh dan izin harus diberikan pada tingkat proyek. Apakah Anda yakin ingin mengubah peran dari administrator ke anggota?"
 
-#: templates/organization/organization_wrapper.html:44
-#: templates/organization/organization_wrapper.html:156
+#: templates/organization/organization_wrapper.html:32
+#: templates/organization/organization_wrapper.html:35
+#: templates/organization/organization_wrapper.html:36
+#: templates/organization/project_wrapper.html:45
+#: templates/organization/project_wrapper.html:48
+#: templates/organization/project_wrapper.html:49
+msgid "More actions"
+msgstr ""
+
+#: templates/organization/organization_wrapper.html:37
+#: templates/organization/project_wrapper.html:50
+msgid "More"
+msgstr ""
+
+#: templates/organization/organization_wrapper.html:45
+#: templates/organization/organization_wrapper.html:159
 msgid "Unarchive organization"
 msgstr "Pulihkan arsip organisasi"
 
-#: templates/organization/organization_wrapper.html:46
-#: templates/organization/organization_wrapper.html:132
+#: templates/organization/organization_wrapper.html:47
+#: templates/organization/organization_wrapper.html:135
 msgid "Archive organization"
 msgstr "Arsipkan organisasi"
 
-#: templates/organization/organization_wrapper.html:58
-#: templates/organization/organization_wrapper.html:76
+#: templates/organization/organization_wrapper.html:57
+#: templates/organization/organization_wrapper.html:59
+#: templates/organization/organization_wrapper.html:78
+#: templates/organization/project_add_wrapper.html:5
+#: templates/organization/project_add_wrapper.html:44
 msgid "Add project"
 msgstr "Tambahkan proyek"
 
-#: templates/organization/organization_wrapper.html:62
-#: templates/organization/project_wrapper.html:66
+#: templates/organization/organization_wrapper.html:63
+#: templates/organization/project_wrapper.html:81
 msgid "Toggle add"
 msgstr "Tambah fungsi"
 
-#: templates/organization/organization_wrapper.html:65
-#: templates/organization/organization_wrapper.html:79
+#: templates/organization/organization_wrapper.html:66
+#: templates/organization/organization_wrapper.html:81
 msgid "Add org member"
 msgstr "Tambahkan anggota organisasi"
 
-#: templates/organization/organization_wrapper.html:135
+#: templates/organization/organization_wrapper.html:138
 msgid "Are you sure you want to archive this organization?"
 msgstr "Apakah Anda yakin ingin mengarsipkan organisasi ini?"
 
-#: templates/organization/organization_wrapper.html:139
+#: templates/organization/organization_wrapper.html:142
 msgid "Yes, archive this organization"
 msgstr "Ya, arsipkan organisasi ini"
 
-#: templates/organization/organization_wrapper.html:160
+#: templates/organization/organization_wrapper.html:163
 msgid "Are you sure you want to unarchive this organization?"
 msgstr "Apakah Anda yakin ingin memulihkan arsip organisasi ini?"
 
-#: templates/organization/organization_wrapper.html:165
+#: templates/organization/organization_wrapper.html:168
 msgid "Yes, unarchive this organization"
 msgstr "Ya, pulihkan arsip organisasi ini"
 
-#: templates/organization/project_add_details.html:6
+#: templates/organization/project_add_details.html:7
 msgid "Add details"
 msgstr "Tambahkan rincian"
 
-#: templates/organization/project_add_details.html:36
+#: templates/organization/project_add_details.html:38
 msgid "1. General Information"
 msgstr "1. Informasi Umum"
 
-#: templates/organization/project_add_details.html:59
+#: templates/organization/project_add_details.html:61
 msgid "Select organization"
 msgstr "Pilih organisasi"
 
-#: templates/organization/project_add_details.html:78
-#: templates/organization/project_edit_details.html:36
+#: templates/organization/project_add_details.html:80
+#: templates/organization/project_edit_details.html:38
 msgid "Project name"
 msgstr "Nama proyek"
 
-#: templates/organization/project_add_details.html:94
-#: templates/organization/project_edit_details.html:46
+#: templates/organization/project_add_details.html:96
+#: templates/organization/project_edit_details.html:48
 msgid "Project description"
 msgstr "Deskripsi proyek"
 
-#: templates/organization/project_add_details.html:100
-#: templates/organization/project_edit_details.html:52
+#: templates/organization/project_add_details.html:102
+#: templates/organization/project_edit_details.html:54
 msgid "Project URL"
 msgstr "URL Proyek"
 
-#: templates/organization/project_add_details.html:107
-#: templates/organization/project_edit_details.html:59
+#: templates/organization/project_add_details.html:109
+#: templates/organization/project_edit_details.html:61
 msgid "2. Questionnaire"
 msgstr "2. Kuesioner"
 
-#: templates/organization/project_add_details.html:111
-#: templates/organization/project_edit_details.html:64
+#: templates/organization/project_add_details.html:113
+#: templates/organization/project_edit_details.html:66
 msgid "Select the questionnaire file to use for this project"
 msgstr "Pilih berkas kuesioner yang digunakan untuk proyek ini"
 
-#: templates/organization/project_add_details.html:114
-#: templates/organization/project_edit_details.html:67
+#: templates/organization/project_add_details.html:116
+#: templates/organization/project_edit_details.html:69
 msgid "Accepted file types: xls, xlsx"
 msgstr "Tipe berkas yang diterimaL xls, xlsx"
 
-#: templates/organization/project_add_details.html:121
-#: templates/organization/project_edit_details.html:74
+#: templates/organization/project_add_details.html:123
+#: templates/organization/project_edit_details.html:76
 msgid ""
-"For assistance with questionnaires view our <a "
-"href=\"http://docs.cadasta.org/en/08-XLSForms.html\" class=\"alert-link\" "
-"target=\"_blank\">user guide</a>.  To help you get started two samples have "
-"been provided: <a href=\"https://s3-us-west-2.amazonaws.com/cadasta-"
-"resources/sample-forms/minimum_cadasta_questionnaire.xlsx\" class=\"alert-"
-"link\">a minimal</a> and <a href=\"https://s3-us-west-2.amazonaws.com"
-"/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx\" class"
-"=\"alert-link\">a standard questionnaire</a>."
-msgstr "Untuk bantuan dengan kuesioner, lihat <a href=\"http://docs.cadasta.org/en/08-XLSForms.html\" class=\"alert-link\" target=\"_blank\">bantuan pengguna</a> kami.  Untuk membantu Anda, kami telah menyediakan dua contoh: <a href=\"https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/minimum_cadasta_questionnaire.xlsx\" class=\"alert-link\">sebuah contoh minimal</a> dan <a href=\"https://s3-us-west-2.amazonaws.com/cadasta-resources/sample-forms/standard_cadasta_questionnaire.xlsx\" class=\"alert-link\">sebuah kuesioner standar</a>."
+"To get started, choose the form that most closely matches your documentation needs.\n"
+"                      <ul>\n"
+"                        <li>The <a href=\"https://docs.google.com/spreadsheets/d/1MHg6iok4SkDxN2NdMVt3P2W9UZe81VxH6CpAz_eUtOY/pub?output=xlsx\" class=\"alert-link\">Customary Rights Form</a> is designed for documenting the rights of a single group of people who are using a single parcel or piece of land.</li>\n"
+"                        <li>The <a href=\"https://docs.google.com/spreadsheets/d/1hyF_uxZb4959lxD6vDMM574cQEFTyq636VAS7n3e0MA/pub?output=xlsx\" class=\"alert-link\">Sustainable Sourcing Form</a> is for documenting land that's being used for sustainable agricultural production.</li>\n"
+"                        <li>The <a href=\"https://docs.google.com/spreadsheets/d/1iORFg75ofq-QzLB5x-WvuggEZN6JaE0iS6yqc7dE1Y0/pub?output=xlsx\" class=\"alert-link\">Urban Informal Settlements Form</a> is for documenting many people who may be living in a very small urban area.</li>\n"
+"                      </ul>\n"
+"                      If you need help or have questions, <a href=\"http://cadasta.org/contact/\" target=\"_blank\" class=\"alert-link\">please contact us</a>.\n"
+"                      "
+msgstr ""
 
-#: templates/organization/project_add_details.html:128
-#: templates/organization/project_edit_details.html:89
+#: templates/organization/project_add_details.html:137
+#: templates/organization/project_edit_details.html:98
 msgid "3. Contacts"
 msgstr "3. Kontak"
 
-#: templates/organization/project_add_details.html:142
+#: templates/organization/project_add_details.html:151
 #: templates/organization/project_add_extents.html:73
-#: templates/organization/project_attrs_import.html:111
-#: templates/organization/project_select_import.html:98
+#: templates/organization/project_attrs_import.html:114
+#: templates/organization/project_select_import.html:99
 msgid "Next"
 msgstr "Berikutnya"
 
-#: templates/organization/project_add_details.html:147
+#: templates/organization/project_add_details.html:156
 #: templates/organization/project_add_permissions.html:66
-#: templates/organization/project_attrs_import.html:115
-#: templates/organization/project_defaults_import.html:94
+#: templates/organization/project_attrs_import.html:118
+#: templates/organization/project_defaults_import.html:98
 msgid "Previous"
 msgstr "Sebelumnya"
 
@@ -2473,7 +2778,7 @@ msgid ""
 msgstr "Gunakan fungsi yang disediakan pada sisi kiri peta untuk menandakan batas proyek baru Anda. Jika sudah selesai, pilih tombol simpan di bawah."
 
 #: templates/organization/project_add_extents.html:67
-#: templates/organization/project_edit_geometry.html:62
+#: templates/organization/project_edit_geometry.html:72
 msgid ""
 "We encourage you to mark the area in which your project takes place (if your"
 " project doesn't include the entire world). This makes interactions simpler "
@@ -2502,14 +2807,9 @@ msgid "Email address"
 msgstr "Alamat email"
 
 #: templates/organization/project_add_permissions.html:61
-#: templates/organization/project_defaults_import.html:90
+#: templates/organization/project_defaults_import.html:94
 msgid "Finish"
 msgstr "Selesai"
-
-#: templates/organization/project_add_wrapper.html:5
-#: templates/organization/project_add_wrapper.html:44
-msgid "Add new project"
-msgstr "Tambahkan proyek baru"
 
 #: templates/organization/project_add_wrapper.html:22
 msgid "Draw Map"
@@ -2523,77 +2823,77 @@ msgstr "Tambahkan rincian"
 msgid "Assign Team"
 msgstr "Tentukan tim"
 
-#: templates/organization/project_attrs_import.html:21
+#: templates/organization/project_attrs_import.html:24
 msgid "Select import fields"
 msgstr "Pilih baris impor"
 
-#: templates/organization/project_attrs_import.html:26
+#: templates/organization/project_attrs_import.html:29
 msgid ""
 "The following attribute fields can be imported.  To prevent a field from "
 "being imported, deselect the checkbox in the right column."
 msgstr "Bidang atribut berikut dapat diimpor. Untuk mencegah lapangan dari yang diimpor, hapus centang pada kotak di kolom kanan."
 
-#: templates/organization/project_attrs_import.html:30
+#: templates/organization/project_attrs_import.html:33
 msgid "CSV Column"
 msgstr "Kolom CSV"
 
-#: templates/organization/project_attrs_import.html:31
+#: templates/organization/project_attrs_import.html:34
 msgid "Schema Attribute"
 msgstr "Atribut skema"
 
-#: templates/organization/project_attrs_import.html:32
+#: templates/organization/project_attrs_import.html:35
 msgid "Content Type"
 msgstr "Tipe konten"
 
-#: templates/organization/project_attrs_import.html:33
+#: templates/organization/project_attrs_import.html:36
 msgid "Required"
 msgstr "Dibutuhkan"
 
-#: templates/organization/project_attrs_import.html:34
+#: templates/organization/project_attrs_import.html:37
 msgid "Import"
 msgstr "Impor"
 
-#: templates/organization/project_attrs_import.html:62
+#: templates/organization/project_attrs_import.html:65
 msgid ""
 "We could not match any import fields to attributes in your project schema."
 msgstr "Kami tidak bisa ditemukan pada bidang impor untuk atribut dalam skema proyek Anda."
 
-#: templates/organization/project_attrs_import.html:73
+#: templates/organization/project_attrs_import.html:76
 msgid ""
 "The following import fields have no corresponding attribute in your project "
 "schema:"
 msgstr "Bidang impor berikut tidak memiliki atribut yang sesuai dalam skema proyek Anda:"
 
-#: templates/organization/project_attrs_import.html:82
+#: templates/organization/project_attrs_import.html:85
 msgid "The following fields can be imported:"
 msgstr "Baris berikut ini dapat di-impor"
 
-#: templates/organization/project_attrs_import.html:96
+#: templates/organization/project_attrs_import.html:99
 msgid ""
 "The following attributes were found in your schema but do not correspond to "
 "any import fields."
 msgstr "Atribut berikut ditemukan dalam skema Anda, tetapi tidak sesuai dengan setiap bidang impor."
 
-#: templates/organization/project_dashboard.html:21
-#: templates/spatial/location_add.html:47
-#: templates/spatial/location_map.html:22
-#: templates/spatial/location_wrapper.html:25
+#: templates/organization/project_dashboard.html:24
+#: templates/spatial/location_add.html:49
+#: templates/spatial/location_map.html:23
+#: templates/spatial/location_wrapper.html:26
 msgid "Open location"
 msgstr "Buka lokasi"
 
-#: templates/organization/project_dashboard.html:61
+#: templates/organization/project_dashboard.html:66
 msgid "Project Overview"
 msgstr "Ringkasan Proyek"
 
-#: templates/organization/project_dashboard.html:67
+#: templates/organization/project_dashboard.html:72
 msgid "Contact information"
 msgstr "Informasi Kontak"
 
-#: templates/organization/project_dashboard.html:81
+#: templates/organization/project_dashboard.html:86
 msgid "Project stats"
 msgstr "Status proyek"
 
-#: templates/organization/project_dashboard.html:84
+#: templates/organization/project_dashboard.html:89
 #, python-format
 msgid ""
 "\n"
@@ -2605,7 +2905,7 @@ msgid_plural ""
 "                "
 msgstr[0] "\n              <div class=\"num\">%(counter)s</div> lokasi\n              "
 
-#: templates/organization/project_dashboard.html:91
+#: templates/organization/project_dashboard.html:96
 #, python-format
 msgid ""
 "\n"
@@ -2617,7 +2917,7 @@ msgid_plural ""
 "                "
 msgstr[0] "\n              <div class=\"num\">%(counter)s</div> kelompok\n              "
 
-#: templates/organization/project_dashboard.html:98
+#: templates/organization/project_dashboard.html:103
 #, python-format
 msgid ""
 "\n"
@@ -2629,21 +2929,21 @@ msgid_plural ""
 "                "
 msgstr[0] "\n              <div class=\"num\">%(counter)s</div> sumber daya\n              "
 
-#: templates/organization/project_dashboard.html:107
+#: templates/organization/project_dashboard.html:112
 msgid "Congratulations!"
 msgstr "Selamat!"
 
-#: templates/organization/project_dashboard.html:108
+#: templates/organization/project_dashboard.html:113
 msgid ""
 "You have successfully created your project.  You're now ready to add your "
 "first location."
 msgstr "Anda telah berhasil membuat proyek Anda. Sekarang Anda siap untuk menambah lokasi pertama Anda."
 
-#: templates/organization/project_dashboard.html:113
+#: templates/organization/project_dashboard.html:118
 msgid "Add a location"
 msgstr "Tambahkan sebuah lokasi"
 
-#: templates/organization/project_dashboard.html:120
+#: templates/organization/project_dashboard.html:125
 msgid "to view project details"
 msgstr "untuk melihat rincian proyek"
 
@@ -2663,11 +2963,11 @@ msgstr "Pilih baris nama kelompok:"
 msgid "Select the <span class=\"highlight\">Party type</span> field"
 msgstr "Pilih Jenis Partai lapangan:"
 
-#: templates/organization/project_defaults_import.html:53
+#: templates/organization/project_defaults_import.html:55
 msgid "Select the <span class=\"highlight\">Geometry</span> field"
 msgstr "Pilih baris geometri:"
 
-#: templates/organization/project_defaults_import.html:69
+#: templates/organization/project_defaults_import.html:71
 msgid "Select the <span class=\"highlight\">Location type</span> field"
 msgstr "Pilih Lokasi Jenis lapangan:"
 
@@ -2700,13 +3000,13 @@ msgid ""
 msgstr "Sebuah berkas XLS mengandung lokasi, hubungan, dan kelompok proyek."
 
 #: templates/organization/project_download.html:35
-#: templates/organization/project_wrapper.html:127
-#: templates/party/party_detail.html:56
-#: templates/party/relationship_detail.html:46
+#: templates/organization/project_wrapper.html:155
+#: templates/party/party_detail.html:28
+#: templates/party/relationship_detail.html:40
 #: templates/party/resources_list.html:18
 #: templates/resources/project_list.html:4
 #: templates/resources/project_list.html:14
-#: templates/spatial/location_detail.html:31
+#: templates/spatial/location_detail.html:27
 msgid "Resources"
 msgstr "Sumber daya"
 
@@ -2724,33 +3024,27 @@ msgid ""
 msgstr "Sebuah berkas ZIP yang mengandung XLS dan shape files dan sumber daya dari seluruh data proyek."
 
 #: templates/organization/project_download.html:50
-#: templates/resources/project_detail.html:47
+#: templates/resources/project_detail.html:59
 msgid "Download"
 msgstr "Download"
 
-#: templates/organization/project_edit_details.html:11
-#: templates/organization/project_edit_details.html:22
-#: templates/organization/project_wrapper.html:40
+#: templates/organization/project_edit_details.html:13
+#: templates/organization/project_edit_details.html:24
+#: templates/organization/project_wrapper.html:54
 msgid "Edit project details"
 msgstr "Ubah rincian proyek"
 
-#: templates/organization/project_edit_details.html:25
+#: templates/organization/project_edit_details.html:27
 msgid "1. General information"
 msgstr "1. Informasi Umum"
 
-#: templates/organization/project_edit_details.html:82
-msgid ""
-"Data has already been contributed to this project. To ensure data integrity,"
-" uploading a new questionnaire is disabled for this project."
-msgstr "Data telah memberikan kontribusi untuk proyek ini. Untuk memastikan integritas data, meng-upload kuesioner baru dinonaktifkan untuk proyek ini."
-
 #: templates/organization/project_edit_geometry.html:7
-#: templates/organization/project_edit_geometry.html:53
-#: templates/organization/project_wrapper.html:39
+#: templates/organization/project_edit_geometry.html:63
+#: templates/organization/project_wrapper.html:53
 msgid "Edit project boundary"
 msgstr "Ubah batas proyek"
 
-#: templates/organization/project_edit_geometry.html:57
+#: templates/organization/project_edit_geometry.html:67
 msgid ""
 "Use the tools provided on the left side of the map to update your project "
 "boundary. Once complete, select the save button below."
@@ -2758,7 +3052,7 @@ msgstr "Gunakan fungsi yang disediakan pada sisi kiri peta untuk memperbarui bat
 
 #: templates/organization/project_edit_permissions.html:7
 #: templates/organization/project_edit_permissions.html:23
-#: templates/organization/project_wrapper.html:41
+#: templates/organization/project_wrapper.html:55
 msgid "Edit member permissions"
 msgstr "Ubah izin anggota"
 
@@ -2770,111 +3064,129 @@ msgstr "Impor Data"
 msgid "Import project data"
 msgstr "Impor data proyek"
 
-#: templates/organization/project_list.html:63
+#: templates/organization/project_list.html:59
 msgid "Organization:"
 msgstr "Organisasi:"
 
-#: templates/organization/project_select_import.html:18
+#: templates/organization/project_select_import.html:19
 msgid "Import details"
 msgstr "rincian impor"
 
-#: templates/organization/project_select_import.html:23
+#: templates/organization/project_select_import.html:24
 msgid "Import name"
 msgstr "nama impor"
 
-#: templates/organization/project_select_import.html:28
+#: templates/organization/project_select_import.html:29
 msgid "Import description"
 msgstr "deskripsi impor"
 
-#: templates/organization/project_select_import.html:34
-#: templates/organization/project_wrapper.html:43
-#: templates/organization/project_wrapper.html:71
-#: templates/organization/project_wrapper.html:90
+#: templates/organization/project_select_import.html:35
+#: templates/organization/project_wrapper.html:57
+#: templates/organization/project_wrapper.html:86
+#: templates/organization/project_wrapper.html:106
 msgid "Import data"
 msgstr "Impor data"
 
-#: templates/organization/project_select_import.html:39
+#: templates/organization/project_select_import.html:40
 msgid "Select the import file format"
 msgstr "Pilih format file impor"
 
-#: templates/organization/project_select_import.html:42
+#: templates/organization/project_select_import.html:43
 msgid "CSV"
 msgstr "CSV"
 
-#: templates/organization/project_select_import.html:47
+#: templates/organization/project_select_import.html:48
 msgid "XLSX"
 msgstr "XLSX"
 
-#: templates/organization/project_select_import.html:56
+#: templates/organization/project_select_import.html:57
 msgid "Select the type of data to import"
 msgstr "Pilih tipe data untuk di-impor"
 
-#: templates/organization/project_select_import.html:64
+#: templates/organization/project_select_import.html:65
 msgid "Includes party information for individuals, groups, corporations."
 msgstr "Termasuk informasi pihak untuk individu, kelompok, perusahaan."
 
-#: templates/organization/project_select_import.html:70
+#: templates/organization/project_select_import.html:71
 msgid "Includes spatial information for project locations."
 msgstr "Termasuk informasi spasial untuk lokasi proyek."
 
-#: templates/organization/project_select_import.html:78
+#: templates/organization/project_select_import.html:79
 msgid "Select the file to import"
 msgstr "Pilih berkas untuk di-impor"
 
-#: templates/organization/project_select_import.html:81
+#: templates/organization/project_select_import.html:82
 msgid "Accepted file types: csv, xlsx"
 msgstr "Tipe berkas yang diterimaL cvs, xlsx"
 
-#: templates/organization/project_select_import.html:89
+#: templates/organization/project_select_import.html:90
 msgid "Include import file in project resources"
 msgstr "Sertakan file impor sumber daya proyek"
 
-#: templates/organization/project_wrapper.html:44
+#: templates/organization/project_wrapper.html:33
+msgid "Language for project fields"
+msgstr ""
+
+#: templates/organization/project_wrapper.html:58
 msgid "Download data"
 msgstr "Download data"
 
-#: templates/organization/project_wrapper.html:48
-#: templates/organization/project_wrapper.html:173
+#: templates/organization/project_wrapper.html:62
+#: templates/organization/project_wrapper.html:236
 msgid "Unarchive project"
 msgstr "Pulihkan arsip proyek"
 
-#: templates/organization/project_wrapper.html:50
-#: templates/organization/project_wrapper.html:149
+#: templates/organization/project_wrapper.html:64
+#: templates/organization/project_wrapper.html:212
 msgid "Archive project"
 msgstr "Arsipkan proyek"
 
-#: templates/organization/project_wrapper.html:60
-#: templates/organization/project_wrapper.html:83
+#: templates/organization/project_wrapper.html:74
+#: templates/organization/project_wrapper.html:75
+#: templates/organization/project_wrapper.html:94
+#: templates/organization/project_wrapper.html:99
+#: templates/spatial/location_add.html:11
+#: templates/spatial/location_form.html:16
 msgid "Add location"
 msgstr "Tambahkan lokasi"
 
-#: templates/organization/project_wrapper.html:69
-#: templates/organization/project_wrapper.html:87
+#: templates/organization/project_wrapper.html:84
+#: templates/organization/project_wrapper.html:103
+#: templates/party/resources_list.html:21
 msgid "Add resource"
 msgstr "Tambahkan sumber daya"
 
-#: templates/organization/project_wrapper.html:115
+#: templates/organization/project_wrapper.html:143
 msgid "Map"
 msgstr "Peta"
 
-#: templates/organization/project_wrapper.html:121
+#: templates/organization/project_wrapper.html:149
 #: templates/party/party_list.html:4 templates/party/party_list.html:14
 msgid "Parties"
 msgstr "Kelompok"
 
-#: templates/organization/project_wrapper.html:152
+#: templates/organization/project_wrapper.html:165
+#: templates/search/search.html:22
+msgid "Search within project for"
+msgstr ""
+
+#: templates/organization/project_wrapper.html:166
+msgid "Search within project"
+msgstr ""
+
+#: templates/organization/project_wrapper.html:215
 msgid "Are you sure you want to archive this project?"
 msgstr "Apakah Anda yakin ingin mengarsipkan proyek ini?"
 
-#: templates/organization/project_wrapper.html:156
+#: templates/organization/project_wrapper.html:219
 msgid "Yes, archive this project"
 msgstr "Ya, arsipkan proyek ini"
 
-#: templates/organization/project_wrapper.html:177
+#: templates/organization/project_wrapper.html:240
 msgid "Are you sure you want to unarchive this project?"
 msgstr "Apakah Anda yakin ingin memulihkan arsip proyek ini?"
 
-#: templates/organization/project_wrapper.html:182
+#: templates/organization/project_wrapper.html:245
 msgid "Yes, unarchive this project"
 msgstr "Ya, pulihkan arsip proyek ini"
 
@@ -2890,15 +3202,15 @@ msgstr "btn-danger,btn-default"
 msgid "Deactivate,Activate"
 msgstr "Deactivate,Activate"
 
-#: templates/party/party_delete.html:13 templates/party/party_detail.html:23
+#: templates/party/party_delete.html:11 templates/party/party_detail.html:17
 msgid "Delete party"
 msgstr "Hapus kelompok"
 
-#: templates/party/party_delete.html:17
+#: templates/party/party_delete.html:15
 msgid "Are you sure you want to delete this party?"
 msgstr "Apakah Anda yakin ingin menghapus kelompok ini?"
 
-#: templates/party/party_delete.html:21
+#: templates/party/party_delete.html:19
 msgid "Yes, delete this party"
 msgstr "Ya, hapus kelompok ini"
 
@@ -2906,41 +3218,42 @@ msgstr "Ya, hapus kelompok ini"
 msgid "Party detail"
 msgstr "Rincian kelompok"
 
-#: templates/party/party_detail.html:21 templates/party/party_edit.html:41
+#: templates/party/party_detail.html:16 templates/party/party_edit.html:43
 msgid "Edit party"
 msgstr "Ubah kelompok"
 
-#: templates/party/party_detail.html:31
-#: templates/party/relationship_detail.html:26
-#: templates/party/relationship_edit.html:40
-msgid "Details"
-msgstr "Rincian"
+#: templates/party/party_detail.html:27 templates/party/resources_list.html:17
+#: templates/spatial/location_detail.html:26
+msgid "Relationships"
+msgstr "Hubungan"
 
-#: templates/party/party_detail.html:41 templates/party/party_form.html:12
-#: templates/party/party_list.html:22
-#: templates/party/relationship_detail.html:29
-#: templates/resources/table.html:8 templates/resources/table_add_lib.html:9
-#: templates/spatial/location_detail.html:40
-msgid "Type"
-msgstr "Tipe"
+#: templates/party/party_detail.html:62
+msgid "Location Type"
+msgstr ""
 
-#: templates/party/party_detail.html:64 templates/party/party_detail.html:76
-#: templates/party/relationship_detail.html:54
-#: templates/party/relationship_detail.html:66
+#: templates/party/party_detail.html:77
+msgid ""
+"This party does not have any relationships and is not connected to any "
+"locations."
+msgstr ""
+
+#: templates/party/party_detail.html:92 templates/party/party_detail.html:104
+#: templates/party/relationship_detail.html:48
+#: templates/party/relationship_detail.html:60
 #: templates/resources/project_list.html:25
-#: templates/spatial/location_detail.html:103
-#: templates/spatial/location_detail.html:115
+#: templates/spatial/location_detail.html:99
+#: templates/spatial/location_detail.html:111
 msgid "Attach"
 msgstr "Lampirkan"
 
-#: templates/party/party_detail.html:69
+#: templates/party/party_detail.html:97
 msgid ""
 "This party does not have any attached resources. To attach a resource, "
 "select the button below."
 msgstr "Kelompok ini tidak memiliki sumber daya yang terlampir. Untuk melampirkan sebuah sumber daya, pilih tombol di bawah."
 
 #: templates/party/relationship_delete.html:12
-#: templates/party/relationship_detail.html:19
+#: templates/party/relationship_detail.html:15
 msgid "Delete relationship"
 msgstr "Hapus hubungan"
 
@@ -2952,48 +3265,48 @@ msgstr "Apakah Anda yakin ingin menghapus hubungan ini?"
 msgid "Yes, delete this relationship"
 msgstr "Ya, hapus hubungan ini"
 
-#: templates/party/relationship_detail.html:17
+#: templates/party/relationship_detail.html:11
+msgid "Relationship Detail"
+msgstr ""
+
+#: templates/party/relationship_detail.html:14
 msgid "Edit relationship"
 msgstr "Ubah hubungan"
 
-#: templates/party/relationship_detail.html:59
+#: templates/party/relationship_detail.html:20
+#: templates/party/relationship_edit.html:43
+msgid "Details"
+msgstr "Rincian"
+
+#: templates/party/relationship_detail.html:53
 msgid ""
 "This relationship does not have any attached resources. To attach a "
 "resource, select the button below."
 msgstr "Hubungan ini tidak memiliki sumber daya yang terlampir. Untuk melampirkan sebuah sumber daya, pilih tombol di bawah."
 
-#: templates/party/relationship_edit.html:35
+#: templates/party/relationship_edit.html:38
 msgid "Edit Relationship"
 msgstr "Ubah Hubungan"
 
-#: templates/party/relationship_edit.html:42
+#: templates/party/relationship_edit.html:45
 msgid "Relationship type"
 msgstr "Tipe hubungan"
 
 #: templates/party/relationship_resources_add.html:5
-msgid "Add new resource for relationship"
-msgstr "Tambahkan sumber daya baru untuk hubungan"
+msgid "Add resource for relationship"
+msgstr ""
 
-#: templates/party/relationship_resources_new.html:4
+#: templates/party/relationship_resources_new.html:5
 msgid "Upload new resource for relationship"
 msgstr "Upload sumber daya baru untuk hubungan"
 
 #: templates/party/resources_add.html:5
-msgid "Add new resource for party"
-msgstr "Tambahkan sumber daya baru untuk kelompok"
+msgid "Add resource for party"
+msgstr ""
 
 #: templates/party/resources_list.html:10
 msgid "Party resources"
 msgstr "Sumber daya kelompok"
-
-#: templates/party/resources_list.html:17
-#: templates/spatial/location_detail.html:30
-msgid "Relationships"
-msgstr "Hubungan"
-
-#: templates/party/resources_list.html:21
-msgid "Add new resource"
-msgstr "Tambah sumber daya baru"
 
 #: templates/party/resources_list.html:23
 msgid "Add from library"
@@ -3004,13 +3317,18 @@ msgstr "Tambahkan dari koleksi"
 msgid "Upload new resource"
 msgstr "Upload sumber daya baru"
 
-#: templates/party/resources_new.html:4
+#: templates/party/resources_new.html:5
 msgid "Upload new resource for party"
 msgstr "Upload sumber daya baru untuk kelompok"
 
-#: templates/resources/edit.html:18
+#: templates/resources/edit.html:19
 msgid "Resources: Edit"
 msgstr "Sumber daya: Ubah"
+
+#: templates/resources/edit.html:29 templates/resources/project_detail.html:34
+#: templates/resources/table.html:26
+msgid "Deleted"
+msgstr "Terhapus"
 
 #: templates/resources/form.html:8
 msgid "Select the file to upload"
@@ -3018,12 +3336,9 @@ msgstr "Pilih berkas untuk di-upload"
 
 #: templates/resources/form.html:11
 msgid ""
-"Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png, xml (gpx), csv"
-msgstr "Tipe berkas yang diterima: pdf, mp3, mp4, doc, docx, jpg, png, xml (gpx), csv"
-
-#: templates/resources/form.html:22
-msgid "Description"
-msgstr "Deskripsi"
+"Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png, gpx, csv, xls, "
+"xlsx, gif, tiff"
+msgstr ""
 
 #: templates/resources/modal_add_lib.html:12
 #: templates/resources/modal_add_lib.html:14
@@ -3037,7 +3352,7 @@ msgid "Upload new"
 msgstr "Upload baru"
 
 #: templates/resources/modal_archive.html:10
-#: templates/resources/project_detail.html:40
+#: templates/resources/project_detail.html:24
 msgid "Delete resource"
 msgstr "Hapus sumber daya"
 
@@ -3055,7 +3370,7 @@ msgid "Yes, delete this resource"
 msgstr "Ya, hapus sumber daya ini"
 
 #: templates/resources/modal_unarchive.html:10
-#: templates/resources/project_detail.html:35
+#: templates/resources/project_detail.html:21
 msgid "Restore deleted resource"
 msgstr "Pulihkan sumber daya yang dihapus"
 
@@ -3068,10 +3383,10 @@ msgid "Yes, restore this resource"
 msgstr "Ya, pulihkan sumber daya ini"
 
 #: templates/resources/project_add_existing.html:5
-msgid "Add new resource for project"
-msgstr "Tambahkan sumber daya baru untuk proyek"
+msgid "Add resource for project"
+msgstr ""
 
-#: templates/resources/project_add_new.html:4
+#: templates/resources/project_add_new.html:5
 msgid "Upload new resource for project"
 msgstr "Upload sumber daya baru untuk proyek"
 
@@ -3083,43 +3398,41 @@ msgstr "Rincian sumber daya:"
 msgid "Resource detail"
 msgstr "Rincian sumber daya"
 
-#: templates/resources/project_detail.html:22
-#: templates/resources/table.html:26
-msgid "Deleted"
-msgstr "Terhapus"
+#: templates/resources/project_detail.html:46
+msgid "File name"
+msgstr ""
 
-#: templates/resources/project_detail.html:26
+#: templates/resources/project_detail.html:50
+msgid "Uploaded on"
+msgstr ""
+
+#: templates/resources/project_detail.html:51
 #, python-format
-msgid "Added on %(date)s by %(user)s"
-msgstr "Ditambahkan pada %(date)s oleh %(user)s"
+msgid "%(date)s by %(user)s"
+msgstr ""
 
-#: templates/resources/project_detail.html:55
+#: templates/resources/project_detail.html:67
 #: templates/resources/table.html:11
 msgid "Attached to"
 msgstr "Terlampir pada"
 
-#: templates/resources/project_detail.html:60
+#: templates/resources/project_detail.html:72
 msgid "Entity Class"
 msgstr "Kelas Entitas"
 
-#: templates/resources/project_detail.html:61
+#: templates/resources/project_detail.html:73
 msgid "Entity Name or Description"
 msgstr "Nama Entitas atau Deskripsi"
 
-#: templates/resources/project_detail.html:62
 #: templates/resources/project_detail.html:74
+#: templates/resources/project_detail.html:86
 #: templates/resources/table.html:53 templates/resources/table_sm.html:30
 msgid "Detach"
 msgstr "Lepaskan"
 
-#: templates/resources/project_detail.html:83
+#: templates/resources/project_detail.html:95
 msgid "This resource is currently not attached to anything."
 msgstr "Saat ini sumber daya ini tidak terlampir pada apapun."
-
-#: templates/resources/table.html:7 templates/resources/table_add_lib.html:8
-#: templates/resources/table_sm.html:7
-msgid "Resource"
-msgstr "Sumber daya"
 
 #: templates/resources/table.html:9 templates/resources/table_add_lib.html:10
 msgid "Contributor"
@@ -3138,22 +3451,75 @@ msgstr "Pulihkan"
 msgid "Attachments"
 msgstr "Lampiran"
 
-#: templates/spatial/location_add.html:11
-#: templates/spatial/location_add.html:77
-msgid "Add new location"
-msgstr "Tambahkan lokasi baru"
+#: templates/search/search.html:27
+msgid ""
+"\n"
+"                  e.g., <kbd>Parcel</kbd>, <kbd>John White</kbd>; <a id=\"search-guidelines-link\">more search guidelines</a>\n"
+"                  "
+msgstr ""
+
+#: templates/search/search.html:32
+#, python-format
+msgid ""
+"\n"
+"                  <ul>\n"
+"                    <li>Review your wording, make sure that there aren’t any typos in your search query</li>\n"
+"                    <li>If no results match your query, try removing some search terms (<kbd>John</kbd>, instead of <kbd>John White</kbd>)</li>\n"
+"                    <li>Search results are limited to a maximum of %(max_num_results)s entries</li>\n"
+"                  </ul>\n"
+"                  "
+msgstr ""
+
+#: templates/search/search.html:44
+msgid "Last updated on"
+msgstr ""
+
+#: templates/search/search.html:50
+msgid "We’re sorry, search is currently not available"
+msgstr ""
+
+#: templates/search/search.html:53
+msgid "We’re sorry, we couldn’t find any results for:"
+msgstr ""
+
+#: templates/search/search.html:55
+msgid "Search tips:"
+msgstr ""
+
+#: templates/search/search.html:57
+msgid "Double check your spelling for typos."
+msgstr ""
+
+#: templates/search/search.html:58
+msgid "Use fewer keywords."
+msgstr ""
+
+#: templates/search/search.html:59
+msgid "Refer to our search guidelines for more tips."
+msgstr ""
+
+#: templates/search/search.html:64
+msgid ""
+"\n"
+"                Showing <span id=\"total-results\"></span> result(s) for <strong><span id=\"query-string\"></span></strong>\n"
+"                "
+msgstr ""
+
+#: templates/search/search.html:69
+msgid "Search results"
+msgstr ""
 
 #: templates/spatial/location_delete.html:4
-#: templates/spatial/location_delete.html:16
-#: templates/spatial/location_detail.html:22
+#: templates/spatial/location_delete.html:14
+#: templates/spatial/location_detail.html:19
 msgid "Delete location"
 msgstr "Hapus lokasi"
 
-#: templates/spatial/location_delete.html:19
+#: templates/spatial/location_delete.html:17
 msgid "Are you sure you want to delete this location?"
 msgstr "Apakah Anda yakin ingin menghapus lokasi ini?"
 
-#: templates/spatial/location_delete.html:22
+#: templates/spatial/location_delete.html:20
 msgid "Yes, delete this location"
 msgstr "Ya, hapus lokasi"
 
@@ -3161,116 +3527,120 @@ msgstr "Ya, hapus lokasi"
 msgid "Location detail"
 msgstr "Rincian lokasi"
 
-#: templates/spatial/location_detail.html:20
+#: templates/spatial/location_detail.html:16
 #: templates/spatial/location_edit.html:7
-#: templates/spatial/location_edit.html:69
 msgid "Edit location"
 msgstr "Ubah lokasi"
 
-#: templates/spatial/location_detail.html:82
+#: templates/spatial/location_detail.html:78
 msgid ""
 "This location does not have any relationships and is not connected to any "
 "parties. To add your first relationship, select the button below."
 msgstr "Lokasi ini tidak memiliki hubungan apapun dan tidak terhubung ke kelompok apapun. Untuk menambahkan hubungan Anda yang pertama, pilih tombol di bawah ini."
 
-#: templates/spatial/location_detail.html:86
+#: templates/spatial/location_detail.html:82
+#: templates/spatial/relationship_add.html:7
+#: templates/spatial/relationship_add.html:65
 msgid "Add relationship"
 msgstr "Tambahkan hubungan"
 
-#: templates/spatial/location_detail.html:108
+#: templates/spatial/location_detail.html:104
 msgid ""
 "This location does not have any attached resources. To attach a resource, "
 "select the button below."
 msgstr "Lokasi ini tidak memiliki lampiran sumber daya apapun. Untuk melampirkan sebuah sumber daya, pilih tombol di bawah."
 
-#: templates/spatial/location_form.html:18
+#: templates/spatial/location_form.html:16
+msgid "Edit details"
+msgstr ""
+
+#: templates/spatial/location_form.html:19
 msgid "Draw location on map"
 msgstr "Gambar lokasi pada peta"
 
-#: templates/spatial/location_form.html:20
+#: templates/spatial/location_form.html:21
 msgid ""
-"1. Use the tools provided on the left side of the map to mark your new "
+"Use the tools provided on the left side of the map to mark your new "
 "location."
-msgstr "1. Gunakan fungsi yang disediakan pada sisi kiri peta untuk menambahkan lokasi Anda yang baru."
+msgstr ""
 
-#: templates/spatial/location_form.html:24
-msgid "2. What type of location is this?"
-msgstr "2. Apa tipe lokasi ini?"
+#: templates/spatial/location_form.html:26
+msgid "What type of location is this?"
+msgstr ""
 
 #: templates/spatial/location_map.html:4
 msgid "Project Map"
 msgstr "Proyek Peta"
 
-#: templates/spatial/location_wrapper.html:42
+#: templates/spatial/location_wrapper.html:43
 msgid "Currently viewing"
 msgstr "Saat ini sedang melihat"
 
-#: templates/spatial/relationship_add.html:6
-#: templates/spatial/relationship_add.html:63
-msgid "Add new relationship"
-msgstr "Tambahkan hubungan baru"
-
-#: templates/spatial/relationship_add.html:68
+#: templates/spatial/relationship_add.html:70
 msgid "1. Connected party"
 msgstr "1. Kelompok terhubung"
 
-#: templates/spatial/relationship_add.html:71
+#: templates/spatial/relationship_add.html:73
 msgid "Choose an existing party to connect to this location"
 msgstr "Pilih sebuah kelompok yang tersedia untuk terhubung dengan lokasi ini"
 
-#: templates/spatial/relationship_add.html:76
+#: templates/spatial/relationship_add.html:78
 msgid "Or add a new party"
 msgstr "Atau tambahkan sebuah kelompok baru"
 
-#: templates/spatial/relationship_add.html:85
+#: templates/spatial/relationship_add.html:87
 msgid "Party name"
 msgstr "Nama kelompok"
 
-#: templates/spatial/relationship_add.html:91
+#: templates/spatial/relationship_add.html:93
 msgid "Party type"
 msgstr "Tipe kelompok"
 
-#: templates/spatial/relationship_add.html:112
+#: templates/spatial/relationship_add.html:102
 msgid "2. Relationship details"
 msgstr "2. Rincian hubungan"
 
-#: templates/spatial/relationship_add.html:115
+#: templates/spatial/relationship_add.html:105
 msgid "Relationship Type"
 msgstr "Tipe hubungan"
 
 #: templates/spatial/resources_add.html:5
-msgid "Add new resource for location"
-msgstr "Tambahkan sumber daya baru untuk lokasi"
+msgid "Add resource for location"
+msgstr ""
 
-#: templates/spatial/resources_new.html:4
+#: templates/spatial/resources_new.html:5
 msgid "Upload new resource for location"
 msgstr "Upload sumber daya baru untuk lokasi"
 
-#: xforms/mixins/model_helper.py:34
+#: xforms/mixins/model_helper.py:42
+msgid "You don't have permission to contribute data to this project."
+msgstr ""
+
+#: xforms/mixins/model_helper.py:60
 msgid "Form out of date"
 msgstr "Formulir diluar tanggal "
 
-#: xforms/mixins/model_helper.py:118
+#: xforms/mixins/model_helper.py:144
 msgid "Party error: {}"
 msgstr "Kesalahan kelompok: {}"
 
-#: xforms/mixins/model_helper.py:150
+#: xforms/mixins/model_helper.py:176
 msgid "Location error: {}"
 msgstr "Kesalahan lokasi: {}"
 
-#: xforms/mixins/model_helper.py:195
+#: xforms/mixins/model_helper.py:221
 msgid "Tenure relationship error: {}"
 msgstr "Kesalahan pada hubungan kepemilikan: {}"
 
-#: xforms/mixins/model_helper.py:224
+#: xforms/mixins/model_helper.py:250
 msgid "{}"
 msgstr "{}"
 
-#: xforms/mixins/model_helper.py:228
+#: xforms/mixins/model_helper.py:254
 msgid "XML submission not found"
 msgstr "Pengajuan XML tidak ditemukan"
 
-#: xforms/mixins/model_helper.py:367
+#: xforms/mixins/model_helper.py:393
 msgid "Questionnaire not found."
 msgstr "Kuesioner tidak ditemukan"
 
@@ -3278,3 +3648,7 @@ msgstr "Kuesioner tidak ditemukan"
 #, python-format
 msgid "Invalid ODK Geometry: %s"
 msgstr "Valid ODK Geometri: %s"
+
+#: xforms/views/api.py:83
+msgid "Form was Successfully Received"
+msgstr ""

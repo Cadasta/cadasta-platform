@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 21:47+0000\n"
+"POT-Creation-Date: 2017-04-28 18:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: e2f_lat_r3 <e2f_lat_r3@outlook.com>, 2016\n"
 "Language-Team: Spanish (https://www.transifex.com/cadasta/teams/61422/es/)\n"
@@ -17,6 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/static/js/dataTables.selectFiltering.js:11
+msgid "Active"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:12
+msgid "Archived"
+msgstr ""
+
+#: core/static/js/dataTables.selectFiltering.js:13
+msgid "All"
+msgstr ""
 
 #: core/static/js/map_utils.js:10
 msgid "Zoom in"
@@ -130,11 +142,11 @@ msgstr ""
 "Su contraseña debe contener al menos 3 de los elementos siguientes: "
 "minúsculas, mayúsculas, caracteres especiales o caracteres numéricos."
 
-#: core/static/js/parsleyAddValidator.js:27
+#: core/static/js/parsleyAddValidator.js:26
 msgid "Your password cannot contain your username."
 msgstr "Su contraseña no puede contener su nombre."
 
-#: core/static/js/parsleyAddValidator.js:37
+#: core/static/js/parsleyAddValidator.js:36
 msgid "Your password cannot contain your email mailbox name."
 msgstr ""
 "Su  contraseña no puede contener el nombre de su casilla de correo "
