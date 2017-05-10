@@ -474,12 +474,12 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             name='WR',
             label={'en': 'Water rights', 'de': 'Wasserecht'})
         lh_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            tenure_type='LH',
             spatial_unit=self.location,
             project=self.project)
 
         wr_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            tenure_type='WR',
             spatial_unit=self.location,
             project=self.project)
 

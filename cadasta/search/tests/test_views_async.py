@@ -238,6 +238,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             self.es_endpoint,
             data=self.es_body,
             headers={'content-type': 'application/json'},
+            timeout=10
         )
         mock_get.assert_not_called()
 

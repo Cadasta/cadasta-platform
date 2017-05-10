@@ -100,7 +100,7 @@ class TransformTest(UserTestCase, TestCase):
             'tenure_attributes': None,
             'tenure_partyid': None,
             'spatial_unit_id': None,
-            'tenure_type_id': None,
+            'tenure_type': None,
             '@timestamp': '2017-01-01T01:23:45.678Z',
         }
         self.tenure_rel_raw_result = {
@@ -120,7 +120,7 @@ class TransformTest(UserTestCase, TestCase):
             },
             'tenure_partyid': self.party.id,
             'spatial_unit_id': self.location.id,
-            'tenure_type_id': self.tenure_rel.tenure_type.id,
+            'tenure_type': self.tenure_rel.tenure_type,
             '@timestamp': '2017-01-01T01:23:45.678Z',
         }
         self.resource_raw_result = {

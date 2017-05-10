@@ -8,6 +8,7 @@ from party.models import TENURE_RELATIONSHIP_TYPES
 from .utils import convert_postgis_ewkb_to_ewkt
 
 tenure_type_choices = {c[0]: c[1] for c in TENURE_RELATIONSHIP_TYPES}
+# TODO: Make this use the flexible approach
 
 
 class Exporter(SchemaSelectorMixin):
@@ -41,7 +42,7 @@ class Exporter(SchemaSelectorMixin):
                                                  model='tenurerelationship'),
                 'schema_attrs': schema_attrs['party.tenurerelationship'],
                 'model_attrs': ['id', 'party_id', 'spatial_unit_id',
-                                'tenure_type.id', 'tenure_type.label'],
+                                'tenure_type_id', 'tenure_type_label'],
             },
         }
 
@@ -107,9 +108,9 @@ class Exporter(SchemaSelectorMixin):
         elif metadatum['model_name'] == 'TenureRelationship':
             source['id'] = source['tenure_id']
             source['party_id'] = source['tenure_partyid']
-            source['tenure_type.id'] = source['tenure_type_id']
-            source['tenure_type.label'] = str(
-                tenure_type_choices[source['tenure_type_id']])
+            source['tenure_type_id'] = source['tenure_type']
+            source['tenure_type_label'] = str(
+                tenure_type_choices[source['tenure_type']])
             source['attributes'] = json.loads(
                 source['tenure_attributes']['value'])
 

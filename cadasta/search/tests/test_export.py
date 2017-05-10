@@ -125,11 +125,11 @@ class ExporterTest(BaseTestClass):
         assert list(attrs.keys()) == ['notes']
         assert metadatum['model_attrs'] == ['id', 'party_id',
                                             'spatial_unit_id',
-                                            'tenure_type.id',
-                                            'tenure_type.label']
+                                            'tenure_type_id',
+                                            'tenure_type_label']
         assert list(metadatum['attr_columns'].keys()) == [
-            'id', 'party_id', 'spatial_unit_id', 'tenure_type.id',
-            'tenure_type.label', 'notes']
+            'id', 'party_id', 'spatial_unit_id', 'tenure_type_id',
+            'tenure_type_label', 'notes']
 
     def test_get_attr_values(self):
         location_data = {
@@ -177,8 +177,8 @@ class ExporterTest(BaseTestClass):
             'id': 'ID',
             'party_id': 'PARTY_ID',
             'spatial_unit_id': 'SPATIAL_UNIT_ID',
-            'tenure_type.id': 'TENURE_TYPE.ID',
-            'tenure_type.label': 'TENURE_TYPE.LABEL',
+            'tenure_type_id': 'TENURE_TYPE_ID',
+            'tenure_type_label': 'TENURE_TYPE_LABEL',
             'attributes': {
                 'notes': ['1', '2', '3'],
             },
@@ -276,8 +276,8 @@ class ExporterTest(BaseTestClass):
             assert source['id'] == dummies[3].id
             assert source['spatial_unit_id'] == dummies[1].id
             assert source['party_id'] == dummies[2].id
-            assert source['tenure_type.id'] == 'CU'
-            assert source['tenure_type.label'] == 'Customary Rights'
+            assert source['tenure_type_id'] == 'CU'
+            assert source['tenure_type_label'] == 'Customary Rights'
             assert source['attributes']['rel_notes'] == "PBS is the best."
 
         exporter.process_entity(es_type_line, es_source_line, callback)
@@ -360,8 +360,8 @@ class ShapeExporterTest(BaseTestClass):
                 assert rows[0][0] == 'id'
                 assert rows[0][1] == 'party_id'
                 assert rows[0][2] == 'spatial_unit_id'
-                assert rows[0][3] == 'tenure_type.id'
-                assert rows[0][4] == 'tenure_type.label'
+                assert rows[0][3] == 'tenure_type_id'
+                assert rows[0][4] == 'tenure_type_label'
                 assert rows[0][5] == 'notes'
                 assert rows[1][0] == 'ID2'
                 assert rows[1][1] == 'ID1'
@@ -515,8 +515,8 @@ class XLSExporterTest(BaseTestClass):
         assert ws['A1'].value == 'id'
         assert ws['B1'].value == 'party_id'
         assert ws['C1'].value == 'spatial_unit_id'
-        assert ws['D1'].value == 'tenure_type.id'
-        assert ws['E1'].value == 'tenure_type.label'
+        assert ws['D1'].value == 'tenure_type_id'
+        assert ws['E1'].value == 'tenure_type_label'
         assert ws['F1'].value == 'notes'
         assert ws['A2'].value == 'ID2'
         assert ws['B2'].value == 'ID1'
@@ -793,8 +793,8 @@ class AllExporterTest(BaseTestClass):
             assert ws['A1'].value == 'id'
             assert ws['B1'].value == 'party_id'
             assert ws['C1'].value == 'spatial_unit_id'
-            assert ws['D1'].value == 'tenure_type.id'
-            assert ws['E1'].value == 'tenure_type.label'
+            assert ws['D1'].value == 'tenure_type_id'
+            assert ws['E1'].value == 'tenure_type_label'
             assert ws['F1'].value == 'notes'
             assert ws['A2'].value == 'ID2'
             assert ws['B2'].value == 'ID1'

@@ -49,7 +49,7 @@ def transform(entity, bulk=False):
             'tenure_attributes': None,
             'tenure_partyid': None,
             'spatial_unit_id': None,
-            'tenure_type_id': None,
+            'tenure_type': None,
             '@timestamp': '2017-01-01T01:23:45.678Z',
         }
         if bulk:
@@ -74,7 +74,7 @@ def transform(entity, bulk=False):
             },
             'tenure_partyid': entity.party.id,
             'spatial_unit_id': entity.spatial_unit.id,
-            'tenure_type_id': entity.tenure_type.id,
+            'tenure_type': entity.tenure_type,
             '@timestamp': '2017-01-01T01:23:45.678Z',
         }
         if bulk:
