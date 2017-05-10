@@ -1,5 +1,25 @@
 # Change Log
 
+## [v1.8.0](https://github.com/Cadasta/cadasta-platform/tree/v1.8.0) (2017-05-10)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.0-alpha.1...v1.8.0)
+
+**Fixed bugs:**
+
+- URL validation seems off [\#1459](https://github.com/Cadasta/cadasta-platform/issues/1459)
+
+**Closed issues:**
+
+- Error Handling for AttributeType Errors :: Worth fixing? Wait for project wizard? [\#1462](https://github.com/Cadasta/cadasta-platform/issues/1462)
+- SMAP: Accessing a location or relationship from url should center on location geometry [\#1310](https://github.com/Cadasta/cadasta-platform/issues/1310)
+- SMAP: Router should handle permission errors [\#1207](https://github.com/Cadasta/cadasta-platform/issues/1207)
+- SMAP: Redirecting to specific location tab [\#1206](https://github.com/Cadasta/cadasta-platform/issues/1206)
+- SMAP: Store the map position [\#1061](https://github.com/Cadasta/cadasta-platform/issues/1061)
+
+**Merged pull requests:**
+
+- Temporarily disable resource exports [\#1477](https://github.com/Cadasta/cadasta-platform/pull/1477) ([seav](https://github.com/seav))
+- Update changelog v1.8.0 [\#1457](https://github.com/Cadasta/cadasta-platform/pull/1457) ([amplifi](https://github.com/amplifi))
+
 ## [v1.8.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.8.0-alpha.1) (2017-05-02)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.7.4-alpha.1...v1.8.0-alpha.1)
 
