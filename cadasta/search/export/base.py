@@ -5,16 +5,21 @@ from django.contrib.contenttypes.models import ContentType
 
 from core.mixins import SchemaSelectorMixin
 from party.models import TENURE_RELATIONSHIP_TYPES
+from core.form_mixins import get_types
 from .utils import convert_postgis_ewkb_to_ewkt
-
-tenure_type_choices = {c[0]: c[1] for c in TENURE_RELATIONSHIP_TYPES}
-# TODO: Make this use the flexible approach
 
 
 class Exporter(SchemaSelectorMixin):
 
     def __init__(self, project):
         self.project = project
+        tenure_types = get_types(
+            'tenure_type',
+            TENURE_RELATIONSHIP_TYPES,
+            questionnaire_id=project.current_questionnaire,
+            include_labels=True)
+        self.tenure_type_choices = dict(tenure_types)
+
         schema_attrs = self.get_attributes(self.project)
 
         get_content_type = ContentType.objects.get
@@ -110,7 +115,7 @@ class Exporter(SchemaSelectorMixin):
             source['party_id'] = source['tenure_partyid']
             source['tenure_type_id'] = source['tenure_type']
             source['tenure_type_label'] = str(
-                tenure_type_choices[source['tenure_type']])
+                self.tenure_type_choices[source['tenure_type']])
             source['attributes'] = json.loads(
                 source['tenure_attributes']['value'])
 

@@ -33,7 +33,6 @@ from ..parser import parse_query
 
 api_url = (
     settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT)
-spatial_type_choices = {c[0]: c[1] for c in SPATIAL_TYPE_CHOICES}
 party_type_choices = {c[0]: c[1] for c in Party.TYPE_CHOICES}
 
 
