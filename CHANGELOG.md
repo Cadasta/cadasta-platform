@@ -1,5 +1,13 @@
 # Change Log
 
+## [v1.8.1](https://github.com/Cadasta/cadasta-platform/tree/v1.8.1) (2017-05-11)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.0...v1.8.1)
+
+**Merged pull requests:**
+
+- Disable search exports [\#1500](https://github.com/Cadasta/cadasta-platform/pull/1500) ([oliverroick](https://github.com/oliverroick))
+- Update Changelog for v1.8.0 release [\#1493](https://github.com/Cadasta/cadasta-platform/pull/1493) ([amplifi](https://github.com/amplifi))
+
 ## [v1.8.0](https://github.com/Cadasta/cadasta-platform/tree/v1.8.0) (2017-05-10)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.0-alpha.1...v1.8.0)
 
