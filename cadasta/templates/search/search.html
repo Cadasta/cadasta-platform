@@ -195,7 +195,7 @@ window.addEventListener('load', function () {
   if (query) {
     $('#search-input')[0].value = query;
     $('#search-clear').addClass('search-clear-show');
-    $('#search_export_form_query')[0].value = query;
+    // $('#search_export_form_query')[0].value = query;
     performSearch(query, false);
   } else {
     $('#search-clear').removeClass('search-clear-show');
@@ -205,7 +205,7 @@ window.addEventListener('load', function () {
   // Perform search when the search form is submitted
   $('#search-form').bind('submit', function(e) {
     var query = $('#search-input')[0].value;
-    $('#search_export_form_query')[0].value = query;
+    // $('#search_export_form_query')[0].value = query;
     performSearch(query, true);
     return false;
   });
