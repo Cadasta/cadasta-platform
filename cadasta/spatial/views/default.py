@@ -116,6 +116,19 @@ class LocationDetail(LoginPermissionRequiredMixin,
                 pass
 
         location = context['location']
+        if location.geometry_details:
+            geometry_details = location.geometry_details
+            if geometry_details['area']:
+                if float(geometry_details['area']['m2']) < 1000:
+                    context['area_metric_units'] = geometry_details['area']['m2'] + 'm2'
+                else:
+                    context['area_metric_units'] = geometry_details['area']['ha'] + 'ha'
+
+                if float(geometry_details['area']['ft2']) < 4356:
+                    context['area_imperial_units'] = geometry_details['area']['ft2'] + 'ft2'
+                else:
+                    context['area_imperial_units'] = geometry_details['area']['ac'] + 'ac'
+
         user = self.request.user
         context['is_allowed_edit_location'] = user.has_perm('spatial.update',
                                                             location)

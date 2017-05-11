@@ -207,6 +207,8 @@ def define_geometry_details(sender, instance, **kwargs):
     from django.contrib.gis.geos.polygon import Polygon
     if geom and isinstance(geom, Polygon) and geom.valid:
         calculate_polygon_area(instance)
+    else:
+        instance.geometry_details = None
 
 
 @fix_model_for_attributes
