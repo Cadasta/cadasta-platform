@@ -264,28 +264,32 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             user=self.user,
             admin=True
         )
+        members = {self.user.username: 'Administrator'}
         response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
                                        is_project_member=True,
-                                       is_allowed_import=True)
+                                       is_allowed_import=True,
+                                       members=members)
         assert response.content == expected
 
     def test_get_with_project_manager(self):
-        ProjectRole.objects.create(
+        role = ProjectRole.objects.create(
             project=self.project,
             user=self.user,
             role='PM',
         )
         response = self.request(user=self.user)
         assert response.status_code == 200
+        members = {self.user.username: role.get_role_display()}
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
                                        is_project_member=True,
-                                       is_allowed_import=True)
+                                       is_allowed_import=True,
+                                       members=members)
         assert response.content == expected
 
     def test_get_non_existent_project(self):
@@ -406,6 +410,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             user=org_admin,
             admin=True
         )
+        members = {org_admin.username: 'Administrator'}
         self.project.archived = True
         self.project.save()
         response = self.request(user=org_admin)
@@ -414,7 +419,8 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
                                        is_allowed_import=True,
-                                       is_project_member=True)
+                                       is_project_member=True,
+                                       members=members)
         assert response.content == expected
 
     def test_get_with_overview_stats(self):
@@ -428,9 +434,9 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                                                        num_locations=1,
                                                        num_parties=1,
                                                        num_resources=1)
-        assert "<div class=\"num\">1</div> location" in response.content
-        assert "<div class=\"num\">1</div> party" in response.content
-        assert "<div class=\"num\">1</div> resource" in response.content
+        assert "<span class=\"num\">1</span>" in response.content
+        assert "<span class=\"num\">1</span>" in response.content
+        assert "<span class=\"num\">1</span>" in response.content
 
     def test_get_with_labels(self):
         file = self.get_file(
@@ -1415,7 +1421,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.user)
         assert response.status_code == 302
-        assert ("You don't have permission to download data from this project"
+        assert ("You don't have permission to export data from this project"
                 in response.messages)
 
     def test_get_with_unauthenticated_user(self):
@@ -1436,7 +1442,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
     def test_post_with_unauthorized_user(self):
         response = self.request(user=self.user, method='POST')
         assert response.status_code == 302
-        assert ("You don't have permission to download data from this project"
+        assert ("You don't have permission to export data from this project"
                 in response.messages)
 
     def test_post_with_unauthenticated_user(self):

@@ -234,7 +234,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
              {'description': _("Remove user from a project"),
               'error_message': messages.PROJ_USERS_REMOVE}),
             ('project.download',
-             {'description': _("Download data from a project"),
+             {'description': _("Export data from a project"),
               'error_message': messages.PROJ_DOWNLOAD}),
             ('project.import',
              {'description': _("Import data to a project"),

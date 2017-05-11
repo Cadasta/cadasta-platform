@@ -28,6 +28,12 @@
 
     switch_layer_controls(map, options);
 
+    {% if is_project_member or is_superuser %}
+      var projectUser = true;
+    {% else %}
+      var projectUser = false;
+    {% endif %}
+
     {% if object.extent %}
     var projectExtent = {{ object.extent.geojson|safe }};
     {% else %}
@@ -47,8 +53,8 @@
 
     renderFeatures(map,
                    '{% url "async:spatial:list" object.organization.slug object.slug %}?exclude={{location.id}}',
-                   {projectExtent: projectExtent, trans: trans, location: currentlocation});
-    
+                   {projectExtent: projectExtent, trans: trans, location: currentlocation, projectUser: projectUser});
+
     var orgSlug = '{{ object.organization.slug }}';
     var projectSlug = '{{ object.slug }}';
     var url = '/api/v1/organizations/'

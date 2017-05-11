@@ -24,7 +24,7 @@
       } else {
         var map = e.originalEvent.detail.map;
       }
-      
+
       map = add_map_controls(map);
       map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
    });
@@ -37,7 +37,7 @@
   <div class="col-md-12 content-single">
     <!-- Extent map  -->
     <div class="col-md-8 map">
-      <div id="project-map" class="project-extent-map">
+      <div id="project_map" class="project-extent-map">
         {{ wizard.management_form }}
         {% if wizard.form.forms %}
           {{ wizard.form.management_form }}

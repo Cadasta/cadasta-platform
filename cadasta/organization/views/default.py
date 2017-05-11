@@ -406,6 +406,20 @@ class ProjectDashboard(PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        members = OrderedDict()
+
+        # add org_admin users
+        for member in self.object.organization.users.all():
+            roles = member.organizationrole_set.filter(
+                organization=self.object.organization, admin=True)
+            if roles:
+                members[member.username] = 'Administrator'
+
+        # add project members
+        for member in self.object.users.all():
+            role = member.projectrole_set.filter(project=self.object)[0]
+            role_name = role.get_role_display()
+            members[member.username] = role_name
         num_locations = self.object.spatial_units.count()
         num_parties = self.object.parties.count()
         num_resources = self.object.resource_set.filter(archived=False).count()
@@ -414,6 +428,12 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
+        context['members'] = members
+        try:
+            context['questionnaire'] = Questionnaire.objects.get(
+                id=self.object.current_questionnaire)
+        except Questionnaire.DoesNotExist:
+            pass
 
         return context
 

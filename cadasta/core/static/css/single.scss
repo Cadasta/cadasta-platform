@@ -18,9 +18,6 @@
   .top-btn {
     margin-top: 0;
   }
-  .btn-add {
-    margin-right: 20px;
-  }
 }
 
 .page-title { // page title
@@ -46,6 +43,12 @@
     }
     a {
       color: $brand-lightblue;
+    }
+    .glyphicon { // private
+      margin: 0 4px;
+      color: #fff;
+      opacity: 0.5;
+      -moz-opacity: .50;
     }
   }
 }
@@ -95,8 +98,8 @@
 #organization-single .page-header { // navy band on pages for single project or organization
   display: table;
   background: $brand-darkblue;
-  height: 110px;
-  min-height: 110px;
+  height: 100px;
+  min-height: 100px;
   border-bottom: solid 1px #fff;
   margin: 0;
   padding-top: 0;
@@ -140,6 +143,7 @@
     }
     .top-btn {
       vertical-align: middle;
+      padding-right: 15px;
       .btn-add {
         margin-right: 14px;
       }
@@ -158,17 +162,19 @@
     margin-bottom: 0;
     height: auto;
     min-height: 74px;
+    .page-title {
+      padding-bottom: 0;
+      h1, h2 {
+        padding-left: 14px;
+      }
+      .top-btn {
+        padding-right: 10px;
+      }
+    }
     .more-menu {
       width: 36px;
       height: 36px;
     }
-    h1, h2 {
-      padding-left: 14px;
-    }
-  }
-  #project-single .page-header .page-title,
-  #organization-single .page-header .page-title {
-    padding-bottom: 0;
   }
 }
 
@@ -247,6 +253,9 @@
   li.overview {
     .icon {
       background-image: url('/static/img/icon-overview.png');
+  li.dashboard {
+    .icon {
+      background-image: url('/static/img/icon-dashboard.png');
     }
   }
   li.search {
@@ -292,7 +301,7 @@
 }
 
 #sidebar.search li.search,
-#sidebar.overview li.overview,
+#sidebar.dashboard li.dashboard,
 #sidebar.map li.map,
 #sidebar.parties li.parties,
 #sidebar.resources li.resources,
@@ -383,7 +392,7 @@
     }
   }
   #sidebar.search li.search,
-  #sidebar.overview li.overview,
+  #sidebar.dashboard li.dashboard,
   #sidebar.map li.map,
   #sidebar.parties li.parties,
   #sidebar.resources li.resources,
@@ -507,41 +516,25 @@
 /* =Stats on overview page
 -------------------------------------------------------------- */
 
-.stats {
-  li {
-    width: 30%;
-    border-right: solid 1px $table-border-color;
-    text-align: center;
-    .num {
-      font-size: 28px;
-      font-size: 2.4vw;
-      font-weight: 600;
-      font-family: $font-family-sans-serif-alt;
-      letter-spacing: -1px;
-    }
-    &:last-child {
-      border-right: none;
-    }
-  }
-}
+// .stats {
+//   li {
+//     width: 30%;
+//     border-right: solid 1px $table-border-color;
+//     text-align: center;
+//     .num {
+//       font-size: 28px;
+//       font-size: 2.4vw;
+//       font-weight: 600;
+//       font-family: $font-family-sans-serif-alt;
+//       letter-spacing: -1px;
+//     }
+//     &:last-child {
+//       border-right: none;
+//     }
+//   }
+// }
 
-@media (max-width: $screen-md-min) {
- .stats li .num {
-    font-size: 36px;
-  }
-}
 
-@media (max-width: $screen-sm-min) {
- .stats li .num {
-    font-size: 28px;
-  }
-}
-
-@media (max-width: $screen-xs-min) {
- .stats li .num {
-    font-size: 21px;
-  }
-}
 
 /* =Tabs
 -------------------------------------------------------------- */
@@ -574,16 +567,16 @@
   left: 0;
   bottom: 0;
   z-index: 900;
-  padding: 0;
   overflow: hidden;
   overflow-y: scroll;
   height: 100%;
   height: -webkit-calc(100% - 30px);
   height: -moz-calc(100% - 30px);
   height: calc(100% - 30px);
+  background-color: #F2F4F7;
+  padding: 0px !important;
   > .row { // for map to expand need height
     height: 100%;
-    margin-right: 0;
   }
   h2 {
     color: $brand-darkblue;
@@ -614,7 +607,7 @@
     margin: 20px auto;
   }
   .btn-block {
-    margin: 24px auto;
+    margin: 10px auto;
   }
   .page-title {
     padding-bottom: 0;
@@ -627,7 +620,7 @@
     height: 100%;
     min-height: 100%;
     padding-right: 0;
-    #project-map, #id_extent_map, #id_extents_extent_map {
+    #project_map, #id_extent_map, #id_extents_extent_map {
       height: 100%;
       min-height: 100%;
     }
@@ -637,7 +630,14 @@
     min-height: 100%;
   }
   .main-text {
-    padding: 30px 40px 50px 50px;
+    padding: 20px 40px;
+    @include clearfix;
+    > .col-md-8 {
+      padding-left: 0;
+    }
+    > .col-md-4 {
+      padding-right: 0;
+    }
   }
   .detail { // right panel detail
     height: 100%;
@@ -645,7 +645,7 @@
     position: relative;
     background: #fff;
     margin: 0 auto;
-    padding: 24px;
+    padding: 20px 40px;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -681,6 +681,14 @@
       &.linked:hover {
         cursor: pointer;
         background-color: $table-bg-hover;
+    .nav-tabs {
+      li > a {
+        font-size: 13px;
+        padding: 10px;
+      }
+      li.active > a, li.active > a:hover, li.active > a:focus {
+        border-color: $table-border-color;
+        border-bottom-color: transparent;
       }
     }
     section > p:first-child {
@@ -697,30 +705,6 @@
       opacity: 0.7;
       padding-right: 12px;
     }
-    dl.contacts { // contacts in overview
-      dt {
-        border-top: dotted 1px $table-border-color;
-        padding-top: 10px;
-        padding-bottom: 6px;
-        padding-left: 30px;
-        &:first-child {
-          border-top: none;
-          padding-top: 0;
-        }
-      }
-      dd {
-        padding-bottom: 10px;
-        padding-left: 30px;
-        a {
-          display: block;
-          font-size: 13px;
-          padding-bottom: 4px;
-        }
-      }
-    }
-  }
-  .row-height .detail { // columns fixed to match heights like org overview
-    padding-top: 0;
   }
   .detail-edit { // edit on right
     background: $body-bg;
@@ -728,65 +712,60 @@
       background: transparent;
     }
   }
-  .panel { // content box in main panel
-    border: 1px solid $table-border-color;
-    clear: both;
-    .panel-heading {
-      background: transparent;
-      h3 {
-        margin: 4px auto;
-      }
-    }
-    .panel-body {
-      > h3 {
-        margin-bottom: 10px;
-        margin-top: 4px;
-        padding-bottom: 10px;
-        border-bottom: solid 1px $gray-light;
-      }
-      .top-add {
-        margin-bottom: -30px;
-      }
-    }
-    .panel-footer {
-      background: lighten($body-bg, 2%);
-    }
-    .panel-buttons { // holds buttons at bottom of panels containing forms
-      padding: 20px 15px;
-      .btn {
-        min-width: 110px;
-        margin-right: 20px;
-        &:last-child {
-          margin-right: 0;
-        }
-      }
-    }
-  }
   .nav-tabs {
     margin-bottom: 20px;
   }
+  ul.list-divider li { // lists with lines between
+    border-bottom: 1px solid $table-border-color;
+    padding: 12px 2px;
+    &:last-child {
+      border-bottom: 0;
+      padding-bottom: 6px;
+    }
+    &.linked:hover {
+      cursor: pointer;
+      background-color: $table-bg-hover;
+    }
+  }
+}
+
+.overview #project-map .leaflet-clickable { // forces cursor on non-interactive map
+  cursor: grab;
+  cursor: -webkit-grab;
+  cursor: -moz-grab;
 }
 
 body.map .content-single {
   overflow-y: hidden;
+  > .row { // for map to expand need height
+    margin-right: 0;
+  }
 }
 
 @media (max-width: $screen-sm-max) {
   .content-single {
     position: relative;
     .map {
-      height: 300px;
-      min-height: 300px;
+      height: 400px;
+      min-height: 400px;
     }
     .main-text {
-      padding: 15px;
+      padding: 10px 30px;
+      > .col-md-8 {
+        padding-left: 0;
+        padding-right: 0;
+      }
+      > .col-md-4 {
+        padding-left: 0;
+        padding-right: 0;
+      }
     }
   }
 }
 
 @media (max-width: $screen-xs-max) {
   .content-single {
-    .panel {
+    .panel-default {
       .panel-buttons .btn {
         width: 100%;
         margin-bottom: 10px;
@@ -811,6 +790,7 @@ body.map .content-single {
 -------------------------------------------------------------- */
 
 #project-map {
+  height: 100%;
   h2 {
     padding-bottom: 0;
   }
@@ -819,5 +799,50 @@ body.map .content-single {
     .btn-block {
       margin: 0 auto;
     }
+  }
+}
+
+#project-single #project-map { // for data tab
+  height: 100% !important;
+}
+
+/* =Dashboard and Overview
+-------------------------------------------------------------- */
+
+dl.contacts { // contact lists
+  margin-bottom: 0;
+  dt {
+    border-top: dotted 2px $table-border-color;
+    padding: 10px 0;
+    &:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+  }
+  dd {
+    padding-bottom: 4px;
+    padding-left: 0;
+    a {
+      display: block;
+      font-size: 13px;
+      padding-bottom: 4px;
+    }
+  }
+}
+
+/* =Tooltips
+-------------------------------------------------------------- */
+
+.tooltip {
+  .tooltip-arrow {
+    border-right-color: #706C69 !important;
+    border-left-color: #706C69 !important;
+  }
+
+  .tooltip-inner {
+    white-space: nowrap;
+    background-color: #706C69;
+    color: #fff;
+    font-weight: normal;
   }
 }

@@ -2,8 +2,11 @@
 -------------------------------------------------------------- */
 
 div.org-logo {
-  float: left;
-  padding: 10px;
+  padding: 30px 10px 10px;
+  img {
+    width: 90%;
+    max-width: 200px;
+  }
 }
 
 .org-text {
@@ -76,6 +79,7 @@ div.org-logo {
 .col-height {
   display: table-cell;
   float: none;
+  vertical-align: top;
   height: 100%;
 }
 
@@ -84,9 +88,6 @@ div.org-logo {
     display: block;
   }
   #organization-single {
-    .content-single > .row {
-      margin-left: 0;
-    }
     .row-height {
       display: table; 
       margin: 0 auto;

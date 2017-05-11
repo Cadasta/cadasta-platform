@@ -112,6 +112,7 @@ h4.div {
   text-transform: uppercase;
   font-size: 14px;
   opacity: 0.7;
+  -moz-opacity: .70;
   padding: 8px;
   background: $body-bg;
 }
@@ -127,6 +128,31 @@ a {
    color: $brand-darkblue;
    outline: none;
   }
+}
+
+a > .glyphicon,
+a > .fa, 
+.btn > .glyphicon,
+.btn > .fa {
+  margin-left: 4px;
+  margin-right: 4px;
+  opacity: 0.8;
+  -moz-opacity: .80;
+  top: 2px;
+  text-decoration: none;
+}
+
+a:hover > .glyphicon,
+a:hover > .fa,
+.btn:hover > .glyphicon,
+.btn:hover > .fa {
+  text-decoration: none;
+  opacity: 1.0;
+  -moz-opacity: 1.0;
+  -webkit-transition: all .2s ease-in-out;
+  -moz-transition: all .2s ease-in-out;
+  -ms-transition: all .2s ease-in-out;
+  -o-transition: all .2s ease-in-out;
 }
 
 kbd {
@@ -177,7 +203,7 @@ body.tinted-bg #page-content { // for bg image
   margin: 0 auto;
   padding: 0;
   position: absolute;
-  top: 180px;
+  top: 160px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -384,6 +410,12 @@ main.container-fluid {
     font-weight: bold;
     margin-top: 0;
     color: $gray-darker;
+    .glyphicon { // private icon
+      margin: 0 4px;
+      color: $gray-dark;
+      opacity: 0.5;
+      -moz-opacity: 0.5;
+    }
   }
   > thead > tr > th {
     border-bottom: 1px solid $table-border-color;
@@ -391,7 +423,7 @@ main.container-fluid {
     text-transform: uppercase;
     font-size: 12px;
     opacity: 0.7;
-    //padding: 4px 24px;
+    -moz-opacity: 0.7;
     background: $body-bg;
   }
   > tbody > tr.linked > td:hover {
@@ -439,6 +471,9 @@ table#select-list {
  .table > thead > tr > th, .table > thead > tr > td, .table > tbody > tr > th, .table > tbody > tr > td, .table > tfoot > tr > th, .table > tfoot > tr > td {
     padding: 8px;
     font-size: 12px;
+    h4 > a {
+      font-size: 16px;
+    }
  }
  .form-group, .form-control, .public-private-widget, .s3-buckets .file-input, #id_select_file-file {
    font-size: 12px;
@@ -464,6 +499,163 @@ table#select-list {
   height: -webkit-calc(100% - 30px);
   height: -moz-calc(100% - 30px);
   height: calc(100% - 30px);
+}
+
+/* =Dashboard Stats
+-------------------------------------------------------------- */
+
+.tile-box {
+  line-height: inherit;
+  display: block;
+  position: relative;
+  height: auto;
+  padding: 0;
+  text-align: center;
+  border-radius: 4px;
+  border: 1px solid $table-border-color;
+  margin-bottom: 20px;
+  .tile-header {
+    font-size: 14px;
+    padding: 5px 10px;
+    text-align: left;
+    text-transform: uppercase;
+    border: 0 !important;
+    background: rgba(255, 255, 255, .2);
+  }
+  .tile-content-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 10px;
+    > .glyphicon,
+    > .fa {
+      font-size: 56px;
+      line-height: 70px;
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      height: 60px;
+      margin-top: -36px;
+      opacity: .30;
+      -moz-opacity: .30;
+    }
+    > .glyphicon-center {
+      position: absolute;
+      top: 50%;
+      left: 16px;
+      height: 60px;
+      margin-top: -36px;
+    }
+    .tile-content {
+      span {
+        font-size: 14px;
+        display: block;
+        opacity: .70;
+        -moz-opacity: .70;
+        .glyphicon {
+          font-size: 11px;
+        }
+      }
+      .num {
+        font-size: 35px;
+        text-align: right;
+        opacity: 1;
+        -moz-opacity: 1;
+      }
+    }
+  }
+  .tile-footer {
+    display: block;
+    margin: 0;
+    padding: 5px 10px;
+    text-align: left;
+    color: inherit;
+    background: rgba(0, 0, 0, .1);
+    &:hover {
+      opacity: .80;
+      color: inherit;
+      -moz-opacity: .80;
+    }
+  }
+}
+
+a.tile-box.btn, 
+.tile-box-shortcut {
+  .tile-content-wrapper > .glyphicon,
+  .tile-content-wrapper > .fa {
+      -webkit-transition: all .2s ease-in-out;
+      -moz-transition: all .2s ease-in-out;
+      -ms-transition: all .2s ease-in-out;
+      -o-transition: all .2s ease-in-out;
+  }
+  &:hover .tile-content-wrapper > .glyphicon,
+  &:hover .tile-content-wrapper > .fa {
+    opacity: .70;
+    -moz-opacity: .70;
+  } 
+}
+
+.tile-box.bg-white  { // for white backgrounds
+  background: #fff;
+  .tile-header {
+    border-bottom: solid 1px $table-border-color !important;
+  }
+  .tile-footer {
+    background: #fff;
+  }
+}
+
+/* =Dashboard Overlays
+-------------------------------------------------------------- */
+
+.overlay-wrapper {
+  z-index: 2;
+  width: 100%;
+  .overlay {
+    background: rgba(14, 48, 94, 0.1);
+    min-height: 150px;
+    padding: 20px;
+    text-align: center;
+    vertical-align: middle;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    p {
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0;
+      color: #000;
+      font-family: Roboto Condensed;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+  .btn {
+      margin: 10px 4px 20px;
+
+  }
+}
+.overlay-wrapper.map {
+  padding: 15px; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  height: 100%;
+  min-height: 100%;
+  .overlay {
+    background: rgba(255, 255, 255, 0.5);
+    height: 100%;
+    min-height: 100%;
+    padding: 40px 20% 0; 
+    margin-bottom: 0;
+  }
+}
+
+/* =Dashboard box
+-------------------------------------------------------------- */
+
+.dashboard-box {
+  padding: 10px 30px 10px;
 }
 
 /* =Img sizing
@@ -525,22 +717,144 @@ img.org-logo, img#org-logo {
   }
 }
 
+/* =Section & Panels
+-------------------------------------------------------------- */
+
+section {
+  @include clearfix;
+}
+.panel {
+  &.panel-default {
+    border: 1px solid $table-border-color;
+    .panel-heading {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+  }
+  &.panel-plain {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    &.border-left {
+      border-left: 1px solid $table-border-color;
+    }
+  }
+  &.panel-default {
+    .panel-heading {
+      background: transparent;
+    }
+  }
+  &.panel-about {
+    padding-left: 0;
+  }
+  .panel-topimage { // above header that spans panel
+    padding-bottom: 20px;
+    border-bottom: 1px solid $table-border-color;
+  }
+  .panel-heading {
+    @include clearfix;
+    .glyphicon-cog, 
+    .glyphicon-plus {
+      font-size: 18px;
+      margin-top: 4px;
+      margin-left: 4px;
+      color: $gray-dark;
+      opacity: 0.5;
+      -moz-opacity: .50;
+      float: right;
+    }
+    a > .glyphicon-cog, 
+    a > .glyphicon-plus {
+      -webkit-transition: all .2s ease-in-out;
+      -moz-transition: all .2s ease-in-out;
+      -ms-transition: all .2s ease-in-out;
+      -o-transition: all .2s ease-in-out;
+    }
+    a:hover > .glyphicon-cog, 
+    a:hover > .glyphicon-plus {
+      opacity: .90;
+      -moz-opacity: .90;
+    }
+  }
+  .panel-body {
+    position: relative;
+    @include clearfix;
+    > h3 {
+      margin-bottom: 10px;
+      margin-top: 4px;
+      padding-bottom: 10px;
+      border-bottom: solid 1px $gray-light;
+    }
+    .top-add {
+      margin-bottom: -30px;
+    }
+  }
+  .panel-footer {
+    background: lighten($body-bg, 2%);
+  }
+  .panel-buttons { // holds buttons at bottom of panels containing forms
+    padding: 20px 15px;
+    .btn {
+      min-width: 110px;
+      margin-right: 20px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+  .panel-title { // applied to h3
+    font-size: 24px;
+  }
+  .panel-title-bordered {
+    border-bottom: solid 1px $gray-light;
+    padding-bottom: 8px; 
+    margin-bottom: 8px;
+  }
+  .panel-subtitle { // applied to h4
+    text-transform: uppercase;
+    opacity: 0.7;
+    -moz-opacity: .70;
+    font-size: 15px;
+    margin-top: 24px;
+    letter-spacing: 0;
+  }
+  &.panel-contacts .panel-subtitle {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: $screen-xs-max) {
+  .dashboard-box.border-right-dotted {
+    border-right: none;
+  }
+}
+
 /* =Buttons
 -------------------------------------------------------------- */
 
 .top-btn {
   margin-top: 10px;
   margin-bottom: 10px;
-  .btn {
-    min-width: 100px;
-  }
   .btn-rt, .btn-action {
     min-width: 34px;
   }
 }
 
+.btn-primary { // for green buttons on dark background
+  &:hover,
+  &:focus {
+    background-color: darken($btn-primary-bg, 5%);
+  }
+}
+
+.btn-default {
+  &:hover,
+  &:focus {
+    background-color: darken($btn-default-bg, 5%);
+  }
+}
+
 .btn-full {
-  background: $gray-lighter;
   text-align: center;
   padding: 20px;
   clear: both;
@@ -557,10 +871,25 @@ img.org-logo, img#org-logo {
   min-width: 60px;
 }
 
+.btn-panel {
+  vertical-align: middle;
+  padding: 20px 10px;
+  .glyphicon {
+    font-size: 48px;
+    color: $btn-primary-bg;
+    display: block;
+    padding: 0 10px 10px;
+  }
+}
+
 .btn-primary { // for green buttons on dark background
   &:hover {
     background-color: darken($btn-primary-bg, 5%);
   }
+}
+
+.btn-half { // 2 buttons inline
+  width: 48%;
 }
 
 div.add-btn-btm { // add party link at bottom of table
@@ -632,7 +961,7 @@ div.add-btn-btm { // add party link at bottom of table
   width: 100%;
   max-width: 100%;
   text-align: left;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   display: table;
   box-shadow: none;
   -moz-box-shadow: none;
@@ -668,8 +997,8 @@ div.add-btn-btm { // add party link at bottom of table
 #messages { // success messages on top of map
   position: relative;
   z-index: 999;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  //margin-top: 10px;
+  //margin-bottom: 10px;
 }
 
 .alert-error { // same as alert-danger
@@ -716,11 +1045,23 @@ h1 .label {
   margin-bottom: 10px;
   margin-top: 0;
   border: 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid $table-border-color;
+}
+
+.border-right-dotted {
+  border-right: 1px dotted $gray-light;
 }
 
 .inline {
   display: inline;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0;
+}
+
+.break { // for email and url long links
+  word-break: break-all;
 }
 
 @media (max-width: $screen-sm-max) {
