@@ -253,6 +253,7 @@
   li.overview {
     .icon {
       background-image: url('/static/img/icon-overview.png');
+  }
   li.dashboard {
     .icon {
       background-image: url('/static/img/icon-dashboard.png');
@@ -535,7 +536,6 @@
 // }
 
 
-
 /* =Tabs
 -------------------------------------------------------------- */
 .nav-tabs {
@@ -681,6 +681,8 @@
       &.linked:hover {
         cursor: pointer;
         background-color: $table-bg-hover;
+      }
+    }
     .nav-tabs {
       li > a {
         font-size: 13px;
