@@ -1,23 +1,23 @@
 import json
-import os
+# import os
 import requests
-import subprocess
-import time
+# import subprocess
+# import time
 
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseBadRequest
+# from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
-from django.views.generic.base import View
+# from django.views.generic.base import View
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from urllib.parse import quote as url_quote
+# from urllib.parse import quote as url_quote
 
 from jsonattrs.models import Schema
 from tutelary import mixins as tmixins
 
-from organization import messages as org_messages
+# from organization import messages as org_messages
 from organization.views.mixins import ProjectMixin
 from spatial.models import SpatialUnit
 from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
@@ -26,8 +26,8 @@ from resources.models import Resource
 from ..parser import parse_query
 # from ..export.all import AllExporter
 # from ..export.resource import ResourceExporter
-from ..export.shape import ShapeExporter
-from ..export.xls import XLSExporter
+# from ..export.shape import ShapeExporter
+# from ..export.xls import XLSExporter
 
 api_url = (
     settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT)
@@ -230,62 +230,62 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
             'search/search_result_item.html', {'result': result})
 
 
-class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
+# class SearchExport(tmixins.PermissionRequiredMixin, ProjectMixin, View):
 
-    permission_required = 'project.download'
-    permission_denied_message = org_messages.PROJ_DOWNLOAD
-    raise_exception = True
+#     permission_required = 'project.download'
+#     permission_denied_message = org_messages.PROJ_DOWNLOAD
+#     raise_exception = True
 
-    exporters = {
-        'shp': ShapeExporter,
-        'xls': XLSExporter,
-        # 'res': ResourceExporter,
-        # 'all': AllExporter,
-    }
+#     exporters = {
+#         'shp': ShapeExporter,
+#         'xls': XLSExporter,
+#         # 'res': ResourceExporter,
+#         # 'all': AllExporter,
+#     }
 
-    def get_perms_objects(self):
-        return [self.get_project()]
+#     def get_perms_objects(self):
+#         return [self.get_project()]
 
-    def post(self, request, *args, **kwargs):
-        query = request.POST.get('q')
-        export_format = request.POST.get('type')
-        if not query or export_format not in self.exporters.keys():
-            return HttpResponseBadRequest()
+#     def post(self, request, *args, **kwargs):
+#         query = request.POST.get('q')
+#         export_format = request.POST.get('type')
+#         if not query or export_format not in self.exporters.keys():
+#             return HttpResponseBadRequest()
 
-        project = self.get_project()
-        es_dump_path = self.query_es(project.id, request.user.id, query)
-        exporter = self.exporters[export_format](project)
-        path, mime_type = exporter.make_download(es_dump_path)
+#         project = self.get_project()
+#         es_dump_path = self.query_es(project.id, request.user.id, query)
+#         exporter = self.exporters[export_format](project)
+#         path, mime_type = exporter.make_download(es_dump_path)
 
-        ext = os.path.splitext(path)[1]
-        response = HttpResponse(open(path, 'rb'), content_type=mime_type)
-        response['Content-Disposition'] = ('attachment; filename=' +
-                                           project.slug + ext)
-        return response
+#         ext = os.path.splitext(path)[1]
+#         response = HttpResponse(open(path, 'rb'), content_type=mime_type)
+#         response['Content-Disposition'] = ('attachment; filename=' +
+#                                            project.slug + ext)
+#         return response
 
-    def query_es(self, project_id, user_id, query):
-        """Run a curl command to ES and dump the results into a temp file."""
+#     def query_es(self, project_id, user_id, query):
+#         """Run a curl command to ES and dump the results into a temp file."""
 
-        query_dsl = {
-            'query': parse_query(query),
-            'from': 0,
-            'size': settings.ES_MAX_RESULTS,
-            'sort': {'_score': {'order': 'desc'}},
-        }
-        query_dsl_param = url_quote(json.dumps(query_dsl), safe='')
-        t = round(time.time() * 1000)
-        es_dump_path = os.path.join(
-            settings.MEDIA_ROOT,
-            'temp/{}-{}-{}.esjson'.format(project_id, user_id, t)
-        )
-        subprocess.run([
-            'curl',
-            '-o', es_dump_path,
-            '-f',
-            '-XGET',
-            (
-                '{}/project-{}/spatial,party,resource/_data/'
-                '?format=json&source={}'
-            ).format(api_url, project_id, query_dsl_param)
-        ]).check_returncode()
-        return es_dump_path
+#         query_dsl = {
+#             'query': parse_query(query),
+#             'from': 0,
+#             'size': settings.ES_MAX_RESULTS,
+#             'sort': {'_score': {'order': 'desc'}},
+#         }
+#         query_dsl_param = url_quote(json.dumps(query_dsl), safe='')
+#         t = round(time.time() * 1000)
+#         es_dump_path = os.path.join(
+#             settings.MEDIA_ROOT,
+#             'temp/{}-{}-{}.esjson'.format(project_id, user_id, t)
+#         )
+#         subprocess.run([
+#             'curl',
+#             '-o', es_dump_path,
+#             '-f',
+#             '-XGET',
+#             (
+#                 '{}/project-{}/spatial,party,resource/_data/'
+#                 '?format=json&source={}'
+#             ).format(api_url, project_id, query_dsl_param)
+#         ]).check_returncode()
+#         return es_dump_path
