@@ -2,6 +2,7 @@ import json
 from buckets.serializers import S3Field
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
+import mimetypes
 
 from .models import ContentObject, Resource, SpatialResource
 
@@ -40,10 +41,14 @@ class ResourceSerializer(serializers.ModelSerializer):
             )
             return self.resource
         else:
+            file_url = validated_data['file']
+            mime_type = mimetypes.MimeTypes().guess_type(file_url)
+
             return Resource.objects.create(
                 content_object=self.context['content_object'],
                 contributor=self.context['contributor'],
                 project_id=self.context['project_id'],
+                mime_type=mime_type,
                 **validated_data
             )
 
