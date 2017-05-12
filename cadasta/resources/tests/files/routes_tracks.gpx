@@ -29,4 +29,31 @@
             <name>05981810818596</name>
         </rtept>
     </rte>
+    <trk>
+        <trkseg>
+          <trkpt lat="45.5366218" lon="-122.5179408">
+            <ele>67.0</ele>
+            <time>2017-03-27T20:48:01Z</time>
+            <hdop>3.0</hdop>
+          </trkpt>
+          <trkpt lat="45.5367998" lon="-122.5180683">
+            <ele>56.0</ele>
+            <time>2017-03-27T20:48:16Z</time>
+            <hdop>3.0</hdop>
+            <extensions>
+              <speed>1.5299999713897705</speed>
+            </extensions>
+          </trkpt>
+        </trkseg>
+        <trkseg>
+          <trkpt lat="45.5368517" lon="-122.5180993">
+            <ele>59.0</ele>
+            <time>2017-03-27T20:48:23Z</time>
+            <hdop>4.0</hdop>
+            <extensions>
+              <speed>0.47999998927116394</speed>
+            </extensions>
+          </trkpt>
+        </trkseg>
+    </trk>
 </gpx>
