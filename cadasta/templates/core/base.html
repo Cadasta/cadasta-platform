@@ -17,8 +17,7 @@
           href="https://cdn.datatables.net/r/bs-3.3.5/jq-2.1.4,dt-1.10.8/datatables.min.css"/>
     <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
     {% if LANGUAGE_BIDI %}
-    <link rel="stylesheet" type="text/css"
-          href="//cdn.rawgit.com/morteza/bootstrap-rtl/v3.3.4/dist/css/bootstrap-rtl.min.css">
+    <link href="{% sass_src 'css/rtl.scss' %}" rel="stylesheet" type="text/css">
     {% endif %}
     {% include "core/tracker.html" %}
     {% block extra_head %}{% endblock %}

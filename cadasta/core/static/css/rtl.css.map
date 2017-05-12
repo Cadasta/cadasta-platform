@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"file": "../../vagrant/cadasta/core/static/css/rtl.css",
+	"sources": [
+		"../../vagrant/cadasta/core/static/css/rtl.scss"
+	],
+	"names": [],
+	"mappings": "AAAA,OAAO,CAAP,8EAAO;AAEP,AAAY,WAAD,CAAC,EAAE,CAAC;EACb,MAAM,EAAE,IAAI,GACb;;AAED,AAAA,UAAU,CAAC;EACT,KAAK,EAAE,KAAK,GACb;;AAED,AAAG,EAAD,CAAC,SAAS,CAAC;EACX,KAAK,EAAE,KAAK,GACb"
+}
