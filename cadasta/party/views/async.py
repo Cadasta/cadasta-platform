@@ -37,17 +37,17 @@ class PartyRelationshipDetail(core_mixins.LoginPermissionRequiredMixin,
                     questionnaire_id=project.current_questionnaire)
                 context['type_labels'] = template_xlang_labels(
                     tenure_type.label_xlat)
-                except Question.DoesNotExist:
+            except Question.DoesNotExist:
+                pass
+            else:
+                try:
+                    option = QuestionOption.objects.get(
+                        question=tenure_type,
+                        name=context['relationship'].tenure_type_id)
+                    context['type_choice_labels'] = template_xlang_labels(
+                        option.label_xlat)
+                except QuestionOption.DoesNotExist:
                     pass
-                else:
-                    try:
-                        option = QuestionOption.objects.get(
-                            question=tenure_type,
-                            name=context['relationship'].tenure_type_id)
-                        context['type_choice_labels'] = template_xlang_labels(
-                            option.label_xlat)
-                    except Question.DoesNotExist:
-                        pass
 
         return context
 

@@ -1,7 +1,7 @@
 // set up webworker object.
 var WebWorker = {};
-WebWorker.addTileData = function(data, callback) {
-    var features = data.geojson.features;
+WebWorker.addTileData = function (data, callback) {
+    var features = data.geojson.results.features;
     var new_layer = [];
     if (features) {
         for (var i = 0, f_len = features.length; i < f_len; i++) {
@@ -24,7 +24,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
     _tiles: {},
     _ticker: 1,
     _original_request_len: null,
-    _addTile: function(tilePoint) {
+    _addTile: function (tilePoint) {
         var tile = {
             datum: null,
             processed: false
@@ -41,8 +41,8 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         this._loadTile(tile, tilePoint);
     },
     // XMLHttpRequest handler; closure over the XHR object, the layer, and the tile
-    _xhrHandler: function(req, layer, tile, tilePoint) {
-        return function() {
+    _xhrHandler: function (req, layer, tile, tilePoint) {
+        return function () {
             if (req.readyState !== 4) {
                 return;
             }
@@ -56,7 +56,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         };
     },
     // Load the requested tile via AJAX
-    _loadTile: function(tile, tilePoint) {
+    _loadTile: function (tile, tilePoint) {
         if (tilePoint.x < 0 || tilePoint.y < 0) {
             return;
         }
@@ -69,7 +69,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
 
         req.addEventListener("loadend", this._loadEnd.bind(this));
     },
-    _loadEnd: function() {
+    _loadEnd: function () {
         this._original_request_len = this._original_request_len || this._requests.length;
         if (this._ticker < this._original_request_len) {
             this._ticker++;
@@ -78,14 +78,14 @@ L.TileLayer.Ajax = L.TileLayer.extend({
             $('#messages #loading').addClass('hidden');
         }
     },
-    _reset: function() {
+    _reset: function () {
         L.TileLayer.prototype._reset.apply(this, arguments);
         for (var i = 0; i < this._requests.length; i++) {
             this._requests[i].abort();
         }
         this._requests = [];
     },
-    _update: function() {
+    _update: function () {
         if (this._map && this._map._panTransition && this._map._panTransition._inProgress) {
             return;
         }
@@ -104,7 +104,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     // Used to calculate svg path string for clip path elements
     _clipPathRectangles: {},
 
-    initialize: function(numWorkers, numLocations, url, options, geojsonOptions) {
+    initialize: function (numWorkers, numLocations, url, options, geojsonOptions) {
         this.numWorkers = numWorkers;
         this.numLocations = numLocations;
         this._workers = new Array(this.numWorkers);
@@ -117,8 +117,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
 
         this.geojsonLayer = new L.GeoJSON(null, geojsonOptions);
     },
-    onAdd: function(map) {
-        var parent = this;
+    onAdd: function (map) {
         var i = 0;
         this.queue.free = [];
         this.queue.len = 0;
@@ -130,7 +129,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
             i++;
         }
 
-        map.on("zoomstart", function() {
+        map.on("zoomstart", function () {
             this.queue.len = 0;
             this.queue.tiles = [];
         }, this);
@@ -142,7 +141,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         map.addLayer(this.geojsonLayer);
         // map.addLayer(this.features);
     },
-    onRemove: function(map) {
+    onRemove: function (map) {
         this.messages = {};
         var len = this._workers.length;
         var i = 0;
@@ -156,19 +155,19 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         map.removeLayer(this.geojsonLayer);
         // map.removeLayer(this.features);
     },
-    _reset: function() {
+    _reset: function () {
         this.geojsonLayer.clearLayers();
         this._keyLayers = {};
         this._removeOldClipPaths();
         L.TileLayer.Ajax.prototype._reset.apply(this, arguments);
     },
 
-    _getUniqueId: function() {
+    _getUniqueId: function () {
         return String(this._leaflet_id || ''); // jshint ignore:line
     },
 
     // Remove clip path elements from other earlier zoom levels
-    _removeOldClipPaths: function() {
+    _removeOldClipPaths: function () {
         for (var clipPathId in this._clipPathRectangles) {
             var prefix = clipPathId.split('tileClipPath')[0];
             if (this._getUniqueId() === prefix) {
@@ -188,7 +187,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     },
 
     // Recurse LayerGroups and call func() on L.Path layer instances
-    _recurseLayerUntilPath: function(func, layer) {
+    _recurseLayerUntilPath: function (func, layer) {
         if (layer instanceof L.Path) {
             func(layer);
         } else if (layer instanceof L.LayerGroup) {
@@ -197,7 +196,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         }
     },
 
-    _clipLayerToTileBoundary: function(layer, tilePoint) {
+    _clipLayerToTileBoundary: function (layer, tilePoint) {
         // Only perform SVG clipping if the browser is using SVG
         if (!L.Path.SVG) {
             return;
@@ -252,39 +251,37 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         }
 
         // Add the clip-path attribute to reference the id of the tile clipPath
-        this._recurseLayerUntilPath(function(pathLayer) {
+        this._recurseLayerUntilPath(function (pathLayer) {
             pathLayer._container.setAttribute('clip-path', 'url(' + window.location.href + '#' + clipPathId + ')');
         }, layer);
     },
 
-    _renderTileData: function(geojson, tilePoint, workerID) {
-        var parent = this;
-
+    _renderTileData: function (geojson, tilePoint, workerID) {
         var msg = {
             geojson: geojson,
             _loadedfeatures: this._loadedfeatures,
             workerID: workerID,
         };
 
-        this._workers[workerID].addTileData(msg).then(function(data) {
+        this._workers[workerID].addTileData(msg).then((function (data) {
             if (data.new_layer.length !== 0) {
-                parent._loadedfeatures = data._loadedfeatures;
-                parent.geojsonLayer.addData(data.new_layer);
+                this._loadedfeatures = data._loadedfeatures;
+                this.geojsonLayer.addData(data.new_layer);
             }
 
 
-            if (parent.queue.len) {
-                parent.queue.len--;
-                next = parent.queue.tiles.shift();
-                parent._renderTileData(next[0], next[1], data.workerID);
+            if (this.queue.len) {
+                this.queue.len--;
+                next = this.queue.tiles.shift();
+                this._renderTileData(next[0], next[1], data.workerID);
             } else {
-                parent.queue.free.push(data.workerID);
+                this.queue.free.push(data.workerID);
             }
 
-        }, function(e) {console.log(a);});
+        }.bind(this)), function (e) { console.log(a); });
     },
 
-    _tileLoaded: function(tile, tilePoint) {
+    _tileLoaded: function (tile, tilePoint) {
         if (tile.datum === null || this.numLocations === Object.keys(this._loadedfeatures).length) {
             return null;
         }
@@ -298,7 +295,7 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         }
     },
 
-    _loadTile: function(tile, tilePoint) {
+    _loadTile: function (tile, tilePoint) {
         if (!this._lazyTiles.isLoaded(tilePoint.x, tilePoint.y, tilePoint.z)) {
 
 
