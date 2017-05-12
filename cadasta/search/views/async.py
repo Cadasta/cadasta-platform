@@ -64,8 +64,6 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
             include_labels=True)
         self.spatial_types = dict(spatial_types)
 
-        SPATIAL_TYPE_CHOICES
-
         results_as_html = []
         num_hits = 0
         timestamp = ''
