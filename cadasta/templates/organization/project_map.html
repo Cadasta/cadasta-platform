@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/leaflet.toolbar.css' %}">
 {% endblock %}
 
 {% block extra_script %}
@@ -47,7 +48,7 @@
                rel_resource_new: '{% trans " Upload new resource for relationship " %}',
                rel_delete: '{% trans " Delete relationship " %}',
              };
-  
+
   {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};
   {% else %}
@@ -65,6 +66,8 @@
   var layers = {{ leaflet_tiles|safe }}
 
 </script>
+<script src="{% static 'js/smap/edit/Leaflet.Editable.js' %}"></script>
+<script src="{% static 'js/smap/edit/leaflet.toolbar.js' %}"></script>
 <script src="{% static 'js/smap/lazytiles.js' %}"></script>
 <script src="{% static 'js/smap/L.TileLayer.GeoJSON.js' %}"></script>
 <script src="{% static 'js/smap/L.Hash.js' %}"></script>
@@ -72,6 +75,12 @@
 <script src="{% static 'js/smap/router_mixins.js' %}"></script>
 <script src="{% static 'js/smap/routes.js' %}"></script>
 <script src="{% static 'js/smap/router.js' %}"></script>
+<script src="{% static 'js/smap/edit/controls.js' %}"></script>
+<script src="{% static 'js/smap/edit/tooltip.js' %}"></script>
+<script src="{% static 'js/smap/edit/editor.js' %}"></script>
+<script src="{% static 'js/smap/edit/LatLngUtil.js' %}"></script>
+<script src="{% static 'js/smap/edit/styles.js' %}"></script>
+<script src="{% static 'js/smap/edit/path.drag.js' %}"></script>
 <script src="{% static 'js/smap/index.js' %}"></script>
 {% endblock %}
 
