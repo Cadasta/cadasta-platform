@@ -47,15 +47,15 @@
         </a>
         <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
           <div class="visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
-          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>   
+          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
           <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
           <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
           <li role="separator" class="divider"></li>
-          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
-          <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Download data" %}</a></li>
+          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}">{% trans "Import data" %}</a></li>
+          <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}">{% trans "Download data" %}</a></li>
           <li role="separator" class="divider"></li>
           <li>
             {% if object.archived %}
@@ -88,7 +88,7 @@
         <ul class="dropdown-menu">
           {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
           {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
-          {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
+          {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}">{% trans "Import data" %}</a></li>{% endif %}
         </ul>
         {% endif %}
       </div>
@@ -111,7 +111,7 @@
           <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
-      </div>      
+      </div>
 
     </div>
   </div>
@@ -186,7 +186,7 @@
 <script>
 'use strict';
 window.addEventListener('load', function() {
-  $( '.search').find('.search').click( function(){ 
+  $( '.search').find('.search').click( function(){
 	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
@@ -197,7 +197,7 @@ window.addEventListener('load', function() {
       } else {
         $('#sidebar-search-box').addClass('disabled');
       }
-    } 
+    }
   });
   $('#sidebar-search-box form').bind('submit', function(e) {
     var query = $('#sidebar-search-box input')[0].value;
@@ -258,6 +258,32 @@ window.addEventListener('load', function() {
       <div class="modal-footer">
         <a href="{% url 'organization:project-unarchive' object.organization.slug object.slug %}" class="btn btn-primary unarchive-final pull-right" role="button">
           {% trans "Yes, unarchive this project" %}
+        </a>
+        <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">
+          {% trans "Cancel" %}
+        </button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="unsaved_edits" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h3 class="modal-title">{% trans "Unsaved Edits" %}</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+          {% trans "Your form has unsaved edits. Do you want to continue?" %}
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary forget-changes pull-right" role="button" data-dismiss="modal">
+          {% trans "Yes, forget changes" %}
         </a>
         <button type="button" class="btn btn-link cancel cancel-u" data-dismiss="modal">
           {% trans "Cancel" %}

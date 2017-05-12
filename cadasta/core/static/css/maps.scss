@@ -1,5 +1,5 @@
-#mapid { 
-  height: 100%; 
+#mapid {
+  height: 100%;
   z-index: 1;
 }
 
@@ -116,3 +116,77 @@ label[for="id_extents-location"] {
   display: none;
 }
 
+/* =LocationEditor
+-------------------------------------------------------------- */
+
+.leaflet-toolbar-icon {
+    cursor: pointer;
+    cursor: hand;
+}
+
+.cadasta-toolbar {
+    color: #000 !important;
+    background-image: url('/static/img/spritesheet.png');
+    background-repeat: no-repeat;
+}
+
+.draw-polygon {
+  background-position: -31px -2px;
+}
+
+.draw-polyline {
+  background-position: -2px -2px;
+}
+
+.draw-rectangle {
+  background-position: -62px -2px;
+}
+
+.draw-marker {
+  background-position: -122px -2px;
+}
+
+.edit-action span, .delete-action span   {
+  color: #464646 !important;
+}
+
+.leaflet-subtoolbar {
+  height: 28px !important;
+}
+
+.leaflet-subtoolbar li:last-child a {
+  border-radius: 0px 4px 4px 0px;
+}
+
+.leaflet-control-toolbar .smap-edit-disable {
+  color: #D8D8D8 !important;
+}
+
+.editor-tooltip {
+  display: inline;
+  position: absolute;
+  background: #666;
+  color: white;
+  opacity: 0.8;
+  padding: 5px;
+  border: 1px solid #999;
+  font-family: sans-serif;
+  line-height: 15px;
+  font-size: 12px;
+  z-index: 1000;
+  overflow: visible;
+  border-radius: 5px;
+  margin-left: 20px;
+  margin-top: -30px;
+  white-space: nowrap;
+}
+
+.editor-tooltip:before {
+	border-right: 7px solid #666;
+	border-top: 7px solid transparent;
+	border-bottom: 7px solid transparent;
+	content: '';
+	position: absolute;
+	top: 7px;
+	left: -6px;
+}

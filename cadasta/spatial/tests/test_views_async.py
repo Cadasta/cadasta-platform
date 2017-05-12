@@ -1,31 +1,31 @@
-import pytest
 import json
 from importlib import import_module
-from django.http import HttpRequest, Http404
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
-from questionnaires.tests import factories as q_factories
-from skivvy import APITestCase, ViewTestCase, remove_csrf
 
-from tutelary.models import Policy, assign_user_policies
-from jsonattrs.models import Attribute, AttributeType, Schema
+import pytest
 
 from accounts.tests.factories import UserFactory
-from organization.tests.factories import ProjectFactory
-from core.tests.utils.cases import UserTestCase, FileStorageTestCase
+from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
+from django.http import Http404, HttpRequest
+from django.test import TestCase
+from jsonattrs.models import Attribute, AttributeType, Schema
+from organization.tests.factories import ProjectFactory
+from party.models import Party, TenureRelationship, TenureRelationshipType
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
+from questionnaires.tests import factories as q_factories
+from resources.forms import AddResourceFromLibraryForm, ResourceForm
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
-from resources.forms import AddResourceFromLibraryForm, ResourceForm
-from party.tests.factories import PartyFactory, TenureRelationshipFactory
-from party.models import Party, TenureRelationship, TenureRelationshipType
+from skivvy import APITestCase, ViewTestCase, remove_csrf
+from tutelary.models import Policy, assign_user_policies
 
-from .factories import SpatialUnitFactory
 from .. import forms
 from ..models import SpatialUnit
 from ..views import async
+from .factories import SpatialUnitFactory
 
 SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
@@ -33,20 +33,19 @@ SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 def assign_policies(user, deny_edit_delete_permissions=False):
     clauses = {
         'clause': [
-            # {
-            #     "effect": "allow",
-            #     "object": ["*"],
-            #     "action": ["org.*"]
-            # }, {
-            #     'effect': 'allow',
-            #     'object': ['organization/*'],
-            #     'action': ['org.*', "org.*.*"]
-            # }, {
-            #     'effect': 'allow',
-            #     'object': ['project/*/*'],
-            #     'action': ['project.*', 'project.*.*', 'spatial.*']
-            # },
             {
+                "effect": "allow",
+                "object": ["*"],
+                "action": ["org.*"]
+            }, {
+                'effect': 'allow',
+                'object': ['organization/*'],
+                'action': ['org.*', "org.*.*"]
+            }, {
+                'effect': 'allow',
+                'object': ['project/*/*'],
+                'action': ['project.*', 'project.*.*', 'spatial.*']
+            }, {
                 'effect': 'allow',
                 'object': ['project/*/*'],
                 'action': ['spatial.*', 'tenure_rel.*']
@@ -64,10 +63,10 @@ def assign_policies(user, deny_edit_delete_permissions=False):
 
     if deny_edit_delete_permissions:
         deny_clause = {
-                          'effect': 'deny',
-                          'object': ['spatial/*/*/*'],
-                          'action': ['spatial.update', 'spatial.delete']
-                       }
+            'effect': 'deny',
+            'object': ['spatial/*/*/*'],
+            'action': ['spatial.update', 'spatial.delete']
+        }
         clauses['clause'].append(deny_clause)
 
     policy = Policy.objects.create(
@@ -126,16 +125,21 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         return (reverse('organization:project-dashboard', kwargs={
             'organization': self.project.organization.slug,
             'project': self.project.slug,
-            }) + '#/records/location/{}/'.format(self.location_created.id))
+        }) + '#/records/location/{}/'.format(self.location_created.id))
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
+        submit_url = (
+            '/async/organizations/{}/projects/{}/records/location/new/'
+            .format(self.project.organization.slug,
+                    self.project.slug)
+        )
         expected_content = self.render_content(cancel_url=reverse(
             'organization:project-dashboard', kwargs=self.setup_url_kwargs()) +
-            '#/overview/')
+            '#/overview/', submit_url=submit_url)
         assert response.content == expected_content
         assert '<input class="form-control" '
         'id="id_spatialunit::default::fname" '
@@ -176,7 +180,12 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         setattr(request, 'session', SessionStore())
         url_params = self._get_url_kwargs()
         view = self.setup_view()
-        expected_content = self.render_content(cancel_url='/info/')
+        submit_url = (
+            '/async/organizations/{}/projects/{}/records/location/new/'
+            .format(url_params['organization'], url_params['project'])
+        )
+        expected_content = self.render_content(
+            cancel_url='/info/', submit_url=submit_url)
 
         # First request that should set the session
         request.META['HTTP_REFERER'] = '/info/'
@@ -232,8 +241,10 @@ class LocationAddTest(ViewTestCase, UserTestCase, TestCase):
         assert SpatialUnit.objects.count() == 1
         self.location_created = SpatialUnit.objects.first()
         assert self.location_created.attributes.get('fname') == 'Test text'
-        assert response.status_code == 302
-        assert response.location == self.expected_success_url
+        assert response.status_code == 200
+        assert response.content == json.dumps({
+            "new_location_id": self.location_created.id
+        })
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -402,86 +413,6 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
                          'data-label-en="Location type"'),
             type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
             relationships=[wr_ten, lh_ten],
-            form_lang_default='en',
-            form_langs=[('en', 'English'), ('de', 'German')]
-        )
-
-    def test_does_not_show_buttons_when_no_edit_permissions(self):
-        user = UserFactory.create()
-        assign_policies(user, True)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        expected = self.render_content(is_allowed_edit_location=False,
-                                       is_allowed_delete_location=False)
-        assert response.content == expected
-
-    def test_get_with_incomplete_questionnaire(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        self.project.current_questionnaire = questionnaire.id
-        self.project.save()
-
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_with_questionnaire(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        self.project.current_questionnaire = questionnaire.id
-        self.project.save()
-
-        location_type_question = q_factories.QuestionFactory.create(
-            questionnaire=questionnaire,
-            name='location_type',
-            label={'en': 'Location type', 'de': 'Parzelle Typ'},
-            type='S1')
-        q_factories.QuestionOptionFactory.create(
-            question=location_type_question,
-            name=self.location.type,
-            label={'en': 'House', 'de': 'Haus'})
-
-        tenure_type_question = q_factories.QuestionFactory.create(
-            questionnaire=questionnaire,
-            name='tenure_type',
-            label={'en': 'Location type', 'de': 'Parzelle Typ'},
-            type='S1')
-        q_factories.QuestionOptionFactory.create(
-            question=tenure_type_question,
-            name='LH',
-            label={'en': 'Leasehold', 'de': 'Miete'})
-        q_factories.QuestionOptionFactory.create(
-            question=tenure_type_question,
-            name='WR',
-            label={'en': 'Water rights', 'de': 'Wasserecht'})
-        lh_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='LH'),
-            spatial_unit=self.location,
-            project=self.project)
-
-        wr_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
-            spatial_unit=self.location,
-            project=self.project)
-
-        relationships = self.location.tenurerelationship_set.all()
-        for rel in relationships:
-            if lh_ten == rel:
-                rel.type_labels = ('data-label-de="Miete" '
-                                   'data-label-en="Leasehold"')
-            elif wr_ten == rel:
-                rel.type_labels = ('data-label-de="Wasserecht" '
-                                   'data-label-en="Water rights"')
-
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content == self.render_content(
-            type_labels=('data-label-de="Parzelle Typ" '
-                         'data-label-en="Location type"'),
-            type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
-            relationships=relationships,
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')]
         )
@@ -1187,9 +1118,9 @@ class TenureRelationshipAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         submit_url = ('/async/organizations/{org}/projects/{prj}/records/'
                       'location/{spatial_id}/relationships/new/'.format(
-                        org=self.project.organization.slug,
-                        prj=self.project.slug,
-                        spatial_id=self.spatial_unit.id))
+                          org=self.project.organization.slug,
+                          prj=self.project.slug,
+                          spatial_id=self.spatial_unit.id))
         return {
             'object': self.project,
             'location': self.spatial_unit,
@@ -1428,7 +1359,7 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['features']) == 1
+        assert len(response.content['results']['features']) == 1
 
     def test_get_with_private_project(self):
         self.prj.access = 'private'
@@ -1457,4 +1388,4 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
     def test_get_with_public_project(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['features']) == 1
+        assert len(response.content['results']['features']) == 1
