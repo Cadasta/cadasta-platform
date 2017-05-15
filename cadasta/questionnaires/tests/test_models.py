@@ -55,6 +55,14 @@ class QuestionTest(TestCase):
                                   'questionnaire=abc123 '
                                   'question_group=abc123>')
 
+        question = factories.QuestionFactory.build(id='abc234',
+                                                   name='Question',
+                                                   question_group=None,
+                                                   questionnaire=questionnaire)
+        assert repr(question) == ('<Question id=abc234 name=Question '
+                                  'questionnaire=abc123 '
+                                  'question_group=None>')
+
     def test_has_options(self):
         question = factories.QuestionFactory.create(type='S1')
         assert question.has_options is True
