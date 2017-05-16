@@ -1,4 +1,3 @@
-import django.views.generic as base_generic
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 from core.views import generic
 from core.views.mixins import ArchiveMixin
@@ -6,61 +5,64 @@ from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 from django.http import Http404
 from organization.views import mixins as organization_mixins
+from organization.views.mixins import ProjectMixin
 
 from . import mixins
 from .. import messages as error_messages
 from ..exceptions import InvalidGPXFile
-from ..forms import AddResourceFromLibraryForm
 from ..models import ContentObject, Resource
 
 
 class ProjectResources(LoginPermissionRequiredMixin,
-                       mixins.ProjectResourceMixin,
                        mixins.HasUnattachedResourcesMixin,
-                       mixins.DetachableResourcesListMixin,
+                       organization_mixins.ProjectMixin,
                        organization_mixins.ProjectAdminCheckMixin,
-                       generic.ListView):
+                       generic.TemplateView):
     template_name = 'resources/project_list.html'
     permission_required = 'resource.list'
     permission_denied_message = error_messages.RESOURCE_LIST
 
-    def filter_archived_resources(self, view, obj):
-        if obj.archived:
-            return ('resource.view', 'resource.unarchive')
-        else:
-            return ('resource.view',)
-
-    permission_filter_queryset = filter_archived_resources
-    use_resource_library_queryset = True
-
-    def get_resource_list(self):
-        return self.get_queryset()
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['success_url'] = None
+
+        project = self.get_project()
+        context['object'] = project
+        context['resource_src'] = reverse(
+            'async:resources:list',
+            args=[project.organization.slug, project.slug])
         return context
+
+    def get_perms_objects(self):
+        return [self.get_project()]
+
+    def get_content_object(self):
+        return self.get_project()
 
 
 class ProjectResourcesAdd(LoginPermissionRequiredMixin,
-                          mixins.ProjectResourceMixin,
-                          base_generic.edit.FormMixin,
+                          ProjectMixin,
+                          mixins.ResourceViewMixin,
                           organization_mixins.ProjectAdminCheckMixin,
                           generic.DetailView):
     template_name = 'resources/project_add_existing.html'
-    form_class = AddResourceFromLibraryForm
     permission_required = update_permissions('resource.add')
     permission_denied_message = error_messages.RESOURCE_ADD
 
     def get_object(self):
         return self.get_project()
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            form.save()
-            return self.form_valid(form)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        project = self.get_project()
+        context['object'] = project
+        context['resource_src'] = reverse(
+            'async:resources:list',
+            args=[project.organization.slug, project.slug])
+        context['resource_lib'] = reverse(
+            'async:resources:add_to_project',
+            args=[project.organization.slug, project.slug])
+        return context
 
 
 class ProjectResourcesNew(LoginPermissionRequiredMixin,
@@ -74,6 +76,19 @@ class ProjectResourcesNew(LoginPermissionRequiredMixin,
 
     def get_perms_objects(self):
         return [self.get_project()]
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        project = self.get_project()
+        context['object'] = project
+        context['resource_src'] = reverse(
+            'async:resources:list',
+            args=[project.organization.slug, project.slug])
+        context['resource_lib'] = reverse(
+            'async:resources:add_to_project',
+            args=[project.organization.slug, project.slug])
+        return context
 
     def post(self, request, *args, **kwargs):
         try:

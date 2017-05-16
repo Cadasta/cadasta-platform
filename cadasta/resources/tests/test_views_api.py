@@ -163,12 +163,6 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
             {'content_object': prj, 'project': prj, 'file': not_found}
         ])
 
-        # self._get(prj.organization.slug,
-        #           prj.slug,
-        #           query='search=image',
-        #           status=200,
-        #           count=2)
-
         response = self.request(
             user=self.user,
             url_kwargs={'organization': prj.organization.slug,

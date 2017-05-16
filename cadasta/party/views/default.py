@@ -5,7 +5,6 @@ from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 
 from organization.views import mixins as organization_mixins
-from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
 from questionnaires.models import Question, QuestionOption
 from . import mixins
@@ -14,32 +13,18 @@ from .. import messages as error_messages
 
 
 class PartiesList(LoginPermissionRequiredMixin,
-                  mixins.PartyQuerySetMixin,
-                  organization_mixins.ProjectAdminCheckMixin,
-                  generic.ListView):
+                  organization_mixins.ProjectMixin,
+                  generic.TemplateView):
     template_name = 'party/party_list.html'
     permission_required = 'party.list'
     permission_denied_message = error_messages.PARTY_LIST
-    no_jsonattrs_in_queryset = True
+
+    def get_perms_objects(self):
+        return [self.get_project()]
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        project = context['object']
-
-        if project.current_questionnaire:
-            try:
-                party_type = Question.objects.get(
-                    name='party_type',
-                    questionnaire_id=project.current_questionnaire)
-                party_opts = QuestionOption.objects.filter(question=party_type)
-                party_opts = dict(party_opts.values_list('name', 'label_xlat'))
-
-                for party in context['object_list']:
-                    party.type_labels = template_xlang_labels(
-                        party_opts.get(party.type))
-            except Question.DoesNotExist:
-                pass
-
+        context['object'] = self.get_project()
         return context
 
 
@@ -65,15 +50,24 @@ class PartiesDetail(LoginPermissionRequiredMixin,
                     mixins.PartyObjectMixin,
                     organization_mixins.ProjectAdminCheckMixin,
                     resource_mixins.HasUnattachedResourcesMixin,
-                    resource_mixins.DetachableResourcesListMixin,
                     generic.DetailView):
     template_name = 'party/party_detail.html'
     permission_required = 'party.view'
     permission_denied_message = error_messages.PARTY_VIEW
     attributes_field = 'attributes'
 
+    def get_content_object(self):
+        return self.get_object()
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('party')
+        context['resource_src'] = reverse('async:resources:party',
+                                          kwargs=url_kwargs)
+        context['resource_exists'] = context['party'].resources.exists()
+
         context['relationships'] = self.object.tenurerelationship_set.all(
         ).select_related('spatial_unit').defer('spatial_unit__attributes')
 
@@ -188,21 +182,23 @@ class PartiesDelete(LoginPermissionRequiredMixin,
 
 
 class PartyResourcesAdd(LoginPermissionRequiredMixin,
-                        mixins.PartyResourceMixin,
+                        mixins.PartyObjectMixin,
                         organization_mixins.ProjectAdminCheckMixin,
-                        base_generic.edit.FormMixin,
                         generic.DetailView):
     template_name = 'party/resources_add.html'
-    form_class = AddResourceFromLibraryForm
     permission_required = update_permissions('party.resources.add')
     permission_denied_message = error_messages.PARTY_RESOURCES_ADD
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            form.save()
-            return self.form_valid(form)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('party')
+
+        context['resource_lib'] = reverse(
+            'async:resources:add_to_party',
+            kwargs=url_kwargs)
+        return context
 
 
 class PartyResourcesNew(LoginPermissionRequiredMixin,
@@ -218,9 +214,7 @@ class PartyResourcesNew(LoginPermissionRequiredMixin,
 class PartyRelationshipDetail(LoginPermissionRequiredMixin,
                               JsonAttrsMixin,
                               mixins.PartyRelationshipObjectMixin,
-                              organization_mixins.ProjectAdminCheckMixin,
                               resource_mixins.HasUnattachedResourcesMixin,
-                              resource_mixins.DetachableResourcesListMixin,
                               generic.DetailView):
     template_name = 'party/relationship_detail.html'
     permission_required = 'tenure_rel.view'
@@ -229,6 +223,12 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('relationship')
+        context['resource_src'] = reverse('async:resources:relationship',
+                                          kwargs=url_kwargs)
+        context['resource_exists'] = context['relationship'].resources.exists()
 
         project = context['object']
         if project.current_questionnaire:
@@ -286,13 +286,28 @@ class PartyRelationshipDelete(LoginPermissionRequiredMixin,
 
 
 class PartyRelationshipResourceNew(LoginPermissionRequiredMixin,
+                                   resource_mixins.HasUnattachedResourcesMixin,
                                    mixins.PartyRelationshipResourceMixin,
                                    organization_mixins.ProjectAdminCheckMixin,
-                                   resource_mixins.HasUnattachedResourcesMixin,
                                    generic.CreateView):
     template_name = 'party/relationship_resources_new.html'
     permission_required = update_permissions('tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('relationship')
+
+        context['resource_src'] = reverse('async:resources:relationship',
+                                          kwargs=url_kwargs)
+        context['resource_exists'] = context['relationship'].resources.exists()
+
+        context['resource_lib'] = reverse(
+            'async:resources:add_to_relationship',
+            kwargs=url_kwargs)
+        return context
 
 
 class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
@@ -301,13 +316,20 @@ class PartyRelationshipResourceAdd(LoginPermissionRequiredMixin,
                                    base_generic.edit.FormMixin,
                                    generic.DetailView):
     template_name = 'party/relationship_resources_add.html'
-    form_class = AddResourceFromLibraryForm
     permission_required = update_permissions('tenure_rel.resources.add')
     permission_denied_message = error_messages.TENURE_REL_RESOURCES_ADD
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            form.save()
-            return self.form_valid(form)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('relationship')
+
+        context['resource_src'] = reverse('async:resources:relationship',
+                                          kwargs=url_kwargs)
+        context['resource_exists'] = context['relationship'].resources.exists()
+
+        context['resource_lib'] = reverse(
+            'async:resources:add_to_relationship',
+            kwargs=url_kwargs)
+        return context

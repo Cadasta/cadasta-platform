@@ -1,11 +1,9 @@
-import django.views.generic as base_generic
 from core.mixins import LoginPermissionRequiredMixin, update_permissions
 from core.views import generic
 from django.core.urlresolvers import reverse
 from jsonattrs.mixins import JsonAttrsMixin, template_xlang_labels
 from organization.views import mixins as organization_mixins
 from party.messages import TENURE_REL_CREATE
-from resources.forms import AddResourceFromLibraryForm
 from resources.views import mixins as resource_mixins
 from questionnaires.models import Question, QuestionOption
 
@@ -68,7 +66,6 @@ class LocationDetail(LoginPermissionRequiredMixin,
                      mixins.SpatialUnitObjectMixin,
                      organization_mixins.ProjectAdminCheckMixin,
                      resource_mixins.HasUnattachedResourcesMixin,
-                     resource_mixins.DetachableResourcesListMixin,
                      generic.DetailView):
     template_name = 'spatial/location_detail.html'
     permission_required = 'spatial.view'
@@ -77,6 +74,13 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('location')
+        context['resource_src'] = reverse('async:resources:location',
+                                          kwargs=url_kwargs)
+        context['resource_exists'] = context['location'].resources.exists()
+
         context['relationships'] = self.object.tenurerelationship_set.all(
         ).select_related('party').defer('party__attributes')
 
@@ -156,21 +160,23 @@ class LocationDelete(LoginPermissionRequiredMixin,
 
 
 class LocationResourceAdd(LoginPermissionRequiredMixin,
-                          mixins.SpatialUnitResourceMixin,
-                          base_generic.edit.FormMixin,
+                          mixins.SpatialUnitObjectMixin,
                           organization_mixins.ProjectAdminCheckMixin,
                           generic.DetailView):
     template_name = 'spatial/resources_add.html'
-    form_class = AddResourceFromLibraryForm
     permission_required = update_permissions('spatial.resources.add')
     permission_denied_message = error_messages.SPATIAL_ADD_RESOURCE
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-        if form.is_valid():
-            form.save()
-            return self.form_valid(form)
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        url_kwargs = self.kwargs
+        url_kwargs['object_id'] = url_kwargs.pop('location')
+
+        context['resource_lib'] = reverse(
+            'async:resources:add_to_location',
+            kwargs=url_kwargs)
+        return context
 
 
 class LocationResourceNew(LoginPermissionRequiredMixin,

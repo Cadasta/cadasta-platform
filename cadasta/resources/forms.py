@@ -1,7 +1,6 @@
 from django import forms
 from core.form_mixins import SanitizeFieldsForm
-from .models import Resource, ContentObject
-from .fields import ResourceField
+from .models import Resource
 
 
 class ResourceForm(SanitizeFieldsForm, forms.ModelForm):
@@ -31,34 +30,3 @@ class ResourceForm(SanitizeFieldsForm, forms.ModelForm):
                 **self.cleaned_data
             )
         return self.instance
-
-
-class AddResourceFromLibraryForm(forms.Form):
-    def __init__(self, content_object, project_id, *args, **kwargs):
-        kwargs.pop('contributor', None)
-        super().__init__(*args, **kwargs)
-
-        self.content_object = content_object
-        self.project_resources = Resource.objects.filter(
-            project_id=project_id, archived=False
-        ).select_related('contributor')
-
-        for resource in self.project_resources:
-            if resource not in content_object.resources:
-                self.fields[resource.id] = ResourceField(
-                    label=resource.name,
-                    initial=False,
-                    resource=resource
-                )
-
-    def save(self):
-        object_resources = self.content_object.resources.values_list('id',
-                                                                     flat=True)
-        for key, value in self.cleaned_data.items():
-            if value and key not in object_resources:
-                ContentObject.objects.create(
-                    resource_id=key,
-                    content_object=self.content_object
-                )
-
-        self.content_object.reload_resources()
