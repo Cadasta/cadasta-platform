@@ -34,10 +34,6 @@ urlpatterns = [
         r'^(?P<organization>[-\w]+)/projects/new/$',
         default.ProjectAddWizard.as_view(),
         name='project-add'),
-    # url(
-    #     r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/#/overview/$',
-    #     default.ProjectDashboard.as_view(),
-    #     name='project-dashboard'),
     url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/$',
         default.ProjectMap.as_view(),

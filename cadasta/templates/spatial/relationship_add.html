@@ -1,9 +1,6 @@
 {% load i18n %}
 {% load widget_tweaks %}
 {% load filters %}
-{% load staticfiles %}
-
-{% block page_title %}{% trans "Add relationship" %} | {% endblock %}
 
 {% block form_modal %}
 <div class="modal-backdrop">
@@ -37,13 +34,13 @@
             <div id="new-item" class="clearfix{% if not form.new_entity.value %} hidden{% endif %}">
 
               <div class="form-group{% if form.name.errors %} has-error{% endif %}">
-                <label class="control-label" for="{{ form.name.id_for_label }}" {{ form.name.field.labels_xlang|safe }}>{% trans "Party name" %}</label>
+                <label class="control-label required" for="{{ form.name.id_for_label }}" {{ form.name.field.labels_xlang|safe }}>{% trans "Party name" %}</label>
                 {% render_field form.name class+="form-control" data-parsley-required="true" %}
                 <div class="error-block">{{ form.name.errors }}</div>
               </div>
 
               <div class="form-group{% if form.party_type.errors %} has-error{% endif %}">
-                <label class="control-label" for="{{ form.party_type.id_for_label }}" {{ form.party_type.field.labels_xlang|safe }}>{% trans "Party type" %}</label>
+                <label class="control-label required" for="{{ form.party_type.id_for_label }}" {{ form.party_type.field.labels_xlang|safe }}>{% trans "Party type" %}</label>
                 {% render_field form.party_type class+="form-control party-type" data-parsley-required="true" %}
                 <div class="error-block">{{ form.party_type.errors }}</div>
               </div>
@@ -55,7 +52,7 @@
             <h4 class="step">{% trans "2. Relationship details" %}</h4>
 
             <div class="form-group{% if form.tenure_type.errors %} has-error{% endif %}">
-              <label class="control-label" for="{{ form.tenure_type.id_for_label }}" {{ form.tenure_type.field.labels_xlang|safe }}>{% trans "Relationship Type" %}</label>
+              <label class="control-label required" for="{{ form.tenure_type.id_for_label }}" {{ form.tenure_type.field.labels_xlang|safe }}>{% trans "Relationship Type" %}</label>
               {% render_field form.tenure_type class+="form-control" data-parsley-required="true" %}
               <div class="error-block">{{ form.tenure_type.errors }}</div>
             </div>

@@ -14,7 +14,7 @@
           </div>
           <h3>{% trans "Overview" %}</h3>
           <div class="form-group{% if form.type.errors %} has-error{% endif %}">
-            <label class="control-label" for="{{ form.type.id_for_label }}" {{ form.type.field.labels_xlang|safe }}>{% trans "What type of location is this?" %}</label>
+            <label class="control-label required" for="{{ form.type.id_for_label }}" {{ form.type.field.labels_xlang|safe }}>{% trans "What type of location is this?" %}</label>
             {% render_field form.type class+="form-control" data-parsley-required="true" %}
             <div class="error-block">{{ form.type.errors }}</div>
           </div>

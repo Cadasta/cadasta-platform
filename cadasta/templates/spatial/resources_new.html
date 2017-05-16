@@ -1,11 +1,4 @@
 {% load i18n %}
-{% load staticfiles %}
-
-{% block page_title %}{% trans "Upload new resource for location" %} | {% endblock %}
-
-{% block extra_script %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-{% endblock %}
 
 {% block location_extra_script %}
   {{ form.media }}

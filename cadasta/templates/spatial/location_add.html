@@ -1,31 +1,4 @@
 {% load i18n %}
-{% load widget_tweaks %}
-
-{% load staticfiles %}
-{% load leaflet_tags %}
-
-
-
-{% block extra_head %}
-{% leaflet_css plugins="draw,forms,groupedlayercontrol,markercluster,deflate"%}
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
-{% endblock %}
-
-{% block extra_script %}
-{% leaflet_js plugins="draw,forms,groupedlayercontrol,markercluster,deflate" %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
-<script src="{% static 'js/jquery-ui.min.js' %}"></script>
-
-{% if get_current_language != "en-us" %}
-  {% get_current_language as LANGUAGE_CODE %}
-  {{ LANGUAGE_CODE }}
-  <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
-{% endif %}
-{% endblock %}
 
 {% block content %}
   {% include "spatial/location_form.html" with add="yes" %}
