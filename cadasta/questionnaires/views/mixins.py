@@ -16,7 +16,8 @@ class ProjectQuestionnairePDFFormMixin(ProjectMixin):
 class PDFFormViewMixin:
     form_class = PDFFormCreateForm
 
-    def get_model_context(self):
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
         project = self.get_project()
         questionnaire = None
         try:
@@ -24,24 +25,13 @@ class PDFFormViewMixin:
                 id=project.current_questionnaire)
         except Questionnaire.DoesNotExist:
             pass
-
-        return {
-            'contributor': self.request.user,
-            'questionnaire': questionnaire
-        }
-
-    def get_form_kwargs(self, *args, **kwargs):
-        form_kwargs = super().get_form_kwargs(*args, **kwargs)
-        form_kwargs.update(self.get_model_context())
+        form_kwargs['contributor'] = self.request.user
+        form_kwargs['questionnaire'] = questionnaire
+        form_kwargs['project_id'] = project.id
         return form_kwargs
 
 
 class ProjectPDFFormMixin(ProjectMixin, PDFFormViewMixin):
-
-    def get_model_context(self):
-        context = super().get_model_context()
-        context['project_id'] = self.get_project().id
-        return context
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -49,11 +39,10 @@ class ProjectPDFFormMixin(ProjectMixin, PDFFormViewMixin):
         context['object'] = project
         try:
             questionnaire = Questionnaire.objects.get(
-                        id=project.current_questionnaire)
+                id=project.current_questionnaire)
             context['questionnaire'] = questionnaire
-            context['has_questionnaire'] = True
         except Questionnaire.DoesNotExist:
-            context['has_questionnaire'] = False
+            pass
 
         return context
 
@@ -73,7 +62,6 @@ class PDFFormObjectMixin(ProjectPDFFormMixin):
         except PDFForm.DoesNotExist as e:
             raise Http404(e)
 
-        self.pdfform = pdfform
         return pdfform
 
     def get_context_data(self, *args, **kwargs):

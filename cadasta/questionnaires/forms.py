@@ -20,10 +20,10 @@ class PDFFormCreateForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         pdfform = super().save(commit=False, *args, **kwargs)
 
-        if not self.instance.id:
+        if not pdfform.id:
             pdfform.contributor = self.contributor
             pdfform.questionnaire = self.questionnaire
             pdfform.project_id = self.project_id
 
         pdfform.save()
-        return self.instance
+        return pdfform

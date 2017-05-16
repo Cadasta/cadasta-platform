@@ -97,7 +97,7 @@ class PDFFormAddTest(ViewTestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         return {
             'object': self.project,
-            'has_questionnaire': True,
+            'questionnaire': self.questionnaire,
             'form': forms.PDFFormCreateForm(contributor=user,
                                             project_id=self.project.id,
                                             questionnaire=self.questionnaire)
