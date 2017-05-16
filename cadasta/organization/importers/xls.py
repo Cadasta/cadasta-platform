@@ -75,10 +75,7 @@ def get_csv_from_dataframe(df, entity_types):
                     right_on='party::id', how='outer'
                 )
                 # drop unused columns
-                drop_cols = [
-                    'spatialunit::id', 'party::id',
-                    'tenurerelationship::tenure_type_label'
-                ]
+                drop_cols = ['spatialunit::id', 'party::id']
                 merged.drop(drop_cols, inplace=True, axis=1)
 
                 return merged.to_csv(index=False, index_label=False)

@@ -527,11 +527,11 @@ class ShapeTest(UserTestCase, TestCase):
             for i, row in enumerate(csvreader):
                 if i == 0:
                     assert row == ['id', 'party_id', 'spatial_unit_id',
-                                   'tenure_type', 'tenure_type_label']
+                                   'tenure_type']
                 else:
                     assert row == [
                         self.tenurerelationship.id, self.parties[0].id,
-                        self.spatialunit_1.id, 'CR', 'Eigentum']
+                        self.spatialunit_1.id, 'CR']
 
         # remove this so other tests pass
         os.remove(filename)

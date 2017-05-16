@@ -125,11 +125,9 @@ class ExporterTest(BaseTestClass):
         assert list(attrs.keys()) == ['notes']
         assert metadatum['model_attrs'] == ['id', 'party_id',
                                             'spatial_unit_id',
-                                            'tenure_type_id',
-                                            'tenure_type_label']
+                                            'tenure_type_id']
         assert list(metadatum['attr_columns'].keys()) == [
-            'id', 'party_id', 'spatial_unit_id', 'tenure_type_id',
-            'tenure_type_label', 'notes']
+            'id', 'party_id', 'spatial_unit_id', 'tenure_type_id', 'notes']
 
     def test_get_attr_values(self):
         location_data = {
@@ -361,14 +359,12 @@ class ShapeExporterTest(BaseTestClass):
                 assert rows[0][1] == 'party_id'
                 assert rows[0][2] == 'spatial_unit_id'
                 assert rows[0][3] == 'tenure_type_id'
-                assert rows[0][4] == 'tenure_type_label'
-                assert rows[0][5] == 'notes'
+                assert rows[0][4] == 'notes'
                 assert rows[1][0] == 'ID2'
                 assert rows[1][1] == 'ID1'
                 assert rows[1][2] == 'ID0'
                 assert rows[1][3] == 'CU'
-                assert rows[1][4] == "Customary Rights"
-                assert rows[1][5] == "The best relationship!"
+                assert rows[1][4] == "The best relationship!"
 
     def test_make_download_not_standalone(self):
         ensure_dirs()
@@ -516,14 +512,12 @@ class XLSExporterTest(BaseTestClass):
         assert ws['B1'].value == 'party_id'
         assert ws['C1'].value == 'spatial_unit_id'
         assert ws['D1'].value == 'tenure_type_id'
-        assert ws['E1'].value == 'tenure_type_label'
-        assert ws['F1'].value == 'notes'
+        assert ws['E1'].value == 'notes'
         assert ws['A2'].value == 'ID2'
         assert ws['B2'].value == 'ID1'
         assert ws['C2'].value == 'ID0'
         assert ws['D2'].value == 'CU'
-        assert ws['E2'].value == "Customary Rights"
-        assert ws['F2'].value == "The best relationship!"
+        assert ws['E2'].value == "The best relationship!"
 
     def test_make_download_empty(self):
         ensure_dirs()
@@ -794,14 +788,12 @@ class AllExporterTest(BaseTestClass):
             assert ws['B1'].value == 'party_id'
             assert ws['C1'].value == 'spatial_unit_id'
             assert ws['D1'].value == 'tenure_type_id'
-            assert ws['E1'].value == 'tenure_type_label'
-            assert ws['F1'].value == 'notes'
+            assert ws['E1'].value == 'notes'
             assert ws['A2'].value == 'ID2'
             assert ws['B2'].value == 'ID1'
             assert ws['C2'].value == 'ID0'
             assert ws['D2'].value == 'CU'
-            assert ws['E2'].value == "Customary Rights"
-            assert ws['F2'].value == "The best relationship!"
+            assert ws['E2'].value == "The best relationship!"
 
     def test_make_download_empty(self):
         ensure_dirs()

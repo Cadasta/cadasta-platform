@@ -47,7 +47,7 @@ class Exporter(SchemaSelectorMixin):
                                                  model='tenurerelationship'),
                 'schema_attrs': schema_attrs['party.tenurerelationship'],
                 'model_attrs': ['id', 'party_id', 'spatial_unit_id',
-                                'tenure_type_id', 'tenure_type_label'],
+                                'tenure_type_id'],
             },
         }
 
