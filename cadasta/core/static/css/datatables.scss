@@ -1,0 +1,136 @@
+/*
+ * This combined file was created by the DataTables downloader builder:
+ *   https://datatables.net/download
+ *
+ * To rebuild or modify this file with the latest versions of the included
+ * software please visit:
+ *   https://datatables.net/download/#dt/jqc-1.12.4/dt-1.10.13
+ *
+ * Included libraries:
+ *   DataTables 1.10.8
+ */
+
+table.dataTable{clear:both;margin-top:6px !important;margin-bottom:6px !important;max-width:none !important}table.dataTable td,table.dataTable th{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}table.dataTable.nowrap th,table.dataTable.nowrap td{white-space:nowrap}div.dataTables_wrapper div.dataTables_length label{font-weight:normal;text-align:left;white-space:nowrap}div.dataTables_wrapper div.dataTables_length select{width:75px;display:inline-block}div.dataTables_wrapper div.dataTables_filter{text-align:right}div.dataTables_wrapper div.dataTables_filter label{font-weight:normal;white-space:nowrap;text-align:left}div.dataTables_wrapper div.dataTables_filter input{margin-left:0.5em;display:inline-block;width:auto}div.dataTables_wrapper div.dataTables_info{padding-top:8px;white-space:nowrap}div.dataTables_wrapper div.dataTables_paginate{margin:0;white-space:nowrap;text-align:right}div.dataTables_wrapper div.dataTables_paginate ul.pagination{margin:2px 0;white-space:nowrap}table.dataTable thead>tr>th,table.dataTable thead>tr>td{padding-right:30px}table.dataTable thead>tr>th:active,table.dataTable thead>tr>td:active{outline:none}table.dataTable thead .sorting,table.dataTable thead .sorting_asc,table.dataTable thead .sorting_desc,table.dataTable thead .sorting_asc_disabled,table.dataTable thead .sorting_desc_disabled{cursor:pointer;position:relative}table.dataTable thead .sorting:after,table.dataTable thead .sorting_asc:after,table.dataTable thead .sorting_desc:after,table.dataTable thead .sorting_asc_disabled:after,table.dataTable thead .sorting_desc_disabled:after{position:absolute;bottom:8px;right:8px;display:block;font-family:'Glyphicons Halflings';opacity:0.5}table.dataTable thead .sorting:after{opacity:0.2;content:"\e150"}table.dataTable thead .sorting_asc:after{content:"\e155"}table.dataTable thead .sorting_desc:after{content:"\e156"}table.dataTable thead .sorting_asc_disabled:after,table.dataTable thead .sorting_desc_disabled:after{color:#eee}div.dataTables_scrollHead table.dataTable{margin-bottom:0 !important}div.dataTables_scrollBody table{border-top:none;margin-top:0 !important;margin-bottom:0 !important}div.dataTables_scrollBody table thead .sorting:after,div.dataTables_scrollBody table thead .sorting_asc:after,div.dataTables_scrollBody table thead .sorting_desc:after{display:none}div.dataTables_scrollBody table tbody tr:first-child th,div.dataTables_scrollBody table tbody tr:first-child td{border-top:none}div.dataTables_scrollFoot table{margin-top:0 !important;border-top:none}@media screen and (max-width: 767px){div.dataTables_wrapper div.dataTables_length,div.dataTables_wrapper div.dataTables_filter,div.dataTables_wrapper div.dataTables_info,div.dataTables_wrapper div.dataTables_paginate{text-align:center}}/*table.dataTable.table-condensed>thead>tr>th{padding-right:20px}table.dataTable.table-condensed .sorting:after,table.dataTable.table-condensed .sorting_asc:after,table.dataTable.table-condensed .sorting_desc:after{top:6px;right:6px}*/table.table-bordered.dataTable{border-collapse:separate !important}table.table-bordered.dataTable th,table.table-bordered.dataTable td{border-left-width:0}table.table-bordered.dataTable th:last-child,table.table-bordered.dataTable th:last-child,table.table-bordered.dataTable td:last-child,table.table-bordered.dataTable td:last-child{border-right-width:0}table.table-bordered.dataTable tbody th,table.table-bordered.dataTable tbody td{border-bottom-width:0}div.dataTables_scrollHead table.table-bordered{border-bottom-width:0}
+
+
+/* =Custom CSS for Cadasta: table for sort and filter
+-------------------------------------------------------------- */
+
+.dataTables_wrapper {
+  div.dataTables_info {
+    padding-top: 10px !important;
+  }
+  .table-search { // search
+    .dataTables_filter {
+      float: left;
+    }
+    label {
+      float: left;
+      text-align: left;
+      margin-right: 10px;
+    }
+    input {
+      margin-left: 0 !important;
+    }
+  }
+  .table-entries { // number of entries
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-right: 20px;
+    opacity: 0.8;
+  }
+  .table-num { // select number of entries per page
+    font-size: 12px;
+    float: left;
+    display: inline-block;
+    padding-top: 3px;
+    padding-right: 20px;
+    opacity: 0.8;
+    .input-sm {
+      padding: 2px;
+    }
+    select {
+      width: 100px !important;
+    }
+  }
+  .table-pagination { // pagination
+    float: right;
+    display: inline-block;
+    .pagination > li > a,
+    .pagination > li > span {
+      color: $gray-dark;
+    }
+    .pagination > .disabled > a, .pagination > .disabled > a:focus, .pagination > .disabled > a:hover, .pagination > .disabled > span, .pagination > .disabled > span:focus, .pagination > .disabled > span:hover    {
+      color: $gray-medium;
+    }
+    .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
+      background-color: $gray-light;
+      border-color: #ddd;
+    }
+  }
+}
+
+table.dataTable {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  thead {
+    .sorting::after {
+      content: initial;
+    }
+    .sorting_asc::after, .sorting_desc::after {
+      position: relative;
+      left: 8px;
+      display: inline-block;
+      font-size: 10px;
+      top: 1px;
+      font-family:'Glyphicons Halflings';
+      opacity:0.5
+    }
+    .sorting_asc::after {
+      content: "\e253";
+    }
+    .sorting_desc::after {
+      content: "\e252";
+    }
+  }
+}
+
+.detail div.dataTables_wrapper {
+  div.dataTables_filter input {
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 500px) {
+  div.dataTables_wrapper div.dataTables_filter input {
+    max-width: 80px;
+  }
+}
+
+@media (max-width: 400px) {
+  #project-single .dataTables_wrapper .col-sm-6,
+  #organization-single .dataTables_wrapper .col-sm-6 {
+    width: 100% !important; // fix for col-xs-6
+    float: left !important;
+  }
+  #project-single div.dataTables_wrapper div.dataTables_filter,
+  #organization-single div.dataTables_wrapper div.dataTables_filter {
+    text-align: left !important;
+  }
+  .dataTables_wrapper {
+    .table-entries { // number of entries
+      font-size: 10px;
+      padding-right: 5px;
+    }
+    .table-num { // select number of entries per page
+      font-size: 10px;
+      select {
+        font-size: 10px;
+      }
+    }
+  }
+  .table > caption + thead > tr:first-child > th, .table > caption + thead > tr:first-child > td, .table > colgroup + thead > tr:first-child > th, .table > colgroup + thead > tr:first-child > td, .table > thead:first-child > tr:first-child > th, .table > thead:first-child > tr:first-child > td {
+    width: auto !important;
+  }
+}
