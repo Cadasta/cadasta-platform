@@ -88,7 +88,10 @@
                 <div class="alert alert-info alert-full clearfix row" role="alert">
                   <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
                   <div>
-                      {% blocktrans %}Data has already been contributed to this project. To ensure data integrity, uploading a new questionnaire is disabled for this project.{% endblocktrans %}
+                    {% if form.initial.questionnaire %}
+                    <p>{% blocktrans %}This project is using questionnaire{% endblocktrans %} <a href="{{ form.initial.questionnaire }}" class="alert-link">{{ form.initial.original_file }}</a></p>
+                    {% endif %}
+                    <p>{% blocktrans %}Data has already been contributed to this project. To ensure data integrity, uploading a new questionnaire is disabled.{% endblocktrans %}</p>
                   </div>
                 </div>
                 {% endif %}
