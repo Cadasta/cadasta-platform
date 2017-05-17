@@ -65,9 +65,9 @@ class SpatialUnitsRelationshipListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 url_kwargs={'location': su1.id})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
         valid_ids = (sr1.id, sr2.id)
-        for rel in response.content:
+        for rel in response.content['results']:
             assert rel['id'] in valid_ids
 
     def test_get_all_relationships_of_party(self):
@@ -85,9 +85,9 @@ class SpatialUnitsRelationshipListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 url_kwargs={'party': party1.id})
         assert response.status_code == 200
-        assert len(response.content) == 3
+        assert len(response.content['results']) == 3
         valid_ids = (pr1.id, pr2.id, tr1.id)
-        for rel in response.content:
+        for rel in response.content['results']:
             assert rel['id'] in valid_ids
 
     def test_get_invalid_relationship_class(self):

@@ -638,9 +638,9 @@ class TenureRelationshipResourceListAPITest(APITestCase, FileStorageTestCase,
     def test_full_list(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_full_list_with_unauthorized_user(self):
@@ -662,8 +662,8 @@ class TenureRelationshipResourceListAPITest(APITestCase, FileStorageTestCase,
             url_kwargs={'tenure_rel_id': tenure.id},
             get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
@@ -680,8 +680,8 @@ class TenureRelationshipResourceListAPITest(APITestCase, FileStorageTestCase,
             url_kwargs={'tenure_rel_id': tenure.id},
             get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names, reverse=True))
 
     def test_search_filter(self):
@@ -704,7 +704,7 @@ class TenureRelationshipResourceListAPITest(APITestCase, FileStorageTestCase,
                         'tenure_rel_id': tenure.id},
             get_data={'search': 'image'})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
     def test_get_full_list_organization_does_not_exist(self):
         response = self.request(user=self.user,
@@ -729,9 +729,9 @@ class TenureRelationshipResourceListAPITest(APITestCase, FileStorageTestCase,
             project=self.prj, content_object=self.tenure, archived=True)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_add_resource(self):

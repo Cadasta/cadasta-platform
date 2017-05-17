@@ -34,7 +34,7 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         UserFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 3
+        assert len(response.content['results']) == 3
 
     def test_full_list_organizations(self):
         """
@@ -46,20 +46,20 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         o2 = OrganizationFactory.create(add_users=[user2])
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 3
+        assert len(response.content['results']) == 3
 
-        assert 'organizations' in response.content[0]
-        assert response.content[0]['organizations'] == []
-        assert 'organizations' in response.content[1]
+        assert 'organizations' in response.content['results'][0]
+        assert response.content['results'][0]['organizations'] == []
+        assert 'organizations' in response.content['results'][1]
         assert ({'id': o0.id, 'name': o0.name}
-                in response.content[1]['organizations'])
+                in response.content['results'][1]['organizations'])
         assert ({'id': o1.id, 'name': o1.name}
-                in response.content[1]['organizations'])
-        assert 'organizations' in response.content[2]
+                in response.content['results'][1]['organizations'])
+        assert 'organizations' in response.content['results'][2]
         assert ({'id': o0.id, 'name': o0.name}
-                in response.content[2]['organizations'])
+                in response.content['results'][2]['organizations'])
         assert ({'id': o2.id, 'name': o2.name}
-                in response.content[2]['organizations'])
+                in response.content['results'][2]['organizations'])
 
     def test_full_list_with_unautorized_user(self):
         """
@@ -79,7 +79,7 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'is_active': True})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
     def test_search_filter(self):
         """
@@ -92,9 +92,9 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'search': 'match'})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
         assert not any([user['username'] == 'excluded'
-                        for user in response.content])
+                        for user in response.content['results']])
 
     def test_ordering(self):
         UserFactory.create_from_kwargs([
@@ -103,8 +103,8 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'ordering': 'username'})
         assert response.status_code == 200
-        assert len(response.content) == 4
-        usernames = [user['username'] for user in response.content]
+        assert len(response.content['results']) == 4
+        usernames = [user['username'] for user in response.content['results']]
         assert(usernames == sorted(usernames))
 
     def test_reverse_ordering(self):
@@ -114,8 +114,8 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'ordering': '-username'})
         assert response.status_code == 200
-        assert len(response.content) == 4
-        usernames = [user['username'] for user in response.content]
+        assert len(response.content['results']) == 4
+        usernames = [user['username'] for user in response.content['results']]
         assert(usernames == sorted(usernames, reverse=True))
 
 

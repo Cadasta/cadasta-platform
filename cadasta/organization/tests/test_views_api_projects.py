@@ -65,9 +65,9 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         self.project = ProjectFactory.create(add_users=prj_users)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
         assert (other_user.username not in
-                [u['username'] for u in response.content])
+                [u['username'] for u in response.content['results']])
 
     def test_full_list_with_unauthorized_user(self):
         self.project = ProjectFactory.create()
@@ -302,9 +302,9 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
         assert all([proj.get('organization').get('id') == self.organization.id
-                    for proj in response.content])
+                    for proj in response.content['results']])
 
     def test_full_list_with_unauthorized_user(self):
         """
@@ -314,9 +314,9 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create_batch(2)
         response = self.request()
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
         assert all([proj.get('organization').get('id') == self.organization.id
-                    for proj in response.content])
+                    for proj in response.content['results']])
 
     def test_filter_archived_without_authorization(self):
         """
@@ -326,7 +326,7 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create(organization=self.organization, archived=False)
         response = self.request(user=self.user, get_data={'archived': True})
         assert response.status_code == 200
-        assert len(response.content) == 0
+        assert len(response.content['results']) == 0
 
     def test_fitler_archived_with_org_admin(self):
         """
@@ -339,7 +339,7 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create(organization=self.organization, archived=False)
         response = self.request(user=user, get_data={'archived': True})
         assert response.status_code == 200
-        assert len(response.content) == 1
+        assert len(response.content['results']) == 1
 
     def test_search_filter(self):
         """
@@ -349,8 +349,9 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create(organization=self.organization, name='aaaa',)
         response = self.request(user=self.user, get_data={'search': 'opdp'})
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert all([proj['name'] == 'opdp' for proj in response.content])
+        assert len(response.content['results']) == 1
+        assert all([proj['name'] == 'opdp' for proj in
+                    response.content['results']])
 
     def test_ordering(self):
         ProjectFactory.create_from_kwargs([
@@ -360,8 +361,8 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [proj['name'] for proj in response.content]
+        assert len(response.content['results']) == 3
+        names = [proj['name'] for proj in response.content['results']]
         assert names == sorted(names)
 
     def test_reverse_ordering(self):
@@ -372,8 +373,8 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [proj['name'] for proj in response.content]
+        assert len(response.content['results']) == 3
+        names = [proj['name'] for proj in response.content['results']]
         assert names == sorted(names, reverse=True)
 
     def test_permission_filter(self):
@@ -397,8 +398,8 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'permissions': 'party.create'})
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert response.content[0]['slug'] != 'unauthorized'
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
 
 
 class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
@@ -417,7 +418,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 4
+        assert len(response.content['results']) == 4
 
     def test_full_list_with_superuser(self):
         """
@@ -431,7 +432,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 4
+        assert len(response.content['results']) == 4
 
     def test_full_list_with_unauthorized_user(self):
         """
@@ -441,9 +442,9 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create_batch(2)
         response = self.request()
         assert response.status_code == 200
-        assert len(response.content) == 4
+        assert len(response.content['results']) == 4
         assert all(['users' not in proj['organization']
-                    for proj in response.content])
+                    for proj in response.content['results']])
 
     def test_empty_list_with_unauthorized_user(self):
         """
@@ -451,7 +452,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         """
         response = self.request()
         assert response.status_code == 200
-        assert len(response.content) == 0
+        assert len(response.content['results']) == 0
 
     def test_filter_active(self):
         """
@@ -461,7 +462,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create(archived=False)
         response = self.request(user=self.user, get_data={'archived': False})
         assert response.status_code == 200
-        assert len(response.content) == 1
+        assert len(response.content['results']) == 1
 
     def test_search_filter(self):
         """
@@ -471,8 +472,9 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ProjectFactory.create_batch(2)
         response = self.request(user=self.user, get_data={'search': 'opdp'})
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert all([proj['name'] == 'opdp' for proj in response.content])
+        assert len(response.content['results']) == 1
+        assert all([proj['name'] == 'opdp' for proj in
+                    response.content['results']])
 
     def test_ordering(self):
         ProjectFactory.create_from_kwargs([
@@ -480,8 +482,8 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [proj['name'] for proj in response.content]
+        assert len(response.content['results']) == 3
+        names = [proj['name'] for proj in response.content['results']]
         assert names == sorted(names)
 
     def test_reverse_ordering(self):
@@ -490,8 +492,8 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [proj['name'] for proj in response.content]
+        assert len(response.content['results']) == 3
+        names = [proj['name'] for proj in response.content['results']]
         assert names == sorted(names, reverse=True)
 
     def test_permission_filter(self):
@@ -515,8 +517,8 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'permissions': 'party.create'})
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert response.content[0]['slug'] != 'unauthorized'
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
 
     # CONDITIONS:
     #
@@ -556,7 +558,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         expected_names = [prjs[i].name for i in idxs]
-        pnames = [p['name'] for p in response.content]
+        pnames = [p['name'] for p in response.content['results']]
         assert(sorted(expected_names) == sorted(pnames))
 
     def test_visibility_filtering(self):

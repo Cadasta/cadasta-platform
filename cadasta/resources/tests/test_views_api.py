@@ -91,9 +91,9 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
     def test_list_resources(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_get_full_list_organization_does_not_exist(self):
@@ -110,7 +110,7 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
     def test_get_full_list_with_unauthorized_user(self):
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
-        assert len(response.content) == 0
+        assert len(response.content['results']) == 0
 
     def test_add_resource(self):
         response = self.request(method='POST', user=self.user)
@@ -171,7 +171,7 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
                         'project': prj.slug},
             get_data={'search': 'image'})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
     def test_filter_unarchived(self):
         prj = ProjectFactory.create()
@@ -186,7 +186,7 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
                         'project': prj.slug},
             get_data={'archived': False})
         assert response.status_code == 200
-        assert len(response.content) == 1
+        assert len(response.content['results']) == 1
 
     def test_filter_archived_with_nonunarchiver(self):
         prj = ProjectFactory.create()
@@ -202,7 +202,7 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
                         'project': prj.slug},
             get_data={'archived': True})
         assert response.status_code == 200
-        assert len(response.content) == 0
+        assert len(response.content['results']) == 0
 
     def test_filter_archived_with_unarchiver(self):
         prj = ProjectFactory.create()
@@ -223,7 +223,7 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
                         'project': prj.slug},
             get_data={'archived': True})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
     def test_ordering(self):
         prj = ProjectFactory.create()
@@ -239,8 +239,8 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
                         'project': prj.slug},
             get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
@@ -256,8 +256,8 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
                         'project': prj.slug},
             get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names, reverse=True))
 
 
@@ -470,20 +470,21 @@ class ProjectSpatialResourcesTest(APITestCase, UserTestCase,
     def test_list_spatial_resources(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 1
-        assert response.content[0]['id'] == self.resource.id
-        assert response.content[0]['spatial_resources'] is not None
-        assert response.content[0]['spatial_resources'][0]['name'] == 'tracks'
-        assert response.content[0]['spatial_resources'][0][
+        results = response.content['results']
+        assert len(results) == 1
+        assert results[0]['id'] == self.resource.id
+        assert results[0]['spatial_resources'] is not None
+        assert results[0]['spatial_resources'][0]['name'] == 'tracks'
+        assert results[0]['spatial_resources'][0][
             'geom']['type'] == 'GeometryCollection'
-        assert response.content[0]['spatial_resources'][0]['geom'][
+        assert results[0]['spatial_resources'][0]['geom'][
             'geometries'][0]['type'] == 'MultiLineString'
 
     def test_list_spatial_resources_with_unauthorized_user(self):
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
-        assert len(response.content) == 0
-        assert response.content == []
+        assert len(response.content['results']) == 0
+        assert response.content['results'] == []
 
 
 @pytest.mark.usefixtures('make_dirs')

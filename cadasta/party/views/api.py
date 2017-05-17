@@ -1,13 +1,13 @@
 """Party API."""
-
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from rest_framework import generics, filters, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from tutelary.mixins import APIPermissionRequiredMixin
-from core.mixins import update_permissions
 
+from core.mixins import update_permissions
+from core.util import paginate_results
 from party.models import (PartyRelationship,
                           TenureRelationship)
 from spatial.models import SpatialRelationship
@@ -113,9 +113,8 @@ class RelationshipList(APIPermissionRequiredMixin,
         'spatial_rel.list', 'party_rel.list', 'tenure_rel.list')
 
     def get(self, request, *args, **kwargs):
-
         acceptable_classes = ('spatial', 'party', 'tenure')
-        rel_class = self.request.query_params.get('class', None)
+        rel_class = request.query_params.get('class', None)
         if rel_class is not None and rel_class not in acceptable_classes:
             content = {'detail': _("Relationship class is unknown")}
             return Response(content, status=status.HTTP_400_BAD_REQUEST)
@@ -127,8 +126,6 @@ class RelationshipList(APIPermissionRequiredMixin,
             spatial_rels = manager.filter(
                 Q(su1=kwargs['location']) | Q(su2=kwargs['location'])
             )
-        serialized_spatial_rels = SpatialRelationshipReadSerializer(
-            spatial_rels, many=True).data
 
         party_rels = []
         if 'party' in kwargs and (rel_class is None or rel_class == 'party'):
@@ -136,8 +133,6 @@ class RelationshipList(APIPermissionRequiredMixin,
             party_rels = manager.filter(
                 Q(party1=kwargs['party']) | Q(party2=kwargs['party'])
             )
-        serialized_party_rels = serializers.PartyRelationshipReadSerializer(
-            party_rels, many=True).data
 
         tenure_rels = []
         if rel_class is None or rel_class == 'tenure':
@@ -146,14 +141,13 @@ class RelationshipList(APIPermissionRequiredMixin,
                 tenure_rels = manager.filter(spatial_unit=kwargs['location'])
             elif 'party' in kwargs:
                 tenure_rels = (manager.filter(party=kwargs['party']))
-        serialized_tenure_rels = serializers.TenureRelationshipReadSerializer(
-            tenure_rels, many=True).data
 
-        return Response(
-            serialized_spatial_rels +
-            serialized_party_rels +
-            serialized_tenure_rels
-        )
+        return Response(paginate_results(
+            request,
+            (spatial_rels, SpatialRelationshipReadSerializer),
+            (party_rels, serializers.PartyRelationshipReadSerializer),
+            (tenure_rels, serializers.TenureRelationshipReadSerializer),
+        ))
 
     def get_perms_objects(self):
         return [self.get_project()]

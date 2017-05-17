@@ -65,8 +65,8 @@ class PartyListAPITest(APITestCase, UserTestCase, TestCase):
         PartyFactory.create_batch(2, project=self.prj)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert 'users' not in response.content[0]
+        assert len(response.content['results']) == 2
+        assert 'users' not in response.content['results'][0]
 
     def test_full_list_with_unauthorized_user(self):
         PartyFactory.create(project=self.prj)
@@ -83,7 +83,7 @@ class PartyListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user,
                                 get_data={'name': 'Test Party One'})
         assert response.status_code == 200
-        assert len(response.content) == 1
+        assert len(response.content['results']) == 1
 
     def test_type_filter(self):
         PartyFactory.create_from_kwargs([
@@ -93,7 +93,7 @@ class PartyListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'type': 'GR'})
         assert response.status_code == 200
-        assert len(response.content) == 1
+        assert len(response.content['results']) == 1
 
     def test_ordering(self):
         PartyFactory.create_from_kwargs([
@@ -103,8 +103,8 @@ class PartyListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [party['name'] for party in response.content]
+        assert len(response.content['results']) == 3
+        names = [party['name'] for party in response.content['results']]
         assert names == sorted(names)
 
     def test_reverse_ordering(self):
@@ -115,8 +115,8 @@ class PartyListAPITest(APITestCase, UserTestCase, TestCase):
         ])
         response = self.request(user=self.user, get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [party['name'] for party in response.content]
+        assert len(response.content['results']) == 3
+        names = [party['name'] for party in response.content['results']]
         assert names == sorted(names, reverse=True)
 
     def test_get_full_list_organization_does_not_exist(self):
@@ -290,9 +290,9 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
     def test_full_list(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_full_list_with_unauthorized_user(self):
@@ -313,8 +313,8 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
             url_kwargs={'party': party.id},
             get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
@@ -330,8 +330,8 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
             url_kwargs={'party': party.id},
             get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names, reverse=True))
 
     def test_search_filter(self):
@@ -353,7 +353,7 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
                         'party': party.id},
             get_data={'search': 'image'})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
     def test_get_full_list_organization_does_not_exist(self):
         response = self.request(user=self.user,
@@ -378,9 +378,9 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
             project=self.prj, content_object=self.party, archived=True)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_add_resource(self):

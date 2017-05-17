@@ -63,9 +63,10 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         extra_record = SpatialUnitFactory.create()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert extra_record.id not in (
-            [u['properties']['id'] for u in response.content['features']])
+        assert len(response.content['results']) == 2
+        assert extra_record.id not in [
+            u['properties']['id'] for u in
+            response.content['results']['features']]
 
     def test_full_list_with_unauthorized_user(self):
         SpatialUnitFactory.create_batch(2, project=self.prj)
@@ -73,9 +74,10 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
 
         response = self.request()
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert extra_record.id not in (
-            [u['properties']['id'] for u in response.content['features']])
+        assert len(response.content['results']) == 2
+        assert extra_record.id not in [
+            u['properties']['id'] for u in
+            response.content['results']['features']]
 
     def test_ordering(self):
         SpatialUnitFactory.create(project=self.prj, type='AP')
@@ -84,9 +86,9 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
 
         response = self.request(user=self.user, get_data={'ordering': 'type'})
         assert response.status_code == 200
-        assert len(response.content['features']) == 3
+        assert len(response.content['results']['features']) == 3
         names = [su['properties']['type'] for su in
-                 response.content['features']]
+                 response.content['results']['features']]
         assert names == sorted(names)
 
     def test_reverse_ordering(self):
@@ -96,9 +98,9 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
 
         response = self.request(user=self.user, get_data={'ordering': '-type'})
         assert response.status_code == 200
-        assert len(response.content['features']) == 3
+        assert len(response.content['results']['features']) == 3
         names = [su['properties']['type'] for su in
-                 response.content['features']]
+                 response.content['results']['features']]
         assert names == sorted(names, reverse=True)
 
     def test_type_filter(self):
@@ -107,7 +109,7 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         SpatialUnitFactory.create(project=self.prj, type='RW')
         response = self.request(user=self.user, get_data={'type': 'RW'})
         assert response.status_code == 200
-        assert len(response.content['features']) == 1
+        assert len(response.content['results']['features']) == 1
 
     def test_get_full_list_organization_does_not_exist(self):
         response = self.request(user=self.user,
@@ -129,9 +131,10 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         extra_record = SpatialUnitFactory.create()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
-        assert extra_record.id not in (
-            [u['properties']['id'] for u in response.content['features']])
+        assert len(response.content['results']) == 2
+        assert extra_record.id not in [
+            u['properties']['id'] for u in
+            response.content['results']['features']]
 
     def test_list_private_record_with_unauthorized_user(self):
         self.prj.access = 'private'
@@ -789,9 +792,9 @@ class SpatialUnitResourceListAPITest(APITestCase, UserTestCase,
     def test_full_list(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_full_list_with_unauthorized_user(self):
@@ -812,8 +815,8 @@ class SpatialUnitResourceListAPITest(APITestCase, UserTestCase,
             url_kwargs={'location': su.id},
             get_data={'ordering': 'name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names))
 
     def test_reverse_ordering(self):
@@ -829,8 +832,8 @@ class SpatialUnitResourceListAPITest(APITestCase, UserTestCase,
             url_kwargs={'location': su.id},
             get_data={'ordering': '-name'})
         assert response.status_code == 200
-        assert len(response.content) == 3
-        names = [resource['name'] for resource in response.content]
+        assert len(response.content['results']) == 3
+        names = [resource['name'] for resource in response.content['results']]
         assert(names == sorted(names, reverse=True))
 
     def test_search_filter(self):
@@ -852,7 +855,7 @@ class SpatialUnitResourceListAPITest(APITestCase, UserTestCase,
                         'location': su.id},
             get_data={'search': 'image'})
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
     def test_get_full_list_organization_does_not_exist(self):
         response = self.request(user=self.user,
@@ -877,9 +880,9 @@ class SpatialUnitResourceListAPITest(APITestCase, UserTestCase,
             project=self.prj, content_object=self.su, archived=True)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content) == 2
+        assert len(response.content['results']) == 2
 
-        returned_ids = [r['id'] for r in response.content]
+        returned_ids = [r['id'] for r in response.content['results']]
         assert all(res.id in returned_ids for res in self.resources)
 
     def test_add_resource(self):
