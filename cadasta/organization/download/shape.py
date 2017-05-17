@@ -74,6 +74,10 @@ class ShapeExporter(Exporter):
         layers = {}
 
         for su in spatial_units:
+            # Excluding empty geometries from export
+            if not su.geometry:
+                continue
+
             geom = ogr.CreateGeometryFromWkt(su.geometry.wkt)
             layer_type = geom.GetGeometryName().lower()
             layer = layers.get(layer_type, None)
