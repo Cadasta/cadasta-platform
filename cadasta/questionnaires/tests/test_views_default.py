@@ -39,13 +39,15 @@ def assign_policies(user):
     assign_user_policies(user, policy)
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormListTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PDFFormList
     template = 'questionnaires/form_list.html'
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.pdfforms = PDFFormFactory.create_batch(2, project=self.project)
+        self.pdfforms = PDFFormFactory.create_batch(
+            2, project=self.project)
 
     def setup_template_context(self):
         return {'object': self.project, 'pdfform_list': self.pdfforms}
@@ -82,6 +84,7 @@ class PDFFormListTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PDFFormAdd
     template = 'questionnaires/form_add_new.html'
@@ -176,6 +179,7 @@ class PDFFormAddTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormAddWithNonExistenceQuestionnaireTest(ViewTestCase,
                                                   UserTestCase, TestCase):
     view_class = default.PDFFormAdd
@@ -225,6 +229,7 @@ class PDFFormAddWithNonExistenceQuestionnaireTest(ViewTestCase,
         assert response.content == self.expected_content
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormDetailTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PDFFormDetails
     template = 'questionnaires/form_detail.html'
@@ -238,7 +243,9 @@ class PDFFormDetailTest(ViewTestCase, UserTestCase, TestCase):
                 'can_edit': True,
                 'can_delete': True,
                 'can_generate': True,
-                'pdfform': self.pdfform}
+                'pdfform': self.pdfform,
+                'thumbnail_url':
+                '/media/s3/uploads/pdf-form-logos/image-128x128.jpg'}
 
     def setup_url_kwargs(self):
         return {
@@ -279,6 +286,7 @@ class PDFFormDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormDeleteTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PDFFormDelete
     template = 'questionnaires/modal_delete.html'
@@ -294,7 +302,9 @@ class PDFFormDeleteTest(ViewTestCase, UserTestCase, TestCase):
                 'can_edit': True,
                 'can_delete': True,
                 'can_generate': True,
-                'pdfform': self.pdfform}
+                'pdfform': self.pdfform,
+                'thumbnail_url':
+                '/media/s3/uploads/pdf-form-logos/image-128x128.jpg'}
 
     def setup_url_kwargs(self):
         return {
@@ -366,6 +376,7 @@ class PDFFormDeleteTest(ViewTestCase, UserTestCase, TestCase):
         assert PDFForm.objects.count() == 1
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormEditTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PDFFormEdit
     template = 'questionnaires/form_edit.html'
@@ -469,6 +480,7 @@ class PDFFormEditTest(ViewTestCase, UserTestCase, TestCase):
         assert self.pdfform.name != self.post_data['name']
 
 
+@pytest.mark.usefixtures('make_dirs')
 class PDFFormDownloadTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PDFFormDownload
 

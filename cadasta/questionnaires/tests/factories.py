@@ -67,10 +67,10 @@ class QuestionOptionFactory(ExtendedFactory):
 
 
 class PDFFormFactory(ExtendedFactory):
-
     class Meta:
         model = PDFForm
 
+    id = factory.Sequence(lambda n: "%sabc" % n)
     name = factory.Sequence(lambda n: "PDFForm #%s" % n)
     description = factory.Sequence(lambda n: "PDF Form #%s description" % n)
     instructions = factory.Sequence(lambda n: "Test #%s instructions" % n)

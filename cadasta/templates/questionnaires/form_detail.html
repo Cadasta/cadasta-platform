@@ -19,7 +19,7 @@
           {% endif %}
           {% if can_delete %}
             <a class="btn btn-default btn-action btn-sm" href="{% url 'questionnaires:pdf_form_delete' object.organization.slug object.slug pdfform.id %}" title="{% trans 'Delete form' %}" aria-label="{% trans 'Delete form' %}"><span class="glyphicon glyphicon-trash"></span></a>
-          {% endif %}    
+          {% endif %}
         </div>
       </div>
       <div class="panel panel-default">
@@ -29,10 +29,10 @@
             {{ pdfform.name }}
           </h2>
           <div class="media">
-            {% if pdfform.file.url is not None and pdfform.file.url != "" %}
-            <div class="media-left">
-              <img alt="Form Logo" src="{{ pdfform.file.url }}" class="thumb-128">
-            </div>
+            {% if thumbnail_url is not None and thumbnail_url != "" %}
+                <div class="media-left">
+                  <img alt="Form Logo" src="{{ thumbnail_url }}">
+                </div>
             {% endif %}
             <div class="media-body">
               {% if pdfform.description is not None and pdfform.description != "" %}

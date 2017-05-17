@@ -2,6 +2,7 @@ import hashlib
 from datetime import datetime
 from buckets.fields import S3FileField
 from core.models import RandomIDModel
+from resources.mixins import ResourceThumbnailMixin
 from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
@@ -204,7 +205,7 @@ class QuestionOption(MultilingualLabelsMixin, RandomIDModel):
 
 
 @permissioned_model
-class PDFForm(RandomIDModel):
+class PDFForm(RandomIDModel, ResourceThumbnailMixin):
     name = models.CharField(max_length=100)
     description = models.TextField(max_length=500, null=True, blank=True)
     instructions = models.TextField(max_length=2500, null=True, blank=True)
@@ -244,3 +245,11 @@ class PDFForm(RandomIDModel):
               'error_message': messages.QUESTIONNAIRE_PDF_FORM_GENERATE,
               'permissions_object': 'project'}),
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_url = self.file.url
+
+    def save(self, *args, **kwargs):
+        self.create_thumbnails((not self.id))
+        super().save(*args, **kwargs)

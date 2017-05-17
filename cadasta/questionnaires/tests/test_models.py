@@ -1,11 +1,20 @@
-from django.test import TestCase
-from core.tests.utils.cases import UserTestCase
+import os
+
+import pytest
+
 from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
+from core.tests.utils.files import make_dirs  # noqa
+from django.conf import settings
+from django.test import TestCase
 from organization.tests.factories import ProjectFactory
+
 from . import factories
+from resources.tests.utils import clear_temp  # noqa
 
 
 class QuestionnaireTest(TestCase):
+
     def test_repr(self):
         project = ProjectFactory.create(slug='prj')
         questionnaire = factories.QuestionnaireFactory.build(id='abc123',
@@ -37,6 +46,7 @@ class QuestionnaireTest(TestCase):
 
 
 class QuestionGroupTest(TestCase):
+
     def test_repr(self):
         questionnaire = factories.QuestionnaireFactory.create(id='abc123')
         group = factories.QuestionGroupFactory.build(
@@ -46,6 +56,7 @@ class QuestionGroupTest(TestCase):
 
 
 class QuestionTest(TestCase):
+
     def test_repr(self):
         group = factories.QuestionGroupFactory.create(id='abc123')
         questionnaire = factories.QuestionnaireFactory.create(id='abc123')
@@ -77,6 +88,7 @@ class QuestionTest(TestCase):
 
 
 class QuestionOptionTest(TestCase):
+
     def test_repr(self):
         question = factories.QuestionFactory.create(id='abc123')
         option = factories.QuestionOptionFactory(id='abc123', name='Option',
@@ -85,7 +97,10 @@ class QuestionOptionTest(TestCase):
                                 'question=abc123>')
 
 
-class PDFFormTest(UserTestCase, TestCase):
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
+class PDFFormTest(UserTestCase, FileStorageTestCase, TestCase):
+
     def test_str(self):
         user = UserFactory.create()
         project = ProjectFactory.create()
@@ -95,3 +110,15 @@ class PDFFormTest(UserTestCase, TestCase):
         assert pdfform.name is not None
         assert pdfform.id == 'abc123'
         assert pdfform.file.url == '/media/s3/uploads/pdf-form-logos/image.jpg'
+
+    def test_create_thumbnails(self):
+        user = UserFactory.create()
+        project = ProjectFactory.create()
+        factories.PDFFormFactory.create(
+            id='abc123', project=project, contributor=user)
+        assert os.path.isfile(
+            os.path.join(
+                settings.MEDIA_ROOT,
+                's3/uploads/pdf-form-logos/image-128x128.jpg'
+            )
+        )

@@ -61,7 +61,6 @@ class PDFFormObjectMixin(ProjectPDFFormMixin):
             )
         except PDFForm.DoesNotExist as e:
             raise Http404(e)
-
         return pdfform
 
     def get_context_data(self, *args, **kwargs):
@@ -69,6 +68,7 @@ class PDFFormObjectMixin(ProjectPDFFormMixin):
         pdfform = self.get_object()
         user = self.request.user
         context['pdfform'] = pdfform
+        context['thumbnail_url'] = pdfform.thumbnail
         context['can_delete'] = user.has_perm('pdfform.delete', pdfform)
         context['can_edit'] = user.has_perm('pdfform.edit', pdfform)
         context['can_generate'] = user.has_perm('pdfform.generate', pdfform)
