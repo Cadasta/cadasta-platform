@@ -30,14 +30,14 @@
     font-family: Helvetica !important;
     font-size: 14px;
     line-height: 120%;
-    background: none !important; 
+    background: none !important;
   }
-  h1 { 
-    page-break-before: auto !important; 
+  h1 {
+    page-break-before: auto !important;
     -weasy-bookmark-level: none;
     margin-top: 0 !important;
     font-size: 24px;
-    line-height: 130%; 
+    line-height: 130%;
   }
   h3 {
     margin-top: 24px;
@@ -143,9 +143,9 @@
 
 <div class="printable-form">
   <div class="media">
-    {% if pdfform.file.url is not None and pdfform.file.url != "" %}
+    {% if thumbnail_url %}
     <div class="media-left">
-      <img alt="Form Logo" src="{{ pdfform.file.url }}" style="width: 128px; margin-right: 20px;">
+      <img alt="Form Logo" src="{{ thumbnail_url }}" style="width: 128px; margin-right: 20px;">
     </div>
     {% endif %}
     <div class="media-body">
@@ -224,7 +224,7 @@
       {% endfor %}
       {% for question_group in question_groups_list %}
         {% if "meta" != question_group.name %}
-          <h3>Question Group: 
+          <h3>Question Group:
             {% if question_group.label_xlat.en %}
               {{question_group.label_xlat.en}}
             {% else %}

@@ -43,7 +43,9 @@ class PDFGenerator():
                                             template_question_groups_list,
                                         'exclude_geo_fields':
                                             EXCLUDE_GEO_FIELDS,
-                                        'pdfform': self.pdfform})
+                                        'pdfform': self.pdfform,
+                                        'thumbnail_url':
+                                        self.pdfform.thumbnail})
         html = HTML(string=html_string, base_url=absolute_uri)
         pdf = html.write_pdf()
 

@@ -29,7 +29,7 @@
             {{ pdfform.name }}
           </h2>
           <div class="media">
-            {% if thumbnail_url is not None and thumbnail_url != "" %}
+            {% if thumbnail_url %}
                 <div class="media-left">
                   <img alt="Form Logo" src="{{ thumbnail_url }}">
                 </div>
