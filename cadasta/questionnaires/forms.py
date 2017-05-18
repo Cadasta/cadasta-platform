@@ -1,5 +1,10 @@
 from django import forms
 from .models import PDFForm
+from buckets.widgets import S3FileUploadWidget
+
+LOGO_TYPES = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/tif', 'image/tiff'
+]
 
 
 class PDFFormCreateForm(forms.ModelForm):
@@ -9,6 +14,11 @@ class PDFFormCreateForm(forms.ModelForm):
     class Meta:
         model = PDFForm
         fields = ['file', 'name', 'description', 'instructions']
+
+    file = forms.CharField(
+        required=False,
+        widget=S3FileUploadWidget(upload_to='pdf-form-logos',
+                                  accepted_types=LOGO_TYPES))
 
     def __init__(self, data=None, contributor=None,
                  project_id=None, questionnaire=None, *args, **kwargs):
