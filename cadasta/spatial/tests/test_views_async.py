@@ -13,6 +13,7 @@ from django.http import Http404, HttpRequest
 from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from organization.tests.factories import ProjectFactory
+from organization.models import OrganizationRole
 from party.models import Party, TenureRelationship, TenureRelationshipType
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.tests import factories as q_factories
@@ -21,6 +22,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from skivvy import APITestCase, ViewTestCase, remove_csrf
 from tutelary.models import Policy, assign_user_policies
+from rest_framework.exceptions import PermissionDenied
 
 from .. import forms
 from ..models import SpatialUnit
@@ -1404,15 +1406,15 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         # inside tile
-        SpatialUnitFactory.create(
+        self.su1 = SpatialUnitFactory.create(
             project=self.prj, type='AP',
             geometry='SRID=4326;POINT(11 53)')
         # outside tile
-        SpatialUnitFactory.create(
+        self.su2 = SpatialUnitFactory.create(
             project=self.prj, type='BU',
             geometry='SRID=4326;POINT(11 54)')
         # outside tile
-        SpatialUnitFactory.create(
+        self.su3 = SpatialUnitFactory.create(
             project=self.prj, type='AP',
             geometry='SRID=4326;POINT(9 53)')
 
@@ -1420,9 +1422,9 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         return {
             'organization': self.prj.organization.slug,
             'project': self.prj.slug,
-            'x': 135,
-            'y': 83,
-            'z': 8
+            'x': 0,
+            'y': 0,
+            'z': 0
         }
 
     def test_num2deg(self):
@@ -1435,12 +1437,133 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         assert xtile == 135
         assert ytile == 83
 
+    def test_full_list(self):
+        extra_record = SpatialUnitFactory.create()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['results']['features']) == 3
+        assert extra_record.id not in (
+            [u['id'] for u in response.content['results']['features']])
+
+    def test_one_tile(self):
+        url_kwargs = {
+            'organization': self.prj.organization.slug,
+            'project': self.prj.slug,
+            'x': 135,
+            'y': 83,
+            'z': 8}
+
+        response = self.request(user=self.user, url_kwargs=url_kwargs)
+        assert response.status_code == 200
+        assert len(response.content['results']['features']) == 1
+
+    def test_exclude(self):
+        response = self.request(user=self.user,
+                                get_data={'exclude': self.su3.id})
+        assert response.status_code == 200
+        assert len(response.content['results']['features']) == 2
+        assert self.su3.id not in (
+            [u['id'] for u in response.content['results']['features']])
+
+    def test_full_list_with_unauthorized_user(self):
+        extra_record = SpatialUnitFactory.create()
+
+        response = self.request()
+        assert response.status_code == 200
+        assert len(response.content['results']['features']) == 3
+        assert extra_record.id not in (
+            [u['id'] for u in response.content['results']['features']])
+
+    def test_get_full_list_organization_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'some-org'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_full_list_project_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'some-prj'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_list_private_record(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        extra_record = SpatialUnitFactory.create()
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['results']['features']) == 3
+        assert extra_record.id not in (
+            [u['id'] for u in response.content['results']['features']])
+
+    def test_list_private_record_with_unauthorized_user(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_list_private_records_without_permission(self):
+        self.prj.access = 'private'
+        self.prj.save()
+
+        restricted_clauses = {
+            'clause': [
+                {
+                    'effect': 'allow',
+                    'object': ['project.list'],
+                    'action': ['organization/*']
+                },
+                {
+                    'effect': 'allow',
+                    'object': ['project.view'],
+                    'action': ['project/*/*']
+                }
+            ]
+        }
+        restricted_policy = Policy.objects.create(
+            name='restricted',
+            body=json.dumps(restricted_clauses))
+        assign_user_policies(self.user, restricted_policy)
+
+        response = self.request(user=self.user)
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_list_private_records_based_on_org_membership(self):
+        SpatialUnitFactory.create(project=self.prj)
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user)
+        response = self.request(user=user)
+        assert response.status_code == 200
+
+    def test_archived_filter_with_unauthorized_user(self):
+        self.prj.archived = True
+        self.prj.save()
+
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_archived_filter_with_org_admin(self):
+        user = UserFactory.create()
+        OrganizationRole.objects.create(organization=self.prj.organization,
+                                        user=user, admin=True)
+
+        self.prj.archived = True
+        self.prj.save()
+        response = self.request(user=user)
+        assert response.status_code == 200
+
     def test_get_with_archived_project(self):
         self.prj.archived = True
         self.prj.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 1
+        assert len(response.content['results']['features']) == 3
 
     def test_get_with_private_project(self):
         self.prj.access = 'private'
@@ -1469,4 +1592,4 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
     def test_get_with_public_project(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 1
+        assert len(response.content['results']['features']) == 3

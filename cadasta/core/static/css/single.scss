@@ -783,7 +783,7 @@ body.map .content-single {
 }
     
 
-@media (max-width: $screen-xs-max) {
+@media (max-width: $screen-sm-max) {
   .content-single {
     position: relative;
     .map {
@@ -793,6 +793,11 @@ body.map .content-single {
     .main-text {
       padding: 15px;
     }
+  }
+}
+
+@media (max-width: $screen-xs-max) {    
+  .content-single {
     .panel {
       .panel-buttons .btn {
         width: 100%;
@@ -840,9 +845,8 @@ body.map .content-single {
     transition: all 0.5s ease-in-out;
   }
   #project-map {
-    // width: 100%;
     h2 {
-    padding-bottom: 0;
+      padding-bottom: 0;
     }
     .btn-wrap { // button
       padding: 4px 4px 5px;

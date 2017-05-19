@@ -106,7 +106,7 @@
 
             var hash = location.hash;
             hash = hash.split('coords=')[0];
-            while (hash.substr(-1) === '&' || hash.substr(-1) === '?') {
+            if (hash.substr(-1) === '&' || hash.substr(-1) === '?') {
                 hash = hash.substr(0, hash.length - 1);
             }
 

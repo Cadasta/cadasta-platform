@@ -28,6 +28,7 @@ function toggleParsleyRequired(val) {
         if (value.hasAttribute('data-parsley-required')) {
           $(value).attr('data-parsley-required', true);
           $(value).prop('required', 'required');
+          $(value).prev('label').addClass('required');
         }
       });
     } else {
@@ -35,6 +36,7 @@ function toggleParsleyRequired(val) {
         if (value.hasAttribute('data-parsley-required')) {
           $(value).attr('data-parsley-required', false);
           $(value).prop('required', '');
+          $(value).prev('label').removeClass('required');
         }
       });
     }

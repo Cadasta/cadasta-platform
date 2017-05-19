@@ -7,6 +7,7 @@ var Location = L.Editable.extend({
     _deleted: false,
     _new: false,
     _dirty: false,
+    _original_state: {},
 
     layer: null,
     feature: null,
@@ -23,7 +24,7 @@ var Location = L.Editable.extend({
     _startEdit: function () {
         if (this.layer) {
             if (!this.layer._new) {
-                this._backupLayer();
+                this._backupLayer(true);
             }
             this.layer.enableEdit(this.map);
             this.layer._dirty = true;
@@ -50,16 +51,18 @@ var Location = L.Editable.extend({
         this.layer._new = false;
     },
 
-    _undoEdit: function () {
-        this._undo();
+    _undoEdit: function (cancel_form) {
+        this._undo(cancel_form);
         if (this.layer) this.layer._dirty = false;
         this._deleting = this._deleted = false;
     },
 
-    _undo: function () {
+    _undo: function (cancel_form) {
         if (this.layer) {
             this.layer.disableEdit();
-            latLngs = this._undoBuffer[this.layer._leaflet_id];
+            var latLngs_dict = cancel_form ? this._original_state : this._undoBuffer;
+            latLngs = latLngs_dict[this.layer._leaflet_id]
+
             if (latLngs && latLngs.latlngs) {
                 if (this.layer instanceof L.Marker) {
                     this.layer.setLatLng(latLngs.latlngs);
@@ -71,8 +74,12 @@ var Location = L.Editable.extend({
                     this.map.geojsonLayer.addLayer(this.layer);
                 }
                 this._clearBackup();
-            } else {
+            } else if (this.layer._new !== undefined) {
                 this._setDeleted();
+            }
+
+            if (cancel_form) {
+                this._original_state = {}
             }
         }
     },
@@ -214,17 +221,28 @@ var Location = L.Editable.extend({
         return layer;
     },
 
-    _backupLayer: function () {
+    _backupLayer: function (initial_edit) {
         this._undoBuffer = {};
         if (this.layer instanceof L.Polyline || this.layer instanceof L.Polygon || this.layer instanceof L.Rectangle) {
             this._undoBuffer[this.layer._leaflet_id] = {
                 latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
             };
+
+            if (initial_edit && Object.keys(this._original_state).length === 0) {
+                this._original_state[this.layer._leaflet_id] = {
+                    latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
+                }
+            }
         }
         if (this.layer instanceof L.Marker) {
             this._undoBuffer[this.layer._leaflet_id] = {
                 latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLng()),
             };
+            if (initial_edit && Object.keys(this._original_state).length === 0) {
+                this._original_state[this.layer._leaflet_id] = {
+                    latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLngs()),
+                }
+            }
         }
     },
 
@@ -301,9 +319,9 @@ var LocationEditor = L.Evented.extend({
         this.location._startEdit();
     },
 
-    cancelEdit: function () {
+    cancelEdit: function (cancel_form) {
         this.tooltip.remove();
-        this.location._undoEdit();
+        this.location._undoEdit(cancel_form);
     },
 
     editing: function () {
@@ -447,7 +465,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     dispose: function () {
-        this.cancelEdit();
+        this.cancelEdit(false);
         this._resetView();
     },
 
@@ -605,9 +623,9 @@ var LocationEditor = L.Evented.extend({
         this.location._reset();
     },
 
-    _cleanAddForm: function () {
+    _cleanForm: function () {
         // if an add location form is canceled, geometry should be removed
-        this.cancelEdit();
+        this.cancelEdit(true);
         this.location._saveDelete();
     },
 
@@ -615,8 +633,8 @@ var LocationEditor = L.Evented.extend({
 
     _addDeleteEvent: function () {
         this.on('location:delete', this._removeLayer, this);
-        this.on('location:reset', this._cleanAddForm, this);
-        this.on('location:reset_dirty', this._cleanAddForm, this);
+        this.on('location:reset', this._cleanForm, this);
+        this.on('location:reset_dirty', this._cleanForm, this);
     },
 
     _addRouterEvents: function () {
