@@ -54,8 +54,8 @@
           <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
           <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
           <li role="separator" class="divider"></li>
-          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}">{% trans "Import data" %}</a></li>
-          <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}">{% trans "Download data" %}</a></li>
+          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
+          <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Download data" %}</a></li>
           <li role="separator" class="divider"></li>
           <li>
             {% if object.archived %}
@@ -88,7 +88,7 @@
         <ul class="dropdown-menu">
           {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
           {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
-          {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}">{% trans "Import data" %}</a></li>{% endif %}
+          {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}"  data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
         </ul>
         {% endif %}
       </div>

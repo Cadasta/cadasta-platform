@@ -1,12 +1,7 @@
 {% load i18n %}
 {% load widget_tweaks %}
 {% load filters %}
-{% load staticfiles %}
 
-
-{% block location_panel %}
-
-<!-- <div class="col-md-4 detail detail-edit"> -->
 <section>
   <h2><a href="#/records/location/{{location.id}}/" id="current-location"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</a></h2>
   <hr class="border-btm">
@@ -41,5 +36,4 @@
       </div>
     </form>
   </div>
-</section>
-{% endblock %}
+</section

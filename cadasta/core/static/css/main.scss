@@ -312,10 +312,6 @@ main.container-fluid {
     height: 100%;
     min-height: 100%;
     padding-right: 0;
-    #project-map, #id_extent_map, #id_extents_extent_map {
-      height: 100%;
-      min-height: 100%;
-    }
   }
   #id_geometry_map {
     height: 100%;
@@ -455,6 +451,11 @@ main.container-fluid {
   }
 }
 
+#project-map, #id_extent-map, #id_extents-extent-map {
+  height: 100%;
+  min-height: 100%;
+}
+
 body.map .content-single {
   overflow-y: hidden;
 }
@@ -462,7 +463,7 @@ body.map .content-single {
 @media (max-width: $screen-sm-max) {
   .content-single {
     position: relative;
-    .map {
+    #project-map, #id_extent-map, #id_extents-extent-map {
       height: 360px;
       min-height: 360px;
     }

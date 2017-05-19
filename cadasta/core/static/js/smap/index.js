@@ -37,9 +37,7 @@ $(document).on('click', 'a', function (e) {
             modal.one('click', '.forget-changes', function (e) {
                 editor.dispose();
                 modal.hide();
-                // if (window.location.hash.includes('new')){
                 editor.fire('location:reset_dirty');
-                // }
                 window.location.href = path;
             });
         }

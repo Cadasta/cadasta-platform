@@ -157,10 +157,11 @@ var CreateRoutes = function (map) {
                 'form': {
                     'type': 'location-wizard',
                     'success_url': 'overview',
+                    'callback': rm.locationEditHooks
                 }
             });
-        }
-    );
+            rm.locationEditHooks();
+        });
     /*******************************************/
 
 
@@ -179,12 +180,14 @@ var CreateRoutes = function (map) {
                 'form': {
                     'type': 'location-wizard',
                     'success_url': 'location',
+                    'callback': rm.locationEditHooks
                 }
             });
             // trigger editing once tiles finished loading
             var hash_path = window.location.hash.slice(1) || '/';
             var fid = hash_path.split('/')[3];
             map.locationEditor.fire('route:location:edit', { 'fid': fid });
+            rm.locationEditHooks();
         });
     /*******************************************/
 

@@ -357,6 +357,22 @@ var RouterMixins = {
         rm.addEventScript('script_add_lib.js');
     },
 
+    datepickerHooks: function() {
+        $('.datepicker').datepicker({
+            yearRange: "c-200:c+200",
+            changeMonth: true,
+            changeYear: true,
+        });
+    },
+
+    requiredFieldHooks: function (name) {
+        $.each($('input[name^="' + name + '"]'), function(idx, input) {
+            if (input.hasAttribute('data-parsley-required')) {
+                $(input).prev('label').addClass('required');
+            }
+        });
+    },
+
     relationshipHooks: function () {
         rm.addEventScript('rel_new_item.js');
         rm.addEventScript('rel_tenure.js');
@@ -379,11 +395,13 @@ var RouterMixins = {
             theme: "bootstrap",
         });
 
-        $('.datepicker').datepicker({
-            yearRange: "c-200:c+200",
-            changeMonth: true,
-            changeYear: true,
-        });
+        rm.datepickerHooks();
+        rm.requiredFieldHooks('tenurerelationship');
+    },
+
+    locationEditHooks: function () {
+        rm.requiredFieldHooks('spatial');
+        rm.datepickerHooks();
     },
 
     locationDetailHooks: function () {
