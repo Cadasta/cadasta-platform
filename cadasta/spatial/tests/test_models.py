@@ -95,10 +95,7 @@ class SpatialUnitTest(UserTestCase, TestCase):
         )
         assert spatial_unit.geometry_details is not None
         assert spatial_unit.geometry_details['area'] is not None
-        assert spatial_unit.geometry_details['area']['m2'] == '30432816.02'
-        assert spatial_unit.geometry_details['area']['ha'] == '3043.28'
-        assert spatial_unit.geometry_details['area']['ft2'] == '327578831.61'
-        assert spatial_unit.geometry_details['area']['ac'] == '7520.25'
+        assert spatial_unit.geometry_details['area'] == '30432816.02'
 
     def test_geometry_details_do_no_exist(self):
         spatial_unit = SpatialUnitFactory.create(

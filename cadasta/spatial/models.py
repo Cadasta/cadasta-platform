@@ -172,16 +172,11 @@ def calculate_polygon_area(instance):
     poly = instance.geometry
     p = poly.transform(3857, clone=True)
     area = p.area
-    areha = area/10000
-    area_ft2 = area * 10.764
-    area_ac = area * 0.00024711
+    # areha = area/10000
+    # area_ft2 = area * 10.764
+    # area_ac = area * 0.00024711
     data = {
-        'area': {
-            'm2': format(area, '.2f'),
-            'ha': format(areha, '.2f'),
-            'ft2': format(area_ft2, '.2f'),
-            'ac': format(area_ac, '.2f')
-        }
+        'area': format(area, '.2f')
     }
     instance.geometry_details = data
 

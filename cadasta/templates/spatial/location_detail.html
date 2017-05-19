@@ -10,14 +10,6 @@
   <section>
     <div class="page-title">
       <h2 class="short"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</h2>
-      
-      {% if area_metric_units and area_imperial_units %}
-      <div>
-        <span>{{ area_metric_units }}</span>
-        |
-        <span>{{ area_imperial_units }}</span>
-      </div>
-      {% endif %}
       <div class="top-btn pull-right">
         <!-- Action buttons -->
         {% if is_allowed_edit_location %}

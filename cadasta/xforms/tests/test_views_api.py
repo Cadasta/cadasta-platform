@@ -307,10 +307,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         print(geom.geometry_details)
         assert geom.geometry_details is not None
         assert geom.geometry_details['area'] is not None
-        assert geom.geometry_details['area']['m2'] == '199413.94'
-        assert geom.geometry_details['area']['ha'] == '19.94'
-        assert geom.geometry_details['area']['ft2'] == '2146491.65'
-        assert geom.geometry_details['area']['ac'] == '49.28'
+        assert geom.geometry_details['area'] == '199413.94'
 
     def test_point_upload(self):
 

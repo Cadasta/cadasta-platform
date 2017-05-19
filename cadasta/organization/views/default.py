@@ -423,12 +423,10 @@ class ProjectDashboard(PermissionRequiredMixin,
         members = OrderedDict(sorted(m.items(), key=lambda t: t[0]))
 
         num_locations = self.object.spatial_units.count()
-        total_ha = 0
-        for unit in self.object.spatial_units.all():
-            if unit.geometry_details:
-                total_ha += float(unit.geometry_details['area']['ha'])
-        if total_ha > 0:
-            context['total_ha'] = total_ha
+        geo_details = self.object.spatial_units.values('geometry_details')
+        context['area'] = sum(
+            [float(gd["geometry_details"]["area"])
+                for gd in geo_details if gd["geometry_details"]])
         num_parties = self.object.parties.count()
         num_resources = self.object.resource_set.filter(archived=False).count()
         context['has_content'] = (
