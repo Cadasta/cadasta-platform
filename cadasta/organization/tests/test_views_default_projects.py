@@ -488,11 +488,12 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             {'username': 'org_member_1'},
             {'username': 'org_member_2'},
             {'username': 'org_member_3'},
+            {'username': 'org_member_4'},
             {'username': 'org_non_member_1'},
             {'username': 'org_non_member_2'},
             {'username': 'org_non_member_3'},
             {'username': 'org_non_member_4'}])
-        for idx in range(5):
+        for idx in range(6):
             OrganizationRole.objects.create(organization=self.org,
                                             user=self.users[idx],
                                             admin=(idx < 2))
@@ -588,13 +589,15 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         'project_add_wizard-current_step': 'permissions',
         'permissions-org_member_1': 'PM',
         'permissions-org_member_2': 'DC',
-        'permissions-org_member_3': 'PU'
+        'permissions-org_member_3': 'PU',
+        'permissions-org_member_4': 'Pb'
     }
     PERMISSIONS_POST_DATA_BAD = {
         'project_add_wizard-current_step': 'permissions',
         'permissions-org_member_1': 'PM',
         'permissions-org_member_2': 'DC',
         'permissions-org_member_3': 'PU',
+        'permissions-org_member_4': 'Pb',
         'permissions-bad_user': 'PU'
     }
     DETAILS_POST_DATA_MANIPULATED = {

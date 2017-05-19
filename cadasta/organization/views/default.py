@@ -550,7 +550,7 @@ class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
         user_roles = []
         for user in org.users.all():
             role = form_data[2].get(user.username, None)
-            if role:
+            if role and role != 'Pb':
                 user_roles.append((user, role))
         try:
             with transaction.atomic():
