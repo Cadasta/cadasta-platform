@@ -68,11 +68,6 @@ class TenureRelationshipForm(form_mixins.SanitizeFieldsForm,
         ('', _("Please select a relationship type"))] +
         sorted(list(TENURE_RELATIONSHIP_TYPES)))
 
-    # class Media:
-    #     js = ('/static/js/rel_tenure.js',
-    #           '/static/js/party_attrs.js',
-    #           'js/sanitize.js', )
-
     def __init__(self, project, spatial_unit, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project

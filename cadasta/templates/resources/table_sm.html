@@ -13,7 +13,7 @@
     {% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id as resource_url %}
     <tr class="linked">
       <td onclick="window.document.location='{{ resource_url }}';">
-        <div class="media-left resource-60">
+        <div class="media-left">
           <img src="{{ resource.thumbnail }}" class="thumb-60">
         </div>
         <div class="media-body resource-text">
