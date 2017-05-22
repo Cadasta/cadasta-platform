@@ -304,13 +304,11 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         assert response.status_code == 201
 
         geom = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
-        print(geom.geometry_details)
         assert geom.geometry_details is not None
         assert geom.geometry_details['area'] is not None
         assert geom.geometry_details['area'] == '199413.94'
 
     def test_point_upload(self):
-
         self._create_questionnaire('t_questionnaire', 0)
         data = self._submission(form='submission_missing_semi')
         response = self.request(method='POST', user=self.user, post_data=data,
