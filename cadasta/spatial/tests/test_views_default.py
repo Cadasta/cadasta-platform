@@ -341,7 +341,8 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
                 'fname': 'test',
                 'fname_2': 'two',
                 'fname_3': ['one', 'three']
-            }, geometry='SRID=4326;POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))')
+            },
+            geometry='SRID=4326;POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))')
 
     def setup_template_context(self):
         return {
@@ -353,7 +354,7 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
             'is_allowed_add_location': True,
             'is_allowed_edit_location': True,
             'is_allowed_delete_location': True,
-            'area':'7700007175103.63'
+            'area': '7700007175103.63'
         }
 
     def setup_url_kwargs(self):
