@@ -28,7 +28,7 @@
     <div class="top-btn">
 
       <!-- Project translation dropdown-->
-      {% if form_langs %}
+      {% if form_langs and is_project_member %}
       <div class="langs-select form-group pull-right">
         <label class="control-label sr-only" for="form-langs-select">{% trans "Language for project fields" %}</label>
         <select id="form-langs-select" class="form-control" data-project-slug="{{ object.slug }}" data-default-lang="{{ form_lang_default }}">
