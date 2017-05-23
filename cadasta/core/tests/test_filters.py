@@ -81,3 +81,23 @@ class FilterTest(TestCase):
         bf = forms.BoundField(form, field, 'name')
         filters.set_parsley_sanitize(bf)
         assert bf.field.widget.attrs == {'data-parsley-sanitize': '1'}
+
+    def test_set_format_area_imperial_units(self):
+        area1 = '10004.494'
+        area2 = '10'
+        expected_value1 = '2.47 ac'
+        expected_value2 = '107.64 ft<sup>2</sup>'
+        imperial_units1 = filters.set_format_area_imperial_units(area1)
+        imperial_units2 = filters.set_format_area_imperial_units(area2)
+        assert imperial_units1 == expected_value1
+        assert imperial_units2 == expected_value2
+
+    def test_set_format_area_metric_units(self):
+        area1 = '10004.494'
+        area2 = '999'
+        expected_value1 = '1.00 ha'
+        expected_value2 = '999.00 m<sup>2</sup>'
+        metric_units1 = filters.set_format_area_metric_units(area1)
+        metric_units2 = filters.set_format_area_metric_units(area2)
+        assert metric_units1 == expected_value1
+        assert metric_units2 == expected_value2

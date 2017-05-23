@@ -424,7 +424,7 @@ class ProjectDashboard(PermissionRequiredMixin,
 
         num_locations = self.object.spatial_units.count()
         geo_details = self.object.spatial_units.values('geometry_details')
-        context['area'] = sum(
+        context['total_area'] = sum(
             [float(gd["geometry_details"]["area"])
                 for gd in geo_details if gd["geometry_details"]])
         num_parties = self.object.parties.count()

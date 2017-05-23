@@ -170,11 +170,8 @@ def calculate_polygon_area(instance):
     # Referece for metric conversions equations
     # http://www.metric-conversions.org/area/square-meters-to-hectares.htm
     poly = instance.geometry
-    p = poly.transform(3857, clone=True)
-    area = p.area
-    # areha = area/10000
-    # area_ft2 = area * 10.764
-    # area_ac = area * 0.00024711
+    poly_trans = poly.transform(3857, clone=True)
+    area = poly_trans.area
     data = {
         'area': format(area, '.2f')
     }
