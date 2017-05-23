@@ -14,15 +14,17 @@ def run(verbose=True, force=False):
     pols = {}
     for pol in ['default', 'superuser', 'org-admin', 'org-member',
                 'project-manager', 'data-collector', 'project-user']:
+        policy_file = open(PERMISSIONS_DIR + pol + '.json')
         try:
             pols[pol] = models.Policy.objects.get(name=pol)
-            pols[pol].body = open(PERMISSIONS_DIR + pol + '.json').read()
+            pols[pol].body = policy_file.read()
             pols[pol].save()
         except:
             pols[pol] = models.Policy.objects.create(
                 name=pol,
-                body=open(PERMISSIONS_DIR + pol + '.json').read()
+                body=policy_file.read()
             )
+        policy_file.close()
 
     if not models.Role.objects.filter(name='superuser').exists():
         models.Role.objects.create(

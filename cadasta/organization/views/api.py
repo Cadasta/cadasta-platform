@@ -36,7 +36,7 @@ class OrganizationList(PermissionsFilterMixin,
                                   else ('org.view_archived',))
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             raise NotAuthenticated
         return super().post(request, *args, **kwargs)
 

@@ -16,7 +16,8 @@ class ResourceFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def setUp(self):
         super().setUp()
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('resources/image.jpg', file)
+        file_name = self.storage.save('resources/image.jpg', file.read())
+        file.close()
 
         self.data = {
             'name': 'Some name',

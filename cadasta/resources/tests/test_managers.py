@@ -14,7 +14,8 @@ from ..models import Resource
 class ResourceModelTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_project_resource(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('resources/image.jpg', file)
+        file_name = self.storage.save('resources/image.jpg', file.read())
+        file.close()
 
         project = ProjectFactory.create()
         user = UserFactory.create()

@@ -23,7 +23,7 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         redirect_url = self.request.META.get('HTTP_REFERER', '/')
 
         if (referer and '/account/login/' in referer and
-                not self.request.user.is_anonymous()):
+                not self.request.user.is_anonymous):
 
             if 'organization' in self.kwargs and 'project' in self.kwargs:
                 redirect_url = reverse(

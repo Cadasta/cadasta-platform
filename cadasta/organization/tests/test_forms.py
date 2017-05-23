@@ -593,18 +593,11 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
             'contacts-0-tel': ''
         }
 
-    def _get_form(self, form_name):
-        file = self.get_file(
-            '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb')
-        form = self.storage.save('xls-forms/{}.xlsx'.format(form_name), file)
-        return form
-
     def test_add_new_questionnaire(self):
         project = ProjectFactory.create()
         data = {
             'name': 'New name',
-            'questionnaire': self._get_form('xls-form'),
+            'questionnaire': self.get_form('xls-form'),
             'original_file': 'original.xls',
             'access': project.access,
             'contacts-TOTAL_FORMS': 1,
@@ -628,7 +621,7 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         project = ProjectFactory.create()
         data = {
             'name': 'New name',
-            'questionnaire': self._get_form('xls-form-invalid'),
+            'questionnaire': self.get_form('xls-form-invalid'),
             'access': project.access,
             'contacts-TOTAL_FORMS': 1,
             'contacts-INITIAL_FORMS': 0,
@@ -649,10 +642,10 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         project = ProjectFactory.create()
         questionnaire = QuestionnaireFactory.create(
             project=project,
-            xls_form=self._get_form('xls-form'))
+            xls_form=self.get_form('xls-form'))
         data = {
             'name': 'New name',
-            'questionnaire': self._get_form('xls-form-copy'),
+            'questionnaire': self.get_form('xls-form-copy'),
             'access': project.access,
             'contacts-TOTAL_FORMS': 1,
             'contacts-INITIAL_FORMS': 0,
@@ -677,13 +670,13 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         project = ProjectFactory.create()
         questionnaire = QuestionnaireFactory.create(
             project=project,
-            xls_form=self._get_form('xls-form'))
+            xls_form=self.get_form('xls-form'))
 
         SpatialUnitFactory.create(project=project)
 
         data = {
             'name': 'New name',
-            'questionnaire': self._get_form('xls-form-copy'),
+            'questionnaire': self.get_form('xls-form-copy'),
             'access': project.access,
             'contacts-TOTAL_FORMS': 1,
             'contacts-INITIAL_FORMS': 0,
@@ -707,7 +700,7 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         project = ProjectFactory.create()
         questionnaire = QuestionnaireFactory.create(
             project=project,
-            xls_form=self._get_form('xls-form'))
+            xls_form=self.get_form('xls-form'))
 
         SpatialUnitFactory.create(project=project)
 
@@ -736,7 +729,7 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         project = ProjectFactory.create()
         questionnaire = QuestionnaireFactory.create(
             project=project,
-            xls_form=self._get_form('xls-form'))
+            xls_form=self.get_form('xls-form'))
         data = {
             'name': 'New name',
             'questionnaire': '',
@@ -1271,7 +1264,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_invalid_file_type(self):
         invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test_invalid.kml', invalid_file, 'application/kml')
+            'test_invalid.kml', invalid_file.read(), 'application/kml')
+        invalid_file.close()
         file_dict = {'file': file}
         form = forms.SelectImportForm(
             files=file_dict, data=self.data,
@@ -1295,7 +1289,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_set_mime_type(self):
         valid_file = self.get_file(self.valid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test.csv', valid_file, 'text/csv')
+            'test.csv', valid_file.read(), 'text/csv')
+        valid_file.close()
         file_dict = {'file': file}
         form = forms.SelectImportForm(
             files=file_dict, data=self.data,
@@ -1307,7 +1302,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_mime_type_file_mismatch(self):
         valid_file = self.get_file(self.valid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test.csv', valid_file, 'text/csv')
+            'test.csv', valid_file.read(), 'text/csv')
+        valid_file.close()
         file_dict = {'file': file}
         data = self.data.copy()
         data['type'] = 'xls'
@@ -1321,7 +1317,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_set_original_file(self):
         valid_file = self.get_file(self.valid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test.csv', valid_file, 'text/csv')
+            'test.csv', valid_file.read(), 'text/csv')
+        valid_file.close()
         file_dict = {'file': file}
         form = forms.SelectImportForm(
             files=file_dict, data=self.data,
@@ -1333,7 +1330,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_clean_entity_types(self):
         valid_file = self.get_file(self.valid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test.csv', valid_file, 'text/csv')
+            'test.csv', valid_file.read(), 'text/csv')
+        valid_file.close()
         file_dict = {'file': file}
         data = self.data.copy()
         data['entity_types'] = []

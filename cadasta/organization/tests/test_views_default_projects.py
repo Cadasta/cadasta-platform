@@ -435,7 +435,8 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
     def test_get_with_labels(self):
         file = self.get_file(
             '/questionnaires/tests/files/ok-multilingual.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form.xlsx', file.read())
+        file.close()
         Questionnaire.objects.create_from_form(
             xls_form=form,
             original_file='original.xls',
@@ -560,13 +561,6 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
 
         assert 'organization' not in form_initial
 
-    def _get_xls_form(self, form_name):
-        file = self.get_file(
-            '/questionnaires/tests/files/{}.xlsx'.format(form_name),
-            'rb')
-        form = self.storage.save('xls-forms/' + form_name + '.xlsx', file)
-        return form
-
     EXTENTS_POST_DATA = {
         'project_add_wizard-current_step': 'extents',
         'extents-extent':
@@ -623,7 +617,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['details-questionnaire'] = self._get_xls_form(
+        self.DETAILS_POST_DATA['details-questionnaire'] = self.get_form(
             'xls-form')
         self.DETAILS_POST_DATA['details-original_file'] = 'original.xls'
         details_response = self.client.post(
@@ -697,7 +691,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert extents_response.status_code == 200
         details_post_data = self.DETAILS_POST_DATA.copy()
         details_post_data[
-            'details-questionnaire'] = self._get_xls_form(
+            'details-questionnaire'] = self.get_form(
             'xls-form-invalid')
         details_response = self.client.post(
             reverse('project:add'), details_post_data
@@ -800,7 +794,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['details-questionaire'] = self._get_xls_form(
+        self.DETAILS_POST_DATA['details-questionaire'] = self.get_form(
             'xls-form')
         details_response = self.client.post(
             reverse('organization:project-add',
@@ -1495,7 +1489,9 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         xlscontent = self.get_file(
             '/organization/tests/files/uttaran_test.xlsx', 'rb'
         )
-        form = self.storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+        form = self.storage.save('xls-forms/uttaran_test.xlsx',
+                                 xlscontent.read())
+        xlscontent.close()
 
         Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -1600,7 +1596,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_full_flow_valid(self):
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
-        file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
+        file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
+        csvfile.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         post_data['select_file-is_resource'] = True
@@ -1659,7 +1656,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         'officedocument.spreadsheetml.sheet'
         self.client.force_login(self.user)
         xlsfile = self.get_file(self.valid_xls, 'rb')
-        file = SimpleUploadedFile('test_download.xlsx', xlsfile, mime)
+        file = SimpleUploadedFile('test_download.xlsx', xlsfile.read(), mime)
+        xlsfile.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         post_data['select_file-is_resource'] = True
@@ -1721,7 +1719,9 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_full_flow_invalid_value(self):
         self.client.force_login(self.user)
         csvfile = self.get_file(self.invalid_csv, 'rb')
-        file = SimpleUploadedFile('test_invalid.csv', csvfile, 'text/csv')
+        file = SimpleUploadedFile('test_invalid.csv', csvfile.read(),
+                                  'text/csv')
+        csvfile.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         select_file_response = self.client.post(
@@ -1762,7 +1762,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.client.force_login(self.user)
         invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test_invalid.kml', invalid_file, 'application/kml')
+            'test_invalid.kml', invalid_file.read(), 'application/kml')
+        invalid_file.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         select_file_response = self.client.post(
@@ -1804,7 +1805,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
         # post first page data
         csvfile = self.get_file(self.valid_csv, 'rb')
-        file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
+        file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
+        csvfile.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         select_file_response = self.client.post(
@@ -1871,7 +1873,8 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_full_flow_valid_no_resource(self):
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
-        file = SimpleUploadedFile('test.csv', csvfile, 'text/csv')
+        file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
+        csvfile.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         post_data['select_file-is_resource'] = False

@@ -163,7 +163,8 @@ class SchemaSelectorMixinTest(UserTestCase, FileStorageTestCase, TestCase):
         super().setUp()
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file.read())
+        file.close()
         self.project = ProjectFactory.create()
         Questionnaire.objects.create_from_form(
             xls_form=form,

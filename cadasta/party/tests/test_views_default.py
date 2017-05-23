@@ -980,7 +980,8 @@ class PartyResourcesNewTest(ViewTestCase, UserTestCase, FileStorageTestCase,
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('resources/image.jpg', file)
+        file_name = self.storage.save('resources/image.jpg', file.read())
+        file.close()
 
         return {
             'name': 'Some name',
@@ -1628,7 +1629,8 @@ class PartyRelationshipResourceNewTest(ViewTestCase, UserTestCase,
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('resources/image.jpg', file)
+        file_name = self.storage.save('resources/image.jpg', file.read())
+        file.close()
 
         return {
             'name': 'Some name',

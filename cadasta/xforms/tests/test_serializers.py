@@ -15,14 +15,8 @@ from .. import serializers
 
 @pytest.mark.usefixtures('make_dirs')
 class XFormListSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
-    def _get_form(self, form_name):
-        file = self.get_file(
-            '/questionnaires/tests/files/{}.xlsx'.format(form_name), 'rb')
-        form = self.storage.save('xls-forms/{}.xlsx'.format(form_name), file)
-        return form
-
     def _test_serialize(self, https=False):
-        form = self._get_form('xls-form')
+        form = self.get_form('xls-form')
         self.url = '/collect/'
         user = UserFactory.create()
         request = APIRequestFactory().get(self.url)

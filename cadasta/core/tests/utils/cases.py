@@ -24,11 +24,13 @@ class FileStorageTestCase:
         return self.storage
 
     def get_file(self, path, mode):
-        return open(self.path + path, mode).read()
+        return open(self.path + path, mode)
 
     def get_form(self, form_name):
         file = self.get_file(
             path='/questionnaires/tests/files/{}.xlsx'.format(form_name),
             mode='rb')
-        form = self.storage.save('xls-forms/{}.xlsx'.format(form_name), file)
+        form = self.storage.save('xls-forms/{}.xlsx'.format(form_name),
+                                 file.read())
+        file.close()
         return form

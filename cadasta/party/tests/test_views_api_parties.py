@@ -270,7 +270,9 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
 
         self.file = self.get_file(
             '/resources/tests/files/image.jpg', 'rb')
-        self.file_name = self.storage.save('resources/image.jpg', self.file)
+        self.file_name = self.storage.save('resources/image.jpg',
+                                           self.file.read())
+        self.file.close()
 
     def setup_url_kwargs(self):
         return {
@@ -335,7 +337,9 @@ class PartyResourceListAPITest(APITestCase, UserTestCase, FileStorageTestCase,
         assert(names == sorted(names, reverse=True))
 
     def test_search_filter(self):
-        not_found = self.storage.save('resources/bild.jpg', self.file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        not_found = self.storage.save('resources/bild.jpg', file.read())
+        file.close()
         party = PartyFactory.create(project=self.prj)
         ResourceFactory.create_from_kwargs([
             {'content_object': party, 'project': self.prj,
