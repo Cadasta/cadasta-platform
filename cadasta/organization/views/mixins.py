@@ -70,7 +70,7 @@ class ProjectMixin:
         return self._org_role
 
     def get_prj_role(self):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             return None
 
         if not hasattr(self, '_prj_role'):
