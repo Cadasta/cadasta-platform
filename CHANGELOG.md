@@ -1,5 +1,29 @@
 # Change Log
 
+## [v1.8.2-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.8.2-alpha.1) (2017-05-17)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.1...v1.8.2-alpha.1)
+
+**Fixed bugs:**
+
+- Ability to download xlsform when data have been submitted to the project [\#1423](https://github.com/Cadasta/cadasta-platform/issues/1423)
+- SHP download breaks when there are empty geometries [\#1373](https://github.com/Cadasta/cadasta-platform/issues/1373)
+
+**Closed issues:**
+
+- Add ability to add user to project as a public user [\#1505](https://github.com/Cadasta/cadasta-platform/issues/1505)
+- Organization Dashboards with no information aren't very exciting... [\#769](https://github.com/Cadasta/cadasta-platform/issues/769)
+- Add Functional Test Coverage [\#558](https://github.com/Cadasta/cadasta-platform/issues/558)
+
+**Merged pull requests:**
+
+- Update CHANGELOG for v1.8.1 [\#1501](https://github.com/Cadasta/cadasta-platform/pull/1501) ([amplifi](https://github.com/amplifi))
+- Support repr\(\) if Question has no QuestionGroup [\#1443](https://github.com/Cadasta/cadasta-platform/pull/1443) ([alukach](https://github.com/alukach))
+- Fix \#1373 -- Ignore empty geometries for SHP export [\#1439](https://github.com/Cadasta/cadasta-platform/pull/1439) ([oliverroick](https://github.com/oliverroick))
+- Add pagination to API list endpoints [\#1425](https://github.com/Cadasta/cadasta-platform/pull/1425) ([alukach](https://github.com/alukach))
+- Bugfix \#1423: Show links to questionnaires even when project schema is locked. [\#1424](https://github.com/Cadasta/cadasta-platform/pull/1424) ([niharika1995](https://github.com/niharika1995))
+- Eliminate duplicate js and css [\#1416](https://github.com/Cadasta/cadasta-platform/pull/1416) ([clash99](https://github.com/clash99))
+- New mo and po files from transifex [\#1441](https://github.com/Cadasta/cadasta-platform/pull/1441) ([clash99](https://github.com/clash99))
+
 ## [v1.8.1](https://github.com/Cadasta/cadasta-platform/tree/v1.8.1) (2017-05-11)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.0...v1.8.1)
 
