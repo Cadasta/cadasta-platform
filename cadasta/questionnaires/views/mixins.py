@@ -68,7 +68,6 @@ class PDFFormObjectMixin(ProjectPDFFormMixin):
         pdfform = self.get_object()
         user = self.request.user
         context['pdfform'] = pdfform
-        context['thumbnail_url'] = pdfform.thumbnail
         context['can_delete'] = user.has_perm('pdfform.delete', pdfform)
         context['can_edit'] = user.has_perm('pdfform.edit', pdfform)
         context['can_generate'] = user.has_perm('pdfform.generate', pdfform)

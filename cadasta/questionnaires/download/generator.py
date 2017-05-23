@@ -34,18 +34,16 @@ class PDFGenerator():
         [template_questions_list.append(question)
             for question in questions_list if question.question_group is None]
 
+        context = {
+            'questionnaire': questionnaire,
+            'questions_list': template_questions_list,
+            'questions_groups_list': template_question_groups_list,
+            'exclude_geo_fields': EXCLUDE_GEO_FIELDS,
+            'pdfform': self.pdfform
+        }
+
         html_string = render_to_string('questionnaires/'
-                                       'pdf_form_generator.html',
-                                       {'questionnaire': questionnaire,
-                                        'questions_list':
-                                            template_questions_list,
-                                        'question_groups_list':
-                                            template_question_groups_list,
-                                        'exclude_geo_fields':
-                                            EXCLUDE_GEO_FIELDS,
-                                        'pdfform': self.pdfform,
-                                        'thumbnail_url':
-                                        self.pdfform.thumbnail})
+                                       'pdf_form_generator.html', context)
         html = HTML(string=html_string, base_url=absolute_uri)
         pdf = html.write_pdf()
 

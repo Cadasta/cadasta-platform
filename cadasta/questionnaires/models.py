@@ -253,3 +253,7 @@ class PDFForm(RandomIDModel, ResourceThumbnailMixin):
     def save(self, *args, **kwargs):
         self.create_thumbnails((not self.id))
         super().save(*args, **kwargs)
+
+    @property
+    def mime_type(self):
+        return 'image/*'

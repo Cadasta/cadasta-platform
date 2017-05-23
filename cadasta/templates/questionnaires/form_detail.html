@@ -29,9 +29,9 @@
             {{ pdfform.name }}
           </h2>
           <div class="media">
-            {% if thumbnail_url %}
+            {% if pdfform.thumbnail  %}
                 <div class="media-left">
-                  <img alt="Form Logo" src="{{ thumbnail_url }}">
+                  <img alt="Form Logo" src="{{ pdfform.thumbnail }}">
                 </div>
             {% endif %}
             <div class="media-body">

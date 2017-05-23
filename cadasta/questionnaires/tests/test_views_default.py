@@ -243,9 +243,7 @@ class PDFFormDetailTest(ViewTestCase, UserTestCase, TestCase):
                 'can_edit': True,
                 'can_delete': True,
                 'can_generate': True,
-                'pdfform': self.pdfform,
-                'thumbnail_url':
-                '/media/s3/uploads/pdf-form-logos/image-128x128.jpg'}
+                'pdfform': self.pdfform}
 
     def setup_url_kwargs(self):
         return {
@@ -302,9 +300,7 @@ class PDFFormDeleteTest(ViewTestCase, UserTestCase, TestCase):
                 'can_edit': True,
                 'can_delete': True,
                 'can_generate': True,
-                'pdfform': self.pdfform,
-                'thumbnail_url':
-                '/media/s3/uploads/pdf-form-logos/image-128x128.jpg'}
+                'pdfform': self.pdfform}
 
     def setup_url_kwargs(self):
         return {
