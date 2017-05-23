@@ -52,6 +52,10 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 
     objects = UserManager()
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     history = HistoricalRecords()
 
     USERNAME_FIELD = 'username'
