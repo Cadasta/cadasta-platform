@@ -275,7 +275,9 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
     def test_get_with_labels(self):
         file = self.get_file(
             '/questionnaires/tests/files/ok-multilingual.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form.xlsx', file.read())
+        file.close()
+
         Questionnaire.objects.create_from_form(
             xls_form=form,
             original_file='original.xls',
