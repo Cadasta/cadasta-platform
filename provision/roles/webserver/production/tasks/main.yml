@@ -60,6 +60,8 @@
     - security
 
 - name: Copy files for blocking bots and scanners
+  become: yes
+  become_user: root
   copy: src={{ item }} dest=/etc/nginx/{{ item }}
     owner=root
     group=root
@@ -89,6 +91,14 @@
   become: yes
   become_user: "{{ app_user }}"
   django_manage: command=loadstatic
+                 app_path="{{ application_path }}cadasta"
+                 virtualenv="{{ virtualenv_path }}"
+                 settings="{{ django_settings }}"
+
+- name: Compile and compress SASS files
+  become: yes
+  become_user: "{{ app_user }}"
+  django_manage: command=compilescss
                  app_path="{{ application_path }}cadasta"
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
