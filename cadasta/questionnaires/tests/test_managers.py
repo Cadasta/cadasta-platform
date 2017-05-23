@@ -127,7 +127,8 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
 
     def test_create_from_form(self):
         file = self.get_file('/questionnaires/tests/files/xls-form.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form.xlsx', file.read())
+        file.close()
         model = models.Questionnaire.objects.create_from_form(
             xls_form=form,
             original_file='original.xls',
@@ -141,7 +142,8 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
     def test_update_from_form(self):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form.xlsx', file.read())
+        file.close()
 
         project = ProjectFactory.create()
         m1 = models.Questionnaire.objects.create_from_form(
@@ -164,7 +166,9 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
     def test_create_from_invald_form(self):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-invalid.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form-invalid.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form-invalid.xlsx',
+                                 file.read())
+        file.close()
         with pytest.raises(InvalidQuestionnaire) as e:
             models.Questionnaire.objects.create_from_form(
                 xls_form=form,
@@ -182,7 +186,8 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
             '/questionnaires/tests/files/'
             't_questionnaire_missing_relevant.xlsx', 'rb')
         form = self.storage.save(
-            'xls-forms/t_questionnaire_missing_relevant.xlsx', file)
+            'xls-forms/t_questionnaire_missing_relevant.xlsx', file.read())
+        file.close()
         with pytest.raises(InvalidQuestionnaire) as e:
             models.Questionnaire.objects.create_from_form(
                 xls_form=form,
@@ -317,7 +322,8 @@ class MultilingualQuestionnaireTest(UserTestCase, FileStorageTestCase,
     def _run(self, xlsxfile):
         file = self.get_file(
             '/questionnaires/tests/files/' + xlsxfile, 'rb')
-        form = self.storage.save('xls-forms/' + xlsxfile, file)
+        form = self.storage.save('xls-forms/' + xlsxfile, file.read())
+        file.close()
         return models.Questionnaire.objects.create_from_form(
             xls_form=form,
             original_file='original.xls',

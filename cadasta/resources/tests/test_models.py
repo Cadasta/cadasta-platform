@@ -180,7 +180,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_register_file_version(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('resources/thumb_new.jpg', file)
+        file_name = self.storage.save('resources/thumb_new.jpg', file.read())
+        file.close()
         resource = ResourceFactory.create()
 
         resource.file = file_name
@@ -191,7 +192,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_create_thumbnail(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('resources/thumb_test.jpg', file)
+        file_name = self.storage.save('resources/thumb_test.jpg', file.read())
+        file.close()
         contributor = UserFactory.create()
         resource = ResourceFactory.create(file=file_name,
                                           mime_type='image/jpeg',
@@ -203,7 +205,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_create_no_thumbnail_non_images(self):
         file = self.get_file('/resources/tests/files/text.txt', 'rb')
-        file_name = self.storage.save('resources/text.txt', file)
+        file_name = self.storage.save('resources/text.txt', file.read())
+        file.close()
         contributor = UserFactory.create()
         resource = ResourceFactory.create(file=file_name,
                                           mime_type='text/plain',
@@ -215,7 +218,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_create_spatial_resource(self):
         file = self.get_file('/resources/tests/files/deramola.xml', 'rb')
-        file_name = self.storage.save('resources/deramola.xml', file)
+        file_name = self.storage.save('resources/deramola.xml', file.read())
+        file.close()
         resource = ResourceFactory.create(
             file=file_name, mime_type='text/xml')
         assert os.path.isfile(os.path.join(
@@ -230,7 +234,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_invalid_gpx_mime_type(self):
         file = self.get_file('/resources/tests/files/mp3.xml', 'rb')
-        file_name = self.storage.save('resources/mp3.xml', file)
+        file_name = self.storage.save('resources/mp3.xml', file.read())
+        file.close()
         resource = ResourceFactory.build(
             file=file_name, mime_type='text/xml')
         assert os.path.isfile(os.path.join(
@@ -243,7 +248,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_invalid_gpx_file(self):
         file = self.get_file('/resources/tests/files/invalidgpx.xml', 'rb')
-        file_name = self.storage.save('resources/invalidgpx.xml', file)
+        file_name = self.storage.save('resources/invalidgpx.xml', file.read())
+        file.close()
         resource = ResourceFactory.build(
             file=file_name, mime_type='application/xml')
         assert os.path.isfile(os.path.join(
@@ -263,7 +269,8 @@ class SpatialResourceTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_spatial_resource(self):
         file = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
-        file_name = self.storage.save('resources/tracks_test.gpx', file)
+        file_name = self.storage.save('resources/tracks_test.gpx', file.read())
+        file.close()
         resource = ResourceFactory.create(
             file=file_name, mime_type='text/xml')
         spatial_resource = SpatialResourceFactory.create(resource=resource)

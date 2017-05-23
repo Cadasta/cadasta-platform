@@ -236,7 +236,8 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.project = ProjectFactory.create(name='Test CSV Import')
         xlscontent = self.get_file(
             '/organization/tests/files/uttaran_test.xlsx', 'rb')
-        form = self.storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+        form = self.storage.save('xls-forms/uttaran_test.xlsx',
+                                 xlscontent.read())
         Questionnaire.objects.create_from_form(
             xls_form=form,
             project=self.project
@@ -573,7 +574,9 @@ class XLSImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.project = ProjectFactory.create(name='Test CSV Import')
         xlscontent = self.get_file(
             '/organization/tests/files/uttaran_test.xlsx', 'rb')
-        form = self.storage.save('xls-forms/uttaran_test.xlsx', xlscontent)
+        form = self.storage.save('xls-forms/uttaran_test.xlsx',
+                                 xlscontent.read())
+        xlscontent.close()
         Questionnaire.objects.create_from_form(
             xls_form=form,
             project=self.project

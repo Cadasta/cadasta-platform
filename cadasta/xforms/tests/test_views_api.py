@@ -181,32 +181,36 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
 
         data = {}
         for image_name in image:
-            img = self._get_resource(
+            img_file = self._get_resource(
                 file_name=image_name,
                 file_type='png')
+            img_stream = img_file.read()
             img = InMemoryUploadedFile(
-                file=io.BytesIO(img),
+                file=io.BytesIO(img_stream),
                 field_name=image_name,
                 name='{}.png'.format(image_name),
                 content_type='image/png',
-                size=len(img),
+                size=len(img_stream),
                 charset='utf-8',
             )
+            img_file.close()
             data[img.name] = img
 
         for audio_name in audio:
             audio_file = self._get_resource(
                 file_name=audio_name,
                 file_type='mp3')
-            audio_file = InMemoryUploadedFile(
-                file=io.BytesIO(audio_file),
+            audio_stream = audio_file.read()
+            audio = InMemoryUploadedFile(
+                file=io.BytesIO(audio_stream),
                 field_name=audio_name,
                 name='{}.mp3'.format(audio_name),
                 content_type='audio/mp3',
-                size=len(audio_file),
+                size=len(audio_stream),
                 charset='utf-8',
             )
-            data[audio_file.name] = audio_file
+            data[audio.name] = audio
+            audio_file.close()
 
         if file:
             file = InMemoryUploadedFile(
@@ -381,9 +385,10 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         msg = self._getResponseMessage(response)
         assert msg == "Tenure relationship error: 'tenure_type'"
 
-        bad_file = self.get_file(
+        file = self.get_file(
             '/xforms/tests/files/test_bad_resource.html', 'rb')
-        bad_file = bad_file.decode('utf-8')
+        bad_file = file.read().decode('utf-8')
+        file.close()
 
         self._create_questionnaire('t_questionnaire_bad', 2, False)
         data = self._submission(form='submission_bad_resource',

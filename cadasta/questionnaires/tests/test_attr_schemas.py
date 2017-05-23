@@ -27,7 +27,8 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_create_attribute_schemas(self):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file.read())
+        file.close()
         project = ProjectFactory.create()
         models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -296,7 +297,8 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_update_questionnaire_attribute_schema(self):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form.xlsx', file.read())
+        file.close()
         project = ProjectFactory.create(name='TestProject')
         q1 = models.Questionnaire.objects.create_from_form(
             xls_form=form,
@@ -335,7 +337,8 @@ class ConditionalAttributeSchemaTest(UserTestCase, FileStorageTestCase,
         super().setUp()
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-attrs.xlsx', 'rb')
-        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file)
+        form = self.storage.save('xls-forms/xls-form-attrs.xlsx', file.read())
+        file.close()
         self.content_type = ContentType.objects.get(
             app_label='party', model='party')
         self.project = ProjectFactory.create(name='TestProject')

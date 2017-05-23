@@ -72,7 +72,9 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
         self.storage = self.get_storage()
         self.file = self.get_file(
             '/resources/tests/files/image.jpg', 'rb')
-        self.file_name = self.storage.save('resources/image.jpg', self.file)
+        self.file_name = self.storage.save('resources/image.jpg',
+                                           self.file.read())
+        self.file.close()
 
     def setup_url_kwargs(self):
         return {
@@ -151,7 +153,9 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
         assert self.project.resources.count() == 3
 
     def test_search_for_file(self):
-        not_found = self.storage.save('resources/bild.jpg', self.file)
+        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
+        not_found = self.storage.save('resources/bild.jpg', file.read())
+        file.close()
         prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
             {'content_object': prj, 'project': prj, 'file': self.file_name},
@@ -408,14 +412,19 @@ class ProjectSpatialResourcesTest(APITestCase, UserTestCase,
 
     def setup_models(self):
         tracks = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
-        self.tracks_file = self.storage.save('resources/tracks.gpx', tracks)
+        self.tracks_file = self.storage.save('resources/tracks.gpx',
+                                             tracks.read())
+        tracks.close()
 
         routes = self.get_file('/resources/tests/files/routes.gpx', 'rb')
-        self.routes_file = self.storage.save('resources/routes.gpx', routes)
+        self.routes_file = self.storage.save('resources/routes.gpx',
+                                             routes.read())
+        routes.close()
 
         waypoints = self.get_file('/resources/tests/files/waypoints.gpx', 'rb')
         self.waypoints_file = self.storage.save(
-            'resources/waypoints.gpx', waypoints)
+            'resources/waypoints.gpx', waypoints.read())
+        waypoints.close()
 
         self.project = ProjectFactory.create()
 
@@ -495,14 +504,19 @@ class ProjectSpatialResourcesDetailTest(APITestCase, UserTestCase,
 
     def setup_models(self):
         tracks = self.get_file('/resources/tests/files/tracks.gpx', 'rb')
-        self.tracks_file = self.storage.save('resources/tracks.gpx', tracks)
+        self.tracks_file = self.storage.save('resources/tracks.gpx',
+                                             tracks.read())
+        tracks.close()
 
         routes = self.get_file('/resources/tests/files/routes.gpx', 'rb')
-        self.routes_file = self.storage.save('resources/routes.gpx', routes)
+        self.routes_file = self.storage.save('resources/routes.gpx',
+                                             routes.read())
+        routes.close()
 
         waypoints = self.get_file('/resources/tests/files/waypoints.gpx', 'rb')
         self.waypoints_file = self.storage.save(
-            'resources/waypoints.gpx', waypoints)
+            'resources/waypoints.gpx', waypoints.read())
+        waypoints.close()
 
         self.project = ProjectFactory.create()
 
