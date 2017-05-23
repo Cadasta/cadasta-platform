@@ -1,5 +1,8 @@
 # Change Log
 
+## [v1.8.2](https://github.com/Cadasta/cadasta-platform/tree/v1.8.2) (2017-05-17)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.2-alpha.1...v1.8.2)
+
 ## [v1.8.2-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.8.2-alpha.1) (2017-05-17)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.1...v1.8.2-alpha.1)
 
