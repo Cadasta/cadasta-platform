@@ -1,10 +1,12 @@
 import os
-import magic
-from django.contrib.contenttypes.models import ContentType
+
 from django.apps import apps
 from django.conf import settings
-from django.dispatch import receiver
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from django.utils.translation import ugettext as _
+
 from .utils import io, thumbnail
 
 
@@ -99,9 +101,5 @@ class ResourceThumbnailMixin:
 
     def _get_mime(self):
         if(hasattr(self, 'mime_type')):
-            mime_type = self.mime_type
-        else:
-            data = self.file.open().read(512)
-            mime = magic.Magic(mime=True)
-            mime_type = mime.from_buffer(data).decode()
-        return mime_type
+            return self.mime_type
+        raise AttributeError(_("No 'mime_type' attribute found."))

@@ -24,6 +24,10 @@ class ResourceThumbnailModel(ResourceThumbnailMixin, Model):
         app_label = 'core'
     file = S3FileField(upload_to='resources', null=True, blank=True)
 
+    @property
+    def mime_type(self):
+        return 'image/*'
+
 
 @pytest.mark.usefixtures('make_dirs')
 class ResourceModelMixinTest(UserTestCase, TestCase):
@@ -209,7 +213,12 @@ class ResourceThumbnailMixinTest(UserTestCase, FileStorageTestCase, TestCase):
             ) is False
 
         def test_get_mime(self):
-            file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-            file_name = self.storage.save('resources/thumb_test.jpg', file)
-            resource = ResourceThumbnailModel(file=file_name)
-            assert resource._get_mime() == 'image/jpeg'
+            resource = ResourceThumbnailModel()
+            assert resource._get_mime() == 'image/*'
+
+        def test_missing_mime_type_attribute(self):
+            del ResourceThumbnailModel.mime_type
+            resource = ResourceThumbnailModel()
+            with pytest.raises(AttributeError) as e:
+                resource._get_mime()
+            assert str(e.value) == "No 'mime_type' attribute found."
