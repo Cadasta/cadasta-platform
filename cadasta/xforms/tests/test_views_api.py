@@ -313,7 +313,6 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         data = self._submission(form='submission_missing_semi')
         response = self.request(method='POST', user=self.user, post_data=data,
                                 content_type='multipart/form-data')
-        print(SpatialUnit.objects.all())
         geom = SpatialUnit.objects.get(attributes={'name': 'Missing Semi'})
         assert response.status_code == 201
         assert geom.geometry.geom_type == 'Point'
