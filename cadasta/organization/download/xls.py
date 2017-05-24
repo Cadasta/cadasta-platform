@@ -40,7 +40,7 @@ class XLSExporter(Exporter):
         content_type = ContentType.objects.get(app_label='spatial',
                                                model='spatialunit')
         self.write_items(worksheet, locations, content_type,
-                         ['id', 'geometry.ewkt', 'type'])
+                         ['id', 'geometry.ewkt', 'type', 'geometry_details'])
 
     def write_parties(self):
         parties = self.project.parties.all()
