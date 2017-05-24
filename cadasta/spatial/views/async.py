@@ -45,6 +45,7 @@ class SpatialUnitTiles(APIPermissionRequiredMixin,
                        generics.ListAPIView):
 
     serializer_class = serializers.SpatialUnitGeoJsonSerializer
+    pagination_class = None
 
     def get_actions(self, request):
         if self.get_project().archived:

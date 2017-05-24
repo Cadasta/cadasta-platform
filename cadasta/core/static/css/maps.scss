@@ -128,6 +128,7 @@ label[for="id_extents-location"] {
     color: #000 !important;
     background-image: url('/static/img/spritesheet.png');
     background-repeat: no-repeat;
+    margin-left: 2px;
 }
 
 .draw-polygon {
@@ -148,6 +149,7 @@ label[for="id_extents-location"] {
 
 .edit-action span, .delete-action span   {
   color: #464646 !important;
+  margin-left: 4px;
 }
 
 .leaflet-subtoolbar {

@@ -7,13 +7,13 @@ var Location = L.Editable.extend({
     _deleted: false,
     _new: false,
     _dirty: false,
-    _original_state: {},
 
     layer: null,
     feature: null,
 
     initialize: function (map, options) {
         this._undoBuffer = {};
+        this._original_state = [];
         this.on('editable:drawing:start', this._drawStart, this);
         this.on('editable:drawing:end', this._drawEnd, this);
         L.Editable.prototype.initialize.call(this, map, options);
@@ -35,6 +35,8 @@ var Location = L.Editable.extend({
         if (this.layer) {
             this.layer.disableEdit(this.map);
             this._clearBackup();
+            this.layer._dirty = false;
+            this._deleted = false;
         }
     },
 
@@ -47,7 +49,6 @@ var Location = L.Editable.extend({
         }
         var gj = JSON.stringify(geom);
         $('textarea[name="geometry"]').html(gj);
-        this.layer._dirty = false;
         this.layer._new = false;
     },
 
@@ -58,11 +59,20 @@ var Location = L.Editable.extend({
     },
 
     _undo: function (cancel_form) {
+        var latLngs;
+
         if (this.layer) {
             this.layer.disableEdit();
-            var latLngs_dict = cancel_form ? this._original_state : this._undoBuffer;
-            latLngs = latLngs_dict[this.layer._leaflet_id];
 
+            if (cancel_form) {
+                this.map.geojsonLayer.removeLayer(this.layer);
+                this.layer = this._original_state[0].layer;
+
+                latLngs = this._original_state[0];
+            } else {
+                var latLngs_dict = this._undoBuffer;
+                latLngs = latLngs_dict[this.layer._leaflet_id];
+            }
             if (latLngs && latLngs.latlngs) {
                 if (this.layer instanceof L.Marker) {
                     this.layer.setLatLng(latLngs.latlngs);
@@ -73,13 +83,9 @@ var Location = L.Editable.extend({
                     this.map.geojsonLayer.removeLayer(this.layer);
                     this.map.geojsonLayer.addLayer(this.layer);
                 }
-                this._clearBackup();
-            } else if (this.layer._new !== undefined) {
+                this._clearBackup(cancel_form);
+            } else if (this.layer._new !== undefined && this.layer._new) {
                 this._setDeleted();
-            }
-
-            if (cancel_form) {
-                this._original_state = {};
             }
         }
     },
@@ -87,7 +93,6 @@ var Location = L.Editable.extend({
     // delete functions
 
     _startDelete: function () {
-        this.layer.disableEdit();
         if (!this.layer._new) {
             this._backupLayer();
         }
@@ -103,12 +108,10 @@ var Location = L.Editable.extend({
             this.layer.enableEdit();
             this.layer.editor.deleteShape(this.layer._latlngs);
             this.layer.disableEdit();
-            // this.map.geojsonLayer.removeLayer(this.layer);
             this._deleted = true;
         } else if (this.layer instanceof L.Marker) {
             this.layer.enableEdit();
             this.layer.remove();
-            // this.map.geojsonLayer.removeLayer(this.layer);
             this._deleted = true;
         }
 
@@ -121,8 +124,8 @@ var Location = L.Editable.extend({
         this.featuresLayer.clearLayers();
     },
 
-    _undoDelete: function () {
-        this._undo();
+    _undoDelete: function (cancel_form) {
+        this._undo(cancel_form);
         this._deleted = false;
         this._deleting = false;
     },
@@ -130,10 +133,9 @@ var Location = L.Editable.extend({
     _saveDelete: function () {
         if (this._deleted) {
             $('textarea[name="geometry"]').html('');
-            this.featuresLayer.clearLayers();
-            this._clearBackup();
         }
         this._deleting = false;
+        this._createNew(this.layer);
     },
 
     // draw functions
@@ -228,20 +230,22 @@ var Location = L.Editable.extend({
                 latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
             };
 
-            if (initial_edit && Object.keys(this._original_state).length === 0) {
-                this._original_state[this.layer._leaflet_id] = {
+            if (initial_edit && !this._original_state[0]) {
+                this._original_state.push({
                     latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
-                };
+                    layer: this.layer
+                });
             }
         }
         if (this.layer instanceof L.Marker) {
             this._undoBuffer[this.layer._leaflet_id] = {
                 latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLng()),
             };
-            if (initial_edit && Object.keys(this._original_state).length === 0) {
-                this._original_state[this.layer._leaflet_id] = {
+            if (initial_edit && !this._original_state[0]) {
+                this._original_state.push({
                     latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLngs()),
-                };
+                    layer: this.layer
+                });
             }
         }
     },
@@ -250,15 +254,18 @@ var Location = L.Editable.extend({
         return this.featuresLayer.getLayers().length > 0;
     },
 
-    _clearBackup: function () {
+    _clearBackup: function (cancel_form) {
         this._undoBuffer = {};
+        if (cancel_form) {
+            this._original_state = [];
+        }
     },
 
     _reset: function () {
         this.layer = null;
         this.feature = null;
         this.featuresLayer.clearLayers();
-        this._clearBackup();
+        this._clearBackup(true);
     },
 
 });
@@ -287,7 +294,7 @@ var LocationEditor = L.Evented.extend({
         if (this.dirty() && !this.deleting()) return;
         var feature = e.target.feature;
         var layer = e.layer || e.target;
-        if (this.preventClick() && feature.id !== this.location.layer.feature.id) return;
+        if (this.preventClick() && this.location.layer && feature.id !== this.location.layer.feature.id) return;
         if (this.editing() && feature.id !== this.location.layer.feature.id) return;
         if (this.deleting()) {
             this.deleteLayer(layer, e);
@@ -302,6 +309,8 @@ var LocationEditor = L.Evented.extend({
     // edit functions
 
     setEditable: function (feature, layer) {
+        if (this.location.layer && this.location.layer.feature.id === feature.id) return;
+
         if (this.location.layer) {
             Styles.resetStyle(this.location.layer);
         }
@@ -361,9 +370,9 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
-    cancelDelete: function () {
+    cancelDelete: function (cancel_form) {
         this.tooltip.remove();
-        this.location._undoDelete();
+        this.location._undoDelete(cancel_form);
         Styles.setSelectedStyle(this.location.layer);
     },
 
@@ -465,12 +474,18 @@ var LocationEditor = L.Evented.extend({
     },
 
     dispose: function () {
-        this.cancelEdit(false);
+        if (this.location._deleting || this.location._deleted) {
+            this.cancelDelete(true);
+        } else if (this._editing || this.dirty()) {
+            this.cancelEdit(true);
+        }
         this._resetView();
     },
 
     _drawStart: function (e) {
-        // this._addTooltip();
+        if (this.layer) {
+            this._cancelEdit();
+        }
     },
 
     _drawEnd: function (e) {
@@ -516,10 +531,18 @@ var LocationEditor = L.Evented.extend({
 
     // saving
 
-    save: function () {
+    save: function (final) {
         this.tooltip.remove();
-        this.location._saveEdit();
-        this._editing = false;
+        if (this.location._deleting) {
+            this.location._saveDelete();
+            this.location._deleting = false;
+        } else if (this._editing) {
+            this.location._saveEdit();
+            this._editing = false;
+        }
+        if (final) {
+            this.location._clearBackup(true);
+        }
     },
 
     // editor toolbars
@@ -534,14 +557,6 @@ var LocationEditor = L.Evented.extend({
                 Styles.setSelectedStyle(this.location.layer);
                 this.edit();
                 this._addEditControls();
-            } else {
-                this.map.on('endtileload', function () {
-                    var layer = this.location._findLayer(fid);
-                    this.location.layer = layer;
-                    Styles.setSelectedStyle(this.location.layer);
-                    this.edit();
-                    this._addEditControls();
-                }, this);
             }
         } else {
             this._addEditControls();
@@ -622,14 +637,9 @@ var LocationEditor = L.Evented.extend({
         this._editing = false;
         this._prevent_click = false;
         this._removeEditControls();
+
         Styles.resetStyle(this.location.layer);
         this.location._reset();
-    },
-
-    _cleanForm: function () {
-        // if an add location form is canceled, geometry should be removed
-        this.cancelEdit(true);
-        this.location._saveDelete();
     },
 
     // events
@@ -637,7 +647,6 @@ var LocationEditor = L.Evented.extend({
     _addDeleteEvent: function () {
         this.on('location:delete', this._removeLayer, this);
         this.on('location:reset', this._cleanForm, this);
-        this.on('location:reset_dirty', this._cleanForm, this);
     },
 
     _addRouterEvents: function () {

@@ -50,7 +50,11 @@
 
         hash = hash || '#/';
 
+        
         if (!hash.includes('?')) {
+            if (hash.substr(hash.length - 1) !== '/') {
+                hash += '/';
+            }
             hash += '?';
         } else if (hash.substr(-1) !== '&') {
             hash += '&';

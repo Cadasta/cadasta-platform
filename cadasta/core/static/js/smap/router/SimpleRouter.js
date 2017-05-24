@@ -28,7 +28,7 @@ function SimpleRouter(map) {
         }
 
         // Fail safe in case a hashpath does not contain the final backslash
-        if (hash_path.substr(-1) !== '/' && !hash_path.includes('?')) {
+        if (hash_path.substr(hash_path.length - 1) !== '/' && !hash_path.includes('?')) {
             hash_path += '/';
         }
 

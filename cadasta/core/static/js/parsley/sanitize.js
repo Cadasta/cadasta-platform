@@ -1,13 +1,17 @@
+/***
+Adds check to parsley to prevent emojis, html, and script tags.
+***/
+
 window.Parsley
   .addValidator('sanitize', function (value, requirement) {
     function isHTMLElement(node) {
-      return node.nodeType === 1
+      return node.nodeType === 1;
     }
 
     function isHTML(str) {
-        const doc = new DOMParser().parseFromString(str, "text/html");
-        const bodyNodes = Array.from(doc.body.childNodes);
-        const headNodes = Array.from(doc.head.childNodes);
+        var doc = new DOMParser().parseFromString(str, "text/html");
+        var bodyNodes = Array.from(doc.body.childNodes);
+        var headNodes = Array.from(doc.head.childNodes);
         return bodyNodes.some(isHTMLElement) || headNodes.some(isHTMLElement);
     }
 

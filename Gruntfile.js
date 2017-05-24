@@ -88,7 +88,7 @@ module.exports = function(grunt) {
             },
             javascript: {
                 files: '<%= dirs.smap.all %>',
-                tasks: ['concat']
+                tasks: ['concat', 'uglify']
             }
         }
     });

@@ -2,7 +2,7 @@ function SMap(map) {
     var layerscontrol = L.control.layers().addTo(map);
 
     var geojsonTileLayer = new L.TileLayer.GeoJSON(
-        1, options.num_locations, url, {
+        1, url, {
             clipTiles: true,
             unique: function (feature) { return feature.id; }
         }, {

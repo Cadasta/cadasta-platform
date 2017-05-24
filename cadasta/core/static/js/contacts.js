@@ -46,6 +46,10 @@ $(document).ready(function () {
         var newRow = tbody.find("tr:not(.contacts-error)").first().clone(true);
         var newPrefix = prefix + '-' + getNumberOfForms(form, prefix);
 
+        function replaceAttrForEach(attr) {
+            replaceAttr(el, attr, prefix, newPrefix);
+        }
+
         var td = newRow.children('td');
         for (var i = 0, ilen = td.length; i < ilen; i++) {
             var elements = $(td[i]).children();
@@ -53,9 +57,7 @@ $(document).ready(function () {
             for (var j = 0, jlen = elements.length; j < jlen; j++) {
                 var el = elements[j];
 
-                ['name', 'id', 'data-prefix'].forEach(function(attr) {
-                    replaceAttr(el, attr, prefix, newPrefix);
-                });
+                ['name', 'id', 'data-prefix'].forEach(replaceAttrForEach);
                 el.value = '';
             }
 

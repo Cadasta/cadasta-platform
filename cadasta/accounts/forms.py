@@ -24,7 +24,7 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
                   'full_name']
 
     class Media:
-        js = ('js/sanitize.js', )
+        js = ('js/parsley/sanitize.js', )
 
     def clean_username(self):
         username = self.data.get('username')
@@ -75,7 +75,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         fields = ['username', 'email', 'full_name']
 
     class Media:
-        js = ('js/sanitize.js', )
+        js = ('js/parsley/sanitize.js', )
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False

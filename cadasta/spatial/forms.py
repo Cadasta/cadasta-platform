@@ -37,9 +37,6 @@ class LocationForm(form_mixins.SanitizeFieldsForm,
         model = SpatialUnit
         fields = ['geometry', 'type']
 
-    class Media:
-        js = ('js/sanitize.js', )
-
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project

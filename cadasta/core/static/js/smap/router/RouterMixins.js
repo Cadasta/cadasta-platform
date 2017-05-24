@@ -45,8 +45,8 @@ function RouterMixins() {
 
             if (kwargs.reset_current_location) {
                 // this.resetPreviousLocationStyle();
-                if (state.current_location.feature) {
-                    Styles.resetStyle(state.current_location.feature);
+                if (state.current_location.layer) {
+                    Styles.resetStyle(state.current_location.layer);
                 }
             }
         },
@@ -79,14 +79,6 @@ function RouterMixins() {
             *********/
             if (kwargs.active_tab) {
                 rm.activateTab(kwargs.active_tab);
-            }
-
-            /*********
-            'check_location_coords': Boolean. Only used when a page first loads. If the page loads to a location/relationship detail page, and if there are not coords, it will zoom in on the coordinates provided in the header.
-            (used in smap/index.js on 'endtileload')
-            *********/
-            if (kwargs.check_location_coords) {
-                this.getCurrentLocationCoords();
             }
 
             /*********
@@ -242,12 +234,19 @@ function RouterMixins() {
             return state.current_location.url;
         },
 
+        getCurrentLocationLayer: function () {
+            return state.current_location.layer;
+        },
+
         setCurrentLocationFeature: function () {
             var url = state.current_location.url;
 
-            if (state.current_location.feature) {
-                if (url.includes(state.current_location.feature.feature.id)) {
-                    Styles.setSelectedStyle(state.current_location.feature);
+            if (!url) return;
+
+            if (state.current_location.layer) {
+                if (url.includes(state.current_location.layer.feature.id)) {
+                    Styles.setSelectedStyle(state.current_location.layer);
+                    editor.setEditable(state.current_location.layer.feature, state.current_location.layer);
                     return;
                 }
             }
@@ -256,24 +255,22 @@ function RouterMixins() {
             var found = false;
 
             for (var i in layers) {
-                if (url.includes(layers[i].feature.id)) {
-                    found = true;
-                    Styles.resetStyle(state.current_location.feature);
-                    state.current_location.feature = layers[i];
-                    Styles.setSelectedStyle(layers[i]);
-                    return;
-                } else if (!isNaN(layers[i].feature.id)) {
+                if (!isNaN(layers[i].feature.id)) {
                     var new_url = url.substr(2);
                     new_url = new_url.substr(0, new_url.length -1);
                     layer_id = new_url.split('/')[2];
 
                     layers[i].feature.id = layer_id;
                     layers[i].feature.properties.url = new_url;
+                }
 
+                if (url.includes(layers[i].feature.id)) {
                     found = true;
-                    Styles.resetStyle(state.current_location.feature);
-                    state.current_location.feature = layers[i];
+                    Styles.resetStyle(state.current_location.layer);
+
+                    state.current_location.layer = layers[i];
                     Styles.setSelectedStyle(layers[i]);
+                    editor.setEditable(state.current_location.layer.feature, state.current_location.layer);
                     return;
                 }
             }
@@ -282,20 +279,14 @@ function RouterMixins() {
         },
 
         setCurrentLocationCoords: function (coords) {
-            if (!state.coords) {
-                coords = coords.replace('(', '').replace(')', '').split(',');
-                state.coords = [
-                    [coords[0], coords[1]],
-                    [coords[2], coords[3]]
-                ];
-            }
-        },
+            coords = coords.replace('(', '').replace(')', '').split(',');
+            state.coords = [
+                [coords[0], coords[1]],
+                [coords[2], coords[3]]
+            ];
 
-        getCurrentLocationCoords: function () {
-            if (state.first_load && state.coords) {
-                map.fitBounds(state.coords);
-                state.first_load = false;
-            }
+            map.fitBounds(state.coords);
+            state.first_load = false;
         },
 
         // Checked to prevent router from firing with each coords change.
@@ -329,6 +320,9 @@ function RouterMixins() {
             } else if (type === 'relationship') {
                 url = rm.getCurrentRelationshipUrl() ? rm.getCurrentRelationshipUrl() : rm.setCurrentRelationshipUrl();
             }
+            if (url.substr(url.length - 1) !== '/') {
+                url += '/';
+            }
 
             url = tab ? url + '?tab=' + tab : url;
 
@@ -340,7 +334,7 @@ function RouterMixins() {
         ****************/
 
         addEventScript: function (file) {
-            scripts = $('script[src="/static/js/' + file + '.js"]');
+            scripts = $('script[src="/static/js/' + file + '"]');
             if (scripts.length) {
                 $.each(scripts, function (i) {
                     scripts[i].parentElement.removeChild(scripts[i]);
@@ -363,6 +357,24 @@ function RouterMixins() {
                 yearRange: "c-200:c+200",
                 changeMonth: true,
                 changeYear: true,
+            });
+        },
+
+        locationDeleteHooks: function () {
+            $('#delete-location').on('click', function (e) {
+                editor.fire('location:delete');
+            });
+        },
+
+        locationFormButtons: function () {
+            $('.btn-default.cancel').on('click', function (e) {
+                editor.dispose();
+            });
+
+            $('button[name="submit-button"]').on('click', function (e) {
+                e.preventDefault();
+                editor.save(true);
+                $('#location-wizard').submit();
             });
         },
 
@@ -402,6 +414,7 @@ function RouterMixins() {
         locationEditHooks: function () {
             rm.requiredFieldHooks('spatial');
             rm.datepickerHooks();
+            rm.locationFormButtons();
         },
 
         locationDetailHooks: function () {
@@ -421,7 +434,14 @@ function RouterMixins() {
                 if (hash.includes('?tab=')) {
                     hash = hash.split('?tab=')[0];
                 }
-                window.location.hash = hash + '?tab=' + tab + '&' + coords;
+
+                hash = hash + '?tab=' + tab;
+
+                if (coords) {
+                    hash = hash + '&' + coords;
+                }
+
+                window.location.hash = hash;
                 rm.activateTab(tab);
             }
 
@@ -467,6 +487,12 @@ function RouterMixins() {
                     obj[item.name] = item.value;
                     return obj;
                 }, {});
+
+                // prevents error caused by submiting a 'location edit' form
+                // after deleting the geometry.
+                if (data.geometry && data.geometry.includes('[[null]]')) {
+                    data.geometry = 'None';
+                }
 
                 var posturl = $.ajax({
                     method: "POST",

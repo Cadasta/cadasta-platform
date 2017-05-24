@@ -1367,9 +1367,9 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         extra_record = SpatialUnitFactory.create()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 3
+        assert len(response.content['features']) == 3
         assert extra_record.id not in (
-            [u['id'] for u in response.content['results']['features']])
+            [u['id'] for u in response.content['features']])
 
     def test_one_tile(self):
         url_kwargs = {
@@ -1381,24 +1381,24 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
 
         response = self.request(user=self.user, url_kwargs=url_kwargs)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 1
+        assert len(response.content['features']) == 1
 
     def test_exclude(self):
         response = self.request(user=self.user,
                                 get_data={'exclude': self.su3.id})
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 2
+        assert len(response.content['features']) == 2
         assert self.su3.id not in (
-            [u['id'] for u in response.content['results']['features']])
+            [u['id'] for u in response.content['features']])
 
     def test_full_list_with_unauthorized_user(self):
         extra_record = SpatialUnitFactory.create()
 
         response = self.request()
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 3
+        assert len(response.content['features']) == 3
         assert extra_record.id not in (
-            [u['id'] for u in response.content['results']['features']])
+            [u['id'] for u in response.content['features']])
 
     def test_get_full_list_organization_does_not_exist(self):
         response = self.request(user=self.user,
@@ -1419,9 +1419,9 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         extra_record = SpatialUnitFactory.create()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 3
+        assert len(response.content['features']) == 3
         assert extra_record.id not in (
-            [u['id'] for u in response.content['results']['features']])
+            [u['id'] for u in response.content['features']])
 
     def test_list_private_record_with_unauthorized_user(self):
         self.prj.access = 'private'
@@ -1489,7 +1489,7 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 3
+        assert len(response.content['features']) == 3
 
     def test_get_with_private_project(self):
         self.prj.access = 'private'
@@ -1518,4 +1518,4 @@ class SpatialUnitTilesAsyncTest(APITestCase, UserTestCase, TestCase):
     def test_get_with_public_project(self):
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']['features']) == 3
+        assert len(response.content['features']) == 3
