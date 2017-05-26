@@ -116,8 +116,7 @@ class LocationDetail(LoginPermissionRequiredMixin,
                 pass
 
         location = context['location']
-        if location.geometry_details:
-            context['area'] = location.geometry_details['area']
+        context['area'] = location.geometry.transform(3857, clone=True).area
         user = self.request.user
         context['is_allowed_edit_location'] = user.has_perm('spatial.update',
                                                             location)

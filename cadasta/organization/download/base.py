@@ -24,12 +24,8 @@ class Exporter(SchemaSelectorMixin):
 
             value = item
             for a in attr.split('.'):
-                if a == 'geometry_details':
-                    value = getattr(value, a)
-                    if value is not None:
-                        value = value['area']
-                    else:
-                        value = ''
+                if a == 'area':
+                    value = value.transform(3857, clone=True).area
                 else:
                     value = getattr(value, a)
             values[attr] = value

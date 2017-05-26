@@ -31,6 +31,7 @@ from .. import messages as error_messages
 from .. import forms
 from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
+from django.contrib.gis.db.models.functions import Area, Transform
 
 
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
@@ -423,10 +424,11 @@ class ProjectDashboard(PermissionRequiredMixin,
         members = OrderedDict(sorted(m.items(), key=lambda t: t[0]))
 
         num_locations = self.object.spatial_units.count()
-        geo_details = self.object.spatial_units.values('geometry_details')
-        context['total_area'] = sum(
-            [float(gd["geometry_details"]["area"])
-                for gd in geo_details if gd["geometry_details"]])
+        qs = self.object.spatial_units.annotate(
+            area=Area(Transform('geometry', 3857)))
+        area = qs.aggregate(Sum('area'))['area__sum']
+        if area:
+            context['total_area'] = area.sq_m
         num_parties = self.object.parties.count()
         num_resources = self.object.resource_set.filter(archived=False).count()
         context['has_content'] = (

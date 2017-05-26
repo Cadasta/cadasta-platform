@@ -65,7 +65,7 @@ class ShapeExporter(Exporter):
 
         content_type = ContentType.objects.get(app_label='spatial',
                                                model='spatialunit')
-        model_attrs = ('id', 'type', 'geometry_details')
+        model_attrs = ('id', 'type', 'geometry.area')
 
         self.write_items(
             filename, spatial_units, content_type, model_attrs)

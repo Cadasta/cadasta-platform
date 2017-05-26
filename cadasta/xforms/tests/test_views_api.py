@@ -294,20 +294,6 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         tenure = TenureRelationship.objects.get(tenure_type='LH')
         self._test_resource('test_audio_one', tenure)
 
-    def test_geometry_details_polygon_upload(self):
-        self._create_questionnaire('t_questionnaire', 0)
-        data = self._submission(form='submission_poly',
-                                audio=['test_audio_one'])
-        response = self.request(method='POST', user=self.user, post_data=data,
-                                content_type='multipart/form-data')
-
-        assert response.status_code == 201
-
-        geom = SpatialUnit.objects.get(attributes={'name': 'Polygon'})
-        assert geom.geometry_details is not None
-        assert geom.geometry_details['area'] is not None
-        assert geom.geometry_details['area'] == '199413.94'
-
     def test_point_upload(self):
         self._create_questionnaire('t_questionnaire', 0)
         data = self._submission(form='submission_missing_semi')

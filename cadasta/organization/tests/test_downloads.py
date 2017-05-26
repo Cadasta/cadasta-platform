@@ -468,21 +468,26 @@ class ShapeTest(UserTestCase, TestCase):
             csvreader = csv.reader(csvfile)
             for i, row in enumerate(csvreader):
                 if i == 0:
-                    head = ['id', 'type', 'geometry_details', 'geom_type']
+                    head = ['id', 'type', 'geometry.area', 'geom_type']
                     assert row == head
                 if i == 1:
-                    assert row == [su1.id, su1.type, '', 'point']
+                    area = str(su1.geometry.transform(3857, clone=True).area)
+                    assert row == [su1.id, su1.type, area, 'point']
                 if i == 2:
-                    assert row == [su2.id, su2.type, '', 'linestring']
+                    area = str(su2.geometry.transform(3857, clone=True).area)
+                    assert row == [su2.id, su2.type, area, 'linestring']
                 if i == 3:
-                    area = su3.geometry_details['area']
+                    area = str(su3.geometry.transform(3857, clone=True).area)
                     assert row == [su3.id, su3.type, area, 'polygon']
                 if i == 4:
-                    assert row == [su4.id, su4.type, '', 'multipoint']
+                    area = str(su4.geometry.transform(3857, clone=True).area)
+                    assert row == [su4.id, su4.type, area, 'multipoint']
                 if i == 5:
-                    assert row == [su5.id, su5.type, '', 'multilinestring']
+                    area = str(su5.geometry.transform(3857, clone=True).area)
+                    assert row == [su5.id, su5.type, area, 'multilinestring']
                 if i == 6:
-                    assert row == [su6.id, su6.type, '', 'multipolygon']
+                    area = str(su6.geometry.transform(3857, clone=True).area)
+                    assert row == [su6.id, su6.type, area, 'multipolygon']
                 if i == 7:
                     assert row == [su7.id, su7.type, '', 'empty']
                 if i == 8:
