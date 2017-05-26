@@ -178,6 +178,8 @@ def santize_form(form_json):
         if isinstance(value, list):
             for list_item in value:
                 santize_form(list_item)
+        elif isinstance(value, dict):
+            santize_form(value)
         else:
             if not sanitize_string(value):
                 raise InvalidQuestionnaire([SANITIZE_ERROR])

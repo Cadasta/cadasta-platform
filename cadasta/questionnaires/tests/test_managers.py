@@ -61,6 +61,26 @@ class SanitizeFormTest(TestCase):
         with pytest.raises(InvalidQuestionnaire):
             santize_form(data)
 
+    def test_valid_multilang_labels(self):
+        data = {
+            'name': 'Field',
+            'label': {'en': 'English', 'de': 'German'}
+        }
+        try:
+            santize_form(data)
+        except InvalidQuestionnaire:
+            assert False, "InvalidQuestionnaire raised unexpectedly"
+        else:
+            assert True
+
+    def test_invalid_multilang_labels(self):
+        data = {
+            'name': 'Field',
+            'label': {'en': 'English 😆', 'de': 'German'}
+        }
+        with pytest.raises(InvalidQuestionnaire):
+            santize_form(data)
+
 
 class CreateChildrenTest(TestCase):
 
