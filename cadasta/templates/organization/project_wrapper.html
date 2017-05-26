@@ -47,7 +47,7 @@
         </a>
         <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
           <div class="visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
-          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>   
+          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
@@ -71,8 +71,8 @@
       <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
-        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
+        <a class="btn btn-primary" href="#" aria-label="{% trans 'Add' %}">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add" %}
         </a>
         {% endif %}
         {% if is_allowed_add_resource or is_allowed_import %}
@@ -81,6 +81,7 @@
           <span class="sr-only">{%trans "Toggle add" %}</span>
         </button>
         <ul class="dropdown-menu">
+          {% if is_allowed_add_location %}<li><a href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">{% trans "Add location" %}</a></li>{% endif %}
           {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
           {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
           {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
@@ -106,7 +107,7 @@
           <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
-      </div>      
+      </div>
 
     </div>
   </div>
@@ -182,7 +183,7 @@ window.addEventListener('load', function() {
       } else {
         $('#sidebar-search-box').addClass('disabled');
       }
-    } 
+    }
   });
   $('#sidebar-search-box form').bind('submit', function(e) {
     var query = $('#sidebar-search-box input')[0].value;
