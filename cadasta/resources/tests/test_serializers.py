@@ -112,7 +112,8 @@ class ResourceSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_sanitize_string(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('image.jpg', file)
+        file_name = self.storage.save('image.jpg', file.read())
+        file.close()
 
         project = ProjectFactory.create()
         user = UserFactory.create()

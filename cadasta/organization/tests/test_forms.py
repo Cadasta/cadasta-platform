@@ -1403,7 +1403,8 @@ class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_sanitize_string(self):
         valid_file = self.get_file(self.valid_file_type, 'rb')
         file = SimpleUploadedFile(
-            'test.csv', valid_file, 'text/csv')
+            'test.csv', valid_file.read(), 'text/csv')
+        valid_file.close()
         file_dict = {'file': file}
         data = self.data.copy()
         data['name'] = '<name>'
