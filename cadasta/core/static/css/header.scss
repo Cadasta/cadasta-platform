@@ -123,6 +123,10 @@ header {
   header .btn-hamburger > a {
     min-width: 50px;
   }
+  .cadasta-tagline {
+    display: none;
+    visibility: hidden;
+  }
 }
 
 /* =Top navigation status
@@ -266,4 +270,13 @@ header {
       }
     }
   }
+}
+
+.cadasta-tagline {
+  border-left: 3px solid #ffffff;
+  width: 280px !important;
+  line-height: 30px !important;
+  font-size: 12px;
+  color: white;
+  padding: 5px;
 }
