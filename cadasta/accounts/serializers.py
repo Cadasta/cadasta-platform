@@ -7,12 +7,14 @@ from rest_framework.serializers import EmailField, ValidationError
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 
+from core.serializers import SanitizeFieldSerializer
 from .models import User
 from .validators import check_username_case_insensitive
 from .exceptions import EmailNotVerifiedError
 
 
-class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
+class RegistrationSerializer(SanitizeFieldSerializer,
+                             djoser_serializers.UserRegistrationSerializer):
     email = EmailField(
         validators=[UniqueValidator(
             queryset=User.objects.all(),
@@ -62,7 +64,8 @@ class RegistrationSerializer(djoser_serializers.UserRegistrationSerializer):
         return password
 
 
-class UserSerializer(djoser_serializers.UserSerializer):
+class UserSerializer(SanitizeFieldSerializer,
+                     djoser_serializers.UserSerializer):
     email = EmailField(
         validators=[UniqueValidator(
             queryset=User.objects.all(),

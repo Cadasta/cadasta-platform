@@ -6,6 +6,7 @@ from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
 
+from core.messages import SANITIZE_ERROR
 from core.tests.utils.cases import UserTestCase
 from .. import serializers
 from ..models import User
@@ -71,6 +72,21 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         serializer = serializers.RegistrationSerializer(data=data)
         assert not serializer.is_valid()
+
+    def test_sanitize(self):
+        """Serialiser should be invalid when no email address is provided."""
+
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
+            'full_name': '😀😃😄😁😆😅',
+        }
+
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert SANITIZE_ERROR in serializer.errors['full_name']
 
     def test_create_with_existing_email(self):
         """Serialiser should be invalid when another user with the same email
@@ -288,6 +304,20 @@ class UserSerializerTest(UserTestCase, TestCase):
         assert not serializer2.is_valid()
         assert serializer2.errors['username'] == [
             _("Username cannot be “add” or “new”.")]
+
+    def test_sanitize(self):
+        user = UserFactory.create(username='imagine71')
+        data = {
+            'full_name': '😀😃😄😁😆😅',
+        }
+        request = APIRequestFactory().patch('/user/imagine71', data)
+        force_authenticate(request, user=user)
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert SANITIZE_ERROR in serializer.errors['full_name']
 
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
