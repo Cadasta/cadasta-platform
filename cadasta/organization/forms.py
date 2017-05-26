@@ -541,7 +541,7 @@ class SelectImportForm(SanitizeFieldsForm, forms.Form):
     ENTITY_TYPE_CHOICES = (('SU', 'Locations'), ('PT', 'Parties'))
 
     class Media:
-        js = ('js/sanitize.js')
+        js = ('js/sanitize.js', )
 
     name = forms.CharField(required=True, max_length=200)
     type = forms.ChoiceField(
