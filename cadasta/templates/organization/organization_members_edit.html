@@ -6,6 +6,13 @@
 
 {% block page_title %}{% trans "Edit member" %} | {% endblock %}
 
+{% block extra_head %}
+<link href="https://select2.github.io/css/bootstrap.css" type="text/css" rel="stylesheet" />
+<link href="https://select2.github.io/dist/css/select2.min.css" type="text/css" rel="stylesheet" />
+<link href="https://select2.github.io/css/font-awesome.css" type="text/css" rel="stylesheet" />
+<link href="https://select2.github.io/css/s2-docs.css" type="text/css" rel="stylesheet" />
+{% endblock %}
+
 {% block left-nav %}members{% endblock %}
 
 {% block content %}
@@ -98,6 +105,11 @@
 {% endblock %}
 
 {% block extra_script %}
+<script type="text/javascript" src="https://select2.github.io/vendor/js/jquery.min.js"></script>
+<script type="text/javascript" src="https://select2.github.io/dist/js/select2.full.js"></script>
+<script type="text/javascript" src="https://select2.github.io/vendor/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="https://select2.github.io/vendor/js/prettify.min.js"></script>
+<script type="text/javascript" src="https://select2.github.io/vendor/js/anchor.min.js"></script>
 <script src="{% static 'js/dataTables.forms.js' %}"></script>
 <script>
   'use strict';
@@ -106,6 +118,43 @@
   });
 
   $(document).ready(function(){
+    $('select').each(function(){
+      $(this).css('width','250px');
+    })
+
+    $('select option').each(function(){
+      if($(this).val() === 'M'){
+        $(this).attr('title','Members can view all the public projects in the organization. Additional permissions are assigned on a project level.');
+      }
+      else if ($(this).val() === 'A') {
+        $(this).attr('title','Administrators have full access to all organizational details and projects.');
+      }
+      else if ($(this).val() === 'Pb') {
+        $(this).attr('title','Members can view all public project data.');
+      }
+      else if ($(this).val() === 'PU') {
+        $(this).attr('title','Members can view both public and private project data.');
+      }
+      else if ($(this).val() === 'DC') {
+        $(this).attr('title','Members can access all project data and upload any field data.');
+      }
+      else if ($(this).val() === 'PM') {
+        $(this).attr('title','Members can edit all project data.');
+      }
+    });
+
+    function formatOption (option) {
+      var $option = $(
+        '<div><strong>' + option.text + '</strong></div><div>' + option.title + '</div>'
+      );
+      return $option;
+    };
+
+    $("select").select2({
+      templateResult: formatOption,
+      minimumResultsForSearch: -1
+    });
+
     var org_admin = "{{org_admin}}"
     $('#id_org_role').change(function() {
       if ($(this).val() === 'M' && org_admin === "True") {

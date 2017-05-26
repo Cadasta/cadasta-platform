@@ -11,8 +11,7 @@
   <div class="modal show" data-backdrop="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="POST"
-              action="{% url 'organization:members_add' organization.slug %}" data-parsley-validate>
+        <form method="POST" action="{% url 'organization:members_add' organization.slug %}" data-parsley-validate>
           <div class="modal-header">
             <a class="close" href="{% url 'organization:members' organization.slug %}"><span aria-hidden="true">&times;</span></a>
             <h3 class="modal-title">{% trans "Add member" %}</h3>
