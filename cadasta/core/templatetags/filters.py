@@ -48,24 +48,20 @@ def set_parsley_sanitize(field):
 
 @register.filter(name='format_area_metric_units')
 def set_format_area_metric_units(area):
-    formated_area = ''
     area = float(area)
     if area < 1000:
-        formated_area = format(area, '.2f') + ' m<sup>2</sup>'
+        return format(area, '.2f') + ' m<sup>2</sup>'
     else:
         ha = area/10000
-        formated_area = format(ha, '.2f') + ' ha'
-    return formated_area
+        return format(ha, '.2f') + ' ha'
 
 
 @register.filter(name='format_area_imperial_units')
 def set_format_area_imperial_units(area):
-    formated_area = ''
     area = float(area)
     area_ft2 = area * 10.764
     if area_ft2 < 4356:
-        formated_area = format(area_ft2, '.2f') + ' ft<sup>2</sup>'
+        return format(area_ft2, '.2f') + ' ft<sup>2</sup>'
     else:
         ac = area * 0.00024711
-        formated_area = format(ac, '.2f') + ' ac'
-    return formated_area
+        return format(ac, '.2f') + ' ac'

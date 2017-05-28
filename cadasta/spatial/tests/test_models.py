@@ -181,6 +181,15 @@ class SpatialUnitTest(UserTestCase, TestCase):
         su = SpatialUnitFactory.create()
         assert su.ui_class_name == "Location"
 
+    def test_area(self):
+        su = SpatialUnitFactory.create(geometry='SRID=4326;POLYGON \
+            ((30 10, 20 20, 20 20, 10 20, 30 10))')
+        assert su.area == '642391915473.73'
+
+    def test_area_no_geometry(self):
+        su = SpatialUnitFactory.create()
+        assert su.area is None
+
     def test_get_absolute_url(self):
         su = SpatialUnitFactory.create()
         assert su.get_absolute_url() == (

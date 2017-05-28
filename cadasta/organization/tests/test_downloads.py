@@ -471,23 +471,18 @@ class ShapeTest(UserTestCase, TestCase):
                     head = ['id', 'type', 'geometry.area', 'geom_type']
                     assert row == head
                 if i == 1:
-                    area = str(su1.geometry.transform(3857, clone=True).area)
-                    assert row == [su1.id, su1.type, area, 'point']
+                    assert row == [su1.id, su1.type, su1.area, 'point']
                 if i == 2:
-                    area = str(su2.geometry.transform(3857, clone=True).area)
-                    assert row == [su2.id, su2.type, area, 'linestring']
+                    assert row == [su2.id, su2.type, su2.area, 'linestring']
                 if i == 3:
-                    area = str(su3.geometry.transform(3857, clone=True).area)
-                    assert row == [su3.id, su3.type, area, 'polygon']
+                    assert row == [su3.id, su3.type, su3.area, 'polygon']
                 if i == 4:
-                    area = str(su4.geometry.transform(3857, clone=True).area)
-                    assert row == [su4.id, su4.type, area, 'multipoint']
+                    assert row == [su4.id, su4.type, su4.area, 'multipoint']
                 if i == 5:
-                    area = str(su5.geometry.transform(3857, clone=True).area)
+                    area = su5.area
                     assert row == [su5.id, su5.type, area, 'multilinestring']
                 if i == 6:
-                    area = str(su6.geometry.transform(3857, clone=True).area)
-                    assert row == [su6.id, su6.type, area, 'multipolygon']
+                    assert row == [su6.id, su6.type, su6.area, 'multipolygon']
                 if i == 7:
                     assert row == [su7.id, su7.type, '', 'empty']
                 if i == 8:
