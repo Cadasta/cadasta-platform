@@ -434,9 +434,6 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                                                        num_locations=1,
                                                        num_parties=1,
                                                        num_resources=1)
-        assert "<span class=\"num\">1</span>" in response.content
-        assert "<span class=\"num\">1</span>" in response.content
-        assert "<span class=\"num\">1</span>" in response.content
 
     def test_get_with_labels(self):
         file = self.get_file(
