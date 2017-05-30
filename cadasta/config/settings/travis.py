@@ -39,3 +39,26 @@ CACHES = {
         'LOCATION': 'jsonattrs'
     }
 }
+
+# Debug logging (match the behavior of dev settings)
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'xform.submissions': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
+        }
+    },
+}
