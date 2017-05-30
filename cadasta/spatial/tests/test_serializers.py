@@ -1,14 +1,17 @@
 import pytest
 from django.test import TestCase
+from django.contrib.contenttypes.models import ContentType
 from rest_framework.serializers import ValidationError
+from jsonattrs.models import Attribute, AttributeType, Schema
 
+from core.tests.utils.cases import UserTestCase
 from spatial import serializers
 from spatial.tests.factories import SpatialUnitFactory
 from spatial.models import SpatialUnit
 from organization.tests.factories import ProjectFactory
 
 
-class SpatialUnitSerializerTest(TestCase):
+class SpatialUnitSerializerTest(UserTestCase, TestCase):
     def test_geojson_serialization(self):
         spatial_data = SpatialUnitFactory.create()
         serializer = serializers.SpatialUnitSerializer(spatial_data)
@@ -97,6 +100,48 @@ class SpatialUnitSerializerTest(TestCase):
 
         su.refresh_from_db()
         assert su.project == project
+
+    def test_invalid_attributes(self):
+        project = ProjectFactory.create(name='Test Project')
+
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+
+        Attribute.objects.create(
+            schema=schema,
+            name='notes',
+            long_name='Notes',
+            attr_type=AttributeType.objects.get(name='text'),
+            index=0
+        )
+        Attribute.objects.create(
+            schema=schema,
+            name='age',
+            long_name='Homeowner Age',
+            attr_type=AttributeType.objects.get(name='integer'),
+            index=1, required=True, default=0
+        )
+
+        data = {
+            'properties': {
+                'type': 'AP',
+                'project': project,
+                'attributes': {
+                    'notes': 'Blah',
+                    'age': 'Ten'
+                }
+            }
+        }
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project}
+        )
+        assert serializer.is_valid() is False
+        assert serializer.errors['attributes']
 
 
 class SpatialUnitGeoJsonSerializerTest(TestCase):

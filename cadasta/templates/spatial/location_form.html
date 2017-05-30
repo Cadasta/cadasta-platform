@@ -35,7 +35,7 @@
               {% if field|field_type == "datefield" %}
                 {{ field|add_class:"form-control datepicker"|set_parsley_required }}
               {% else %}
-                {{ field|add_class:"form-control"|set_parsley_required }}
+                {{ field|add_class:"form-control"|set_parsley_required|set_parsley_sanitize }}
               {% endif %}
               <div class="error-block">{{ field.errors }}</div>
             </div>

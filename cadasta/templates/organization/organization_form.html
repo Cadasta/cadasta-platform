@@ -9,7 +9,7 @@
   <div class="col-sm-12">
     <div class="form-group{% if form.name.errors %} has-error{% endif %}">
       <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Organization name" %}</label>
-      {% render_field form.name class+="form-control" data-parsley-required="true" %}
+      {% render_field form.name class+="form-control" data-parsley-required="true" data-parsley-sanitize="1" %}
       <div class="error-block">{{ form.name.errors }}</div>
     </div>
   </div>
@@ -20,7 +20,7 @@
 
 <div class="form-group{% if form.description.errors %} has-error{% endif %}">
   <label class="control-label" for="{{ form.description.id_for_label }}">{% trans "Organization description" %}</label>
-  {% render_field form.description class+="form-control" %}
+  {% render_field form.description class+="form-control" data-parsley-sanitize="1" %}
   <div class="error-block">{{ form.description.errors }}</div>
 </div>
 

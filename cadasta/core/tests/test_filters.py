@@ -74,3 +74,10 @@ class FilterTest(TestCase):
         bf = forms.BoundField(form, field, 'type')
         filters.set_parsley_required(bf)
         assert bf.field.widget.attrs == {'data-parsley-required': 'true'}
+
+    def test_set_parsley_sanitize(self):
+        form = MockForm(data={'name', 'Test'})
+        field = form.fields.get('name')
+        bf = forms.BoundField(form, field, 'name')
+        filters.set_parsley_sanitize(bf)
+        assert bf.field.widget.attrs == {'data-parsley-sanitize': '1'}

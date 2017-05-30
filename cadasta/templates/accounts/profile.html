@@ -7,6 +7,10 @@
 
 {% block title %} | {% trans "Profile" %}{% endblock %}
 
+{% block extra_script %}
+  {{ form.media }}
+{% endblock %}
+
 {% block content %}
 
 <form class="profile-form form-narrow" method="POST"
@@ -17,27 +21,27 @@
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
-    {% render_field form.username class+="form-control input-lg" data-parsley-required="true" %}
+    {% render_field form.username class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
     <div class="error-block">{{ form.username.errors }}</div>
   </div>
 
   <div class="form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
-    {% render_field form.email class+="form-control input-lg" data-parsley-required="true" %}
+    {% render_field form.email class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
     {% if emails_to_verify %}<p class="help-block small">{% trans "The email for this account has been changed recently, but the new email address has not yet been verified. You should have received an email with a link to verify the new email address." %}</p>{% endif %}
     <div class="error-block">{{ form.email.errors }}</div>
   </div>
 
   <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}</label>
-    {% render_field form.full_name class+="form-control input-lg" %}
+    {% render_field form.full_name class+="form-control input-lg" data-parsley-sanitize="1" %}
     <div class="error-block">{{ form.full_name.errors }}</div>
   </div>
 
   <div class="well form-group {% if form.password.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
     <p class="help-block small">{% trans "Please enter your password to verify your identity." %}</p>
-    {% render_field form.password class+="form-control input-lg" data-parsley-required="true" %}
+    {% render_field form.password class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
     <div class="error-block">{{ form.password.errors }}</div>
   </div>
 

@@ -5,8 +5,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy as __
 
 from leaflet.forms.widgets import LeafletWidget
-
-from core.form_mixins import AttributeForm, AttributeModelForm
+from core import form_mixins
 from core.util import ID_FIELD_LENGTH
 from party.models import Party, TenureRelationship, TenureRelationshipType
 
@@ -14,7 +13,8 @@ from .models import TYPE_CHOICES, SpatialUnit
 from .widgets import NewEntityWidget, SelectPartyWidget
 
 
-class LocationForm(AttributeModelForm):
+class LocationForm(form_mixins.SanitizeFieldsForm,
+                   form_mixins.AttributeModelForm):
     attributes_field = 'attributes'
 
     geometry = gisforms.GeometryField(
@@ -35,6 +35,9 @@ class LocationForm(AttributeModelForm):
         model = SpatialUnit
         fields = ['geometry', 'type']
 
+    class Media:
+        js = ('js/sanitize.js', )
+
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.project = project
@@ -52,7 +55,8 @@ class LocationForm(AttributeModelForm):
         return super().save(*args, **kwargs)
 
 
-class TenureRelationshipForm(AttributeForm):
+class TenureRelationshipForm(form_mixins.SanitizeFieldsForm,
+                             form_mixins.AttributeForm):
     # new_entity should be first because the other fields depend on it
     new_entity = forms.BooleanField(required=False, widget=NewEntityWidget())
     id = forms.CharField(required=False, max_length=ID_FIELD_LENGTH)
@@ -61,7 +65,9 @@ class TenureRelationshipForm(AttributeForm):
     tenure_type = forms.ChoiceField(required=True, choices=[])
 
     class Media:
-        js = ('/static/js/rel_tenure.js', '/static/js/party_attrs.js')
+        js = ('/static/js/rel_tenure.js',
+              '/static/js/party_attrs.js',
+              'js/sanitize.js', )
 
     def __init__(self, project, spatial_unit, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -119,7 +125,8 @@ class TenureRelationshipForm(AttributeForm):
     def clean(self):
         # remove validation errors for required fields
         # which are not related to the current party type
-        new_entity = self.cleaned_data.get('new_entity', False)
+        cleaned_data = super().clean()
+        new_entity = cleaned_data.get('new_entity', False)
         if not new_entity:
             for name, field in self.fields.items():
                 if name.startswith('party::'):
@@ -127,7 +134,7 @@ class TenureRelationshipForm(AttributeForm):
                             self.errors.get(name, None) is not None):
                         del self.errors[name]
 
-        party_type = self.cleaned_data.get('party_type', None)
+        party_type = cleaned_data.get('party_type', None)
         if party_type:
             ptype = party_type.lower()
             for name, field in self.fields.items():
@@ -136,6 +143,8 @@ class TenureRelationshipForm(AttributeForm):
                     if (field.required and self.errors.get(name, None)
                             is not None):
                         del self.errors[name]
+
+        return cleaned_data
 
     def save(self):
         if self.cleaned_data['new_entity']:

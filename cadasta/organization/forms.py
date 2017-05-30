@@ -4,8 +4,9 @@ import time
 
 from accounts.models import User
 from buckets.widgets import S3FileUploadWidget
-from core.form_mixins import SuperUserCheck
+from core.form_mixins import SuperUserCheck, SanitizeFieldsForm
 from core.util import slugify
+from core.messages import SANITIZE_ERROR
 from django import forms
 from django.conf import settings
 from django.contrib.gis import forms as gisforms
@@ -44,10 +45,15 @@ def create_update_or_delete_project_role(project, user, role):
                                    project_id=project).delete()
 
 
-class ContactsForm(forms.Form):
-    name = forms.CharField()
-    email = forms.EmailField(required=False)
-    tel = forms.CharField(required=False)
+class ContactsForm(SanitizeFieldsForm, forms.Form):
+    name = forms.CharField(
+        widget=forms.TextInput(attrs={'data-parsley-sanitize': '1'}))
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={'data-parsley-sanitize': '1'}),
+        required=False)
+    tel = forms.CharField(
+        widget=forms.TextInput(attrs={'data-parsley-sanitize': '1'}),
+        required=False)
     remove = forms.BooleanField(required=False, widget=forms.HiddenInput())
 
     def as_table(self):
@@ -83,8 +89,12 @@ class ContactsForm(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
         error_msgs = []
+
         if 'name' in self.errors:
-            error_msgs.append(_("Please provide a name."))
+            if not self.data.get(self.prefix + '-name'):
+                error_msgs.append(_("Please provide a name."))
+            else:
+                error_msgs.append(SANITIZE_ERROR)
         if 'email' in self.errors:
             error_msgs.append(_("The provided email address is invalid."))
         if (
@@ -112,7 +122,7 @@ class ContactsForm(forms.Form):
         return self.clean_string(self.cleaned_data['tel'])
 
 
-class OrganizationForm(forms.ModelForm):
+class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
     urls = pg_forms.SimpleArrayField(
         forms.URLField(required=False),
         required=False,
@@ -124,6 +134,9 @@ class OrganizationForm(forms.ModelForm):
     class Meta:
         model = Organization
         fields = ['name', 'description', 'urls', 'contacts', 'access']
+
+    class Media:
+        js = ('js/file-upload.js', 'js/sanitize.js')
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -261,10 +274,9 @@ class ProjectAddExtents(forms.ModelForm):
         fields = ['extent']
 
 
-class ProjectAddDetails(SuperUserCheck, forms.Form):
-
+class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
     class Media:
-        js = ('js/file-upload.js',)
+        js = ('js/file-upload.js', 'js/sanitize.js')
 
     organization = forms.ChoiceField()
     name = forms.CharField(max_length=100)
@@ -325,7 +337,7 @@ class ProjectAddDetails(SuperUserCheck, forms.Form):
         return name
 
 
-class ProjectEditDetails(forms.ModelForm):
+class ProjectEditDetails(SanitizeFieldsForm, forms.ModelForm):
     urls = pg_forms.SimpleArrayField(
         forms.URLField(required=False),
         required=False,
@@ -342,7 +354,7 @@ class ProjectEditDetails(forms.ModelForm):
     contacts = org_fields.ContactsField(form=ContactsForm, required=False)
 
     class Media:
-        js = ('js/file-upload.js',)
+        js = ('js/file-upload.js', 'js/sanitize.js')
 
     class Meta:
         model = Project
@@ -514,7 +526,7 @@ class DownloadForm(forms.Form):
         return path, mime
 
 
-class SelectImportForm(forms.Form):
+class SelectImportForm(SanitizeFieldsForm, forms.Form):
     MIME_TYPES = {
         'xls': [
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -527,6 +539,9 @@ class SelectImportForm(forms.Form):
     TYPE_CHOICES = (('xls', 'XLS'), ('shp', 'SHP'),
                     ('csv', 'CSV'))
     ENTITY_TYPE_CHOICES = (('SU', 'Locations'), ('PT', 'Parties'))
+
+    class Media:
+        js = ('js/sanitize.js', )
 
     name = forms.CharField(required=True, max_length=200)
     type = forms.ChoiceField(

@@ -82,6 +82,35 @@ class LocationFormTest(UserTestCase, TestCase):
         assert form.errors['type'][0] == "This field is required."
         assert SpatialUnit.objects.filter(project=project).count() == 0
 
+    def test_sanitize_string(self):
+        data = {
+            'geometry': '{"type": "Polygon","coordinates": [[[-0.1418137550354'
+                        '004,51.55240622205599],[-0.14117002487182617,51.55167'
+                        '905819532],[-0.1411914825439453,51.55181915488898],[-'
+                        '0.1411271095275879,51.55254631651022],[-0.14181375503'
+                        '54004,51.55240622205599]]]}',
+            'type': 'CB',
+            'spatialunit::default::fname': '<test>'
+        }
+
+        project = ProjectFactory.create()
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='fname', long_name='Test field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        form = forms.LocationForm(project=project, data=data)
+        form.is_valid() is False
+        assert form.errors.get('spatialunit::default::fname') is not None
+
 
 class TenureRelationshipFormTest(UserTestCase, TestCase):
     def test_init(self):
@@ -422,3 +451,36 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
 
         assert form.is_valid()
         form.save()
+
+    def test_sanitize_string(self):
+        project = ProjectFactory.create()
+        questionnaire = QuestionnaireFactory.create(project=project)
+        spatial_unit = SpatialUnitFactory.create(project=project)
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(
+                project.organization.id, project.id, questionnaire.id, ))
+        attr_type = AttributeType.objects.get(name='text')
+        Attribute.objects.create(
+            schema=schema,
+            name='r_name', long_name='Relationship field',
+            attr_type=attr_type, index=0,
+            required=False, omit=False
+        )
+
+        form = forms.TenureRelationshipForm(
+            project=project,
+            spatial_unit=spatial_unit,
+            data={'new_entity': 'on',
+                  'id': '',
+                  'name': '<The Beatles>',
+                  'party_type': 'GR',
+                  'tenure_type': 'CU',
+                  'tenurerelationship::default::r_name': '<RName>'})
+
+        assert form.is_valid() is False
+        assert form.errors['name'] is not None
+        assert form.errors['tenurerelationship::default::r_name'] is not None

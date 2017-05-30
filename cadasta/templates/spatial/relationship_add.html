@@ -85,7 +85,7 @@ $(document).ready(function() {
 
               <div class="form-group{% if form.name.errors %} has-error{% endif %}">
                 <label class="control-label" for="{{ form.name.id_for_label }}" {{ form.name.field.labels_xlang|safe }}>{% trans "Party name" %}</label>
-                {% render_field form.name class+="form-control" data-parsley-required="true" %}
+                {% render_field form.name class+="form-control" data-parsley-required="true" data-parsley-sanitize="1" %}
                 <div class="error-block">{{ form.name.errors }}</div>
               </div>
 
@@ -114,7 +114,7 @@ $(document).ready(function() {
                 {% if field|field_type == "datefield" %}
                   {{ field|add_class:"form-control datepicker"|set_parsley_required }}
                 {% else %}
-                  {{ field|add_class:"form-control"|set_parsley_required }}
+                  {{ field|add_class:"form-control"|set_parsley_required|set_parsley_sanitize }}
                 {% endif %}
                 <div class="error-block">{{ field.errors }}</div>
               </div>

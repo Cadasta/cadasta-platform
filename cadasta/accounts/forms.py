@@ -5,6 +5,7 @@ from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
+from core.form_mixins import SanitizeFieldsForm
 from .utils import send_email_update_notification
 from .models import User
 from .validators import check_username_case_insensitive
@@ -12,7 +13,7 @@ from parsley.decorators import parsleyfy
 
 
 @parsleyfy
-class RegisterForm(forms.ModelForm):
+class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
     email = forms.EmailField(required=True)
     password = forms.CharField(widget=forms.PasswordInput())
     MIN_LENGTH = 10
@@ -21,6 +22,9 @@ class RegisterForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'password',
                   'full_name']
+
+    class Media:
+        js = ('js/sanitize.js', )
 
     def clean_username(self):
         username = self.data.get('username')
@@ -63,12 +67,15 @@ class RegisterForm(forms.ModelForm):
         return user
 
 
-class ProfileForm(forms.ModelForm):
+class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
         model = User
         fields = ['username', 'email', 'full_name']
+
+    class Media:
+        js = ('js/sanitize.js', )
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False

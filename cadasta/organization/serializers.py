@@ -8,14 +8,16 @@ from rest_framework_gis import serializers as geo_serializers
 from django_countries.serializer_fields import CountryField
 
 from core.form_mixins import SuperUserCheck
-from core.serializers import DetailSerializer, FieldSelectorSerializer
+from core import serializers as core_serializers
 from accounts.models import User
 from accounts.serializers import UserSerializer
 from .models import Organization, Project, OrganizationRole, ProjectRole
 from .forms import create_update_or_delete_project_role
 
 
-class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
+class OrganizationSerializer(core_serializers.SanitizeFieldSerializer,
+                             core_serializers.DetailSerializer,
+                             core_serializers.FieldSelectorSerializer,
                              serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
 
@@ -55,7 +57,9 @@ class OrganizationSerializer(DetailSerializer, FieldSelectorSerializer,
         return org
 
 
-class ProjectSerializer(DetailSerializer, serializers.ModelSerializer):
+class ProjectSerializer(core_serializers.SanitizeFieldSerializer,
+                        core_serializers.DetailSerializer,
+                        serializers.ModelSerializer):
     users = UserSerializer(many=True, read_only=True)
     organization = OrganizationSerializer(hide_detail=True, read_only=True)
     country = CountryField(required=False)

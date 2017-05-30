@@ -1,12 +1,15 @@
-from django.forms import Form, ModelForm, MultipleChoiceField
+from django.forms import Form, ModelForm, MultipleChoiceField, CharField
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from jsonattrs.mixins import template_xlang_labels
 from jsonattrs.forms import form_field_from_name
-from django.contrib.contenttypes.models import ContentType
 from tutelary.models import Role
 
+from core.validators import sanitize_string
 from questionnaires.models import Questionnaire, Question, QuestionOption
 from .mixins import SchemaSelectorMixin
 from .widgets import XLangSelect, XLangSelectMultiple
+from .messages import SANITIZE_ERROR
 
 
 class SuperUserCheck:
@@ -174,3 +177,18 @@ class AttributeModelForm(AttributeFormMixin, ModelForm):
         if project_id is not None and hasattr(instance, 'project_id'):
             setattr(instance, 'project_id', project_id)
         return super().save()
+
+
+class SanitizeFieldsForm:
+    def clean(self):
+        cleaned_data = super().clean()
+        for name in self.fields:
+            field = self.fields[name]
+            if type(field) is not CharField:
+                continue
+
+            value = cleaned_data.get(name)
+            if not sanitize_string(value):
+                self.add_error(name, ValidationError(SANITIZE_ERROR))
+
+        return cleaned_data

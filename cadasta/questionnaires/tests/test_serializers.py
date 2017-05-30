@@ -264,8 +264,8 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
                     "constraint": None,
                     "default": None,
                     "hint": None,
-                    "relevant": None,
-                    "index": 1
+                    "index": 1,
+                    "relevant": "${start}>='IN'"
                 },
                 {
                     "id": "rw7mt32858cu2w5urbf9z3a4",

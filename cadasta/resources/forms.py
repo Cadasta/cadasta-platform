@@ -1,11 +1,12 @@
 from django import forms
+from core.form_mixins import SanitizeFieldsForm
 from .models import Resource, ContentObject
 from .fields import ResourceField
 
 
-class ResourceForm(forms.ModelForm):
+class ResourceForm(SanitizeFieldsForm, forms.ModelForm):
     class Media:
-        js = ('js/file-upload.js',)
+        js = ('js/file-upload.js',  'js/sanitize.js', )
 
     class Meta:
         model = Resource

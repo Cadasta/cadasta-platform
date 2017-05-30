@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.utils.translation import ugettext as _
+from core.messages import SANITIZE_ERROR
+from core.validators import sanitize_string
 from .models import Question
 
 
@@ -65,6 +67,8 @@ def validate_schema(schema, json):
             if reqs.get('enum') and item not in reqs.get('enum'):
                 item_errors.append(
                     _("{} is not an accepted value.").format(item))
+            if not sanitize_string(item):
+                item_errors.append(SANITIZE_ERROR)
 
         if item_errors:
             errors[key] = item_errors

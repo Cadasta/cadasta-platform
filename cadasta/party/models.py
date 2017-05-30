@@ -215,7 +215,8 @@ class PartyRelationship(RandomIDModel):
 
 @fix_model_for_attributes
 @permissioned_model
-class TenureRelationship(ResourceModelMixin, RandomIDModel):
+class TenureRelationship(ResourceModelMixin,
+                         RandomIDModel):
     """TenureRelationship model.
 
     Governs relationships between Party and SpatialUnit.

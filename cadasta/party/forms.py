@@ -1,10 +1,10 @@
 from django.utils.translation import ugettext as _
 
-from core.form_mixins import AttributeModelForm
+from core.form_mixins import AttributeModelForm, SanitizeFieldsForm
 from .models import Party, TenureRelationshipType, TenureRelationship
 
 
-class PartyForm(AttributeModelForm):
+class PartyForm(SanitizeFieldsForm, AttributeModelForm):
     attributes_field = 'attributes'
 
     class Meta:
@@ -12,7 +12,7 @@ class PartyForm(AttributeModelForm):
         fields = ['name', 'type']
 
     class Media:
-        js = ('/static/js/party_attrs.js',)
+        js = ('/static/js/party_attrs.js',  'js/sanitize.js')
 
     def __init__(self, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -26,7 +26,8 @@ class PartyForm(AttributeModelForm):
     def clean(self):
         # remove validation errors for required fields
         # which are not related to the current type
-        party_type = self.cleaned_data.get('type', None)
+        cleaned_data = super().clean()
+        party_type = cleaned_data.get('type', None)
         if party_type:
             ptype = party_type.lower()
             for name, field in self.fields.items():
@@ -35,6 +36,7 @@ class PartyForm(AttributeModelForm):
                     if (field.required and self.errors.get(name, None)
                             is not None):
                         del self.errors[name]
+        return cleaned_data
 
     def save(self, *args, **kwargs):
         entity_type = self.cleaned_data['type']
@@ -43,12 +45,15 @@ class PartyForm(AttributeModelForm):
         return super().save(*args, **kwargs)
 
 
-class TenureRelationshipEditForm(AttributeModelForm):
+class TenureRelationshipEditForm(SanitizeFieldsForm, AttributeModelForm):
     attributes_field = 'attributes'
 
     class Meta:
         model = TenureRelationship
         fields = ['tenure_type']
+
+    class Media:
+        js = ('js/sanitize.js', )
 
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)

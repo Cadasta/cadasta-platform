@@ -11,6 +11,7 @@
 
 {% block extra_script %}
 {{ block.super }}
+{{ form.media }}
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
 {% if get_current_language != "en-us" %}

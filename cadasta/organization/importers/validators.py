@@ -4,6 +4,8 @@ from django.contrib.gis.geos import GEOSGeometry, GEOSException
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
+from core.validators import sanitize_string
+from core.messages import SANITIZE_ERROR
 from party.models import TenureRelationshipType
 from spatial.choices import TYPE_CHOICES
 from xforms.utils import InvalidODKGeometryError, odk_geom_to_wkt
@@ -65,7 +67,12 @@ def validate_row(headers, row, config):
                 _("Invalid tenure_type: '%s'.") % tenure_type
             )
 
-    return (party_name, party_type, geometry, location_type, tenure_type)
+    values = (party_name, party_type, geometry, location_type, tenure_type)
+
+    if not all(sanitize_string(val) for val in values):
+        raise ValidationError(SANITIZE_ERROR)
+
+    return values
 
 
 def get_fields_from_config(config):

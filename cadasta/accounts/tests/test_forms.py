@@ -1,6 +1,7 @@
 import random
 
 from core.tests.utils.cases import UserTestCase
+from core.messages import SANITIZE_ERROR
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.http import HttpRequest
@@ -207,6 +208,19 @@ class RegisterFormTest(UserTestCase, TestCase):
                 in form.errors.get('username'))
         assert User.objects.count() == 0
 
+    def test_sanitize(self):
+        data = {
+            'username': '😛😛😛😛',
+            'email': 'john@beatles.uk',
+            'password': 'Iloveyoko68!',
+            'full_name': 'John Lennon'
+        }
+        form = forms.RegisterForm(data)
+
+        assert form.is_valid() is False
+        assert SANITIZE_ERROR in form.errors.get('username')
+        assert User.objects.count() == 0
+
 
 class ProfileFormTest(UserTestCase, TestCase):
     def test_update_user(self):
@@ -380,6 +394,20 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
+
+    def test_sanitize(self):
+        user = UserFactory.create(email='john@beatles.uk',
+                                  password='imagine71')
+        data = {
+            'username': '😛😛😛😛',
+            'email': 'john@beatles.uk',
+            'password': 'Iloveyoko68!',
+            'full_name': 'John Lennon'
+        }
+        form = forms.ProfileForm(data, instance=user)
+
+        assert form.is_valid() is False
+        assert SANITIZE_ERROR in form.errors.get('username')
 
 
 class ChangePasswordFormTest(UserTestCase, TestCase):

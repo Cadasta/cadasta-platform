@@ -70,6 +70,7 @@ class SchemaSelectorMixin():
 
     def get_attributes(self, project):
         content_type_to_selectors = self._get_content_types_to_selectors()
+
         attributes_for_models = {}
         for content_type, selector_fields in content_type_to_selectors.items():
             label = '{}.{}'.format(content_type.app_label, content_type.model)
