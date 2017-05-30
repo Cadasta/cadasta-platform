@@ -1678,7 +1678,9 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
 
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv_custom, 'rb')
-        file = SimpleUploadedFile('test_custom.csv', csvfile, 'text/csv')
+        file = SimpleUploadedFile('test_custom.csv', csvfile.read(),
+                                  'text/csv')
+        csvfile.close()
         post_data = self.SELECT_FILE_POST_DATA.copy()
         post_data['select_file-file'] = file
         post_data['select_file-is_resource'] = True
