@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd cadasta/core
+npm install bootstrap-sass
+cd ..
+./manage.py migrate
+./manage.py loadstatic
+./manage.py runserver 0.0.0.0:8000 &
+cd ..
+sleep 5  # Wait for the server to start up
+./runtests.py --functional
+ret=$?
+killall python  # Kill the server
+exit $ret

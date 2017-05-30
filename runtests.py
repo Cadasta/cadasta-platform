@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 from __future__ import print_function
 
-import pytest
-import sys
 import os
+import pytest
 import subprocess
+import sys
 
 
 BASE_PYTEST_ARGS = ['cadasta', '--cov=cadasta', '--cov-report=term-missing']
@@ -13,9 +13,9 @@ PYTEST_ARGS = {
     'fast': BASE_PYTEST_ARGS + ['-q']
 }
 
-BASE_PYTEST_ARGS_FUNCTIONAL = []
+BASE_PYTEST_ARGS_FUNCTIONAL = ['--pyargs', 'cadasta.test']
 PYTEST_ARGS_FUNCTIONAL = {
-    'default': BASE_PYTEST_ARGS_FUNCTIONAL,
+    'default': BASE_PYTEST_ARGS_FUNCTIONAL + ['-v'],
     'fast': BASE_PYTEST_ARGS_FUNCTIONAL + ['-q'],
 }
 
@@ -62,8 +62,17 @@ def flake8_main(args):
 
 def functional_main(args):
     print('Running functional tests')
-    ret = subprocess.run(['./run.py'] + args,
-                         cwd='./functional_tests').returncode
+    django_settings_module = None
+    if 'DJANGO_SETTINGS_MODULE' in os.environ:
+        django_settings_module = os.environ['DJANGO_SETTINGS_MODULE']
+        del os.environ['DJANGO_SETTINGS_MODULE']
+    devnull = subprocess.DEVNULL
+    xvfb = subprocess.Popen(["Xvfb", ":1"], stdout=devnull, stderr=devnull)
+    os.environ['DISPLAY'] = ':1'
+    ret = pytest.main(args)
+    xvfb.terminate()
+    if django_settings_module:
+        os.environ['DJANGO_SETTINGS_MODULE'] = django_settings_module
     print('Functional tests failed' if ret else 'Functional tests passed')
     return ret
 
@@ -114,26 +123,28 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         pytest_args = sys.argv[1:]
-        first_arg = pytest_args[0]
-        if first_arg.startswith('-'):
-            # `runtests.py [flags]`
-            pytest_args = ['tests'] + pytest_args
-        elif is_class(first_arg) and is_function(first_arg):
-            # `runtests.py TestCase.test_function [flags]`
-            expression = split_class_and_function(first_arg)
-            pytest_args = ['tests', '-k', expression] + pytest_args[1:]
-        elif is_class(first_arg) or is_function(first_arg):
-            # `runtests.py TestCase [flags]`
-            # `runtests.py test_function [flags]`
-            pytest_args = ['tests', '-k', pytest_args[0]] + pytest_args[1:]
-        pytest_args_functional = pytest_args
+        if run_tests:
+            first_arg = pytest_args[0]
+            if first_arg.startswith('-'):
+                # `runtests.py [flags]`
+                pytest_args = ['tests'] + pytest_args
+            elif is_class(first_arg) and is_function(first_arg):
+                # `runtests.py TestCase.test_function [flags]`
+                expression = split_class_and_function(first_arg)
+                pytest_args = ['tests', '-k', expression] + pytest_args[1:]
+            elif is_class(first_arg) or is_function(first_arg):
+                # `runtests.py TestCase [flags]`
+                # `runtests.py test_function [flags]`
+                pytest_args = ['tests', '-k', pytest_args[0]] + pytest_args[1:]
     else:
-        pytest_args = PYTEST_ARGS[style]
-
-        if os.environ['DJANGO_SETTINGS_MODULE'] == 'config.settings.travis':
-            pytest_args = pytest_args + ['--disable-pytest-warnings', '--ds=config.settings.travis']
-
-        pytest_args_functional = PYTEST_ARGS_FUNCTIONAL[style]
+        if run_tests:
+            pytest_args = PYTEST_ARGS[style]
+            django_settings_module = os.environ.get('DJANGO_SETTINGS_MODULE')
+            if django_settings_module == 'config.settings.travis':
+                pytest_args = pytest_args + ['--disable-pytest-warnings',
+                                             '--ds=config.settings.travis']
+        elif run_functional:
+            pytest_args = PYTEST_ARGS_FUNCTIONAL[style]
 
     if run_tests:
         stdoutsav = sys.stdout
@@ -148,4 +159,4 @@ if __name__ == "__main__":
     if run_flake8:
         exit_on_failure(flake8_main(FLAKE8_ARGS))
     if run_functional:
-        exit_on_failure(functional_main(pytest_args_functional))
+        exit_on_failure(functional_main(pytest_args))
