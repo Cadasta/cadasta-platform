@@ -162,6 +162,9 @@ class OrganizationProjectList(PermissionsFilterMixin,
                                          slug=self.kwargs['organization'])
         return self.org
 
+    def get_perms_objects(self):
+        return list(self.get_queryset()) + [self.get_organization()]
+
     def get_serializer_context(self, *args, **kwargs):
         org = self.get_organization()
         context = super(OrganizationProjectList,

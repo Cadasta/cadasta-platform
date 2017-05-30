@@ -306,6 +306,14 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         assert all([proj.get('organization').get('id') == self.organization.id
                     for proj in response.content['results']])
 
+    def test_empty_list(self):
+        """
+        It should return an empty array.
+        """
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content['results'] == []
+
     def test_full_list_with_unauthorized_user(self):
         """
         It should return all projects.
