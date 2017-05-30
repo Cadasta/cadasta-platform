@@ -17,7 +17,7 @@
       <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">{{ object.organization.name }}</a>
       {{ object.name }}
       {% if object.access == "private" %}
-        <span class="glyphicon glyphicon-eye-close inline small" data-toggle="tooltip" data-trigger="hover" data-placement="right" title="{% trans 'Private project' %}"></span>
+        <span class="label label-info">{% trans "Private" %}</span>
       {% endif %}
       {% if object.archived %}
         <span class="label label-danger">{% trans "Archived" %}</span>

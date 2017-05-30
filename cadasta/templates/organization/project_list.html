@@ -53,7 +53,7 @@
         <h4>
             <a href="{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}">{{ proj.name }}</a>
             {% if proj.access == "private" %}
-              <span class="glyphicon glyphicon-eye-close inline small" data-toggle="tooltip" data-trigger="hover" data-placement="right" title="{% trans 'Private project' %}"></span>
+              <span class="label label-info">{% trans "Private" %}</span>
             {% endif %}
             {% if proj.archived %}
               <span class="label label-danger">{% trans "Archived" %}</span>
