@@ -1,0 +1,135 @@
+{% load i18n %}
+{% load leaflet_tags %}
+
+      <!-- Project Overview for non-project members  -->
+      <div class="main-text">
+        <div class="col-md-8">
+
+        <h2>{% trans "Project Overview" %}</h2>
+          {% if not user.is_authenticated %}
+            <section>
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  <div class="row">
+                    <!-- Sign in link -->
+                    <div class="col-sm-6 dashboard-box border-right-dotted">
+                      <h3 class="panel-title panel-title-bordered">{% trans "New Users" %}</h3>
+                      <p>{% trans "Use the Cadasta platform to collect, manage and store data on land and resource rights in our secure cloud Platform. You can also request to join one of the many ongoing projects. Registration is free and easy." %}</p> 
+                      <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="fa fa-pencil"></i> {% trans "Register now" %}</a>
+                    </div>
+                    <!-- Register link -->
+                    <div class="col-sm-6 dashboard-box">
+                      <h3 class="panel-title panel-title-bordered">{% trans "Have an account?" %}</h3>
+                      <p>{% trans "Because we care about protecting your sensitive data, you must sign in to verify you have the proper permission to view project information. Access to project data is restricted to current project members only." %}</p> 
+                      <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="fa fa-lock"></i> {% trans "Sign in" %}</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+            
+          {% elif user.is_authenticated and has_content %}
+            <!-- Project stats -->
+            <section>
+              <div class="row">
+                <div class="col-sm-4">
+                  <div class="tile-box bg-primary">
+                    <div class="tile-header">{% trans "Locations" %}</div>
+                    <div class="tile-content-wrapper">
+                      <i class="fa fa-map-marker"></i>
+                      <div class="tile-content">
+                        <span class="num">{{ num_locations }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="tile-box bg-primary">
+                    <div class="tile-header">
+                      <h3 class="panel-title">{% trans "Parties" %}</h4>
+                    </div>
+                    <div class="tile-content-wrapper">
+                      <i class="fa fa-user"></i>
+                      <div class="tile-content">
+                        <span class="num">{{ num_parties }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div class="tile-box bg-primary">
+                    <div class="tile-header">{% trans "Resources" %}</div>
+                    <div class="tile-content-wrapper">
+                      <i class="glyphicon glyphicon-file"></i>
+                      <div class="tile-content">
+                        <span class="num">{{ num_resources }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          {% endif %}
+
+          <!-- Project map -->
+          <section>
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">{% trans "Project Map" %}</h3>
+              </div>
+              <div class="panel-body overview">
+                <!-- Display locations without interactions -->
+                {% leaflet_map "project-map" callback="project_map_init" %}
+
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="col-md-4">
+
+          <!-- Project about -->
+          <section>
+            <div class="panel panel-default panel-about">
+              <div class="panel-heading">
+                <h3 class="panel-title">{% trans "About this project" %}</h3>
+                {% if is_administrator %}
+                  <a href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">
+                    <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Edit project details' %}"></i>
+                  </a>
+                {% endif %}
+              </div>
+              <div class="panel-body">
+                <p>{{ object.description }}</p>
+                {% if object.urls.0 %}
+                  <p><a href="{{ object.urls.0 }}" target="_blank" class="break"><i class="glyphicon glyphicon-globe"></i> {{ object.urls.0 }}</a></p>
+                {% endif %}
+                {% if object.contacts %}
+                  <h4 class="panel-subtitle">{% trans "Contacts" %}</h4>
+                  <dl class="contacts">
+                  {% for contact in object.contacts %}
+                    <dt>{{ contact.name }}</dt>
+                    <dd class="clearfix">
+                      {% if contact.email %}
+                      <a href="mailto:{{ contact.email }}" class="break">
+                        <i class="glyphicon glyphicon-envelope"></span>
+                       {{ contact.email }}
+                      </a>
+                      {% endif %}
+                      {% if contact.tel %}
+                      <a href="tel:{{ contact.tel }}">
+                        <i class="glyphicon glyphicon-earphone"></i>
+                        {{ contact.tel }}
+                      </a>
+                      {% endif %}
+                    </dd>
+                  {% endfor %}
+                  </dl>
+                {% endif %}
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
