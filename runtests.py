@@ -131,7 +131,7 @@ if __name__ == "__main__":
         pytest_args = PYTEST_ARGS[style]
 
         if os.environ['DJANGO_SETTINGS_MODULE'] == 'config.settings.travis':
-            pytest_args = pytest_args + ['--ds=config.settings.travis']
+            pytest_args = pytest_args + ['--disable-pytest-warnings', '--ds=config.settings.travis']
 
         pytest_args_functional = PYTEST_ARGS_FUNCTIONAL[style]
 
