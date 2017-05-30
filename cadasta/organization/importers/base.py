@@ -6,7 +6,7 @@ from core.validators import sanitize_string
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from party.models import Party, TenureRelationship, TenureRelationshipType
+from party.models import Party, TenureRelationship
 from spatial.models import SpatialUnit
 
 from . import exceptions, validators
@@ -159,6 +159,7 @@ class Importer(SchemaSelectorMixin):
     def _import(self, config, csvfile):
         attributes = config.get('attributes', None)
         entity_types = config.get('entity_types', None)
+
         type = config.get('type', None)
         (attr_map,
             extra_attrs, extra_headers) = self.get_attribute_map(
@@ -207,7 +208,7 @@ class Importer(SchemaSelectorMixin):
             raise exceptions.DataImportError(
                 e.messages[0], line_num=reader.line_num)
 
-    def _create_models(self, type, headers, row, content_types, tenure_type):
+    def _create_models(self, type, headers, row, content_types, tenure):
 
         party_ct = content_types['party.party']
         spatial_ct = content_types['spatial.spatialunit']
@@ -258,10 +259,9 @@ class Importer(SchemaSelectorMixin):
                     self._parties_created[party_id] = party.pk
 
         if party_ct and spatial_ct:
-            tt = TenureRelationshipType.objects.get(id=tenure_type)
             content_types['party.tenurerelationship']['party'] = party
             content_types['party.tenurerelationship']['spatial_unit'] = su
-            content_types['party.tenurerelationship']['tenure_type'] = tt
+            content_types['party.tenurerelationship']['tenure_type'] = tenure
             TenureRelationship.objects.create(
                 **content_types['party.tenurerelationship']
             )

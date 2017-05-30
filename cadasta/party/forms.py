@@ -1,7 +1,7 @@
-from django.utils.translation import ugettext as _
-
+from django.forms import ChoiceField
 from core.form_mixins import AttributeModelForm, SanitizeFieldsForm
-from .models import Party, TenureRelationshipType, TenureRelationship
+from .models import Party, TenureRelationship
+from .choices import TENURE_RELATIONSHIP_TYPES
 
 
 class PartyForm(SanitizeFieldsForm, AttributeModelForm):
@@ -46,6 +46,7 @@ class PartyForm(SanitizeFieldsForm, AttributeModelForm):
 
 
 class TenureRelationshipEditForm(SanitizeFieldsForm, AttributeModelForm):
+    tenure_type = ChoiceField(choices=TENURE_RELATIONSHIP_TYPES)
     attributes_field = 'attributes'
 
     class Meta:
@@ -61,17 +62,9 @@ class TenureRelationshipEditForm(SanitizeFieldsForm, AttributeModelForm):
 
         if self.project.current_questionnaire:
             self.set_standard_field('tenure_type')
-        else:
-            tenuretypes = sorted([
-                (choice[0], _(choice[1])) for choice in
-                TenureRelationshipType.objects.values_list('id', 'label')
-            ])
-            self.fields['tenure_type'].choices = tenuretypes
 
         self.add_attribute_fields()
 
     def save(self, *args, **kwargs):
-        entity_type = self.cleaned_data['tenure_type']
-        kwargs['entity_type'] = entity_type.id
         kwargs['project_id'] = self.project.pk
         return super().save(*args, **kwargs)

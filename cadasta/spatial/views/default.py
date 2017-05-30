@@ -111,7 +111,7 @@ class LocationDetail(LoginPermissionRequiredMixin,
 
                 for rel in context['relationships']:
                     rel.type_labels = template_xlang_labels(
-                        tenure_opts.get(rel.tenure_type_id))
+                        tenure_opts.get(rel.tenure_type))
             except Question.DoesNotExist:
                 pass
 

@@ -34,7 +34,7 @@
           <tbody>
             <tr>
               <td class="col-md-4"><label {{ type_labels|safe }}>{% trans "Type" %}</label></td>
-              <td class="col-md-8" {{ type_choice_labels|safe }}>{{ location.get_type_display }}</td>
+              <td class="col-md-8" {{ type_choice_labels|safe }}>{{ location.location_type_label }}</td>
             </tr>
             {% for attr in attributes %}
             <tr>

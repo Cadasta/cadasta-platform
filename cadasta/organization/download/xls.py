@@ -60,8 +60,7 @@ class XLSExporter(Exporter):
         content_type = ContentType.objects.get(app_label='party',
                                                model='tenurerelationship')
         self.write_items(worksheet, relationships, content_type,
-                         ['party_id', 'spatial_unit_id', 'tenure_type.id',
-                          'tenure_type.label'])
+                         ['party_id', 'spatial_unit_id', 'tenure_type'])
 
     def make_download(self, f_name):
         path = os.path.join(settings.MEDIA_ROOT, 'temp/{}.xlsx'.format(f_name))

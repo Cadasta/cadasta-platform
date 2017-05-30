@@ -130,7 +130,7 @@ class PartiesDetail(LoginPermissionRequiredMixin,
             for rel in context['relationships']:
                 if tenure_opts:
                     rel.type_labels = template_xlang_labels(
-                        tenure_opts.get(rel.tenure_type_id))
+                        tenure_opts.get(rel.tenure_type))
                 if location_opts:
                     rel.location_labels = template_xlang_labels(
                         location_opts.get(rel.spatial_unit.type))
@@ -244,7 +244,7 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
                 try:
                     option = QuestionOption.objects.get(
                         question=tenure_type,
-                        name=context['relationship'].tenure_type_id)
+                        name=context['relationship'].tenure_type)
                     context['type_choice_labels'] = template_xlang_labels(
                         option.label_xlat)
                 except QuestionOption.DoesNotExist:

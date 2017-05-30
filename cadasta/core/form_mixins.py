@@ -1,6 +1,7 @@
 from django.forms import Form, ModelForm, MultipleChoiceField, CharField
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.utils.translation import get_language
 from jsonattrs.mixins import template_xlang_labels
 from jsonattrs.forms import form_field_from_name
 from tutelary.models import Role
@@ -10,6 +11,38 @@ from questionnaires.models import Questionnaire, Question, QuestionOption
 from .mixins import SchemaSelectorMixin
 from .widgets import XLangSelect, XLangSelectMultiple
 from .messages import SANITIZE_ERROR
+
+
+def get_types(question_name, default, questionnaire_id=None,
+              include_labels=False):
+    types = []
+    if questionnaire_id:
+        try:
+            question = Question.objects.get(
+                name=question_name,
+                questionnaire=questionnaire_id)
+        except Question.DoesNotExist:
+            pass
+        else:
+            options = QuestionOption.objects.filter(
+                question=question).values_list('name', 'label_xlat')
+
+            lang = get_language()
+            default_lang = question.questionnaire.default_language
+
+            for key, label in options:
+                if isinstance(label, dict):
+                    label = label.get(lang, label.get(default_lang))
+
+                types.append((key, label))
+
+    if not types:
+        types = default
+
+    if include_labels:
+        return types
+    else:
+        return [key for key, _ in types]
 
 
 class SuperUserCheck:
@@ -51,6 +84,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
 
                 choices = ([('', empty_choice)] + list(choices)
                            if empty_choice else list(choices))
+                self.fields[field_name].choices = choices
                 self.fields[field_name].widget = XLangSelect(
                     attrs=self.fields[field_name].widget.attrs,
                     choices=choices,

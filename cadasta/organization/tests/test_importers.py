@@ -9,9 +9,12 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from party.models import Party, TenureRelationship
+from party.choices import TENURE_RELATIONSHIP_TYPES
 from questionnaires.models import Questionnaire
+from questionnaires.tests import factories as q_factories
 from resources.tests.utils import clear_temp  # noqa
 from spatial.models import SpatialUnit
+from spatial.choices import TYPE_CHOICES
 
 from ..importers import csv, exceptions, validators, xls
 from ..importers.base import Importer
@@ -242,7 +245,8 @@ class ImportValidatorTest(TestCase):
             'party_type_field': 'party_type',
             'geometry_field': 'location_geometry',
             'type': 'csv',
-            'location_type_field': 'location_type'
+            'location_type_field': 'location_type',
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         geometry = 'SRID=4326;POINT (30 10)'
         headers = [
@@ -262,6 +266,9 @@ class ImportValidatorTest(TestCase):
             'geometry_field': 'location_geometry',
             'type': 'csv',
             'location_type_field': 'location_type',
+            'project': ProjectFactory.create(),
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         geometry = 'SRID=4326;POINT (30 10)'
         headers = [
@@ -426,7 +433,9 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'location_type',
             'geometry_field': 'location_geometry',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 10
@@ -503,7 +512,8 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'location_type',
             'geometry_field': 'location_geometry',
             'attributes': self.location_attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 0
@@ -541,7 +551,9 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'location_type',
             'geometry_field': 'location_geoshape',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 10
@@ -562,7 +574,9 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'location_type',
             'geometry_field': 'location_geotrace',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 10
@@ -583,7 +597,9 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'location_type',
             'geometry_field': 'location_geometry',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
 
@@ -680,7 +696,9 @@ class XLSImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'type',
             'geometry_field': 'geometry.ewkt',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 10
@@ -734,7 +752,8 @@ class XLSImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'type',
             'geometry_field': 'geometry.ewkt',
             'attributes': self.location_attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 0
@@ -798,7 +817,9 @@ class XLSImportTest(UserTestCase, FileStorageTestCase, TestCase):
             'location_type_field': 'type',
             'geometry_field': 'geometry.ewkt',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 10
@@ -863,6 +884,19 @@ class ImportConditionalAttributesTest(UserTestCase, FileStorageTestCase,
         self.conditionals_xls = (
             '/organization/tests/files/test_conditionals.xlsx')
         self.project = ProjectFactory.create(current_questionnaire='123abc')
+
+        q_factories.QuestionnaireFactory.create(id='123abc',
+                                                project=self.project)
+        question = q_factories.QuestionFactory.create(
+            questionnaire_id='123abc',
+            type='S1',
+            name='tenure_type',
+            label={'en': 'Type', 'de': 'Typ'})
+        q_factories.QuestionOptionFactory.create(question=question, name='CU')
+        q_factories.QuestionOptionFactory.create(question=question, name='WR')
+        q_factories.QuestionOptionFactory.create(question=question, name='LH')
+        q_factories.QuestionOptionFactory.create(question=question, name='FH')
+
         self.spatial_content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit'
         )
@@ -968,7 +1002,9 @@ class ImportConditionalAttributesTest(UserTestCase, FileStorageTestCase,
             'location_type_field': 'location_type',
             'geometry_field': 'location_geometry',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 2
@@ -1020,7 +1056,9 @@ class ImportConditionalAttributesTest(UserTestCase, FileStorageTestCase,
             'location_type_field': 'type',
             'geometry_field': 'geometry.ewkt',
             'attributes': self.attributes,
-            'project': self.project
+            'project': self.project,
+            'allowed_tenure_types': [t[0] for t in TENURE_RELATIONSHIP_TYPES],
+            'allowed_location_types': [choice[0] for choice in TYPE_CHOICES]
         }
         importer.import_data(config)
         assert Party.objects.all().count() == 2

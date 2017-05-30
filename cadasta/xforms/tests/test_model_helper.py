@@ -19,9 +19,7 @@ from spatial.tests.factories import SpatialUnitFactory
 from questionnaires.tests.factories import (QuestionnaireFactory,
                                             QuestionFactory,)
 
-from party.models import (Party, TenureRelationship,
-                          load_tenure_relationship_types,
-                          TenureRelationshipType)
+from party.models import Party, TenureRelationship
 from organization.models import OrganizationRole
 from resources.models import Resource
 from spatial.models import SpatialUnit
@@ -39,7 +37,6 @@ class XFormModelHelperTest(TestCase):
         create_attribute_types()
 
         loadattrtypes.Command().handle(force=True)
-        load_tenure_relationship_types(force=True)
 
         self.user = UserFactory.create()
         self.project = ProjectFactory.create(
@@ -312,7 +309,7 @@ class XFormModelHelperTest(TestCase):
             project=self.project,
             spatial_unit=su,
             party=party1,
-            tenure_type=TenureRelationshipType.objects.get(id='CO'),
+            tenure_type='CO',
             attributes={
                 'fname': False,
                 'fname_two': 'Tenure One'
@@ -322,7 +319,7 @@ class XFormModelHelperTest(TestCase):
             project=self.project,
             spatial_unit=su,
             party=party2,
-            tenure_type=TenureRelationshipType.objects.get(id='CO'),
+            tenure_type='CO',
             attributes={
                 'fname': False,
                 'fname_two': 'Tenure One'
@@ -634,12 +631,12 @@ class XFormModelHelperTest(TestCase):
         assert tenure_relationships == [tenure2, tenure3]
 
         assert tenure2.spatial_unit == location
-        assert tenure2.tenure_type.id == 'WR'
+        assert tenure2.tenure_type == 'WR'
         assert tenure2.attributes == {
             'fname': False, 'fname_two': 'Tenure Two'}
 
         assert tenure3.spatial_unit == location
-        assert tenure3.tenure_type.id == 'CO'
+        assert tenure3.tenure_type == 'CO'
         assert tenure3.attributes == {
             'fname': True, 'fname_two': 'Tenure Three'}
 
@@ -682,12 +679,12 @@ class XFormModelHelperTest(TestCase):
         assert tenure_relationships == [tenure4, tenure5]
 
         assert tenure4.party == party
-        assert tenure4.tenure_type.id == 'WR'
+        assert tenure4.tenure_type == 'WR'
         assert tenure4.attributes == {
             'fname': False, 'fname_two': 'Tenure Four'}
 
         assert tenure5.party == party
-        assert tenure5.tenure_type.id == 'CO'
+        assert tenure5.tenure_type == 'CO'
         assert tenure5.attributes == {
             'fname': True, 'fname_two': 'Tenure Five'}
 
@@ -721,12 +718,12 @@ class XFormModelHelperTest(TestCase):
 
         assert tenure_relationships == [tenure6, tenure7]
         assert tenure6.spatial_unit == location
-        assert tenure6.tenure_type.id == 'CO'
+        assert tenure6.tenure_type == 'CO'
         assert tenure6.attributes == {
             'fname': True, 'fname_two': 'Tenure 6, 7'}
 
         assert tenure7.spatial_unit == location
-        assert tenure7.tenure_type.id == 'CO'
+        assert tenure7.tenure_type == 'CO'
         assert tenure7.attributes == {
             'fname': True, 'fname_two': 'Tenure 6, 7'}
 
@@ -761,12 +758,12 @@ class XFormModelHelperTest(TestCase):
         assert tenure_relationships == [tenure8, tenure9]
 
         assert tenure8.party == party
-        assert tenure8.tenure_type.id == 'WR'
+        assert tenure8.tenure_type == 'WR'
         assert tenure8.attributes == {
             'fname': False, 'fname_two': 'Tenure 8, 9'}
 
         assert tenure9.party == party
-        assert tenure9.tenure_type.id == 'WR'
+        assert tenure9.tenure_type == 'WR'
         assert tenure9.attributes == {
             'fname': False, 'fname_two': 'Tenure 8, 9'}
 

@@ -7,6 +7,7 @@ from jsonattrs.models import (Attribute, AttributeType, Schema,
 from organization.tests.factories import ProjectFactory
 from party.models import Party
 from party.tests.factories import PartyFactory
+from party.choices import TENURE_RELATIONSHIP_TYPES as default_types
 from questionnaires.tests import factories as q_factories
 
 from .. import form_mixins
@@ -431,3 +432,115 @@ class SanitizeFieldsFormTest(TestCase):
         assert form.is_valid() is False
         assert SANITIZE_ERROR in form.errors['name']
         assert form.errors.get('number') is not None
+
+
+class GetTypesTest(TestCase):
+    def test_get_types_no_questionnaire(self):
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      include_labels=True)
+        assert types == default_types
+
+    def test_get_types_no_question(self):
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      questionnaire_id='abc',
+                                      include_labels=True)
+        assert types == default_types
+
+    def test_get_types_questionnaire_default_label(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='AA',
+            label='AA Label')
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='BB',
+            label='BB Label')
+
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      questionnaire_id=questionnaire.id,
+                                      include_labels=True)
+        assert list(types) == [('AA', 'AA Label'), ('BB', 'BB Label')]
+
+    def test_get_types_questionnaire_multilang_label(self):
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='kar')
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            label={'kar': 'Karen Type', 'cs': 'Czech Type'},
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='AA',
+            label={'kar': 'AA Karen', 'cs': 'AA Czech'})
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='BB',
+            label={'kar': 'BB Karen', 'cs': 'BB Czech'})
+
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      questionnaire_id=questionnaire.id,
+                                      include_labels=True)
+        assert list(types) == [('AA', 'AA Karen'), ('BB', 'BB Karen')]
+
+    def test_get_types_no_questionnaire_no_labels(self):
+        types = form_mixins.get_types('tenure_type',
+                                      default_types)
+        assert types == [t[0] for t in default_types]
+
+    def test_get_types_no_question_no_labels(self):
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      questionnaire_id='abc')
+        assert types == [t[0] for t in default_types]
+
+    def test_get_types_questionnaire_default_label_no_labels(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='AA',
+            label='AA Label')
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='BB',
+            label='BB Label')
+
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      questionnaire_id=questionnaire.id)
+        assert list(types) == ['AA', 'BB']
+
+    def test_get_types_questionnaire_multilang_label_no_labels(self):
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='kar')
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='tenure_type',
+            label={'kar': 'Karen Type', 'cs': 'Czech Type'},
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='AA',
+            label={'kar': 'AA Karen', 'cs': 'AA Czech'})
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='BB',
+            label={'kar': 'BB Karen', 'cs': 'BB Czech'})
+
+        types = form_mixins.get_types('tenure_type',
+                                      default_types,
+                                      questionnaire_id=questionnaire.id)
+        assert list(types) == ['AA', 'BB']

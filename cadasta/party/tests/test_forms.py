@@ -7,7 +7,8 @@ from party.tests.factories import PartyFactory
 from questionnaires.tests import factories as q_factories
 
 from .. import forms
-from ..models import Party, TenureRelationshipType
+from ..models import Party
+from ..choices import TENURE_RELATIONSHIP_TYPES
 
 
 class PartyFormTest(UserTestCase, TestCase):
@@ -246,11 +247,9 @@ class TenureRelationshipEditFormTest(UserTestCase, TestCase):
     def test_init(self):
         project = ProjectFactory.create()
         form = forms.TenureRelationshipEditForm(project=project)
-        tenuretypes = sorted(
-            TenureRelationshipType.objects.values_list('id', 'label')
-        )
-        assert len(tenuretypes) > 0
-        assert list(form.fields['tenure_type'].choices) == list(tenuretypes)
+
+        assert (list(form.fields['tenure_type'].choices) ==
+                list(TENURE_RELATIONSHIP_TYPES))
         assert hasattr(form.fields['tenure_type'], 'labels_xlang') is False
 
     def test_init_with_form(self):

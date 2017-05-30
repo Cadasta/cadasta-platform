@@ -8,6 +8,7 @@ from core.tests.utils.cases import UserTestCase
 from spatial import serializers
 from spatial.tests.factories import SpatialUnitFactory
 from spatial.models import SpatialUnit
+from questionnaires.tests import factories as q_factories
 from organization.tests.factories import ProjectFactory
 
 
@@ -24,7 +25,8 @@ class SpatialUnitSerializerTest(UserTestCase, TestCase):
         spatial_data = {
             'properties': {
                 'name': 'Spatial',
-                'project': project
+                'project': project,
+                'type': 'PA'
             }
         }
         serializer = serializers.SpatialUnitSerializer(
@@ -36,6 +38,70 @@ class SpatialUnitSerializerTest(UserTestCase, TestCase):
 
         spatial_instance = serializer.instance
         assert spatial_instance.project == project
+
+    def test_valid_location_type(self):
+        project = ProjectFactory.create()
+        data = {'type': 'PA'}
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is True
+
+    def test_valid_custom_location_type(self):
+        project = ProjectFactory.create()
+
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=project)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='location_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='BOO',
+            label='BOO Label')
+
+        data = {'type': 'BOO'}
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is True
+
+    def test_invalid_location_type(self):
+        project = ProjectFactory.create()
+        data = {'type': 'BOO'}
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is False
+        assert ("'BOO' is not a valid choice for field 'type'." in
+                serializer.errors['type'])
+
+    def test_invalid_custom_location_type(self):
+        project = ProjectFactory.create()
+
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=project)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='location_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FU',
+            label='FU Label')
+
+        data = {'type': 'PA'}
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project})
+        assert serializer.is_valid() is False
+        assert ("'PA' is not a valid choice for field 'type'." in
+                serializer.errors['type'])
 
     def test_update_spatial_unit(self):
         project = ProjectFactory.create()

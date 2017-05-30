@@ -20,7 +20,7 @@ from tutelary.models import Policy, assign_user_policies
 from questionnaires.tests import factories as q_factories
 
 from .. import forms
-from ..models import Party, TenureRelationship, TenureRelationshipType
+from ..models import Party, TenureRelationship
 from ..views import default
 from .factories import PartyFactory, TenureRelationshipFactory
 
@@ -383,25 +383,25 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             label={'en': 'Building', 'de': 'Haus'})
 
         TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            tenure_type='LH',
             party=self.party,
             spatial_unit=SpatialUnitFactory(project=self.project, type='PA'),
             project=self.project)
 
         TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            tenure_type='WR',
             party=self.party,
             spatial_unit=SpatialUnitFactory(project=self.project, type='BU'),
             project=self.project)
 
         relationships = self.party.tenurerelationship_set.all()
         for rel in relationships:
-            if rel.tenure_type_id == 'LH':
+            if rel.tenure_type == 'LH':
                 rel.type_labels = ('data-label-de="Miete" '
                                    'data-label-en="Leasehold"')
                 rel.location_labels = ('data-label-de="Parzelle" '
                                        'data-label-en="Parcel"')
-            elif rel.tenure_type_id == 'WR':
+            elif rel.tenure_type == 'WR':
                 rel.type_labels = ('data-label-de="Wasserecht" '
                                    'data-label-en="Water rights"')
                 rel.location_labels = ('data-label-de="Haus" '
@@ -470,25 +470,25 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
             label={'en': 'Building', 'de': 'Haus'})
 
         TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='LH'),
+            tenure_type='LH',
             party=self.party,
             spatial_unit=SpatialUnitFactory(project=self.project, type='PA'),
             project=self.project)
 
         TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            tenure_type='WR',
             party=self.party,
             spatial_unit=SpatialUnitFactory(project=self.project, type='BU'),
             project=self.project)
 
         relationships = self.party.tenurerelationship_set.all()
         for rel in relationships:
-            if rel.tenure_type_id == 'LH':
+            if rel.tenure_type == 'LH':
                 rel.type_labels = ('data-label-de="Miete" '
                                    'data-label-en="Leasehold"')
                 rel.location_labels = ('data-label-de="Parzelle" '
                                        'data-label-en="Parcel"')
-            elif rel.tenure_type_id == 'WR':
+            elif rel.tenure_type == 'WR':
                 rel.type_labels = ('data-label-de="Wasserecht" '
                                    'data-label-en="Water rights"')
                 rel.location_labels = ('data-label-de="Haus" '
@@ -1160,7 +1160,7 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
             type='S1')
         q_factories.QuestionOptionFactory.create(
             question=tenure_type_question,
-            name=self.relationship.tenure_type_id,
+            name=self.relationship.tenure_type,
             label={'en': 'Some type', 'de': 'Ein Typ'})
 
         user = UserFactory.create()
@@ -1247,7 +1247,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         self.relationship = TenureRelationshipFactory.create(
             project=self.project,
             attributes={'fname': 'test'},
-            tenure_type=TenureRelationshipType.objects.get(id='WR')
+            tenure_type='WR'
         )
 
     def setup_template_context(self):
@@ -1322,7 +1322,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         # attributes field is deferred so we fetch a fresh instance
         relationship = TenureRelationship.objects.defer(None).get(
             id=self.relationship.id)
-        assert relationship.tenure_type_id == 'LH'
+        assert relationship.tenure_type == 'LH'
         assert relationship.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
@@ -1333,16 +1333,16 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
                 in response.messages)
 
         self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id != 'LH'
+        assert self.relationship.tenure_type != 'LH'
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
-        print(self.relationship.tenure_type_id)
+        print(self.relationship.tenure_type)
         self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id != 'LH'
+        assert self.relationship.tenure_type != 'LH'
 
     def test_post_with_archived_project(self):
         self.project.archived = True
@@ -1356,7 +1356,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
                 in response.messages)
 
         self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id != 'LH'
+        assert self.relationship.tenure_type != 'LH'
 
 
 class PartyRelationshipDeleteTest(ViewTestCase, UserTestCase, TestCase):

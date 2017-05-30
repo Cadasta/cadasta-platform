@@ -323,7 +323,7 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
                                 method='POST',
                                 post_data=invalid_data)
         assert response.status_code == 400
-        assert response.content['type'][0] == '"" is not a valid choice.'
+        assert response.content['type'][0] == 'This field may not be blank.'
 
     def test_create_spatial_unit_with_invalid_geometry(self):
         invalid_data = {
@@ -611,7 +611,7 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 400
         self.su.refresh_from_db()
         assert self.su.type == 'PA'
-        assert response.content['type'][0] == '"" is not a valid choice.'
+        assert response.content['type'][0] == 'This field may not be blank.'
 
     def test_update_with_invalid_geometry(self):
         invalid_data = {

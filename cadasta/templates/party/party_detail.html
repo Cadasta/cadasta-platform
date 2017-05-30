@@ -67,7 +67,7 @@
                   {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
                   <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
                     <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
-                    <td><a href="{% url 'locations:detail' object.organization.slug object.slug rel.spatial_unit.id %}" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.get_type_display }}</a></td>
+                    <td><a href="{% url 'locations:detail' object.organization.slug object.slug rel.spatial_unit.id %}" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.location_type_label }}</a></td>
                   </tr>
                   {% endfor %}
                 </tbody>

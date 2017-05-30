@@ -4,8 +4,7 @@ import factory
 
 from core.tests.factories import ExtendedFactory
 from organization.tests.factories import ProjectFactory
-from party.models import (Party, PartyRelationship, TenureRelationship,
-                          TenureRelationshipType)
+from party.models import Party, PartyRelationship, TenureRelationship
 from spatial.tests.factories import SpatialUnitFactory
 
 
@@ -45,4 +44,4 @@ class TenureRelationshipFactory(ExtendedFactory):
         PartyFactory, project=factory.SelfAttribute('..project'))
     spatial_unit = factory.SubFactory(
         SpatialUnitFactory, project=factory.SelfAttribute('..project'))
-    tenure_type = factory.Iterator(TenureRelationshipType.objects.all())
+    tenure_type = 'LH'

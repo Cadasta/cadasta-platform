@@ -21,7 +21,9 @@ from tutelary import mixins as tmixins
 from organization.views.mixins import ProjectMixin
 from spatial.models import SpatialUnit
 from spatial.choices import TYPE_CHOICES as SPATIAL_TYPE_CHOICES
-from party.models import Party, TenureRelationship, TenureRelationshipType
+from party.models import Party, TenureRelationship
+from party.choices import TENURE_RELATIONSHIP_TYPES
+from core.form_mixins import get_types
 from resources.models import Resource
 from ..parser import parse_query
 # from ..export.all import AllExporter
@@ -31,7 +33,6 @@ from ..parser import parse_query
 
 api_url = (
     settings.ES_SCHEME + '://' + settings.ES_HOST + ':' + settings.ES_PORT)
-spatial_type_choices = {c[0]: c[1] for c in SPATIAL_TYPE_CHOICES}
 party_type_choices = {c[0]: c[1] for c in Party.TYPE_CHOICES}
 
 
@@ -47,6 +48,21 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
         start_idx = int(request.data.get('start', 0))
         page_size = int(request.data.get('length', 10))
         dataTablesDraw = int(request.data['draw'])
+
+        project = self.get_project()
+        tenure_types = get_types(
+            'tenure_type',
+            TENURE_RELATIONSHIP_TYPES,
+            questionnaire_id=project.current_questionnaire,
+            include_labels=True)
+        self.tenure_types = dict(tenure_types)
+
+        spatial_types = get_types(
+            'location_type',
+            SPATIAL_TYPE_CHOICES,
+            questionnaire_id=project.current_questionnaire,
+            include_labels=True)
+        self.spatial_types = dict(spatial_types)
 
         results_as_html = []
         num_hits = 0
@@ -69,7 +85,7 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
             results = raw_results['hits']['hits']
 
             if len(results) == 0:
-                timestamp = self.query_es_timestamp(self.get_project().id)
+                timestamp = self.query_es_timestamp(project.id)
             else:
                 timestamp = results[0]['_source'].get('@timestamp')
 
@@ -188,14 +204,9 @@ class Search(tmixins.APIPermissionRequiredMixin, ProjectMixin, APIView):
     def get_main_label(self, model, source):
         """Returns the search result's main UI label."""
         if model == SpatialUnit:
-            return spatial_type_choices.get(source['type'], '—')
+            return self.spatial_types.get(source['type'], '—')
         elif model == TenureRelationship:
-            try:
-                rel_type = TenureRelationshipType.objects.get(
-                    id=source['tenure_type_id'])
-                return _(rel_type.label)
-            except TenureRelationshipType.DoesNotExist:
-                return '—'
+            return self.tenure_types.get(source['tenure_type'], '—')
         else:  # Party or Resource
             return source.get('name', '—')
 

@@ -9,7 +9,8 @@ from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import ProjectFactory
 from party.tests.factories import PartyFactory
 from questionnaires.tests.factories import QuestionnaireFactory
-from party.models import TenureRelationship, Party, TENURE_RELATIONSHIP_TYPES
+from party.models import TenureRelationship, Party
+from party.choices import TENURE_RELATIONSHIP_TYPES
 from .factories import SpatialUnitFactory
 from ..models import SpatialUnit
 from .. import forms
@@ -243,7 +244,7 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         rel = TenureRelationship.objects.first()
         assert rel.party == party
         assert rel.spatial_unit == spatial_unit
-        assert rel.tenure_type_id == 'CU'
+        assert rel.tenure_type == 'CU'
 
     def test_save_new_party(self):
         project = ProjectFactory.create()
@@ -268,7 +269,7 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         rel = TenureRelationship.objects.first()
         assert rel.party == party
         assert rel.spatial_unit == spatial_unit
-        assert rel.tenure_type_id == 'CU'
+        assert rel.tenure_type == 'CU'
 
     def test_save_new_party_with_attributes(self):
         project = ProjectFactory.create()
@@ -327,7 +328,7 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         rel = TenureRelationship.objects.first()
         assert rel.party == party
         assert rel.spatial_unit == spatial_unit
-        assert rel.tenure_type_id == 'CU'
+        assert rel.tenure_type == 'CU'
         assert rel.attributes.get('r_name') == 'Rel Name'
 
     def test_clean(self):
@@ -397,7 +398,7 @@ class TenureRelationshipFormTest(UserTestCase, TestCase):
         rel = TenureRelationship.objects.first()
         assert rel.party == party
         assert rel.spatial_unit == spatial_unit
-        assert rel.tenure_type_id == 'CU'
+        assert rel.tenure_type == 'CU'
         assert rel.attributes.get('r_name') == 'Rel Name'
 
     def test_clean_with_existing_party(self):

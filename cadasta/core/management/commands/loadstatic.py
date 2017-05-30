@@ -3,7 +3,6 @@ from django.core.management.base import BaseCommand
 from core.management.commands import loadsite
 from accounts.management.commands import loadpolicies
 from geography.management.commands import loadcountries
-from party.management.commands import loadtenurereltypes
 from jsonattrs.management.commands import loadattrtypes
 
 
@@ -33,5 +32,3 @@ class Command(BaseCommand):
         loadpolicies.Command().handle(force=options['force'])
         print('LOADING ATTRIBUTE TYPES\n')
         loadattrtypes.Command().handle(force=options['force'])
-        print('LOADING TENURE RELATIONSHIP TYPES\n')
-        loadtenurereltypes.Command().handle(force=options['force'])
