@@ -14,13 +14,13 @@
                     <!-- Sign in link -->
                     <div class="col-sm-6 dashboard-box border-right-dotted">
                       <h3 class="panel-title panel-title-bordered">{% trans "New Users" %}</h3>
-                      <p>{% trans "Use the Cadasta platform to collect, manage and store data on land and resource rights in our secure cloud Platform. You can also request to join one of the many ongoing projects. Registration is free and easy." %}</p> 
+                      <p>{% trans "Register for free to securely collect, manage, and store your land and resource rights documentation, geometries, and other data." %}</p> 
                       <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="fa fa-pencil"></i> {% trans "Register now" %}</a>
                     </div>
                     <!-- Register link -->
                     <div class="col-sm-6 dashboard-box">
                       <h3 class="panel-title panel-title-bordered">{% trans "Have an account?" %}</h3>
-                      <p>{% trans "Because we care about protecting your sensitive data, you must sign in to verify you have the proper permission to view project information. Access to project data is restricted to current project members only." %}</p> 
+                      <p>{% trans "Sign in to manage your projects and access permissions-based data." %}</p> 
                       <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="fa fa-lock"></i> {% trans "Sign in" %}</a>
                     </div>
                   </div>
@@ -28,47 +28,59 @@
               </div>
             </section>
             
-          {% elif user.is_authenticated and has_content %}
-            <!-- Project stats -->
-            <section>
-              <div class="row">
-                <div class="col-sm-4">
-                  <div class="tile-box bg-primary">
-                    <div class="tile-header">{% trans "Locations" %}</div>
-                    <div class="tile-content-wrapper">
-                      <i class="fa fa-map-marker"></i>
-                      <div class="tile-content">
-                        <span class="num">{{ num_locations }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-4">
-                  <div class="tile-box bg-primary">
-                    <div class="tile-header">
-                      <h3 class="panel-title">{% trans "Parties" %}</h4>
-                    </div>
-                    <div class="tile-content-wrapper">
-                      <i class="fa fa-user"></i>
-                      <div class="tile-content">
-                        <span class="num">{{ num_parties }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-sm-4">
-                  <div class="tile-box bg-primary">
-                    <div class="tile-header">{% trans "Resources" %}</div>
-                    <div class="tile-content-wrapper">
-                      <i class="glyphicon glyphicon-file"></i>
-                      <div class="tile-content">
-                        <span class="num">{{ num_resources }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          {% elif user.is_authenticated %}
+            <!-- Project restriction message -->
+            <div class="alert alert-info alert-full alert-dismissible" role="alert">
+              <div class="text-center">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <i class="glyphicon glyphicon-info-sign"></i>
+                {% blocktrans %}
+                Access to project data is restricted to current project members only.
+                {% endblocktrans %}
               </div>
-            </section>
+            </div>
+
+            {% if has_content %}
+              <!-- Project stats -->
+              <section>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <div class="tile-box bg-primary">
+                      <div class="tile-header">{% trans "Locations" %}</div>
+                      <div class="tile-content-wrapper">
+                        <i class="fa fa-map-marker"></i>
+                        <div class="tile-content">
+                          <span class="num">{{ num_locations }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="tile-box bg-primary">
+                      <div class="tile-header">{% trans "Parties" %}</div>
+                      <div class="tile-content-wrapper">
+                        <i class="fa fa-user"></i>
+                        <div class="tile-content">
+                          <span class="num">{{ num_parties }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="tile-box bg-primary">
+                      <div class="tile-header">{% trans "Resources" %}</div>
+                      <div class="tile-content-wrapper">
+                        <i class="glyphicon glyphicon-file"></i>
+                        <div class="tile-content">
+                          <span class="num">{{ num_resources }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            {% endif %}
+
           {% endif %}
 
           <!-- Project map -->
@@ -80,7 +92,6 @@
               <div class="panel-body overview">
                 <!-- Display locations without interactions -->
                 {% leaflet_map "project-map" callback="project_map_init" %}
-
               </div>
             </div>
           </section>
@@ -94,11 +105,6 @@
             <div class="panel panel-default panel-about">
               <div class="panel-heading">
                 <h3 class="panel-title">{% trans "About this project" %}</h3>
-                {% if is_administrator %}
-                  <a href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">
-                    <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Edit project details' %}"></i>
-                  </a>
-                {% endif %}
               </div>
               <div class="panel-body">
                 <p>{{ object.description }}</p>
