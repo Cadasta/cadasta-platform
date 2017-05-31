@@ -113,31 +113,44 @@
               {% endif %}
             </div>
             <div class="panel-body">
-              <p>{{ organization.description }}</p>
-              {% if organization.urls.0 %}
-                <p><a href="{{ organization.urls.0 }}" target="_blank" class="break"><i class="glyphicon glyphicon-globe"></i> {{ organization.urls.0 }}</a></p>
-              {% endif %}
-              {% if organization.contacts %}
-                <h4 class="panel-subtitle">{% trans "Contacts" %}</h4>
-                <dl class="contacts">
-                {% for contact in organization.contacts %}
-                  <dt>{{ contact.name }}</dt>
-                  <dd class="clearfix">
-                    {% if contact.email %}
-                    <a href="mailto:{{ contact.email }}" class="break">
-                      <i class="glyphicon glyphicon-envelope"></i> 
-                     {{ contact.email }}
-                    </a>
-                    {% endif %}
-                    {% if contact.tel %}
-                    <a href="tel:{{ contact.tel }}">
-                      <span class="glyphicon glyphicon-earphone"></span>
-                      {{ contact.tel }}
-                    </a>
-                    {% endif %}
-                  </dd>
-                {% endfor %}
-                </dl>
+              {% if is_administrator and not organization.description and not organization.urls.0 and not organization.contacts %}
+                <div class="overlay-wrapper">
+                  <div class="overlay">
+                    {% blocktrans %}
+                      <p>This organization needs a description. Would you like to add one now?</p>
+                    {% endblocktrans %}
+                    <div class="text-center">
+                      <a class="btn btn-primary" href="{% url 'organization:edit' organization.slug %}">{% trans "Add organization description" %}</a>
+                    </div>
+                  </div>
+                </div>
+              {% else %}
+                <p>{{ organization.description }}</p>
+                {% if organization.urls.0 %}
+                  <p><a href="{{ organization.urls.0 }}" target="_blank" class="break"><i class="glyphicon glyphicon-globe"></i> {{ organization.urls.0 }}</a></p>
+                {% endif %}
+                {% if organization.contacts %}
+                  <h4 class="panel-subtitle">{% trans "Contacts" %}</h4>
+                  <dl class="contacts">
+                  {% for contact in organization.contacts %}
+                    <dt>{{ contact.name }}</dt>
+                    <dd class="clearfix">
+                      {% if contact.email %}
+                      <a href="mailto:{{ contact.email }}" class="break">
+                        <i class="glyphicon glyphicon-envelope"></i> 
+                       {{ contact.email }}
+                      </a>
+                      {% endif %}
+                      {% if contact.tel %}
+                      <a href="tel:{{ contact.tel }}">
+                        <span class="glyphicon glyphicon-earphone"></span>
+                        {{ contact.tel }}
+                      </a>
+                      {% endif %}
+                    </dd>
+                  {% endfor %}
+                  </dl>
+                {% endif %}
               {% endif %}
             </div>
           </div>
@@ -163,7 +176,7 @@
                   {% for user in organization.users.all %}
                     <li class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
                       <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">
-                        <i class="fa fa-user-circle fa-2x" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{ user.username }}"></i>
+                        <!--<i class="fa fa-user-circle fa-2x" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{ user.username }}"></i>-->
                         <strong>{{ user.username }}</strong>
                       </a>
                     </li>
