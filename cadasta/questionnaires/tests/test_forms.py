@@ -16,7 +16,7 @@ class PDFFormFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def setUp(self):
         super().setUp()
         file = self.get_file('/questionnaires/tests/files/image.jpg', 'rb')
-        file_name = self.storage.save('pdf-form-logos/image.jpg', file)
+        file_name = self.storage.save('pdf-form-logos/image.jpg', file.read())
 
         self.data = {
             'name': 'Some name',
@@ -30,7 +30,8 @@ class PDFFormFormTest(UserTestCase, FileStorageTestCase, TestCase):
         file = self.get_file(
             '/questionnaires/tests/files/{}.xlsx'.format(form_name),
             'rb')
-        form = self.storage.save('xls-forms/{}.xlsx'.format(form_name), file)
+        form = self.storage.save(
+            'xls-forms/{}.xlsx'.format(form_name), file.read())
         return form
 
     def _save(self, data, count=1):

@@ -187,7 +187,8 @@ class ResourceThumbnailMixinTest(UserTestCase, FileStorageTestCase, TestCase):
 
         def test_create_thumbnail(self):
             file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-            file_name = self.storage.save('resources/thumb_test.jpg', file)
+            file_name = self.storage.save(
+                'resources/thumb_test.jpg', file.read())
             contributor = UserFactory.create()
             resource = ResourceFactory.create(file=file_name,
                                               mime_type='image/jpeg',
@@ -202,7 +203,7 @@ class ResourceThumbnailMixinTest(UserTestCase, FileStorageTestCase, TestCase):
 
         def test_create_no_thumbnail_non_images(self):
             file = self.get_file('/resources/tests/files/text.txt', 'rb')
-            file_name = self.storage.save('resources/text.txt', file)
+            file_name = self.storage.save('resources/text.txt', file.read())
             contributor = UserFactory.create()
             resource = ResourceFactory.create(file=file_name,
                                               mime_type='text/plain',
