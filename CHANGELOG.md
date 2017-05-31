@@ -1,5 +1,35 @@
 # Change Log
 
+## [v1.9.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.9.0-alpha.1) (2017-05-30)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.2-alpha.1...v1.9.0-alpha.1)
+
+**Fixed bugs:**
+
+- Add an async view to serve spatial resources [\#1513](https://github.com/Cadasta/cadasta-platform/issues/1513)
+- Project extent is exported in shp file [\#1498](https://github.com/Cadasta/cadasta-platform/issues/1498)
+- PDF Generator :: Format PDF Form [\#1412](https://github.com/Cadasta/cadasta-platform/issues/1412)
+- Simplify js calls [\#1408](https://github.com/Cadasta/cadasta-platform/issues/1408)
+- Subsequent activation emails not sent for inactive user accounts [\#1370](https://github.com/Cadasta/cadasta-platform/issues/1370)
+- Critical: Emojis should not be valid Org or Project names [\#1224](https://github.com/Cadasta/cadasta-platform/issues/1224)
+- Input fields should be sanitized to exclude code [\#1157](https://github.com/Cadasta/cadasta-platform/issues/1157)
+
+**Closed issues:**
+
+- Custom additional types for location and relationships [\#611](https://github.com/Cadasta/cadasta-platform/issues/611)
+
+**Merged pull requests:**
+
+- Pytest warning filters [\#1523](https://github.com/Cadasta/cadasta-platform/pull/1523) ([amplifi](https://github.com/amplifi))
+- Update changelog for v.1.8.2 [\#1522](https://github.com/Cadasta/cadasta-platform/pull/1522) ([amplifi](https://github.com/amplifi))
+- Reduce the number of warnings logged for tests [\#1520](https://github.com/Cadasta/cadasta-platform/pull/1520) ([oliverroick](https://github.com/oliverroick))
+- Public user project roles are not created with new project [\#1515](https://github.com/Cadasta/cadasta-platform/pull/1515) ([oliverroick](https://github.com/oliverroick))
+- Sass compilation update [\#1512](https://github.com/Cadasta/cadasta-platform/pull/1512) ([amplifi](https://github.com/amplifi))
+- Update changelog for v1.8.2-alpha.1 [\#1509](https://github.com/Cadasta/cadasta-platform/pull/1509) ([amplifi](https://github.com/amplifi))
+- Ensure that a view can list projects in an organization even if no projects exist [\#1506](https://github.com/Cadasta/cadasta-platform/pull/1506) ([alukach](https://github.com/alukach))
+- Implements \#611 -- Customizable location and relationship types [\#1429](https://github.com/Cadasta/cadasta-platform/pull/1429) ([oliverroick](https://github.com/oliverroick))
+- Partial bugfix/1282: Only project members can see project language selector dropdown [\#1399](https://github.com/Cadasta/cadasta-platform/pull/1399) ([niharika1995](https://github.com/niharika1995))
+- String sanitation for forms and serializers [\#1395](https://github.com/Cadasta/cadasta-platform/pull/1395) ([oliverroick](https://github.com/oliverroick))
+
 ## [v1.8.2](https://github.com/Cadasta/cadasta-platform/tree/v1.8.2) (2017-05-17)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.2-alpha.1...v1.8.2)
 
