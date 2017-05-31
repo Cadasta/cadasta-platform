@@ -183,17 +183,16 @@
                     </div>
                   {% else %}
                     <div class="overlay-wrapper">
-                      <div class="text-center">
-                        {% if questionnaire %}
-                          <a class="btn btn-primary" href="{{ questionnaire.xls_form.url }}">{% trans "Download current XLS Form" %}</a>
-                        {% endif %}
-                      </div>
-                      <div class="alert alert-info alert-full">
-                        <i class="glyphicon glyphicon-info-sign"></i>
-                        {% blocktrans %}
-                        Data has already been contributed to this project. To ensure data integrity, uploading a new questionnaire is disabled for this project.
-                        {% endblocktrans %}
-                      </div>
+                      {% if questionnaire %}
+                        <div class="alert alert-info alert-full">
+                          <div class="pull-left"><i class="glyphicon glyphicon-info-sign"></i></div>
+                          <div>
+                            <p>{% blocktrans %}This project is using questionnaire{% endblocktrans %} <a href="{{ questionnaire.xls_form.url }}" class="alert-link">{{ questionnaire.original_file }}</a></p>
+                            <p>{% blocktrans %}Data has already been contributed to this project. To ensure data integrity, uploading a new questionnaire is disabled.{% endblocktrans %}</p>
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
                   {% endif %}
                 </div>
               </div>

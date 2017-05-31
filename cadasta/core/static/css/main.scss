@@ -970,7 +970,7 @@ div.add-btn-btm { // add party link at bottom of table
     display: table-cell;
     vertical-align: top;
     padding: 2px;
-    > span.glyphicon {
+    > span.glyphicon, > i.glyphicon {
       padding-right: 10px;
     }
     ul {
