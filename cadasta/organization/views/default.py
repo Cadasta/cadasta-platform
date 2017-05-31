@@ -420,8 +420,7 @@ class ProjectDashboard(PermissionRequiredMixin,
             user['username']: role_labels.get(user['projectrole__role'])
             for user in prj_members}
         m = {**org_roles, **prj_roles}
-        members = OrderedDict(
-            sorted(m.items(), key=lambda t: t[1]))
+        members = OrderedDict(sorted(m.items(), key=lambda t: t[1]))
 
         num_locations = self.object.spatial_units.count()
         num_parties = self.object.parties.count()
