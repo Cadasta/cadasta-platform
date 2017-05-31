@@ -72,7 +72,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'full_name']
+        fields = ['username', 'email', 'full_name', 'language']
 
     class Media:
         js = ('js/sanitize.js', )
