@@ -76,7 +76,7 @@ class PDFFormEdit(LoginPermissionRequiredMixin,
 class PDFFormDownload(LoginPermissionRequiredMixin, mixins.PDFFormObjectMixin,
                       organization_mixins.ProjectAdminCheckMixin,
                       generic.DetailView):
-    permission_required = 'pdfform.download'
+    permission_required = 'pdfform.generate'
     permission_denied_message = error_messages.QUESTIONNAIRE_PDF_FORM_GENERATE
     template_name = 'questionnaires/pdf_form_generator.html'
 

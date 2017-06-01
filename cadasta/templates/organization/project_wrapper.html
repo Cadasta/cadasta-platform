@@ -155,12 +155,15 @@
         <span class="title">{% trans "Resources" %}</span>
       </a>
     </li><!--
-    --><li class="forms">
+    -->
+    {% if is_administrator %}
+    <li class="forms">
       <a href="{% url 'questionnaires:pdf_form_list' object.organization.slug object.slug %}">
         <span class="icon forms"></span>
         <span class="title">{% trans "Forms" %}</span>
       </a>
     </li>
+    {% endif %}
   </ul>
 </div>
 <!-- /.sidebar -->
@@ -177,7 +180,7 @@
 <script>
 'use strict';
 window.addEventListener('load', function() {
-  $( '.search').find('.search').click( function(){ 
+  $( '.search').find('.search').click( function(){
 	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
