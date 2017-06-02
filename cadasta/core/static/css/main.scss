@@ -131,9 +131,7 @@ a {
 }
 
 a > .glyphicon,
-a > .fa, 
-.btn > .glyphicon,
-.btn > .fa {
+.btn > .glyphicon {
   margin-left: 4px;
   margin-right: 4px;
   opacity: 0.8;
@@ -143,9 +141,7 @@ a > .fa,
 }
 
 a:hover > .glyphicon,
-a:hover > .fa,
-.btn:hover > .glyphicon,
-.btn:hover > .fa {
+.btn:hover > .glyphicon {
   text-decoration: none;
   opacity: 1.0;
   -moz-opacity: 1.0;
@@ -461,6 +457,13 @@ table#select-list {
   margin-bottom: 0;
 }
 
+.table.noborder {
+  border: none;
+  > tbody > tr > td {
+    border: none;
+  }
+}
+
 @media (max-width: $screen-xs-max) {
   table {
     overflow-x: auto;
@@ -526,8 +529,7 @@ table#select-list {
     position: relative;
     overflow: hidden;
     padding: 10px;
-    > .glyphicon,
-    > .fa {
+    > .glyphicon {
       font-size: 56px;
       line-height: 70px;
       position: absolute;
@@ -580,15 +582,13 @@ table#select-list {
 
 a.tile-box.btn, 
 .tile-box-shortcut {
-  .tile-content-wrapper > .glyphicon,
-  .tile-content-wrapper > .fa {
+  .tile-content-wrapper > .glyphicon {
       -webkit-transition: all .2s ease-in-out;
       -moz-transition: all .2s ease-in-out;
       -ms-transition: all .2s ease-in-out;
       -o-transition: all .2s ease-in-out;
   }
-  &:hover .tile-content-wrapper > .glyphicon,
-  &:hover .tile-content-wrapper > .fa {
+  &:hover .tile-content-wrapper > .glyphicon {
     opacity: .70;
     -moz-opacity: .70;
   } 
@@ -654,8 +654,8 @@ a.tile-box.btn,
 /* =Dashboard box
 -------------------------------------------------------------- */
 
-.dashboard-box {
-  padding: 10px 30px 10px;
+td.dashboard-box:first-child {
+  border-right: 1px dotted $table-border-color !important;
 }
 
 /* =Img sizing

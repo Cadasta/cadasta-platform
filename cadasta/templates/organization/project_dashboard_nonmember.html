@@ -10,20 +10,32 @@
             <section>
               <div class="panel panel-default">
                 <div class="panel-body">
-                  <div class="row">
-                    <!-- Sign in link -->
-                    <div class="col-sm-6 dashboard-box border-right-dotted">
-                      <h3 class="panel-title panel-title-bordered">{% trans "New Users" %}</h3>
-                      <p>{% trans "Register for free to securely collect, manage, and store your land and resource rights documentation, geometries, and other data." %}</p> 
-                      <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="fa fa-pencil"></i> {% trans "Register now" %}</a>
-                    </div>
-                    <!-- Register link -->
-                    <div class="col-sm-6 dashboard-box">
-                      <h3 class="panel-title panel-title-bordered">{% trans "Have an account?" %}</h3>
-                      <p>{% trans "Sign in to manage your projects and access permissions-based data." %}</p> 
-                      <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="fa fa-lock"></i> {% trans "Sign in" %}</a>
-                    </div>
-                  </div>
+                  <table class="table noborder">
+                    <tr>
+                      <td class="col-sm-6 dashboard-box">
+                        <h3 class="panel-title panel-title-bordered">{% trans "New Users" %}</h3>
+                      </td>
+                      <td class="col-sm-6 dashboard-box">
+                        <h3 class="panel-title panel-title-bordered">{% trans "Have an account?" %}</h3>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="dashboard-box">
+                        <p>{% trans "Register for free to securely collect, manage, and store your land and resource rights documentation, geometries, and other data." %}</p>
+                      </td>
+                      <td class="dashboard-box">
+                        <p>{% trans "Sign in to manage your projects and access permissions-based data." %}</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="dashboard-box">
+                        <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="glyphicon glyphicon-pencil"></i> {% trans "Register now" %}</a>
+                      </td>
+                      <td class="dashboard-box">
+                        <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-primary btn-block btn-lg"><i class="glyphicon glyphicon-lock"></i> {% trans "Sign in" %}</a>
+                      </td>
+                    </tr>
+                  </table>
                 </div>
               </div>
             </section>
@@ -48,7 +60,7 @@
                     <div class="tile-box bg-primary">
                       <div class="tile-header">{% trans "Locations" %}</div>
                       <div class="tile-content-wrapper">
-                        <i class="fa fa-map-marker"></i>
+                        <i class="glyphicon glyphicon-map"></i>
                         <div class="tile-content">
                           <span class="num">{{ num_locations }}</span>
                         </div>
@@ -59,7 +71,7 @@
                     <div class="tile-box bg-primary">
                       <div class="tile-header">{% trans "Parties" %}</div>
                       <div class="tile-content-wrapper">
-                        <i class="fa fa-user"></i>
+                        <i class="glyphicon glyphicon-user"></i>
                         <div class="tile-content">
                           <span class="num">{{ num_parties }}</span>
                         </div>

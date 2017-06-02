@@ -17,7 +17,7 @@
                   {% endblocktrans %}
                   <div class="media">
                     <div class="media-left">
-                      <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
+                      <i class="glyphicon glyphicon-ok text-success" aria-hidden="true"></i>
                     </div>
                     <div class="media-body">
                       <h4 class="media-heading"><a href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Name your project" %}</a></h4>
@@ -26,7 +26,7 @@
                   </div>
                   <div class="media">
                     <div class="media-left">
-                      <i class="fa fa-2x {% if not project.extent and num_locations == 0 %}fa-times-circle text-danger{% else %}fa-check-circle text-success{% endif %}" aria-hidden="true"></i>
+                      <i class="glyphicon {% if not project.extent and num_locations == 0 %}glyphicon-remove text-danger{% else %}glyphicon-ok text-success{% endif %}" aria-hidden="true"></i>
                     </div>
                     <div class="media-body">
                       <h4 class="media-heading"><a href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Define your project map" %}</a></h4>
@@ -35,7 +35,7 @@
                   </div>
                   <div class="media">
                     <div class="media-left">
-                      <i class="fa fa-2x {% if not questionnaire and not has_content %}fa-times-circle text-danger{% else %}fa-check-circle text-success{% endif %}" aria-hidden="true"></i>
+                      <i class="glyphicon {% if not questionnaire and not has_content %}glyphicon-remove text-danger{% else %}glyphicon-ok text-success{% endif %}" aria-hidden="true"></i>
                     </div>
                     <div class="media-body">
                       <h4 class="media-heading"><a href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Upload your questionnaire" %}</a></h4>
@@ -44,7 +44,7 @@
                   </div>
                   <div class="media">
                     <div class="media-left">
-                      <i class="fa fa-2x {% if not members %}fa-times-circle text-danger{% else %}fa-check-circle text-success{% endif %}" aria-hidden="true"></i>
+                      <i class="glyphicon {% if not members %}glyphicon-remove text-danger{% else %}glyphicon-ok text-success{% endif %}" aria-hidden="true"></i>
                     </div>
                     <div class="media-body">
                       <h4 class="media-heading"><a href="{% url 'organization:members' object.organization.slug %}">{% trans "Select your team members" %}</a></h4>
@@ -68,7 +68,7 @@
                   <a href="{% url 'locations:list' object.organization.slug object.slug %}" title="{% trans 'Project locations' %}" class="tile-box btn btn-primary">
                     <div class="tile-header">{% trans "Locations" %}</div>
                     <div class="tile-content-wrapper">
-                      <i class="fa fa-map-marker"></i>
+                      <i class="glyphicon glyphicon-map-marker"></i>
                       <div class="tile-content">
                         <span class="num">{{ num_locations }}</span>
                       </div>
@@ -79,7 +79,7 @@
                   <a href="{% url 'parties:list' object.organization.slug object.slug %}" title="{% trans 'Project parties' %}" class="tile-box btn btn-primary">
                     <div class="tile-header">{% trans "Parties" %}</div>
                     <div class="tile-content-wrapper">
-                      <i class="fa fa-user"></i>
+                      <i class="glyphicon glyphicon-user"></i>
                       <div class="tile-content">
                         <span class="num">{{ num_parties }}</span>
                       </div>
@@ -90,7 +90,7 @@
                   <a href="{% url 'resources:project_list' object.organization.slug object.slug %}" title="{% trans 'Project resources' %}" class="tile-box btn btn-primary">
                     <div class="tile-header">{% trans "Resources" %}</div>
                     <div class="tile-content-wrapper">
-                      <i class="fa fa-file"></i>
+                      <i class="glyphicon glyphicon-file"></i>
                       <div class="tile-content">
                         <span class="num">{{ num_resources }}</span>
                       </div>
@@ -189,6 +189,13 @@
                           <div>
                             <p>{% blocktrans %}This project is using questionnaire{% endblocktrans %} <a href="{{ questionnaire.xls_form.url }}" class="alert-link">{{ questionnaire.original_file }}</a></p>
                             <p>{% blocktrans %}Data has already been contributed to this project. To ensure data integrity, uploading a new questionnaire is disabled.{% endblocktrans %}</p>
+                          </div>
+                        </div>
+                      {% else %}
+                        <div class="alert alert-info alert-full">
+                          <div class="text-center">
+                            <i class="glyphicon glyphicon-info-sign"></i>
+                            {% blocktrans %}No questionnaire is available for this project.{% endblocktrans %}
                           </div>
                         </div>
                       {% endif %}
@@ -311,7 +318,7 @@
                   <ul class="list-unstyled list-divider">
                     {% for member, role in members.items %}
                       <li>
-                        <!--<i class="fa fa-user-circle fa-2x" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{member}}"></i>-->
+                        <!--<i class="glyphicon glyphicon-user" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{member}}"></i>-->
                         <strong>{{ member }}</strong>, {{ role }}
                       </li>
                     {% endfor %}

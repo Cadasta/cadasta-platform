@@ -34,40 +34,40 @@
                 </a>
               {% endif %}
             </div>
-            {% if projects %}
-              <table class="table table-hover datatable" data-paging-type="simple">
-                  <thead>
-                    <tr>
-                      <th class="col-md-6">{% trans "Project" %}</th>
-                      <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
-                      <th class="col-md-2">{% trans "Last updated" %}</th>
-                      <th class="hidden"><!-- Hidden archived status column --></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for proj in projects %}
-                    <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}';">
-                      <td>
-                        <h4>
-                          <a href="{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}">{{ proj.name }}</a>
-                          {% if proj.access == "private" %}
-                            <span class="label label-info">{% trans "Private" %}</span>
-                          {% endif %}
-                          {% if proj.archived %}
-                            <span class="label label-danger">{% trans "Archived" %}</span>
-                          {% endif %}
-                        </h4>
-                        <p>{{ proj.description }}</p>
-                      </td>   
-                      <td class="hidden-xs">{{ proj.country }}</td>
-                      <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
-                      <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-              </table>
-            {% else %}
-              <div class="panel-body">
+            <div class="panel-body">
+              {% if projects %}
+                <table class="table table-hover datatable" data-paging-type="simple">
+                    <thead>
+                      <tr>
+                        <th class="col-md-6">{% trans "Project" %}</th>
+                        <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
+                        <th class="col-md-2">{% trans "Last updated" %}</th>
+                        <th class="hidden"><!-- Hidden archived status column --></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for proj in projects %}
+                      <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}';">
+                        <td>
+                          <h4>
+                            <a href="{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}">{{ proj.name }}</a>
+                            {% if proj.access == "private" %}
+                              <span class="label label-info">{% trans "Private" %}</span>
+                            {% endif %}
+                            {% if proj.archived %}
+                              <span class="label label-danger">{% trans "Archived" %}</span>
+                            {% endif %}
+                          </h4>
+                          <p>{{ proj.description }}</p>
+                        </td>   
+                        <td class="hidden-xs">{{ proj.country }}</td>
+                        <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+                        <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
+              {% else %}
                 {% if add_allowed %}
                   <!-- Starter text -->
                   <div class="overlay-wrapper">
@@ -85,8 +85,8 @@
                     {% trans "This organization does not have any public projects." %}
                   </p>
                 {% endif %}
-              </div>
-            {% endif %}
+              {% endif %}
+            </div>
           </div>
         </section>
 
@@ -176,7 +176,7 @@
                   {% for user in organization.users.all %}
                     <li class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
                       <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">
-                        <!--<i class="fa fa-user-circle fa-2x" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{ user.username }}"></i>-->
+                        <!--<i class="glyphicon glyphicon-user" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{ user.username }}"></i>-->
                         <strong>{{ user.username }}</strong>
                       </a>
                     </li>
