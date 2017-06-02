@@ -201,9 +201,16 @@ header {
     &:focus {
       @include button-variant(#fff, darken($btn-blue-bg, 5%), $btn-blue-bg);
       transition: all 0.3s ease 0s;
-       .caret, .glyphicon-user {
-         color: #fff;
-       }
+      .caret, .glyphicon-user {
+        color: #fff;
+      }
+    }
+    .badge {
+      background-color: #edaa00;
+      color: #fff;
+      padding: 3px 5px;
+      font-size: 10px;
+      font-weight: 400;
     }
     .thumbnail {
       display: inline-block;
