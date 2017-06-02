@@ -37,7 +37,7 @@ class PDFGenerator():
         context = {
             'questionnaire': questionnaire,
             'questions_list': template_questions_list,
-            'questions_groups_list': template_question_groups_list,
+            'question_groups_list': template_question_groups_list,
             'exclude_geo_fields': EXCLUDE_GEO_FIELDS,
             'pdfform': self.pdfform
         }
