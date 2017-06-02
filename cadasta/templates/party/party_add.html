@@ -14,10 +14,7 @@
 {{ form.media }}
 <script src="{% static 'js/jquery-ui.min.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
-{% if get_current_language != "en-us" %}
-{% get_current_language as LANGUAGE_CODE %}
-<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}.js"></script>
-{% endif %}
+<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
 <script>
   $(document).ready(function () {
     $('.datepicker').datepicker({
