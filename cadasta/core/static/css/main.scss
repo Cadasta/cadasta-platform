@@ -39,10 +39,26 @@
 }
 
 @font-face {
-    font-family: 'Noto Sans Bengali';
-    src: url('/static/fonts/NotoSansBengali/NotoSansBengali-Regular.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
+  font-family: 'PadaukW';
+  src: url('/static/fonts/Padauk/Padauk-Regular.woff') format('woff'),
+       url('/static/fonts/Padauk/Padauk-Regular.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'KNU Unicode';
+  src: url('/static/fonts/KNU/knuunicode-webfont.woff') format('woff'),
+       url('/static/fonts/KNU/knuunicode-webfont.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Noto Sans Bengali';
+  src: url('/static/fonts/NotoSansBengali/NotoSansBengali-Regular.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
 }
 
 /* =Basics
@@ -226,7 +242,7 @@ main.container-fluid {
 }
 
 #project-single #page-content main.show-sidebar,
-#organization-single #page-content main.show-sidebar { 
+#organization-single #page-content main.show-sidebar {
   margin-left: 100px;
 }
 
@@ -235,7 +251,7 @@ main.container-fluid {
     padding-bottom: 0;
   }
   #project-single #page-content main,
-  #organization-single #page-content main, 
+  #organization-single #page-content main,
   #project-single #page-content main.show-sidebar,
   #organization-single #page-content main.show-sidebar,
   #organization-single #page-content main {
@@ -428,7 +444,7 @@ table#select-list {
    font-size: 12px;
  }
  .form-control {
-   padding: 6px; 
+   padding: 6px;
  }
 }
 
@@ -674,7 +690,7 @@ h1 .label {
   font-size: 16px;
 }
 
-.entity { // small entity title above link 
+.entity { // small entity title above link
   font-size: 14px;
   font-weight: normal;
   color: $gray-medium;
@@ -683,7 +699,7 @@ h1 .label {
   letter-spacing: 0;
 }
 
-.text-wrap .entity { // map popovers 
+.text-wrap .entity { // map popovers
   font-size: 11px;
 }
 
