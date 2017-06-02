@@ -232,7 +232,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
 
         request = HttpRequest()
@@ -263,7 +264,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'imagine71',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         form.save()
@@ -280,7 +282,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'existing',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -296,6 +299,7 @@ class ProfileFormTest(UserTestCase, TestCase):
                 'username': user.username.lower(),
                 'email': '%s@beatles.uk' % user.username,
                 'full_name': 'John Lennon',
+                'language': 'en'
             }
             form = forms.ProfileForm(data, instance=existing_user)
             assert form.is_valid() is False
@@ -311,7 +315,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'johnLennon',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is True
@@ -329,7 +334,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'imagine71',
             'email': 'existing@example.com',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -342,7 +348,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -358,7 +365,8 @@ class ProfileFormTest(UserTestCase, TestCase):
         data = {
             'username': 'user1',
             'email': 'user1_email_change@example.com',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
 
         request = HttpRequest()

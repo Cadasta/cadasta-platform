@@ -64,7 +64,8 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
             'username': 'John',
             'email': user.email,
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         response = self.request(method='POST', post_data=post_data, user=user)
         response.status_code == 200
