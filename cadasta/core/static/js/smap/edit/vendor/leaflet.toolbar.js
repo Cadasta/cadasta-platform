@@ -1,3 +1,7 @@
+/**
+Based on Leaflet.Toolbar: https://github.com/Leaflet/Leaflet.toolbar/blob/master/src/Toolbar.js
+*/
+
 (function (window, document, undefined) {
 
     "use strict";

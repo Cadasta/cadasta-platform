@@ -1,3 +1,6 @@
+/**
+Used in adding existing resource forms.
+**/
 $(function() {
   'use strict';
   activateFormFieldsInDataTable('.modal form', 0, 'checkbox');

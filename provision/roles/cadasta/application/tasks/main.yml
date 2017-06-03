@@ -95,8 +95,14 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
-- name: Install Bootstrap for SASS processing
+- name: Install Grunt
+  become: yes
+  become_user: root
+  command: chdir="{{ application_path }}cadasta/core"
+           npm install -g grunt-cli
+
+- name: Install Package.json
   become: yes
   become_user: "{{ app_user }}"
   command: chdir="{{ application_path }}cadasta/core"
-           npm install bootstrap-sass
+           npm install

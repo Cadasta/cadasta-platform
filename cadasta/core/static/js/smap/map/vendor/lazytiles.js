@@ -10,13 +10,13 @@
     }
 
     Tile.prototype.findPathToChild = function(x, y, z) {
-        const nleafs = Math.pow(2, z - this.z);
-        const l0x = nleafs * this.x;
-        const l0y = nleafs * this.y;
-        const xleft = (x < l0x + (nleafs / 2));
-        const yleft = (y < l0y + (nleafs / 2));
-        xt = xleft ? this.x * 2 : this.x * 2 + 1;
-        yt = yleft ? this.y * 2 : this.y * 2 + 1;
+        var nleafs = Math.pow(2, z - this.z);
+        var l0x = nleafs * this.x;
+        var l0y = nleafs * this.y;
+        var xleft = (x < l0x + (nleafs / 2));
+        var yleft = (y < l0y + (nleafs / 2));
+        var xt = xleft ? this.x * 2 : this.x * 2 + 1;
+        var yt = yleft ? this.y * 2 : this.y * 2 + 1;
 
         if (!this.children.length && this.z < this.maxLevels) {
             this.children = [
@@ -27,20 +27,21 @@
             ];
         }
 
+        var child;
         for (var i in this.children) {
-            const child = this.children[i];
+            child = this.children[i];
             if (child.x === x && child.y === y && child.z === z) {
                 return child;
             }
         }
 
-        for (var i in this.children) {
-            const child = this.children[i];
+        for (var j in this.children) {
+            child = this.children[j];
             if (child.x === xt && child.y === yt) {
                 return child;
             }
         }
-    }
+    };
 
     Tile.prototype.load = function(x, y, z) {
         if (this.x === x && this.y === y && this.z === z && !this.loaded) {
@@ -49,12 +50,12 @@
                 this.parent.loadFromChild();
             }
         } else {
-            const child = this.findPathToChild(x, y, z);
+            var child = this.findPathToChild(x, y, z);
             if (child) {
                 child.load(x, y, z);
             }
         }
-    }
+    };
 
     Tile.prototype.loadFromChild = function() {
         var loaded = true;
@@ -69,7 +70,7 @@
                 this.parent.loadFromChild();
             }
         }
-    }
+    };
 
     Tile.prototype.isLoaded = function(x, y, z) {
         if (this.loaded) {
@@ -80,13 +81,13 @@
             return false;
         }
 
-        const child = this.findPathToChild(x, y, z);
+        var child = this.findPathToChild(x, y, z);
         if (child) {
             return child.isLoaded(x, y, z);
         } else {
             return false;
         }
-    }
+    };
 
     window.Tile = Tile;
 })(window, Math);

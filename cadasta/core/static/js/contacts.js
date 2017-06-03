@@ -1,12 +1,16 @@
+/**
+Used to create a contact list during project creation.
+**/
+
 $(document).ready(function () {
     function getNumberOfForms(form, prefix) {
         var totalForms = form.find('[name="' + prefix + '-TOTAL_FORMS"]');
-        return parseInt(totalForms.val())
+        return parseInt(totalForms.val());
     }
 
     function updateNumberOfForms(form, prefix, no) {
         var totalForms = form.find('[name="' + prefix + '-TOTAL_FORMS"]');
-        totalForms.val(parseInt(totalForms.val()) + no)
+        totalForms.val(parseInt(totalForms.val()) + no);
 
         form.find('[name="' + prefix + '-INITIAL_FORMS"]').val(0);
     }
@@ -42,7 +46,7 @@ $(document).ready(function () {
         var newRow = tbody.find("tr:not(.contacts-error)").first().clone(true);
         var newPrefix = prefix + '-' + getNumberOfForms(form, prefix);
 
-        var td = newRow.children('td')
+        var td = newRow.children('td');
         for (var i = 0, ilen = td.length; i < ilen; i++) {
             var elements = $(td[i]).children();
 
@@ -59,7 +63,7 @@ $(document).ready(function () {
         }
         tbody.append(newRow.show());
 
-        updateNumberOfForms(form, prefix, 1)
+        updateNumberOfForms(form, prefix, 1);
     }
 
     $('.remove-contact').click(removeContact);

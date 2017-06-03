@@ -111,6 +111,11 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
+- name: Ugifly JS files
+  become: yes
+  become_user: "{{ app_user }}"
+  shell: grunt production
+
 - name: Create cron job to prune MEDIA_ROOT files
   become: yes
   become_user: root

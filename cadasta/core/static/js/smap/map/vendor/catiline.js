@@ -221,7 +221,7 @@ function regexImports(string){
     var matches = {};
     var loopFunc = function(a,b){
         if(b){
-            'importScripts('+b.split(',').forEach(function(cc){
+            return 'importScripts('+b.split(',').forEach(function(cc){
                 matches[catiline.makeUrl(cc.match(/\s*[\'\"](\S*)[\'\"]\s*/)[1])]=true; // trim whitespace, add to matches
             })+');\n';
         }

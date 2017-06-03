@@ -1,4 +1,9 @@
 /* eslint-env jquery */
+/**
+Adds ability to toggle between conditional attributes.
+If 'Individual' is selected as the party type, individual attributes will be displayed.
+If 'Group' is selected, individual will disappear and group attributes will be displayed.
+**/
 
 function disableConditionals() {
   $('.party-co').addClass('hidden');
@@ -10,18 +15,18 @@ function disableConditionals() {
 }
 
 function enableConditions(val) {
-  const types = ['co', 'gr', 'in'];
+  var types = ['co', 'gr', 'in'];
   types.splice(types.indexOf(val), 1);
   $('.party-' + val).removeClass('hidden');
   $('.party-' + val + ' .form-control').prop('disabled', '');
-  for (i in types) {
-    $('.party-' + types[i]).addClass('hidden')
+  for (var i in types) {
+    $('.party-' + types[i]).addClass('hidden');
     $('.party-' + types[i] +  '.form-control').prop('disabled', 'disabled');
   }
 }
 
 function toggleParsleyRequired(val) {
-  const typeChoices = ['in', 'gr', 'co'];
+  var typeChoices = ['in', 'gr', 'co'];
   $.each(typeChoices, function(idx, choice) {
     if (val === choice) {
       $.each($('.party-' + val + ' .form-control'), function(idx, value) {
@@ -53,13 +58,13 @@ function toggleStates(val) {
 }
 
 $().ready(function() {
-  const val = $('.party-type').val().toLowerCase();
+  var val = $('.party-type').val().toLowerCase();
   toggleStates(val);
 });
 
 
 $('select.party-type').on('change', function(e) {
-  const val = e.target.value.toLowerCase();
+  var val = e.target.value.toLowerCase();
   toggleStates(val);
 });
 

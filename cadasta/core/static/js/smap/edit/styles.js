@@ -1,4 +1,4 @@
-Styles = {
+var Styles = {
 
     setSelectedStyle: function (layer) {
         if (layer instanceof L.Polygon || layer instanceof L.Rectangle) {
@@ -84,4 +84,4 @@ Styles = {
             });
         }
     }
-}
+};

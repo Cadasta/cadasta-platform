@@ -1,3 +1,6 @@
+/**
+Adds an "eye" icon that toggles between displaying/hiding password in the registration form.
+*/
 $(document).ready(function () {
   $("input[type='password'] + span > button").click(function() {
     var glyph = $(this).children(".glyphicon");

@@ -1,10 +1,10 @@
-var rm = RouterMixins;
-var CreateRoutes = function (map) {
+function CreateRoutes(map) {
     'use strict';
     var routes = {};
-    rm.init();
+    window.rm =  RouterMixins();
+    window.rm.init();
 
-    function route(path, el, controller, eventHook = null) {
+    function route(path, el, controller, eventHook) {
         routes[path] = {
             el: el,
             controller: controller,
@@ -393,4 +393,4 @@ var CreateRoutes = function (map) {
         });
 
     return routes;
-};
+}

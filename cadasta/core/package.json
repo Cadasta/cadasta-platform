@@ -1,0 +1,24 @@
+{
+  "name": "cadasta",
+  "version": "1.8.2",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cadasta/cadasta-platform.git"
+  },
+  "license": "GNU Affero General Public License v3.0",
+  "devDependencies": {
+    "bootstrap-sass": "^3.3.7",
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-uglify": "^2.3.0",
+    "grunt-contrib-watch": "^1.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/Cadasta/cadasta-platform/issues"
+  },
+  "homepage": "https://github.com/Cadasta/cadasta-platform#readme",
+  "keywords": [],
+  "author": "Cadasta",
+  "description": "The Cadasta Platform is designed to document the relationship between people and the land and resources they rely on."
+}

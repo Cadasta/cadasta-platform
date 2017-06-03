@@ -64,17 +64,10 @@
                 </thead>
                 <tbody>
                   {% for rel in relationships %}
-<<<<<<< HEAD
-                  {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
-                  <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
-                    <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
-                    <td><a href="{% url 'locations:detail' object.organization.slug object.slug rel.spatial_unit.id %}" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.location_type_label }}</a></td>
-=======
                   <tr class="linked">
                     <td onclick="window.document.location='{% url 'organization:project-dashboard' object.organization.slug object.slug %}#/records/relationship/{{rel.id}}/';"><a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}#/records/relationship/{{rel.id}}/" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
 
                     <td onclick="window.document.location='{% url 'organization:project-dashboard' object.organization.slug object.slug %}#/records/location/{{rel.spatial_unit.id}}/';"><a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}#/records/location/{{rel.spatial_unit.id}}/" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.get_type_display }}</a></td>
->>>>>>> 5b330905... Implemented router to handle single page view calls. Added coordinates to url to allow user to store specific map locations. (#1403)
                   </tr>
                   {% endfor %}
                 </tbody>

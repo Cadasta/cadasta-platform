@@ -20,7 +20,7 @@ from spatial.models import SpatialUnit
 from tutelary.models import Policy, assign_user_policies
 
 from .. import forms
-from ..models import Party, TenureRelationship, TenureRelationshipType
+from ..models import Party, TenureRelationship
 from ..views import async
 from .factories import TenureRelationshipFactory
 
@@ -141,7 +141,7 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
             type='S1')
         q_factories.QuestionOptionFactory.create(
             question=tenure_type_question,
-            name=self.relationship.tenure_type_id,
+            name=self.relationship.tenure_type,
             label={'en': 'Some type', 'de': 'Ein Typ'})
 
         user = UserFactory.create()
@@ -227,7 +227,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         self.relationship = TenureRelationshipFactory.create(
             project=self.project,
             attributes={'fname': 'test'},
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
+            tenure_type='WR',
             spatial_unit__geometry=('SRID=4326;POINT(11 53)')
         )
 
@@ -268,6 +268,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert ('<input class="form-control" '
+                'data-parsley-sanitize="1" '
                 'id="id_tenurerelationship::default::fname" '
                 'name="tenurerelationship::default::fname" '
                 'type="text" value="test" />') in response.content
@@ -318,7 +319,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         # attributes field is deferred so we fetch a fresh instance
         relationship = TenureRelationship.objects.defer(None).get(
             id=self.relationship.id)
-        assert relationship.tenure_type_id == 'LH'
+        assert relationship.tenure_type == 'LH'
         assert relationship.attributes.get('fname') == 'New text'
 
     def test_post_with_unauthorized_user(self):
@@ -329,7 +330,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
                 in response.messages)
 
         self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id != 'LH'
+        assert self.relationship.tenure_type != 'LH'
 
     def test_post_with_unauthenticated_user(self):
         response = self.request(method='POST')
@@ -337,7 +338,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
         self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id != 'LH'
+        assert self.relationship.tenure_type != 'LH'
 
     def test_post_with_archived_project(self):
         self.project.archived = True
@@ -351,7 +352,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
                 in response.messages)
 
         self.relationship.refresh_from_db()
-        assert self.relationship.tenure_type_id != 'LH'
+        assert self.relationship.tenure_type != 'LH'
 
     def test_post_with_bad_data(self):
         user = UserFactory.create()
@@ -366,7 +367,7 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         # attributes field is deferred so we fetch a fresh instance
         relationship = TenureRelationship.objects.defer(None).get(
             id=self.relationship.id)
-        assert relationship.tenure_type_id == 'WR'
+        assert relationship.tenure_type == 'WR'
         assert relationship.attributes.get('fname') == 'test'
 
 

@@ -43,7 +43,7 @@ class PartyRelationshipDetail(core_mixins.LoginPermissionRequiredMixin,
                 try:
                     option = QuestionOption.objects.get(
                         question=tenure_type,
-                        name=context['relationship'].tenure_type_id)
+                        name=context['relationship'].tenure_type)
                     context['type_choice_labels'] = template_xlang_labels(
                         option.label_xlat)
                 except QuestionOption.DoesNotExist:

@@ -14,7 +14,7 @@ from django.test import TestCase
 from jsonattrs.models import Attribute, AttributeType, Schema
 from organization.tests.factories import ProjectFactory
 from organization.models import OrganizationRole
-from party.models import Party, TenureRelationship, TenureRelationshipType
+from party.models import Party, TenureRelationship
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.tests import factories as q_factories
 from resources.forms import AddResourceFromLibraryForm, ResourceForm
@@ -344,80 +344,6 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.expected_content
         assert 'coordinates' in response.headers
-
-    def test_does_not_show_buttons_when_no_edit_permissions(self):
-        user = UserFactory.create()
-        assign_policies(user, True)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        expected = self.render_content(is_allowed_edit_location=False,
-                                       is_allowed_delete_location=False)
-        assert response.content == expected
-
-    def test_get_with_incomplete_questionnaire(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        self.project.current_questionnaire = questionnaire.id
-        self.project.save()
-
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_with_questionnaire(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        self.project.current_questionnaire = questionnaire.id
-        self.project.save()
-
-        location_type_question = q_factories.QuestionFactory.create(
-            questionnaire=questionnaire,
-            name='location_type',
-            label={'en': 'Location type', 'de': 'Parzelle Typ'},
-            type='S1')
-        q_factories.QuestionOptionFactory.create(
-            question=location_type_question,
-            name=self.location.type,
-            label={'en': 'House', 'de': 'Haus'})
-
-        tenure_type_question = q_factories.QuestionFactory.create(
-            questionnaire=questionnaire,
-            name='tenure_type',
-            label={'en': 'Location type', 'de': 'Parzelle Typ'},
-            type='S1')
-        q_factories.QuestionOptionFactory.create(
-            question=tenure_type_question,
-            name='LH',
-            label={'en': 'Leasehold', 'de': 'Miete'})
-        q_factories.QuestionOptionFactory.create(
-            question=tenure_type_question,
-            name='WR',
-            label={'en': 'Water rights', 'de': 'Wasserecht'})
-        lh_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='LH'),
-            spatial_unit=self.location,
-            project=self.project)
-        lh_ten.type_labels = ('data-label-de="Miete" '
-                              'data-label-en="Leasehold"')
-        wr_ten = TenureRelationshipFactory.create(
-            tenure_type=TenureRelationshipType.objects.get(id='WR'),
-            spatial_unit=self.location,
-            project=self.project)
-        wr_ten.type_labels = ('data-label-de="Wasserecht" '
-                              'data-label-en="Water rights"')
-
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content == self.render_content(
-            type_labels=('data-label-de="Parzelle Typ" '
-                         'data-label-en="Location type"'),
-            type_choice_labels=('data-label-de="Haus" data-label-en="House"'),
-            relationships=[wr_ten, lh_ten],
-            form_lang_default='en',
-            form_langs=[('en', 'English'), ('de', 'German')]
-        )
 
     def test_does_not_show_buttons_when_no_edit_permissions(self):
         user = UserFactory.create()

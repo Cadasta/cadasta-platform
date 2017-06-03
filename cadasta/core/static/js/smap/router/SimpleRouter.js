@@ -1,9 +1,8 @@
 // Based on http://joakim.beng.se/blog/posts/a-javascript-router-in-20-lines.html
-var SimpleRouter = function (map) {
-    var rm = RouterMixins;
-    var routes = new CreateRoutes(map);
+function SimpleRouter(map) {
+    var routes = CreateRoutes(map);
 
-    function router(force_reload = false) {
+    function router(force_reload) {
         var async_url = '/async' + location.pathname;
         var hash_path = location.hash.slice(1) || '/';
 
@@ -90,4 +89,4 @@ var SimpleRouter = function (map) {
     return {
         router: router,
     };
-}; // end SimpleRouter()
+} // end SimpleRouter()
