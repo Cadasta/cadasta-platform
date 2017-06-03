@@ -18,8 +18,8 @@
 {% block extra_script %}
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
-<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
-<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
+<script src="{% static 'js/vendor/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/vendor/L.Map.Deflate.js' %}"></script>
 <script>
   function project_map_init(map, options) {
     map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);

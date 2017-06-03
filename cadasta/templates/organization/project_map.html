@@ -18,13 +18,12 @@
 
 {% block extra_script %}
 {% leaflet_js plugins="groupedlayercontrol" %}
-<script src="{% static 'js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'js/vendor/jquery-ui.min.js' %}"></script>
 <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
 <script type="text/javascript" src="{% static 'buckets/js/script.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
-<script type="text/javascript" src="{% static 'js/dataTables.forms.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/smap/catiline.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/dataTables/dataTables.forms.js' %}"></script>
 <script>
   var url = '/async/organizations/' +
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatial/tiled/{z}/{x}/{y}';
@@ -66,22 +65,7 @@
   var layers = {{ leaflet_tiles|safe }}
 
 </script>
-<script src="{% static 'js/smap/edit/Leaflet.Editable.js' %}"></script>
-<script src="{% static 'js/smap/edit/leaflet.toolbar.js' %}"></script>
-<script src="{% static 'js/smap/lazytiles.js' %}"></script>
-<script src="{% static 'js/smap/L.TileLayer.GeoJSON.js' %}"></script>
-<script src="{% static 'js/smap/L.Hash.js' %}"></script>
-<script src="{% static 'js/smap/map.js' %}"></script>
-<script src="{% static 'js/smap/router_mixins.js' %}"></script>
-<script src="{% static 'js/smap/routes.js' %}"></script>
-<script src="{% static 'js/smap/router.js' %}"></script>
-<script src="{% static 'js/smap/edit/controls.js' %}"></script>
-<script src="{% static 'js/smap/edit/tooltip.js' %}"></script>
-<script src="{% static 'js/smap/edit/editor.js' %}"></script>
-<script src="{% static 'js/smap/edit/LatLngUtil.js' %}"></script>
-<script src="{% static 'js/smap/edit/styles.js' %}"></script>
-<script src="{% static 'js/smap/edit/path.drag.js' %}"></script>
-<script src="{% static 'js/smap/index.js' %}"></script>
+<script src="{% static 'js/smap/dist/smap.min.js' %}"></script>
 {% endblock %}
 
 {% block page_title %}{% trans "Overview" %} | {% endblock %}

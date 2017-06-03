@@ -1,4 +1,4 @@
-Tooltip = L.Class.extend({
+var Tooltip = L.Class.extend({
 
     EDIT_ENABLED: 'Click cancel to undo changes. <br/>' +
         'Drag handles, or marker to edit feature. <br/>' +

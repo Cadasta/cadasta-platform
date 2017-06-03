@@ -43,7 +43,7 @@
         }
     };
 
-    L.Hash.formatHash = function(map, hash=null) {
+    L.Hash.formatHash = function(map, hash) {
         var center = map.getCenter(),
             zoom = map.getZoom(),
             precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
@@ -176,7 +176,7 @@
                 clearInterval(this.hashChangeInterval);
             }
             this.isListening = false;
-        }
+        },
     };
     L.hash = function(map) {
         return new L.Hash(map);

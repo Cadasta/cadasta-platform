@@ -28,6 +28,7 @@ htmlcov
 # JS
 */dist/bundle.js
 node_modules/
+node_modules
 
 # Floobits
 .floo

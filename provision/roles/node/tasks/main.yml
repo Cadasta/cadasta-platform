@@ -37,3 +37,8 @@
   become_user: root
   shell: npm install -g npm@2
   when: node_check.stat.exists == False
+
+- name: Make node_module link
+  become: yes
+  become_user: root
+  file: path=/vagrant/node_modules src=/vagrant/cadasta/core/node_modules state=link follow=yes

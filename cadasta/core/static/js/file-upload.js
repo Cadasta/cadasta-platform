@@ -1,3 +1,7 @@
+/**
+Used in questionnaire uploads and resource file uploads.
+**/
+
 $(function() {
   original_file = $('input[name="original_file"]').val();
 

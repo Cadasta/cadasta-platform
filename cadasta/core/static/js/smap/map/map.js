@@ -1,4 +1,4 @@
-var SMap = function (map) {
+function SMap(map) {
     var layerscontrol = L.control.layers().addTo(map);
 
     var geojsonTileLayer = new L.TileLayer.GeoJSON(
@@ -49,7 +49,7 @@ var SMap = function (map) {
                 }
             );
             boundary.addTo(map);
-            projectBounds = boundary.getBounds();
+            var projectBounds = boundary.getBounds();
             options.projectExtent = projectBounds;
             if (options.fitBounds === 'project') {
                 map.fitBounds(projectBounds);
@@ -150,4 +150,4 @@ var SMap = function (map) {
 
     add_map_controls();
 
-};
+}

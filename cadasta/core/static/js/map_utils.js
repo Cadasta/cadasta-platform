@@ -41,7 +41,7 @@ function add_map_controls(map) {
 
   map.addControl(new Geolocate());
 
-  return map
+  return map;
 }
 
 function renderFeatures(map, featuresUrl, options) {
@@ -104,7 +104,7 @@ function renderFeatures(map, featuresUrl, options) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                       "<h2><span class=\"entity\">Location</span>" +
                       feature.properties.type + "</h2></div>" +
-                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
+                      "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans.open + "</a>"  +
                       "</div>");
       }
     }
@@ -129,8 +129,8 @@ function switch_layer_controls(map, options){
   // swap out default layer switcher
   var layers = options.djoptions.layers;
   var baseLayers = {};
-  for (var l in layers){
-    var layer = layers[l];
+  for (var i in layers){
+    var layer = layers[i];
     var baseLayer = L.tileLayer(layer[1], layer[2]);
     baseLayers[layer[0]] = baseLayer;
   }
