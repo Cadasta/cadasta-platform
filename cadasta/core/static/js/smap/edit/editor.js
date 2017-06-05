@@ -115,8 +115,6 @@ var Location = L.Editable.extend({
             this._deleted = true;
         }
 
-        this.map.geojsonLayer.removeLayer(this.layer);
-
         if (this.layer._new) {
             this.layer = null;
         }
@@ -135,7 +133,7 @@ var Location = L.Editable.extend({
             $('textarea[name="geometry"]').html('');
         }
         this._deleting = false;
-        this._createNew(this.layer);
+        // this._createNew(this.layer);
     },
 
     // draw functions
@@ -178,7 +176,9 @@ var Location = L.Editable.extend({
         feature.id = L.stamp(layer);
         layer.feature = feature;
 
+        console.log('first this.layer:', this.layer);
         this.layer = layer;
+        console.log('second this.layer:', this.layer);
         this.map.geojsonLayer.addLayer(this.layer);
         this.layer._new = true;
         this.layer._dirty = true;
@@ -309,11 +309,17 @@ var LocationEditor = L.Evented.extend({
     // edit functions
 
     setEditable: function (feature, layer) {
-        if (this.location.layer && this.location.layer.feature.id === feature.id) return;
+        if (this.location.layer) {
+            console.log(this.location.layer.feature.id, feature.id);
+            if (this.location.layer.feature.id === feature.id) return;
+        }
+        console.log('made it here');
+        console.log('is there a layer?', this.location.layer);
 
         if (this.location.layer) {
             Styles.resetStyle(this.location.layer);
         }
+        console.log('layer:', layer);
         layer.feature = feature;
         this.location.layer = layer;
         this.location.feature = feature;
