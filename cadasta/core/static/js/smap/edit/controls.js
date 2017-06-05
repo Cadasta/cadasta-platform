@@ -191,7 +191,9 @@ var EditorToolbars = function () {
             },
         },
         addHooks: function () {
-            this.editor.cancelDelete();
+            if (this.editor.deleting()) {
+                this.editor.cancelDelete();
+            }
             this.editor.cancelEdit();
             SubAction.prototype.addHooks.call(this);
         }
@@ -262,7 +264,9 @@ var EditorToolbars = function () {
             })
         },
         addHooks: function () {
-            this.editor.cancelEdit();
+            if (this.editor.editing()) {
+                this.editor.cancelEdit();
+            }
             this.editor.startDelete();
         },
         enable: function () {

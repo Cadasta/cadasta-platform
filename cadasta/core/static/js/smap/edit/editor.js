@@ -54,7 +54,7 @@ var Location = L.Editable.extend({
 
     _undoEdit: function (cancel_form) {
         this._undo(cancel_form);
-        if (this.layer) this.layer._dirty = false;
+        if (this.layer) this.layer._editing = false;
         this._deleting = this._deleted = false;
     },
 
@@ -64,7 +64,7 @@ var Location = L.Editable.extend({
         if (this.layer) {
             this.layer.disableEdit();
 
-            if (cancel_form) {
+            if (cancel_form && this._original_state[0]) {
                 this.map.geojsonLayer.removeLayer(this.layer);
                 this.layer = this._original_state[0].layer;
 
@@ -73,6 +73,7 @@ var Location = L.Editable.extend({
                 var latLngs_dict = this._undoBuffer;
                 latLngs = latLngs_dict[this.layer._leaflet_id];
             }
+
             if (latLngs && latLngs.latlngs) {
                 if (this.layer instanceof L.Marker) {
                     this.layer.setLatLng(latLngs.latlngs);
@@ -83,8 +84,7 @@ var Location = L.Editable.extend({
                     this.map.geojsonLayer.removeLayer(this.layer);
                     this.map.geojsonLayer.addLayer(this.layer);
                 }
-                this._clearBackup(cancel_form);
-            } else if (this.layer._new !== undefined && this.layer._new) {
+            } else if (this.layer._new || !this._original_state[0] ) {
                 this._setDeleted();
             }
         }
@@ -115,7 +115,8 @@ var Location = L.Editable.extend({
             this._deleted = true;
         }
 
-        if (this.layer._new) {
+        if (this.layer._new || !this._original_state[0]) {
+            this.map.geojsonLayer.removeLayer(this.layer);
             this.layer = null;
         }
 
@@ -133,7 +134,7 @@ var Location = L.Editable.extend({
             $('textarea[name="geometry"]').html('');
         }
         this._deleting = false;
-        // this._createNew(this.layer);
+        this._clearBackup();
     },
 
     // draw functions
@@ -176,9 +177,7 @@ var Location = L.Editable.extend({
         feature.id = L.stamp(layer);
         layer.feature = feature;
 
-        console.log('first this.layer:', this.layer);
         this.layer = layer;
-        console.log('second this.layer:', this.layer);
         this.map.geojsonLayer.addLayer(this.layer);
         this.layer._new = true;
         this.layer._dirty = true;
@@ -228,7 +227,7 @@ var Location = L.Editable.extend({
         if (this.layer instanceof L.Polyline || this.layer instanceof L.Polygon || this.layer instanceof L.Rectangle) {
             this._undoBuffer[this.layer._leaflet_id] = {
                 latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
-            };
+            }; 
 
             if (initial_edit && !this._original_state[0]) {
                 this._original_state.push({
@@ -310,16 +309,12 @@ var LocationEditor = L.Evented.extend({
 
     setEditable: function (feature, layer) {
         if (this.location.layer) {
-            console.log(this.location.layer.feature.id, feature.id);
             if (this.location.layer.feature.id === feature.id) return;
         }
-        console.log('made it here');
-        console.log('is there a layer?', this.location.layer);
 
         if (this.location.layer) {
             Styles.resetStyle(this.location.layer);
         }
-        console.log('layer:', layer);
         layer.feature = feature;
         this.location.layer = layer;
         this.location.feature = feature;
@@ -537,17 +532,14 @@ var LocationEditor = L.Evented.extend({
 
     // saving
 
-    save: function (final) {
+    save: function () {
         this.tooltip.remove();
-        if (this.location._deleting) {
+        if (this.deleting()) {
             this.location._saveDelete();
             this.location._deleting = false;
-        } else if (this._editing) {
+        } else if (this.editing()) {
             this.location._saveEdit();
             this._editing = false;
-        }
-        if (final) {
-            this.location._clearBackup(true);
         }
     },
 

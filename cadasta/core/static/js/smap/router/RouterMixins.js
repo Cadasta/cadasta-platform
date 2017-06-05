@@ -263,7 +263,6 @@ function RouterMixins() {
                     layers[i].feature.id = layer_id;
                     layers[i].feature.properties.url = new_url;
                 }
-
                 if (url.includes(layers[i].feature.id)) {
                     found = true;
                     Styles.resetStyle(state.current_location.layer);
@@ -373,7 +372,7 @@ function RouterMixins() {
 
             $('button[name="submit-button"]').on('click', function (e) {
                 e.preventDefault();
-                editor.save(true);
+                editor.save();
                 $('#location-wizard').submit();
             });
         },
