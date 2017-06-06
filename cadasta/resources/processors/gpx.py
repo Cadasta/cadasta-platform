@@ -17,7 +17,6 @@ class GPXProcessor:
             try:
                 self.gpx = gpxpy.parse(f)
             except gpxpy.gpx.GPXException as e:
-                logger.exception(e)
                 raise InvalidGPXFile(_("Invalid GPX file: %s" % e))
 
     def get_layers(self):
