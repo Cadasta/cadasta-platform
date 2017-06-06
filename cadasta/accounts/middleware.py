@@ -3,7 +3,8 @@ from django.utils import translation
 
 class UserLanguageMiddleware(object):
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        print (request)
+        if not request.user.is_authenticated:
             return None
 
         user_language = request.user.language
