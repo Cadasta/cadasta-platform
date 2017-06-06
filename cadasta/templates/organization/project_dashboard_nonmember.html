@@ -46,9 +46,7 @@
               <div class="text-center">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <i class="glyphicon glyphicon-info-sign"></i>
-                {% blocktrans %}
-                Access to project data is restricted to current project members only.
-                {% endblocktrans %}
+                {% trans "Access to project data is restricted to current project members only." %}
               </div>
             </div>
 
@@ -119,31 +117,40 @@
                 <h3 class="panel-title">{% trans "About this project" %}</h3>
               </div>
               <div class="panel-body">
-                <p>{{ object.description }}</p>
-                {% if object.urls.0 %}
-                  <p><a href="{{ object.urls.0 }}" target="_blank" class="break"><i class="glyphicon glyphicon-globe"></i> {{ object.urls.0 }}</a></p>
-                {% endif %}
-                {% if object.contacts %}
-                  <h4 class="panel-subtitle">{% trans "Contacts" %}</h4>
-                  <dl class="contacts">
-                  {% for contact in object.contacts %}
-                    <dt>{{ contact.name }}</dt>
-                    <dd class="clearfix">
-                      {% if contact.email %}
-                      <a href="mailto:{{ contact.email }}" class="break">
-                        <i class="glyphicon glyphicon-envelope"></span>
-                       {{ contact.email }}
-                      </a>
-                      {% endif %}
-                      {% if contact.tel %}
-                      <a href="tel:{{ contact.tel }}">
-                        <i class="glyphicon glyphicon-earphone"></i>
-                        {{ contact.tel }}
-                      </a>
-                      {% endif %}
-                    </dd>
-                  {% endfor %}
-                  </dl>
+                {% if not object.description and not object.urls.0 and not object.contacts %}
+                  <!-- No project description -->
+                  <div class="overlay-wrapper">
+                    <div class="overlay">
+                      <p class="text-center">{% trans "Looks like this project doesn't have a description yet." %}</p>
+                    </div>
+                  </div>
+                {% else %}
+                  <p>{{ object.description }}</p>
+                  {% if object.urls.0 %}
+                    <p><a href="{{ object.urls.0 }}" target="_blank" class="break"><i class="glyphicon glyphicon-globe"></i> {{ object.urls.0 }}</a></p>
+                  {% endif %}
+                  {% if object.contacts %}
+                    <h4 class="panel-subtitle">{% trans "Contacts" %}</h4>
+                    <dl class="contacts">
+                    {% for contact in object.contacts %}
+                      <dt>{{ contact.name }}</dt>
+                      <dd class="clearfix">
+                        {% if contact.email %}
+                        <a href="mailto:{{ contact.email }}" class="break">
+                          <i class="glyphicon glyphicon-envelope"></span>
+                         {{ contact.email }}
+                        </a>
+                        {% endif %}
+                        {% if contact.tel %}
+                        <a href="tel:{{ contact.tel }}">
+                          <i class="glyphicon glyphicon-earphone"></i>
+                          {{ contact.tel }}
+                        </a>
+                        {% endif %}
+                      </dd>
+                    {% endfor %}
+                    </dl>
+                  {% endif %}
                 {% endif %}
               </div>
             </div>
