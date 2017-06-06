@@ -5,10 +5,15 @@
   <div class="col-md-6">
     {% csrf_token %}
     <div class="form-group{% if form.file.errors %} has-error{% endif %}">
-      <label class="control-label required" for="{{ form.file.id_for_label }}">{% trans "Select the file to upload" %}</label>
-      <div class="well file-well">
-        {{ form.file }}
-        <p class="help-block">{% trans "Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png, gpx, csv, xls, xlsx, gif, tiff" %}</p>
+      <div class="resource-60">
+        <img src="{{ resource.thumbnail }}" class="thumb-128">
+      </div>
+      <div class="resource-text">
+        <label class="control-label required" id="form_file_label" style="display: none;" for="{{ form.file.id_for_label }}">{% trans "Select the file to upload" %}</label>
+        <div class="no-well file-well" id="file_well">
+          {{ form.file }}
+          <p class="help-block" style="display: none;">{% trans "Accepted file types: pdf, mp3, mp4, doc, docx, jpg, png, gpx, csv" %}</p>
+        </div>
       </div>
       <div class="error-block">{{ form.file.errors }}</div>
     </div>
@@ -27,3 +32,19 @@
     <input type="hidden" name="mime_type" value="{{ form.mime_type.value }}">
   </div>
 </div>
+
+<script>
+
+window.addEventListener('load', function () {
+
+  $(".file-remove").click(function() {
+    $("#file_well").removeClass("no-well");
+    $("#file_well").addClass("well");
+    $(".resource-60").hide();
+    $(".form_file_label").show();
+    $(".help-block").show();
+  });
+  
+});
+
+</script>
