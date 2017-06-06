@@ -1,7 +1,7 @@
 cadasta-platform
 ================
 
-|build-status-image|
+|build-status-image| |req-status-image|
 
 
 Install for development
@@ -66,6 +66,9 @@ Do this::
   
 .. |build-status-image| image:: https://secure.travis-ci.org/Cadasta/cadasta-platform.svg?branch=master
    :target: http://travis-ci.org/Cadasta/cadasta-platform?branch=master
+.. |req-status-image| image:: https://requires.io/github/Cadasta/cadasta-platform/requirements.svg?branch=master
+   :target: https://requires.io/github/Cadasta/cadasta-platform/requirements/?branch=master
+
 
 Acknowledgements
 ================
