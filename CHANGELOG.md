@@ -1,5 +1,12 @@
 # Change Log
 
+## [v1.9.0](https://github.com/Cadasta/cadasta-platform/tree/v1.9.0) (2017-05-31)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.9.0-alpha.1...v1.9.0)
+
+**Merged pull requests:**
+
+- Update changelog v1.9.0-alpha.1 [\#1542](https://github.com/Cadasta/cadasta-platform/pull/1542) ([amplifi](https://github.com/amplifi))
+
 ## [v1.9.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.9.0-alpha.1) (2017-05-30)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.8.2-alpha.1...v1.9.0-alpha.1)
 
