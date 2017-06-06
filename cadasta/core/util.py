@@ -10,13 +10,16 @@ from rest_framework.utils.urls import replace_query_param, remove_query_param
 ID_FIELD_LENGTH = 24
 
 alphabet = string.ascii_lowercase + string.digits
-for loser in 'l1o0':
-    i = alphabet.index(loser)
-    alphabet = alphabet[:i] + alphabet[i + 1:]
+
+chars_to_delete = 'l1o0'
+replace_rules = dict.fromkeys(map(ord, chars_to_delete), None)
+alphabet = alphabet.translate(replace_rules)
+
+len_alphabet = len(alphabet) - 1
 
 
 def byte_to_base32_chr(byte):
-    return alphabet[byte & 31]
+    return alphabet[byte & len_alphabet]
 
 
 def random_id():
