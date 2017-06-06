@@ -19,18 +19,20 @@ var Location = L.Editable.extend({
         L.Editable.prototype.initialize.call(this, map, options);
     },
 
-    // edit functions
+    /**************
+    EDIT FUNCTIONS
+    **************/
 
+    // Triggered when the 'edit tool' button is clicked'
     _startEdit: function () {
         if (this.layer) {
-            if (!this.layer._new) {
-                this._backupLayer(true);
-            }
+            this._backupLayer( initial_edit = true);
             this.layer.enableEdit(this.map);
             this.layer._dirty = true;
         }
     },
 
+    // triggered when starting edit process, and on final "save/cancel" buttons
     _stopEdit: function () {
         if (this.layer) {
             this.layer.disableEdit(this.map);
@@ -40,31 +42,43 @@ var Location = L.Editable.extend({
         }
     },
 
+    // Update the geometry, and the geometry form field.
     _saveEdit: function (final) {
         this.layer.disableEdit();
         var geom = this.layer.toGeoJSON().geometry;
         this.layer.feature.geometry = geom;
-        if (!final) {
+        if (!this.layer._new) {
             this._backupLayer();
         }
         var gj = JSON.stringify(geom);
         $('textarea[name="geometry"]').html(gj);
-        this.layer._new = false;
+        if (final) {
+            this.layer._new = false;
+            this._clearBackup();
+        }
     },
 
-    _undoEdit: function (cancel_form) {
-        this._undo(cancel_form);
+    // revert latest editing change.
+    _undoEdit: function (final) {
+        this._undo(final);
         if (this.layer) this.layer._editing = false;
         this._deleting = this._deleted = false;
     },
 
-    _undo: function (cancel_form) {
+    // either revert to the most recent state, or back to the original_state.
+    _undo: function (final) {
         var latLngs;
 
         if (this.layer) {
             this.layer.disableEdit();
 
-            if (cancel_form && this._original_state[0]) {
+            if (this.layer._new && final) {
+                this._setDeleted();
+                this._saveDelete();
+                return;
+            }
+
+            if (final && this._original_state[0]) {
                 this.map.geojsonLayer.removeLayer(this.layer);
                 this.layer = this._original_state[0].layer;
 
@@ -84,26 +98,25 @@ var Location = L.Editable.extend({
                     this.map.geojsonLayer.removeLayer(this.layer);
                     this.map.geojsonLayer.addLayer(this.layer);
                 }
-            } else if (this.layer._new || !this._original_state[0] ) {
-                this._setDeleted();
             }
         }
     },
 
-    // delete functions
+    /****************
+    DELETE FUNCTIONS
+    *****************/
 
+    // initiate "deleting"
     _startDelete: function () {
-        if (!this.layer._new) {
-            this._backupLayer();
-        }
+        this._backupLayer();
         this._deleting = true;
         this._deleted = false;
     },
 
+    // enable edit and remove the geometry.
+    // if the layer is new, delete the entire layer? Is this right?
     _setDeleted: function (e) {
-        if (!this.layer._new) {
-            this._backupLayer();
-        }
+        this._backupLayer();
         if (this.layer instanceof L.Polyline || this.layer instanceof L.Polygon || this.layer instanceof L.Rectangle) {
             this.layer.enableEdit();
             this.layer.editor.deleteShape(this.layer._latlngs);
@@ -115,21 +128,23 @@ var Location = L.Editable.extend({
             this._deleted = true;
         }
 
+        this.featuresLayer.clearLayers();
+    },
+
+    // revert delete changes.
+    _undoDelete: function (final) {
+        this._undo(final);
+        this._deleted = false;
+        this._deleting = false;
+    },
+
+    // update geometry form field, set deleting to false, clear backup.
+    _saveDelete: function () {
         if (this.layer._new || !this._original_state[0]) {
             this.map.geojsonLayer.removeLayer(this.layer);
             this.layer = null;
         }
 
-        this.featuresLayer.clearLayers();
-    },
-
-    _undoDelete: function (cancel_form) {
-        this._undo(cancel_form);
-        this._deleted = false;
-        this._deleting = false;
-    },
-
-    _saveDelete: function () {
         if (this._deleted) {
             $('textarea[name="geometry"]').html('');
         }
@@ -137,10 +152,16 @@ var Location = L.Editable.extend({
         this._clearBackup();
     },
 
-    // draw functions
+    /**************
+    DRAW FUNCTIONS
+    **************/
 
-    _drawStart: function (e) {},
+    // fired when a geometry button is clicked.
+    _drawStart: function (e) {
+        
+    },
 
+    // fired when adding a new geometry, or replacing an old geometry
     _drawEnd: function (e) {
         if (!this._hasDrawnFeature()) return;
         if (!this._checkValid(e.layer)) return;
@@ -156,6 +177,7 @@ var Location = L.Editable.extend({
         this._deleting = false;
     },
 
+    // fired when a geometry is deleted and a new one replaces the old one.
     _update: function (lyr) {
         this.layer.disableEdit();
         var geometry = lyr.toGeoJSON().geometry;
@@ -163,14 +185,14 @@ var Location = L.Editable.extend({
         L.stamp(layer);
         this.layer.feature.geometry = geometry;
         layer.feature = this.layer.feature;
+        layer._new = this.layer._new;
         this.layer = layer;
-        if (!this.layer._new) {
-            this._backupLayer();
-        }
+        this._backupLayer();
         this._replaceGeoJSONFeature(this.layer);
         this.layer._dirty = true;
     },
 
+    // only fired when 'adding location'
     _createNew: function (lyr) {
         var feature = lyr.toGeoJSON();
         var layer = LatLngUtil.copyLayer(lyr);
@@ -200,8 +222,11 @@ var Location = L.Editable.extend({
         }
     },
 
-    // utils
+    /*********
+    UTILS
+    ********/
 
+    // if a geometry has been updated, it removes the old layer and replaces it with the new.
     _replaceGeoJSONFeature: function (layer) {
         this.map.geojsonLayer.eachLayer(function (l) {
             if (l.feature.id === layer.feature.id) {
@@ -211,6 +236,7 @@ var Location = L.Editable.extend({
         }, this);
     },
 
+    // finds the feature id that matches the id in the url.
     _findLayer: function (fid) {
         var layer = null;
         this.map.geojsonLayer.eachLayer(function (l) {
@@ -222,44 +248,48 @@ var Location = L.Editable.extend({
         return layer;
     },
 
+    // Stores the ORIGINAL version fo the geometry, and the version right before the lastest change.
     _backupLayer: function (initial_edit) {
-        this._undoBuffer = {};
-        if (this.layer instanceof L.Polyline || this.layer instanceof L.Polygon || this.layer instanceof L.Rectangle) {
-            this._undoBuffer[this.layer._leaflet_id] = {
-                latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
-            }; 
+        var cloneLatLngs;
 
-            if (initial_edit && !this._original_state[0]) {
-                this._original_state.push({
-                    latlngs: LatLngUtil.cloneLatLngs(this.layer.getLatLngs()),
-                    layer: this.layer
-                });
-            }
+        this._undoBuffer = {};
+
+        if (this.layer instanceof L.Marker) { 
+            cloneLatLngs = LatLngUtil.cloneLatLng(this.layer.getLatLng()); 
+        } else { 
+            cloneLatLngs = LatLngUtil.cloneLatLngs(this.layer.getLatLngs());
         }
-        if (this.layer instanceof L.Marker) {
-            this._undoBuffer[this.layer._leaflet_id] = {
-                latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLng()),
-            };
-            if (initial_edit && !this._original_state[0]) {
-                this._original_state.push({
-                    latlngs: LatLngUtil.cloneLatLng(this.layer.getLatLngs()),
-                    layer: this.layer
-                });
-            }
+
+        this._undoBuffer[this.layer._leaflet_id] = {
+            latlngs: cloneLatLngs,
+        };
+
+        // if the object is NEW, original state should always be empty
+        // else, if it's the initial edit, it should save the very first shape.
+        if (initial_edit && !this.layer._new && !this._original_state[0]) {
+            this._original_state.push({
+                latlngs: cloneLatLngs,
+                layer: this.layer
+            });
         }
     },
 
+    // checks if the user has drawn a shape.
+    // triggered after a geometry has bee completed.
     _hasDrawnFeature: function () {
         return this.featuresLayer.getLayers().length > 0;
     },
 
-    _clearBackup: function (cancel_form) {
+    // removes all information in the buffer.
+    // if "final" removes the _original_state
+    _clearBackup: function (final) {
         this._undoBuffer = {};
-        if (cancel_form) {
+        if (final) {
             this._original_state = [];
         }
     },
 
+    // fired when editing starts, and when final "cancel" is clicked.
     _reset: function () {
         this.layer = null;
         this.feature = null;
@@ -289,6 +319,7 @@ var LocationEditor = L.Evented.extend({
         this._addEditableEvents();
     },
 
+    // determines whether or not clicking on a location is "allowed"
     onLayerClick: function (e) {
         if (this.dirty() && !this.deleting()) return;
         var feature = e.target.feature;
@@ -305,8 +336,11 @@ var LocationEditor = L.Evented.extend({
         this.setEditable(feature, layer);
     },
 
-    // edit functions
+    /********
+    EDIT FUNCTIONS
+    *********/ 
 
+    // Make the currently selected location editable.
     setEditable: function (feature, layer) {
         if (this.location.layer) {
             if (this.location.layer.feature.id === feature.id) return;
@@ -321,6 +355,7 @@ var LocationEditor = L.Evented.extend({
         Styles.setSelectedStyle(layer);
     },
 
+    // Triggered when finishing adding a geometry, clicking "edit tool" button
     edit: function () {
         this.tooltip.update(this.tooltip.EDIT_ENABLED);
         if (this.editing()) {
@@ -329,38 +364,50 @@ var LocationEditor = L.Evented.extend({
         this.location._startEdit();
     },
 
-    cancelEdit: function (cancel_form) {
+    // Triggered by cancel in the map
+    // Also manually triggered by "dispose"
+    cancelEdit: function (final) {
         this.tooltip.remove();
-        this.location._undoEdit(cancel_form);
+        this.location._undoEdit(final);
     },
 
+    // checks if currently "editing";
     editing: function () {
         return this._editing;
     },
 
+    // checks if prevent_click is true
     preventClick: function () {
         return this._prevent_click;
     },
 
+    // checks if a location is "dirty".
+    // Should be dirty until final "save/cancel"
     dirty: function () {
         if (this.location.layer) {
             return this.location.layer._dirty;
         }
     },
 
+    // Triggered by click on geom button, cancel geom button, and "edit tool" button.
+    // why is it being triggered by cancel?
     _editStart: function (e) {
         this._editing = true;
         this._prevent_click = true;
         Styles.setEditStyle(e.layer);
     },
 
+    // Triggered when a geom is added, canceled, AND saved.
     _editStop: function (e) {
         this._editing = false;
         Styles.setSelectedStyle(e.layer);
     },
 
-    // delete functions
+    /***************
+    DELETE FUNCTIONS
+    ***************/
 
+    // finalizes "delete" on the map, not in form.
     delete: function () {
         this.tooltip.remove();
         this.location._saveDelete();
@@ -371,12 +418,14 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
-    cancelDelete: function (cancel_form) {
+    // adds locations that had been deleted back.
+    cancelDelete: function (final) {
         this.tooltip.remove();
-        this.location._undoDelete(cancel_form);
+        this.location._undoDelete(final);
         Styles.setSelectedStyle(this.location.layer);
     },
 
+    // enables the delete button, starts delete process, and sets the style of the location to "deleting"
     startDelete: function () {
         this.tooltip.update(this.tooltip.START_DELETE);
         if (this.location.layer) {
@@ -385,14 +434,17 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
+    // checks to see if a location is in the process of being deleted.
     deleting: function () {
         return this.location._deleting;
     },
 
+    // Checks to see if a location has been deleted.
     deleted: function () {
         return this.location._deleted;
     },
 
+    // Only fired when clicking 'delete geometry' in map.
     deleteLayer: function (layer, e) {
         this.tooltip.update(this.tooltip.CONTINUE_DELETE);
         var currentLayer = this.location.layer;
@@ -402,6 +454,11 @@ var LocationEditor = L.Evented.extend({
         this.location._setDeleted(e);
     },
 
+    /************************
+    DELETE LOCATION FUNCTIONS
+    *************************/
+
+    // ONLY fired when clicking "delete location" on location detail page.
     _removeLayer: function () {
         var hash_path = window.location.hash.slice(1) || '/';
         var fid = hash_path.split('/')[3];
@@ -409,21 +466,27 @@ var LocationEditor = L.Evented.extend({
         if (layer) layer.remove();
     },
 
-    // new location functions
+    /********************* 
+    NEW LOCATION FUCTIONS
+    *********************/
 
+    // triggered when "add location" is clicked.
     _addNew: function () {
         this._resetView();
         this._addEditControls();
         this._disableEditToolbar();
     },
 
+    // checks if this is a newly added location.
     isNew: function () {
         if (this.location.layer) {
             return this.location.layer._new;
         }
     },
 
-    // draw functions
+    /**************
+    DRAW FUNCTIONS
+    ***************/
 
     startRectangle: function () {
         this.tooltip.update(this.tooltip.ADD_RECTANGLE);
@@ -454,42 +517,41 @@ var LocationEditor = L.Evented.extend({
         this.location.startMarker();
     },
 
+    // checked to see if edit tool button can be enabled.
     hasEditableLayer: function () {
         return ((this.location.layer !== null ? true : false) ||
                 this.hasDrawnFeature()) &&
             (!this.deleting() && !this.deleted());
     },
 
+    // checks to see if there is a layer that can be edited
     hasDrawnFeature: function () {
         return this.location.featuresLayer.getLayers().length > 0;
     },
 
+    // Only fired when cancel-action button is clicked.
     cancelDrawing: function (e) {
         this.location.stopDrawing();
         this.tooltip.remove();
-        if (this.location.layer) {
-            this.deleteLayer(this.location.layer, e);
-            this.delete();
+        // if (this.location.layer) {
+        //     this.deleteLayer(this.location.layer, e);
+        //     this.delete();
+        // }
+        if (!this.location.layer) {
+            this._disableEditToolbar();
         }
-        this._disableEditToolbar(deactivate = true);
     },
 
-    dispose: function () {
-        if (this.location._deleting || this.location._deleted) {
-            this.cancelDelete(true);
-        } else if (this._editing || this.dirty()) {
-            this.cancelEdit(true);
-        }
-        this._resetView();
-    },
-
+    // Fired every time a geometry button is clicked.
+    // Why did I add ._cancelEdit?
+    // I honestly don't remember. Commenting it out for now.
     _drawStart: function (e) {
-        if (this.layer) {
-            this._cancelEdit();
-        }
+        // if (this.layer) {
+        //     this._cancelEdit();
+        // }
     },
 
-    // fired every a geometry is 'completed', or the cancel action button is clicked.
+    // fired every a geometry is 'completed', or the cancel-action button is clicked.
     // Adds a click event if there is a layer, and automatically enables the edit toolbar.
     _drawEnd: function (e) {
         this._cancelDraw();
@@ -498,8 +560,9 @@ var LocationEditor = L.Evented.extend({
             if (!this.location.layer._events.hasOwnProperty('click')) {
                 this.location.layer.on('click', this.onLayerClick, this);
             }
-            this._enableEditToolbar(active = true);
-            Styles.setEditStyle(this.location.layer);
+            this.save();
+            this._enableEditToolbar();
+            Styles.setSelectedStyle(this.location.layer);
         }
     },
 
@@ -532,9 +595,9 @@ var LocationEditor = L.Evented.extend({
         this.tooltip.update(this.tooltip.EDIT_ENABLED);
     },
 
-    /************
-    SAVING
-    *************/
+    /*******************
+    SAVING vs. DISPOSING
+    ********************/
 
     // fired when clicking "save" on the map, as well as the final "Save" in the form
     // if "final", the Save button in the form has been clicked
@@ -542,16 +605,26 @@ var LocationEditor = L.Evented.extend({
         this.tooltip.remove();
         if (this.deleting()) {
             this.location._saveDelete();
-            this.location._deleting = false;
-        } else if (this.editing()) {
+        } else if (this.editing() || this.dirty()) {
             this.location._saveEdit(final);
-            this._editing = false;
         }
     },
 
-    /**************
-    EDITOR TOOLBARS
-    ***************/
+    // ONLY fired when the "big" cancel button in form is clicked.
+    // This is only time it should rely on _original_state
+    dispose: function () {
+        if (this.location._deleting || this.location._deleted) {
+            this.cancelDelete( final = true);
+        } else if (this._editing || this.dirty()) {
+            this.cancelEdit( final = true);
+        }
+
+        this._resetView();
+    },
+
+    /**********************************
+    EDITOR TOOLBARS && DOM MANIPULATORS
+    ***********************************/
 
     // When editing an existing location, there won't be layers if the page has been refreshed.
     _setUpEditor: function (e) {
@@ -637,7 +710,8 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
-    // closes cancel button next to rectangle/square/marker etc
+    // triggered when cancel-action button is clicked.
+    // closes cancel-action button
     _cancelDraw: function () {
         var cancelDraw = $('a.cancel-draw');
         cancelDraw.each(function (idx, ele) {
@@ -659,7 +733,9 @@ var LocationEditor = L.Evented.extend({
         this.location._reset();
     },
 
-    // events
+    /***********
+    EVENTS
+    ************/
 
     _addDeleteEvent: function () {
         this.on('location:delete', this._removeLayer, this);

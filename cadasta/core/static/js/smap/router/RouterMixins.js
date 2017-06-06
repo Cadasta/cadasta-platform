@@ -493,6 +493,7 @@ function RouterMixins() {
                     data.geometry = 'None';
                 }
 
+
                 var posturl = $.ajax({
                     method: "POST",
                     url: formaction,
