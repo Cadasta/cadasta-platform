@@ -40,11 +40,11 @@ var Location = L.Editable.extend({
         }
     },
 
-    _saveEdit: function () {
+    _saveEdit: function (final) {
         this.layer.disableEdit();
         var geom = this.layer.toGeoJSON().geometry;
         this.layer.feature.geometry = geom;
-        if (!this.layer._new) {
+        if (!final) {
             this._backupLayer();
         }
         var gj = JSON.stringify(geom);
@@ -489,6 +489,8 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
+    // fired every a geometry is 'completed', or the cancel action button is clicked.
+    // Adds a click event if there is a layer, and automatically enables the edit toolbar.
     _drawEnd: function (e) {
         this._cancelDraw();
         if (this.location.layer) {
@@ -530,21 +532,28 @@ var LocationEditor = L.Evented.extend({
         this.tooltip.update(this.tooltip.EDIT_ENABLED);
     },
 
-    // saving
+    /************
+    SAVING
+    *************/
 
-    save: function () {
+    // fired when clicking "save" on the map, as well as the final "Save" in the form
+    // if "final", the Save button in the form has been clicked
+    save: function (final) {
         this.tooltip.remove();
         if (this.deleting()) {
             this.location._saveDelete();
             this.location._deleting = false;
         } else if (this.editing()) {
-            this.location._saveEdit();
+            this.location._saveEdit(final);
             this._editing = false;
         }
     },
 
-    // editor toolbars
+    /**************
+    EDITOR TOOLBARS
+    ***************/
 
+    // When editing an existing location, there won't be layers if the page has been refreshed.
     _setUpEditor: function (e) {
         if (!this.location.layer) {
             var hash_path = window.location.hash.slice(1) || '/';
@@ -561,6 +570,8 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
+    // adds the leaflet edit toolbar.
+    // automatically clicks on the edit button so that editing locations is automatic
     _addEditControls: function () {
         var map = this.map;
         this.toolbars.forEach(function (toolbar) {
@@ -569,6 +580,7 @@ var LocationEditor = L.Evented.extend({
         this._enableEditToolbar(active = true);
     },
 
+    // removes the leaflet edit toolbars. Turns prevent click off.
     _removeEditControls: function () {
         var map = this.map;
         this.toolbars.forEach(function (toolbar) {
@@ -581,6 +593,8 @@ var LocationEditor = L.Evented.extend({
         this.tooltip.remove();
     },
 
+    // activates edit/delete tool logo on map.
+    // If 'active' === true, the "save/cancel" buttons appear automatically.
     _enableEditToolbar: function (active) {
         active = active || false;
         var editLink = $('a.edit-action').get(0);
@@ -594,6 +608,7 @@ var LocationEditor = L.Evented.extend({
         $('span#edit, span#delete').removeClass('smap-edit-disable');
     },
 
+    // deactivates the edit tool logo on map
     _disableEditToolbar: function (deactivate) {
         deactivate = deactivate || false;
         var edit = $('ul.leaflet-smap-edit a').prop('disabled', 'disabled');
@@ -605,6 +620,8 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
+    // Automatically clicks the edit/delete cancel buttons.
+    // if reset, the location style goes back to default
     _cancelEdit: function (reset) {
         reset = reset || true;
         var cancelEdit = $('a.cancel-edit'),
@@ -620,6 +637,7 @@ var LocationEditor = L.Evented.extend({
         }
     },
 
+    // closes cancel button next to rectangle/square/marker etc
     _cancelDraw: function () {
         var cancelDraw = $('a.cancel-draw');
         cancelDraw.each(function (idx, ele) {
@@ -631,6 +649,7 @@ var LocationEditor = L.Evented.extend({
         });
     },
 
+    // returns view back to normal
     _resetView: function () {
         this._editing = false;
         this._prevent_click = false;

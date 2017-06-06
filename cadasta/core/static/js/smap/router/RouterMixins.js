@@ -372,7 +372,7 @@ function RouterMixins() {
 
             $('button[name="submit-button"]').on('click', function (e) {
                 e.preventDefault();
-                editor.save();
+                editor.save(final = true);
                 $('#location-wizard').submit();
             });
         },

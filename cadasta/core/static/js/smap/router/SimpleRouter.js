@@ -3,6 +3,7 @@ function SimpleRouter(map) {
     var routes = CreateRoutes(map);
 
     function router(force_reload) {
+        var force_reload = force_reload || false;
         var async_url = '/async' + location.pathname;
         var hash_path = location.hash.slice(1) || '/';
 
