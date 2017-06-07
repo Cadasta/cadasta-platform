@@ -1,23 +1,32 @@
-import logging
-
-import gpxpy
 from django.contrib.gis.geos import (GeometryCollection, LineString,
                                      MultiLineString, MultiPoint, Point)
 from django.utils.translation import ugettext as _
+from gpxpy import gpx, parser
 
 from ..exceptions import InvalidGPXFile
 
-logger = logging.getLogger(__name__)
+
+class GPXParser(parser.GPXParser):
+
+    def parse(self, version=None):
+        try:
+            self.xml_parser = parser.LXMLParser(self.xml)
+            self.__parse_dom(version)
+            return self.gpx
+        except Exception as e:
+            raise gpx.GPXXMLSyntaxException(
+                'Error parsing XML: %s' % str(e), e)
 
 
 class GPXProcessor:
 
     def __init__(self, gpx_file):
-        with open(gpx_file) as f:
+        with open(gpx_file, 'r') as f:
             try:
-                self.gpx = gpxpy.parse(f)
-            except gpxpy.gpx.GPXException as e:
-                raise InvalidGPXFile(_("Invalid GPX file: %s" % e))
+                parser = GPXParser(f)
+                self.gpx = parser.parse(f)
+            except gpx.GPXException as e:
+                raise InvalidGPXFile(_("Invalid GPX file: %s" % str(e)))
 
     def get_layers(self):
         layers = {}
