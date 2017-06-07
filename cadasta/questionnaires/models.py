@@ -254,7 +254,7 @@ class PDFForm(RandomIDModel, ResourceThumbnailMixin):
         self._original_url = self.file.url
 
     def save(self, *args, **kwargs):
-        self.create_thumbnails((not self.id))
+        self.create_thumbnails((not self.id), cropped=False)
         super().save(*args, **kwargs)
 
     @property

@@ -29,12 +29,12 @@ def crop(img):
     return region
 
 
-def make(img, size):
+def make(img, size, cropped=True):
     im = fix_orientation(Image.open(img))
     copy = im.copy()
-    cropped_img = crop(copy)
-    cropped_img.thumbnail(size, Image.ANTIALIAS)
-    return cropped_img
+    image = crop(copy) if cropped else copy
+    image.thumbnail(size, Image.ANTIALIAS)
+    return image
 
 
 # Code below this point is adapted from

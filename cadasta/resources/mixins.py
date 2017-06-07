@@ -75,7 +75,7 @@ class ResourceThumbnailMixin:
 
             return self._thumbnail
 
-    def create_thumbnails(self, created):
+    def create_thumbnails(self, created, cropped=True):
         if self.file.url:
             if created or self._original_url != self.file.url:
                 mime_type = self._get_mime()
@@ -91,7 +91,7 @@ class ResourceThumbnailMixin:
                     size = 128, 128
 
                     file = self.file.open()
-                    thumb = thumbnail.make(file, size)
+                    thumb = thumbnail.make(file, size, cropped=cropped)
                     thumb.save(write_path)
                     if self.file.field.upload_to:
                         name = self.file.field.upload_to + '/' + name

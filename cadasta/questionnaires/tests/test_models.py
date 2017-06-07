@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from PIL import Image
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
@@ -122,3 +123,8 @@ class PDFFormTest(UserTestCase, FileStorageTestCase, TestCase):
                 's3/uploads/pdf-form-logos/image-128x128.jpg'
             )
         )
+        img = Image.open(os.path.join(
+            settings.MEDIA_ROOT,
+            's3/uploads/pdf-form-logos/image-128x128.jpg'))
+        assert img.size[0] == 128
+        assert img.size[1] == 95

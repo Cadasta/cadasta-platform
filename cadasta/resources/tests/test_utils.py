@@ -30,6 +30,12 @@ class ThumbnailTest(TestCase):
         assert thumb.size[0] == 100
         assert thumb.size[1] == 100
 
+    def test_make_no_crop(self):
+        image = path + '/resources/tests/files/image.jpg'
+        thumb = thumbnail.make(image, (100, 100), cropped=False)
+        assert thumb.size[0] == 100
+        assert thumb.size[1] == 74
+
     def test_make_rotated(self):
         image = path + '/resources/tests/files/rotated-image.jpg'
         thumb = thumbnail.make(image, (100, 100))
