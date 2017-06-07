@@ -1,6 +1,6 @@
 {% load i18n %}
 
-      {% if not projects and not organization.description %}
+      {% if not projects and not organization.description and not organization.urls.0 and not organization.contacts%}
         <!-- Empty state  -->
         <div class="main-text">
           <div class="col-md-6 col-md-offset-3">
@@ -10,7 +10,7 @@
                 <p class="text-center">{% trans "Looks like this organization has nothing to show yet. As details and projects are created, they'll appear here." %}</p>
                 <div class="btn-full">
                   <a class="btn btn-primary" href="{% url 'organization:list' %}" role="button">
-                    <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "View all organizations" %}
+                    {% trans "View all organizations" %}
                   </a>
                 </div>
               </div>
@@ -69,7 +69,7 @@
                         <p class="text-center">{% trans "Looks like this organization has no public projects. As public projects are created, they'll appear here." %}</p>
                         <div class="btn-full">
                           <a class="btn btn-primary" href="{% url 'organization:list' %}" role="button">
-                            <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "View all organizations" %}
+                            {% trans "View all organizations" %}
                           </a>
                         </div>
                       </div>
