@@ -54,7 +54,7 @@ var Location = L.Editable.extend({
         $('textarea[name="geometry"]').html(gj);
         if (final) {
             this.layer._new = false;
-            this._clearBackup();
+            this._clearBackup(final);
         }
     },
 
@@ -63,6 +63,10 @@ var Location = L.Editable.extend({
         this._undo(final);
         if (this.layer) this.layer._editing = false;
         this._deleting = this._deleted = false;
+
+        if (final) {
+            this._clearBackup(final);
+        }
     },
 
     // either revert to the most recent state, or back to the original_state.
