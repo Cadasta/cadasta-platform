@@ -227,7 +227,8 @@ class ProfileFormTest(UserTestCase, TestCase):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
                                   email_verified=True,
-                                  password='sgt-pepper')
+                                  password='sgt-pepper',
+                                  language='en')
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
@@ -249,6 +250,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
         assert user.email == 'john@beatles.uk'
+        assert user.language == 'en'
         assert user.email_verified is True
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
@@ -402,6 +404,33 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
+
+    def test_update_user_language(self):
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk',
+                                  password='sgt-pepper',
+                                  language='en')
+        data = {
+            'username': 'imagine71',
+            'email': 'john2@beatles.uk',
+            'password': 'sgt-pepper',
+            'language': 'fr'
+        }
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = '80'
+
+        form = forms.ProfileForm(data, request=request, instance=user)
+        form.save()
+        user.refresh_from_db()
+        assert form.is_valid() is True
+        assert user.language == 'fr'
+
+    def test_update_user_language_with_invalid_language(self):
+        pass
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
