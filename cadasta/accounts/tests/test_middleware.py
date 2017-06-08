@@ -15,8 +15,8 @@ class UserLanguageMiddlewareTest(TestCase):
     def test_process_request_user_not_authenticated(self, mock_translation):
         self.mock_request.user.is_authenticated = False
         response = self.ulm.process_request(self.mock_request)
-        self.assertEqual(0, mock_translation.activate.call_count)
-        self.assertIsNone(response)
+        assert 0 == mock_translation.activate.call_count
+        assert response is None
 
     @patch.object(middleware, 'translation')
     def test_process_request_with_same_language(self, mock_translation):
@@ -24,8 +24,8 @@ class UserLanguageMiddlewareTest(TestCase):
         self.mock_request.user.language = 'en'
         mock_translation.get_language.return_value = 'en'
         response = self.ulm.process_request(self.mock_request)
-        self.assertEqual(0, mock_translation.activate.call_count)
-        self.assertIsNone(response)
+        assert 0 == mock_translation.activate.call_count
+        assert response is None
 
     @patch.object(middleware, 'translation')
     def test_process_request_activate_user_language(self, mock_translation):
@@ -36,6 +36,6 @@ class UserLanguageMiddlewareTest(TestCase):
         session_lang = self.mock_request.session
         session_lang[self.LANGUAGE_SESSION_KEY] = user_lang
         response = self.ulm.process_request(self.mock_request)
-        self.assertEqual(1, mock_translation.activate.call_count)
-        self.assertEqual('fr', session_lang[self.LANGUAGE_SESSION_KEY])
-        self.assertIsNone(response)
+        assert 1 == mock_translation.activate.call_count
+        assert 'fr' == session_lang[self.LANGUAGE_SESSION_KEY]
+        assert response is None
