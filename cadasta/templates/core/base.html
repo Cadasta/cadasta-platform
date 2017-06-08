@@ -139,6 +139,7 @@
             {% now 'Y' as copydate %}
             {% blocktrans %}Copyright {{ copydate }} Cadasta. <span>All Rights Reserved.</span> {% endblocktrans %}
           </p>
+          {% if not user.is_authenticated %}
           <form action="{% url 'set_language' %}" method="post" class="language">
           {% csrf_token %}
             <select id="language" class="form-control input-sm" name="language">
@@ -153,6 +154,7 @@
             </select>
             <input hidden="true" type="submit" value="Go" />
           </form>
+          {% endif %}
           <div class="footer-links">
             <ul class="list-inline">
               <li>
