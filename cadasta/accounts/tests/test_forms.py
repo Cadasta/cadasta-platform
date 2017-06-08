@@ -429,9 +429,6 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert form.is_valid() is True
         assert user.language == 'fr'
 
-    def test_update_user_language_with_invalid_language(self):
-        pass
-
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
                                   password='imagine71')
