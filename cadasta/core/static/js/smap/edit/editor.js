@@ -76,17 +76,17 @@ var Location = L.Editable.extend({
         if (this.layer) {
             this.layer.disableEdit();
 
-            if (this.layer._new && final) {
-                this._setDeleted();
-                this._saveDelete();
-                return;
-            }
+            if (final) {
+                if (this.layer._new || !this._original_state[0]) {
+                    this._setDeleted();
+                    this._saveDelete();
+                    return;
+                } else if (this._original_state[0]) {
+                    this.map.geojsonLayer.removeLayer(this.layer);
+                    this.layer = this._original_state[0].layer;
 
-            if (final && this._original_state[0]) {
-                this.map.geojsonLayer.removeLayer(this.layer);
-                this.layer = this._original_state[0].layer;
-
-                latLngs = this._original_state[0];
+                    latLngs = this._original_state[0];
+                }
             } else {
                 var latLngs_dict = this._undoBuffer;
                 latLngs = latLngs_dict[this.layer._leaflet_id];
