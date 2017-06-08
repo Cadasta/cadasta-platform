@@ -191,9 +191,6 @@ var EditorToolbars = function () {
             },
         },
         addHooks: function () {
-            if (this.editor.deleting()) {
-                this.editor.cancelDelete();
-            }
             this.editor.cancelEdit();
             SubAction.prototype.addHooks.call(this);
         }

@@ -144,12 +144,12 @@ var Location = L.Editable.extend({
 
     // update geometry form field, set deleting to false, clear backup.
     _saveDelete: function () {
-        if (this.layer._new || !this._original_state[0]) {
-            this.map.geojsonLayer.removeLayer(this.layer);
-            this.layer = null;
-        }
 
         if (this._deleted) {
+            if (this.layer._new || !this._original_state[0]) {
+                this.map.geojsonLayer.removeLayer(this.layer);
+                this.layer = null;
+            }
             $('textarea[name="geometry"]').html('');
         }
         this._deleting = false;
