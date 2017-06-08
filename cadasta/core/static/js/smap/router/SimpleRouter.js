@@ -3,9 +3,9 @@ function SimpleRouter(map) {
     var routes = CreateRoutes(map);
 
     function router(force_reload) {
-        var force_reload = force_reload || false;
         var async_url = '/async' + location.pathname;
         var hash_path = location.hash.slice(1) || '/';
+        force_reload = force_reload || false;
 
         // first_load will only be true if the first page landed on is a record without coordinates
         if (!hash_path.includes('/records/') || hash_path.includes('coords=')) {

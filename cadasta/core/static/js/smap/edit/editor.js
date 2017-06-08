@@ -161,9 +161,7 @@ var Location = L.Editable.extend({
     **************/
 
     // fired when a geometry button is clicked.
-    _drawStart: function (e) {
-        
-    },
+    _drawStart: function (e) {},
 
     // fired when adding a new geometry, or replacing an old geometry
     _drawEnd: function (e) {
@@ -537,23 +535,14 @@ var LocationEditor = L.Evented.extend({
     cancelDrawing: function (e) {
         this.location.stopDrawing();
         this.tooltip.remove();
-        // if (this.location.layer) {
-        //     this.deleteLayer(this.location.layer, e);
-        //     this.delete();
-        // }
+        this._editing = false;
         if (!this.location.layer) {
             this._disableEditToolbar();
         }
     },
 
     // Fired every time a geometry button is clicked.
-    // Why did I add ._cancelEdit?
-    // I honestly don't remember. Commenting it out for now.
-    _drawStart: function (e) {
-        // if (this.layer) {
-        //     this._cancelEdit();
-        // }
-    },
+    _drawStart: function (e) {},
 
     // fired every a geometry is 'completed', or the cancel-action button is clicked.
     // Adds a click event if there is a layer, and automatically enables the edit toolbar.
@@ -564,9 +553,12 @@ var LocationEditor = L.Evented.extend({
             if (!this.location.layer._events.hasOwnProperty('click')) {
                 this.location.layer.on('click', this.onLayerClick, this);
             }
-            this.save();
             this._enableEditToolbar();
             Styles.setSelectedStyle(this.location.layer);
+
+            // This temporariily saves geometries once they're added to the map,
+            // rather than having them go directly into "edit" mode.
+            this.save();
         }
     },
 
@@ -743,7 +735,6 @@ var LocationEditor = L.Evented.extend({
 
     _addDeleteEvent: function () {
         this.on('location:delete', this._removeLayer, this);
-        this.on('location:reset', this._cleanForm, this);
     },
 
     _addRouterEvents: function () {
