@@ -247,6 +247,11 @@ function RouterMixins() {
                 if (url.includes(state.current_location.layer.feature.id)) {
                     Styles.setSelectedStyle(state.current_location.layer);
                     editor.setEditable(state.current_location.layer.feature, state.current_location.layer);
+
+                    if (window.location.hash.includes('/edit/')) {
+                        map.locationEditor.fire('route:location:edit', { 'fid': state.current_location.layer.feature.id });
+                    }
+
                     return;
                 }
             }
@@ -270,6 +275,10 @@ function RouterMixins() {
                     state.current_location.layer = layers[i];
                     Styles.setSelectedStyle(layers[i]);
                     editor.setEditable(state.current_location.layer.feature, state.current_location.layer);
+
+                    if (window.location.hash.includes('/edit/')) {
+                        map.locationEditor.fire('route:location:edit', { 'fid': layers[i].feature.id });
+                    }
                     return;
                 }
             }
