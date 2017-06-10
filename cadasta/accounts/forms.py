@@ -92,6 +92,14 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                 _("Username cannot be “add” or “new”."))
         return username
 
+    def clean_language(self):
+        lang_codes = next(zip(*settings.LANGUAGES))
+        language = self.data.get('language')
+        if language not in lang_codes:
+            raise forms.ValidationError(
+                _("You didn't select an available language."))
+        return language
+
     def clean_password(self):
         if (self.fields['password'].required and
                 not self.instance.check_password(self.data.get('password'))):
