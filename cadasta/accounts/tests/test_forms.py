@@ -405,7 +405,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
 
-    def test_update_user_language(self):
+    def test_update_with_valid_language(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
                                   password='sgt-pepper',
@@ -428,6 +428,20 @@ class ProfileFormTest(UserTestCase, TestCase):
         user.refresh_from_db()
         assert form.is_valid() is True
         assert user.language == 'fr'
+
+    def test_update_with_invalid_language(self):
+        user = UserFactory.create(email='john@beatles.uk',
+                                  password='imagine71',
+                                  language='en')
+        data = {
+            'username': 'imagine71',
+            'email': 'john2@beatles.uk',
+            'full_name': 'John Lennon',
+            'password': 'stg-pepper',
+            'language': 'invalid'
+        }
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
