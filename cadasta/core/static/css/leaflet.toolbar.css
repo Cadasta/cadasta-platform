@@ -115,3 +115,10 @@
     width:26px;
     height:26px
 }
+
+.leaflet-vertex-icon, .leaflet-middle-icon {
+    margin-left: -4px !important;
+    margin-top: -4px !important;
+    width: 8px !important;
+    height: 8px !important;
+}
