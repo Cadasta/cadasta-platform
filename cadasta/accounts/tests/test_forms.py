@@ -433,6 +433,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         user = UserFactory.create(email='john@beatles.uk',
                                   password='imagine71',
                                   language='en')
+        valid_languages = ['en', 'fr', 'es']
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
@@ -441,11 +442,12 @@ class ProfileFormTest(UserTestCase, TestCase):
             'language': 'invalid'
         }
         form = forms.ProfileForm(data, instance=user)
-        assert form.is_valid() is False
-        assert user.language == 'en'
-        assert (_("Select a valid choice. %s is not one "
-                  "of the available choices." % (data['language'])) in
-                form.errors.get('language'))
+        if data['language'] not in valid_languages:
+            assert form.is_valid() is False
+            assert user.language == 'en'
+            assert (_("Select a valid choice. %s is not one "
+                      "of the available choices." % (data['language'])) in
+                    form.errors.get('language'))
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
