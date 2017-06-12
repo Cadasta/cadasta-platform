@@ -442,6 +442,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
+        assert user.language == 'en'
         assert (_("Select a valid choice. %s is not one "
                   "of the available choices." % (data['language'])) in
                 form.errors.get('language'))
