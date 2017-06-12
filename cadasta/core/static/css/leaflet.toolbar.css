@@ -10,7 +10,7 @@
     background-color: #fff;
     position:relative;
     width: 30px;
-    border-bottom:2px solid #ccc
+    border-bottom:1px solid #ccc
 
 }.leaflet-control-toolbar>li:last-child{
     border-bottom-width:0
