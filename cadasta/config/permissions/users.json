@@ -1,0 +1,13 @@
+{
+    "content_type": "accounts.user",
+    "permissions": {
+        "user_create": {
+            "name": "Create User",
+            "codename": "user.create"
+        },
+        "user_update": {
+            "name": "Update User",
+            "codename": "user.update"
+        }
+    }
+}

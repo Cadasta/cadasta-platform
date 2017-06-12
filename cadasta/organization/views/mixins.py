@@ -1,5 +1,12 @@
 from django.conf import settings
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import AnonymousUser
+
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
+from django.utils.translation import gettext as _
+
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Prefetch
@@ -7,7 +14,9 @@ from django.db.models import Q, Prefetch
 from tutelary.models import check_perms
 
 from core.views.mixins import SuperUserCheckMixin
+from core.roles import AnonymousUserRole
 from ..models import Organization, Project, OrganizationRole, ProjectRole
+from accounts.models import PublicRole
 from questionnaires.models import Questionnaire
 
 
@@ -277,3 +286,64 @@ class OrgRoleCheckMixin(SuperUserCheckMixin):
         context['is_member'] = self.is_member
         context['is_administrator'] = self.is_administrator
         return context
+
+
+class RolePermissionMixin(PermissionRequiredMixin):
+
+    def get_role(self):
+        if self.request.user.is_anonymous:
+            return AnonymousUserRole()
+        if hasattr(self, '_org_role'):
+            return self._org_role
+        if hasattr(self, '_prj_role'):
+            return self._prj_role
+        try:
+            return PublicRole.objects.get(user=self.request.user)
+        except PublicRole.DoesNotExist:
+            pass
+
+    def has_permission(self):
+        user = self.request.user
+        # superusers have all permissions
+        if user.is_superuser:
+            return True
+        role = self.get_role()
+        if not role:
+            return False
+        perms = self.get_permission_required()
+
+        # how to check method-level permissions
+        return all(False for perm in perms
+                   if not user.has_perm(perm, obj=role))
+
+    def handle_no_permission(self):
+        messages.add_message(self.request, messages.WARNING,
+                             _("You don't have permission for this action."))
+
+        referer = self.request.META.get('HTTP_REFERER')
+        redirect_url = self.request.META.get('HTTP_REFERER', '/')
+
+        if (referer and '/account/login/' in referer and
+                not self.request.user.is_anonymous):
+
+            if 'organization' in self.kwargs and 'project' in self.kwargs:
+                redirect_url = reverse(
+                    'organization:project-dashboard',
+                    kwargs={'organization': self.kwargs['organization'],
+                            'project': self.kwargs['project']}
+                )
+                if redirect_url == self.request.get_full_path():
+                    redirect_url = reverse(
+                        'organization:dashboard',
+                        kwargs={'slug': self.kwargs['organization']}
+                    )
+
+            elif 'slug' in self.kwargs:
+                redirect_url = reverse(
+                    'organization:dashboard',
+                    kwargs={'slug': self.kwargs['slug']}
+                )
+                if redirect_url == self.request.get_full_path():
+                    redirect_url = reverse('core:dashboard')
+
+        return redirect(redirect_url)

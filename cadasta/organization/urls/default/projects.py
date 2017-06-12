@@ -10,5 +10,5 @@ urlpatterns = [
     url(
         r'^new/$',
         default.ProjectAddWizard.as_view(),
-        name='add')
+        name='add'),
 ]

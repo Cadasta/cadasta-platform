@@ -38,6 +38,13 @@ urlpatterns = [
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/$',
         default.ProjectDashboard.as_view(),
         name='project-dashboard'),
+
+    # test url
+    url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/blah$',
+        default.ProjectTestView.as_view(),
+        name='project-dashboard-test'),
+
     url(
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/edit/'
         'geometry/$',

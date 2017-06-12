@@ -15,7 +15,7 @@ from shapely.wkt import dumps
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
 
-from core.models import RandomIDModel, SlugModel
+from core.models import RandomIDModel, SlugModel, Role
 from geography.models import WorldBorder
 from resources.mixins import ResourceModelMixin
 from .validators import validate_contact
@@ -112,10 +112,11 @@ class Organization(SlugModel, RandomIDModel):
         return self.projects.all()
 
 
-class OrganizationRole(RandomIDModel):
+class OrganizationRole(Role):
     organization = models.ForeignKey(Organization)
-    user = models.ForeignKey('accounts.User')
     admin = models.BooleanField(default=False)
+    group = models.ForeignKey(
+        'auth.Group', null=True, related_name='organization_roles')
 
     history = HistoricalRecords()
 
@@ -309,12 +310,13 @@ def check_extent(sender, instance, **kwargs):
         reassign_project_extent(instance)
 
 
-class ProjectRole(RandomIDModel):
+class ProjectRole(Role):
     project = models.ForeignKey(Project)
-    user = models.ForeignKey('accounts.User')
     role = models.CharField(max_length=2,
                             choices=ROLE_CHOICES,
                             default='PU')
+    group = models.ForeignKey(
+        'auth.Group', null=True, related_name='project_roles')
 
     history = HistoricalRecords()
 

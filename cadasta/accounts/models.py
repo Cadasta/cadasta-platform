@@ -13,6 +13,7 @@ from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
 
 from simple_history.models import HistoricalRecords
+from core.models import Role
 from .manager import UserManager
 
 
@@ -84,8 +85,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
         return repr_string.format(obj=self)
 
     def get_display_name(self):
-        """
-        Returns the display name.
+        """Return the display name.
+
         If full name is present then return full name as display name
         else return username.
         """
@@ -97,6 +98,14 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     @property
     def avatar_url(self):
         return self.avatar.url or settings.DEFAULT_AVATAR
+
+
+@receiver(models.signals.post_save, sender=User)
+def assign_public_user_role(sender, instance, **kwargs):
+    if not PublicRole.objects.filter(user=instance).exists():
+        group = auth.Group.objects.get(name='PublicUser')
+        PublicRole.objects.create(
+            user=instance, name='public_user', group=group)
 
 
 @receiver(models.signals.post_save, sender=User)
@@ -120,3 +129,18 @@ def password_changed_reset(sender, request, user, **kwargs):
         [user.email],
         fail_silently=False
     )
+
+
+class PublicRole(Role):
+
+    is_public_user = True
+
+    group = models.ForeignKey(
+        'auth.Group', null=True, related_name='publicuser_roles')
+
+    history = HistoricalRecords()
+
+    def __repr__(self):
+        repr_string = (
+            '<PublicRole id={obj.id} user={obj.user.username}')
+        return repr_string.format(obj=self)

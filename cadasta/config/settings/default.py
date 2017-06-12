@@ -133,6 +133,7 @@ TEMPLATES = [
 ]
 
 AUTHENTICATION_BACKENDS = [
+    'core.backends.RoleAuthorizationBackend',
     'core.backends.Auth',
     'django.contrib.auth.backends.ModelBackend',
     'accounts.backends.AuthenticationBackend'

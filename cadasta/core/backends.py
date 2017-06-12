@@ -19,3 +19,11 @@ class MemorySafePyLibMCCache(PyLibMCCache, metaclass=HandledErrors):
         ('set', pylibmc.TooBig),
         ('set_many', pylibmc.TooBig),
     ]
+
+
+class RoleAuthorizationBackend(ModelBackend):
+
+    def has_perm(self, user_obj, perm, obj=None):
+        if not obj or not hasattr(obj, 'permissions'):
+            return False
+        return perm in obj.permissions

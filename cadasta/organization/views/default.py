@@ -991,3 +991,23 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         clazz = parts[-1]
         importer = getattr(module, clazz)
         return importer(project=self.get_project(), path=path)
+
+
+class ProjectTestView(mixins.RolePermissionMixin,
+                      mixins.ProjectMixin, generic.DetailView):
+    model = Project
+    template_name = 'organization/project_dashboard.html'
+
+    def get_object(self, queryset=None):
+        return self.get_project()
+
+    def get_permission_required(self):
+        perms = []
+        project = self.get_object()
+        if project.access == 'public':
+            perms.append('project.view')
+        else:
+            perms.append('project.view.private')
+        if project.archived:
+            perms.append('project.view.archived')
+        return perms

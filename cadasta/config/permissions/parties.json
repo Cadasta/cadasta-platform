@@ -1,0 +1,25 @@
+{
+    "content_type": "party.party",
+    "permissions": {
+        "party_create": {
+            "name": "Create Party",
+            "codename": "party.create"
+        },
+        "party_delete": {
+            "name": "Delete Party",
+            "codename": "party.delete"
+        },
+        "party_update": {
+            "name": "Update Party",
+            "codename": "party.update"
+        },
+        "party_resources_add": {
+            "name": "Add Party Resources",
+            "codename": "party.resources.add"
+        },
+        "party_resources_remove": {
+            "name": "Remove Party Resources",
+            "codename": "party.resources.remove"
+        }
+    }
+}

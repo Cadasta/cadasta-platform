@@ -1,0 +1,53 @@
+{
+    "content_type": "organization.project",
+    "permissions": {
+        "project_view": {
+            "name": "View Project",
+            "codename": "project.view"
+        },
+        "project_view_private": {
+            "name": "View Private Project",
+            "codename": "project.view.private"
+        },
+        "project_list": {
+            "name": "List Projects",
+            "codename": "project.list"
+        },
+        "project_create": {
+            "name": "Create Project",
+            "codename": "project.create"
+        },
+        "project_update": {
+            "name": "Update Project",
+            "codename": "project.update"
+        },
+        "project_archive": {
+            "name": "Archive Project",
+            "codename": "project.archive"
+        },
+        "project_unarchive": {
+            "name": "Unarchive Project",
+            "codename": "project.unarchive"
+        },
+        "project_download": {
+            "name": "Project Export",
+            "codename": "project.export"
+        },
+        "project_import": {
+            "name": "Project Import",
+            "codename": "project.import"
+        },
+        "project_users_add": {
+            "name": "Add Project Users",
+            "codename": "project.users.add"
+        },
+        "project_users_edit": {
+            "name": "Edit Project Users",
+            "codename": "project.users.edit"
+        },
+        "project_users_remove": {
+            "name": "Remove Project Users",
+            "codename": "project.users.remove"
+        }
+    }
+}
