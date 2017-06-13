@@ -103,6 +103,13 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
+- name: Uglify JS files
+  become: yes
+  become_user: root
+  shell: grunt production
+  args:
+    chdir: "{{ application_path }}"
+
 - name: Link static content
   become: yes
   become_user: "{{ app_user }}"
@@ -110,11 +117,6 @@
                  app_path="{{ application_path }}cadasta"
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
-
-- name: Ugifly JS files
-  become: yes
-  become_user: "{{ app_user }}"
-  shell: grunt production
 
 - name: Create cron job to prune MEDIA_ROOT files
   become: yes
