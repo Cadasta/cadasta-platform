@@ -554,11 +554,13 @@ var LocationEditor = L.Evented.extend({
                 this.location.layer.on('click', this.onLayerClick, this);
             }
             this._enableEditToolbar();
-            Styles.setSelectedStyle(this.location.layer);
 
             // This temporariily saves geometries once they're added to the map,
             // rather than having them go directly into "edit" mode.
-            this.save();
+            if (this.isNew()) {
+                Styles.setSelectedStyle(this.location.layer);
+                this.save();
+            }
         }
     },
 
