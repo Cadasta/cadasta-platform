@@ -1,6 +1,8 @@
 {% extends "organization/organization_wrapper.html" %}
 
 {% load i18n %}
+{% load staticfiles %}
+
 {% block page_title %}{% trans "Members" %} | {% endblock %}
 
 {% block left-nav %}members{% endblock %}
@@ -55,4 +57,9 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_script %}
+  {{ form.media }}
+  <script src="{% static 'js/form_submit.js' %}"></script>
 {% endblock %}
