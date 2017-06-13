@@ -11,9 +11,6 @@ from core.form_mixins import SuperUserCheck
 from core import serializers as core_serializers
 from accounts.models import User
 from accounts.serializers import UserSerializer
-from spatial.serializers import SpatialUnitSerializer
-from party.serializers import PartySerializer
-from resources.serializers import ResourceSerializer
 from .models import Organization, Project, OrganizationRole, ProjectRole
 from .forms import create_update_or_delete_project_role
 
@@ -116,18 +113,6 @@ class ProjectSerializer(core_serializers.SanitizeFieldSerializer,
             organization_id=organization.id,
             **validated_data
         )
-
-
-class ProjectStateSerializer(core_serializers.DetailSerializer,
-                             serializers.ModelSerializer):
-    spatial_units = SpatialUnitSerializer(many=True, read_only=True)
-    parties = PartySerializer(many=True, read_only=True)
-    resources = ResourceSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Project
-        fields = ('id', 'description', 'urls', 'contacts',
-                  'spatial_units', 'parties', 'resources')
 
 
 class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):

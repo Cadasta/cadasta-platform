@@ -1,15 +1,17 @@
 import json
+from skivvy import ViewTestCase
 
-from accounts.tests.factories import UserFactory
-from core.tests.utils.cases import UserTestCase
 from django.http import HttpRequest
 from django.test import TestCase
 from django.utils.encoding import force_text
+
+from accounts.tests.factories import UserFactory
+from core.tests.utils.cases import UserTestCase
+from tutelary.models import Role
+from organization.tests.factories import OrganizationFactory, ProjectFactory
+
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
-from organization.tests.factories import OrganizationFactory, ProjectFactory
-from skivvy import ViewTestCase
-from tutelary.models import Role
 
 from ..views.default import Dashboard, IndexPage, server_error
 from config.settings.default import LEAFLET_CONFIG
