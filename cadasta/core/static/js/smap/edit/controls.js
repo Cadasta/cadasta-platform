@@ -261,6 +261,9 @@ var EditorToolbars = function () {
             })
         },
         addHooks: function () {
+            if (this.editor.editing()) {
+                this.editor.cancelEdit();
+            }
             this.editor.startDelete();
         },
         enable: function () {

@@ -205,8 +205,10 @@ function CreateRoutes(map) {
                 'form': {
                     'type': 'modal',
                     'success_url': 'overview',
+                    'callback': rm.locationDeleteHooks
                 },
             });
+            rm.locationDeleteHooks();
         });
 
     /*********************

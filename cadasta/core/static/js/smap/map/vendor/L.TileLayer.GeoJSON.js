@@ -1,7 +1,7 @@
 // set up webworker object.
 var WebWorker = {};
 WebWorker.addTileData = function (data, callback) {
-    var features = data.geojson.results.features;
+    var features = data.geojson.features;
     var new_layer = [];
     if (features) {
         for (var i = 0, f_len = features.length; i < f_len; i++) {
@@ -21,9 +21,8 @@ WebWorker.addTileData = function (data, callback) {
 L.TileLayer.Ajax = L.TileLayer.extend({
     _requests: [],
     _loadedfeatures: {},
+    _loadedTiles: {},
     _tiles: {},
-    _ticker: 1,
-    _original_request_len: null,
     _addTile: function (tilePoint) {
         var tile = {
             datum: null,
@@ -38,6 +37,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
             },
             current: true
         };
+
         this._loadTile(tile, tilePoint);
     },
     // XMLHttpRequest handler; closure over the XHR object, the layer, and the tile
@@ -57,27 +57,37 @@ L.TileLayer.Ajax = L.TileLayer.extend({
     },
     // Load the requested tile via AJAX
     _loadTile: function (tile, tilePoint) {
+        if (this._loadedTiles[tilePoint.x + ';' + tilePoint.y + ';' + tilePoint.z]) {
+            return;
+        }
         if (tilePoint.x < 0 || tilePoint.y < 0) {
             return;
         }
+
+        if ($('#messages #loading').hasClass('hidden')) {
+            $('#messages #loading').removeClass('hidden');
+        }
+
+        this._loadedTiles[tilePoint.x + ';' + tilePoint.y + ';' + tilePoint.z] = true;
+
+        // prevents request from caching results
+        var req_url = this.getTileUrl(tilePoint)
+        req_url = req_url + ((/\?/).test(req_url) ? "&" : "?") + (new Date()).getTime()
+
         var layer = this;
         var req = new XMLHttpRequest();
+
         this._requests.push(req);
         req.onreadystatechange = this._xhrHandler(req, layer, tile, tilePoint);
-        req.open('GET', this.getTileUrl(tilePoint), true);
+        req.open('GET', req_url, true);
         req.send();
 
-        req.addEventListener("loadend", this._loadEnd.bind(this));
     },
+
     _loadEnd: function () {
-        this._original_request_len = this._original_request_len || this._requests.length;
-        if (this._ticker < this._original_request_len) {
-            this._ticker++;
-        } else {
-            map.fire('endtileload');
-            $('#messages #loading').addClass('hidden');
-        }
+        map.fire('endloadtile');
     },
+
     _reset: function () {
         L.TileLayer.prototype._reset.apply(this, arguments);
         for (var i = 0; i < this._requests.length; i++) {
@@ -85,6 +95,7 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         }
         this._requests = [];
     },
+
     _update: function () {
         if (this._map && this._map._panTransition && this._map._panTransition._inProgress) {
             return;
@@ -104,14 +115,15 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
     // Used to calculate svg path string for clip path elements
     _clipPathRectangles: {},
 
-    initialize: function (numWorkers, numLocations, url, options, geojsonOptions) {
+    initialize: function (numWorkers, url, options, geojsonOptions) {
         this.numWorkers = numWorkers;
-        this.numLocations = numLocations;
         this._workers = new Array(this.numWorkers);
         this.messages = {};
-        this.queue = { total: numWorkers };
-
-        $('#messages #loading').removeClass('hidden');
+        this.queue = {
+            total: numWorkers,
+            requests_processed: 0,
+        };
+        this.event = new Event('endtileload');
 
         L.TileLayer.Ajax.prototype.initialize.call(this, url, options);
 
@@ -129,18 +141,13 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
             i++;
         }
 
-        map.on("zoomstart", function () {
-            this.queue.len = 0;
-            this.queue.tiles = [];
-        }, this);
-
 
         this._lazyTiles = new Tile(0, 0, 0, map.maxZoom);
         this._map = map;
         L.TileLayer.Ajax.prototype.onAdd.call(this, map);
         map.addLayer(this.geojsonLayer);
-        // map.addLayer(this.features);
     },
+
     onRemove: function (map) {
         this.messages = {};
         var len = this._workers.length;
@@ -153,7 +160,6 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
         L.TileLayer.Ajax.prototype.onRemove.call(this, map);
 
         map.removeLayer(this.geojsonLayer);
-        // map.removeLayer(this.features);
     },
     _reset: function () {
         this.geojsonLayer.clearLayers();
@@ -269,7 +275,6 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
                 this.geojsonLayer.addData(data.new_layer);
             }
 
-
             if (this.queue.len) {
                 this.queue.len--;
                 next = this.queue.tiles.shift();
@@ -278,16 +283,24 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
                 this.queue.free.push(data.workerID);
             }
 
+            this.queue.requests_processed++;
+            if (this._requests.length === this.queue.requests_processed) {
+                if (!$('#messages #loading').hasClass('hidden')) {
+                    $('#messages #loading').addClass('hidden');
+                    this._loadEnd();
+                }
+            }
+
         }.bind(this)), function (e) { console.log(a); });
     },
 
     _tileLoaded: function (tile, tilePoint) {
-        if (tile.datum === null || this.numLocations === Object.keys(this._loadedfeatures).length) {
+        if (tile.datum === null) {
             return null;
         }
 
         if (!this.queue.free.length) {
-            this.queue.tiles.push([tile, tilePoint]);
+            this.queue.tiles.push([tile.datum, tilePoint]);
             this.queue.len++;
         } else {
             this._renderTileData(tile.datum, tilePoint, this.queue.free.pop());
@@ -297,9 +310,6 @@ L.TileLayer.GeoJSON = L.TileLayer.Ajax.extend({
 
     _loadTile: function (tile, tilePoint) {
         if (!this._lazyTiles.isLoaded(tilePoint.x, tilePoint.y, tilePoint.z)) {
-
-
-
             L.TileLayer.Ajax.prototype._loadTile.call(this, tile, tilePoint);
         }
     },

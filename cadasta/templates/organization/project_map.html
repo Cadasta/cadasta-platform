@@ -24,6 +24,7 @@
 <script type="text/javascript" src="{% static 'buckets/js/script.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script type="text/javascript" src="{% static 'js/dataTables/dataTables.forms.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/parsley/sanitize.js' %}"></script>
 <script>
   var url = '/async/organizations/' +
       '{{ project.organization.slug }}/projects/{{ project.slug }}/spatial/tiled/{z}/{x}/{y}';

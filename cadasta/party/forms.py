@@ -12,7 +12,7 @@ class PartyForm(SanitizeFieldsForm, AttributeModelForm):
         fields = ['name', 'type']
 
     class Media:
-        js = ('/static/js/party_attrs.js',  'js/sanitize.js')
+        js = ('/static/js/party_attrs.js',  'js/parsley/sanitize.js')
 
     def __init__(self, project, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -54,7 +54,7 @@ class TenureRelationshipEditForm(SanitizeFieldsForm, AttributeModelForm):
         fields = ['tenure_type']
 
     class Media:
-        js = ('js/sanitize.js', )
+        js = ('js/parsley/sanitize.js', )
 
     def __init__(self, project=None, *args, **kwargs):
         super().__init__(*args, **kwargs)

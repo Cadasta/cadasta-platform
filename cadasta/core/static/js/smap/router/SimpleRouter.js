@@ -5,6 +5,7 @@ function SimpleRouter(map) {
     function router(force_reload) {
         var async_url = '/async' + location.pathname;
         var hash_path = location.hash.slice(1) || '/';
+        force_reload = force_reload || false;
 
         // first_load will only be true if the first page landed on is a record without coordinates
         if (!hash_path.includes('/records/') || hash_path.includes('coords=')) {
@@ -28,7 +29,7 @@ function SimpleRouter(map) {
         }
 
         // Fail safe in case a hashpath does not contain the final backslash
-        if (hash_path.substr(-1) !== '/' && !hash_path.includes('?')) {
+        if (hash_path.substr(hash_path.length - 1) !== '/' && !hash_path.includes('?')) {
             hash_path += '/';
         }
 
