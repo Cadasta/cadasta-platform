@@ -11,7 +11,8 @@ from django.utils.translation import gettext as _
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
 from ..exceptions import InvalidGPXFile
-from ..models import ContentObject, Resource, create_spatial_resource
+from ..models import (ContentObject, Resource, SpatialResource,
+                      create_spatial_resource)
 from .factories import ResourceFactory, SpatialResourceFactory
 from .utils import clear_temp  # noqa
 
@@ -227,8 +228,8 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         spatial_resources = resource.spatial_resources.all()
         assert spatial_resources.count() == 1
-        geom = spatial_resources[0].geom
-        assert len(geom) == 18
+        resource = spatial_resources[0]
+        assert len(resource.geom[0]) == 18
         assert spatial_resources[0].name == 'waypoints'
         assert spatial_resources[0].attributes == {}
 
@@ -244,7 +245,7 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         with pytest.raises(InvalidGPXFile) as e:
             create_spatial_resource(Resource, resource, True)
 
-        assert str(e.value) == _('Invalid GPX mime type: audio/mpeg')
+        assert str(e.value) == _("Invalid GPX mime type: audio/mpeg")
 
     def test_invalid_gpx_file(self):
         file = self.get_file('/resources/tests/files/invalidgpx.xml', 'rb')
@@ -257,10 +258,29 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         with pytest.raises(InvalidGPXFile)as e:
             create_spatial_resource(Resource, resource, True)
-        assert str(e.value) == _('Invalid GPX file')
+        assert str(e.value) == _("Error parsing GPX file: no geometry found.")
+        assert Resource.objects.all().count() == 0
+
+    def test_handle_invalid_xml_version(self):
+        file = self.get_file(
+            '/resources/tests/files/invalid_xml_version.gpx', 'rb')
+        file_name = self.storage.save(
+            'resources/invalid_xml_version.gpx', file.read())
+        file.close()
+        resource = ResourceFactory.build(
+            file=file_name, mime_type='application/xml')
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT,
+            's3/uploads/resources/invalid_xml_version.gpx')
+        )
+        with pytest.raises(InvalidGPXFile)as e:
+            create_spatial_resource(Resource, resource, True)
+        assert str(e.value)[:16] == _("Invalid GPX file")
         assert Resource.objects.all().count() == 0
 
 
+@pytest.mark.usefixtures('make_dirs')
+@pytest.mark.usefixtures('clear_temp')
 class SpatialResourceTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_repr(self):
         res = ResourceFactory.build(id='abc123')
@@ -276,3 +296,12 @@ class SpatialResourceTest(UserTestCase, FileStorageTestCase, TestCase):
         spatial_resource = SpatialResourceFactory.create(resource=resource)
         assert spatial_resource.project.pk == resource.project.pk
         assert spatial_resource.archived == resource.archived
+
+    def test_spatial_resource_routes_and_tracks(self):
+        file = self.get_file('/resources/tests/files/routes_tracks.gpx', 'rb')
+        file_name = self.storage.save(
+            'resources/routes_tracks.gpx', file.read())
+        file.close()
+        resource = ResourceFactory.create(
+            file=file_name, mime_type='text/xml')
+        assert SpatialResource.objects.filter(resource=resource).count() == 2

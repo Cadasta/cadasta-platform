@@ -65,7 +65,7 @@ function renderFeatures(map, featuresUrl, options) {
         if (options.fitBounds === 'locations') {
           var bounds = markers.getBounds();
           if (bounds.isValid()) {
-            map.fitBounds(bounds);  
+            map.fitBounds(bounds);
           }
         }
       }
@@ -96,7 +96,7 @@ function renderFeatures(map, featuresUrl, options) {
   } else {
     map.fitBounds([[-45.0, -180.0], [45.0, 180.0]]);
   }
-  
+
   var geoJson = L.geoJson(null, {
     style: { weight: 2 },
     onEachFeature: function(feature, layer) {
@@ -105,7 +105,7 @@ function renderFeatures(map, featuresUrl, options) {
                       "<h2><span class=\"entity\">Location</span>" +
                       feature.properties.type + "</h2></div>" +
                       "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
-                      "</div>");  
+                      "</div>");
       }
     }
   });
@@ -116,7 +116,7 @@ function renderFeatures(map, featuresUrl, options) {
 
   if (options.location) {
     options.location.addTo(map);
-    map.fitBounds(options.location.getBounds());  
+    map.fitBounds(options.location.getBounds());
   } else if (projectBounds) {
     map.fitBounds(projectBounds);
   }
@@ -149,23 +149,24 @@ function switch_layer_controls(map, options){
 
 function add_spatial_resources(map, url){
   $.ajax(url).done(function(data){
-    if (data.length == 0) return;
+    if (data.count == 0) return;
     var spatialResources = {};
-    $.each(data, function(idx, resource){
+    $.each(data.results, function (idx, resource) {
       var name = resource.name;
       var layers = {};
-      var group = new L.LayerGroup();
-      $.each(resource.spatial_resources, function(i, spatial_resource){
-        var layer = L.geoJson(spatial_resource.geom).addTo(group);
-        layers['name'] = spatial_resource.name;
-        layers['group'] = group;
+      $.each(resource.spatial_resources, function (i, spatial_resource) {
+          var group = new L.LayerGroup();
+          var layer = L.geoJson(spatial_resource.geom).addTo(group);
+          layers[spatial_resource.name] = group
       });
       spatialResources[name] = layers;
     });
-    $.each(spatialResources, function(sr){
-      var layer = spatialResources[sr];
-      map.layerscontrol.addOverlay(layer['group'], layer['name'], sr);
-    })
+    $.each(spatialResources, function (sr) {
+      var layers = spatialResources[sr];
+      $.each(layers, function (layer) {
+          map.layerscontrol.addOverlay(layers[layer], layer, sr);
+      });
+    });
   });
 }
 

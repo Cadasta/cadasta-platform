@@ -1,4 +1,6 @@
 import os
+import tempfile
+
 from datetime import datetime
 
 import magic
@@ -9,7 +11,6 @@ from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.db.models import GeometryCollectionField
-from django.contrib.gis.gdal.error import GDALException
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.dispatch import receiver
@@ -179,36 +180,27 @@ def create_thumbnails(instance, created):
 def create_spatial_resource(sender, instance, created, **kwargs):
     if created or instance._original_url != instance.file.url:
         if instance.mime_type in GPX_MIME_TYPES:
-            io.ensure_dirs()
-            file_name = instance.file.url.split('/')[-1]
-            write_path = os.path.join(settings.MEDIA_ROOT,
-                                      'temp', file_name)
-            file = instance.file.open().read()
-            with open(write_path, 'wb') as f:
-                f.write(file)
-            # need to double check the mime-type here as browser detection
-            # of gpx mime type is not reliable
-            mime = magic.Magic(mime=True)
-            mime_type = str(mime.from_file(write_path), 'utf-8')
-
-            if mime_type in GPX_MIME_TYPES:
-                try:
-                    processor = GPXProcessor(write_path)
+            temp = io.ensure_dirs()
+            with tempfile.NamedTemporaryFile(mode='wb', dir=temp) as f:
+                f.write(instance.file.open().read())
+                f.seek(0)
+                # need to double check the mime-type here as browser detection
+                # of gpx mime type is not reliable
+                mime = magic.Magic(mime=True)
+                mime_type = str(mime.from_file(f.name), 'utf-8')
+                if mime_type in GPX_MIME_TYPES:
+                    processor = GPXProcessor(f.name)
                     layers = processor.get_layers()
-                except GDALException:
+                    for layer in layers.keys():
+                        if len(layers[layer]) > 0:
+                            SpatialResource.objects.create(
+                                resource=instance, name=layer,
+                                geom=layers[layer])
+                else:
                     raise InvalidGPXFile(
-                        _('Invalid GPX file')
+                        _("Invalid GPX mime type: {error}".format(
+                            error=mime_type))
                     )
-                for layer in layers.keys():
-                    if len(layers[layer]) > 0:
-                        SpatialResource.objects.create(
-                            resource=instance, name=layer, geom=layers[layer])
-            else:
-                os.remove(write_path)
-                raise InvalidGPXFile(
-                    _('Invalid GPX mime type: {error}'.format(
-                        error=mime_type))
-                )
 
 
 class ContentObject(RandomIDModel):
