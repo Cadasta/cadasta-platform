@@ -4,6 +4,7 @@ from core.tests.utils.cases import UserTestCase
 from core.messages import SANITIZE_ERROR
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.http import HttpRequest
 from django.db import IntegrityError
 from allauth.account.models import EmailAddress
@@ -433,7 +434,6 @@ class ProfileFormTest(UserTestCase, TestCase):
         user = UserFactory.create(email='john@beatles.uk',
                                   password='imagine71',
                                   language='en')
-        valid_languages = ['en', 'fr', 'es']
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
@@ -442,12 +442,12 @@ class ProfileFormTest(UserTestCase, TestCase):
             'language': 'invalid'
         }
         form = forms.ProfileForm(data, instance=user)
-        if data['language'] not in valid_languages:
-            assert form.is_valid() is False
-            assert user.language == 'en'
-            assert (_("Select a valid choice. %s is not one "
-                      "of the available choices." % (data['language'])) in
-                    form.errors.get('language'))
+        self.assertRaises(ValidationError, form.clean_language)
+        assert form.is_valid() is False
+        assert user.language == 'en'
+        assert (_("Select a valid choice. %s is not one "
+                "of the available choices." % (data['language'])) in
+                form.errors.get('language'))
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
