@@ -35,6 +35,8 @@ Enter the cadasta directory and start the server::
   cd cadasta
   ./runserver
 
+To add the Django debug toolbar, use ``./runserver --debug``.
+
 Open ``http://localhost:8000/`` in your local machine's browser. This will forward you to the web server port on the VM and you should see the front page of the platform site.
 
 See the wiki (`here <https://devwiki.corp.cadasta.org/Installation>`_ and `here <https://devwiki.corp.cadasta.org/Run%20for%20development>`_) for detailed instructions on installation and running the platform for development.
