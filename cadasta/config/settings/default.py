@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+from kombu import Exchange, Queue
 
 from django.utils.translation import ugettext_lazy as _
 from .languages import FORM_LANGS  # noqa
@@ -536,8 +537,40 @@ ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
 
-CELERY_TASK_ROUTES = {
-    'export.*': {'queue': 'export'},
-    'import.*': {'queue': 'import'},
+# Connection
+CELERY_BROKER_TRANSPORT = 'sqs'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'region': 'us-west-2',
+    'queue_name_prefix': '{}-'.format(os.environ.get('QUEUE-PREFIX', 'dev')),
 }
-CELERY_RESULT_QUEUE = 'result.fifo'
+# CELERY_RESULT_BACKEND = 'tasks.backends.ResultQueueRPC'
+# CELERYD_CONSUMER = 'tasks.consumers:ResultConsumer'
+
+# Exchanges
+TASK_EXCHANGE = 'task_exchange'
+CELERY_DEFAULT_EXCHANGE = TASK_EXCHANGE
+CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
+CELERY_RESULT_EXCHANGE = 'result_exchange'
+CELERY_RESULT_EXCHANGE_TYPE = 'topic'
+default_exchange = Exchange(TASK_EXCHANGE, CELERY_DEFAULT_EXCHANGE_TYPE)
+# result_exchange_obj = Exchange(CELERY_RESULT_EXCHANGE, CELERY_RESULT_EXCHANGE_TYPE)
+
+# Queues
+CELERY_DEFAULT_QUEUE = 'scheduled_tasks.fifo'
+CELERY_RESULT_QUEUE = 'result_queue.fifo'  # Custom variable
+CELERY_TASK_QUEUES = (
+    # Associate queues with an exchange and a specific routing key or
+    # routing key pattern
+    Queue(CELERY_DEFAULT_QUEUE, default_exchange, routing_key='#'),
+    Queue('export', default_exchange, routing_key='export'),
+)
+
+# Routing
+CELERY_TASK_ROUTES = {
+    # Associate specific task names or task name patterns to an exchange
+    # and routing key
+    'export.*': {
+        'exchange': TASK_EXCHANGE,
+        'routing_key': 'export',
+    },
+}
