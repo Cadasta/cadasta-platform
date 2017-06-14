@@ -1,6 +1,7 @@
 import logging
 
 from celery.app.trace import build_tracer
+from celery.backends.base import DisabledBackend
 from celery.exceptions import InvalidTaskError
 from celery.worker.consumer import Consumer
 from django.db.models import F
@@ -14,7 +15,7 @@ from .models import BackgroundTask
 logger = logging.getLogger(__name__)
 
 
-@app.task()
+@app.task(name='result_consumer.process_task')
 def process_task(message):
     """ Add scheduled tasks to database """
     try:
@@ -55,7 +56,7 @@ def process_task(message):
         raise InvalidTaskError("Failed to parse task.")
 
 
-@app.task()
+@app.task(name='result_consumer.process_result')
 def process_result(message):
     """ Handle result message """
     try:
@@ -86,6 +87,13 @@ def process_result(message):
 
 
 class ResultConsumer(Consumer):
+    def __init__(self, *args, **kwargs):
+        super(ResultConsumer, self).__init__(*args, **kwargs)
+        self.app.tasks = {
+            k: v for k, v in self.app.tasks.items()
+            if k.startswith('result_consumer')}
+        self.app.backend = DisabledBackend(self.app)
+
     def update_strategies(self):
         self.strategies = {
             'task': process_task,
@@ -114,6 +122,8 @@ class ResultConsumer(Consumer):
         call_soon = self.call_soon
 
         def on_task_received(message):
+            # from celery.contrib import rdb; rdb.set_trace()
+
             try:
                 type_ = self._detect_msg_type(message)
             except TypeError as exc:
@@ -127,7 +137,7 @@ class ResultConsumer(Consumer):
                     message, None,
                     promise(call_soon, (message.ack_log_error,)),
                     promise(call_soon, (message.reject_log_error,)),
-                    callbacks,
+                    None, # callbacks,
                 )
             except InvalidTaskError as exc:
                 return on_invalid_task(None, message, exc)
