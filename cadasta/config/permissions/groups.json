@@ -1,22 +1,36 @@
 {
+    "SuperUser": {
+        "permissions": [
+            "org.view", "org.view.private", "org.list", "org.create",
+            "org.update", "org.archive", "org.unarchive",
+            "org.users.add", "org.users.edit", "org.users.remove",
+            "project.view", "project.view.private", "project.view.archived",
+            "project.list", "project.create", "project.update", "project.archive",
+            "project.unarchive", "project.export", "project.import",
+            "project.users.add", "project.users.edit", "project.users.remove",
+            "spatial.create", "resource.add"
+        ]
+    },
     "OrgAdmin": {
         "permissions": [
             "org.view", "org.view.private", "org.list", "org.create",
             "org.update", "org.archive", "org.unarchive",
             "org.users.add", "org.users.edit", "org.users.remove",
-            "project.view", "project.view.private", "project.list",
-            "project.create", "project.update", "project.archive",
+            "project.view", "project.view.private", "project.view.archived",
+            "project.list", "project.create", "project.update", "project.archive",
             "project.unarchive", "project.export", "project.import",
-            "project.users.add", "project.users.edit", "project.users.remove"
+            "project.users.add", "project.users.edit", "project.users.remove",
+            "spatial.create", "resource.add"
         ]
     },
     "ProjectManager": {
         "permissions": [
             "org.view", "org.view.private", "org.list", "org.create",
-            "org.update", "project.view", "project.view.private", "project.list",
-            "project.create", "project.update", "project.archive",
+            "org.update", "project.view", "project.view.private", "project.view.archived",
+            "project.list", "project.create", "project.update", "project.archive",
             "project.unarchive", "project.export", "project.import",
-            "project.users.add", "project.users.edit", "project.users.remove"
+            "project.users.add", "project.users.edit", "project.users.remove",
+            "spatial.create", "resource.add"
         ]
     },
     "DataCollector": {
@@ -35,7 +49,7 @@
     "PublicUser": {
         "permissions": [
             "org.view", "org.view.private", "org.list", "org.create",
-            "org.update", "project.view", "project.view.private", "project.list"
+            "org.update", "project.view", "project.list", "spatial.view"
         ]
     },
     "AnonymousUser": {

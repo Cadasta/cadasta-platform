@@ -12,6 +12,7 @@ from jsonattrs.models import create_attribute_types
 
 from accounts.tests.factories import UserFactory
 from core.tests.factories import PolicyFactory
+from core.tests.utils.cases import UserTestCase
 from core.messages import SANITIZE_ERROR
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from organization.tests.factories import ProjectFactory
@@ -30,7 +31,7 @@ from xforms.exceptions import InvalidXMLSubmission
 path = os.path.dirname(settings.BASE_DIR)
 
 
-class XFormModelHelperTest(TestCase):
+class XFormModelHelperTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
         PolicyFactory.load_policies()

@@ -9,6 +9,10 @@
             "name": "View Private Project",
             "codename": "project.view.private"
         },
+        "project_view_archived": {
+            "name": "View Archived Project",
+            "codename": "project.view.archived"
+        },
         "project_list": {
             "name": "List Projects",
             "codename": "project.list"

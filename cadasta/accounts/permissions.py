@@ -12,7 +12,9 @@ def load():
     Permission.objects.all().delete()  # remove all perms here??
 
     # add permissions
-    for ct in ['organizations', 'projects', 'users', 'parties']:
+    for ct in [
+            'organizations', 'projects', 'users', 'parties', 'spatialunits',
+            'resources']:
         perm_file = open(PERMISSIONS_DIR + ct + '.json')
         perms = json.loads(perm_file.read())
         content_type_label = perms['content_type'].split('.')

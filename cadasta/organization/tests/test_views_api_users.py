@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
 from skivvy import APITestCase
 
+from accounts.permissions import load as load_role_permissions
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
 from .factories import OrganizationFactory, clause
@@ -14,6 +15,9 @@ from ..views.api import UserAdminList, UserAdminDetail
 
 class UserListAPITest(APITestCase, UserTestCase, TestCase):
     view_class = UserAdminList
+
+    def setUp(self):
+        super().setUp()
 
     def setup_models(self):
         clauses = {
@@ -123,6 +127,7 @@ class UserDetailAPITest(APITestCase, TestCase):
     view_class = UserAdminDetail
 
     def setup_models(self):
+        load_role_permissions()
         clauses = {
             'clause': [
                 clause('allow', ['user.*']),

@@ -2,12 +2,12 @@ from allauth.account.models import EmailAddress
 from core.tests.utils.cases import UserTestCase
 from django.contrib.auth.models import Group
 from django.test import TestCase
-from organization.models import (Organization, OrganizationRole, Project,
-                                 ProjectRole)
-from organization.tests.factories import OrganizationFactory, ProjectFactory
+from organization.models import ProjectRole
+from organization.tests.factories import ProjectFactory
 
-from ..backends import AuthenticationBackend, RoleAuthorizationBackend
-from ..permissions import load as load_permissions
+from ..backends import AuthenticationBackend
+from core.backends import RoleAuthorizationBackend
+
 from .factories import UserFactory
 
 
@@ -62,7 +62,7 @@ class RoleAuthorizationBackendTest(UserTestCase, TestCase):
         group = Group.objects.get(name='OrgAdmin')
         role = ProjectRole.objects.create(
             user=self.user, project=self.project, group=group)
-        assert len(role.permissions) == 22
+        assert len(role.permissions) == 25
         assert self.backend.has_perm(self.user, 'org.create', obj=role)
         assert self.backend.has_perm(
             self.user, 'project.create', obj=role) is True

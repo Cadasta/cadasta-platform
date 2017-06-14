@@ -1,14 +1,13 @@
 import json
-import os
 
 import pytest
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 from django.test import TestCase
-from organization.models import OrganizationRole, Project, ProjectRole
+from organization.models import OrganizationRole, ProjectRole
 from django.http import Http404
 from party.tests.factories import PartyFactory
 from questionnaires.models import Questionnaire
@@ -16,6 +15,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from spatial.tests.factories import SpatialUnitFactory
 from skivvy import ViewTestCase
+from tutelary.models import Policy, Role
 
 from ..views import default
 from .factories import OrganizationFactory, ProjectFactory, clause
@@ -29,6 +29,8 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
     def setup_models(self):
         self.project = ProjectFactory.create()
         self.user = UserFactory.create()
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_template_context(self):
         return {
@@ -84,6 +86,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=self.user,
+            group=self.org_admin_group,
             admin=True
         )
         response = self.request(user=self.user)
@@ -99,6 +102,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         ProjectRole.objects.create(
             project=self.project,
             user=self.user,
+            group=self.pm_group,
             role='PM',
         )
         response = self.request(user=self.user)
@@ -133,15 +137,15 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         self.project.access = 'private'
         self.project.save()
         response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.status_code == 302
+        assert response.location == '/'
 
     def test_get_private_project_with_unauthenticated_user(self):
         self.project.access = 'private'
         self.project.save()
         response = self.request()
         assert response.status_code == 302
-        assert ("You don't have permission to access this project"
+        assert ("You don't have permission to perform this action."
                 in response.messages)
 
     def test_get_private_project_without_permission(self):
@@ -163,18 +167,25 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         self.project.save()
         response = self.request()
         assert response.status_code == 302
-        assert ("You don't have permission to access this project"
+        assert ("You don't have permission to perform this action."
                 in response.messages)
 
     def test_get_private_project_based_on_org_membership(self):
         OrganizationRole.objects.create(organization=self.project.organization,
+                                        group=self.org_admin_group,
                                         user=self.user)
         self.project.access = 'private'
         self.project.save()
 
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected = self.render_content(is_superuser=False,
+                                       is_administrator=False,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_project_member=False,
+                                       is_allowed_import=True)
+        assert response.content == expected
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
@@ -184,13 +195,12 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
 
         response = self.request(user=UserFactory.create())
         assert response.status_code == 302
-        assert ("You don't have permission to access this project"
+        assert ("You don't have permission to perform this action."
                 in response.messages)
 
     def test_get_private_project_with_superuser(self):
         self.project.access = 'private'
         self.project.save()
-
         self.superuser_role = Role.objects.get(name='superuser')
         self.user.assign_policies(self.superuser_role)
         response = self.request(user=self.user)
@@ -209,16 +219,16 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
 
         response = self.request()
         assert response.status_code == 302
-        assert ("You don't have permission to access this project"
+        assert ("You don't have permission to perform this action."
                 in response.messages)
 
-    def test_get_archived_project_with_unauthentic_user(self):
+    def test_get_archived_project_with_anonymous_user(self):
         self.project.archived = True
         self.project.save()
 
         response = self.request(user=AnonymousUser())
         assert response.status_code == 302
-        assert ("You don't have permission to access this project"
+        assert ("You don't have permission to perform this action."
                 in response.messages)
 
     def test_get_archived_project_with_org_admin(self):
@@ -226,6 +236,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=org_admin,
+            group=self.org_admin_group,
             admin=True
         )
         self.project.archived = True
