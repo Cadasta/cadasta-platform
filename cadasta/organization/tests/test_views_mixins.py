@@ -145,7 +145,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         self.project.save()
         response = self.request()
         assert response.status_code == 302
-        assert ("You don't have permission to perform this action."
+        assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_private_project_without_permission(self):
@@ -167,7 +167,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
         self.project.save()
         response = self.request()
         assert response.status_code == 302
-        assert ("You don't have permission to perform this action."
+        assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_private_project_based_on_org_membership(self):
@@ -195,7 +195,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
 
         response = self.request(user=UserFactory.create())
         assert response.status_code == 302
-        assert ("You don't have permission to perform this action."
+        assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_private_project_with_superuser(self):
@@ -219,7 +219,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
 
         response = self.request()
         assert response.status_code == 302
-        assert ("You don't have permission to perform this action."
+        assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_archived_project_with_anonymous_user(self):
@@ -228,7 +228,7 @@ class ProjectTestViewTest(FileStorageTestCase, ViewTestCase,
 
         response = self.request(user=AnonymousUser())
         assert response.status_code == 302
-        assert ("You don't have permission to perform this action."
+        assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_archived_project_with_org_admin(self):

@@ -996,8 +996,22 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
 class ProjectTestView(mixins.ProjectRolePermissionMixin,
                       mixins.ProjectAdminCheckMixin,
                       mixins.ProjectMixin, generic.DetailView):
+
+    def get_actions(self, request):
+        perms = []
+        project = self.get_object()
+        if project.access == 'public':
+            perms.append('project.view')
+        else:
+            perms.append('project.view.private')
+        if project.archived:
+            perms.append('project.view.archived')
+        return perms
+
     model = Project
     template_name = 'organization/project_dashboard.html'
+    permission_required = get_actions
+    permission_denied_message = error_messages.PROJ_VIEW
 
     def get_object(self, queryset=None):
         return self.get_project()
@@ -1013,14 +1027,3 @@ class ProjectTestView(mixins.ProjectRolePermissionMixin,
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
         return context
-
-    def get_permission_required(self):
-        perms = []
-        project = self.get_object()
-        if project.access == 'public':
-            perms.append('project.view')
-        else:
-            perms.append('project.view.private')
-        if project.archived:
-            perms.append('project.view.archived')
-        return perms

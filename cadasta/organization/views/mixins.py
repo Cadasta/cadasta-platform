@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import AnonymousUser
 
 from django.contrib import messages
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
@@ -297,6 +298,28 @@ class OrgRoleCheckMixin(SuperUserCheckMixin):
 
 class RolePermissionMixin(PermissionRequiredMixin):
 
+    def get_permission_required(self):
+        if (not hasattr(self, 'permission_required') or
+           self.permission_required is None):
+            raise ImproperlyConfigured(
+                '{0} is missing the permission_required attribute. Define '
+                '{0}.permission_required, or override '
+                '{0}.get_permission_required().'.format(
+                    self.__class__.__name__)
+            )
+
+        perms = self.permission_required
+        if isinstance(self.permission_required, dict):
+            perms = self.permission_required.get(self.request.method, ())
+
+        if callable(perms):
+            perms = perms(self.request)
+
+        if isinstance(perms, str):
+            perms = (perms, )
+
+        return perms
+
     def get_role(self):
         user = self.request.user
         if user.is_anonymous:
@@ -321,9 +344,11 @@ class RolePermissionMixin(PermissionRequiredMixin):
                    if perm not in self._role.permissions)
 
     def handle_no_permission(self):
+        msg = _("You don't have permission to perform this action.")
+        if hasattr(self, 'permission_denied_message'):
+            msg = self.get_permission_denied_message()
         messages.add_message(
-            self.request, messages.WARNING,
-            _("You don't have permission to perform this action."))
+            self.request, messages.WARNING, msg)
 
         referer = self.request.META.get('HTTP_REFERER')
         redirect_url = self.request.META.get('HTTP_REFERER', '/')
