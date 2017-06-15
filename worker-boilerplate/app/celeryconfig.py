@@ -12,9 +12,7 @@ if os.environ.get('SQS', True):
 
 # List of modules to import when the Celery worker starts.
 imports = ('app.tasks',)
-
 QUEUE_NAME = 'export'
-
 
 # Exchanges
 task_default_exchange = 'task_exchange'
@@ -47,3 +45,6 @@ task_routes = {
         'routing_key': 'export',
     },
 }
+
+# Tasks
+task_track_started = True

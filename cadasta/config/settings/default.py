@@ -556,12 +556,13 @@ default_exchange = Exchange(TASK_EXCHANGE, CELERY_DEFAULT_EXCHANGE_TYPE)
 # result_exchange_obj = Exchange(CELERY_RESULT_EXCHANGE, CELERY_RESULT_EXCHANGE_TYPE)
 
 # Queues
-CELERY_DEFAULT_QUEUE = 'scheduled_tasks.fifo'
+TASK_DUPLICATE_QUEUE = 'scheduled_tasks.fifo'
+CELERY_DEFAULT_QUEUE = TASK_DUPLICATE_QUEUE
 CELERY_RESULT_QUEUE = 'result_queue.fifo'  # Custom variable
 CELERY_TASK_QUEUES = (
     # Associate queues with an exchange and a specific routing key or
     # routing key pattern
-    Queue(CELERY_DEFAULT_QUEUE, default_exchange, routing_key='#'),
+    Queue(TASK_DUPLICATE_QUEUE, default_exchange, routing_key='#'),
     Queue('export', default_exchange, routing_key='export'),
 )
 

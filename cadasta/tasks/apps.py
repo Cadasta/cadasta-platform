@@ -9,8 +9,10 @@ class TasksConfig(AppConfig):
     def ready(self):
         # from . import signals  # NOQA
         from .celery import app
-        # from .consumers import ResultConsumerStep, WorkerStep
-        # app.steps['worker'].add(WorkerStep)
+        from .consumers import ResultConsumerStep
+        app.steps['consumer'].add(ResultConsumerStep)
+        from .consumers import ExampleWorkerStep
+        app.steps['worker'].add(ExampleWorkerStep)
         app.autodiscover_tasks(force=True)
 
         # Setup exchanges
