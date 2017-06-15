@@ -44,7 +44,6 @@ function RouterMixins() {
             }
 
             if (kwargs.reset_current_location) {
-                // this.resetPreviousLocationStyle();
                 if (state.current_location.layer) {
                     Styles.resetStyle(state.current_location.layer);
                 }
@@ -248,7 +247,7 @@ function RouterMixins() {
                     Styles.setSelectedStyle(state.current_location.layer);
                     editor.setEditable(state.current_location.layer.feature, state.current_location.layer);
 
-                    if (window.location.hash.includes('/edit/')) {
+                    if (window.location.hash.includes('/edit/') && window.location.hash.includes('/location/')) {
                         map.locationEditor.fire('route:location:edit', { 'fid': state.current_location.layer.feature.id });
                     }
 
@@ -267,6 +266,8 @@ function RouterMixins() {
 
                     layers[i].feature.id = layer_id;
                     layers[i].feature.properties.url = new_url;
+
+                    map.geojsonTileLayer._loadedfeatures[layer_id] = true;
                 }
                 if (url.includes(layers[i].feature.id)) {
                     found = true;
@@ -276,7 +277,7 @@ function RouterMixins() {
                     Styles.setSelectedStyle(layers[i]);
                     editor.setEditable(state.current_location.layer.feature, state.current_location.layer);
 
-                    if (window.location.hash.includes('/edit/')) {
+                    if (window.location.hash.includes('/edit/') && window.location.hash.includes('/location/')) {
                         map.locationEditor.fire('route:location:edit', { 'fid': layers[i].feature.id });
                     }
                     return;
@@ -360,12 +361,19 @@ function RouterMixins() {
             rm.addEventScript('script_add_lib.js');
         },
 
-        datepickerHooks: function() {
+        datepickerHooks: function () {
             $('.datepicker').datepicker({
                 yearRange: "c-200:c+200",
                 changeMonth: true,
                 changeYear: true,
             });
+        },
+
+        xlangHooks: function () {
+            rm.addEventScript('xlang.js');
+
+            var xl = xLang();
+            xl.getFormLang();
         },
 
         locationDeleteHooks: function () {
@@ -394,8 +402,8 @@ function RouterMixins() {
             });
         },
 
-        relationshipHooks: function () {
-            rm.addEventScript('rel_tenure.js');
+        relationshipAddHooks: function () {
+            rm.relationshipHooks();
             rm.addEventScript('party_attrs.js');
 
             var template = function (party) {
@@ -414,18 +422,25 @@ function RouterMixins() {
                 templateResult: template,
                 theme: "bootstrap",
             });
+        },
 
+        relationshipHooks: function () {
+            rm.addEventScript('rel_tenure.js');
+            rm.xlangHooks();
             rm.datepickerHooks();
             rm.requiredFieldHooks('tenurerelationship');
         },
 
         locationEditHooks: function () {
+            rm.xlangHooks();
             rm.requiredFieldHooks('spatial');
             rm.datepickerHooks();
             rm.locationFormButtons();
         },
 
         locationDetailHooks: function () {
+            rm.xlangHooks();
+
             function formatHashTab(tab) {
                 var hash = window.location.hash;
                 var coords = '';
@@ -491,22 +506,16 @@ function RouterMixins() {
                 var formaction = $('.submit-btn', target.target).attr('formaction');
                 $('.submit-btn', target.target).prop({ 'disabled': true });
 
-                var data = $(this).serializeArray().reduce(function (obj, item) {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
-
                 // prevents error caused by submiting a 'location edit' form
                 // after deleting the geometry.
-                if (data.geometry && data.geometry.includes('[[null]]')) {
-                    data.geometry = 'None';
+                if ($('textarea[name="geometry"]').text().includes('[[null]]')) {
+                    $('textarea[name="geometry"]').text('None');
                 }
-
 
                 var posturl = $.ajax({
                     method: "POST",
                     url: formaction,
-                    data: data,
+                    data: $(this).serialize(),
                     success: function (response, status, xhr) {
                         form_error = posturl.getResponseHeader('Form-Error');
                         if (form_error) {
@@ -556,26 +565,6 @@ function RouterMixins() {
                 "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>" +
                 "<span aria-hidden='true'>×</span>" +
                 "</button>" + error + "</div>";
-        },
-
-        nonActivePopup: function (feature) {
-            return "<div class=\"text-wrap\"><h2><span>Location</span>" +
-                feature.properties.type +
-                "</h2></div>" +
-                "<div class=\"btn-wrap\"><a href='#/" +
-                feature.properties.url + '/' +
-                "' id='spatial-pop-up' class='btn btn-primary btn-sm btn-block'>" +
-                options.trans.open +
-                "</a></div>";
-        },
-
-        activePopup: function (feature) {
-            return "<div class=\"text-wrap\"><h2><span>Location</span>" +
-                feature.properties.type +
-                "</h2></div>" +
-                "<div class=\"btn-wrap\"><span class=\"btn-sm btn-block\">" +
-                options.trans.current_viewing +
-                "</span></div>";
         },
     };
 }

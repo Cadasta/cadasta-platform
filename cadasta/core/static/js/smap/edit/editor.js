@@ -61,7 +61,6 @@ var Location = L.Editable.extend({
     // revert latest editing change.
     _undoEdit: function (final) {
         this._undo(final);
-        if (this.layer) this.layer._editing = false;
         this._deleting = this._deleted = false;
 
         if (final) {
@@ -81,10 +80,8 @@ var Location = L.Editable.extend({
                     this._setDeleted();
                     this._saveDelete();
                     return;
-                } else if (this._original_state[0]) {
-                    this.map.geojsonLayer.removeLayer(this.layer);
-                    this.layer = this._original_state[0].layer;
 
+                } else if (this._original_state[0]) {
                     latLngs = this._original_state[0];
                 }
             } else {
@@ -93,16 +90,16 @@ var Location = L.Editable.extend({
             }
 
             if (latLngs && latLngs.latlngs) {
-                if (this.layer instanceof L.Marker) {
-                    this.layer.setLatLng(latLngs.latlngs);
-                    this.map.geojsonLayer.removeLayer(this.layer);
-                    this.map.geojsonLayer.addLayer(this.layer);
+                if (latLngs.layer instanceof L.Marker) {
+                    latLngs.layer.setLatLng(latLngs.latlngs);
                 } else {
-                    this.layer.setLatLngs(latLngs.latlngs);
-                    this.map.geojsonLayer.removeLayer(this.layer);
-                    this.map.geojsonLayer.addLayer(this.layer);
+                    latLngs.layer.setLatLngs(latLngs.latlngs);
                 }
+
+                this._drawEnd(latLngs.layer);
             }
+
+            this.featuresLayer.clearLayers();
         }
     },
 
@@ -144,8 +141,8 @@ var Location = L.Editable.extend({
 
     // update geometry form field, set deleting to false, clear backup.
     _saveDelete: function () {
-
         if (this._deleted) {
+
             if (this.layer._new || !this._original_state[0]) {
                 this.map.geojsonLayer.removeLayer(this.layer);
                 this.layer = null;
@@ -233,6 +230,7 @@ var Location = L.Editable.extend({
         this.map.geojsonLayer.eachLayer(function (l) {
             if (l.feature.id === layer.feature.id) {
                 l.remove();
+                this.map.geojsonLayer.removeLayer(l);
                 this.map.geojsonLayer.addLayer(layer);
             }
         }, this);
@@ -253,24 +251,32 @@ var Location = L.Editable.extend({
     // Stores the ORIGINAL version fo the geometry, and the version right before the lastest change.
     _backupLayer: function (initial_edit) {
         var cloneLatLngs;
+        var originalLatLngs;
 
         this._undoBuffer = {};
 
         if (this.layer instanceof L.Marker) { 
-            cloneLatLngs = LatLngUtil.cloneLatLng(this.layer.getLatLng()); 
+            cloneLatLngs = LatLngUtil.cloneLatLng(this.layer.getLatLng());
         } else { 
             cloneLatLngs = LatLngUtil.cloneLatLngs(this.layer.getLatLngs());
         }
 
         this._undoBuffer[this.layer._leaflet_id] = {
             latlngs: cloneLatLngs,
+            layer: this.layer,
         };
-
         // if the object is NEW, original state should always be empty
         // else, if it's the initial edit, it should save the very first shape.
         if (initial_edit && !this.layer._new && !this._original_state[0]) {
+            // cannot use cloneLatLngs because it's not constant.
+            if (this.layer instanceof L.Marker) { 
+                originalLatLngs = LatLngUtil.cloneLatLng(this.layer.getLatLng());
+            } else { 
+                originalLatLngs = LatLngUtil.cloneLatLngs(this.layer.getLatLngs());
+            }
+
             this._original_state.push({
-                latlngs: cloneLatLngs,
+                latlngs: originalLatLngs,
                 layer: this.layer
             });
         }
@@ -305,6 +311,7 @@ var Location = L.Editable.extend({
 var LocationEditor = L.Evented.extend({
 
     _editing: false,
+    _multi: false,
     _prevent_click: false,
 
     initialize: function (map, options) {
@@ -340,17 +347,18 @@ var LocationEditor = L.Evented.extend({
 
     /********
     EDIT FUNCTIONS
-    *********/ 
+    *********/
 
     // Make the currently selected location editable.
     setEditable: function (feature, layer) {
         if (this.location.layer) {
-            if (this.location.layer.feature.id === feature.id) return;
+            if (this.location.layer.feature.id === feature.id) {
+                return;
+            } else {
+                Styles.resetStyle(this.location.layer);
+            }
         }
 
-        if (this.location.layer) {
-            Styles.resetStyle(this.location.layer);
-        }
         layer.feature = feature;
         this.location.layer = layer;
         this.location.feature = feature;
@@ -370,6 +378,7 @@ var LocationEditor = L.Evented.extend({
     // Also manually triggered by "dispose"
     cancelEdit: function (final) {
         this.tooltip.remove();
+        this._multi = false;
         this.location._undoEdit(final);
     },
 
@@ -413,7 +422,7 @@ var LocationEditor = L.Evented.extend({
     delete: function () {
         this.tooltip.remove();
         this.location._saveDelete();
-        if (this.location._deleted) {
+        if (this.deleted()) {
             this._disableEditToolbar();
         } else {
             Styles.setSelectedStyle(this.location.layer);
@@ -501,6 +510,7 @@ var LocationEditor = L.Evented.extend({
     },
 
     addMulti: function (e, type) {
+        this._multi = true;
         if (type instanceof L.Editable.PolygonEditor) {
             this.tooltip.update(this.tooltip.UPDATE_MULTIPOLYGON);
         } else {
@@ -555,12 +565,16 @@ var LocationEditor = L.Evented.extend({
             }
             this._enableEditToolbar();
 
-            // This temporariily saves geometries once they're added to the map,
-            // rather than having them go directly into "edit" mode.
-            if (this.isNew()) {
+            if (!this._multi) {
                 Styles.setSelectedStyle(this.location.layer);
-                this.save();
+                
+                // This temporarily saves geometries once they're added to the map,
+                // rather than having them go directly into "edit" mode.
+                if (this.isNew()) {
+                    this.save();
+                }
             }
+
         }
     },
 
@@ -601,6 +615,7 @@ var LocationEditor = L.Evented.extend({
     // if "final", the Save button in the form has been clicked
     save: function (final) {
         this.tooltip.remove();
+        this._multi = false;
         if (this.deleting()) {
             this.location._saveDelete();
         } else if (this.editing() || this.dirty()) {
@@ -611,9 +626,11 @@ var LocationEditor = L.Evented.extend({
     // ONLY fired when the "big" cancel button in form is clicked.
     // This is only time it should rely on _original_state
     dispose: function () {
-        if (this.location._deleting || this.location._deleted) {
+        if (this.deleting() || this.deleted()) {
             this.cancelDelete( final = true);
-        } else if (this._editing || this.dirty()) {
+        }
+
+        if (this.editing() || this.dirty()) {
             this.cancelEdit( final = true);
         }
 
@@ -724,10 +741,14 @@ var LocationEditor = L.Evented.extend({
     // returns view back to normal
     _resetView: function () {
         this._editing = false;
+        this._multi = false;
         this._prevent_click = false;
         this._removeEditControls();
 
-        Styles.resetStyle(this.location.layer);
+        if (!window.location.hash.includes('/edit/')) {
+            Styles.resetStyle(this.location.layer);
+        }
+
         this.location._reset();
     },
 

@@ -13,8 +13,11 @@ module.exports = function(grunt) {
 
                 all: ['<%= dirs.smap.index %>/*.js',
                       '<%= dirs.smap.edit %>/*.js',
+                      '<%= dirs.smap.edit %>/**/*.js',
                       '<%= dirs.smap.router %>/*.js',
-                      '<%= dirs.smap.map %>/*.js']
+                      '<%= dirs.smap.router %>/**/*.js',
+                      '<%= dirs.smap.map %>/*.js',
+                      '<%= dirs.smap.map %>/**/*.js']
             },
         },
 
@@ -46,8 +49,8 @@ module.exports = function(grunt) {
             dist: {
                src: [
                 '<%= dirs.smap.map %>/vendor/catiline.js', 
-                '<%= dirs.smap.map %>/vendor/lazytiles.js', 
                 '<%= dirs.smap.map %>/vendor/L.TileLayer.GeoJSON.js', 
+                '<%= dirs.smap.map %>/lazytiles.js', 
                 '<%= dirs.smap.map %>/map.js', 
                 '<%= dirs.smap.edit %>/vendor/Leaflet.Editable.js',
                 '<%= dirs.smap.edit %>/vendor/leaflet.toolbar.js',

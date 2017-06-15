@@ -281,10 +281,10 @@ function CreateRoutes(map) {
                     'type': 'modal',
                     'success_url': 'location',
                     'tab': 'relationships',
-                    'callback': rm.relationshipHooks,
+                    'callback': rm.relationshipAddHooks,
                 },
             });
-            rm.relationshipHooks();
+            rm.relationshipAddHooks();
         });
 
     /*******************
@@ -306,6 +306,7 @@ function CreateRoutes(map) {
                 'datatable': true,
                 'detach_forms': true,
             });
+            rm.relationshipHooks();
         });
 
     /*******************
@@ -327,8 +328,10 @@ function CreateRoutes(map) {
                 'form': {
                     'type': 'detail',
                     'success_url': 'relationship',
+                    'callback': rm.relationshipHooks,
                 },
             });
+            rm.relationshipHooks();
         });
 
     route('/records/relationship/delete/', 'modal',

@@ -71,8 +71,8 @@ L.TileLayer.Ajax = L.TileLayer.extend({
         this._loadedTiles[tilePoint.x + ';' + tilePoint.y + ';' + tilePoint.z] = true;
 
         // prevents request from caching results
-        var req_url = this.getTileUrl(tilePoint)
-        req_url = req_url + ((/\?/).test(req_url) ? "&" : "?") + (new Date()).getTime()
+        var req_url = this.getTileUrl(tilePoint);
+        req_url = req_url + ((/\?/).test(req_url) ? "&" : "?") + (new Date()).getTime();
 
         var layer = this;
         var req = new XMLHttpRequest();

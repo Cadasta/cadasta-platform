@@ -1,6 +1,7 @@
 {% extends "core/base.html" %}
 
 {% load staticfiles %}
+{% load leaflet_tags %}
 {% load i18n %}
 
 {% block top-nav %}dashboard{% endblock %}
@@ -9,14 +10,16 @@
 {% block title %} | {% trans "Dashboard" %}{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+{% leaflet_css %}
+<!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" /> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.css">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
 
 {% block extra_script %}
-<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+{% leaflet_js %}
+<!-- <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geocoder-mapzen/1.8.0/leaflet-geocoder-mapzen.js"></script>
 <script src="{% static 'js/vendor/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/vendor/L.Map.Deflate.js' %}"></script>
