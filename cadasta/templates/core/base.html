@@ -44,6 +44,9 @@
                   {{ user.username }}
                   {% endif %}
                 </span>
+                {% if is_superuser %}
+                  <span class="badge" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'You have superuser permissions' %}">SU</span>
+                {% endif %}
                 <span class="caret"></span>
               </button>
               <ul class="dropdown-menu">
