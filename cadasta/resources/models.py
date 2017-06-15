@@ -1,4 +1,3 @@
-import os
 import tempfile
 
 from datetime import datetime
@@ -6,7 +5,6 @@ from datetime import datetime
 import magic
 from buckets.fields import S3FileField
 from core.models import ID_FIELD_LENGTH, RandomIDModel
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
