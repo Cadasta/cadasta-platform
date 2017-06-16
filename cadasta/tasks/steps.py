@@ -13,41 +13,34 @@ from .models import BackgroundTask
 logger = logging.getLogger(__name__)
 
 
-from celery import bootsteps
-
-
-class ExampleWorkerStep(bootsteps.StartStopStep):
-    # def __init__(self, worker, **kwargs):
-    #     print('Called when the WorkController instance is constructed')
-    #     print('Arguments to WorkController: {0!r}'.format(kwargs))
+class DisableQueues(bootsteps.StartStopStep):
 
     def create(self, worker):
-        # this method can be used to delegate the action methods
-        # to another object that implements ``start`` and ``stop``.
-        logger.warn('Disabling queues')
+        logger.info('Disabling queues')
         worker.app.amqp.queues = {}
+        # TODO: Without any known queues, the worker processes a default
+        # queue (celery), creating it if it does not exist. Is there a
+        # way to start the worker via `$ celery worker` but only run the
+        # consumers?
         return self
 
     def start(self, worker):
-        print('Called when the worker is started.')
+        pass
 
     def stop(self, worker):
-        print('Called when the worker shuts down.')
-
-    def terminate(self, worker):
-        print('Called when the worker terminates')
+        pass
 
 
-class ResultConsumerStep(bootsteps.ConsumerStep):
+class MessageConsumer(bootsteps.ConsumerStep):
     """
-    Reads off the Result queue, inserting messages into DB.
-    NOTE: This only works if you run a celery worker that is NOT looking
-    at the Result queue. Ex. "celery -A config worker"
+    Reads off the Task Duplicate queue and Result queue, inserting
+    messages into DB. NOTE: This only works if you run a celery worker
+    that is NOT looking at the Result queue. Ex. "celery -A config worker"
     """
 
     # def __init__(self, *args, **kwargs):
     #     print(app.app_or_default().amqp.queues)
-    #     super(ResultConsumerStep, self).__init__(*args, **kwargs)
+    #     super(MessageConsumer, self).__init__(*args, **kwargs)
 
     def get_consumers(self, channel):
         return [
@@ -63,7 +56,8 @@ class ResultConsumerStep(bootsteps.ConsumerStep):
                 accept=['json']),
         ]
 
-    def handle_task(self, body, message):
+    @staticmethod
+    def handle_task(body, message):
         logger.debug("Handling task message %r", body)
         try:
             args, kwargs, options = message.decode()
@@ -104,7 +98,8 @@ class ResultConsumerStep(bootsteps.ConsumerStep):
         finally:
             message.ack()
 
-    def handle_result(self, body, message):
+    @staticmethod
+    def handle_result(body, message):
         """ Handle result message """
         logger.debug("Handling result message %r", body)
         try:
@@ -113,13 +108,14 @@ class ResultConsumerStep(bootsteps.ConsumerStep):
             task_id = result['task_id']
             task_qs = BackgroundTask.objects.filter(id=task_id)
 
+            MAX_ATTEMPTS = 10
             attempts = 0
             while not task_qs.exists():
                 logger.debug("No corresponding task found (%r), retrying...", task_id)
-                if attempts > 3:
+                if attempts > MAX_ATTEMPTS:
                     logger.exception("No corresponding task found, exiting...\n%r", result)
                     return
-                time.sleep(1)
+                time.sleep(.25)
                 attempts += 1
 
             status = result.get('status')

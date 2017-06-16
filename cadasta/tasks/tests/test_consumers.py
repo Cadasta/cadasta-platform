@@ -4,7 +4,7 @@ from django.test import TestCase, override_settings
 from django.db.models import F
 from django.db.models.expressions import CombinedExpression, Value
 
-from tasks.consumers import ResultConsumer
+from tasks.consumers import MessageConsumer
 from tasks.tests.factories import BackgroundTaskFactory
 
 
@@ -23,17 +23,17 @@ class TestConsumers(TestCase):
         mock_app.amqp.queues = ['foo', 'results-queue']
 
         with self.assertRaises(ValueError):
-            ResultConsumer()
+            MessageConsumer()
         self.assertFalse(consumer_init.called)
 
         # Correct setup
         mock_app.amqp.queues = ['foo', 'bar']
-        ResultConsumer()
+        MessageConsumer()
         consumer_init.assert_called_once_with()
 
     @patch('tasks.consumers.bootsteps.ConsumerStep.__init__', MagicMock())
     def test_get_queues(self):
-        consumers = ResultConsumer().get_consumers(MagicMock())
+        consumers = MessageConsumer().get_consumers(MagicMock())
         self.assertEqual(len(consumers), 1)
         consumer = consumers[0]
         self.assertEqual(len(consumer.queues), 1)
@@ -55,7 +55,7 @@ class TestConsumers(TestCase):
             'result': 'All succeeded',
         }
         mock_msg = MagicMock()
-        ResultConsumer().handle_message(fake_body, mock_msg)
+        MessageConsumer().handle_message(fake_body, mock_msg)
         mock_qs.update.assert_has_calls([
             call(status='SUCCESS'),
             call(output='All succeeded')
@@ -77,7 +77,7 @@ class TestConsumers(TestCase):
             'result': {'log': 'Things are coming along'},
         }
         mock_msg = MagicMock()
-        ResultConsumer().handle_message(fake_body, mock_msg)
+        MessageConsumer().handle_message(fake_body, mock_msg)
         calls = mock_qs.update.call_args_list
         self.assertEqual(calls[0], call(status='PROGRESS'))
         self.assertEqual(
@@ -96,7 +96,7 @@ class TestConsumers(TestCase):
         """
         mock_msg = MagicMock()
         empty_body = {}
-        ResultConsumer().handle_message(empty_body, mock_msg)
+        MessageConsumer().handle_message(empty_body, mock_msg)
         mock_msg.ack.assert_called_once_with()
         self.assertEqual(mock_log.exception.call_count, 1)
 
@@ -117,6 +117,6 @@ class TestConsumers(TestCase):
         }
         ack_func = MagicMock(side_effect=Exception("Failed ack"))
         mock_msg = MagicMock(ack=ack_func)
-        ResultConsumer().handle_message(fake_body, mock_msg)
+        MessageConsumer().handle_message(fake_body, mock_msg)
         ack_func.assert_called_once_with()
         self.assertEqual(mock_log.exception.call_count, 1)
