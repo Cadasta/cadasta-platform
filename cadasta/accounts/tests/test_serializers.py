@@ -5,6 +5,7 @@ from django.utils.translation import gettext as _
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
+from rest_framework.serializers import ValidationError
 
 from core.messages import SANITIZE_ERROR
 from core.tests.utils.cases import UserTestCase
@@ -20,6 +21,7 @@ BASIC_TEST_DATA = {
     'email': 'john@beatles.uk',
     'password': 'iloveyoko79!',
     'full_name': 'John Lennon',
+    'language': 'en',
 }
 
 
@@ -229,7 +231,8 @@ class UserSerializerTest(UserTestCase, TestCase):
             'email': 'john@beatles.uk',
             'password': 'iloveyoko79',
             'full_name': 'John Lennon',
-            'last_login': '2016-01-01 23:00:00'
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en'
         }
         serializer = serializers.UserSerializer(data=data)
         assert serializer.is_valid()
@@ -304,6 +307,26 @@ class UserSerializerTest(UserTestCase, TestCase):
         assert not serializer2.is_valid()
         assert serializer2.errors['username'] == [
             _("Username cannot be “add” or “new”.")]
+
+    def test_update_with_invalid_language(self):
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
+        assert serializer.is_valid()
+        user = serializer.save()
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'language': 'invalid',
+        }
+        request = APIRequestFactory().patch('/user/imagine71', data)
+        force_authenticate(request, user=user)
+        serializer2 = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)}
+        )
+        with self.assertRaises(ValidationError):
+            serializer2.validate_language(data['language'])
+        assert not serializer2.is_valid()
+        assert serializer2.errors['language'] == [
+            _('"%s" is not a valid choice.' % data['language'])]  # default str
 
     def test_sanitize(self):
         user = UserFactory.create(username='imagine71')

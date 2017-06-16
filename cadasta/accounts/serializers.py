@@ -31,6 +31,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
             'email',
             'password',
             'email_verified',
+            'language',
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -82,6 +83,7 @@ class UserSerializer(SanitizeFieldSerializer,
             'email',
             'email_verified',
             'last_login',
+            'language',
         )
         extra_kwargs = {
             'email': {'required': True, 'unique': True},
@@ -107,8 +109,14 @@ class UserSerializer(SanitizeFieldSerializer,
         if instance is not None:
             if (last_login is not None and
                     last_login != instance.last_login):
-                raise ValidationError('Cannot update last_login')
+                raise ValidationError(_('Cannot update last_login'))
         return last_login
+
+    def validate_language(self, language):
+        valid_langs = next(zip(*settings.LANGUAGES))
+        if language not in valid_langs:
+            raise ValidationError(_("Language not available"))  # overridden
+        return language
 
 
 class AccountLoginSerializer(djoser_serializers.LoginSerializer):
