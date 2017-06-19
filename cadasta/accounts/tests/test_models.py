@@ -10,9 +10,11 @@ class UserTest(TestCase):
                                  full_name='John Lennon',
                                  email='john@beatles.uk',
                                  email_verified=True,
-                                 verify_email_by=date)
+                                 phone='+12025550111',
+                                 phone_verified=True)
         assert repr(user) == ('<User username=John'
                               ' full_name=John Lennon'
                               ' email=john@beatles.uk'
                               ' email_verified=True'
-                              ' verify_email_by={}>').format(date)
+                              ' phone=+12025550111'
+                              ' phone_verified=True>').format(date)
