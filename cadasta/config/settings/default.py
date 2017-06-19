@@ -72,6 +72,7 @@ INSTALLED_APPS = (
     'simple_history',
     'jsonattrs',
     'compressor',
+    'django_otp',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -87,6 +88,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 )
 
 REST_FRAMEWORK = {
@@ -507,7 +509,7 @@ ICON_LOOKUPS = {
 }
 
 MIME_LOOKUPS = {
-     'gpx': 'application/gpx+xml'
+    'gpx': 'application/gpx+xml'
 }
 
 FILE_UPLOAD_HANDLERS = [
@@ -534,3 +536,6 @@ ES_SCHEME = 'http'
 ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
+
+TOTP_TOKEN_VALIDITY = 3600
+TOTP_DIGITS = 6
