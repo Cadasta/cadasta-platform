@@ -68,7 +68,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 class AccountLogin(LoginView):
     def form_valid(self, form):
         user = form.user
-        if not user.email_verified and timezone.now() > user.verify_email_by:
+        if not user.email_verified:
             user.is_active = False
             user.save()
             send_email_confirmation(self.request, user)
