@@ -54,7 +54,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     history = HistoricalRecords()
 
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'full_name']
+    REQUIRED_FIELDS = ['email', 'phone', 'full_name']
 
     class Meta:
         ordering = ('username',)
