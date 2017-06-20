@@ -108,6 +108,8 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
 
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""
+        self.user.email_verified = True
+        self.user.save()
         data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
@@ -120,11 +122,9 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 401
 
     def test_login_with_unverified_email(self):
-        """The view should return an error message if the User.verify_email_by
-           is exceeded. An email with a verification link should be have been
-           sent to the user."""
-        self.user.verify_email_by = datetime.now()
-        self.user.save()
+        """The view should return an error message if the User email
+        has not been verified. An email with a verification link
+        should be have been sent to the user."""
         data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data, user=self.user)
         assert response.status_code == 401
