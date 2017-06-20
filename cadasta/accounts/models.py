@@ -78,7 +78,9 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
         repr_string = ('<User username={obj.username}'
                        ' full_name={obj.full_name}'
                        ' email={obj.email}'
-                       ' email_verified={obj.email_verified}>')
+                       ' email_verified={obj.email_verified}'
+                       ' phone={obj.phone}'
+                       ' phone_verified={obj.phone_verified}>')
         return repr_string.format(obj=self)
 
     def get_display_name(self):
