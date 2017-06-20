@@ -42,6 +42,9 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     language = models.CharField(max_length=10,
                                 choices=settings.LANGUAGES,
                                 default=settings.LANGUAGE_CODE)
+    measurement = models.CharField(max_length=20,
+                                   choices=settings.MEASUREMENTS,
+                                   default=settings.MEASUREMENT_DEFAULT)
 
     objects = UserManager()
 

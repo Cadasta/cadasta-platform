@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 
-from rest_framework.serializers import EmailField, ValidationError, ChoiceField
+from rest_framework.serializers import ChoiceField, EmailField, ValidationError
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 
@@ -32,6 +32,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
             'password',
             'email_verified',
             'language',
+            'measurement',
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -42,7 +43,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
         check_username_case_insensitive(username)
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
-                _("Username cannot be “add” or “new”."))
+                _('Username cannot be “add” or “new”.'))
         return username
 
     def validate_password(self, password):
@@ -81,6 +82,13 @@ class UserSerializer(SanitizeFieldSerializer,
             'invalid_choice': _('Language invalid or not available')
         }
     )
+    measurement = ChoiceField(
+        choices=settings.MEASUREMENTS,
+        default=settings.MEASUREMENT_DEFAULT,
+        error_messages={
+            'invalid_choice': _('Measurement system invalid or not available')
+        }
+    )
 
     class Meta:
         model = User
@@ -91,6 +99,7 @@ class UserSerializer(SanitizeFieldSerializer,
             'email_verified',
             'last_login',
             'language',
+            'measurement',
         )
         extra_kwargs = {
             'email': {'required': True, 'unique': True},
@@ -108,7 +117,7 @@ class UserSerializer(SanitizeFieldSerializer,
                 check_username_case_insensitive(username)
         if username.lower() in settings.CADASTA_INVALID_ENTITY_NAMES:
             raise ValidationError(
-                _("Username cannot be “add” or “new”."))
+                _('Username cannot be “add” or “new”.'))
         return username
 
     def validate_last_login(self, last_login):

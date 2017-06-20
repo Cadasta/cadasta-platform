@@ -75,10 +75,17 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
             'invalid_choice': _('Language invalid or not available')
         }
     )
+    measurement = forms.ChoiceField(
+        choices=settings.MEASUREMENTS,
+        error_messages={
+            'invalid_choice': _('Measurement system invalid or not available')
+        }
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'full_name', 'language']
+        fields = ['username', 'email', 'full_name', 'language',
+                  'measurement']
 
     class Media:
         js = ('js/sanitize.js', )
