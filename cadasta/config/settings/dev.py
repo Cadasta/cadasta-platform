@@ -86,6 +86,10 @@ LOGGING = {
             'filename': '/var/log/django/debug.log',
             'formatter': 'simple'
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
     },
     'loggers': {
         'django': {
@@ -96,6 +100,10 @@ LOGGING = {
         'xform.submissions': {
             'handlers': ['file'],
             'level': 'DEBUG'
+        },
+        'accounts.token': {
+            'handlers': ['console'],
+            'level': 'INFO'
         }
     },
 }
