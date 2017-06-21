@@ -139,8 +139,8 @@ class VerificationDevice(Device):
     )
     user = models.OneToOneField(User)
 
-    step = getattr(settings, 'TOTP_TOKEN_VALIDITY')
-    digits = getattr(settings, 'TOTP_DIGITS')
+    step = settings.TOTP_TOKEN_VALIDITY
+    digits = settings.TOTP_DIGITS
 
     class Meta(Device.Meta):
         verbose_name = "Verification Device"
@@ -154,12 +154,11 @@ class VerificationDevice(Device):
         totp.time = time.time()
         return totp
 
-    def generate_token(self):
+    def generate_challenge(self):
         totp = self.totp_obj()
-        token = totp.token()
+        token = format(totp.token(), '0%sd' % self.digits)
         message = "Your Cadasta Token is %s. It is valid for %s minutes." % (
-            str(token).zfill(self.digits),
-            getattr(settings, 'TOTP_TOKEN_VALIDITY') // 60)
+            token, self.step // 60)
 
         logger.info("Token has been sent to %s " % self.unverified_phone)
         logger.info("%s" % message)
@@ -173,7 +172,7 @@ class VerificationDevice(Device):
             verified = False
         else:
             totp = self.totp_obj()
-            if (totp.t() > self.last_t) and (totp.verify(token=token)):
+            if (totp.t() > self.last_t) and (totp.token() == token):
                 self.last_t = totp.t()
                 verified = True
                 self.save()
