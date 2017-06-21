@@ -137,7 +137,7 @@ class VerificationDevice(Device):
          The next token must be at a higher time step.\
          It makes sure a token is used only once."
     )
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     step = settings.TOTP_TOKEN_VALIDITY
     digits = settings.TOTP_DIGITS

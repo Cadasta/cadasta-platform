@@ -31,14 +31,12 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         self.sherlock = UserFactory.create()
         self.sherlock.verificationdevice = VerificationDevice.objects.create(
             user=self.sherlock,
-            unverified_phone=self.sherlock.phone,
-            secret_key='01234567890123456789')
+            unverified_phone=self.sherlock.phone)
 
         self.john = UserFactory.create()
         self.john.verificationdevice = VerificationDevice.objects.create(
             user=self.john,
-            unverified_phone=self.john.phone,
-            secret_key='98765432109876543210')
+            unverified_phone=self.john.phone)
 
         self.TOTP_TOKEN_VALIDITY = settings.TOTP_TOKEN_VALIDITY
         self._now = 1497657600
@@ -107,6 +105,16 @@ class VerificationDeviceTest(UserTestCase, TestCase):
             verified = device_john.verify_token(token)
 
         self.assertFalse(verified)
+
+    def test_token_invalid(self):
+        device = self.sherlock.verificationdevice
+        with self.with_time(self._now):
+            token = device.generate_challenge()
+            verified_invalid_token = device.verify_token('ABCDEF')
+            verified_valid_token = device.verify_token(token)
+
+        self.assertFalse(verified_invalid_token)
+        self.assertTrue(verified_valid_token)
 
     def with_time(self, timestamp):
         return self._patch('time.time', lambda: timestamp)
