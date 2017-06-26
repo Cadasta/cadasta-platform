@@ -34,6 +34,7 @@ var Tooltip = L.Class.extend({
         this._popupPane = map._panes.popupPane;
         this._container = L.DomUtil.create(
             'div', 'editor-tooltip', this._popupPane);
+        this._container.style.visibility = 'hidden';
 
         this._map.on('mouseout', this._onMouseOut, this);
     },
