@@ -62,7 +62,7 @@ class RoleAuthorizationBackendTest(UserTestCase, TestCase):
         group = Group.objects.get(name='OrgAdmin')
         role = ProjectRole.objects.create(
             user=self.user, project=self.project, group=group)
-        assert len(role.permissions) == 25
+        assert len(role.permissions) == 26
         assert self.backend.has_perm(self.user, 'org.create', obj=role)
         assert self.backend.has_perm(
             self.user, 'project.create', obj=role) is True

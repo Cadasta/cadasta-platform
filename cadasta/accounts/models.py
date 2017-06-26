@@ -142,5 +142,5 @@ class PublicRole(Role):
 
     def __repr__(self):
         repr_string = (
-            '<PublicRole id={obj.id} user={obj.user.username}')
+            '<PublicRole id={obj.id} user={obj.user.username}>')
         return repr_string.format(obj=self)

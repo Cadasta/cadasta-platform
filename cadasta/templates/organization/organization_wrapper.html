@@ -28,24 +28,23 @@
 
       <!-- More options menu -->
       {% if is_administrator %}
-        <div class="dropdown pull-right btn-add">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
-            <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-          </a>
-          <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="dLabel">
-            <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
-            {% if is_administrator %}
-              <li role="separator" class="divider"></li>
-              <li>
-                {% if organization.archived %}
-                  <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
-                {% else %}
-                  <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
-                {% endif %}
-              </li>
+      <div class="dropdown pull-right btn-add">
+        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
+          <span class="more-menu glyphicon glyphicon-option-vertical"></span>
+        </a>
+        <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
+          <div class="visible-md-inline visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
+          <div class="visible-sm-inline">{% trans "More" %} <span class="caret"></span></div>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dLabel">
+          <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
+          {% if is_administrator %}
+          <li role="separator" class="divider"></li>
+          <li>
+            {% if organization.archived %}
+            <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive organization" %}</a>
+            {% else %}
+            <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive organization" %}</a>
             {% endif %}
           </ul>
         </div>

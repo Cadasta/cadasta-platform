@@ -1,7 +1,7 @@
 import json
 
 from django.test import TestCase
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 
 from tutelary.models import Policy, Role, assign_user_policies
 from skivvy import ViewTestCase
@@ -162,7 +162,7 @@ class OrganizationAddTest(ViewTestCase, UserTestCase, TestCase):
 
 
 class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
-    view_class = default.OrganizationDashboard
+    view_class = default.OrganizationTestDashboard
     template = 'organization/organization_dashboard.html'
 
     def setup_models(self):
@@ -171,17 +171,8 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.private_proj = ProjectFactory.create(
             organization=self.org, access='private')
         self.all_projects = self.projs + [self.private_proj]
-
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
+        self.org_member_group = Group.objects.get(name='OrgMember')
         self.user = UserFactory.create()
 
     def setup_url_kwargs(self):
@@ -198,7 +189,6 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def test_get_org_with_authorized_user(self):
-        assign_user_policies(self.user, self.policy)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -211,7 +201,8 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_org_with_org_membership(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.org_member_group)
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -220,7 +211,6 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_org_with_new_org(self):
         new_org = OrganizationFactory.create()
-        assign_user_policies(self.user, self.policy)
         response = self.request(user=self.user,
                                 url_kwargs={'slug': new_org.slug})
         assert response.status_code == 200
@@ -244,6 +234,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(
             organization=self.org,
             user=org_admin,
+            group=self.org_admin_group,
             admin=True
         )
         response = self.request(user=org_admin)
@@ -277,6 +268,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(
             organization=self.org,
             user=org_admin,
+            group=self.org_admin_group,
             admin=True
         )
         self.org.archived = True

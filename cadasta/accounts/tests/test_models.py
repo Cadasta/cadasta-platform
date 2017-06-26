@@ -48,5 +48,5 @@ class PublicRoleTest(UserTestCase, TestCase):
         role = PublicRole.objects.get(user=user)
         assert role.name == 'public_user'
         assert role.group.name == 'PublicUser'
-        assert len(role.permissions) == 8
+        assert len(role.permissions) == 5
         assert role.is_public_user

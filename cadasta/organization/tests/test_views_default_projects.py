@@ -7,7 +7,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.gis.geos import Point
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -189,22 +189,11 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        clauses = {
-            'clause': [
-                clause('allow',
-                       ['project.list'],
-                       ['organization/*']),
-                clause('allow',
-                       ['project.view', 'project.view_private'],
-                       ['project/*/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         self.user = UserFactory.create()
-        self.user.assign_policies(self.policy)
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
+        self.org_member_group = Group.objects.get(name='OrgMember')
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
 
     def setup_template_context(self):
         return {
@@ -261,6 +250,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=self.user,
+            group=self.org_admin_group,
             admin=True
         )
         members = {self.user.username: 'Administrator'}
@@ -279,6 +269,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         role = ProjectRole.objects.create(
             project=self.project,
             user=self.user,
+            group=self.pm_group,
             role='PM',
         )
         response = self.request(user=self.user)
@@ -313,11 +304,22 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == self.expected_content
 
     def test_get_private_project(self):
+        ProjectRole.objects.create(
+            project=self.project,
+            user=self.user,
+            group=self.pu_group,
+            role='PU',
+        )
         self.project.access = 'private'
         self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=False,
+                                       is_allowed_add_resource=False,
+                                       is_project_member=True,
+                                       is_allowed_import=False)
+        assert response.content == expected
 
     def test_get_private_project_with_unauthenticated_user(self):
         self.project.access = 'private'
@@ -328,36 +330,27 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                 in response.messages)
 
     def test_get_private_project_without_permission(self):
-        # Note, no project.view_private!
-        restricted_clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*'])
-            ]
-        }
-        restricted_policy = Policy.objects.create(
-            name='restricted',
-            body=json.dumps(restricted_clauses))
-        self.user.assign_policies(restricted_policy)
-
         self.project.access = 'private'
         self.project.save()
         response = self.request()
         assert response.status_code == 302
+        assert response.location == '/'
         assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_private_project_based_on_org_membership(self):
+        # user doesn't have private project access even if an org member
         OrganizationRole.objects.create(organization=self.project.organization,
+                                        group=self.org_member_group,
                                         user=self.user)
         self.project.access = 'private'
         self.project.save()
 
         response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.status_code == 302
+        assert response.location == '/'
+        assert ("You don't have permission to access this project"
+                in response.messages)
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
@@ -371,11 +364,10 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                 in response.messages)
 
     def test_get_private_project_with_superuser(self):
-        self.project.access = 'private'
-        self.project.save()
-
         self.user.is_superuser = True
         self.user.save()
+        self.project.access = 'private'
+        self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_superuser=True,
@@ -410,6 +402,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=org_admin,
+            group=self.org_admin_group,
             admin=True
         )
         members = {org_admin.username: 'Administrator'}

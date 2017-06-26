@@ -10,8 +10,8 @@ class LoadPermissionsTest(TestCase):
 
     def test_permissions(self):
         permissions = Permission.objects.all()
-        assert permissions.count() == 38
+        assert permissions.count() == 39
 
     def test_groups(self):
         groups = Group.objects.all()
-        assert groups.count() == 7
+        assert groups.count() == 8

@@ -75,15 +75,15 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
         return kwargs
 
 
-class OrganizationDashboard(PermissionRequiredMixin,
+class OrganizationDashboard(mixins.OrgRolePermissionMixin,
                             mixins.OrgRoleCheckMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
 
-    def get_actions(self, view, request):
+    def get_actions(self, request):
         if self.get_object().archived:
-            return 'org.view_archived'
+            return 'org.view.archived'
         return 'org.view'
 
     model = Organization
@@ -388,22 +388,26 @@ class ProjectList(PermissionRequiredMixin,
         return super().render_to_response(context)
 
 
-class ProjectDashboard(PermissionRequiredMixin,
+class ProjectDashboard(mixins.ProjectRolePermissionMixin,
                        mixins.ProjectAdminCheckMixin,
                        mixins.ProjectMixin,
                        generic.DetailView):
 
-    def get_actions(self, view):
-        if self.prj.archived:
-            return 'project.view_archived'
-        if self.prj.public():
-            return 'project.view'
+    def get_actions(self, request):
+        perms = []
+        project = self.get_object()
+        if project.access == 'public':
+            perms.append('project.view')
         else:
-            return 'project.view_private'
+            perms.append('project.view.private')
+        if project.archived:
+            perms.append('project.view.archived')
+        return perms
 
     model = Project
     template_name = 'organization/project_dashboard.html'
-    permission_required = {'GET': get_actions}
+    # permission_required = {'GET': get_actions}
+    permission_required = get_actions
     permission_denied_message = error_messages.PROJ_VIEW
 
     def get_context_data(self, **kwargs):
@@ -1027,3 +1031,40 @@ class ProjectTestView(mixins.ProjectRolePermissionMixin,
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
         return context
+
+
+class OrganizationTestDashboard(mixins.OrgRolePermissionMixin,
+                                mixins.OrgRoleCheckMixin,
+                                mixins.ProjectCreateCheckMixin,
+                                core_mixins.CacheObjectMixin,
+                                generic.DetailView):
+
+    def get_actions(self, request):
+        if self.get_object().archived:
+            return 'org.view.archived'
+        return 'org.view'
+
+    model = Organization
+    template_name = 'organization/organization_dashboard.html'
+    permission_required = get_actions
+    permission_denied_message = error_messages.ORG_VIEW
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data()
+        if self.is_superuser:
+            projects = self.object.all_projects()
+        else:
+            projects = self.object.public_projects()
+            if hasattr(self.request.user, 'organizations'):
+                orgs = self.request.user.organizations.all()
+                for org in orgs:
+                    if org.slug == self.kwargs['slug']:
+                        if self.is_administrator:
+                            projects = self.object.all_projects()
+                        else:
+                            projects = self.object.all_projects().filter(
+                                archived=False)
+
+        context['projects'] = projects
+        return super(generic.DetailView, self).render_to_response(context)

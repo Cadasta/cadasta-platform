@@ -9,6 +9,7 @@ from core.util import slugify
 from core.messages import SANITIZE_ERROR
 from django import forms
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.gis import forms as gisforms
 from django.contrib.postgres import forms as pg_forms
 from django.db import transaction
@@ -33,13 +34,24 @@ QUESTIONNAIRE_TYPES = [
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 ]
 
+ROLE_GROUPS = {
+    'A': 'OrgAdmin',
+    'M': 'OrgMember',
+    'Pb': 'PublicUser',
+    'PU': 'ProjectMember',
+    'DC': 'DataCollector',
+    'PM': 'ProjectManager'
+}
+
 
 def create_update_or_delete_project_role(project, user, role):
     if role != 'Pb':
+        name = ROLE_GROUPS.get(role, 'ProjectMember')
+        group = Group.objects.get(name=name)
         ProjectRole.objects.update_or_create(
             user=user,
             project_id=project,
-            defaults={'role': role})
+            defaults={'role': role, 'group': group})
     else:
         ProjectRole.objects.filter(user=user,
                                    project_id=project).delete()
@@ -197,9 +209,12 @@ class AddOrganizationMemberForm(forms.Form):
                 _("The role could not be assigned because the data didn't "
                   "validate.")
             )
-
+        try:
+            group = Group.objects.get(name='OrgMember')
+        except Group.DoesNotExist as e:
+            raise forms.ValidationError(e)
         self.instance = OrganizationRole.objects.create(
-            organization=self.organization, user=self.user)
+            organization=self.organization, user=self.user, group=group)
         return self.instance
 
 
@@ -231,6 +246,12 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
 
     def save(self):
         self.org_role_instance.admin = self.data.get('org_role') == 'A'
+        try:
+            name = ROLE_GROUPS.get(self.data.get('org_role'), 'M')
+            group = Group.objects.get(name=name)
+        except Group.DoesNotExist as e:
+            raise forms.ValidationError(e)
+        self.org_role_instance.group = group
         self.org_role_instance.save()
 
 

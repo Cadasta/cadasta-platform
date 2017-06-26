@@ -320,28 +320,38 @@ class RolePermissionMixin(PermissionRequiredMixin):
 
         return perms
 
-    def get_role(self):
+    def get_user_roles(self):
+        self._roles = []
         user = self.request.user
         if user.is_anonymous:
-            self._role = AnonymousUserRole()
-        if self.is_superuser:
-            self._role = SuperUserRole()
+            self._roles.append(AnonymousUserRole())
+        elif user.is_superuser:
+            self._roles.append(SuperUserRole())
+
+    @property
+    def permissions(self):
+        # compose permissions for all roles
+        self._perms = []
+        if hasattr(self, '_roles'):
+            [self._perms.extend(role.permissions) for role in self._roles]
+        perms = sorted(set(self._perms))
+        return perms
 
     def has_permission(self):
-        if not hasattr(self, '_role'):
-            self.get_role()
-        # user = self.request.user
+        if not hasattr(self, '_roles'):
+            self.get_user_roles()
         # superusers have all permissions
         if self.is_superuser:
             return True
         perms = self.get_permission_required()
 
-        # how to check method-level permissions
+        # replace when we eventually use role authorization backend
+        # user = self.request.user
         # return all(False for perm in perms
-        #            if not user.has_perm(perm, obj=self._role))
+        #            if not user.has_perm(perm, obj=self.permissions))
 
         return all(False for perm in perms
-                   if perm not in self._role.permissions)
+                   if perm not in self.permissions)
 
     def handle_no_permission(self):
         msg = _("You don't have permission to perform this action.")
@@ -381,36 +391,35 @@ class RolePermissionMixin(PermissionRequiredMixin):
 
 class OrgRolePermissionMixin(RolePermissionMixin):
 
-    def get_role(self):
-        super().get_role()
-        user = self.request.user
-        if user.is_anonymous:
-            return AnonymousUserRole()
-        if self.get_org_role():
-            return self.get_org_role()
-        if hasattr(self, '_prj_role'):
-            return self._prj_role
-        try:
-            return PublicRole.objects.get(user=user)
-        except PublicRole.DoesNotExist:
-            pass
+    def get_user_roles(self):
+        super().get_user_roles()
+        if hasattr(self, '_roles') and not self._roles:
+            try:
+                role = OrganizationRole.objects.get(
+                    organization=self.get_object(),
+                    user=self.request.user,
+                )
+                self._roles.append(role)
+            except OrganizationRole.DoesNotExist:
+                pass
+            try:
+                role = PublicRole.objects.get(user=self.request.user)
+                self._roles.append(role)
+            except PublicRole.DoesNotExist:
+                pass
 
 
 class ProjectRolePermissionMixin(RolePermissionMixin):
 
-    def get_role(self):
-        super().get_role()
-        if not hasattr(self, '_role'):
+    def get_user_roles(self):
+        super().get_user_roles()
+        if hasattr(self, '_roles') and not self._roles:
             if hasattr(self, 'get_org_role') and self.get_org_role():
-                self._role = self._org_role
-                return self._role
+                self._roles.append(self._org_role)
             if hasattr(self, 'get_prj_role') and self.get_prj_role():
-                self._role = self._prj_role
-                return self._role
+                self._roles.append(self._prj_role)
             try:
                 role = PublicRole.objects.get(user=self.request.user)
-                self._role = role
-                return self._role
+                self._roles.append(role)
             except PublicRole.DoesNotExist:
                 pass
-        return self._role

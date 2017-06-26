@@ -13,6 +13,10 @@
             "name": "View Private Organization",
             "codename": "org.view.private"
         },
+        "org_view_archived": {
+            "name": "View Archived Organization",
+            "codename": "org.view.archived"
+        },
         "org_create": {
             "name": "Create Organization",
             "codename": "org.create"

@@ -9,6 +9,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
@@ -848,15 +849,17 @@ class UpdateProjectRolesTest(UserTestCase, TestCase):
         assert ProjectRole.objects.count() == 0
 
     def test_update_existing_role(self):
+        group = Group.objects.get(name='DataCollector')
         ProjectRole.objects.create(
             project=self.project,
             user=self.user,
+            group=group,
             role='DC')
         forms.create_update_or_delete_project_role(
-            self.project.id, self.user, 'PM')
+            self.project.id, self.user, 'PU')
 
         role = ProjectRole.objects.get(project=self.project, user=self.user)
-        assert role.role == 'PM'
+        assert role.role == 'PU'
 
     def test_delete_existing_role(self):
         """If role is updated to Pb (public user) the Project Role instance

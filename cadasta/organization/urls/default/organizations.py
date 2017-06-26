@@ -15,6 +15,12 @@ urlpatterns = [
         r'^(?P<slug>[-\w]+)/$',
         default.OrganizationDashboard.as_view(),
         name='dashboard'),
+
+    # prg permissions testing url
+    url(
+        r'^(?P<slug>[-\w]+)/perms$',
+        default.OrganizationTestDashboard.as_view(),
+        name='dashboard-test'),
     url(
         r'^(?P<slug>[-\w]+)/edit/$',
         default.OrganizationEdit.as_view(),
@@ -39,9 +45,9 @@ urlpatterns = [
         default.ProjectDashboard.as_view(),
         name='project-dashboard'),
 
-    # test url
+    # project permissions testing url
     url(
-        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/blah$',
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/perms$',
         default.ProjectTestView.as_view(),
         name='project-dashboard-test'),
 
