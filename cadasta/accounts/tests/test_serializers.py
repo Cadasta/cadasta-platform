@@ -1,5 +1,6 @@
 import random
 import pytest
+
 from datetime import datetime
 from django.utils.translation import gettext as _
 from django.test import TestCase
