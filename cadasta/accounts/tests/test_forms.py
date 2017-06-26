@@ -1,4 +1,5 @@
 import random
+import pytest
 
 from core.tests.utils.cases import UserTestCase
 from core.messages import SANITIZE_ERROR
@@ -406,30 +407,6 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
 
-    def test_update_with_valid_language(self):
-        user = UserFactory.create(username='imagine71',
-                                  email='john@beatles.uk',
-                                  password='sgt-pepper',
-                                  language='en')
-        data = {
-            'username': 'imagine71',
-            'email': 'john2@beatles.uk',
-            'password': 'sgt-pepper',
-            'language': 'fr'
-        }
-        request = HttpRequest()
-        setattr(request, 'session', 'session')
-        self.messages = FallbackStorage(request)
-        setattr(request, '_messages', self.messages)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
-
-        form = forms.ProfileForm(data, request=request, instance=user)
-        form.save()
-        user.refresh_from_db()
-        assert form.is_valid() is True
-        assert user.language == 'fr'
-
     def test_update_with_invalid_language(self):
         user = UserFactory.create(email='john@beatles.uk',
                                   password='imagine71',
@@ -442,12 +419,12 @@ class ProfileFormTest(UserTestCase, TestCase):
             'language': 'invalid'
         }
         form = forms.ProfileForm(data, instance=user)
-        self.assertRaises(ValidationError, form.clean_language)
+        with pytest.raises(ValidationError):
+            form.clean_language()
         assert form.is_valid() is False
         assert user.language == 'en'
-        assert (_("Select a valid choice. %s is not one "
-                "of the available choices." % (data['language'])) in
-                form.errors.get('language'))
+        assert ("Select a valid choice. invalid is not one of the available "
+                "choices." in form.errors.get('language'))
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',

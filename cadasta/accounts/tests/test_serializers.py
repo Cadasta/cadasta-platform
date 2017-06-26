@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
-from rest_framework.serializers import ValidationError
 
 from core.messages import SANITIZE_ERROR
 from core.tests.utils.cases import UserTestCase
@@ -235,7 +234,7 @@ class UserSerializerTest(UserTestCase, TestCase):
             'language': 'en'
         }
         serializer = serializers.UserSerializer(data=data)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
 
         serializer.save()
         assert User.objects.count() == 1
@@ -246,7 +245,7 @@ class UserSerializerTest(UserTestCase, TestCase):
 
     def test_update_username_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
         user = serializer.save()
         other_user = UserFactory.create()
         update_data = {'username': 'bad-update'}
@@ -255,7 +254,7 @@ class UserSerializerTest(UserTestCase, TestCase):
         serializer2 = serializers.UserSerializer(
             user, update_data, context={'request': Request(request)}
         )
-        assert not serializer2.is_valid()
+        assert serializer2.is_valid() is False
         assert serializer2.errors['username'] == ['Cannot update username']
 
     def test_case_insensitive_username(self):
@@ -280,18 +279,18 @@ class UserSerializerTest(UserTestCase, TestCase):
 
     def test_update_last_login_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
         user = serializer.save()
         update_data1 = {'username': 'imagine71',
                         'email': 'john@beatles.uk',
                         'last_login': '2016-01-01 23:00:00'}
         serializer2 = serializers.UserSerializer(user, data=update_data1)
-        assert not serializer2.is_valid()
+        assert serializer2.is_valid() is False
         assert serializer2.errors['last_login'] == ['Cannot update last_login']
 
     def test_update_with_restricted_username(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
         user = serializer.save()
         invalid_usernames = ('add', 'ADD', 'Add', 'new', 'NEW', 'New')
         data = {
@@ -304,13 +303,13 @@ class UserSerializerTest(UserTestCase, TestCase):
         serializer2 = serializers.UserSerializer(
             user, data=data, context={'request': Request(request)}
         )
-        assert not serializer2.is_valid()
+        assert serializer2.is_valid() is False
         assert serializer2.errors['username'] == [
             _("Username cannot be “add” or “new”.")]
 
     def test_update_with_invalid_language(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
         user = serializer.save()
         data = {
             'username': 'imagine71',
@@ -322,11 +321,9 @@ class UserSerializerTest(UserTestCase, TestCase):
         serializer2 = serializers.UserSerializer(
             user, data=data, context={'request': Request(request)}
         )
-        with self.assertRaises(ValidationError):
-            serializer2.validate_language(data['language'])
-        assert not serializer2.is_valid()
-        assert serializer2.errors['language'] == [
-            _('"%s" is not a valid choice.' % data['language'])]  # default str
+        assert serializer2.is_valid() is False
+        assert ('"invalid" is not a valid choice.'
+                in serializer2.errors['language'])
 
     def test_sanitize(self):
         user = UserFactory.create(username='imagine71')

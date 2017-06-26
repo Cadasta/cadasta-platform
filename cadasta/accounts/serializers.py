@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 
-from rest_framework.serializers import EmailField, ValidationError
+from rest_framework.serializers import EmailField, ValidationError, ChoiceField
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 
@@ -74,6 +74,8 @@ class UserSerializer(SanitizeFieldSerializer,
                       "email address")
         )]
     )
+    language = ChoiceField(choices=next(zip(*settings.LANGUAGES)),
+                           default=settings.LANGUAGE_CODE)
 
     class Meta:
         model = User
@@ -111,12 +113,6 @@ class UserSerializer(SanitizeFieldSerializer,
                     last_login != instance.last_login):
                 raise ValidationError(_('Cannot update last_login'))
         return last_login
-
-    def validate_language(self, language):
-        valid_langs = next(zip(*settings.LANGUAGES))
-        if language not in valid_langs:
-            raise ValidationError(_("Language not available"))  # overridden
-        return language
 
 
 class AccountLoginSerializer(djoser_serializers.LoginSerializer):
