@@ -41,6 +41,8 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     # have a textual description of their location.
     geometry = GeometryField(null=True)
 
+    area = models.FloatField(null=True)
+
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
 
@@ -102,13 +104,13 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     def ui_class_name(self):
         return _("Location")
 
-    @property
-    def area(self):
-        if self.geometry is not None:
-            return format(self.geometry.transform(
-                3857, clone=True).area, '.2f')
-        else:
-            return None
+    # @property
+    # def area(self):
+    #     if self.geometry is not None:
+    #         return format(self.geometry.transform(
+    #             3857, clone=True).area, '.2f')
+    #     else:
+    #         return None
 
     def get_absolute_url(self):
         return iri_to_uri(reverse(
