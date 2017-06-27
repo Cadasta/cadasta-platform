@@ -41,7 +41,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
     def test_instant(self):
         """Verify token as soon as it is created"""
         device = self.sherlock.verificationdevice_set.get()
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
             verified = device.verify_token(token)
 
@@ -51,9 +51,10 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         """Verify token 1 second before it expires"""
         device = self.sherlock.verificationdevice_set.get()
 
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
-        with mock_current_time(self._now + self.TOTP_TOKEN_VALIDITY - 1):
+        with mock.patch('time.time',
+                        return_value=self._now + self.TOTP_TOKEN_VALIDITY - 1):
             verified = device.verify_token(token)
 
         assert verified is True
@@ -62,9 +63,10 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         """Verify token 1 second after it expires"""
         device = self.sherlock.verificationdevice_set.get()
 
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
-        with mock_current_time(self._now + self.TOTP_TOKEN_VALIDITY + 1):
+        with mock.patch('time.time',
+                        return_value=self._now + self.TOTP_TOKEN_VALIDITY + 1):
             verified = device.verify_token(token)
 
         assert verified is False
@@ -73,9 +75,9 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         """Verify token from the future. Time Travel!!"""
         device = self.sherlock.verificationdevice_set.get()
 
-        with mock_current_time(self._now + 1):
+        with mock.patch('time.time', return_value=self._now + 1):
             token = device.generate_challenge()
-        with mock_current_time(self._now - 1):
+        with mock.patch('time.time', return_value=self._now - 1):
             verified = device.verify_token(token)
 
         assert verified is False
@@ -84,7 +86,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         """Verify same token twice"""
         device = self.sherlock.verificationdevice_set.get()
 
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
             verified_once = device.verify_token(token)
             verified_twice = device.verify_token(token)
@@ -97,7 +99,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         device_sherlock = self.sherlock.verificationdevice_set.get()
         device_john = self.john.verificationdevice_set.get()
 
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token = device_sherlock.generate_challenge()
             verified = device_john.verify_token(token)
 
@@ -107,7 +109,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         """Verify an invalid token"""
         device = self.sherlock.verificationdevice_set.get()
 
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
             verified_invalid_token = device.verify_token('ABCDEF')
             verified_valid_token = device.verify_token(token)
@@ -125,12 +127,8 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         device_2 = self.sherlock.verificationdevice_set.get(
             unverified_phone='+919067439937')
 
-        with mock_current_time(self._now):
+        with mock.patch('time.time', return_value=self._now):
             token_device_1 = device_1.generate_challenge()
             verified_device_2 = device_2.verify_token(token_device_1)
 
         assert verified_device_2 is False
-
-
-def mock_current_time(timestamp):
-    return mock.patch('time.time', lambda: timestamp)
