@@ -74,7 +74,7 @@ class UserSerializer(SanitizeFieldSerializer,
                       "email address")
         )]
     )
-    language = ChoiceField(choices=next(zip(*settings.LANGUAGES)),
+    language = ChoiceField(choices=settings.LANGUAGES,
                            default=settings.LANGUAGE_CODE)
 
     class Meta:
