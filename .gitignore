@@ -54,7 +54,10 @@ functional_tests/screenshots
 /cadasta_platform.egg-info/
 /pytest.txt
 
+# Platform
 /cadasta/geography/data
 /cadasta/core/media/
 /cadasta/core/static/css/main.css.map
 /cadasta/core/static/css/main.css
+
+/cadasta/templates/core/identifier.html

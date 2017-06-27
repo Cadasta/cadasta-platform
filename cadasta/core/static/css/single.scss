@@ -39,7 +39,6 @@
       font-size: 16px;
       display: block;
       padding-bottom: 2px;
-      text-transform: uppercase;
     }
     a {
       color: $brand-lightblue;
@@ -140,6 +139,7 @@
       padding-left: 24px;
       display: table-cell;
       vertical-align: middle;
+      text-transform: capitalize;
     }
     .top-btn {
       vertical-align: middle;
