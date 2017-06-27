@@ -5,6 +5,7 @@ var Location = L.Editable.extend({
 
     _deleting: false,
     _deleted: false,
+    _canceled: false,
     _new: false,
     _dirty: false,
 
@@ -16,6 +17,7 @@ var Location = L.Editable.extend({
         this._original_state = [];
         this.on('editable:drawing:start', this._drawStart, this);
         this.on('editable:drawing:end', this._drawEnd, this);
+        this.on('editable:drawing:cancel', this._drawCancel, this);
         L.Editable.prototype.initialize.call(this, map, options);
     },
 
@@ -97,9 +99,9 @@ var Location = L.Editable.extend({
                 }
 
                 this._drawEnd(latLngs.layer);
+                this.featuresLayer.clearLayers();
             }
 
-            this.featuresLayer.clearLayers();
         }
     },
 
@@ -122,13 +124,11 @@ var Location = L.Editable.extend({
             this.layer.enableEdit();
             this.layer.editor.deleteShape(this.layer._latlngs);
             this.layer.disableEdit();
-            this._deleted = true;
         } else if (this.layer instanceof L.Marker) {
             this.layer.enableEdit();
             this.layer.remove();
-            this._deleted = true;
         }
-
+        this._deleted = true;
         this.featuresLayer.clearLayers();
     },
 
@@ -164,6 +164,15 @@ var Location = L.Editable.extend({
     _drawEnd: function (e) {
         if (!this._hasDrawnFeature()) return;
         if (!this._checkValid(e.layer)) return;
+        if (this._canceled) {
+            this._canceled = false;
+            if (this.layer) {
+                e.layer = this.layer;
+            } else {
+                e.layer.remove();
+                return;
+            }
+        }
         if (this.layer) {
             this._update(e.layer);
         } else {
@@ -174,6 +183,10 @@ var Location = L.Editable.extend({
         this.layer.dragging.disable();
         this._deleted = false;
         this._deleting = false;
+    },
+
+    _drawCancel: function (e) {
+        this._canceled = true;
     },
 
     // fired when a geometry is deleted and a new one replaces the old one.
@@ -558,6 +571,7 @@ var LocationEditor = L.Evented.extend({
     // Adds a click event if there is a layer, and automatically enables the edit toolbar.
     _drawEnd: function (e) {
         this._cancelDraw();
+
         if (this.location.layer) {
             this.tooltip.remove();
             if (!this.location.layer._events.hasOwnProperty('click')) {
