@@ -137,7 +137,7 @@ class VerificationDevice(Device):
          The next token must be at a higher time step.\
          It makes sure a token is used only once."
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     step = settings.TOTP_TOKEN_VALIDITY
     digits = settings.TOTP_DIGITS
@@ -156,9 +156,11 @@ class VerificationDevice(Device):
 
     def generate_challenge(self):
         totp = self.totp_obj()
-        token = format(totp.token(), '0%sd' % self.digits)
-        message = "Your Cadasta Token is %s. It is valid for %s minutes." % (
-            token, self.step // 60)
+        token = str(totp.token()).zfill(self.digits)
+
+        message = ("Your token for Cadasta is {token_value}."
+                   " It is valid for {time_validity} minutes.").format(
+            token_value=token, time_validity=self.step // 60)
 
         logger.info("Token has been sent to %s " % self.unverified_phone)
         logger.info("%s" % message)
@@ -168,7 +170,7 @@ class VerificationDevice(Device):
     def verify_token(self, token):
         try:
             token = int(token)
-        except Exception:
+        except ValueError:
             verified = False
         else:
             totp = self.totp_obj()

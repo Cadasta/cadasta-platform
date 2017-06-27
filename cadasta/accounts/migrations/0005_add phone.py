@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0004_auto_20170619_1644'),
+        ('accounts', '0004_remove_verify_email_by'),
     ]
 
     operations = [

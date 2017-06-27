@@ -12,7 +12,7 @@ import django_otp.util
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0005_auto_20170619_1655'),
+        ('accounts', '0005_add phone'),
     ]
 
     operations = [
