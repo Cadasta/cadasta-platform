@@ -19,30 +19,54 @@ function RouterMixins() {
         },
 
         updatePage: function (kwargs) {
+            /*********
+            'page_title': trans.page_name
+            Since the browser tab doesn't update with hashes, it has to be forcibly updated. The page title text should go in project_map.html -> var trans
+            *********/
             if (kwargs.page_title) {
                 this.setPageTitle(kwargs.page_title);
             }
 
+            /*********
+            'display_modal': bool
+            Does the page your calling belong in a modal?
+            *********/
             if (kwargs.display_modal) {
                 this.displayModal();
             } else {
                 this.hideModal();
             }
 
+            /*********
+            'display_detail_panel': bool
+            Does the page your calling require the detail page to be showing?
+            *********/
             if (kwargs.display_detail_panel) {
                 this.displayDetailPanel();
             } else {
                 this.hideDetailPanel();
             }
 
+            /*********
+            'display_edit_panel': bool
+            Is it an edit form page? They have different backgrounds colors than normal pages.
+            *********/
             if (kwargs.display_edit_panel) {
                 this.displayEditDetailPanel();
             }
 
+            /*********
+            'active_sidebar': "overview" || "map"
+            Which button on the left hand side do you want highlighted?
+            *********/
             if (kwargs.active_sidebar) {
                 this.setSidebar(kwargs.active_sidebar);
             }
 
+            /*********
+            'reset_current_location': bool
+            If there was a location selected, should it be returned to its default? (i.e. switching from location_detail to overview)
+            *********/
             if (kwargs.reset_current_location) {
                 if (state.current_location.layer) {
                     Styles.resetStyle(state.current_location.layer);
@@ -529,6 +553,7 @@ function RouterMixins() {
                             }
 
                         } else if (typeof response === 'object' && 'new_location_id' in response) {
+                            // when a new location is created, redirect to it using the location id in the response.
                             window.location.replace('#/records/location/' + response.new_location_id + '/');
                         } else {
                             if (detach) {
