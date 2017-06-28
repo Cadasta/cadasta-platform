@@ -323,7 +323,6 @@ class UserSerializerTest(UserTestCase, TestCase):
             user, data=data, context={'request': Request(request)}
         )
         assert serializer2.is_valid() is False
-        print(serializer2.errors['language'])
         assert ('Language invalid or not available'
                 in serializer2.errors['language'])
 
