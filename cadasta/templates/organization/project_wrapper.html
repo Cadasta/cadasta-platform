@@ -39,6 +39,7 @@
 
       <!-- More actions menu -->
       {% if is_administrator %}
+<<<<<<< HEAD
         <div class="dropdown pull-right btn-add">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
@@ -166,7 +167,11 @@
 'use strict';
 window.addEventListener('load', function() {
   $( '.search').find('.search').click( function(){
+<<<<<<< HEAD
    $('.content-single').animate({ scrollTop: 0 }, 'fast');
+=======
+	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
+>>>>>>> WIP: consolidate role permission mixins
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
     if (!$('#sidebar').hasClass('search')) {

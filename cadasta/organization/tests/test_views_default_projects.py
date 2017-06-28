@@ -847,6 +847,9 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
+        self.dc_group = Group.objects.get(name="DataCollector")
 
     def setup_url_kwargs(self):
         return {
@@ -862,11 +865,19 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user, group=self.pm_group, role='PM')
 
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_administrator=True,
+            is_allowed_add_location=True,
+            is_allowed_add_resource=True,
+            is_allowed_import=True,
+            is_allowed_download=True,
+            is_project_member=True
+        )
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
@@ -893,7 +904,9 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user, group=self.dc_group, role='DC')
+
         response = self.request(user=user, method='POST')
         assert response.status_code == 302
         assert self.expected_success_url in response.location
@@ -921,7 +934,8 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user, group=self.pu_group, role='PU')
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -953,6 +967,9 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         self.project = ProjectFactory.create(current_questionnaire='abc')
         self.questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project, id='abc')
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
+        self.dc_group = Group.objects.get(name="DataCollector")
 
     def setup_url_kwargs(self):
         return {
@@ -968,12 +985,20 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
                     initial={'questionnaire': self.questionnaire.xls_form.url,
                              'original_file': self.questionnaire.original_file}
                 ),
-                'is_allowed_import': True}
+                'is_allowed_import': True,
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_import': True,
+                'is_allowed_download': True,
+                'is_project_member': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
-
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
@@ -981,7 +1006,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_get_empty_questionnaire_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         self.project.current_questionnaire = ''
         self.project.save()
@@ -995,7 +1023,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_get_with_blocked_questionnaire_upload(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         SpatialUnitFactory.create(project=self.project)
 
         response = self.request(user=user)
@@ -1007,7 +1038,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user)
         form = forms.ProjectEditDetails(
@@ -1031,7 +1065,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         self.project.archived = True
         self.project.save()
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pu_group, role='PU'
+        )
 
         response = self.request(user=user)
         assert response.status_code == 302
@@ -1040,7 +1077,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': ''})
 
@@ -1054,7 +1094,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': ''})
 
@@ -1067,7 +1110,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_empty_questionnaire_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user, method='POST')
 
         assert response.status_code == 302
@@ -1080,7 +1126,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_invalid_form(self):
         question = self.get_form('xls-form-invalid')
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': question})
@@ -1101,7 +1150,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_update_missing_relevant(self):
         question = self.get_form('t_questionnaire_missing_relevant')
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': question})
@@ -1120,7 +1172,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_private_project_form(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user, method='POST',
                                 post_data={'access': ['on']})
@@ -1157,7 +1212,6 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -1177,15 +1231,21 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-
         self.project_user = UserFactory.create()
+
+        self.om_group = Group.objects.get(name="OrgMember")
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
+        self.dc_group = Group.objects.get(name="DataCollector")
+
         OrganizationRole.objects.create(
             organization=self.project.organization,
-            user=self.project_user
+            user=self.project_user, group=self.om_group
         )
         self.project_role = ProjectRole.objects.create(
             project=self.project,
             user=self.project_user,
+            group=self.dc_group,
             role='DC'
         )
 
@@ -1202,11 +1262,21 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
         return {'project': self.project,
                 'object': self.project,
                 'form': forms.ProjectEditPermissions(instance=self.project),
-                'is_allowed_import': True}
+                'is_allowed_import': True,
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_import': True,
+                'is_allowed_download': True,
+                'is_project_member': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group,
+            role='PM'
+        )
 
         response = self.request(user=user)
         assert response.status_code == 200
@@ -1226,8 +1296,6 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
-
         self.project.archived = True
         self.project.save()
         response = self.request(user=user)
@@ -1237,7 +1305,11 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group,
+            role='PM'
+        )
         response = self.request(user=user, method='POST')
 
         assert self.expected_success_url in response.location
@@ -1264,7 +1336,6 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -1281,6 +1352,7 @@ class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_url_kwargs(self):
         return {
@@ -1290,7 +1362,10 @@ class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_archive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1325,6 +1400,7 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create(archived=True)
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_url_kwargs(self):
         return {
@@ -1334,7 +1410,10 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_unarchive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1365,7 +1444,6 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_unarchive_with_archived_organization(self):
         user = UserFactory.create()
-        assign_policies(user)
 
         self.project.refresh_from_db()
         self.project.organization.archived = True
@@ -1392,6 +1470,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         geometry = 'SRID=4326;POINT (30 10)'
         SpatialUnitFactory.create(project=self.project, geometry=geometry)
         self.user = UserFactory.create()
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_url_kwargs(self):
         return {
@@ -1404,10 +1483,19 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'object': self.project,
                 'form': forms.DownloadForm(project=self.project,
                                            user=self.user),
-                'is_allowed_import': True}
+                'is_allowed_import': True,
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_import': True,
+                'is_allowed_download': True,
+                'is_project_member': True}
 
     def test_get_with_authorized_user(self):
-        assign_policies(self.user)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -1425,7 +1513,10 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        assign_policies(self.user)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
         assert (response.headers['content-disposition'][1] ==
@@ -1456,16 +1547,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('allow', ['project.import'], ['project/*/*']),
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
+        self.pm_group = Group.objects.get(name='ProjectManager')
 
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
@@ -1475,7 +1557,6 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.unauth_user = UserFactory.create()
 
         setattr(self.request, 'user', self.user)
-        assign_user_policies(self.user, self.policy)
 
         self.org = OrganizationFactory.create(
             name='Test Org', slug='test-org'
@@ -1589,6 +1670,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             assert remove_csrf(expected) == remove_csrf(content)
 
     def test_initial_get_valid(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         self._get(status=200, check_content=True)
 
@@ -1600,6 +1685,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self._get(status=302, login_redirect=True)
 
     def test_full_flow_valid(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
@@ -1677,6 +1766,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             name='BB',
             label='BB Label')
 
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv_custom, 'rb')
         file = SimpleUploadedFile('test_custom.csv', csvfile.read(),
@@ -1738,6 +1831,11 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_full_flow_valid_xls(self):
         mime = 'application/vnd.openxmlformats-'
         'officedocument.spreadsheetml.sheet'
+
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         xlsfile = self.get_file(self.valid_xls, 'rb')
         file = SimpleUploadedFile('test_download.xlsx', xlsfile.read(), mime)
@@ -1801,6 +1899,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert resource.original_file == 'test_download.xlsx'
 
     def test_full_flow_invalid_value(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.invalid_csv, 'rb')
         file = SimpleUploadedFile('test_invalid.csv', csvfile.read(),
@@ -1843,6 +1945,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             project_id=proj.pk).count() == 0
 
     def test_full_flow_invalid_file_type(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
@@ -1885,6 +1991,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             project_id=proj.pk).count() == 0
 
     def test_wizard_goto_step(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
 
         # post first page data
@@ -1955,6 +2065,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert select_defaults_response.status_code == 200
 
     def test_full_flow_valid_no_resource(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')

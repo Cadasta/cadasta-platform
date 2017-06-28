@@ -33,6 +33,10 @@
             "name": "Unarchive Organization",
             "codename": "org.unarchive"
         },
+        "org.users.list": {
+            "name": "List Organization Users",
+            "codename": "org.users.list"
+        },
         "org_users_add": {
             "name": "Add Organization Users",
             "codename": "org.users.add"

@@ -6,8 +6,9 @@ import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
-from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
-                         update_permissions)
+from core.mixins import (
+    LoginPermissionRequiredMixin, PermissionRequiredMixin,
+    RolePermissionRequiredMixin, RoleLoginPermissionRequiredMixin)
 from core.util import random_id
 from core.views import mixins as core_mixins
 from django.conf import settings
@@ -75,7 +76,8 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
         return kwargs
 
 
-class OrganizationDashboard(mixins.OrgRolePermissionMixin,
+class OrganizationDashboard(RolePermissionRequiredMixin,
+                            mixins.OrganizationMixin,
                             mixins.OrgRoleCheckMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
@@ -112,20 +114,22 @@ class OrganizationDashboard(mixins.OrgRolePermissionMixin,
         return super(generic.DetailView, self).render_to_response(context)
 
 
-class OrganizationEdit(LoginPermissionRequiredMixin,
+class OrganizationEdit(RoleLoginPermissionRequiredMixin,
+                       mixins.OrganizationMixin,
                        core_mixins.CacheObjectMixin,
                        generic.UpdateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_edit.html'
-    permission_required = update_permissions('org.update', True)
+    permission_required = 'org.update'
     permission_denied_message = error_messages.ORG_EDIT
 
     def get_success_url(self):
         return reverse('organization:dashboard', kwargs=self.kwargs)
 
 
-class OrgArchiveView(LoginPermissionRequiredMixin,
+class OrgArchiveView(RoleLoginPermissionRequiredMixin,
+                     mixins.OrganizationMixin,
                      core_mixins.ArchiveMixin,
                      generic.DetailView):
     model = Organization
@@ -156,7 +160,8 @@ class OrganizationUnarchive(OrgArchiveView):
     do_archive = False
 
 
-class OrganizationMembers(LoginPermissionRequiredMixin,
+class OrganizationMembers(RoleLoginPermissionRequiredMixin,
+                          mixins.OrganizationMixin,
                           mixins.OrgRoleCheckMixin,
                           mixins.ProjectCreateCheckMixin,
                           core_mixins.CacheObjectMixin,
@@ -167,13 +172,14 @@ class OrganizationMembers(LoginPermissionRequiredMixin,
     permission_denied_message = error_messages.ORG_USERS_LIST
 
 
-class OrganizationMembersAdd(mixins.OrganizationMixin,
-                             LoginPermissionRequiredMixin,
+class OrganizationMembersAdd(RoleLoginPermissionRequiredMixin,
+                             mixins.OrganizationMixin,
                              generic.CreateView):
     model = OrganizationRole
     form_class = forms.AddOrganizationMemberForm
     template_name = 'organization/organization_members_add.html'
-    permission_required = update_permissions('org.users.add')
+    # permission_required = update_permissions('org.users.add')
+    permission_required = 'org.users.add'
     permission_denied_message = error_messages.ORG_USERS_ADD
 
     def get_context_data(self, *args, **kwargs):
@@ -197,8 +203,8 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
         )
 
 
-class OrganizationMembersEdit(mixins.OrganizationMixin,
-                              LoginPermissionRequiredMixin,
+class OrganizationMembersEdit(RoleLoginPermissionRequiredMixin,
+                              mixins.OrganizationMixin,
                               mixins.OrgRoleCheckMixin,
                               mixins.ProjectCreateCheckMixin,
                               core_mixins.CacheObjectMixin,
@@ -210,14 +216,15 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     template_name = 'organization/organization_members_edit.html'
     project_form_class = forms.EditOrganizationMemberProjectPermissionForm
     org_role_form_class = forms.EditOrganizationMemberForm
-    permission_required = update_permissions('org.users.edit')
+    # permission_required = update_permissions('org.users.edit')
+    permission_required = 'org.users.edit'
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
         if self.request.POST and self.request.POST.get('org_role'):
             return reverse(
-                 'organization:members_edit',
-                 kwargs=self.kwargs,
+                'organization:members_edit',
+                kwargs=self.kwargs,
             )
 
         return reverse(
@@ -284,10 +291,11 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         return super().form_valid(form)
 
 
-class OrganizationMembersRemove(mixins.OrganizationMixin,
-                                LoginPermissionRequiredMixin,
+class OrganizationMembersRemove(RoleLoginPermissionRequiredMixin,
+                                mixins.OrganizationMixin,
                                 generic.DeleteView):
-    permission_required = update_permissions('org.users.remove')
+    # permission_required = update_permissions('org.users.remove')
+    permission_required = 'org.users.remove'
     permission_denied_message = error_messages.ORG_USERS_REMOVE
 
     def get_object(self):
@@ -306,7 +314,7 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
         return self.post(*args, **kwargs)
 
 
-class UserList(LoginPermissionRequiredMixin, generic.ListView):
+class UserList(RoleLoginPermissionRequiredMixin, generic.ListView):
     model = User
     template_name = 'organization/user_list.html'
     permission_required = 'user.list'
@@ -330,7 +338,7 @@ class UserList(LoginPermissionRequiredMixin, generic.ListView):
         return context
 
 
-class UserActivation(LoginPermissionRequiredMixin, base_generic.View):
+class UserActivation(RoleLoginPermissionRequiredMixin, base_generic.View):
     permission_required = 'user.update'
     permission_denied_message = error_messages.USERS_UPDATE
     new_state = None
@@ -388,7 +396,7 @@ class ProjectList(PermissionRequiredMixin,
         return super().render_to_response(context)
 
 
-class ProjectDashboard(mixins.ProjectRolePermissionMixin,
+class ProjectDashboard(RolePermissionRequiredMixin,
                        mixins.ProjectAdminCheckMixin,
                        mixins.ProjectMixin,
                        generic.DetailView):
@@ -476,8 +484,8 @@ def add_wizard_permission_required(self, view, request):
         return 'project.create'
 
 
-class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
-                       LoginPermissionRequiredMixin,
+class ProjectAddWizard(LoginPermissionRequiredMixin,
+                       core_mixins.SuperUserCheckMixin,
                        wizard.SessionWizardView):
     permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
@@ -640,11 +648,12 @@ class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
         return done_response
 
 
-class ProjectEdit(mixins.ProjectMixin,
-                  mixins.ProjectAdminCheckMixin,
-                  LoginPermissionRequiredMixin):
+class ProjectEdit(RoleLoginPermissionRequiredMixin,
+                  mixins.ProjectMixin,
+                  mixins.ProjectAdminCheckMixin):
     model = Project
-    permission_required = update_permissions('project.update', True)
+    # permission_required = update_permissions('project.update', True)
+    permission_required = 'project.update'
 
     def get_object(self):
         return self.get_project()
@@ -711,22 +720,23 @@ class ProjectUnarchive(ProjectEdit,
                        core_mixins.ArchiveMixin,
                        generic.DetailView):
 
-    def patch_actions(self, request, view=None):
-        if self.get_organization().archived:
-            return False
-        return 'project.unarchive'
-    permission_required = patch_actions
+    # def patch_actions(self, request, view=None):
+    #     if self.get_organization().archived:
+    #         return False
+    #     return 'project.unarchive'
+    # permission_required = patch_actions
+    permission_required = 'project.unarchive'
     permission_denied_message = error_messages.PROJ_UNARCHIVE
     do_archive = False
 
 
-class ProjectDataDownload(mixins.ProjectMixin,
-                          LoginPermissionRequiredMixin,
+class ProjectDataDownload(RoleLoginPermissionRequiredMixin,
+                          mixins.ProjectMixin,
                           mixins.ProjectAdminCheckMixin,
                           base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'organization/project_download.html'
-    permission_required = 'project.download'
+    permission_required = 'project.export'
     permission_denied_message = error_messages.PROJ_DOWNLOAD
     form_class = forms.DownloadForm
 
@@ -762,8 +772,8 @@ DATA_IMPORT_TEMPLATES = {
 }
 
 
-class ProjectDataImportWizard(mixins.ProjectMixin,
-                              LoginPermissionRequiredMixin,
+class ProjectDataImportWizard(RoleLoginPermissionRequiredMixin,
+                              mixins.ProjectMixin,
                               mixins.ProjectAdminCheckMixin,
                               wizard.SessionWizardView):
     permission_required = 'project.import'
@@ -995,76 +1005,3 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
         clazz = parts[-1]
         importer = getattr(module, clazz)
         return importer(project=self.get_project(), path=path)
-
-
-class ProjectTestView(mixins.ProjectRolePermissionMixin,
-                      mixins.ProjectAdminCheckMixin,
-                      mixins.ProjectMixin, generic.DetailView):
-
-    def get_actions(self, request):
-        perms = []
-        project = self.get_object()
-        if project.access == 'public':
-            perms.append('project.view')
-        else:
-            perms.append('project.view.private')
-        if project.archived:
-            perms.append('project.view.archived')
-        return perms
-
-    model = Project
-    template_name = 'organization/project_dashboard.html'
-    permission_required = get_actions
-    permission_denied_message = error_messages.PROJ_VIEW
-
-    def get_object(self, queryset=None):
-        return self.get_project()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        num_locations = self.object.spatial_units.count()
-        num_parties = self.object.parties.count()
-        num_resources = self.object.resource_set.filter(archived=False).count()
-        context['has_content'] = (
-            num_locations > 0 or num_parties > 0 or num_resources > 0)
-        context['num_locations'] = num_locations
-        context['num_parties'] = num_parties
-        context['num_resources'] = num_resources
-        return context
-
-
-class OrganizationTestDashboard(mixins.OrgRolePermissionMixin,
-                                mixins.OrgRoleCheckMixin,
-                                mixins.ProjectCreateCheckMixin,
-                                core_mixins.CacheObjectMixin,
-                                generic.DetailView):
-
-    def get_actions(self, request):
-        if self.get_object().archived:
-            return 'org.view.archived'
-        return 'org.view'
-
-    model = Organization
-    template_name = 'organization/organization_dashboard.html'
-    permission_required = get_actions
-    permission_denied_message = error_messages.ORG_VIEW
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data()
-        if self.is_superuser:
-            projects = self.object.all_projects()
-        else:
-            projects = self.object.public_projects()
-            if hasattr(self.request.user, 'organizations'):
-                orgs = self.request.user.organizations.all()
-                for org in orgs:
-                    if org.slug == self.kwargs['slug']:
-                        if self.is_administrator:
-                            projects = self.object.all_projects()
-                        else:
-                            projects = self.object.all_projects().filter(
-                                archived=False)
-
-        context['projects'] = projects
-        return super(generic.DetailView, self).render_to_response(context)

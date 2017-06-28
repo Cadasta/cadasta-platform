@@ -1,12 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import AnonymousUser
-
-from django.contrib import messages
-from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
-from django.utils.translation import gettext as _
 
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
@@ -15,9 +8,7 @@ from django.db.models import Q, Prefetch
 from tutelary.models import check_perms
 
 from core.views.mixins import SuperUserCheckMixin
-from core.roles import AnonymousUserRole, SuperUserRole
 from ..models import Organization, Project, OrganizationRole, ProjectRole
-from accounts.models import PublicRole
 from questionnaires.models import Questionnaire
 
 
@@ -195,8 +186,9 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
             ('project.export', 'is_allowed_download'),
         )
         project = self.get_project()
-        if not hasattr(self, '_role'):
+        if not hasattr(self, '_roles'):
             # delegate permission check to tutelary backend
+            # remove this when tutelary is removed
             for permission_context in permissions_contexts:
                 context[permission_context[1]] = user.has_perm(
                     permission_context[0], project
@@ -207,7 +199,7 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
             for permission_context in permissions_contexts:
                 context[permission_context[1]] = (
                     True if permission_context[0]
-                    in self._role.permissions else False)
+                    in self.permissions else False)
             return context
 
 
@@ -296,130 +288,160 @@ class OrgRoleCheckMixin(SuperUserCheckMixin):
         return context
 
 
-class RolePermissionMixin(PermissionRequiredMixin):
+# class RolePermissionRequiredMixin(PermissionRequiredMixin):
+#
+#     def get_permission_required(self):
+#         if (not hasattr(self, 'permission_required') or
+#            self.permission_required is None):
+#             raise ImproperlyConfigured(
+#                 '{0} is missing the permission_required attribute. Define '
+#                 '{0}.permission_required, or override '
+#                 '{0}.get_permission_required().'.format(
+#                     self.__class__.__name__)
+#             )
+#
+#         perms = self.permission_required
+#         if isinstance(self.permission_required, dict):
+#             perms = self.permission_required.get(self.request.method, ())
+#
+#         if callable(perms):
+#             perms = perms(self.request)
+#
+#         if isinstance(perms, str):
+#             perms = (perms, )
+#
+#         return perms
+#
+#     def get_user_roles(self):
+#         """Set user roles."""
+#         self._roles = []
+#         user = self.request.user
+#         # check for anonymous and su roles
+#         if user.is_anonymous:
+#             self._roles.append(AnonymousUserRole())
+#             return
+#         elif user.is_superuser:
+#             self._roles.append(SuperUserRole())
+#             return
+#         # for org mixins get the org role
+#         if not self._roles and hasattr(self, 'get_organization'):
+#             try:
+#                 role = OrganizationRole.objects.get(
+#                     organization=self.get_organization(),
+#                     user=self.request.user,
+#                 )
+#                 self._roles.append(role)
+#             except OrganizationRole.DoesNotExist:
+#                 pass
+#         # for project mixins get org and project roles
+#         if not self._roles:
+#             if hasattr(self, 'get_org_role') and self.get_org_role():
+#                 self._roles.append(self._org_role)
+#             if hasattr(self, 'get_prj_role') and self.get_prj_role():
+#                 self._roles.append(self._prj_role)
+#         # get the default public role
+#         try:
+#             role = PublicRole.objects.get(user=self.request.user)
+#             self._roles.append(role)
+#         except PublicRole.DoesNotExist:
+#             pass
+#
+#     @property
+#     def permissions(self):
+#         # compose permissions for all roles
+#         self._perms = []
+#         if hasattr(self, '_roles'):
+#             [self._perms.extend(role.permissions) for role in self._roles]
+#         perms = sorted(set(self._perms))
+#         return perms
+#
+#     def has_permission(self):
+#         if not hasattr(self, '_roles'):
+#             self.get_user_roles()
+#         # superusers have all permissions
+#         if hasattr(self, 'is_superuser'):
+#             if self.is_superuser:
+#                 return True
+#         else:
+#             if self.request.user.is_superuser:
+#                 return True
+#         perms = self.get_permission_required()
+#
+#         # replace when we eventually use role authorization backend
+#         # user = self.request.user
+#         # return all(False for perm in perms
+#         #            if not user.has_perm(perm, obj=self.permissions))
+#
+#         return all(False for perm in perms
+#                    if perm not in self.permissions)
+#
+#     def handle_no_permission(self):
+#         msg = _("You don't have permission to perform this action.")
+#         if hasattr(self, 'permission_denied_message'):
+#             msg = self.get_permission_denied_message()
+#         messages.add_message(
+#             self.request, messages.WARNING, msg)
+#
+#         referer = self.request.META.get('HTTP_REFERER')
+#         redirect_url = self.request.META.get('HTTP_REFERER', '/')
+#
+#         if (referer and '/account/login/' in referer and
+#                 not self.request.user.is_anonymous):
+#
+#             if 'organization' in self.kwargs and 'project' in self.kwargs:
+#                 redirect_url = reverse(
+#                     'organization:project-dashboard',
+#                     kwargs={'organization': self.kwargs['organization'],
+#                             'project': self.kwargs['project']}
+#                 )
+#                 if redirect_url == self.request.get_full_path():
+#                     redirect_url = reverse(
+#                         'organization:dashboard',
+#                         kwargs={'slug': self.kwargs['organization']}
+#                     )
+#
+#             elif 'slug' in self.kwargs:
+#                 redirect_url = reverse(
+#                     'organization:dashboard',
+#                     kwargs={'slug': self.kwargs['slug']}
+#                 )
+#                 if redirect_url == self.request.get_full_path():
+#                     redirect_url = reverse('core:dashboard')
+#
+#         return redirect(redirect_url)
 
-    def get_permission_required(self):
-        if (not hasattr(self, 'permission_required') or
-           self.permission_required is None):
-            raise ImproperlyConfigured(
-                '{0} is missing the permission_required attribute. Define '
-                '{0}.permission_required, or override '
-                '{0}.get_permission_required().'.format(
-                    self.__class__.__name__)
-            )
 
-        perms = self.permission_required
-        if isinstance(self.permission_required, dict):
-            perms = self.permission_required.get(self.request.method, ())
-
-        if callable(perms):
-            perms = perms(self.request)
-
-        if isinstance(perms, str):
-            perms = (perms, )
-
-        return perms
-
-    def get_user_roles(self):
-        self._roles = []
-        user = self.request.user
-        if user.is_anonymous:
-            self._roles.append(AnonymousUserRole())
-        elif user.is_superuser:
-            self._roles.append(SuperUserRole())
-
-    @property
-    def permissions(self):
-        # compose permissions for all roles
-        self._perms = []
-        if hasattr(self, '_roles'):
-            [self._perms.extend(role.permissions) for role in self._roles]
-        perms = sorted(set(self._perms))
-        return perms
-
-    def has_permission(self):
-        if not hasattr(self, '_roles'):
-            self.get_user_roles()
-        # superusers have all permissions
-        if self.is_superuser:
-            return True
-        perms = self.get_permission_required()
-
-        # replace when we eventually use role authorization backend
-        # user = self.request.user
-        # return all(False for perm in perms
-        #            if not user.has_perm(perm, obj=self.permissions))
-
-        return all(False for perm in perms
-                   if perm not in self.permissions)
-
-    def handle_no_permission(self):
-        msg = _("You don't have permission to perform this action.")
-        if hasattr(self, 'permission_denied_message'):
-            msg = self.get_permission_denied_message()
-        messages.add_message(
-            self.request, messages.WARNING, msg)
-
-        referer = self.request.META.get('HTTP_REFERER')
-        redirect_url = self.request.META.get('HTTP_REFERER', '/')
-
-        if (referer and '/account/login/' in referer and
-                not self.request.user.is_anonymous):
-
-            if 'organization' in self.kwargs and 'project' in self.kwargs:
-                redirect_url = reverse(
-                    'organization:project-dashboard',
-                    kwargs={'organization': self.kwargs['organization'],
-                            'project': self.kwargs['project']}
-                )
-                if redirect_url == self.request.get_full_path():
-                    redirect_url = reverse(
-                        'organization:dashboard',
-                        kwargs={'slug': self.kwargs['organization']}
-                    )
-
-            elif 'slug' in self.kwargs:
-                redirect_url = reverse(
-                    'organization:dashboard',
-                    kwargs={'slug': self.kwargs['slug']}
-                )
-                if redirect_url == self.request.get_full_path():
-                    redirect_url = reverse('core:dashboard')
-
-        return redirect(redirect_url)
+# class OrgRolePermissionMixin(RolePermissionMixin):
+#
+#     def get_user_roles(self):
+#         super().get_user_roles()
+#         if hasattr(self, '_roles') and not self._roles:
+#             try:
+#                 role = OrganizationRole.objects.get(
+#                     organization=self.get_organization(),
+#                     user=self.request.user,
+#                 )
+#                 self._roles.append(role)
+#             except OrganizationRole.DoesNotExist:
+#                 pass
+#             try:
+#                 role = PublicRole.objects.get(user=self.request.user)
+#                 self._roles.append(role)
+#             except PublicRole.DoesNotExist:
+#                 pass
 
 
-class OrgRolePermissionMixin(RolePermissionMixin):
-
-    def get_user_roles(self):
-        super().get_user_roles()
-        if hasattr(self, '_roles') and not self._roles:
-            try:
-                role = OrganizationRole.objects.get(
-                    organization=self.get_object(),
-                    user=self.request.user,
-                )
-                self._roles.append(role)
-            except OrganizationRole.DoesNotExist:
-                pass
-            try:
-                role = PublicRole.objects.get(user=self.request.user)
-                self._roles.append(role)
-            except PublicRole.DoesNotExist:
-                pass
-
-
-class ProjectRolePermissionMixin(RolePermissionMixin):
-
-    def get_user_roles(self):
-        super().get_user_roles()
-        if hasattr(self, '_roles') and not self._roles:
-            if hasattr(self, 'get_org_role') and self.get_org_role():
-                self._roles.append(self._org_role)
-            if hasattr(self, 'get_prj_role') and self.get_prj_role():
-                self._roles.append(self._prj_role)
-            try:
-                role = PublicRole.objects.get(user=self.request.user)
-                self._roles.append(role)
-            except PublicRole.DoesNotExist:
-                pass
+# class ProjectRolePermissionMixin(RolePermissionRequiredMixin):
+#
+#     def get_user_roles(self):
+#         super().get_user_roles()
+#         if hasattr(self, '_roles') and not self._roles:
+#             if hasattr(self, 'get_org_role') and self.get_org_role():
+#                 self._roles.append(self._org_role)
+#             if hasattr(self, 'get_prj_role') and self.get_prj_role():
+#                 self._roles.append(self._prj_role)
+#             try:
+#                 role = PublicRole.objects.get(user=self.request.user)
+#                 self._roles.append(role)
+#             except PublicRole.DoesNotExist:
+#                 pass
