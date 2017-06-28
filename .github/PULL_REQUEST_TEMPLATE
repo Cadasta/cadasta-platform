@@ -61,6 +61,9 @@ environments.]
 - **Are all necessary strings marked for translation?** All strings that are exposed to users via the UI must be [marked for translation](https://docs.djangoproject.com/en/1.10/topics/i18n/translation/). 
   - [ ] Review 1
   - [ ] Review 2
+- **Is the code documented sufficiently?** Large and complex classes, functions or methods must be annotated with comments following our [code-style guidelines](https://devwiki.corp.cadasta.org/Contributing%20Style%20Guide#documentation-and-comments).
+  - [ ] Review 1
+  - [ ] Review 2
 - **Has the scalability of this change been evaluated?**
   - [ ] Review 1
   - [ ] Review 2
