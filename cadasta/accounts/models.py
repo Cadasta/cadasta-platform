@@ -158,8 +158,8 @@ class VerificationDevice(Device):
         totp = self.totp_obj()
         token = str(totp.token()).zfill(self.digits)
 
-        message = ("Your token for Cadasta is {token_value}."
-                   " It is valid for {time_validity} minutes.").format(
+        message = _("Your token for Cadasta is {token_value}."
+                    " It is valid for {time_validity} minutes.").format(
             token_value=token, time_validity=self.step // 60)
 
         logger.info("Token has been sent to %s " % self.unverified_phone)
