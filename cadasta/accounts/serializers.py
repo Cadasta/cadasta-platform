@@ -74,8 +74,13 @@ class UserSerializer(SanitizeFieldSerializer,
                       "email address")
         )]
     )
-    language = ChoiceField(choices=settings.LANGUAGES,
-                           default=settings.LANGUAGE_CODE)
+    language = ChoiceField(
+        choices=settings.LANGUAGES,
+        default=settings.LANGUAGE_CODE,
+        error_messages={
+            'invalid_choice': _('Language invalid or not available')
+        }
+    )
 
     class Meta:
         model = User
