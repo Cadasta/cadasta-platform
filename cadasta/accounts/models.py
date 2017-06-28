@@ -131,10 +131,10 @@ class VerificationDevice(Device):
         help_text="Hex-encoded secret key to generate totp tokens.",
         unique=True,
     )
-    last_t = models.BigIntegerField(
+    last_verified_counter = models.BigIntegerField(
         default=-1,
-        help_text="The t value of the latest verified token.\
-         The next token must be at a higher time step.\
+        help_text="The counter value of the latest verified token.\
+         The next token must be at a higher counter value.\
          It makes sure a token is used only once."
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -175,8 +175,9 @@ class VerificationDevice(Device):
             verified = False
         else:
             totp = self.totp_obj()
-            if (totp.t() > self.last_t) and (totp.token() == token):
-                self.last_t = totp.t()
+            if ((totp.t() > self.last_verified_counter) and
+                    (totp.token() == token)):
+                self.last_verified_counter = totp.t()
                 verified = True
                 self.save()
             else:
