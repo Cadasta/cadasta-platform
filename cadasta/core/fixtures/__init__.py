@@ -23,11 +23,11 @@ class FixturesData:
         users = []
         # the first two named users will have superuser access
         named_users = [
-            {'username': 'iross', 'email': 'iross@cadasta.org',
-             'full_name': 'Ian Ross'},
-            {'username': 'oroick', 'email': 'oroick@cadasta.org',
-             'full_name': 'Oliver Roick'}]
-        # add user's with names in languages that need to be tested.
+            {'username': 'superuser1', 'email': 'superuser1@cadasta.org',
+             'full_name': 'Super User1'},
+            {'username': 'superuser2', 'email': 'superuser2@cadasta.org',
+             'full_name': 'Super User2'}]
+        # add users with names in languages that need to be tested.
         languages = ['el_GR', 'ja_JP', 'hi_IN', 'hr_HR', 'lt_LT']
         named_users.append({
             'full_name': 'עזרא ברש'
@@ -444,7 +444,7 @@ class FixturesData:
             models.OrganizationRole.objects.filter(user=user).delete()
             user.delete()
         # Specified named users.
-        named_users = ['iross', 'oroick']
+        named_users = ['superuser1', 'superuser2']
         for user in named_users:
             if User.objects.filter(username=user).exists():
                 u = User.objects.get(username=user)
