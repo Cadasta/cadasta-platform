@@ -4,6 +4,7 @@
 
 - Fork the repository on Github
 - Install the development environment. Follow the instructions in the [README](https://github.com/Cadasta/cadasta-platform/blob/master/README.rst#install-for-development).
+- Review our [Contributing Style Guide](https://github.com/Cadasta/cadasta-platform/wiki/Contributing-Style-Guide), [Git Workflow](https://github.com/Cadasta/cadasta-platform/wiki/Git-Workflow), and [Code Layout](https://github.com/Cadasta/cadasta-platform/wiki/Code-layout) documentation. Additional information can be found in our [wiki](https://github.com/Cadasta/cadasta-platform/wiki).
 
 ## Making Changes
 
