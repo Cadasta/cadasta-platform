@@ -117,7 +117,7 @@
     padding-bottom: 8px;
     > div {
       display: table-cell;
-      vertical-align: middle;  
+      vertical-align: middle;
     }
     .index-link {
       padding: 4px 10px;
@@ -245,47 +245,47 @@
 
 #sidebar {
   li.overview {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-overview.png');
     }
   }
   li.search {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-search.png');
     }
   }
   li.map {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-map.png');
     }
   }
   li.parties {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-parties.png');
     }
   }
   li.resources {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-resources.png');
     }
   }
   li.reports {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-reports.png');
     }
   }
   li.activity {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-activity.png');
     }
   }
   li.projects {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-projects.png');
     }
   }
   li.members {
-    .icon { 
+    .icon {
       background-image: url('/static/img/icon-members.png');
     }
   }
@@ -543,6 +543,28 @@
   }
 }
 
+/* =Tabs
+-------------------------------------------------------------- */
+.nav-tabs {
+  li > a {
+    padding: 10px;
+    border-radius: 1px 1px 0 0;
+    font-family: $font-family-sans-serif-alt;
+    background: $body-bg;
+    color: $gray-dark;
+  }
+  li.active > a, li.active > a:hover, li.active > a:focus {
+    border-color: $table-border-color;
+    border-top: solid 4px $brand-gold;
+    border-bottom-color: transparent;
+    background: #fff;
+  }
+  li > a:hover {
+    border-bottom-color: transparent;
+    background: $nav-link-hover-bg;
+  }
+}
+
 /* =Main content within project or organization
 -------------------------------------------------------------- */
 
@@ -659,16 +681,6 @@
       &.linked:hover {
         cursor: pointer;
         background-color: $table-bg-hover;
-      }
-    }
-    .nav-tabs {
-      li > a {
-        font-size: 13px;
-        padding: 10px;
-      }
-      li.active > a, li.active > a:hover, li.active > a:focus {
-        border-color: $table-border-color;
-        border-bottom-color: transparent;
       }
     }
     section > p:first-child {

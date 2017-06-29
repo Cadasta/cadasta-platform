@@ -45,7 +45,7 @@
           {% endif %}
         {% endif %}
       </td>
-      <td>
+      <td class="text-right">
         {% if resource.attachment_id %}
           <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}">
             {% csrf_token %}
