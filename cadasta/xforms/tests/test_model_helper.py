@@ -76,7 +76,7 @@ class XFormModelHelperTest(TestCase):
                 attr_type=attr_type, index=1,
                 required=False, omit=False
             )
-
+        self.sanitizeable_questions = ['party_name', 'fname_two']
         OrganizationRole.objects.create(
             user=self.user, organization=self.project.organization)
 
@@ -117,7 +117,7 @@ class XFormModelHelperTest(TestCase):
         }
 
         with pytest.raises(InvalidXMLSubmission) as e:
-            mh.sanitize_submission(mh(), data)
+            mh.sanitize_submission(mh(), data, self.sanitizeable_questions)
         assert str(e.value) == SANITIZE_ERROR
 
     def test_sanitize_submission_with_error_in_group(self):
@@ -157,8 +157,51 @@ class XFormModelHelperTest(TestCase):
         }
 
         with pytest.raises(InvalidXMLSubmission) as e:
-            mh.sanitize_submission(mh(), data)
+            mh.sanitize_submission(mh(), data, self.sanitizeable_questions)
         assert str(e.value) == SANITIZE_ERROR
+
+    def test_sanitize_submission_with_negative_longitude(self):
+        geoshape = ('-45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0')
+        data = {
+            'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
+            'version': str(self.questionnaire.version),
+            'party_name': 'Party One',
+            'party_type': 'IN',
+            'party_attributes_individual': {
+                'fname': False,
+                'fname_two': 'socks',
+            },
+            'party_photo': 'sad_birthday.png',
+            'party_resource_invite': 'invitation.pdf',
+            'location_type': 'BU',
+            'location_geometry': geoshape,
+            'location_attributes': {
+                'fname': False,
+                'fname_two': 'Location One',
+            },
+            'location_photo': 'resource_one.png',
+            'location_resource_invite': 'resource_two.pdf',
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure One'
+            },
+            'tenure_resource_photo': 'resource_three.png'
+        }
+
+        try:
+            mh.sanitize_submission(mh(), data, self.sanitizeable_questions)
+        except InvalidXMLSubmission:
+            assert False, "InvalidXMLSubmission raised unexpectedly"
+        else:
+            assert True
 
     def test_create_models(self):
         geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'

@@ -6,7 +6,7 @@ from jsonattrs.models import Attribute, AttributeType
 from tutelary.models import Policy
 from party.models import Party, TenureRelationship
 from pyxform.xform2json import XFormToDict
-from questionnaires.models import Questionnaire
+from questionnaires.models import Questionnaire, Question
 from resources.models import Resource
 from spatial.models import SpatialUnit
 from xforms.exceptions import InvalidXMLSubmission
@@ -250,12 +250,12 @@ class ModelHelper():
         except Exception as e:
             raise InvalidXMLSubmission(_("{}".format(e)))
 
-    def sanitize_submission(self, submission):
-        for value in list(submission.values()):
+    def sanitize_submission(self, submission, sanitizable_questions):
+        for key, value in submission.items():
             if isinstance(value, dict):
-                self.sanitize_submission(value)
+                self.sanitize_submission(value, sanitizable_questions)
 
-            elif not sanitize_string(value):
+            elif key in sanitizable_questions and not sanitize_string(value):
                 raise InvalidXMLSubmission(SANITIZE_ERROR)
 
     def upload_submission_data(self, request):
@@ -267,7 +267,12 @@ class ModelHelper():
             xml_submission_file.decode('utf-8')).get_dict()
 
         submission = full_submission[list(full_submission.keys())[0]]
-        self.sanitize_submission(submission)
+
+        sanitizable_questions = Question.objects.filter(
+            questionnaire__id=submission['id'],
+            questionnaire__version=submission['version'],
+            type__in=['TX', 'NO']).values_list('name', flat=True)
+        self.sanitize_submission(submission, sanitizable_questions)
 
         with transaction.atomic():
             (questionnaire,
