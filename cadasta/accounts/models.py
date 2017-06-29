@@ -39,6 +39,9 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     verify_email_by = models.DateTimeField(default=now_plus_48_hours)
     change_pw = models.BooleanField(default=True)
+    language = models.CharField(max_length=10,
+                                choices=settings.LANGUAGES,
+                                default=settings.LANGUAGE_CODE)
 
     objects = UserManager()
 

@@ -69,10 +69,16 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
 
 class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
+    language = forms.ChoiceField(
+        choices=settings.LANGUAGES,
+        error_messages={
+            'invalid_choice': _('Language invalid or not available')
+        }
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'full_name']
+        fields = ['username', 'email', 'full_name', 'language']
 
     class Media:
         js = ('js/sanitize.js', )

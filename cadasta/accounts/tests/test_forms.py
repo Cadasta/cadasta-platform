@@ -227,12 +227,14 @@ class ProfileFormTest(UserTestCase, TestCase):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
                                   email_verified=True,
-                                  password='sgt-pepper')
+                                  password='sgt-pepper',
+                                  language='en')
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
 
         request = HttpRequest()
@@ -248,6 +250,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         user.refresh_from_db()
         assert user.full_name == 'John Lennon'
         assert user.email == 'john@beatles.uk'
+        assert user.language == 'en'
         assert user.email_verified is True
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
@@ -263,7 +266,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'imagine71',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         form.save()
@@ -280,7 +284,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'existing',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -296,6 +301,7 @@ class ProfileFormTest(UserTestCase, TestCase):
                 'username': user.username.lower(),
                 'email': '%s@beatles.uk' % user.username,
                 'full_name': 'John Lennon',
+                'language': 'en'
             }
             form = forms.ProfileForm(data, instance=existing_user)
             assert form.is_valid() is False
@@ -311,7 +317,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'johnLennon',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is True
@@ -329,7 +336,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'imagine71',
             'email': 'existing@example.com',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -342,7 +350,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is False
@@ -358,7 +367,8 @@ class ProfileFormTest(UserTestCase, TestCase):
         data = {
             'username': 'user1',
             'email': 'user1_email_change@example.com',
-            'password': 'sgt-pepper'
+            'password': 'sgt-pepper',
+            'language': 'en'
         }
 
         request = HttpRequest()
@@ -394,6 +404,23 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
+
+    def test_update_with_invalid_language(self):
+        user = UserFactory.create(email='john@beatles.uk',
+                                  password='imagine71',
+                                  language='en')
+        data = {
+            'username': 'imagine71',
+            'email': 'john2@beatles.uk',
+            'full_name': 'John Lennon',
+            'password': 'stg-pepper',
+            'language': 'invalid'
+        }
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+        assert user.language == 'en'
+        assert ('Language invalid or not available'
+                in form.errors.get('language'))
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
