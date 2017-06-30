@@ -279,7 +279,8 @@ LANGUAGES = [
     # ('de', _('German')),    (hiding until translation coverage >= 75%)
     ('es', _('Spanish')),
     ('id', _('Indonesian')),
-    ('pt', _('Portuguese')),
+    ('it', _('Italian')),
+    ('pt', _('Portuguese'))
     # ('sw', _('Swahili')),   (hiding until translation coverage >= 75%)
 ]
 
