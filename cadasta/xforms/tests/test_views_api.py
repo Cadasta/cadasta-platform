@@ -12,6 +12,7 @@ from skivvy import APITestCase
 from tutelary.models import Policy
 
 from accounts.tests.factories import UserFactory
+from core.messages import SANITIZE_ERROR
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from organization.models import OrganizationRole
@@ -355,7 +356,10 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         assert geom.geometry.geom_type == 'Polygon'
 
     def test_invalid_submission_upload(self):
-        self._create_questionnaire('t_questionnaire', 0)
+        questionnaire = self._create_questionnaire('t_questionnaire', 0)
+        QuestionFactory.create(name='party_name',
+                               questionnaire=questionnaire,
+                               type='TX')
         # testing submitting with a missing xml_submission_file
         data = self._invalid_submission(form='This is not an xml form!')
         response = self.request(method='POST', user=self.user, post_data=data,
@@ -384,6 +388,13 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         assert response.status_code == 400
         msg = self._getResponseMessage(response)
         assert msg == "Tenure relationship error: 'tenure_type'"
+
+        data = self._submission(form='submission_not_sane')
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
+        msg = self._getResponseMessage(response)
+        assert msg == SANITIZE_ERROR
 
         file = self.get_file(
             '/xforms/tests/files/test_bad_resource.html', 'rb')

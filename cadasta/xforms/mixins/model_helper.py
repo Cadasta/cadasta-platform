@@ -269,7 +269,7 @@ class ModelHelper():
         submission = full_submission[list(full_submission.keys())[0]]
 
         sanitizable_questions = Question.objects.filter(
-            questionnaire__id=submission['id'],
+            questionnaire__id_string=submission['id'],
             questionnaire__version=submission['version'],
             type__in=['TX', 'NO']).values_list('name', flat=True)
         self.sanitize_submission(submission, sanitizable_questions)
