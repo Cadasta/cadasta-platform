@@ -1,9 +1,6 @@
-import json
-
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser, Group
 
-from tutelary.models import Policy, Role, assign_user_policies
 from skivvy import ViewTestCase
 
 from core.tests.utils.cases import UserTestCase
@@ -11,20 +8,7 @@ from accounts.tests.factories import UserFactory
 from ..views import default
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 from .. import forms
-from .factories import OrganizationFactory, ProjectFactory, clause
-
-
-def assign_policies(user):
-    clauses = {
-        'clause': [
-            clause('allow', ['org.list']),
-            clause('allow', ['org.*', 'org.*.*'], ['organization/*'])
-        ]
-    }
-    policy = Policy.objects.create(
-        name='allow',
-        body=json.dumps(clauses))
-    assign_user_policies(user, policy)
+from .factories import OrganizationFactory, ProjectFactory
 
 
 class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
@@ -42,20 +26,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         for org in self.all_orgs:
             org.num_projects = 0
 
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('deny', ['org.view'], ['organization/unauthorized'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
         self.user = UserFactory.create()
-        assigned_policies = self.user.assigned_policies()
-        assigned_policies.append(self.policy)
-        self.user.assign_policies(*assigned_policies)
 
     def setup_template_context(self):
         return {
@@ -110,16 +81,7 @@ class OrganizationAddTest(ViewTestCase, UserTestCase, TestCase):
     template_context = {'form': forms.OrganizationForm()}
 
     def setup_models(self):
-        clauses = {
-            'clause': [
-                clause('allow', ['org.create'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
         self.user = UserFactory.create()
-        assign_user_policies(self.user, self.policy)
 
     def setup_post_data(self):
         return {
@@ -377,7 +339,6 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
         self.org.archived = True
         self.org.save()
         user = UserFactory.create()
-        assign_policies(user)
         response = self.request(user=user)
 
         assert response.status_code == 302
@@ -663,7 +624,6 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
     def test_post_with_archived_organization(self):
         user = UserFactory.create()
         user_to_add = UserFactory.create(username='add_me')
-        assign_policies(user)
         self.org.archived = True
         self.org.save()
 

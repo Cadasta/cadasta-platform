@@ -34,7 +34,7 @@ from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
-class OrganizationList(PermissionRequiredMixin, generic.ListView):
+class OrganizationList(RolePermissionRequiredMixin, generic.ListView):
     model = Organization
     template_name = 'organization/organization_list.html'
     permission_required = 'org.list'
@@ -55,7 +55,7 @@ class OrganizationList(PermissionRequiredMixin, generic.ListView):
     )
 
 
-class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
+class OrganizationAdd(RoleLoginPermissionRequiredMixin, generic.CreateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_add.html'
@@ -178,7 +178,6 @@ class OrganizationMembersAdd(RoleLoginPermissionRequiredMixin,
     model = OrganizationRole
     form_class = forms.AddOrganizationMemberForm
     template_name = 'organization/organization_members_add.html'
-    # permission_required = update_permissions('org.users.add')
     permission_required = 'org.users.add'
     permission_denied_message = error_messages.ORG_USERS_ADD
 
@@ -216,7 +215,6 @@ class OrganizationMembersEdit(RoleLoginPermissionRequiredMixin,
     template_name = 'organization/organization_members_edit.html'
     project_form_class = forms.EditOrganizationMemberProjectPermissionForm
     org_role_form_class = forms.EditOrganizationMemberForm
-    # permission_required = update_permissions('org.users.edit')
     permission_required = 'org.users.edit'
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
@@ -294,7 +292,6 @@ class OrganizationMembersEdit(RoleLoginPermissionRequiredMixin,
 class OrganizationMembersRemove(RoleLoginPermissionRequiredMixin,
                                 mixins.OrganizationMixin,
                                 generic.DeleteView):
-    # permission_required = update_permissions('org.users.remove')
     permission_required = 'org.users.remove'
     permission_denied_message = error_messages.ORG_USERS_REMOVE
 
@@ -414,7 +411,6 @@ class ProjectDashboard(RolePermissionRequiredMixin,
 
     model = Project
     template_name = 'organization/project_dashboard.html'
-    # permission_required = {'GET': get_actions}
     permission_required = get_actions
     permission_denied_message = error_messages.PROJ_VIEW
 
@@ -470,23 +466,20 @@ PROJECT_ADD_TEMPLATES = {
 }
 
 
-def add_wizard_permission_required(self, view, request):
-    if 'organization' in self.kwargs:
-        if Organization.objects.get(
-                slug=self.kwargs.get('organization')).archived:
-            return False
-    if request.method != 'POST':
-        return ()
-    session = request.session.get('wizard_project_add_wizard', None)
-    if session is None or 'details' not in session['step_data']:
-        return ()
-    else:
-        return 'project.create'
-
-
-class ProjectAddWizard(LoginPermissionRequiredMixin,
+class ProjectAddWizard(RoleLoginPermissionRequiredMixin,
                        core_mixins.SuperUserCheckMixin,
                        wizard.SessionWizardView):
+
+    def add_wizard_permission_required(self, request):
+        if 'organization' in self.kwargs:
+            if Organization.objects.get(
+                    slug=self.kwargs.get('organization')).archived:
+                return ''
+        session = request.session.get('wizard_project_add_wizard', None)
+        if session is None or session['step'] != 'permissions':
+            return ()
+        return 'project.create'
+
     permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
 
@@ -505,13 +498,12 @@ class ProjectAddWizard(LoginPermissionRequiredMixin,
 
         return initial
 
-    def get_perms_objects(self):
+    def get_organization(self):
         session = self.request.session.get('wizard_project_add_wizard', None)
         if session is None or 'details' not in session['step_data']:
-            return []
-        else:
-            slug = session['step_data']['details']['details-organization'][0]
-            return [Organization.objects.get(slug=slug)]
+            return None
+        slug = session['step_data']['details']['details-organization'][0]
+        return Organization.objects.get(slug=slug)
 
     def get_template_names(self):
         return [PROJECT_ADD_TEMPLATES[self.steps.current]]
@@ -569,7 +561,7 @@ class ProjectAddWizard(LoginPermissionRequiredMixin,
             }
         elif step == 'permissions':
             return {
-                'organization': self.storage.extra_data['organization'],
+                'organization': self.storage.extra_data.get('organization'),
             }
         else:
             return {}
@@ -601,6 +593,7 @@ class ProjectAddWizard(LoginPermissionRequiredMixin,
                     access=access, contacts=contacts
                 )
                 for username, role in user_roles:
+                    # add group to ProjectRole
                     user = User.objects.get(username=username)
                     ProjectRole.objects.create(
                         project=project, user=user, role=role

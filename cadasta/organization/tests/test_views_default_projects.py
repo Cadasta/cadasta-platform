@@ -459,26 +459,15 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.create'], ['organization/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
         setattr(self.request, '_messages', self.messages)
 
         self.user = UserFactory.create()
         self.unauth_user = UserFactory.create()
-        self.superuser = UserFactory.create()
-        self.superuser.assign_policies(Role.objects.get(name='superuser'))
+        self.superuser = UserFactory.create(is_superuser=True)
 
         setattr(self.request, 'user', self.user)
-        assign_user_policies(self.user, self.policy)
 
         self.org = OrganizationFactory.create(
             name='Test Org', slug='test-org'
@@ -494,9 +483,15 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             {'username': 'org_non_member_2'},
             {'username': 'org_non_member_3'},
             {'username': 'org_non_member_4'}])
+
+        self.oa_group = Group.objects.get(name="OrgAdmin")
+        self.om_group = Group.objects.get(name="OrgMember")
+
         for idx in range(6):
+            group = self.oa_group if idx < 2 else self.om_group
             OrganizationRole.objects.create(organization=self.org,
                                             user=self.users[idx],
+                                            group=group,
                                             admin=(idx < 2))
 
     def _get(self, status=None, check_content=False, login_redirect=False):
@@ -526,8 +521,8 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         self._get(status=302, login_redirect=True)
 
     def test_get_from_initial_with_org(self):
-        """ If users create a project from an organization directly, the
-            initial field value will be set the the `organization` value
+        """If users create a project from an organization directly, the
+            initial field value will be the `organization` value
             provided with the URL kwargs.
         """
         view = default.ProjectAddWizard()
@@ -538,8 +533,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert form_initial.get('organization') == self.org.slug
 
     def test_get_from_initial_with_archived_org(self):
-        """ If users create a project from an archived organization, if fails.
-        """
+        """If users create a project from an archived organization, fail"""
         self.org.archived = True
         self.org.save()
         self.org.refresh_from_db()
@@ -553,7 +547,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert '/projects/new/' not in response['location']
 
     def test_get_from_initial_with_no_org(self):
-        """ If a project is created from scratch, no the initial value for
+        """If a project is created from scratch, no the initial value for
             `organization must be empty.
         """
         view = default.ProjectAddWizard()
@@ -715,6 +709,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         second_org = OrganizationFactory.create(name="Second Org")
         OrganizationRole.objects.create(organization=second_org,
                                         user=self.users[0],
+                                        group=self.oa_group,
                                         admin=True)
         self.client.force_login(self.users[0])
         extents_response = self.client.post(
@@ -757,6 +752,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
+
         details_post_data = self.DETAILS_POST_DATA.copy()
         details_post_data['details-name'] = project_name
         details_response = self.client.post(

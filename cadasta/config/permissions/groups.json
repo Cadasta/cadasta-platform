@@ -40,14 +40,14 @@
     "DataCollector": {
         "permissions": [
             "org.view", "org.view.private", "org.list", "org.create",
-            "org.update", "project.view", "project.view.private", "project.list",
+            "project.view", "project.view.private", "project.list",
             "project.update"
         ]
     },
     "ProjectMember": {
         "permissions": [
             "org.view", "org.view.private", "org.list", "org.create",
-            "org.update", "project.view", "project.view.private", "project.list"
+            "project.view", "project.view.private", "project.list"
         ]
     },
     "PublicUser": {

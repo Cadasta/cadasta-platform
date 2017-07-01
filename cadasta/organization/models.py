@@ -126,6 +126,7 @@ class OrganizationRole(Role):
     def __repr__(self):
         repr_string = ('<OrganizationRole id={obj.id} user={obj.user.username}'
                        ' organization={obj.organization.slug}'
+                       ' group={obj.group.name}'
                        ' admin={obj.admin}>')
         return repr_string.format(obj=self)
 
@@ -326,6 +327,7 @@ class ProjectRole(Role):
     def __repr__(self):
         repr_string = ('<ProjectRole id={obj.id} user={obj.user.username}'
                        ' project={obj.project.slug}'
+                       ' group={obj.group}'
                        ' role={obj.role}>')
         return repr_string.format(obj=self)
 

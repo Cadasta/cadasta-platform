@@ -172,9 +172,11 @@ class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
         instance.save()
 
         if is_create:
+            group = Group.objects.get(name="OrgAdmin")
             OrganizationRole.objects.create(
                 organization=instance,
                 user=self.user,
+                group=group,
                 admin=True
             )
 
@@ -322,12 +324,11 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
             self.orgs = Organization.objects.filter(
                 archived=False).order_by('name')
         else:
-            qs = self.user.organizations.filter(
-                archived=False).order_by('name')
-            self.orgs = [
-                o for o in qs
-                if check_perms(self.user, ('project.create',), (o,))
-            ]
+            roles = OrganizationRole.objects.filter(
+                user=self.user, group__name='OrgAdmin',
+                organization__archived=False
+            )
+            self.orgs = [r.organization for r in roles]
         choices = [(o.slug, o.name) for o in self.orgs]
         if not org_is_chosen and len(choices) > 1:
             choices = [('', _("Please select an organization"))] + choices

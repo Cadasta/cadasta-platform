@@ -118,25 +118,16 @@ class RolePermissionRequiredMixin(auth_mixins.PermissionRequiredMixin):
         except PublicRole.DoesNotExist:
             pass
 
-    @property
-    def permissions(self):
-        # compose permissions for all roles
-        self._perms = []
-        if hasattr(self, '_roles'):
-            [self._perms.extend(role.permissions) for role in self._roles]
-        perms = sorted(set(self._perms))
-        return perms
-
     def has_permission(self):
         if not hasattr(self, '_roles'):
             self.get_user_roles()
-        # superusers have all permissions
-        if hasattr(self, 'is_superuser'):
-            if self.is_superuser:
-                return True
-        else:
-            if self.request.user.is_superuser:
-                return True
+        # # superusers have all permissions
+        # if hasattr(self, 'is_superuser'):
+        #     if self.is_superuser:
+        #         return True
+        # else:
+        #     if self.request.user.is_superuser:
+        #         return True
         perms = self.get_permission_required()
 
         # replace when we eventually use role authorization backend
@@ -146,6 +137,15 @@ class RolePermissionRequiredMixin(auth_mixins.PermissionRequiredMixin):
 
         return all(False for perm in perms
                    if perm not in self.permissions)
+
+    @property
+    def permissions(self):
+        # compose permissions for all roles
+        self._perms = []
+        if hasattr(self, '_roles'):
+            [self._perms.extend(role.permissions) for role in self._roles]
+        perms = sorted(set(self._perms))
+        return perms
 
     def handle_no_permission(self):
         msg = _("You don't have permission to perform this action.")

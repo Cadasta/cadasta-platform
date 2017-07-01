@@ -52,11 +52,13 @@ class SuperUserCheck:
         self._su_role = None
 
     def is_superuser(self, user):
-        if not hasattr(self, 'su_role'):
-            self.su_role = Role.objects.get(name='superuser')
-
-        return any([isinstance(pol, Role) and pol == self.su_role
-                    for pol in user.assigned_policies()])
+        # if not hasattr(self, 'su_role'):
+        #     self.su_role = Role.objects.get(name='superuser')
+        #
+        # return any([isinstance(pol, Role) and
+        #             (pol == self.su_role or user.is_superuser)
+        #             for pol in user.assigned_policies()])
+        return user.is_superuser
 
 
 class AttributeFormMixin(SchemaSelectorMixin):

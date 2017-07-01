@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 from accounts.models import User
 from accounts.tests.factories import UserFactory
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import GEOSGeometry
 from faker import Factory
@@ -68,17 +69,21 @@ class FixturesData:
         roles['superuser'] = Role.objects.get(name='superuser')
         users[0].assign_policies(roles['superuser'])
         users[1].assign_policies(roles['superuser'])
+        oa_group = Group.objects.get(name='OrgAdmin')
+        om_group = Group.objects.get(name='OrgMember')
 
         for i in [0, 1, 3, 4, 7, 10]:
             admin = i == 3 or i == 4
+            group = oa_group if admin else om_group
             models.OrganizationRole.objects.create(
-                organization=orgs[0], user=users[i], admin=admin
+                organization=orgs[0], user=users[i], group=group, admin=admin
             )
 
         for i in [0, 1, 2, 4, 8, 10]:
             admin = i == 2 or i == 4
+            group = oa_group if admin else om_group
             models.OrganizationRole.objects.create(
-                organization=orgs[1], user=users[i], admin=admin
+                organization=orgs[1], user=users[i], group=group, admin=admin
             )
 
         print("{} and {} have superuser policies.".format(users[0], users[1]))
