@@ -1105,3 +1105,26 @@ class XFormModelHelperTest(TestCase):
             mh._check_perm(mh, self.user, self.project)
         except PermissionDenied:
             self.fail("PermissionDenied raised unexpectedly")
+
+    def test_get_sanitizable_questions(self):
+        QuestionFactory.create(
+            name='text',
+            type='TX',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='note',
+            type='NO',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='integer',
+            type='IN',
+            questionnaire=self.questionnaire)
+
+        sanitizeable_questions = mh.get_sanitizable_questions(
+            mh(),
+            self.questionnaire.id_string,
+            self.questionnaire.version)
+        assert len(sanitizeable_questions) == 2
+        assert 'text' in sanitizeable_questions
+        assert 'note' in sanitizeable_questions
+        assert 'integer' not in sanitizeable_questions

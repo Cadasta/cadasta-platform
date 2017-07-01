@@ -258,6 +258,12 @@ class ModelHelper():
             elif key in sanitizable_questions and not sanitize_string(value):
                 raise InvalidXMLSubmission(SANITIZE_ERROR)
 
+    def get_sanitizable_questions(self, id_string, version):
+        return Question.objects.filter(
+            questionnaire__id_string=id_string,
+            questionnaire__version=version,
+            type__in=['TX', 'NO']).values_list('name', flat=True)
+
     def upload_submission_data(self, request):
         if 'xml_submission_file' not in request.data.keys():
             raise InvalidXMLSubmission(_('XML submission not found'))
@@ -268,10 +274,8 @@ class ModelHelper():
 
         submission = full_submission[list(full_submission.keys())[0]]
 
-        sanitizable_questions = Question.objects.filter(
-            questionnaire__id_string=submission['id'],
-            questionnaire__version=submission['version'],
-            type__in=['TX', 'NO']).values_list('name', flat=True)
+        sanitizable_questions = self.get_sanitizable_questions(
+            submission['id'], submission['version'])
         self.sanitize_submission(submission, sanitizable_questions)
 
         with transaction.atomic():
