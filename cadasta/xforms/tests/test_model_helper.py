@@ -1119,6 +1119,90 @@ class XFormModelHelperTest(TestCase):
             name='integer',
             type='IN',
             questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='select_one',
+            type='S1',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='select_multiple',
+            type='SM',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='geopoint',
+            type='GP',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='geotrace',
+            type='GT',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='geoshape',
+            type='GS',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='date',
+            type='DA',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='time',
+            type='TI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='datetime',
+            type='DT',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='calculate',
+            type='CA',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='acknowledge',
+            type='AC',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='photo',
+            type='PH',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='audio',
+            type='AU',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='video',
+            type='VI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='barcode',
+            type='BC',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='start',
+            type='ST',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='end',
+            type='EN',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='today',
+            type='TD',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='deviceid',
+            type='DI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='subscriber_id',
+            type='SI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='simserial',
+            type='SS',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='phonenumber',
+            type='PN',
+            questionnaire=self.questionnaire)
 
         sanitizeable_questions = mh.get_sanitizable_questions(
             mh(),
@@ -1128,3 +1212,24 @@ class XFormModelHelperTest(TestCase):
         assert 'text' in sanitizeable_questions
         assert 'note' in sanitizeable_questions
         assert 'integer' not in sanitizeable_questions
+        assert 'select_one' not in sanitizeable_questions
+        assert 'select_multiple' not in sanitizeable_questions
+        assert 'geopoint' not in sanitizeable_questions
+        assert 'geotrace' not in sanitizeable_questions
+        assert 'geoshape' not in sanitizeable_questions
+        assert 'date' not in sanitizeable_questions
+        assert 'time' not in sanitizeable_questions
+        assert 'datetime' not in sanitizeable_questions
+        assert 'calculate' not in sanitizeable_questions
+        assert 'acknowledge' not in sanitizeable_questions
+        assert 'photo' not in sanitizeable_questions
+        assert 'audio' not in sanitizeable_questions
+        assert 'video' not in sanitizeable_questions
+        assert 'barcode' not in sanitizeable_questions
+        assert 'start' not in sanitizeable_questions
+        assert 'end' not in sanitizeable_questions
+        assert 'today' not in sanitizeable_questions
+        assert 'deviceid' not in sanitizeable_questions
+        assert 'subscriber_id' not in sanitizeable_questions
+        assert 'simserial' not in sanitizeable_questions
+        assert 'phonenumber' not in sanitizeable_questions
