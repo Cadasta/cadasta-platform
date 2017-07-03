@@ -1,0 +1,18 @@
+{% if question.name not in exclude_geo_fields %}
+<div class="form-horizontal">
+    <div class="form-group pdf_form_fields">
+        <label class="col-left control-label">
+        	<strong>{% if question.label_xlat.en %} {{ question.label_xlat.en }} {% else %} {{ question.name }} {% endif %}</strong>
+        	<i>(Select only one option)</i>
+        </label>
+        <div class="col-right">
+        	{% for option in question.options.all %}
+    		<label>
+    			<input type="checkbox" class="form-control" name="{{ option.name }}">{% if option.label_xlat.en %} {{ option.label_xlat.en }} {% else %} {{ option.name }} {% endif %}
+    		</label>
+        	{% endfor %}
+        </div>
+    </div>
+</div>
+<div class="hr"></div>
+{% endif %}

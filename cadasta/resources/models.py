@@ -1,4 +1,3 @@
-import os
 import tempfile
 
 from datetime import datetime
@@ -6,7 +5,6 @@ from datetime import datetime
 import magic
 from buckets.fields import S3FileField
 from core.models import ID_FIELD_LENGTH, RandomIDModel
-from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -23,8 +21,9 @@ from tutelary.decorators import permissioned_model
 from . import messages
 from .exceptions import InvalidGPXFile
 from .managers import ResourceManager
+from .mixins import ResourceThumbnailMixin
 from .processors.gpx import GPXProcessor
-from .utils import io, thumbnail
+from .utils import io
 from .validators import ACCEPTED_TYPES, validate_file_type
 
 content_types = models.Q(app_label='organization', model='project')
@@ -33,7 +32,7 @@ GPX_MIME_TYPES = ('application/xml', 'text/xml', 'application/gpx+xml')
 
 
 @permissioned_model
-class Resource(RandomIDModel):
+class Resource(RandomIDModel, ResourceThumbnailMixin):
     name = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     file = S3FileField(upload_to='resources', accepted_types=ACCEPTED_TYPES)
@@ -89,32 +88,6 @@ class Resource(RandomIDModel):
         return repr_string.format(obj=self)
 
     @property
-    def file_name(self):
-        if not hasattr(self, '_file_name'):
-            self._file_name = self.file.url.split('/')[-1]
-
-        return self._file_name
-
-    @property
-    def file_type(self):
-        return self.file_name.split('.')[-1]
-
-    @property
-    def thumbnail(self):
-        if not hasattr(self, '_thumbnail'):
-            icon = settings.ICON_LOOKUPS.get(self.mime_type, None)
-            if 'image' in self.mime_type and 'tif' not in self.mime_type:
-                ext = self.file_name.split('.')[-1]
-                base_url = self.file.url[:self.file.url.rfind('.')]
-                self._thumbnail = base_url + '-128x128.' + ext
-            elif icon:
-                self._thumbnail = settings.ICON_URL.format(icon)
-            else:
-                self._thumbnail = ''
-
-        return self._thumbnail
-
-    @property
     def num_entities(self):
         if not hasattr(self, '_num_entities'):
             self._num_entities = ContentObject.objects.filter(
@@ -122,7 +95,7 @@ class Resource(RandomIDModel):
         return self._num_entities
 
     def save(self, *args, **kwargs):
-        create_thumbnails(self, (not self.id))
+        self.create_thumbnails((not self.id))
         super().save(*args, **kwargs)
 
     @property
@@ -152,28 +125,6 @@ def archive_file(sender, instance, **kwargs):
     # Detach the resource when it is archived
     if instance.archived:
         ContentObject.objects.filter(resource=instance).delete()
-
-
-def create_thumbnails(instance, created):
-    if created or instance._original_url != instance.file.url:
-        if 'image' in instance.mime_type:
-            io.ensure_dirs()
-            file_name = instance.file.url.split('/')[-1]
-            name = file_name[:file_name.rfind('.')]
-            ext = file_name.split('.')[-1]
-            write_path = os.path.join(settings.MEDIA_ROOT,
-                                      'temp',
-                                      name + '-128x128.' + ext)
-
-            size = 128, 128
-
-            file = instance.file.open()
-            thumb = thumbnail.make(file, size)
-            thumb.save(write_path)
-            if instance.file.field.upload_to:
-                name = instance.file.field.upload_to + '/' + name
-            instance.file.storage.save(name + '-128x128.' + ext,
-                                       open(write_path, 'rb').read())
 
 
 @receiver(models.signals.post_save, sender=Resource)

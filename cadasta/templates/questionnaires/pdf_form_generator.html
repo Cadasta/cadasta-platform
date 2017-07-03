@@ -1,0 +1,299 @@
+{% load i18n %}
+{% load staticfiles %}
+{% load sass_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<body>
+{% block content %}
+<style type="text/css">
+  @page {
+    size: A4 portrait;
+    margin: 1cm;
+    @bottom-right {
+      font-size: 14px;
+      margin: 10px 0 30px 0;
+      content: "Page " counter(page) " of " counter(pages);
+      color: #333;
+    }
+  }
+  @page :first {
+    @bottom-left {
+      font-size: 10px;
+      margin: 10px 0 30px 0;
+      content: "{% trans "Questionnaire" %}: {{ questionnaire.title }}\A {% blocktrans with date=pdfform.last_updated user=pdfform.contributor.full_name %}Form created on {{ date }} by {{ user }}{% endblocktrans %} ";
+      display: block;
+      white-space: pre;
+      color: #333;
+    }
+  }
+  html, body {
+    font-family: Helvetica !important;
+    font-size: 14px;
+    line-height: 120%;
+    background: none !important;
+  }
+  h1 {
+    page-break-before: auto !important;
+    -weasy-bookmark-level: none;
+    margin-top: 0 !important;
+    font-size: 24px;
+    line-height: 130%;
+  }
+  h3 {
+    margin-top: 24px;
+    margin-bottom: 20px;
+  }
+  /* ---------- layout --------- */
+  .col-full {
+    width: 100%;
+  }
+  .col-left {
+    width: 30%;
+  }
+  .col-offset-left {
+    margin-left: 34%;
+  }
+  .col-right {
+    width: 60%;
+  }
+  .col-left, .col-right, .col-full {
+    float: left;
+    position: relative;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .media-body, .media-left {
+    display: table-cell;
+    vertical-align: top;
+  }
+  .media-left, .media > .pull-left {
+    padding-right: 10px;
+  }
+  .hr {
+    clear: both;
+    position: relative;
+    display: block;
+    border-bottom: 1px dotted #ddd;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+  /* ---------- form --------- */
+  .pdf_form_fields {
+    page-break-inside: avoid;
+  }
+  .form-group {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    width: 100%;
+    display: block;
+  }
+  .form-group::before {
+    display: table;
+    content: " ";
+  }
+  .form-group::after {
+    clear: both;
+  }
+  .form-horizontal .control-label {
+    padding-top: 2px;
+    margin-bottom: 0;
+    text-align: right;
+  }
+  .form-horizontal .form-control {
+    margin-bottom: 10px;
+  }
+  .form-control {
+    display: block;
+    width: 90%;
+    height: 36px;
+    background-color: #fff;
+  }
+  input:before{content:attr(value)}
+  select:before{content:attr(value)}
+  input[type=checkbox] {
+    background-clip: content-box;
+    border: 1px solid;
+    border-radius: 10px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+  }
+  input.form-control {
+    border: 1px solid #ccc;
+  }
+  label {
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+  label.required::after {
+    content: "*";
+    color: #d9534f;
+    font-style: normal;
+    padding: 0 3px;
+  }
+  label i {
+    font-size: 80%;
+    display: block;
+  }
+  .form-group > div > label {
+    display: block;
+  }
+</style>
+
+<div class="printable-form">
+  <div class="media">
+    {% if pdfform.thumbnail %}
+    <div class="media-left">
+      <img alt="Form Logo" src="{{ pdfform.thumbnail }}" style="width: 128px; margin-right: 20px;">
+    </div>
+    {% endif %}
+    <div class="media-body">
+      <h1>{{ pdfform.name }}</h1>
+      {% if pdfform.description is not None and pdfform.description != "" %}
+      <p><strong>{% trans "Description" %}</strong><br>{{ pdfform.description }}</p>
+      {% endif %}
+    </div>
+  </div>
+  <div style="border-top: solid 3px #ccc; margin-top: 20px;">
+    {% if pdfform.instructions is not None and pdfform.instructions != "" %}
+    <div id="instructions" style="border-bottom: solid 1px #ccc; margin-bottom: 10px;">
+      <h3><strong>{% trans "Instructions" %}</strong></h3>
+      <p>{{ pdfform.instructions }}</p>
+    </div>
+    {% endif %}
+    <div id="available_questions">
+      {% include 'questionnaires/fields/geo_point.html' %}
+      {% for question in questions_list %}
+        {% if "title" != question.name and "instanceID" != question.name %}
+          {% if "IN" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "DE" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "TX" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "S1" == question.type %}
+            {% include 'questionnaires/fields/select_one.html' %}
+          {% endif %}
+          {% if "SM" == question.type %}
+            {% include 'questionnaires/fields/select_apply_all.html' %}
+          {% endif %}
+          {% if "NO" == question.type %}
+            {% include 'questionnaires/fields/textarea.html' %}
+          {% endif %}
+          {% if "DA" == question.type %}
+            {% include 'questionnaires/fields/date_input.html' %}
+          {% endif %}
+          {% if "TI" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "DT" == question.type %}
+            {% include 'questionnaires/fields/date_input.html' %}
+          {% endif %}
+          {% if "CA" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "AC" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "PH" == question.type %}
+            {% include 'questionnaires/fields/photo.html' %}
+          {% endif %}
+          {% if "AU" == question.type %}
+            {% include 'questionnaires/fields/audio.html' %}
+          {% endif %}
+          {% if "VI" == question.type %}
+            {% include 'questionnaires/fields/video.html' %}
+          {% endif %}
+          {% if "BC" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "SI" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "SS" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+          {% if "PN" == question.type %}
+            {% include 'questionnaires/fields/input.html' %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+      {% for question_group in question_groups_list %}
+        {% if "meta" != question_group.name %}
+          <h3>Question Group:
+            {% if question_group.label_xlat.en %}
+              {{question_group.label_xlat.en}}
+            {% else %}
+              {{ question_group.name}}
+            {% endif %}
+          </h3>
+          {% for question in question_group.questions.all %}
+            {% if "title" != question.name and "instanceID" != question.name %}
+              {% if "IN" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "DE" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "TX" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "S1" == question.type %}
+                {% include 'questionnaires/fields/select_one.html' %}
+              {% endif %}
+              {% if "SM" == question.type %}
+                {% include 'questionnaires/fields/select_apply_all.html' %}
+              {% endif %}
+              {% if "NO" == question.type %}
+                {% include 'questionnaires/fields/textarea.html' %}
+              {% endif %}
+              {% if "DA" == question.type %}
+                {% include 'questionnaires/fields/date_input.html' %}
+              {% endif %}
+              {% if "TI" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "DT" == question.type %}
+                {% include 'questionnaires/fields/date_input.html' %}
+              {% endif %}
+              {% if "CA" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "AC" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "PH" == question.type %}
+                {% include 'questionnaires/fields/photo.html' %}
+              {% endif %}
+              {% if "AU" == question.type %}
+                {% include 'questionnaires/fields/audio.html' %}
+              {% endif %}
+              {% if "VI" == question.type %}
+                {% include 'questionnaires/fields/video.html' %}
+              {% endif %}
+              {% if "BC" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "SI" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "SS" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+              {% if "PN" == question.type %}
+                {% include 'questionnaires/fields/input.html' %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+</body>
+</html>

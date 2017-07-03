@@ -1,0 +1,17 @@
+{% extends "questionnaires/form_list.html" %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Add new form" %} | {% endblock %}
+
+{% block extra_script %}
+  {{ form.media }}
+{% endblock %}
+
+{% block modals %}
+{% url 'questionnaires:pdf_form_list' object.organization.slug object.slug as cancel_url %}
+{% if questionnaire %}
+    {% include 'questionnaires/modal_add.html' %}
+{% else %}
+    {% include 'questionnaires/modal_form_add_unauthorized.html' %}
+{% endif %}
+{% endblock %}

@@ -289,6 +289,11 @@
       background-image: url('/static/img/icon-members.png');
     }
   }
+  li.forms {
+    .icon {
+      background-image: url('/static/img/icon-forms.png');
+    }
+  }
 }
 
 #sidebar.search li.search,
@@ -299,6 +304,7 @@
 #sidebar.reports li.reports,
 #sidebar.activity li.activity,
 #sidebar.projects li.projects,
+#sidebar.forms li.forms,
 #sidebar.members li.members { // show active icon
   a {
     border-left: 7px solid $brand-gold;
@@ -353,7 +359,7 @@
       > li {
         display: inline-block;
         border-left: 0;
-        width: 20%;
+        width: 16%;
         border-right: solid 1px $brand-darkerblue;
         border-bottom: 0;
         margin-top: -3px;
@@ -390,6 +396,7 @@
   #sidebar.reports li.reports,
   #sidebar.activity li.activity,
   #sidebar.projects li.projects,
+  #sidebar.forms li.forms,
   #sidebar.members li.members { // show active icon
     a {
       border-top: 3px solid $brand-gold;

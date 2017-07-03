@@ -1,0 +1,26 @@
+{% load i18n %}
+
+<table class="table table-hover datatable" data-paging-type="simple">
+  <thead>
+    <tr>
+      <th class="col-md-4">{% trans "Form" %}</th>
+      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Contributor" %}</th>
+      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for pdfform in pdfform_list %}
+    <tr data-link-url="{% url 'questionnaires:pdf_form_view' project=object.slug organization=object.organization.slug form=pdfform.id %}">
+      <td>
+        <div class="pdfform">
+          <p>
+            <a href="{% url 'questionnaires:pdf_form_view' project=object.slug organization=object.organization.slug form=pdfform.id %}"><strong>{{ pdfform.name }}</strong></a>
+          </p>
+        </div>
+      </td>
+      <td class="hidden-xs hidden-sm">{{ pdfform.contributor.username }}<br>{{ pdfform.contributor.full_name }}</td>
+      <td class="hidden-xs hidden-sm">{{ pdfform.last_updated }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>

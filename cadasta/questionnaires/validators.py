@@ -4,7 +4,6 @@ from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
 from .models import Question
 
-
 QUESTIONNAIRE_SCHEMA = {
     'title': {'type': 'string', 'required': True},
     'id_string': {'type': 'string', 'required': True},

@@ -1,0 +1,33 @@
+{% extends "organization/project_wrapper.html" %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Edit form" %} | {% endblock %}
+{% block left-nav %}forms{% endblock %}
+
+{% block extra_script %}
+  {{ form.media }}
+{% endblock %}
+{% block content %}
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- Main text  -->
+    <div class="col-md-12 main-text">
+      <div class="page-title">
+        <h2>{% trans "Forms: Edit" %}</h2>
+      </div>
+      <form method="POST" data-parsley-validate>
+      {% csrf_token %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            {% include "questionnaires/form.html" %}
+          </div>
+          <div class="panel-footer panel-buttons">
+            <button type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+            <a href="{% url 'questionnaires:pdf_form_view' object.organization.slug object.slug form.instance.id %}" class="btn btn-default cancel">{% trans "Cancel" %}</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

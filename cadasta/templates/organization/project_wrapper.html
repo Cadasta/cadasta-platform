@@ -47,7 +47,7 @@
         </a>
         <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
           <div class="visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
-          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>   
+          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
@@ -106,7 +106,7 @@
           <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
-      </div>      
+      </div>
 
     </div>
   </div>
@@ -154,7 +154,16 @@
         <span class="icon resources"></span>
         <span class="title">{% trans "Resources" %}</span>
       </a>
+    </li><!--
+    -->
+    {% if is_administrator %}
+    <li class="forms">
+      <a href="{% url 'questionnaires:pdf_form_list' object.organization.slug object.slug %}">
+        <span class="icon forms"></span>
+        <span class="title">{% trans "Forms" %}</span>
+      </a>
     </li>
+    {% endif %}
   </ul>
 </div>
 <!-- /.sidebar -->
@@ -171,7 +180,7 @@
 <script>
 'use strict';
 window.addEventListener('load', function() {
-  $( '.search').find('.search').click( function(){ 
+  $( '.search').find('.search').click( function(){
 	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
@@ -182,7 +191,7 @@ window.addEventListener('load', function() {
       } else {
         $('#sidebar-search-box').addClass('disabled');
       }
-    } 
+    }
   });
   $('#sidebar-search-box form').bind('submit', function(e) {
     var query = $('#sidebar-search-box input')[0].value;

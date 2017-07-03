@@ -3,7 +3,7 @@
     {
       "effect": "allow",
       "action": ["resource.*", "spatial.*", "spatial_rel.*",
-                 "party.*", "party_rel.*", "tenure_rel.*"],
+                 "party.*", "party_rel.*", "tenure_rel.*", "pdfform.*"],
       "object": ["project/$organization/$project"]
     },
     {
@@ -45,6 +45,11 @@
       "effect": "allow",
       "action": ["questionnaire.view"],
       "object": ["project/$organization/$project"]
-    }
+    },
+    {
+      "effect": "deny",
+      "action": ["pdfform.edit"],
+      "object": ["project/$organization/$project"]
+   }
   ]
 }

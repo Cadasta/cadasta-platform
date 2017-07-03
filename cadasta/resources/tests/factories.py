@@ -32,7 +32,6 @@ class ResourceFactory(ExtendedFactory):
             storage = FakeS3Storage()
             file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
             file_name = storage.save('resources/image.jpg', file)
-
             resource.file = file_name
             if create:
                 resource.save()
