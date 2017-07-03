@@ -9,6 +9,7 @@ from core.form_mixins import SanitizeFieldsForm
 from .utils import send_email_update_notification
 from .models import User
 from .validators import check_username_case_insensitive
+
 from parsley.decorators import parsleyfy
 
 
@@ -73,10 +74,10 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'full_name', 'language',
-                  'measurement']
+                  'measurement', 'avatar']
 
     class Media:
-        js = ('js/sanitize.js', )
+        js = ('js/image-upload.js', 'js/sanitize.js', )
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False

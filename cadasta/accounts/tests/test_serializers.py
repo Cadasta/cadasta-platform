@@ -8,10 +8,11 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
 
 from core.messages import SANITIZE_ERROR
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from .. import serializers
 from ..models import User
 from ..exceptions import EmailNotVerifiedError
+from core.tests.utils.files import make_dirs  # noqa
 
 from .factories import UserFactory
 
@@ -219,14 +220,19 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
                   ) in serializer._errors['password'])
 
 
-class UserSerializerTest(UserTestCase, TestCase):
+@pytest.mark.usefixtures('make_dirs')
+class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = serializers.UserSerializer(user)
         assert 'email_verified' in serializer.data
         assert 'password' not in serializer.data
+        assert serializer.data['avatar'] == user.avatar.url
 
     def test_create_with_valid_data(self):
+        test_file_path = '/accounts/tests/files/avatar.png'
+        with self.get_file(test_file_path, 'rb') as test_file:
+            image = self.storage.save('avatars/avatar.png', test_file.read())
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
@@ -235,6 +241,7 @@ class UserSerializerTest(UserTestCase, TestCase):
             'last_login': '2016-01-01 23:00:00',
             'language': 'en',
             'measurement': 'metric',
+            'avatar': image,
         }
         serializer = serializers.UserSerializer(data=data)
         assert serializer.is_valid() is True

@@ -19,6 +19,17 @@
   {% csrf_token %}
   {{ form.non_field_errors }}
 
+  <div class="form-group{% if form.avatar.errors %} has-error{% endif %}">
+    <label class="control-label" for="{{ form.avatar.id_for_label }}">{% trans "Profile picture" %}</label>
+    <div class="well">
+      <div id="preview-box" class="center-block">
+        <img src='{{user.avatar_url}}' id="avatar-preview"/>
+      </div>
+      <p class="help-block small">{% trans "For best results upload a square image, ideally 200x200 pixels." %}</p>
+      {% render_field form.avatar class+="form-control input-lg" data-parsley-sanitize="1" %}
+    </div>
+  </div>
+
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
     {% render_field form.username class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}

@@ -1,15 +1,18 @@
 import random
+import pytest
 
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.messages import SANITIZE_ERROR
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.http import HttpRequest
 from django.db import IntegrityError
+
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
 from django.test import TestCase
 from django.utils.translation import gettext as _
+from core.tests.utils.files import make_dirs  # noqa
 
 from .. import forms
 from ..models import User
@@ -223,22 +226,28 @@ class RegisterFormTest(UserTestCase, TestCase):
         assert User.objects.count() == 0
 
 
-class ProfileFormTest(UserTestCase, TestCase):
+@pytest.mark.usefixtures('make_dirs')
+class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
+
     def test_update_user(self):
+        test_file_path = '/accounts/tests/files/avatar.png'
+        with self.get_file(test_file_path, 'rb') as test_file:
+            image = self.storage.save('avatars/avatar.png', test_file.read())
+
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
                                   email_verified=True,
                                   password='sgt-pepper',
-                                  language='en',
-                                  measurement='metric')
-
+                                  measurement='metric',
+                                  language='en')
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
             'language': 'en',
-            'measurement': 'imperial'
+            'measurement': 'imperial',
+            'avatar': image,
         }
 
         request = HttpRequest()
@@ -250,8 +259,8 @@ class ProfileFormTest(UserTestCase, TestCase):
 
         form = forms.ProfileForm(data, request=request, instance=user)
         form.save()
-
         user.refresh_from_db()
+
         assert user.full_name == 'John Lennon'
         assert user.email == 'john@beatles.uk'
         assert user.language == 'en'

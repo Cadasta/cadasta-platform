@@ -290,6 +290,9 @@ MEASUREMENTS = [
     ('imperial', _('Imperial')),
 ]
 
+DEFAULT_AVATAR = '/static/img/avatar_sm.jpg'
+ACCEPTED_AVATAR_TYPES = ['image/png', 'image/jpeg']
+
 USE_L10N = True
 
 USE_TZ = True
