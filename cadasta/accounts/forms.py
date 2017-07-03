@@ -11,6 +11,9 @@ from .models import User
 from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
 
+from base64 import b64decode
+from tempfile import NamedTemporaryFile
+
 
 @parsleyfy
 class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
@@ -81,6 +84,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
             'invalid_choice': _('Measurement system invalid or not available')
         }
     )
+    base64 = forms.CharField(required=False)
 
     class Meta:
         model = User
@@ -88,7 +92,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                   'measurement', 'avatar']
 
     class Media:
-        js = ('js/sanitize.js', )
+        js = ('js/image-upload.js', 'js/sanitize.js', )
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False
@@ -119,6 +123,20 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                     _("Another user with this email already exists"))
 
         return email
+
+    def clean_avatar(self):
+        """convert base64 of cropped image to image file to store"""
+        base64 = self.data.get('base64')
+        avatar = self.instance.avatar
+        if base64:
+            image_format, image_bytes_base64 = base64.split(',')
+            image_extension = '.' + image_format.split('/')[1].split(';')[0]
+            image_bytes = b64decode(image_bytes_base64)
+            image_file = NamedTemporaryFile('w+b', prefix='avatar-', suffix=image_extension)
+            image_file.write(image_bytes)
+            image_file.seek(0)
+            avatar.file = image_file
+        return avatar
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)

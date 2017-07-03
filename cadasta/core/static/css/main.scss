@@ -1086,3 +1086,27 @@ h1 .label {
     font-size: 12px;
   }
 }
+
+/* =Cropit, image input, Laura's work
+-------------------------------------------------------------- */
+
+.cropit-preview-wrapper {
+  text-align: center;
+}
+
+.cropit-preview {
+  /* You can specify preview size in CSS */
+  width: 150px;
+  height: 150px;
+  margin: 10px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.cropit-preview-image-container {
+  cursor: move;
+}
+
+.image-editor > input {
+  display: block;
+}
