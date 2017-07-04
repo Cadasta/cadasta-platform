@@ -15,12 +15,22 @@ header {
   #logo {
     display: inline-block;
     line-height: $header-height;
-    font-size: 22px;
+    font-size: 24px;
     margin: 0 auto;
     padding: 0 0 0 10px;
     img {
       height: 18px;
       width: 124px;
+    }
+    .site-name {
+      font-family: $font-family-sans-serif-alt;
+      color: $brand-darkerblue;
+      text-transform: uppercase;
+      opacity: 0.8;
+      position: relative;
+      top: 2px;
+      left: 4px;
+      letter-spacing: -0.2px;
     }
   }
   .nav {
@@ -119,12 +129,21 @@ header {
 }
 
 @media (max-width: $screen-xs-max) {
-  header #logo img {
-    height: 13px;
-    width: 90px;
+  header #logo {
+    font-size: 18px;
+    img {
+      height: 13px;
+      width: 90px;
+    }
   }
   header .btn-hamburger > a {
     min-width: 50px;
+  }
+}
+
+@media (max-width: 400px) {
+  header #logo {
+    font-size: 12px;
   }
 }
 

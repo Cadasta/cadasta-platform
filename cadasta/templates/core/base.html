@@ -27,7 +27,7 @@
       <header class="header" role="banner">
         <div class="container-fluid">
           <div id="logo" class="pull-left">
-            <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>
+            <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>{% include "core/identifier.html" %}
           </div>
           <div class="reg-links pull-right">
             {% if user.is_authenticated %}

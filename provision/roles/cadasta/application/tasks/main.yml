@@ -100,3 +100,9 @@
   become_user: "{{ app_user }}"
   command: chdir="{{ application_path }}cadasta/core"
            npm install bootstrap-sass
+
+- name: Write platform identifier to core template file
+  become: yes
+  become_user: "{{ app_user }}"
+  template: src=identifier
+            dest="{{ application_path }}cadasta/templates/core/identifier.html"

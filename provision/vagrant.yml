@@ -5,6 +5,7 @@
     django_settings: config.settings.dev
     app_user: vagrant
     uwsgi_socket: /tmp/uwsgi.sock
+    identifier: local
   vars_files:
     - shared_vars.yml
   roles:
