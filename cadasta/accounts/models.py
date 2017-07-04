@@ -40,10 +40,13 @@ def abstract_user_field(name):
 class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     username = abstract_user_field('username')
     full_name = models.CharField(_('full name'), max_length=130, blank=True)
-    email = abstract_user_field('email')
-    phone = models.CharField(_('phone number'), max_length=16, blank=True)
+    email = models.EmailField(
+        _('email address'), blank=True, null=True, default=None, unique=True)
+    phone = models.CharField(_('phone number'), max_length=16,
+                             blank=True, null=True,
+                             default=None, unique=True)
     is_staff = abstract_user_field('is_staff')
-    is_active = abstract_user_field('is_active')
+    is_active = models.BooleanField(default=False)
     date_joined = abstract_user_field('date_joined')
     email_verified = models.BooleanField(default=False)
     phone_verified = models.BooleanField(default=False)
@@ -123,7 +126,7 @@ def default_key():
 
 
 class VerificationDevice(Device):
-    unverified_phone = models.CharField(max_length=16, blank=True)
+    unverified_phone = models.CharField(max_length=16)
     secret_key = models.CharField(
         max_length=40,
         default=default_key,
@@ -133,9 +136,9 @@ class VerificationDevice(Device):
     )
     last_verified_counter = models.BigIntegerField(
         default=-1,
-        help_text="The counter value of the latest verified token.\
-         The next token must be at a higher counter value.\
-         It makes sure a token is used only once."
+        help_text=("The counter value of the latest verified token."
+                   "The next token must be at a higher counter value."
+                   "It makes sure a token is used only once.")
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -169,17 +172,12 @@ class VerificationDevice(Device):
         return token
 
     def verify_token(self, token):
-        try:
-            token = int(token)
-        except ValueError:
-            verified = False
+        totp = self.totp_obj()
+        if ((totp.t() > self.last_verified_counter) and
+                (totp.token() == token)):
+            self.last_verified_counter = totp.t()
+            verified = True
+            self.save()
         else:
-            totp = self.totp_obj()
-            if ((totp.t() > self.last_verified_counter) and
-                    (totp.token() == token)):
-                self.last_verified_counter = totp.t()
-                verified = True
-                self.save()
-            else:
-                verified = False
+            verified = False
         return verified

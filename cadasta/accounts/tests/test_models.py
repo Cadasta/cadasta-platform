@@ -43,7 +43,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         device = self.sherlock.verificationdevice_set.get()
         with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
-            verified = device.verify_token(token)
+            verified = device.verify_token(int(token))
 
         assert verified is True
 
@@ -55,7 +55,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
             token = device.generate_challenge()
         with mock.patch('time.time',
                         return_value=self._now + self.TOTP_TOKEN_VALIDITY - 1):
-            verified = device.verify_token(token)
+            verified = device.verify_token(int(token))
 
         assert verified is True
 
@@ -67,7 +67,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
             token = device.generate_challenge()
         with mock.patch('time.time',
                         return_value=self._now + self.TOTP_TOKEN_VALIDITY + 1):
-            verified = device.verify_token(token)
+            verified = device.verify_token(int(token))
 
         assert verified is False
 
@@ -78,7 +78,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         with mock.patch('time.time', return_value=self._now + 1):
             token = device.generate_challenge()
         with mock.patch('time.time', return_value=self._now - 1):
-            verified = device.verify_token(token)
+            verified = device.verify_token(int(token))
 
         assert verified is False
 
@@ -88,8 +88,8 @@ class VerificationDeviceTest(UserTestCase, TestCase):
 
         with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
-            verified_once = device.verify_token(token)
-            verified_twice = device.verify_token(token)
+            verified_once = device.verify_token(int(token))
+            verified_twice = device.verify_token(int(token))
 
         assert verified_once is True
         assert verified_twice is False
@@ -101,7 +101,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
 
         with mock.patch('time.time', return_value=self._now):
             token = device_sherlock.generate_challenge()
-            verified = device_john.verify_token(token)
+            verified = device_john.verify_token(int(token))
 
         assert verified is False
 
@@ -112,7 +112,7 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         with mock.patch('time.time', return_value=self._now):
             token = device.generate_challenge()
             verified_invalid_token = device.verify_token('ABCDEF')
-            verified_valid_token = device.verify_token(token)
+            verified_valid_token = device.verify_token(int(token))
 
         assert verified_invalid_token is False
         assert verified_valid_token is True

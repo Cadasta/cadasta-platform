@@ -38,7 +38,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         user_obj = User.objects.first()
         assert user_obj.check_password(BASIC_TEST_DATA['password'])
-        assert user_obj.is_active
+        assert not user_obj.is_active
         assert not user_obj.email_verified
 
     def test_case_insensitive_username(self):
@@ -237,7 +237,7 @@ class UserSerializerTest(UserTestCase, TestCase):
         assert User.objects.count() == 1
 
         user_obj = User.objects.first()
-        assert user_obj.is_active
+        assert not user_obj.is_active
         assert not user_obj.email_verified
 
     def test_update_username_fails(self):
@@ -327,7 +327,6 @@ class AccountLoginSerializerTest(UserTestCase, TestCase):
         UserFactory.create(username='sgt_pepper',
                            password='iloveyoko79',
                            email_verified=False)
-
         with pytest.raises(EmailNotVerifiedError):
             serializers.AccountLoginSerializer().validate(attrs={
                 'username': 'sgt_pepper',
