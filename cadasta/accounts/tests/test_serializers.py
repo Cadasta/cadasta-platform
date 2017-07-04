@@ -22,6 +22,7 @@ BASIC_TEST_DATA = {
     'password': 'iloveyoko79!',
     'full_name': 'John Lennon',
     'language': 'en',
+    'measurement': 'metric',
 }
 
 
@@ -34,7 +35,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
     def test_create_with_valid_data(self):
         serializer = serializers.RegistrationSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
 
         serializer.save()
         assert User.objects.count() == 1
@@ -58,7 +59,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         TEST_DATA = BASIC_TEST_DATA.copy()
         TEST_DATA['username'] = 'userFour'
         serializer = serializers.RegistrationSerializer(data=TEST_DATA)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is True
         serializer.save()
         assert User.objects.count() == 4
 
@@ -73,7 +74,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         }
 
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
 
     def test_sanitize(self):
         """Serialiser should be invalid when no email address is provided."""
@@ -105,7 +106,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         }
 
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert (_("Another user is already registered with this email address")
                 in serializer._errors['email'])
 
@@ -120,8 +121,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         }
 
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
-        assert (_("Username cannot be “add” or “new”.")
+        assert serializer.is_valid() is False
+        assert (_('Username cannot be “add” or “new”.')
                 in serializer._errors['username'])
 
     def test_password_contains_username(self):
@@ -133,7 +134,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert (_("The password is too similar to the username.") in
                 serializer._errors['password'])
 
@@ -146,7 +147,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert (_("The password is too similar to the username.") in
                 serializer._errors['password'])
 
@@ -159,7 +160,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert ('password' not in serializer._errors)
 
     def test_password_contains_email(self):
@@ -171,7 +172,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert (_("Passwords cannot contain your email.") in
                 serializer._errors['password'])
 
@@ -184,7 +185,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert ('password' not in serializer._errors)
 
     def test_password_contains_less_than_min_characters(self):
@@ -196,7 +197,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert (_("This password is too short."
                   " It must contain at least 10 characters.") in
                 serializer._errors['password'])
@@ -210,7 +211,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert not serializer.is_valid()
+        assert serializer.is_valid() is False
         assert (_("Passwords must contain at least 3"
                   " of the following 4 character types:\n"
                   "lowercase characters, uppercase characters,"
@@ -232,7 +233,8 @@ class UserSerializerTest(UserTestCase, TestCase):
             'password': 'iloveyoko79',
             'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00',
-            'language': 'en'
+            'language': 'en',
+            'measurement': 'metric',
         }
         serializer = serializers.UserSerializer(data=data)
         assert serializer.is_valid() is True
@@ -325,6 +327,24 @@ class UserSerializerTest(UserTestCase, TestCase):
         assert serializer2.is_valid() is False
         assert ('Language invalid or not available'
                 in serializer2.errors['language'])
+
+    def test_update_with_invalid_measurement_system(self):
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
+        assert serializer.is_valid() is True
+        user = serializer.save()
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'measurement': 'invalid',
+        }
+        request = APIRequestFactory().patch('/user/imagine71', data)
+        force_authenticate(request, user=user)
+        serializer2 = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)}
+        )
+        assert serializer2.is_valid() is False
+        assert ('Measurement system invalid or not available'
+                in serializer2.errors['measurement'])
 
     def test_sanitize(self):
         user = UserFactory.create(username='imagine71')

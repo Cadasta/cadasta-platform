@@ -44,6 +44,12 @@
     <div class="error-block">{{ form.language.errors }}</div>
   </div>
 
+  <div class="form-group{% if form.measurement.errors %} has-error{% endif %}">
+    <label class="control-label" for="{{ form.measurement.id_for_label }}">{% trans "Your preferred measurement system" %}</label>
+    {% render_field form.measurement class+="form-control input-lg" %}
+    <div class="error-block">{{ form.measurement.errors }}</div>
+  </div>
+
   <div class="well form-group {% if form.password.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
     <p class="help-block small">{% trans "Please enter your password to verify your identity." %}</p>

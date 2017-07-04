@@ -283,6 +283,12 @@ LANGUAGES = [
     ('pt', _('Portuguese'))
     # ('sw', _('Swahili')),   (hiding until translation coverage >= 75%)
 ]
+MEASUREMENT_DEFAULT = 'metric'
+
+MEASUREMENTS = [
+    ('metric', _('Metric')),
+    ('imperial', _('Imperial')),
+]
 
 USE_L10N = True
 

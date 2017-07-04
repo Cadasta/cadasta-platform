@@ -228,13 +228,16 @@ class ProfileFormTest(UserTestCase, TestCase):
                                   email='john@beatles.uk',
                                   email_verified=True,
                                   password='sgt-pepper',
-                                  language='en')
+                                  language='en',
+                                  measurement='metric')
+
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
-            'language': 'en'
+            'language': 'en',
+            'measurement': 'imperial'
         }
 
         request = HttpRequest()
@@ -251,6 +254,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert user.full_name == 'John Lennon'
         assert user.email == 'john@beatles.uk'
         assert user.language == 'en'
+        assert user.measurement == 'imperial'
         assert user.email_verified is True
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
@@ -259,7 +263,8 @@ class ProfileFormTest(UserTestCase, TestCase):
     def test_display_name(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
-                                  password='sgt-pepper')
+                                  password='sgt-pepper',
+                                  measurement='metric')
         assert user.get_display_name() == 'imagine71'
 
         data = {
@@ -267,7 +272,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
-            'language': 'en'
+            'language': 'en',
+            'measurement': 'metric'
         }
         form = forms.ProfileForm(data, instance=user)
         form.save()
@@ -312,13 +318,15 @@ class ProfileFormTest(UserTestCase, TestCase):
 
         user = UserFactory.create(username='JohNlEnNoN',
                                   email='john@beatles.uk',
-                                  password='sgt-pepper')
+                                  password='sgt-pepper',
+                                  measurement='metric')
         data = {
             'username': 'johnLennon',
             'email': 'john@beatles.uk',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
-            'language': 'en'
+            'language': 'en',
+            'measurement': 'metric'
         }
         form = forms.ProfileForm(data, instance=user)
         assert form.is_valid() is True
@@ -360,7 +368,8 @@ class ProfileFormTest(UserTestCase, TestCase):
         user = UserFactory.create(username='user1',
                                   email='user1@example.com',
                                   email_verified=True,
-                                  password='sgt-pepper')
+                                  password='sgt-pepper',
+                                  measurement='metric')
 
         EmailAddress.objects.create(user=user, email=user.email,
                                     verified=True)
@@ -368,7 +377,8 @@ class ProfileFormTest(UserTestCase, TestCase):
             'username': 'user1',
             'email': 'user1_email_change@example.com',
             'password': 'sgt-pepper',
-            'language': 'en'
+            'language': 'en',
+            'measurement': 'metric'
         }
 
         request = HttpRequest()
@@ -421,6 +431,23 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert user.language == 'en'
         assert ('Language invalid or not available'
                 in form.errors.get('language'))
+
+    def test_update_user_with_invalid_measurement(self):
+        user = UserFactory.create(email='john@beatles.uk',
+                                  password='imagine71',
+                                  measurement='metric')
+        data = {
+            'username': 'imagine71',
+            'email': 'john2@beatles.uk',
+            'full_name': 'John Lennon',
+            'password': 'stg-pepper',
+            'measurement': 'invalid'
+        }
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+        assert user.measurement == 'metric'
+        assert ('Measurement system invalid or not available'
+                in form.errors['measurement'])
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
