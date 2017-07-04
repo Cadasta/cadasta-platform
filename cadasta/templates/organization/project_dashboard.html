@@ -19,6 +19,11 @@
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script>
+
+  $(function () {
+    $('[data-toggle="tooltip"]').tooltip({container: 'body'});
+  });
+
   function project_map_init(map, options) {
     var trans = {
       open: "{% trans 'Open location' %}"
@@ -28,6 +33,12 @@
 
     switch_layer_controls(map, options);
 
+    {% if is_project_member or is_superuser %}
+      var projectUser = true;
+    {% else %}
+      var projectUser = false;
+    {% endif %}
+
     {% if project.extent %}
     var projectExtent = {{ project.extent.geojson|safe }};
     {% else %}
@@ -36,7 +47,7 @@
 
     renderFeatures(map,
                    '{% url "async:spatial:list" project.organization.slug project.slug %}',
-                   {projectExtent: projectExtent, trans: trans, fitBounds: 'project'});
+                   {projectExtent: projectExtent, trans: trans, fitBounds: 'project', projectUser: projectUser});
 
     var orgSlug = '{{ project.organization.slug }}';
     var projectSlug = '{{ project.slug }}';
@@ -47,88 +58,19 @@
 </script>
 {% endblock %}
 
-{% block page_title %}{% trans "Overview" %} | {% endblock %}
-{% block body-class %} map{% endblock %}
-{% block left-nav %}overview{% endblock %}
+{% block page_title %}{% if is_project_member %}{% trans "Dashboard" %}{% else %}{% trans "Overview" %} | {% endif %}{% endblock %}
+{% block body-class %} dashboard{% endblock %}
+{% block left-nav %}dashboard{% endblock %}
 
 {% block content %}
 
 <div class="col-md-12 content-single">
   <div class="row">
-    <!-- Start overview map  -->
-    <div class="col-md-8 map">
-      {% leaflet_map "project-map" callback="project_map_init" %}
-    </div>
-    <!-- / end overview map -->
-    <!-- Overview detail  -->
-    <div class="col-md-4 detail">
-      <section>
-        <h2>{% trans "Project Overview" %}</h2>
-        <p>{{ object.description }}</p>
-        {% if object.urls.0 %}
-          <p><a href="{{ object.urls.0 }}" target="_blank"><span class="glyphicon glyphicon-globe"></span>{{ object.urls.0 }}</a></p>
-        {% endif %}
-        {% if object.contacts %}
-          <h4>{% trans "Contact information" %}</h4>
-          <dl class="contacts">
-          {% for contact in object.contacts %}
-            <dt>{{ contact.name }}</dt>
-            <dd class="clearfix">
-              {% if contact.email %}<a href="mailto:{{ contact.email }}"><span class="glyphicon glyphicon-envelope"></span>{{ contact.email }}</a>{% endif %}
-              {% if contact.tel %} <a href="tel:{{ contact.tel }}"><span class="glyphicon glyphicon-earphone"></span>{{ contact.tel }}</a>{% endif %}
-            </dd>
-          {% endfor %}
-          </dl>
-        {% endif %}
-        <div class="divider-thick"></div>
-          {% if user.is_authenticated %}
-            {% if has_content or not is_allowed_add_location %}
-            <h4>{% trans "Project stats" %}</h4>
-            <ul class="list-inline stats">
-              <li>
-                {% blocktrans count counter=num_locations %}
-                <div class="num">{{ counter }}</div> location
-                {% plural %}
-                <div class="num">{{ counter }}</div> locations
-                {% endblocktrans %}
-              </li>
-              <li>
-                {% blocktrans count counter=num_parties %}
-                <div class="num">{{ counter }}</div> party
-                {% plural %}
-                <div class="num">{{ counter }}</div> parties
-                {% endblocktrans %}
-              </li>
-              <li>
-                {% blocktrans count counter=num_resources %}
-                <div class="num">{{ counter }}</div> resource
-                {% plural %}
-                <div class="num">{{ counter }}</div> resources
-                {% endblocktrans %}
-              </li>
-            </ul>
-          {% else %}
-            <!-- Starter text -->
-            <h3 style="text-transform: capitalize;">{% trans "Congratulations!" %}</h3>
-            <p>{% trans "You have successfully created your project.  You're now ready to add your first location." %}</p>
-          {% endif %}
-          {% if is_allowed_add_location %}
-          <div class="btn-full">
-            <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add a location" %}
-            </a>
-          </div>
-          {% endif %}
-        {% else %}
-          <div class="alert alert-info alert-full clearfix row" role="alert">
-            <div class="text-center">
-              <a href="{% url 'account_login' %}?next={{ request.path }}">{% trans "Sign in" %}</a> {% trans "to view project details" %}
-            </div>
-          </div>
-        {% endif %}
-      </section>
-    </div>
-    <!-- / overview detail -->
+    {% if is_project_member %}
+      {% include 'organization/project_dashboard_member.html' %}
+    {% else %}
+      {% include 'organization/project_dashboard_nonmember.html' %}
+    {% endif %}
   </div>
 </div>
 

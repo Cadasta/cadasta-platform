@@ -7,22 +7,20 @@
 
 {% block title %} | {% block page_title %}{% endblock %} {{ object.name }}{% endblock %}
 
-{% block main-width %}{% if is_project_member %} show-sidebar{% endif %}{% endblock %}
+{% block main-width %}-fluid{% if is_project_member %} show-sidebar{% endif %}{% endblock %}
 
 {% block page-header %}
-
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
     <h1 class="{% if is_administrator or is_allowed_add_location or is_allowed_add_resource %}short{% endif %}">
-      <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">
-        {{ object.organization.name }}
-      </a>
+      <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">{{ object.organization.name }}</a>
       {{ object.name }}
+      {% if object.access == "private" %}
+        <span class="label label-info">{% trans "Private" %}</span>
+      {% endif %}
       {% if object.archived %}
-      <span class="label label-danger">
-        {% trans "Archived" %}
-      </span>
+        <span class="label label-danger">{% trans "Archived" %}</span>
       {% endif %}
     </h1>
     <div class="top-btn">
@@ -41,57 +39,53 @@
 
       <!-- More actions menu -->
       {% if is_administrator %}
-      <div class="dropdown pull-right btn-add">
-        <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
-          <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-        </a>
-        <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
-          <div class="visible-lg-block">{% trans "More actions" %} <span class="caret"></span></div>
-          <div class="visible-sm-inline visible-md-inline ">{% trans "More" %} <span class="caret"></span></div>   
-        </button>
-        <ul class="dropdown-menu" aria-labelledby="dLabel">
-          <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
-          <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
-          <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
-          <li role="separator" class="divider"></li>
-          <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
-          <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Download data" %}</a></li>
-          <li role="separator" class="divider"></li>
-          <li>
-            {% if object.archived %}
-            <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive project" %}</a>
-            {% else %}
-            <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive project" %}</a>
-            {% endif %}
-          </li>
-        </ul>
-      </div>
+        <div class="dropdown pull-right btn-add">
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dLabel">
+            <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
+            <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
+            <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
+            <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Export data" %}</a></li>
+            <li role="separator" class="divider"></li>
+            <li>
+              {% if object.archived %}
+              <a class="archive" href="#unarchive_confirm" data-toggle="modal">{% trans "Unarchive project" %}</a>
+              {% else %}
+              <a class="archive" href="#archive_confirm" data-toggle="modal">{% trans "Archive project" %}</a>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
       {% endif %}
 
       <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
         {% if is_allowed_add_location %}
-        <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
-        </a>
+          <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
+          </a>
         {% endif %}
         {% if is_allowed_add_resource or is_allowed_import %}
-        <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="caret"></span>
-          <span class="sr-only">{%trans "Toggle add" %}</span>
-        </button>
-        <ul class="dropdown-menu">
-          {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
-          {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
-          {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
-        </ul>
+          <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">{% trans "Toggle add" %}</span>
+          </button>
+          <ul class="dropdown-menu">
+            {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
+            {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
+            {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
+          </ul>
         {% endif %}
       </div>
 
       <!-- Single add button for smaller screens-->
       <div class="dropdown pull-right visible-xs-inline">
         {% if is_allowed_add_location or is_allowed_add_resource %}
-        <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button" aria-label="{% trans 'Add location' %}">
+        <a data-target="#" data-toggle="dropdown" class="btn btn-primary btn-add dropdown-toggle" role="button" aria-label="{% trans 'Add location' %}">
           <span class="glyphicon glyphicon-plus"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
@@ -106,7 +100,7 @@
           <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
         </ul>
         {% endif %}
-      </div>      
+      </div>
 
     </div>
   </div>
@@ -120,7 +114,6 @@
 {% endblock %}
 
 {% block sub-nav %}
-
 {% if is_project_member %}
 <!-- Sidebar -->
 <div id="sidebar" class="{% block left-nav %}{% endblock %}">
@@ -131,16 +124,16 @@
         <span class="title">{% trans "Search" %}</span>
       </a>
     </li><!-- needed to eliminate spacing issue on horizontal menus
-    --><li class="overview">
+    --><li class="dashboard">
       <a href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">
         <span class="icon"></span>
-        <span class="title">{% trans "Overview" %}</span>
+        <span class="title">{% trans "Dashboard" %}</span>
       </a>
     </li><!--
     --><li class="map">
       <a href="{% url 'locations:list' object.organization.slug object.slug %}">
         <span class="icon map"></span>
-        <span class="title">{% trans "Map" %}</span>
+        <span class="title">{% trans "Data" %}</span>
       </a>
     </li><!--
     --><li class="parties">
@@ -171,8 +164,8 @@
 <script>
 'use strict';
 window.addEventListener('load', function() {
-  $( '.search').find('.search').click( function(){ 
-	 $('.content-single').animate({ scrollTop: 0 }, 'fast');
+  $( '.search').find('.search').click( function(){
+   $('.content-single').animate({ scrollTop: 0 }, 'fast');
   });
   $('#sidebar .nav-sidebar .search a').bind('click', function(e) {
     if (!$('#sidebar').hasClass('search')) {
@@ -182,7 +175,7 @@ window.addEventListener('load', function() {
       } else {
         $('#sidebar-search-box').addClass('disabled');
       }
-    } 
+    }
   });
   $('#sidebar-search-box form').bind('submit', function(e) {
     var query = $('#sidebar-search-box input')[0].value;
@@ -194,14 +187,13 @@ window.addEventListener('load', function() {
 </script>
 <!-- /.sidebar search box -->
 {% endif %}
-
 {% endblock %}
 
 {% block content %}{% endblock %}
 
 {% block modals %}
+{% if is_project_member %}
 {% block form_modal %}{% endblock %}
-
 <div class="modal fade" id="archive_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -251,5 +243,5 @@ window.addEventListener('load', function() {
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
+{% endif %}
 {% endblock %}

@@ -6,6 +6,10 @@
   z-index: 1;
 }
 
+.dashboard .leaflet-container-default { // for project overview and dashboard
+  min-height: 400px;
+}
+
 .leaflet-popup-content-wrapper {
   border-radius: 4px !important;
   padding-bottom: 0 !important;
@@ -24,9 +28,9 @@
     }
   }
   .btn-wrap { // button
-  background: $body-bg;
-  border-top: 1px solid $gray-light;
-  padding: 4px 4px 5px;
+    background: $body-bg;
+    border-top: 1px solid $gray-light;
+    padding: 4px 4px 5px;
   }
 }
 
@@ -82,7 +86,7 @@
     font-size: 9px !important;
   }
   .leaflet-container-default {
-    min-block-size: auto !important;
+    min-block-size: 300px !important;
   }
 }
 

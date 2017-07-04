@@ -16,15 +16,17 @@
 <!-- Page header -->
 <div class="header page-header">
   <div class="container">
-    <div class="page-title">
-      <h1>{% trans "Projects" %}</h1>
-      {% if add_allowed %}
-      <div class="top-btn pull-right">
-        <a href="{% url 'project:add' %}" class="btn btn-primary">
-          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span class="hidden-xs"> {% trans "Add" %}</span>
-        </a>
+    <div class="row">
+      <div class="col-md-12 page-title">
+        <h1>{% trans "Projects" %}</h1>
+        {% if add_allowed %}
+        <div class="top-btn pull-right">
+          <a href="{% url 'project:add' %}" class="btn btn-primary">
+            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span class="hidden-xs"> {% trans "Add" %}</span>
+          </a>
+        </div>
+        {% endif %}
       </div>
-      {% endif %}
     </div>
   </div>
 </div>
@@ -33,46 +35,49 @@
 {% endblock %}
 
 {% block content %}
-
-<!-- Project index table -->
-<table class="table table-hover datatable" data-paging-type="simple">
-  <thead>
-    <tr>
-      <th class="col-md-6">{% trans "Project" %}</th>
-      <th class="col-md-2 hidden-xs">{% trans "Organization" %}</th>
-      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Country" %}</th>
-      <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
-      <th class="hidden"><!-- Hidden archived status column --></th>
-    </tr>
-  </thead>
-  {% for proj in object_list %}
-  <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}';">
-    <td>
-      <h4>
-          <a href="{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}">{{ proj.name }}</a>
-          {% if proj.archived %}
-          <span class="label label-danger">{% trans "Archived" %}</span>
-          {% endif %}
+<div class="col-md-12">
+  <!-- Project index table -->
+  <table class="table table-hover datatable" data-paging-type="simple">
+    <thead>
+      <tr>
+        <th class="col-md-6">{% trans "Project" %}</th>
+        <th class="col-md-2 hidden-xs">{% trans "Organization" %}</th>
+        <th class="col-md-2 hidden-xs hidden-sm">{% trans "Country" %}</th>
+        <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
+        <th class="hidden"><!-- Hidden archived status column --></th>
+      </tr>
+    </thead>
+    {% for proj in object_list %}
+    <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}';">
+      <td>
+        <h4>
+            <a href="{% url 'organization:project-dashboard' organization=proj.organization.slug project=proj.slug %}">{{ proj.name }}</a>
+            {% if proj.access == "private" %}
+              <span class="label label-info">{% trans "Private" %}</span>
+            {% endif %}
+            {% if proj.archived %}
+              <span class="label label-danger">{% trans "Archived" %}</span>
+            {% endif %}
+          </h4>
         </h4>
-      </h4>
-      <p>{{ proj.description }}</p>
-      <p class="visible-xs-block">{% trans "Organization:" %} {{ proj.organization.name }}</p>
-    </td>
-    <td class="hidden-xs">
-      {% if proj.organization.logo %}
-        <div class="org-logo">
-          <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
-          <img src="{{ proj.organization.logo }}" class="org-logo" alt="{{ proj.organization.name }}"/>
-        </div>
-      {% else %}
-        <p class="org-name-alt">{{ proj.organization.name }}</p>
-      {% endif %}
-    </td>
-    <td class="hidden-xs hidden-sm">{{ proj.country.name }}</td>
-    <td class="hidden-xs hidden-sm" data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
-    <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
-  </tr>
-  {% endfor %}
-</table>
-
+        <p>{{ proj.description }}</p>
+        <p class="visible-xs-block">{% trans "Organization:" %} {{ proj.organization.name }}</p>
+      </td>
+      <td class="hidden-xs">
+        {% if proj.organization.logo %}
+          <div class="org-logo">
+            <span class="hidden">{{ proj.organization.name }}</span><!-- needed for sorting -->
+            <img src="{{ proj.organization.logo }}" class="org-logo" alt="{{ proj.organization.name }}"/>
+          </div>
+        {% else %}
+          <p class="org-name-alt">{{ proj.organization.name }}</p>
+        {% endif %}
+      </td>
+      <td class="hidden-xs hidden-sm">{{ proj.country.name }}</td>
+      <td class="hidden-xs hidden-sm" data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+      <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
 {% endblock %}

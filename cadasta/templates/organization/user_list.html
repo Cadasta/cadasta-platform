@@ -11,8 +11,10 @@
 <!-- Page header -->
 <div class="header page-header">
   <div class="container">
-    <div class="page-title">
-      <h1>{% trans "Users" %}</h1>
+    <div class="row">
+      <div class="col-md-12 page-title">
+        <h1>{% trans "Users" %}</h1>
+      </div>
     </div>
   </div>
 </div>
@@ -21,43 +23,43 @@
 {% endblock %}
 
 {% block content %}
-
-<!-- Organization index table -->
-<table class="table table-hover datatable" data-paging-type="simple">
-  <thead>
-    <tr>
-      <th class="col-md-2">
-        {% trans "Member" %}
-      </th>
-      <th class="col-md-3">
-        {% trans "Email" %}
-      </th>
-      <th class="col-md-4" data-orderable="false">
-        {% trans "Organizations" %}
-      </th>
-      <th class="col-md-2">
-        {% trans "Last login" %}
-      </th>
-      <th class="col-md-1" data-orderable="false"> </th>
+<div class="col-md-12">
+  <!-- Organization index table -->
+  <table class="table table-hover datatable" data-paging-type="simple">
+    <thead>
+      <tr>
+        <th class="col-md-2">
+          {% trans "Member" %}
+        </th>
+        <th class="col-md-3">
+          {% trans "Email" %}
+        </th>
+        <th class="col-md-4" data-orderable="false">
+          {% trans "Organizations" %}
+        </th>
+        <th class="col-md-2">
+          {% trans "Last login" %}
+        </th>
+        <th class="col-md-1" data-orderable="false"> </th>
+      </tr>
+    </thead>
+    {% for user in object_list %}
+    <tr class="{{ user.is_active|yesno:_("disabled,active") }}">
+      <td><p>{{ user.username }}</p><p>{{ user.full_name }}</p></td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.org_names|safe }}</td>
+      <td>{{ user.last_login|default_if_none:"&mdash;" }}</td>
+      <td>
+        <form method="POST"
+              action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm {{ user.is_active|yesno:_("btn-danger,btn-default") }}">
+            {{ user.is_active|yesno:_("Deactivate,Activate") }}
+          </button>
+        </form>
+      </td>
     </tr>
-  </thead>
-  {% for user in object_list %}
-  <tr class="{{ user.is_active|yesno:_("disabled,active") }}">
-    <td><p>{{ user.username }}</p><p>{{ user.full_name }}</p></td>
-    <td>{{ user.email }}</td>
-    <td>{{ user.org_names|safe }}</td>
-    <td>{{ user.last_login|default_if_none:"&mdash;" }}</td>
-    <td>
-      <form method="POST"
-            action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-sm {{ user.is_active|yesno:_("btn-danger,btn-default") }}">
-          {{ user.is_active|yesno:_("Deactivate,Activate") }}
-        </button>
-      </form>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
-
+    {% endfor %}
+  </table>
+</div>
 {% endblock %}

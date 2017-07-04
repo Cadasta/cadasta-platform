@@ -1,0 +1,136 @@
+{% load i18n %}
+
+      {% if not projects and not organization.description and not organization.urls.0 and not organization.contacts%}
+        <!-- Empty state  -->
+        <div class="main-text">
+          <div class="col-md-6 col-md-offset-3">
+            <div class="overlay-wrapper">
+              <div class="overlay no-bg">
+                <span class="glyphicon glyphicon-remove-circle large"></span>
+                <p class="text-center">{% trans "Looks like this organization has nothing to show yet. As details and projects are created, they'll appear here." %}</p>
+                <div class="btn-full">
+                  <a class="btn btn-primary" href="{% url 'organization:list' %}" role="button">
+                    {% trans "View all organizations" %}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <!-- Organization overview for non-members  -->
+        <div class="main-text">
+          <div class="col-md-8">
+            <h2>{% trans "Organization Overview" %}</h2>           
+            <!-- Project list  -->
+            <section>
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title inline">{% trans "Projects" %}</h3>
+                </div>
+                <div class="panel-body">
+                  {% if projects %}
+                    <table class="table table-hover datatable" data-paging-type="simple">
+                      <thead>
+                        <tr>
+                          <th class="col-md-6">{% trans "Project" %}</th>
+                          <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
+                          <th class="col-md-2">{% trans "Last updated" %}</th>
+                          <th class="hidden"><!-- Hidden archived status column --></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for proj in projects %}
+                        <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}';">
+                          <td>
+                            <h4>
+                              <a href="{% url 'organization:project-dashboard' organization=organization.slug project=proj.slug %}">{{ proj.name }}</a>
+                              {% if proj.access == "private" %}
+                                <span class="label label-info">{% trans "Private" %}</span>
+                              {% endif %}
+                              {% if proj.archived %}
+                                <span class="label label-danger">{% trans "Archived" %}</span>
+                              {% endif %}
+                            </h4>
+                            <p>{{ proj.description }}</p>
+                          </td>   
+                          <td class="hidden-xs">{{ proj.country }}</td>
+                          <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+                          <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
+                        </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  {% else %}
+                    <!-- No public projects -->
+                    <div class="overlay-wrapper">
+                      <div class="overlay">
+                        <span class="glyphicon glyphicon-remove-circle large"></span>
+                        <p class="text-center">{% trans "Looks like this organization has no public projects. As public projects are created, they'll appear here." %}</p>
+                        <div class="btn-full">
+                          <a class="btn btn-primary" href="{% url 'organization:list' %}" role="button">
+                            {% trans "View all organizations" %}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-md-4">
+            <!-- Organization about -->
+            <section>
+              <div class="panel panel-default panel-about">
+                {% if organization.logo %}
+                  <div class="panel-topimage text-center">
+                    <div class="org-logo"><img src="{{ organization.logo }}" alt="{{ organization.name }}" /></div>
+                  </div>
+                {% endif %}
+                <div class="panel-heading">
+                  <h3 class="panel-title inline">{% trans "About this org" %}</h3>
+                </div>
+                <div class="panel-body">
+                  {% if not organization.description and not organization.urls.0 and not organization.contacts %}
+                    <!-- No project description -->
+                    <div class="overlay-wrapper">
+                      <div class="overlay">
+                        <p class="text-center">{% trans "Looks like this organization doesn't have a description yet." %}</p>
+                      </div>
+                    </div>
+                  {% else %}
+                    <p>{{ organization.description }}</p>
+                    {% if organization.urls.0 %}
+                      <p><a href="{{ organization.urls.0 }}" target="_blank" class="break"><i class="glyphicon glyphicon-globe"></i> {{ organization.urls.0 }}</a></p>
+                    {% endif %}
+                    {% if organization.contacts %}
+                      <h4 class="panel-subtitle">{% trans "Contacts" %}</h4>
+                      <dl class="contacts">
+                      {% for contact in organization.contacts %}
+                        <dt>{{ contact.name }}</dt>
+                        <dd class="clearfix">
+                          {% if contact.email %}
+                          <a href="mailto:{{ contact.email }}" class="break">
+                            <i class="glyphicon glyphicon-envelope"></i> 
+                           {{ contact.email }}
+                          </a>
+                          {% endif %}
+                          {% if contact.tel %}
+                          <a href="tel:{{ contact.tel }}">
+                            <span class="glyphicon glyphicon-earphone"></span>
+                            {{ contact.tel }}
+                          </a>
+                          {% endif %}
+                        </dd>
+                      {% endfor %}
+                      </dl>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      {% endif %}

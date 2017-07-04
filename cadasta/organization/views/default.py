@@ -17,6 +17,7 @@ from django.db import transaction
 from django.db.models import Sum, When, Case, IntegerField
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.translation import ugettext as _
 from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.models import Questionnaire
 from resources.models import ContentObject, Resource
@@ -25,6 +26,7 @@ from party.choices import TENURE_RELATIONSHIP_TYPES
 from spatial.choices import TYPE_CHOICES
 
 from . import mixins
+from ..choices import ROLE_CHOICES
 from .. import messages as error_messages
 from .. import forms
 from ..importers.exceptions import DataImportError
@@ -406,6 +408,20 @@ class ProjectDashboard(PermissionRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        role_labels = dict(ROLE_CHOICES)
+        org_admins = self.object.organization.users.filter(
+            organizationrole__admin=True).values('id', 'username')
+        org_roles = {
+            user['username']: _("Administrator") for user in org_admins}
+        org_admin_ids = [user['id'] for user in org_admins]
+        prj_members = self.object.users.exclude(
+            id__in=org_admin_ids).values('username', 'projectrole__role')
+        prj_roles = {
+            user['username']: role_labels.get(user['projectrole__role'])
+            for user in prj_members}
+        m = {**org_roles, **prj_roles}
+        members = OrderedDict(sorted(m.items(), key=lambda t: t[0]))
+
         num_locations = self.object.spatial_units.count()
         num_parties = self.object.parties.count()
         num_resources = self.object.resource_set.filter(archived=False).count()
@@ -414,6 +430,12 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_locations'] = num_locations
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
+        context['members'] = members
+        try:
+            context['questionnaire'] = Questionnaire.objects.get(
+                id=self.object.current_questionnaire)
+        except Questionnaire.DoesNotExist:
+            pass
 
         return context
 

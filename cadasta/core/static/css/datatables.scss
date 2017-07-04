@@ -17,6 +17,7 @@ table.dataTable{clear:both;margin-top:6px !important;margin-bottom:6px !importan
 -------------------------------------------------------------- */
 
 .dataTables_wrapper {
+  @include clearfix;
   div.dataTables_info {
     padding-top: 10px !important;
   }
@@ -68,6 +69,18 @@ table.dataTable{clear:both;margin-top:6px !important;margin-bottom:6px !importan
       background-color: $gray-light;
       border-color: #ddd;
     }
+  }
+}
+
+.panel > .dataTables_wrapper {
+  .table-search { // for tables within a panel on dashboard
+    padding: 15px 15px 0 15px;
+  }
+  .table-entries {
+    padding-left: 15px;
+  }
+  .table-pagination {
+    padding-right: 15px;
   }
 }
 

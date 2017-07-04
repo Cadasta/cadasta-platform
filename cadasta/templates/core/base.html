@@ -25,7 +25,7 @@
     <div id="cadasta">
       <!-- Site header -->
       <header class="header" role="banner">
-        <div class="container">
+        <div class="container-fluid">
           <div id="logo" class="pull-left">
             <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>
           </div>
@@ -113,7 +113,7 @@
       <!-- Page content -->
       <div id="page-content">
         {% block sub-nav %}{% endblock %}
-        <main class="container-fluid{% block main-width %}{% endblock %}" role="main">
+        <main class="container{% block main-width %}{% endblock %}" role="main">
           <div id="messages">
             {% for message in messages %}
             <div class="alert alert-dismissible{% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
@@ -127,7 +127,9 @@
               {% trans "Loading locations..." %}
             </div>
           </div>
+          <div class="row">
           {% block content %}{% endblock %}
+          </div>
         </main>
       </div>
       <!-- /.page-content -->

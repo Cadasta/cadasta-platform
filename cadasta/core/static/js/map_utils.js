@@ -100,7 +100,7 @@ function renderFeatures(map, featuresUrl, options) {
   var geoJson = L.geoJson(null, {
     style: { weight: 2 },
     onEachFeature: function(feature, layer) {
-      if (options.trans) {
+      if (options.trans && options.projectUser) {
         layer.bindPopup("<div class=\"text-wrap\">" +
                       "<h2><span class=\"entity\">Location</span>" +
                       feature.properties.type + "</h2></div>" +

@@ -25,7 +25,7 @@ PROJ_USERS_EDIT = _("You don't have permission to edit roles of this "
                     "project")
 PROJ_USERS_REMOVE = _("You don't have permission to remove members from this "
                       "project")
-PROJ_DOWNLOAD = _("You don't have permission to download data from this "
+PROJ_DOWNLOAD = _("You don't have permission to export data from this "
                   "project")
 PROJ_IMPORT = _("You don't have permission to import data to this "
                 "project")
