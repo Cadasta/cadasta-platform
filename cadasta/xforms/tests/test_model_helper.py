@@ -76,7 +76,7 @@ class XFormModelHelperTest(TestCase):
                 attr_type=attr_type, index=1,
                 required=False, omit=False
             )
-
+        self.sanitizeable_questions = ['party_name', 'fname_two']
         OrganizationRole.objects.create(
             user=self.user, organization=self.project.organization)
 
@@ -117,7 +117,7 @@ class XFormModelHelperTest(TestCase):
         }
 
         with pytest.raises(InvalidXMLSubmission) as e:
-            mh.sanitize_submission(mh(), data)
+            mh.sanitize_submission(mh(), data, self.sanitizeable_questions)
         assert str(e.value) == SANITIZE_ERROR
 
     def test_sanitize_submission_with_error_in_group(self):
@@ -157,8 +157,51 @@ class XFormModelHelperTest(TestCase):
         }
 
         with pytest.raises(InvalidXMLSubmission) as e:
-            mh.sanitize_submission(mh(), data)
+            mh.sanitize_submission(mh(), data, self.sanitizeable_questions)
         assert str(e.value) == SANITIZE_ERROR
+
+    def test_sanitize_submission_with_negative_longitude(self):
+        geoshape = ('-45.56342779158167 -122.67650283873081 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
+                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
+                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
+                    '45.56176327330353 -122.67669159919024 0.0 0.0')
+        data = {
+            'id': 'a1',
+            'meta': {
+                'instanceID': 'uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad'
+            },
+            'version': str(self.questionnaire.version),
+            'party_name': 'Party One',
+            'party_type': 'IN',
+            'party_attributes_individual': {
+                'fname': False,
+                'fname_two': 'socks',
+            },
+            'party_photo': 'sad_birthday.png',
+            'party_resource_invite': 'invitation.pdf',
+            'location_type': 'BU',
+            'location_geometry': geoshape,
+            'location_attributes': {
+                'fname': False,
+                'fname_two': 'Location One',
+            },
+            'location_photo': 'resource_one.png',
+            'location_resource_invite': 'resource_two.pdf',
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure One'
+            },
+            'tenure_resource_photo': 'resource_three.png'
+        }
+
+        try:
+            mh.sanitize_submission(mh(), data, self.sanitizeable_questions)
+        except InvalidXMLSubmission:
+            assert False, "InvalidXMLSubmission raised unexpectedly"
+        else:
+            assert True
 
     def test_create_models(self):
         geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
@@ -1062,3 +1105,131 @@ class XFormModelHelperTest(TestCase):
             mh._check_perm(mh, self.user, self.project)
         except PermissionDenied:
             self.fail("PermissionDenied raised unexpectedly")
+
+    def test_get_sanitizable_questions(self):
+        QuestionFactory.create(
+            name='text',
+            type='TX',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='note',
+            type='NO',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='integer',
+            type='IN',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='select_one',
+            type='S1',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='select_multiple',
+            type='SM',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='geopoint',
+            type='GP',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='geotrace',
+            type='GT',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='geoshape',
+            type='GS',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='date',
+            type='DA',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='time',
+            type='TI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='datetime',
+            type='DT',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='calculate',
+            type='CA',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='acknowledge',
+            type='AC',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='photo',
+            type='PH',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='audio',
+            type='AU',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='video',
+            type='VI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='barcode',
+            type='BC',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='start',
+            type='ST',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='end',
+            type='EN',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='today',
+            type='TD',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='deviceid',
+            type='DI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='subscriber_id',
+            type='SI',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='simserial',
+            type='SS',
+            questionnaire=self.questionnaire)
+        QuestionFactory.create(
+            name='phonenumber',
+            type='PN',
+            questionnaire=self.questionnaire)
+
+        sanitizeable_questions = mh.get_sanitizable_questions(
+            mh(),
+            self.questionnaire.id_string,
+            self.questionnaire.version)
+        assert len(sanitizeable_questions) == 2
+        assert 'text' in sanitizeable_questions
+        assert 'note' in sanitizeable_questions
+        assert 'integer' not in sanitizeable_questions
+        assert 'select_one' not in sanitizeable_questions
+        assert 'select_multiple' not in sanitizeable_questions
+        assert 'geopoint' not in sanitizeable_questions
+        assert 'geotrace' not in sanitizeable_questions
+        assert 'geoshape' not in sanitizeable_questions
+        assert 'date' not in sanitizeable_questions
+        assert 'time' not in sanitizeable_questions
+        assert 'datetime' not in sanitizeable_questions
+        assert 'calculate' not in sanitizeable_questions
+        assert 'acknowledge' not in sanitizeable_questions
+        assert 'photo' not in sanitizeable_questions
+        assert 'audio' not in sanitizeable_questions
+        assert 'video' not in sanitizeable_questions
+        assert 'barcode' not in sanitizeable_questions
+        assert 'start' not in sanitizeable_questions
+        assert 'end' not in sanitizeable_questions
+        assert 'today' not in sanitizeable_questions
+        assert 'deviceid' not in sanitizeable_questions
+        assert 'subscriber_id' not in sanitizeable_questions
+        assert 'simserial' not in sanitizeable_questions
+        assert 'phonenumber' not in sanitizeable_questions

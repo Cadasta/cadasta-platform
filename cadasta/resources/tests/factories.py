@@ -30,8 +30,9 @@ class ResourceFactory(ExtendedFactory):
 
         if not resource.file.url:
             storage = FakeS3Storage()
-            file = open(path + '/resources/tests/files/image.jpg', 'rb').read()
-            file_name = storage.save('resources/image.jpg', file)
+            file = open(path + '/resources/tests/files/image.jpg', 'rb')
+            file_name = storage.save('resources/image.jpg', file.read())
+            file.close()
 
             resource.file = file_name
             if create:
