@@ -59,7 +59,6 @@ class BackgroundTask(RandomIDModel):
     options = JSONField(
         _('Task scheduling options'), default=dict, blank=True,
         validators=[utils.is_type(dict)])
-    log = ArrayField(models.TextField(), default=list, blank=True)
 
     related_content_type = models.ForeignKey(
         ContentType, on_delete=models.CASCADE, null=True, blank=True)
