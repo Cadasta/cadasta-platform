@@ -49,7 +49,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     avatar = S3FileField(upload_to='avatars',
                          blank=True,
                          accepted_types=['image/png', 'image/jpeg'],
-                         default='/static/img/avatar.png')
+                         default='/static/img/avatar.jpg')
 
     objects = UserManager()
 
