@@ -1110,3 +1110,20 @@ h1 .label {
 .image-editor > input {
   display: block;
 }
+
+.slider-wrapper.slider-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 10px 0 20px 0;
+}
+
+.slider-wrapper > #zoom-range#zoom-range {
+    display: inline-block;
+    width: 200px;
+    margin: 0 10px;
+}
+.slider-wrapper .large.large {
+    font-size: 25px;
+}

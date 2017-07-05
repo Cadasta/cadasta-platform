@@ -9,6 +9,7 @@
 
 {% block extra_script %}
   {{ form.media }}
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cropit/0.5.1/jquery.cropit.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -25,13 +26,19 @@
     <div class="image-editor well file-well">
       <div class="cropit-preview-wrapper">
         <div class="cropit-preview">
-          <img src={{user.avatar.url}}/>
+          <img src={{user.avatar.url}} id="user-avatar"/>
         </div>
       </div>
-      <input type="range" class="cropit-image-zoom-input" name="zoom">
-      <input type="file" class="cropit-image-input" name="new-image">
+
+      <div class="slider-wrapper hidden" id="zoom">
+        <span class="glyphicon glyphicon-picture"></span>
+        <input type="range" class="cropit-image-zoom-input" id="zoom-range">
+        <span class="glyphicon glyphicon-picture large"></span>
+      </div>
+
+      <input type="file" class="cropit-image-input" name="new-image" accept=".jpg,.gif,.png">
       <input type="hidden" name="base64" class="hidden-image-data" />
-      <p class="help-block">{% trans "Accepted file types: jpg, png" %}</p>
+      <p class="help-block">{% trans "Accepted file types: jpg, png, gif, svg" %}</p>
     </div>
     <div class="error-block">{{ form.avatar.errors }}</div>
   </div>

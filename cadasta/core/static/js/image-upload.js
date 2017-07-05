@@ -1,13 +1,15 @@
 $(function() {
-    $("input[name='zoom']").hide();
     $('.image-editor').cropit();
 
     $("input[name='new-image']").change(function() {
-    $("input[name='zoom']").show();
+        // hide img tag with preview of existing stored image
+        // in this way cropit displays selected image without overlapping
+        $("#user-avatar").hide();
+        $("#zoom").removeClass("hidden");
     });
 
     $('form').submit(function() {
-    var imageData = $('.image-editor').cropit('export');
-    $('.hidden-image-data').val(imageData);
+        var imageData = $('.image-editor').cropit('export');
+        $('.hidden-image-data').val(imageData);
     });
 });
