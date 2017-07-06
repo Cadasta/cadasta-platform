@@ -103,7 +103,7 @@ LOGGING = {
         },
         'accounts.token': {
             'handlers': ['console'],
-            'level': 'INFO'
+            'level': 'DEBUG'
         }
     },
 }

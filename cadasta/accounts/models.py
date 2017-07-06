@@ -41,12 +41,11 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     username = abstract_user_field('username')
     full_name = models.CharField(_('full name'), max_length=130, blank=True)
     email = models.EmailField(
-        _('email address'), blank=True, null=True, default=None, unique=True)
+        _('email address'), blank=True, null=True, default=None)
     phone = models.CharField(_('phone number'), max_length=16,
-                             blank=True, null=True,
-                             default=None, unique=True)
+                             blank=True, null=True, default=None)
     is_staff = abstract_user_field('is_staff')
-    is_active = models.BooleanField(default=False)
+    is_active = abstract_user_field('is_active')
     date_joined = abstract_user_field('date_joined')
     email_verified = models.BooleanField(default=False)
     phone_verified = models.BooleanField(default=False)
