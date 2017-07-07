@@ -5,6 +5,13 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 
+def calculate_area_field(apps, schema_editor):
+    SpatialUnit = apps.get_model('spatial', 'SpatialUnit')
+    SpatialUnit.objects.exclude(geometry=None).extra(
+        where=["geometrytype(geometry) LIKE 'POLYGON'"]).update(
+        area=Area(Transform('geometry', 3857)))
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -21,5 +28,9 @@ class Migration(migrations.Migration):
             model_name='spatialunit',
             name='area',
             field=models.FloatField(null=True),
+        ),
+        migrations.RunPython(
+            calculate_area_field,
+            reverse_code=migrations.RunPython.noop
         ),
     ]
