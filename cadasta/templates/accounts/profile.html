@@ -29,10 +29,12 @@
         </div>
         <div id="image-buttons">
           <div id="flex-column">
-            <button type="button" class="glyphicon glyphicon-remove-circle btn btn-primary btn-sm"
-                    title="Remove account picture" id="delete"></button>
-            <button type="button" class="glyphicon glyphicon-refresh btn btn-primary btn-sm"
-                    title="Reset your current picture" id="undo"></button>
+            <button type="button" class="btn btn-primary btn-sm" title="Remove account picture" id="delete">
+              <span class="glyphicon glyphicon-remove"></span>
+            </button>
+            <button type="button" class ="btn btn-primary btn-sm" title="Reset your current picture" id="undo">
+              <span class="glyphicon glyphicon-refresh"></span>
+            </button>
           </div>
         </div>
       </div>
@@ -42,11 +44,11 @@
         <span class="glyphicon glyphicon-picture large"></span>
       </div>
 
-        <input type="file" class="cropit-image-input" id="upload" accept=".jpg,.gif,.png">
-        <input type="hidden" name="base64" id="hidden-image-data" />
+      <input type="file" class="cropit-image-input" id="upload" accept=".jpg,.gif,.png">
+      <input type="hidden" name="base64" id="hidden-image-data" />
       <p class="help-block">{% trans "Accepted file types: jpg, png, gif, svg" %}</p>
+      <div class="error-block">{{ form.avatar.errors }}</div>
     </div>
-    <div class="error-block">{{ form.avatar.errors }}</div>
   <!-- END image input block -->
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">

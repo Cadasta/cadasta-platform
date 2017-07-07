@@ -5,13 +5,12 @@ from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
+from base64 import b64decode
 from core.form_mixins import SanitizeFieldsForm
 from .utils import send_email_update_notification
 from .models import User
 from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
-
-from base64 import b64decode
 from tempfile import NamedTemporaryFile
 
 
@@ -125,14 +124,17 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         return email
 
     def clean_avatar(self):
-        """convert base64 of cropped image to image file to store"""
         base64 = self.data.get('base64')
         avatar = self.instance.avatar
         if base64:
-            image_format, image_bytes_base64 = base64.split(',')
-            image_extension = '.' + image_format.split('/')[1].split(';')[0]
-            image_bytes = b64decode(image_bytes_base64)
-            image_file = NamedTemporaryFile('w+b', prefix='avatar-', suffix=image_extension)
+            base64_format, base64_bytes = base64.split(',')
+            correct_format = "data:image/png;base64"
+            if base64_format != correct_format:
+                raise forms.ValidationError(
+                    _("Image url format not valid."))
+            image_bytes = b64decode(base64_bytes)
+            image_file = NamedTemporaryFile('w+b', prefix='avatar-',
+                                            suffix='.png')
             image_file.write(image_bytes)
             image_file.seek(0)
             avatar.file = image_file
