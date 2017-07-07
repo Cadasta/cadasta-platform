@@ -1091,8 +1091,8 @@ h1 .label {
 -------------------------------------------------------------- */
 
 #user-avatar {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
 }
 
 .cropit-preview-wrapper {
@@ -1101,8 +1101,8 @@ h1 .label {
 
 .cropit-preview {
   /* You can specify preview size in CSS */
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   margin: 10px;
   border-radius: 5px;
   display: inline-block;
@@ -1131,4 +1131,13 @@ h1 .label {
 }
 .slider-wrapper .large.large {
     font-size: 25px;
+}
+
+#image-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+#delete, #upload {
+    display: inline-block;
 }

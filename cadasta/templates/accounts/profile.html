@@ -21,27 +21,27 @@
   {{ form.non_field_errors }}
 
   <!-- START image input block -->
-  <div class="form-group{% if form.avatar.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.avatar.id_for_label }}">{% trans "Upload profile image" %}</label>
+    <label class="control-label">{% trans "Upload profile image" %}</label>
     <div class="image-editor well file-well">
       <div class="cropit-preview-wrapper">
         <div class="cropit-preview">
           <img src={{user.avatar.url}} id="user-avatar"/>
         </div>
       </div>
-
       <div class="slider-wrapper hidden" id="zoom">
         <span class="glyphicon glyphicon-picture"></span>
         <input type="range" class="cropit-image-zoom-input" id="zoom-range">
         <span class="glyphicon glyphicon-picture large"></span>
       </div>
-
-      <input type="file" class="cropit-image-input" name="new-image" accept=".jpg,.gif,.png">
-      <input type="hidden" name="base64" class="hidden-image-data" />
+      <div id="image-buttons">
+        <input type="file" class="cropit-image-input" name="new-image" id="upload" accept=".jpg,.gif,.png">
+        <input type="hidden" name="base64" class="hidden-image-data" />
+        <button type="button" id="delete">set default</button>
+      </div>
+      <button type="button" id="undo">Undo</button>
       <p class="help-block">{% trans "Accepted file types: jpg, png, gif, svg" %}</p>
     </div>
     <div class="error-block">{{ form.avatar.errors }}</div>
-  </div>
   <!-- END image input block -->
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
