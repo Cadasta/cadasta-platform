@@ -19,6 +19,7 @@ $(function() {
 
     $("#undo").click(function() {
         avatarChanged = false;
+        $("#zoom").addClass("hidden");
         $('#image-editor').cropit('imageSrc', URL_USER_AVATAR);
     });
 
