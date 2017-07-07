@@ -19,6 +19,12 @@ from core.validators import sanitize_string
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
 
+def check_relevant_clause(relevant):
+    if not re.match(r"^\$\{\w+\}=('|\"|”)\w+('|\"|”)$", relevant):
+        raise InvalidQuestionnaire(
+            [_("Invalid relevant clause: {0}".format(relevant))])
+
+
 def create_children(children, errors=[], project=None,
                     default_language='', kwargs={}):
     if children:
@@ -83,6 +89,7 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
     if bind:
         relevant = bind.get('relevant', None)
         if relevant:
+            check_relevant_clause(relevant)
             clauses = relevant.split('=')
             selector = re.sub("'", '', clauses[1])
             selectors += (selector,)
@@ -267,6 +274,8 @@ class QuestionGroupManager(models.Manager):
         bind = dict.get('bind')
         if bind:
             relevant = bind.get('relevant', None)
+            if relevant:
+                check_relevant_clause(relevant)
 
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
@@ -301,6 +310,8 @@ class QuestionManager(models.Manager):
         bind = dict.get('bind')
         if bind:
             relevant = bind.get('relevant', None)
+            if relevant:
+                check_relevant_clause(relevant)
             required = True if bind.get('required', 'no') == 'yes' else False
 
         instance.type = type_dict[dict.get('type')]
