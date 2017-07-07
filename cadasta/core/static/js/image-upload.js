@@ -3,7 +3,7 @@ $(function() {
     var URL_USER_AVATAR = $('#user-avatar').attr('src');
     var avatarChanged = false;
 
-    $('.image-editor').cropit({
+    $('#image-editor').cropit({
         onFileChange: function() {
             avatarChanged = true;
             $("#user-avatar").hide();
@@ -14,18 +14,18 @@ $(function() {
     $("#delete").click(function() {
         avatarChanged = true;
         $("#zoom").addClass("hidden");
-        $('.image-editor').cropit('imageSrc', URL_DEFAULT_AVATAR);
+        $('#image-editor').cropit('imageSrc', URL_DEFAULT_AVATAR);
     });
 
     $("#undo").click(function() {
         avatarChanged = false;
-        $('.image-editor').cropit('imageSrc', URL_USER_AVATAR);
+        $('#image-editor').cropit('imageSrc', URL_USER_AVATAR);
     });
 
     $('form').submit(function() {
         if (avatarChanged) {
-            var imageData = $('.image-editor').cropit('export');
-            $('.hidden-image-data').val(imageData);
+            var imageData = $('#image-editor').cropit('export');
+            $('#hidden-image-data').val(imageData);
         }
     });
 });
