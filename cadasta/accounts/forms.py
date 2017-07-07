@@ -127,7 +127,6 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     def clean_avatar(self):
         """convert base64 of cropped image to image file to store"""
         base64 = self.data.get('base64')
-        print(base64)
         avatar = self.instance.avatar
         if base64:
             image_format, image_bytes_base64 = base64.split(',')

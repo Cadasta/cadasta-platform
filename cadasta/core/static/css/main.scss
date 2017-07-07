@@ -1096,7 +1096,8 @@ h1 .label {
 }
 
 .cropit-preview-wrapper {
-  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
 .cropit-preview {
@@ -1112,7 +1113,7 @@ h1 .label {
   cursor: move;
 }
 
-.image-editor > input {
+#image-editor > input {
   display: block;
 }
 
@@ -1133,11 +1134,18 @@ h1 .label {
     font-size: 25px;
 }
 
-#image-buttons {
-    display: flex;
-    justify-content: space-between;
+#image-buttons, .cropit-preview {
+    display: inline-block;
+    margin-top: 10px;
 }
 
-#delete, #upload {
+#flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+#flex-column > #delete, #undo {
     display: inline-block;
+    margin: 0 0 5px 0;
+    cursor: pointer;
 }

@@ -22,10 +22,18 @@
 
   <!-- START image input block -->
     <label class="control-label">{% trans "Upload profile image" %}</label>
-    <div id="image-editor" class="image-editor well file-well">
+    <div class="image-editor well file-well" id="image-editor">
       <div class="cropit-preview-wrapper">
         <div class="cropit-preview">
           <img src={{user.avatar.url}} id="user-avatar"/>
+        </div>
+        <div id="image-buttons">
+          <div id="flex-column">
+            <button type="button" class="glyphicon glyphicon-remove-circle btn btn-primary btn-sm"
+                    title="Remove account picture" id="delete"></button>
+            <button type="button" class="glyphicon glyphicon-refresh btn btn-primary btn-sm"
+                    title="Reset your current picture" id="undo"></button>
+          </div>
         </div>
       </div>
       <div class="slider-wrapper hidden" id="zoom">
@@ -33,12 +41,9 @@
         <input type="range" class="cropit-image-zoom-input" id="zoom-range">
         <span class="glyphicon glyphicon-picture large"></span>
       </div>
-      <div id="image-buttons">
-        <input type="file" class="cropit-image-input" name="new-image" id="upload" accept=".jpg,.gif,.png">
+
+        <input type="file" class="cropit-image-input" id="upload" accept=".jpg,.gif,.png">
         <input type="hidden" name="base64" id="hidden-image-data" />
-        <button type="button" id="delete">set default</button>
-      </div>
-      <button type="button" id="undo">Undo</button>
       <p class="help-block">{% trans "Accepted file types: jpg, png, gif, svg" %}</p>
     </div>
     <div class="error-block">{{ form.avatar.errors }}</div>
