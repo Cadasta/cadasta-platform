@@ -15,21 +15,6 @@ class TestConsumers(TestCase):
         self.mock_worker = Worker(
             connection=self.mock_conn, queues=self.mock_queues)
 
-    def get_result_msg(self):
-        args, kwargs = [], {}
-        return MagicMock(
-            headers={},
-            payload={
-                'status': None,
-                'children': [],
-                'result': {'log': 'About to download some huge file'},
-                'traceback': None,
-                'task_id': '486e8738-a9ef-475a-b8e1-158e987f4ae6'
-            },
-            decode=MagicMock(return_value=(args, kwargs, {})),
-            properties={}
-        )
-
     def get_task_msg(self, chain=None):
         args, kwargs = [], {}
         headers = {

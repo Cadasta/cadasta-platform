@@ -1,3 +1,4 @@
+import os
 from .default import *  # NOQA
 
 DEBUG = True
@@ -103,6 +104,10 @@ LOGGING = {
 ES_PORT = '8000'
 
 # Async Tooling
-CELERY_ALWAYS_EAGER = True
-CELERY_EAGER_PROPAGATES_EXCEPTIONS = True
-CELERY_BROKER_TRANSPORT = 'memory'
+CELERY_BROKER_TRANSPORT = 'SQS' if os.environ.get('SQS') else 'memory'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'region': 'us-west-2',
+    'queue_name_prefix': '{}-'.format(os.environ.get('QUEUE-PREFIX', 'dev')),
+    'wait_time_seconds': 20,
+    'visibility_timeout': 20,
+} if CELERY_BROKER_TRANSPORT == 'SQS' else {}

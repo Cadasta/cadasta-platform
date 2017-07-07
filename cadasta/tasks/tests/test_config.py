@@ -1,7 +1,6 @@
-from django.conf import settings
 from django.test import TestCase
 
-from tasks.celery import app
+from tasks.celery import app, conf
 
 
 class TestConfig(TestCase):
@@ -24,4 +23,4 @@ class TestConfig(TestCase):
             default=app.conf.task_default_queue)
         self.assertEqual(len(queues), 2)
         self.assertTrue('celery' in queues)
-        self.assertTrue(settings.PLATFORM_QUEUE_NAME in queues)
+        self.assertTrue(conf.PLATFORM_QUEUE_NAME in queues)

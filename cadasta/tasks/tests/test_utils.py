@@ -1,10 +1,9 @@
 from collections import OrderedDict
 
 from django.core.exceptions import ValidationError
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
-from tasks.celery import app
-from tasks.utils import fields, celery
+from tasks.utils import fields
 
 
 class TestFields(TestCase):
@@ -38,42 +37,3 @@ class TestFields(TestCase):
             fields.validate_input_field({'args': [], 'kwargs': []})
         fields.validate_input_field({'args': ['1'], 'kwargs': {'a': 'b'}})
         fields.validate_input_field({'args': ('a',), 'kwargs': {'foo': 'bar'}})
-
-
-@override_settings(CELERY_TASK_ROUTES={
-    'foo.*': {'queue': 'foo_q'},
-    'bar.*': {'queue': 'bar_q'}
-})
-@override_settings(CELERY_TASK_DEFAULT_QUEUE='default-queue')
-@override_settings(CELERY_RESULT_QUEUE='result-queue')
-class TestCelery(TestCase):
-
-    def setUp(self):
-        # Ensure new routes are applied
-        app.amqp.flush_routes()
-        app.amqp.router = app.amqp.Router()
-
-    def test_apply_default_options_properly_routed(self):
-        self.assertEqual(
-            celery.apply_default_options({}, 'foo.asdf').get('queue'),
-            'foo_q')
-        self.assertEqual(
-            celery.apply_default_options({}, 'bar.asdf').get('queue'),
-            'bar_q')
-        self.assertEqual(
-            celery.apply_default_options({}, 'asdf.asdf').get('queue'),
-            'default-queue')
-
-    def test_apply_default_options_no_override_queue(self):
-        """ Ensure specified queue option is not overridden """
-        options = {'queue': 'asdf'}
-        self.assertEqual(
-            celery.apply_default_options(options, 'foo.asdf').get('queue'),
-            'asdf')
-
-    def test_apply_default_options_override_reply_to(self):
-        """ Ensure reply_to option is always overridden """
-        options = {'reply_to': 'asdf'}
-        self.assertEqual(
-            celery.apply_default_options(options, 'foo.asdf').get('reply_to'),
-            'result-queue')

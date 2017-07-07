@@ -1,11 +1,10 @@
 import logging
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from kombu import Queue
 from kombu.async import Hub, set_event_loop
 
-from tasks.celery import app
+from tasks.celery import app, conf
 from tasks.consumer import Worker
 
 
@@ -16,7 +15,7 @@ class Command(BaseCommand):
     help = "Sync task and result messages with database."
 
     def add_arguments(self, parser):
-        parser.add_argument('--queue', '-q', default=settings.PLATFORM_QUEUE)
+        parser.add_argument('--queue', '-q', default=conf.PLATFORM_QUEUE_NAME)
 
     def handle(self, queue, *args, **options):
         fmt = '%(asctime)s %(name)-12s: %(levelname)-8s %(message)s'

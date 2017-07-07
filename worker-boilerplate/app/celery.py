@@ -1,8 +1,10 @@
 from __future__ import absolute_import
 
 from celery import Celery
-from .signals import *  # NOQA
+from cadasta.workertoolbox.conf import Config
 
 
 app = Celery('app')
-app.config_from_object('app.celeryconfig')
+app.config_from_object(
+    Config(queues=('export',))
+)

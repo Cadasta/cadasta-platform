@@ -31,7 +31,7 @@ class Worker(ConsumerMixin):
             logger.exception("Failed to process message: %r", message)
         finally:
             logger.info("ACKing message %r", message)
-            if self.connection.as_uri().startswith('sqs://'):
+            if self.connection.as_uri().lower().startswith('sqs://'):
                 # HACK: Can't seem to get message.ack() to work for SQS
                 # backend. Without this hack, messages will keep
                 # re-appearing after the visibility_timeout expires.

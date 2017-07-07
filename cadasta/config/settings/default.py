@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from kombu import Exchange, Queue
 
 from django.utils.translation import ugettext_lazy as _
 from .languages import FORM_LANGS  # noqa
@@ -545,40 +544,4 @@ ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
 
-
-# Async Tooling
-# Exchanges
-TASK_EXCHANGE = 'task_exchange'
-CELERY_DEFAULT_EXCHANGE = TASK_EXCHANGE
-CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
-default_exchange = Exchange(TASK_EXCHANGE, CELERY_DEFAULT_EXCHANGE_TYPE)
-
-result_backend = 'db+postgresql://{user}:{pw}@{host}/cadasta'.format(
-    user=os.environ.get('TASK_DB_USER', 'cadasta'),
-    pw=os.environ.get('TASK_DB_PASS', 'cadasta'),
-    host=os.environ.get('TASK_DB_HOST', 'localhost'),
-)
-
-# Queues
-PLATFORM_QUEUE_NAME = 'platform.fifo'
-CELERY_TASK_QUEUES = (
-    # Associate queues with an exchange and a specific routing key or
-    # routing key pattern
-    Queue('celery', default_exchange, routing_key='celery'),
-    Queue('export', default_exchange, routing_key='export'),
-    Queue(PLATFORM_QUEUE_NAME, default_exchange, routing_key='#'),
-)
-
-# Routing
-CELERY_TASK_ROUTES = {
-    # Associate specific task names or task name patterns to an exchange
-    # and routing key
-    'export.*': {
-        'exchange': default_exchange,
-        'routing_key': 'export',
-    },
-    'celery.*': {
-        'exchange': default_exchange,
-        'routing_key': 'celery',
-    },
-}
+CELERY_QUEUES = ['export']
