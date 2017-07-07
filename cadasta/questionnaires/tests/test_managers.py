@@ -246,6 +246,23 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
         assert models.QuestionGroup.objects.exists() is False
         assert models.Question.objects.exists() is False
 
+    def test_create_from_form_invalid_form_id(self):
+        file = self.get_file(
+            '/questionnaires/tests/files/invalid_form_id.xlsx', 'rb')
+        form = self.storage.save('xls-forms/xls-form-invalid.xlsx',
+                                 file.read())
+        file.close()
+        with pytest.raises(InvalidQuestionnaire) as e:
+            models.Questionnaire.objects.create_from_form(
+                xls_form=form,
+                project=ProjectFactory.create()
+            )
+        assert "'form_id' field must not contain whitespace." in e.value.errors
+
+        assert models.Questionnaire.objects.exists() is False
+        assert models.QuestionGroup.objects.exists() is False
+        assert models.Question.objects.exists() is False
+
     def test_create_from_invald_form_missing_relevant_clause(self):
         create_attribute_types()
         file = self.get_file(

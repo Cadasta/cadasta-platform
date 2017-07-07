@@ -108,6 +108,24 @@ class QuestionnaireTestCase(TestCase):
         assert ('This field is required.' in
                 errors['question_groups'][0]['name'])
 
+    def test_invalid_id_string(self):
+        data = {
+            'title': 'yx8sqx6488wbc4yysnkrbnfq',
+            'id_string': 'yx8sqx6488w bc4yysnkrbnfq',
+            'default_language': 'en',
+            'questions': [{
+                'name': "start",
+                'label': None,
+                'type': "ST",
+                'required': False,
+                'constraint': None,
+                'index': 0
+            }]
+        }
+        errors = validators.validate_questionnaire(data)
+        assert ("'id_string' cannot be blank or contain whitespace." in
+                errors['id_string'])
+
 
 class QuestionGroupTestCase(TestCase):
     def test_valid_questiongroup(self):

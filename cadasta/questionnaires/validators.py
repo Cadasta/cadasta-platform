@@ -1,3 +1,4 @@
+import re
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from core.messages import SANITIZE_ERROR
@@ -36,6 +37,12 @@ QUESTION_OPTION_SCHEMA = {
     'label': {'type': 'string', 'required': True},
     'index': {'type': 'integer', 'required': True}
 }
+
+
+def validate_id_string(json):
+    id_string = json.get('id_string', '')
+    if not id_string or re.search(r"\s", id_string):
+        return _("'id_string' cannot be blank or contain whitespace.")
 
 
 def validate_type(type, value):
@@ -120,7 +127,13 @@ def validate_question_groups(groups):
 
 
 def validate_questionnaire(json):
+
     errors = validate_schema(QUESTIONNAIRE_SCHEMA, json)
+
+    if not errors.get('id_string'):
+        id_errors = validate_id_string(json)
+        if id_errors:
+            errors['id_string'] = id_errors
 
     question_errs = validate_questions(json.get('questions', []))
     if any([q for q in question_errs]):

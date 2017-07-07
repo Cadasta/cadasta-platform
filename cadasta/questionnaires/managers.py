@@ -199,6 +199,11 @@ class QuestionnaireManager(models.Manager):
                 )
                 json = parse_file_to_json(instance.xls_form.file.name)
 
+                id_string = json['id_string']
+                if re.search(r"\s", id_string):
+                    raise InvalidQuestionnaire([
+                        _("'form_id' field must not contain whitespace.")])
+
                 santize_form(json)
 
                 has_default_language = (
