@@ -127,11 +127,11 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         base64 = self.data.get('base64')
         avatar = self.instance.avatar
         if base64:
-            base64_format, base64_bytes = base64.split(',')
-            correct_format = "data:image/png;base64"
-            if base64_format != correct_format:
+            correct_format = 'data:image/png;base64,'
+            if not base64.startswith(correct_format):
                 raise forms.ValidationError(
-                    _("Image url format not valid."))
+                    _('Image url format not valid.'))
+            base64_bytes = base64.split(',')[1]
             image_bytes = b64decode(base64_bytes)
             image_file = NamedTemporaryFile('w+b', prefix='avatar-',
                                             suffix='.png')

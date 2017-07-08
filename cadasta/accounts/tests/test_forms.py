@@ -1,11 +1,15 @@
 import random
+import re
+from base64 import b64encode
 
-from core.tests.utils.cases import UserTestCase
+import pytest
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.messages import SANITIZE_ERROR
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core import mail
 from django.http import HttpRequest
 from django.db import IntegrityError
+from django.forms import ValidationError
 from allauth.account.models import EmailAddress
 from allauth.account.utils import send_email_confirmation
 from django.test import TestCase
@@ -222,22 +226,28 @@ class RegisterFormTest(UserTestCase, TestCase):
         assert User.objects.count() == 0
 
 
-class ProfileFormTest(UserTestCase, TestCase):
+class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
+    def read_png_as_data_url(self, path_to_file):
+        with self.get_file(path_to_file, 'rb') as png_file:
+            data_url = 'data:image/png;base64,%s' % b64encode(png_file.read())
+        return data_url
+
     def test_update_user(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
                                   email_verified=True,
                                   password='sgt-pepper',
-                                  language='en',
-                                  measurement='metric')
-
+                                  measurement='metric',
+                                  language='en')
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
             'language': 'en',
-            'measurement': 'imperial'
+            'measurement': 'imperial',
+            'base64': self.read_png_as_data_url(
+                '/accounts/tests/files/image.png'),
         }
 
         request = HttpRequest()
@@ -256,6 +266,8 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert user.language == 'en'
         assert user.measurement == 'imperial'
         assert user.email_verified is True
+        assert re.match(r'^/media/s3/uploads/avatars/avatar-[^.]+\.png$',
+                        user.avatar.url)
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to
@@ -448,6 +460,38 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert user.measurement == 'metric'
         assert ('Measurement system invalid or not available'
                 in form.errors['measurement'])
+
+    def test_update_with_invalid_avatar(self):
+        user = UserFactory.create(username='imagine71',
+                                  email='john@beatles.uk',
+                                  email_verified=True,
+                                  password='sgt-pepper',
+                                  language='en')
+        old_avatar_url = user.avatar.url
+        data = {
+            'username': 'imagine71',
+            'email': 'john2@beatles.uk',
+            'full_name': 'John Lennon',
+            'password': 'sgt-pepper',
+            'language': 'en',
+            'base64': 'invalid',
+        }
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+        request.META['SERVER_NAME'] = 'testserver'
+        request.META['SERVER_PORT'] = '80'
+
+        form = forms.ProfileForm(data, request=request, instance=user)
+        with pytest.raises(ValidationError):
+            form.clean_avatar()
+
+        user.refresh_from_db()
+        assert ('Image url format not valid.'
+                in form.errors.get('avatar'))
+        assert form.is_valid() is False
+        assert user.avatar.url == old_avatar_url
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
