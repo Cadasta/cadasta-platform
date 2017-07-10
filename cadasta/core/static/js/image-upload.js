@@ -7,19 +7,25 @@ $(function() {
         onFileChange: function() {
             avatarChanged = true;
             $("#user-avatar").hide();
+        },
+        onZoomDisabled: function() {
+            $("#zoom").addClass("hidden");
+        },
+        onZoomEnabled: function() {
             $("#zoom").removeClass("hidden");
-        }
+        },
+        smallImage: 'stretch',
     });
 
     $("#delete").click(function() {
         avatarChanged = true;
-        $("#zoom").addClass("hidden");
+        $("#upload").val("");
         $('#image-editor').cropit('imageSrc', URL_DEFAULT_AVATAR);
     });
 
     $("#undo").click(function() {
         avatarChanged = false;
-        $("#zoom").addClass("hidden");
+        $("#upload").val("");
         $('#image-editor').cropit('imageSrc', URL_USER_AVATAR);
     });
 
