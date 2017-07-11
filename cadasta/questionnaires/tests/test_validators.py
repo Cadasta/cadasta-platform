@@ -29,6 +29,22 @@ class ValidateTypeTest(TestCase):
         assert validators.validate_type('array', []) is True
 
 
+class ValidateIDStringTest(TestCase):
+    def test_validate_id_string_missing(self):
+        data = {'id_string': ''}
+        assert validators.validate_id_string(data) == (
+            "'id_string' cannot be blank or contain whitespace.")
+
+    def test_validate_id_string_valid(self):
+        data = {'id_string': 'yx8sqx6488wbc4yysnkrbnfq'}
+        assert validators.validate_id_string(data) is None
+
+    def test_validate_id_string_contains_whitespace(self):
+        data = {'id_string': 'yx8sqx6488wbc4yys nkrbnfq'}
+        assert validators.validate_id_string(data) == (
+            "'id_string' cannot be blank or contain whitespace.")
+
+
 class ValidateSchemaTest(TestCase):
     SCHEMA = {
         'title': {
