@@ -12,8 +12,20 @@ from jsonattrs.models import create_attribute_types
 
 from . import factories
 from .. import models
-from ..managers import create_children, create_options, santize_form
+from ..managers import (create_children, create_options, santize_form,
+                        check_relevant_clause)
 from ..messages import MISSING_RELEVANT
+
+
+class RelevantSyntaxValidationTest(TestCase):
+    def test_relevant_syntax_valid(self):
+        assert check_relevant_clause("${party_type}='IN'") is None
+
+    def test_relevant_syntax_invalid(self):
+        relevant = "${party_type='IN'}"
+        with pytest.raises(InvalidQuestionnaire) as e:
+            check_relevant_clause(relevant)
+        assert str(e.value) == "Invalid relevant clause: ${party_type='IN'}"
 
 
 class SanitizeFormTest(TestCase):
