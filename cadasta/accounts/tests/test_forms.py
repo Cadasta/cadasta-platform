@@ -247,7 +247,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
             'language': 'en',
             'measurement': 'imperial',
             'base64': self.read_png_as_data_url(
-                '/accounts/tests/files/image.png'),
+                '/accounts/tests/files/avatar.png'),
         }
 
         request = HttpRequest()
@@ -267,7 +267,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user.measurement == 'imperial'
         assert user.email_verified is True
         assert re.match(r'^/media/s3/uploads/avatars/avatar-[^.]+\.png$',
-                        user.avatar.url)
+                        user.avatar.url) is not None
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to

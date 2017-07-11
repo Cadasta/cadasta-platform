@@ -1,3 +1,4 @@
+from buckets.serializers import S3Field
 from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -33,6 +34,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
             'email_verified',
             'language',
             'measurement',
+            'avatar',
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -89,6 +91,7 @@ class UserSerializer(SanitizeFieldSerializer,
             'invalid_choice': _('Measurement system invalid or not available')
         }
     )
+    avatar = S3Field(required=False)
 
     class Meta:
         model = User
@@ -100,6 +103,7 @@ class UserSerializer(SanitizeFieldSerializer,
             'last_login',
             'language',
             'measurement',
+            'avatar',
         )
         extra_kwargs = {
             'email': {'required': True, 'unique': True},
