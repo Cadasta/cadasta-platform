@@ -3,7 +3,7 @@ from core.models import RandomIDModel
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import JSONField, ArrayField
+from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import lazy
@@ -48,8 +48,8 @@ class BackgroundTask(RandomIDModel):
         _('Task function'), max_length=128,
         choices=choices())
 
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
     creator = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True)
 
@@ -76,7 +76,7 @@ class BackgroundTask(RandomIDModel):
         _("If arguments are immutable (only applies to chained tasks)."))
 
     class Meta:
-        ordering = ['created']
+        ordering = ['created_date']
 
     def __str__(self):
         return 'id={0.id} type={0.type} status={0.status}'.format(self)
