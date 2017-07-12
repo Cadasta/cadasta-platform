@@ -10,7 +10,7 @@ from jsonattrs.models import Attribute, AttributeType, Schema
 from .messages import MISSING_RELEVANT
 from .exceptions import InvalidQuestionnaire
 from .validators import validate_questionnaire
-from .managers import fix_labels
+from .managers import fix_labels, check_relevant_clause
 from . import models
 
 
@@ -94,15 +94,18 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         initial_data = self.find_initial_data(validated_data['name'])
         validated_data['label_xlat'] = initial_data['label']
+        relevant = initial_data.get('relevant', None)
+        if relevant:
+            check_relevant_clause(relevant)
         question = models.Question.objects.create(
             questionnaire_id=self.context['questionnaire_id'],
             question_group_id=self.context.get('question_group_id'),
             **validated_data)
 
         option_serializer = QuestionOptionSerializer(
-                data=initial_data.get('options', []),
-                many=True,
-                context={'question_id': question.id})
+            data=initial_data.get('options', []),
+            many=True,
+            context={'question_id': question.id})
 
         option_serializer.is_valid(raise_exception=True)
         option_serializer.save()
@@ -117,7 +120,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
 
     class Meta:
         model = models.QuestionGroup
-        fields = ('id', 'name', 'label',  'type', 'questions',
+        fields = ('id', 'name', 'label', 'type', 'questions',
                   'question_groups', 'label_xlat', 'relevant', 'index', )
         read_only_fields = ('id', 'questions', 'question_groups', )
         write_only_fields = ('label_xlat', )
@@ -139,6 +142,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         initial_data = self.find_initial_data(validated_data['name'])
         validated_data['label_xlat'] = initial_data['label']
+
         group = models.QuestionGroup.objects.create(
             questionnaire_id=self.context['questionnaire_id'],
             question_group_id=self.context.get('question_group_id'),
@@ -162,8 +166,9 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
 
                 relevant = initial_data.get('relevant', None)
                 if relevant:
+                    check_relevant_clause(relevant)
                     clauses = relevant.split('=')
-                    selector = re.sub("'", '', clauses[1])
+                    selector = re.sub("('|\"|”)", '', clauses[1])
                     selectors += (selector,)
 
                 app_label = ATTRIBUTE_GROUPS[attr_group]['app_label']

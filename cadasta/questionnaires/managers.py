@@ -91,7 +91,7 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
         if relevant:
             check_relevant_clause(relevant)
             clauses = relevant.split('=')
-            selector = re.sub("'", '', clauses[1])
+            selector = re.sub("('|\"|”)", '', clauses[1])
             selectors += (selector,)
 
     try:
