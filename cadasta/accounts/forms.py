@@ -5,11 +5,13 @@ from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 
+from base64 import b64decode
 from core.form_mixins import SanitizeFieldsForm
 from .utils import send_email_update_notification
 from .models import User
 from .validators import check_username_case_insensitive
 from parsley.decorators import parsleyfy
+from tempfile import NamedTemporaryFile
 
 
 @parsleyfy
@@ -81,14 +83,15 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
             'invalid_choice': _('Measurement system invalid or not available')
         }
     )
+    base64 = forms.CharField(required=False)
 
     class Meta:
         model = User
         fields = ['username', 'email', 'full_name', 'language',
-                  'measurement']
+                  'measurement', 'avatar']
 
     class Media:
-        js = ('js/sanitize.js', )
+        js = ('js/image-upload.js', 'js/sanitize.js', )
 
     def __init__(self, *args, **kwargs):
         self._send_confirmation = False
@@ -119,6 +122,23 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                     _("Another user with this email already exists"))
 
         return email
+
+    def clean_avatar(self):
+        base64 = self.data.get('base64')
+        avatar = self.instance.avatar
+        if base64:
+            correct_format = 'data:image/png;base64,'
+            if not base64.startswith(correct_format):
+                raise forms.ValidationError(
+                    _('Image url format not valid.'))
+            base64_bytes = base64.split(',')[1]
+            image_bytes = b64decode(base64_bytes)
+            image_file = NamedTemporaryFile('w+b', prefix='avatar-',
+                                            suffix='.png')
+            image_file.write(image_bytes)
+            image_file.seek(0)
+            avatar.file = image_file
+        return avatar
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)

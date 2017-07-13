@@ -1,17 +1,20 @@
+import os
 import random
 import pytest
 
 from datetime import datetime
+from django.conf import settings
 from django.utils.translation import gettext as _
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
 
 from core.messages import SANITIZE_ERROR
-from core.tests.utils.cases import UserTestCase
+from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from .. import serializers
 from ..models import User
 from ..exceptions import EmailNotVerifiedError
+from core.tests.utils.files import make_dirs  # noqa
 
 from .factories import UserFactory
 
@@ -219,14 +222,19 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
                   ) in serializer._errors['password'])
 
 
-class UserSerializerTest(UserTestCase, TestCase):
+@pytest.mark.usefixtures('make_dirs')
+class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = serializers.UserSerializer(user)
         assert 'email_verified' in serializer.data
         assert 'password' not in serializer.data
+        assert serializer.data['avatar'] == user.avatar.url
 
     def test_create_with_valid_data(self):
+        file = self.get_file('/accounts/tests/files/avatar.png', 'rb')
+        file_name = self.storage.save('avatars/avatar.png', file.read())
+        file.close()
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
@@ -235,6 +243,7 @@ class UserSerializerTest(UserTestCase, TestCase):
             'last_login': '2016-01-01 23:00:00',
             'language': 'en',
             'measurement': 'metric',
+            'avatar': file_name,
         }
         serializer = serializers.UserSerializer(data=data)
         assert serializer.is_valid() is True
@@ -245,6 +254,8 @@ class UserSerializerTest(UserTestCase, TestCase):
         user_obj = User.objects.first()
         assert user_obj.is_active
         assert not user_obj.email_verified
+        assert os.path.isfile(os.path.join(
+            settings.MEDIA_ROOT, 's3/uploads/avatars/avatar.png'))
 
     def test_update_username_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)

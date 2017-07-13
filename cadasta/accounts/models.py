@@ -1,3 +1,4 @@
+from buckets.fields import S3FileField
 from datetime import datetime, timezone, timedelta
 from django.conf import settings
 from django.db import models
@@ -45,6 +46,10 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     measurement = models.CharField(max_length=20,
                                    choices=settings.MEASUREMENTS,
                                    default=settings.MEASUREMENT_DEFAULT)
+    avatar = S3FileField(upload_to='avatars',
+                         blank=True,
+                         accepted_types=['image/png', 'image/jpeg'],
+                         default='/static/img/avatar_sm.jpg')
 
     objects = UserManager()
 

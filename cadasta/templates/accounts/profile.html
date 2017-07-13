@@ -9,6 +9,7 @@
 
 {% block extra_script %}
   {{ form.media }}
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cropit/0.5.1/jquery.cropit.min.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -18,6 +19,36 @@
   <h1>{% trans "Update your profile" %}</h1>
   {% csrf_token %}
   {{ form.non_field_errors }}
+
+  <!-- START image input block -->
+    <label class="control-label">{% trans "Upload profile image" %}</label>
+    <div class="image-editor well file-well" id="image-editor">
+      <div class="cropit-preview-wrapper">
+        <div class="cropit-preview">
+          <img src={{user.avatar.url}} id="user-avatar"/>
+        </div>
+        <div id="image-buttons">
+          <div id="flex-column">
+            <button type="button" class="btn btn-primary btn-sm" title="Remove account picture" id="delete">
+              <span class="glyphicon glyphicon-remove"></span>
+            </button>
+            <button type="button" class ="btn btn-primary btn-sm" title="Reset your current picture" id="undo">
+              <span class="glyphicon glyphicon-refresh"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="slider-wrapper hidden" id="zoom">
+        <span class="glyphicon glyphicon-picture"></span>
+        <input type="range" class="cropit-image-zoom-input" id="zoom-range">
+        <span class="glyphicon glyphicon-picture large"></span>
+      </div>
+      <input type="file" class="cropit-image-input" id="upload" accept=".jpg,.gif,.png">
+      <input type="hidden" name="base64" id="hidden-image-data" />
+      <p class="help-block">{% trans "Accepted file: jpg, png, gif. Minimum size: 200x200 pixels." %}</p>
+      <div class="error-block">{{ form.avatar.errors }}</div>
+    </div>
+  <!-- END image input block -->
 
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
