@@ -372,7 +372,7 @@ class ProfileFormTest(UserTestCase, TestCase):
         form = forms.ProfileForm(data, request=request, instance=user)
         form.save()
         with pytest.raises(EmailAddress.DoesNotExist):
-            EmailAddress.objects.get(email="user1@exampl.com")
+            EmailAddress.objects.get(email="user1@example.com")
 
         with pytest.raises(IntegrityError):
             user = UserFactory.create(username='user2',
