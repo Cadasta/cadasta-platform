@@ -40,10 +40,10 @@ def abstract_user_field(name):
 class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     username = abstract_user_field('username')
     full_name = models.CharField(_('full name'), max_length=130, blank=True)
-    email = models.EmailField(
-        _('email address'), blank=True, null=True, default=None)
+    email = models.EmailField(_('email address'), null=True,
+                              default=None, unique=True)
     phone = models.CharField(_('phone number'), max_length=16,
-                             blank=True, null=True, default=None)
+                             null=True, default=None, unique=True)
     is_staff = abstract_user_field('is_staff')
     is_active = abstract_user_field('is_active')
     date_joined = abstract_user_field('date_joined')
@@ -125,7 +125,7 @@ def default_key():
 
 
 class VerificationDevice(Device):
-    unverified_phone = models.CharField(max_length=16)
+    unverified_phone = models.CharField(max_length=16, unique=True)
     secret_key = models.CharField(
         max_length=40,
         default=default_key,

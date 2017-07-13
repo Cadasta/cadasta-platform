@@ -442,7 +442,7 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
     def test_set_roles_for_duplicate_username(self):
         org = OrganizationFactory.create()
         user1 = UserFactory.create(email='some-user@some.com')
-        UserFactory.create(email='some-user@some.com')
+        UserFactory.create(username='some-user@some.com')
         data = {'username': user1.email, 'admin': 'true'}
         serializer = serializers.OrganizationUserSerializer(
             data=data, context={'organization': org}
