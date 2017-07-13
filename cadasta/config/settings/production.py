@@ -35,14 +35,14 @@ DATABASES = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'BACKEND': 'core.backends.MemorySafePyLibMCCache',
         'LOCATION': [
             os.environ['MEMCACHED_HOST'],
         ],
         'OPTIONS': {'distribution': 'consistent'}
     },
     'jsonattrs': {
-        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'BACKEND': 'core.backends.MemorySafePyLibMCCache',
         'LOCATION': [
             os.environ['MEMCACHED_HOST'],
         ],
@@ -114,6 +114,11 @@ LOGGING = {
     },
     'loggers': {
         'django': {
+            'handlers': ['file', 'email_admins', 'opbeat'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'core': {
             'handlers': ['file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
             'propagate': True,
