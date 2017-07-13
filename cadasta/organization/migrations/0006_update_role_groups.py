@@ -43,7 +43,7 @@ def update_public_user_roles(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0004_add_groups'),
+        ('accounts', '0007_add_groups'),
         ('organization', '0005_add_group_to_prj_org_roles'),
     ]
 
