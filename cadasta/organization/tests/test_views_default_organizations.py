@@ -97,9 +97,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             object_list=sorted(self.orgs, key=lambda p: p.slug))
 
     def test_get_with_superuser(self):
-        superuser = UserFactory.create()
-        self.superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(self.superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
         response = self.request(user=superuser)
         assert response.status_code == 200
         assert response.content == self.render_content(user=superuser,
@@ -230,9 +228,7 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
                                                        projects=[])
 
     def test_get_org_with_superuser(self):
-        superuser = UserFactory.create()
-        self.superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(self.superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
         response = self.request(user=superuser)
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -686,9 +682,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
     def test_get_with_superuser(self):
-        superuser = UserFactory.create()
-        superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
         response = self.request(user=superuser)
         assert response.status_code == 200
         assert response.content == self.render_content(is_superuser=True,

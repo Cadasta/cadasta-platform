@@ -4,7 +4,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Prefetch
 
-from tutelary.models import Role, check_perms
+from tutelary.models import check_perms
 
 from core.views.mixins import SuperUserCheckMixin
 from ..models import Organization, Project, OrganizationRole, ProjectRole
@@ -159,12 +159,8 @@ class ProjectRoles(ProjectMixin):
 
 class ProjectQuerySetMixin:
     def get_queryset(self):
-        if not hasattr(self, 'su_role'):
-            self.su_role = Role.objects.get(name='superuser')
-
         if (not isinstance(self.request.user, AnonymousUser) and
-            any([isinstance(pol, Role) and pol == self.su_role
-                 for pol in self.request.user.assigned_policies()])):
+                self.request.user.is_superuser):
             return Project.objects.all()
 
         if hasattr(self.request.user, 'organizations'):

@@ -1,7 +1,5 @@
 from django.shortcuts import redirect
 
-from tutelary.models import Role
-
 
 class ArchiveMixin:
     def archive(self):
@@ -23,14 +21,7 @@ class SuperUserCheckMixin:
 
     @property
     def is_superuser(self):
-        if self.is_su is None:
-            role = Role.objects.filter(name='superuser')
-            self.is_su = False
-            if len(role) > 0:
-                if hasattr(self.request.user, 'assigned_policies'):
-                    if role[0] in self.request.user.assigned_policies():
-                        self.is_su = True
-        return self.is_su
+        return self.request.user.is_superuser
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
