@@ -59,7 +59,6 @@ class Role(RandomIDModel):
     class Meta:
         abstract = True
 
-    name = models.CharField(max_length=80, default='', db_index=True)
     user = models.ForeignKey('accounts.User')
 
     @property

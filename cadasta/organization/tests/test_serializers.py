@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 from tutelary.models import Role
 from core.util import slugify
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import gettext as _
 from django.core.urlresolvers import reverse
@@ -375,8 +376,9 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
         users = UserFactory.create_batch(2)
         org_admin = UserFactory.create()
         org = OrganizationFactory.create(add_users=users)
+        group = Group.objects.get(name="OrgAdmin")
         OrganizationRole.objects.create(
-            user=org_admin, organization=org, admin=True
+            user=org_admin, organization=org, group=group
         )
         serializer = serializers.OrganizationUserSerializer(
             org.users.all(), many=True, context={'organization': org}
@@ -500,18 +502,17 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
         org_admin = UserFactory.create()
         public_user = UserFactory.create()
 
-        superuser = UserFactory.create()
-        superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
 
         org = OrganizationFactory.create(
             add_users=[superuser, prj_admin, public_user])
         project = ProjectFactory.create(add_users=users, organization=org)
-
+        oa = Group.objects.get(name='OrgAdmin')
+        pm = Group.objects.get(name='ProjectManager')
         OrganizationRole.objects.create(
-            organization=org, user=org_admin, admin=True)
+            organization=org, user=org_admin, group=oa)
         ProjectRole.objects.create(
-            project=project, user=prj_admin, role='PM')
+            project=project, user=prj_admin, group=pm, role='PM')
 
         serializer = serializers.ProjectUserSerializer(
             org.users.all(),
@@ -581,7 +582,8 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
         project = ProjectFactory.create(organization=org)
-        ProjectRole.objects.create(user=user, project=project)
+        pu = Group.objects.get(name='ProjectMember')
+        ProjectRole.objects.create(user=user, project=project, group=pu)
         serializer = serializers.ProjectUserSerializer(
             data={'username': user.username, 'role': 'DC'},
             partial=True,
@@ -643,9 +645,9 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
     def test_update_roles_for_org_admin(self):
         user = UserFactory.create(username='some-user')
         project = ProjectFactory.create()
+        oa = Group.objects.get(name='OrgAdmin')
         OrganizationRole.objects.create(organization=project.organization,
-                                        user=user,
-                                        admin=True)
+                                        user=user, group=oa)
         data = {'role': 'DC'}
         serializer = serializers.ProjectUserSerializer(
             user,
@@ -660,14 +662,11 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
                  ' updated.') in serializer.errors['non_field_errors'])
 
     def test_update_roles_for_superuser(self):
-        user = UserFactory.create(username='some-user')
-        superuser_role = Role.objects.get(name='superuser')
-        user.assign_policies(superuser_role)
-
+        user = UserFactory.create(username='some-user', is_superuser=True)
+        oa = Group.objects.get(name='OrgAdmin')
         project = ProjectFactory.create()
         OrganizationRole.objects.create(organization=project.organization,
-                                        user=user,
-                                        admin=True)
+                                        user=user, group=oa)
         data = {'role': 'DC'}
         serializer = serializers.ProjectUserSerializer(
             user,

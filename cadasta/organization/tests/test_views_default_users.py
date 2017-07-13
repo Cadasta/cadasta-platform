@@ -1,27 +1,13 @@
-import json
 import pytest
 
 from django.test import TestCase
 from django.http import Http404
 
-from tutelary.models import Policy, assign_user_policies
 from skivvy import ViewTestCase
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import OrganizationFactory
 from ..views.default import UserList, UserActivation
-from .factories import clause
-
-
-def assign_policies(user):
-    USER_CLAUSES = {
-        'clause': [
-            clause('allow', ['user.list']),
-            clause('allow', ['user.update'], ['user/*'])
-        ]
-    }
-    policy = Policy.objects.create(name='allow', body=json.dumps(USER_CLAUSES))
-    assign_user_policies(user, policy)
 
 
 class UserListTest(ViewTestCase, UserTestCase, TestCase):

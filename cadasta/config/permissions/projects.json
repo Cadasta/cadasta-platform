@@ -41,13 +41,17 @@
             "name": "Project Import",
             "codename": "project.import"
         },
+        "project_users_list": {
+            "name": "Project Users List",
+            "codename": "project.users.list"
+        },
         "project_users_add": {
             "name": "Add Project Users",
             "codename": "project.users.add"
         },
-        "project_users_edit": {
-            "name": "Edit Project Users",
-            "codename": "project.users.edit"
+        "project_users_update": {
+            "name": "Update Project Users",
+            "codename": "project.users.update"
         },
         "project_users_remove": {
             "name": "Remove Project Users",

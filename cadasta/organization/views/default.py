@@ -6,11 +6,12 @@ import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
-from core.mixins import (
-    LoginPermissionRequiredMixin, PermissionRequiredMixin,
-    RolePermissionRequiredMixin, RoleLoginPermissionRequiredMixin)
+from core.mixins import (PermissionRequiredMixin,
+                         RolePermissionRequiredMixin,
+                         RoleLoginPermissionRequiredMixin)
 from core.util import random_id
 from core.views import mixins as core_mixins
+from django.contrib.auth.models import Group
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
@@ -31,7 +32,8 @@ from ..choices import ROLE_CHOICES
 from .. import messages as error_messages
 from .. import forms
 from ..importers.exceptions import DataImportError
-from ..models import Organization, OrganizationRole, Project, ProjectRole
+from ..models import (Organization, OrganizationRole, Project,
+                      ProjectRole, ROLE_GROUPS)
 
 
 class OrganizationList(RolePermissionRequiredMixin, generic.ListView):
@@ -40,7 +42,7 @@ class OrganizationList(RolePermissionRequiredMixin, generic.ListView):
     permission_required = 'org.list'
     permission_filter_queryset = (lambda self, view, o: ('org.view',)
                                   if o.archived is False
-                                  else ('org.view_archived',))
+                                  else ('org.view.archived',))
 
     # This queryset annotation is needed to avoid generating a query for each
     # organization in order to count the number of projects per org
@@ -266,7 +268,7 @@ class OrganizationMembersEdit(RoleLoginPermissionRequiredMixin,
         context['org_admin'] = OrganizationRole.objects.filter(
             user=context['org_member'],
             organization=context['organization'],
-            admin=True).exists()
+            group__name='OrgAdmin').exists()
         context['current_user'] = (
             context['org_member'] == self.request.user and
             not self.is_superuser)
@@ -594,9 +596,11 @@ class ProjectAddWizard(RoleLoginPermissionRequiredMixin,
                 )
                 for username, role in user_roles:
                     # add group to ProjectRole
+                    group = Group.objects.get(
+                        name=ROLE_GROUPS.get(role, 'ProjectMember'))
                     user = User.objects.get(username=username)
                     ProjectRole.objects.create(
-                        project=project, user=user, role=role
+                        project=project, user=user, group=group, role=role
                     )
                 if questionnaire:
                     Questionnaire.objects.create_from_form(

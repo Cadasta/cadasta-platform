@@ -8,7 +8,7 @@ def load():
 
     PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
-    Group.objects.all().delete()
+    # Group.objects.all().delete()
     Permission.objects.all().delete()  # remove all perms here??
 
     # add permissions
@@ -27,13 +27,18 @@ def load():
                 codename=permissions[perm]['codename'])
         perm_file.close()
 
-    # add groups
+    # groups already exist in system:
+    # see accounts/migrtions/0004_add_groups
     groups_file = open(PERMISSIONS_DIR + 'groups.json')
     groups = json.loads(groups_file.read())
     for group in groups:
         perm_list = groups[group]['permissions']
         perms = Permission.objects.filter(
             codename__in=perm_list)
-        g = Group.objects.create(name=group)
+        try:
+            g = Group.objects.get(name=group)
+        except Group.DoesNotExist:
+            g = Group.objects.create(name=group)
         g.permissions.set(perms)
         g.save()
+    groups_file.close()

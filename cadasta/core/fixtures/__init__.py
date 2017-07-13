@@ -76,14 +76,14 @@ class FixturesData:
             admin = i == 3 or i == 4
             group = oa_group if admin else om_group
             models.OrganizationRole.objects.create(
-                organization=orgs[0], user=users[i], group=group, admin=admin
+                organization=orgs[0], user=users[i], group=group
             )
 
         for i in [0, 1, 2, 4, 8, 10]:
             admin = i == 2 or i == 4
             group = oa_group if admin else om_group
             models.OrganizationRole.objects.create(
-                organization=orgs[1], user=users[i], group=group, admin=admin
+                organization=orgs[1], user=users[i], group=group
             )
 
         print("{} and {} have superuser policies.".format(users[0], users[1]))

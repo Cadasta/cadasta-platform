@@ -1,6 +1,5 @@
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.db import models
 from django_countries.fields import CountryField
 from django.contrib.postgres.fields import JSONField, ArrayField
@@ -22,8 +21,16 @@ from .validators import validate_contact
 from .choices import ROLE_CHOICES, ACCESS_CHOICES
 from . import messages
 
-
-PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
+ROLE_GROUPS = {
+    'A': 'OrgAdmin',
+    'M': 'OrgMember',
+    'Pb': 'PublicUser',
+    'PU': 'ProjectMember',
+    'DC': 'DataCollector',
+    'PM': 'ProjectManager',
+    'SU': 'SuperUser',
+    'AN': 'AnonymousUser'
+}
 
 
 def get_policy_instance(policy_name, variables):
@@ -114,14 +121,17 @@ class Organization(SlugModel, RandomIDModel):
 
 class OrganizationRole(Role):
     organization = models.ForeignKey(Organization)
-    admin = models.BooleanField(default=False)
     group = models.ForeignKey(
-        'auth.Group', null=True, related_name='organization_roles')
+        'auth.Group', related_name='organization_roles')
 
     history = HistoricalRecords()
 
     class Meta:
         unique_together = ('organization', 'user')
+
+    @property
+    def admin(self):
+        return self.group.name == 'OrgAdmin'
 
     def __repr__(self):
         repr_string = ('<OrganizationRole id={obj.id} user={obj.user.username}'
@@ -317,7 +327,7 @@ class ProjectRole(Role):
                             choices=ROLE_CHOICES,
                             default='PU')
     group = models.ForeignKey(
-        'auth.Group', null=True, related_name='project_roles')
+        'auth.Group', related_name='project_roles')
 
     history = HistoricalRecords()
 

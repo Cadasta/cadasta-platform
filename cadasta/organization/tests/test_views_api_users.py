@@ -1,15 +1,12 @@
-import json
 from datetime import datetime, timedelta, timezone
 
 from django.test import TestCase
 from rest_framework.exceptions import PermissionDenied
-from tutelary.models import Policy, assign_user_policies
 from skivvy import APITestCase
 
-from accounts.permissions import load as load_role_permissions
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
-from .factories import OrganizationFactory, clause
+from .factories import OrganizationFactory
 from ..views.api import UserAdminList, UserAdminDetail
 
 
@@ -20,30 +17,17 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         super().setUp()
 
     def setup_models(self):
-        clauses = {
-            'clause': [
-                clause('allow', ['user.list'])
-            ]
-        }
-        policy = Policy.objects.create(
-            name='test-default',
-            body=json.dumps(clauses))
-        self.user = UserFactory.create()
-        assign_user_policies(self.user, policy)
+        self.user = UserFactory.create(is_superuser=True)
 
     def test_full_list(self):
-        """
-        It should return all users.
-        """
+        """It should return all users."""
         UserFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert len(response.content['results']) == 3
 
     def test_full_list_organizations(self):
-        """
-        It should return all users with their organizations.
-        """
+        """It should return all users with their organizations."""
         user1, user2 = UserFactory.create_batch(2)
         o0 = OrganizationFactory.create(add_users=[user1, user2])
         o1 = OrganizationFactory.create(add_users=[user1])
@@ -66,18 +50,14 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
                 in response.content['results'][2]['organizations'])
 
     def test_full_list_with_unautorized_user(self):
-        """
-        It should 403 "You do not have permission to perform this action."
-        """
+        """It should 403 "You do not have permission to perform this action."""
         UserFactory.create_batch(2)
         response = self.request()
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_filter_active(self):
-        """
-        It should return only one active user (plus the "setup" user).
-        """
+        """It should return only one active user (plus the "setup" user)."""
         UserFactory.create_from_kwargs([
             {'is_active': True}, {'is_active': False}
         ])
@@ -86,9 +66,7 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         assert len(response.content['results']) == 2
 
     def test_search_filter(self):
-        """
-        It should return only two matching users.
-        """
+        """It should return only two matching users."""
         UserFactory.create_from_kwargs([
             {'full_name': 'Match'},
             {'username': 'ivegotamatch'},
@@ -123,22 +101,11 @@ class UserListAPITest(APITestCase, UserTestCase, TestCase):
         assert(usernames == sorted(usernames, reverse=True))
 
 
-class UserDetailAPITest(APITestCase, TestCase):
+class UserDetailAPITest(APITestCase, UserTestCase, TestCase):
     view_class = UserAdminDetail
 
     def setup_models(self):
-        load_role_permissions()
-        clauses = {
-            'clause': [
-                clause('allow', ['user.*']),
-                clause('allow', ['user.*'], ['user/*'])
-            ]
-        }
-        policy = Policy.objects.create(
-            name='default',
-            body=json.dumps(clauses))
-        self.user = UserFactory.create()
-        assign_user_policies(self.user, policy)
+        self.user = UserFactory.create(is_superuser=True)
         self.test_user = UserFactory.create(username='test-user')
 
     def setup_url_kwargs(self):

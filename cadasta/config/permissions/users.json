@@ -8,6 +8,10 @@
         "user_update": {
             "name": "Update User",
             "codename": "user.update"
+        },
+        "user_list": {
+            "name": "List Users",
+            "codename": "user.list"
         }
     }
 }

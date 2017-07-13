@@ -250,8 +250,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=self.user,
-            group=self.org_admin_group,
-            admin=True
+            group=self.org_admin_group
         )
         members = {self.user.username: 'Administrator'}
         response = self.request(user=self.user)
@@ -354,7 +353,8 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
-        OrganizationRole.objects.create(organization=org, user=self.user)
+        OrganizationRole.objects.create(
+            organization=org, user=self.user, group=self.org_member_group)
         self.project.access = 'private'
         self.project.save()
 
@@ -402,8 +402,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=org_admin,
-            group=self.org_admin_group,
-            admin=True
+            group=self.org_admin_group
         )
         members = {org_admin.username: 'Administrator'}
         self.project.archived = True
@@ -491,8 +490,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             group = self.oa_group if idx < 2 else self.om_group
             OrganizationRole.objects.create(organization=self.org,
                                             user=self.users[idx],
-                                            group=group,
-                                            admin=(idx < 2))
+                                            group=group)
 
     def _get(self, status=None, check_content=False, login_redirect=False):
         response = self.client.get(reverse('project:add'))
@@ -709,8 +707,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         second_org = OrganizationFactory.create(name="Second Org")
         OrganizationRole.objects.create(organization=second_org,
                                         user=self.users[0],
-                                        group=self.oa_group,
-                                        admin=True)
+                                        group=self.oa_group)
         self.client.force_login(self.users[0])
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
@@ -794,7 +791,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['details-questionaire'] = self.get_form(
+        self.DETAILS_POST_DATA['details-questionnaire'] = self.get_form(
             'xls-form')
         details_response = self.client.post(
             reverse('organization:project-add',

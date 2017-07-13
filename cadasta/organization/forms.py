@@ -18,14 +18,14 @@ from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
 from leaflet.forms.widgets import LeafletWidget
 from questionnaires.models import Questionnaire
-from tutelary.models import check_perms
 
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
 # from .download.resources import ResourceExporter
 from .download.shape import ShapeExporter
 from .download.xls import XLSExporter
 from organization import fields as org_fields
-from .models import Organization, OrganizationRole, Project, ProjectRole
+from .models import (ROLE_GROUPS, Organization, OrganizationRole,
+                     Project, ProjectRole)
 
 FORM_CHOICES = (('Pb', _('Public User')),) + ROLE_CHOICES
 QUESTIONNAIRE_TYPES = [
@@ -33,15 +33,6 @@ QUESTIONNAIRE_TYPES = [
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 ]
-
-ROLE_GROUPS = {
-    'A': 'OrgAdmin',
-    'M': 'OrgMember',
-    'Pb': 'PublicUser',
-    'PU': 'ProjectMember',
-    'DC': 'DataCollector',
-    'PM': 'ProjectManager'
-}
 
 
 def create_update_or_delete_project_role(project, user, role):
@@ -176,9 +167,7 @@ class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
             OrganizationRole.objects.create(
                 organization=instance,
                 user=self.user,
-                group=group,
-                admin=True
-            )
+                group=group)
 
         return instance
 
@@ -247,7 +236,6 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
         return org_role
 
     def save(self):
-        self.org_role_instance.admin = self.data.get('org_role') == 'A'
         try:
             name = ROLE_GROUPS.get(self.data.get('org_role'), 'M')
             group = Group.objects.get(name=name)
@@ -324,11 +312,13 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
             self.orgs = Organization.objects.filter(
                 archived=False).order_by('name')
         else:
-            roles = OrganizationRole.objects.filter(
-                user=self.user, group__name='OrgAdmin',
-                organization__archived=False
-            )
-            self.orgs = [r.organization for r in roles]
+            self.orgs = [
+                role.organization for role in
+                OrganizationRole.objects.filter(
+                    user=self.user, group__name='OrgAdmin',
+                    organization__archived=False
+                ).select_related('organization').order_by('organization__name')
+            ]
         choices = [(o.slug, o.name) for o in self.orgs]
         if not org_is_chosen and len(choices) > 1:
             choices = [('', _("Please select an organization"))] + choices
@@ -441,8 +431,7 @@ class PermissionsForm(SuperUserCheck):
         if not hasattr(self, 'admins'):
             self.admins = [
                 role.user for role in OrganizationRole.objects.filter(
-                    organization=self.organization,
-                    admin=True
+                    organization=self.organization, group__name='OrgAdmin'
                 ).select_related('user')
             ]
 

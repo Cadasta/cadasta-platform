@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
@@ -48,7 +49,10 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.user = UserFactory.create()
-        assign_policies(self.user)
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
+        self.pm_group = Group.objects.get(name='ProjectManager')
+        self.pu_group = Group.objects.get(name='ProjectMember')
 
     def setup_url_kwargs(self):
         return {
@@ -57,12 +61,13 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         }
 
     def test_full_list(self):
-        """
-        It should return all organizations.
-        """
+        """It should return all users."""
         prj_users = UserFactory.create_batch(2)
         other_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=prj_users)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert len(response.content['results']) == 2
@@ -93,18 +98,25 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
         user_to_add = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user_to_add])
         self.project = ProjectFactory.create(organization=org)
-
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(post_data={'username': user_to_add.username},
                                 method='POST',
                                 user=self.user)
         assert response.status_code == 201
-        assert self.project.users.count() == 1
+        assert self.project.users.count() == 2
 
     def test_add_user_when_role_exists(self):
         new_user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[new_user])
         self.project = ProjectFactory.create(organization=org)
-        ProjectRole.objects.create(user=new_user, project=self.project)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
+        ProjectRole.objects.create(
+            user=new_user, project=self.project,
+            group=self.pu_group, role='PU')
         response = self.request(user=self.user, method='POST',
                                 post_data={'username': new_user.username})
         assert response.status_code == 400
@@ -120,11 +132,14 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_add_user_with_invalid_data(self):
         self.project = ProjectFactory.create()
+        ProjectRole.objects.create(
+            user=self.user, project=self.project,
+            group=self.pm_group, role='PM')
         response = self.request(post_data={'username': 'some-user'},
                                 method='POST',
                                 user=self.user)
         assert response.status_code == 400
-        assert self.project.users.count() == 0
+        assert self.project.users.count() == 1
         assert ('User with username or email some-user does not exist'
                 in response.content['username'])
 
@@ -149,7 +164,7 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.user = UserFactory.create()
-        assign_policies(self.user)
+        self.pm_group = Group.objects.get(name='ProjectManager')
 
     def setup_url_kwargs(self):
         username = 'blah'
@@ -165,6 +180,9 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_get_user(self):
         self.test_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=[self.test_user])
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content['username'] == self.test_user.username
@@ -177,6 +195,9 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_get_user_that_does_not_exist(self):
         self.project = ProjectFactory.create()
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(user=self.user,
                                 url_kwargs={'username': self.user.username})
         assert response.status_code == 404
@@ -184,6 +205,9 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_get_user_from_org_that_does_not_exist(self):
         self.project = ProjectFactory.create()
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(user=self.user,
                                 url_kwargs={'organization': 'some-org'})
         assert response.status_code == 404
@@ -191,6 +215,9 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_get_user_from_project_that_does_not_exist(self):
         self.project = ProjectFactory.create()
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(user=self.user,
                                 url_kwargs={'project': 'some-prj'})
         assert response.status_code == 404
@@ -199,6 +226,9 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_update_user(self):
         self.test_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=[self.test_user])
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(user=self.user, method='PATCH')
         assert response.status_code == 200
         role = ProjectRole.objects.get(project=self.project,
@@ -262,9 +292,12 @@ class ProjectUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_delete_user(self):
         self.test_user = UserFactory.create()
         self.project = ProjectFactory.create(add_users=[self.test_user])
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM')
         response = self.request(method='DELETE', user=self.user)
         assert response.status_code == 204
-        assert self.project.users.count() == 0
+        assert self.project.users.count() == 1
         assert User.objects.filter(username=self.test_user.username).exists()
 
     def test_delete_user_with_unauthorized_user(self):
@@ -666,7 +699,6 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.user = UserFactory.create()
-        assign_policies(self.user)
         self.organization = OrganizationFactory.create(slug='namati')
         self.project = ProjectFactory.create(
             slug='project',
@@ -674,6 +706,15 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
             name='Test Project',
             archived=False,
             access='public')
+
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
+        self.pm_group = Group.objects.get(name='ProjectManager')
+        OrganizationRole.objects.create(
+            organization=self.organization, user=self.user,
+            group=self.oa_group)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user, group=self.pm_group)
 
     def setup_url_kwargs(self):
         return {
@@ -732,29 +773,18 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_get_private_project_without_permission(self):
         self.project.access = 'private'
         self.project.save()
+        user = UserFactory.create()
 
-        restricted_clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*'])
-            ]
-        }
-        restricted_policy = Policy.objects.create(
-            name='restricted',
-            body=json.dumps(restricted_clauses))
-        assign_user_policies(self.user, restricted_policy)
-
-        response = self.request(user=self.user)
+        response = self.request(user=user)
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_get_private_project_based_on_org_membership(self):
         self.project.access = 'private'
         self.project.save()
+        user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.organization,
-                                        user=self.user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -766,7 +796,8 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.project.save()
         user = UserFactory.create()
         other_org = OrganizationFactory.create()
-        OrganizationRole.objects.create(organization=other_org, user=user)
+        OrganizationRole.objects.create(
+            organization=other_org, user=user, group=self.om_group)
 
         response = self.request(user=user)
         assert response.status_code == 403
@@ -837,28 +868,18 @@ class ProjectDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_valid_visibility_patching(self):
         # Create users with default list and view permissions for
         # organizations and projects.
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view', 'project.list'],
-                       ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*'])
-            ]
-        }
-        policy = Policy.objects.create(
-            name='test-policy',
-            body=json.dumps(clauses)
-        )
         org_user = UserFactory.create()
-        assign_user_policies(org_user, policy)
         non_org_user = UserFactory.create()
-        assign_user_policies(non_org_user, policy)
 
         # Create organization, adding just one user.
         org = OrganizationFactory.create(add_users=[org_user])
 
         # Create public project in organization.
-        prj = ProjectFactory.create(organization=org, access='public')
+        prj = ProjectFactory.create(
+            organization=org, access='public', add_users=[org_user])
+
+        OrganizationRole.objects.create(
+            user=self.user, organization=org, group=self.oa_group)
 
         # User in org SHOULD be able to see project.
         response = self.request(

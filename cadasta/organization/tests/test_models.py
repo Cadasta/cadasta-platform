@@ -1,16 +1,13 @@
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.test import TestCase
-
-from tutelary.models import Policy
 
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
 from geography import load as load_countries
 from spatial.tests.factories import SpatialUnitFactory
 from .factories import OrganizationFactory, ProjectFactory
-from ..models import OrganizationRole, ProjectRole
-
-PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
+from ..models import OrganizationRole, ProjectRole, ROLE_GROUPS
 
 
 class OrganizationTest(TestCase):
@@ -34,7 +31,6 @@ class OrganizationTest(TestCase):
 class OrganizationRoleTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
-        self.oa_policy = Policy.objects.get(name='org-admin')
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create(add_users=[self.user])
         self.no_user_org = OrganizationFactory.create()
@@ -42,42 +38,41 @@ class OrganizationRoleTest(UserTestCase, TestCase):
     def test_repr(self):
         user = UserFactory.build(username='john')
         org = OrganizationFactory.build(slug='org')
+        group = Group.objects.get(name='OrgAdmin')
         role = OrganizationRole(id='abc123', user=user, organization=org,
-                                admin=True)
+                                group=group)
         assert repr(role) == ('<OrganizationRole id=abc123 user=john'
-                              ' organization=org admin=True>')
+                              ' organization=org group=OrgAdmin admin=True>')
 
     def _get_role(self):
         return OrganizationRole.objects.get(organization=self.org,
                                             user=self.user)
 
-    def _admin_role(self, before, assign, after):
-        assert self.user.has_perm('org.update', self.org) is before
-        role = self._get_role()
-        role.admin = assign
-        role.save()
-        assert self.user.has_perm('org.update', self.org) is after
-
     def test_assign_new_admin(self):
-        OrganizationRole.objects.create(
-            organization=self.no_user_org, user=self.user, admin=True)
-        assert self.user.has_perm('org.update', self.no_user_org) is True
+        user = UserFactory.create(username='john')
+        group = Group.objects.get(name='OrgAdmin')
+        role = OrganizationRole.objects.create(
+            organization=self.no_user_org, user=user,
+            group=group)
+        assert 'org.update' in role.permissions
 
-    def test_keep_admin_role(self):
-        self.user.assign_policies((self.oa_policy,
-                                   {'organization': self.org.slug}))
-        self._admin_role(True, True, True)
-
-    def test_keep_non_admin_role(self):
-        self._admin_role(False, False, False)
-
-    def test_add_admin_role(self):
-        self._admin_role(False, True, True)
+    def test_add_org_member(self):
+        user = UserFactory.create(username='john')
+        group = Group.objects.get(name='OrgMember')
+        role = OrganizationRole.objects.create(
+            organization=self.no_user_org, user=user, group=group)
+        assert 'org.update' not in role.permissions
+        assert not role.admin
 
     def test_remove_admin_role(self):
-        self.user.assign_policies((self.oa_policy,
-                                   {'organization': self.org.slug}))
-        self._admin_role(True, False, False)
+        user = UserFactory.create(username='john')
+        group = Group.objects.get(name='OrgAdmin')
+        role = OrganizationRole.objects.create(
+            organization=self.no_user_org, user=user,
+            group=group)
+        assert 'org.update' in role.permissions
+        role.delete()
+        assert user.organizationrole_set.count() == 0
 
     def test_delete_org_role(self):
         ProjectFactory.create_batch(2, add_users=[self.user],
@@ -88,15 +83,6 @@ class OrganizationRoleTest(UserTestCase, TestCase):
         role = self._get_role()
         role.delete()
         assert ProjectRole.objects.filter(user=self.user).count() == 2
-
-    def test_delete_admin_role(self):
-        role = self._get_role()
-        role.admin = True
-        role.save()
-        assert self.user.has_perm('org.update', self.org) is True
-
-        role.delete()
-        assert self.user.has_perm('org.update', self.org) is False
 
 
 class ProjectTest(TestCase):
@@ -187,46 +173,49 @@ class ProjectRoleTest(UserTestCase, TestCase):
         super().setUp()
         self.project = ProjectFactory.create()
         self.user = UserFactory.create()
-        v = {
-            'organization': self.project.organization.slug,
-            'project': self.project.slug
-        }
-        self.roles = {
-            'PM': (Policy.objects.get(name='project-manager'), v),
-            'DC': (Policy.objects.get(name='data-collector'), v),
-            'PU': (Policy.objects.get(name='project-user'), v)
-        }
+        group = Group.objects.get(name="ProjectMember")
+        self.project_role = ProjectRole.objects.create(
+            project=self.project, user=self.user, group=group, role='PU')
 
     def test_repr(self):
+        group = Group.objects.get(name="DataCollector")
         user = UserFactory.build(username='john')
         project = ProjectFactory.build(slug='prj')
-        role = ProjectRole(id='abc123', user=user, project=project, role='DC')
+        role = ProjectRole(id='abc123', user=user, project=project,
+                           group=group, role='DC')
         assert repr(role) == ('<ProjectRole id=abc123 user=john project=prj '
-                              'role=DC>')
+                              'group=DataCollector role=DC>')
 
     def _has(self, role, state=True):
-        assert (self.roles[role] in self.user.assigned_policies()) is state
+        try:
+            self.project_role.refresh_from_db()
+        except ProjectRole.DoesNotExist:
+            assert state is False
+        else:
+            assert (self.project_role.role == role) == state
 
-    def _add_role(self, role):
-        return ProjectRole.objects.create(
-            project=self.project, user=self.user, role=role)
+    def _set_role(self, role):
+        group = Group.objects.get(name=ROLE_GROUPS.get(role, 'ProjectMember'))
+        self.project_role.group = group
+        self.project_role.role = role
+        self.project_role.save()
+        self.project_role.refresh_from_db()
 
     def _change_role(self, before_role, after_role):
-        role = self._add_role(before_role)
+        self._set_role(before_role)
         self._has(before_role)
-        role.role = after_role
-        role.save()
+        self._set_role(after_role)
         self._has(after_role)
         if before_role != after_role:
             self._has(before_role, state=False)
 
     def test_assign_new_manager(self):
-        self._add_role('PM')
+        self._set_role('PM')
         self._has('PM')
 
     def test_add_manager_role(self):
         self._has('PM', state=False)
-        self._add_role('PM')
+        self._set_role('PM')
         self._has('PM', state=True)
 
     def test_keep_manager_role(self):
@@ -239,13 +228,14 @@ class ProjectRoleTest(UserTestCase, TestCase):
         self._change_role('PM', 'PU')
 
     def test_assign_new_collector(self):
-        self._add_role('DC')
+        self._has('DC', state=False)
+        self._set_role('DC')
         self._has('DC')
 
     def test_add_collector_role(self):
         self._has('DC', state=False)
-        self._add_role('DC')
-        self._has('DC', state=True)
+        self._set_role('DC')
+        self._has('DC')
 
     def test_keep_collector_role(self):
         self._change_role('DC', 'DC')
@@ -257,19 +247,22 @@ class ProjectRoleTest(UserTestCase, TestCase):
         self._change_role('DC', 'PU')
 
     def test_delete_manager_role(self):
-        self._add_role('PM')
+        self._set_role('PM')
         self._has('PM', state=True)
-        ProjectRole.objects.get(project=self.project, user=self.user).delete()
+        ProjectRole.objects.filter(
+            project=self.project, user=self.user).delete()
         self._has('PM', state=False)
 
     def test_delete_collector_role(self):
-        self._add_role('DC')
+        self._set_role('DC')
         self._has('DC', state=True)
-        ProjectRole.objects.get(project=self.project, user=self.user).delete()
+        ProjectRole.objects.filter(
+            project=self.project, user=self.user).delete()
         self._has('DC', state=False)
 
     def test_delete_user_role(self):
-        self._add_role('PU')
+        self._set_role('PU')
         self._has('PU', state=True)
-        ProjectRole.objects.get(project=self.project, user=self.user).delete()
+        ProjectRole.objects.filter(
+            project=self.project, user=self.user).delete()
         self._has('PU', state=False)

@@ -1,5 +1,6 @@
 import factory
 
+from django.contrib.auth.models import Group
 from core.tests.factories import ExtendedFactory
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
@@ -22,7 +23,9 @@ class OrganizationFactory(ExtendedFactory):
 
         if users:
             for u in users:
-                OrganizationRole.objects.create(organization=self, user=u)
+                group = Group.objects.get(name='OrgMember')
+                OrganizationRole.objects.create(organization=self,
+                                                group=group, user=u)
 
 
 class ProjectFactory(ExtendedFactory):
@@ -45,9 +48,12 @@ class ProjectFactory(ExtendedFactory):
 
         if users:
             for u in users:
+                om = Group.objects.get(name="OrgMember")
+                pu = Group.objects.get(name="ProjectMember")
                 OrganizationRole.objects.get_or_create(
-                    organization=self.organization, user=u)
-                ProjectRole.objects.create(project=self, user=u)
+                    organization=self.organization, group=om, user=u)
+                ProjectRole.objects.create(project=self, user=u,
+                                           group=pu, role='PU')
 
 
 def clause(effect, action, object=None):

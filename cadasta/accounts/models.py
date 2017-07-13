@@ -5,6 +5,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
+from django.contrib.auth.models import Group
 from django.template.loader import render_to_string
 import django.contrib.auth.models as auth
 import django.contrib.auth.base_user as auth_base
@@ -104,8 +105,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 def assign_public_user_role(sender, instance, **kwargs):
     if not PublicRole.objects.filter(user=instance).exists():
         group = auth.Group.objects.get(name='PublicUser')
-        PublicRole.objects.create(
-            user=instance, name='public_user', group=group)
+        PublicRole.objects.create(user=instance, group=group)
 
 
 @receiver(models.signals.post_save, sender=User)
@@ -133,10 +133,8 @@ def password_changed_reset(sender, request, user, **kwargs):
 
 class PublicRole(Role):
 
-    is_public_user = True
-
     group = models.ForeignKey(
-        'auth.Group', null=True, related_name='publicuser_roles')
+        'auth.Group', related_name='publicuser_roles')
 
     history = HistoricalRecords()
 

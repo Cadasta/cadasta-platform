@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import get_language
 from jsonattrs.mixins import template_xlang_labels
 from jsonattrs.forms import form_field_from_name
-from tutelary.models import Role
 
 from core.validators import sanitize_string
 from questionnaires.models import Questionnaire, Question, QuestionOption
