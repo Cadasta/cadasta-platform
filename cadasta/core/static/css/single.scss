@@ -38,7 +38,6 @@
     .org-name {
       font-size: 16px;
       display: block;
-      padding-bottom: 2px;
     }
     a {
       color: $brand-lightblue;
@@ -515,28 +514,6 @@
   }
 }
 
-/* =Stats on overview page
--------------------------------------------------------------- */
-
-// .stats {
-//   li {
-//     width: 30%;
-//     border-right: solid 1px $table-border-color;
-//     text-align: center;
-//     .num {
-//       font-size: 28px;
-//       font-size: 2.4vw;
-//       font-weight: 600;
-//       font-family: $font-family-sans-serif-alt;
-//       letter-spacing: -1px;
-//     }
-//     &:last-child {
-//       border-right: none;
-//     }
-//   }
-// }
-
-
 /* =Tabs
 -------------------------------------------------------------- */
 .nav-tabs {
@@ -646,7 +623,7 @@
     position: relative;
     background: #fff;
     margin: 0 auto;
-    padding: 20px 40px;
+    padding: 20px;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-box-shadow: 0 0 6px rgba(0,0,0,.3);
@@ -682,16 +659,6 @@
       &.linked:hover {
         cursor: pointer;
         background-color: $table-bg-hover;
-      }
-    }
-    .nav-tabs {
-      li > a {
-        font-size: 13px;
-        padding: 10px;
-      }
-      li.active > a, li.active > a:hover, li.active > a:focus {
-        border-color: $table-border-color;
-        border-bottom-color: transparent;
       }
     }
     section > p:first-child {
@@ -751,6 +718,9 @@ body.map .content-single {
     .map {
       height: 400px;
       min-height: 400px;
+    }
+    .detail {
+      padding-left: 35px;
     }
     .main-text {
       padding: 10px 30px;
