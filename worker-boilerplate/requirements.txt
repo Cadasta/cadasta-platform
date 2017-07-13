@@ -1,4 +1,1 @@
-cadasta-workertoolbox==0.0.2dev4
-celery==4.0.2
-boto3==1.4.4
-pycurl==7.43.0
+cadasta-workertoolbox==0.0.2dev5
