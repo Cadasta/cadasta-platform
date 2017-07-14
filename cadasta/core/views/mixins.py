@@ -15,10 +15,6 @@ class ArchiveMixin:
 
 
 class SuperUserCheckMixin:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.is_su = None
-
     @property
     def is_superuser(self):
         return self.request.user.is_superuser
