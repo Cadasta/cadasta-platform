@@ -10,6 +10,9 @@ from core import backends
 
 class MemorySafePyLibMCCacheTest(TestCase):
 
+    def tearDown(cls):
+        importlib.reload(backends)
+
     @override_settings(CACHES={
         'default': {
             'BACKEND': 'core.backends.MemorySafePyLibMCCache',

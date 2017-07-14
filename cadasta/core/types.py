@@ -4,10 +4,15 @@ import logging
 
 class HandledErrors(type):
     """
-    Metaclass to suppress and log exceptions white-listed exceptions from
-    associated with method names in the implementing class' HANDLED_ERRORS
-    property. Rather than raising the error, an exception will be logged in
-    the implementing class' module logger.
+    Metaclass to suppress and log white-listed exceptions within the
+    methods specified in the implementing class' HANDLED_ERRORS
+    property. Rather than raising the error, an exception will be logged
+    in the implementing class' module logger.
+
+    HANDLED_ERRORS is expected to be a an iterable of tuples containing
+    the method name to which the handling should be applied and an
+    exception or tuple of exceptions that should caught and logged
+    within the method.
     """
 
     def __init__(cls, name, bases, namespace, **kwargs):
