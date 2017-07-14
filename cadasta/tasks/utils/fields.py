@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 def validate_type(_type, val):
     """
-    Throw ValidationError if the provided value is of the provided type.
+    Throw ValidationError if the provided value is not of the provided type.
     """
     if not isinstance(val, _type):
         msg = _(

@@ -1,7 +1,7 @@
 argon2-cffi==16.3.0
 awscli==1.11.23
 beautifulsoup4==4.5.3
-cadasta-workertoolbox==0.1.2
+cadasta-workertoolbox==0.1.4
 django-allauth==0.25.2
 django-audit-log==0.7.0
 django-buckets==0.1.20
@@ -23,7 +23,7 @@ djangorestframework-gis==0.10.1
 djangorestframework==3.3.3
 djoser==0.5.2
 drfdocs-cadasta==0.0.12
-git+https://github.com/celery/kombu.git@master
+git+https://github.com/celery/kombu.git@master  # Rm when Kombu 4.0.3 is released and cadasta-workertoolbox version is updated to use that version
 gdal==1.10.0
 gpxpy==1.1.2
 jsonschema==2.5.1

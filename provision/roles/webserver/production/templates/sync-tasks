@@ -6,6 +6,6 @@ respawn
 setuid {{ app_user }}
 
 exec {{ virtualenv_path }}bin/python \
-    {{ application_path }}manage.py \
+    {{ application_path }}cadasta/manage.py \
     --settings {{ django_settings }} \
     sync_tasks
