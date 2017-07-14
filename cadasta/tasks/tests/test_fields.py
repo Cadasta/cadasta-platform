@@ -22,13 +22,12 @@ class PickledObjectFieldTests(TestCase):
 
     def test_to_python(self):
         for (data_in, exp_out) in TEST_DATA:
-            self.assertEqual(PickledObjectField().to_python(data_in), exp_out)
+            assert PickledObjectField().to_python(data_in) == exp_out
 
     def test_from_db_value(self):
         for (data_in, exp_out) in TEST_DATA:
-            self.assertEqual(
-                PickledObjectField().from_db_value(data_in, None, None, None),
-                exp_out)
+            out = PickledObjectField().from_db_value(data_in, None, None, None)
+            assert out == exp_out
 
     def test_get_db_prep_value(self):
         for (_, data_in) in TEST_DATA:
@@ -45,7 +44,7 @@ class PickledObjectFieldTests(TestCase):
                 f = PickledObjectField()
                 f.attname = 'foo'
                 mock.return_value = exp_out
-                self.assertEqual(f.value_to_string(obj), exp_out)
+                assert f.value_to_string(obj) == exp_out
                 f.get_db_prep_value.assert_called_once_with(data_in)
 
     def test_get_lookup(self):
@@ -62,4 +61,4 @@ class PickledObjectFieldTests(TestCase):
                 else:
                     with self.assertRaises(TypeError):
                         f.get_lookup(lookup)
-                        self.assertEqual(func.call_count, 0)
+                        assert func.call_count == 0

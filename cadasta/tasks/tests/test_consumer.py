@@ -60,14 +60,14 @@ class TestConsumers(TestCase):
         )
         consumers = w.get_consumers(MockConsumer, mock_channel)
 
-        self.assertEqual(len(consumers), 1)
+        assert len(consumers) == 1
         consumer = consumers[0]
-        self.assertEqual(len(consumer.queues), 1)
+        assert len(consumer.queues) == 1
         queue = consumer.queues[0]
-        self.assertEqual(queue.name, 'foobar')
+        assert queue.name == 'foobar'
 
-        self.assertEqual(len(consumer.callbacks), 1)
-        self.assertEqual(consumer.callbacks[0], w.process_task)
+        assert len(consumer.callbacks) == 1
+        assert consumer.callbacks[0] == w.process_task
 
     @patch('tasks.consumer.logger')
     @patch('tasks.consumer.Worker._handle_task')
@@ -85,7 +85,7 @@ class TestConsumers(TestCase):
 
         self.mock_worker.process_task(body, msg)
 
-        self.assertEqual(logger.exception.call_count, 1)
+        assert logger.exception.call_count == 1
         self.assert_sqs_ack(sqs_client, msg)
         logger.exception.assert_called_once_with(
             'Failed to process message: %r', msg)
@@ -103,7 +103,7 @@ class TestConsumers(TestCase):
         self.mock_worker.process_task(body, msg)
 
         msg.ack.assert_called_once_with()
-        self.assertEqual(logger.exception.call_count, 0)
+        assert logger.exception.call_count == 0
 
     @patch('tasks.consumer.logger')
     @patch('tasks.consumer.BackgroundTask')
@@ -125,9 +125,9 @@ class TestConsumers(TestCase):
             },
             task_id='486e8738-a9ef-475a-b8e1-158e987f4ae6'
         )
-        self.assertEqual(logger.debug.call_args_list, [
+        assert logger.debug.call_args_list == [
             call('Handling task message %r', body),
-            call('Processed task: %r', msg)])
+            call('Processed task: %r', msg)]
 
     @patch('tasks.consumer.logger')
     @patch('tasks.consumer.BackgroundTask')

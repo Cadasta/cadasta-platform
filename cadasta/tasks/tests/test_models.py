@@ -84,17 +84,17 @@ class TestBackgroundTaskModel(TestCase):
     def test_input_args_property(self):
         """ Ensure that input args getter/setter works as expected """
         task = BackgroundTaskFactory.build(input={'args': [], 'kwargs': {}})
-        self.assertEqual(task.input_args, [])
+        assert task.input_args == []
         args = ['a', 'b', 'c']
         task.input_args = args
-        self.assertEqual(task.input_args, args)
-        self.assertEqual(task.input, {'args': args, 'kwargs': {}})
+        assert task.input_args == args
+        assert task.input == {'args': args, 'kwargs': {}}
 
     def test_input_kwargs_property(self):
         """ Ensure that input kwargs getter/setter works as expected """
         task = BackgroundTaskFactory.build(input={'args': [], 'kwargs': {}})
-        self.assertEqual(task.input_kwargs, {})
+        assert task.input_kwargs == {}
         kwargs = {'a': 1, 'b': 2, 'c': 3}
         task.input_kwargs = kwargs
-        self.assertEqual(task.input_kwargs, kwargs)
-        self.assertEqual(task.input, {'args': [], 'kwargs': kwargs})
+        assert task.input_kwargs == kwargs
+        assert task.input == {'args': [], 'kwargs': kwargs}
