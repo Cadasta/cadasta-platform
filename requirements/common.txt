@@ -24,7 +24,7 @@ django-buckets==0.1.20
 pyxform-cadasta==0.9.22
 python-magic==0.4.11
 Pillow==3.4.2
-django-jsonattrs==0.1.22
+django-jsonattrs==0.1.23
 openpyxl==2.4.1
 pytz==2016.4
 shapely==1.5.16
