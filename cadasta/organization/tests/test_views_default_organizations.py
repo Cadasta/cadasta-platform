@@ -18,9 +18,11 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.orgs = OrganizationFactory.create_batch(2)
         self.archived_org = OrganizationFactory.create(archived=True)
+        self.private_org = OrganizationFactory.create(access='private')
         unauthorized = OrganizationFactory.create(slug='unauthorized')
         self.public_orgs = self.orgs + [unauthorized]
-        self.all_orgs = self.orgs + [unauthorized] + [self.archived_org]
+        self.all_orgs = (self.orgs + [unauthorized] +
+                         [self.archived_org] + [self.private_org])
 
         # Annotate each org with the number of projects
         for org in self.all_orgs:
@@ -39,7 +41,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(self.orgs, key=lambda p: p.slug))
+            object_list=sorted(self.public_orgs, key=lambda p: p.slug))
 
     def test_get_without_user(self):
         response = self.request()
@@ -55,7 +57,33 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
             organization=self.archived_org, user=adminuser, group=group)
         response = self.request(user=adminuser)
         assert response.status_code == 200
-        assert response.content == self.render_content(user=adminuser)
+        object_list = self.public_orgs + [self.archived_org]
+        assert response.content == self.render_content(
+            user=adminuser,
+            object_list=sorted(object_list, key=lambda p: p.slug))
+
+    def test_get_archived_with_org_member(self):
+        org_member = UserFactory.create()
+        group = Group.objects.get(name="OrgMember")
+        OrganizationRole.objects.create(
+            organization=self.archived_org, user=org_member, group=group)
+        response = self.request(user=org_member)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user=org_member,
+            object_list=sorted(self.public_orgs, key=lambda p: p.slug))
+
+    def test_get_private_with_org_member(self):
+        org_member = UserFactory.create()
+        group = Group.objects.get(name="OrgMember")
+        OrganizationRole.objects.create(
+            organization=self.private_org, user=org_member, group=group)
+        response = self.request(user=org_member)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user=org_member,
+            object_list=sorted(
+                self.public_orgs + [self.private_org], key=lambda p: p.slug))
 
     def test_num_projects_attribute(self):
         # Add projects and annotate num_projects for self.orgs
@@ -66,7 +94,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(self.orgs, key=lambda p: p.slug))
+            object_list=sorted(self.public_orgs, key=lambda p: p.slug))
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create(is_superuser=True)

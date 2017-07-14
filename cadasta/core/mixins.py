@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 from accounts.models import PublicRole
-from collections.abc import Sequence
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import mixins as auth_mixins
@@ -139,31 +138,10 @@ class BaseRolePermissionMixin():
         return perms
 
     def get_queryset(self):
-        if hasattr(self, 'filtered_queryset'):
-            return self.filtered_queryset
+        if hasattr(self, 'get_filtered_queryset'):
+            return self.get_filtered_queryset()
         else:
             return super().get_queryset()
-
-    def perms_filter_queryset(self, objs):
-        actions = self.get_permission_required()
-        if isinstance(self.permission_filter_queryset, Sequence):
-            actions += tuple(self.permission_filter_queryset)
-
-        # we dont want to check each
-        # we just need to build a query based on the permissions
-        def check_each(obj):
-            check_actions = actions
-            if callable(self.permission_filter_queryset):
-                check_actions += self.permission_filter_queryset(self, obj)
-            import pytest
-            pytest.set_trace()
-            return check_perms(self.request.user, check_actions,
-                               [obj], self.request.method)
-
-        filtered_pks = [o.pk for o in filter(check_each, objs)]
-        self.filtered_queryset = self.get_queryset().filter(
-            pk__in=filtered_pks
-        )
 
     def get_user_roles(self):
         """Set user roles."""
@@ -215,21 +193,14 @@ class RolePermissionRequiredMixin(BaseRolePermissionMixin,
     def has_permission(self):
         if not hasattr(self, '_roles'):
             self.get_user_roles()
-        # # superusers have all permissions
-        # if hasattr(self, 'is_superuser'):
-        #     if self.is_superuser:
-        #         return True
-        # else:
-        #     if self.request.user.is_superuser:
-        #         return True
+        # superusers have all permissions
+        if hasattr(self, 'is_superuser'):
+            if self.is_superuser:
+                return True
+        else:
+            if self.request.user.is_superuser:
+                return True
         perms = self.get_permission_required()
-        objs = self.get_queryset()
-        if (hasattr(self, 'permission_filter_queryset') and
-           self.permission_filter_queryset is not False and
-           self.request.method == 'GET'):
-            if objs != [None]:
-                self.perms_filter_queryset(objs)
-            return True
 
         # replace when we eventually use role authorization backend
         # user = self.request.user
@@ -298,13 +269,13 @@ class APIPermissionRequiredMixin(BaseRolePermissionMixin):
     def check_permissions(self, request):
         if not hasattr(self, '_roles'):
             self.get_user_roles()
-        # # superusers have all permissions
-        # if hasattr(self, 'is_superuser'):
-        #     if self.is_superuser:
-        #         return True
-        # else:
-        #     if self.request.user.is_superuser:
-        #         return True
+        # superusers have all permissions
+        if hasattr(self, 'is_superuser'):
+            if self.is_superuser:
+                return True
+        else:
+            if self.request.user.is_superuser:
+                return True
         perms = self.get_permission_required()
 
         has_perm = all(False for perm in perms

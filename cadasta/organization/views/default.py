@@ -16,7 +16,7 @@ from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Sum, When, Case, IntegerField
+from django.db.models import Sum, When, Case, IntegerField, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
@@ -40,21 +40,38 @@ class OrganizationList(RolePermissionRequiredMixin, generic.ListView):
     model = Organization
     template_name = 'organization/organization_list.html'
     permission_required = 'org.list'
-    permission_filter_queryset = (lambda self, view, o: ('org.view',)
-                                  if o.archived is False
-                                  else ('org.view.archived',))
 
-    # This queryset annotation is needed to avoid generating a query for each
-    # organization in order to count the number of projects per org
-    queryset = Organization.objects.annotate(
-        num_projects=Sum(
-            Case(
-                When(projects__archived=False, then=1),
-                default=0,
-                output_field=IntegerField(),
+    def get_filtered_queryset(self):
+        clauses = Q(access='public', archived=False)
+        all_orgs = Organization.objects.all()
+        if self.request.user.is_superuser:
+            return self._annotate_queryset(all_orgs)
+        if self.request.user.is_anonymous:
+            return self._annotate_queryset(
+                all_orgs.filter(clauses))
+
+        org_roles = OrganizationRole.objects.filter(
+            user=self.request.user).prefetch_related('organization')
+        for role in org_roles:
+            perms = role.permissions
+            org = role.organization
+            if (('org.view.private' in perms and org.access == 'private') or
+                    ('org.view.archived' in perms and org.archived)):
+                clauses |= Q(id=org.id)
+        results = all_orgs.filter(clauses)
+        return self._annotate_queryset(results)
+
+    def _annotate_queryset(self, qs):
+        results = qs.annotate(
+            num_projects=Sum(
+                Case(
+                    When(projects__archived=False, then=1),
+                    default=0,
+                    output_field=IntegerField(),
+                ),
             ),
-        ),
-    )
+        )
+        return results
 
 
 class OrganizationAdd(RoleLoginPermissionRequiredMixin, generic.CreateView):
