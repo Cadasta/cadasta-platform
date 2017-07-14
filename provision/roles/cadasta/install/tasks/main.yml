@@ -38,6 +38,7 @@
       OPBEAT_APPID="{{ opbeat_appID }}"
       OPBEAT_TOKEN="{{ opbeat_token }}"
       SLACK_HOOK="{{ slack_hook }}"
+      QUEUE_PREFIX="{{ identifier }}"
 
 - name: Enable environment variables for SSH
   become: yes
@@ -64,6 +65,7 @@
       Defaults  env_keep += OPBEAT_APPID
       Defaults  env_keep += OPBEAT_TOKEN
       Defaults  env_keep += SLACK_HOOK
+      Defaults  env_keep += QUEUE_PREFIX
 
 # This is VERY ugly.  The problem is that Ansible keeps SSH
 # connections open across tasks, so the environment variable changes
