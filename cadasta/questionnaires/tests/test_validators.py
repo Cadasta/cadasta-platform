@@ -29,6 +29,22 @@ class ValidateTypeTest(TestCase):
         assert validators.validate_type('array', []) is True
 
 
+class ValidateIDStringTest(TestCase):
+    def test_validate_id_string_missing(self):
+        data = {'id_string': ''}
+        assert validators.validate_id_string(data) == (
+            "'id_string' cannot be blank or contain whitespace.")
+
+    def test_validate_id_string_valid(self):
+        data = {'id_string': 'yx8sqx6488wbc4yysnkrbnfq'}
+        assert validators.validate_id_string(data) is None
+
+    def test_validate_id_string_contains_whitespace(self):
+        data = {'id_string': 'yx8sqx6488wbc4yys nkrbnfq'}
+        assert validators.validate_id_string(data) == (
+            "'id_string' cannot be blank or contain whitespace.")
+
+
 class ValidateSchemaTest(TestCase):
     SCHEMA = {
         'title': {
@@ -107,6 +123,24 @@ class QuestionnaireTestCase(TestCase):
         assert 'This field is required.' in errors['questions'][0]['name']
         assert ('This field is required.' in
                 errors['question_groups'][0]['name'])
+
+    def test_invalid_id_string(self):
+        data = {
+            'title': 'yx8sqx6488wbc4yysnkrbnfq',
+            'id_string': 'yx8sqx6488w bc4yysnkrbnfq',
+            'default_language': 'en',
+            'questions': [{
+                'name': "start",
+                'label': None,
+                'type': "ST",
+                'required': False,
+                'constraint': None,
+                'index': 0
+            }]
+        }
+        errors = validators.validate_questionnaire(data)
+        assert ("'id_string' cannot be blank or contain whitespace." in
+                errors['id_string'])
 
 
 class QuestionGroupTestCase(TestCase):
