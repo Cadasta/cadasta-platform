@@ -369,47 +369,39 @@ class UserActivation(RoleLoginPermissionRequiredMixin, base_generic.View):
         return redirect('user:list')
 
 
-class ProjectList(PermissionRequiredMixin,
-                  mixins.ProjectQuerySetMixin,
+class ProjectList(RolePermissionRequiredMixin,
                   mixins.ProjectCreateCheckMixin,
                   generic.ListView):
-
-    def permission_filter(self, view, p):
-        if p.archived is True:
-            return ('project.view_archived',)
-        elif p.access == 'private':
-            return ('project.view_private',)
-        else:
-            return ('project.view',)
 
     model = Project
     template_name = 'organization/project_list.html'
     permission_required = 'project.list'
-    permission_filter_queryset = permission_filter
     project_create_check_multiple = True
 
-    def get(self, request, *args, **kwargs):
+    def get_filtered_queryset(self):
         user = self.request.user
-        if self.is_superuser:
-            projects = Project.objects.select_related('organization')
+        default = Q(access='public', archived=False)
+        all_projects = Project.objects.select_related('organization')
+        if user.is_superuser:
+            return all_projects
+        if user.is_anonymous:
+            return all_projects.filter(default)
         else:
-            projects = []
-            projects.extend(Project.objects.filter(
-                access='public', archived=False).select_related(
-                    'organization'))
-            if hasattr(user, 'organizations'):
-                for org in user.organizations.all():
-                    projects.extend(org.projects.filter(
-                        access='private', archived=False).select_related(
-                            'organization'))
-                    if OrganizationRole.objects.get(organization=org,
-                                                    user=user).admin is True:
-                        projects.extend(org.projects.filter(
-                            archived=True).select_related('organization'))
-        self.object_list = sorted(
-            projects, key=lambda p: p.organization.slug + ':' + p.slug)
-        context = self.get_context_data()
-        return super().render_to_response(context)
+            org_admin_roles = user.organizationrole_set.filter(
+                group__name='OrgAdmin').select_related('organization')
+            prj_roles = user.projectrole_set.all().select_related('project')
+            ids = []
+            for role in org_admin_roles:
+                ids += [prj.id for prj in role.organization.all_projects()]
+            for role in prj_roles:
+                perms = role.permissions
+                prj = role.project
+                if (('project.view.private' in perms and prj.access ==
+                     'private') or ('project.view.archived' in perms and
+                                    prj.archived)):
+                    ids.append(prj.id)
+            default |= Q(id__in=ids)
+            return all_projects.filter(default)
 
 
 class ProjectDashboard(RolePermissionRequiredMixin,
@@ -437,7 +429,7 @@ class ProjectDashboard(RolePermissionRequiredMixin,
         context = super().get_context_data(**kwargs)
         role_labels = dict(ROLE_CHOICES)
         org_admins = self.object.organization.users.filter(
-            organizationrole__admin=True).values('id', 'username')
+            organizationrole__group__name='OrgAdmin').values('id', 'username')
         org_roles = {
             user['username']: _("Administrator") for user in org_admins}
         org_admin_ids = [user['id'] for user in org_admins]

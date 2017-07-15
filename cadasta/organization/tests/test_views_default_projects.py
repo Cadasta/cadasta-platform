@@ -52,62 +52,44 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
     template = 'organization/project_list.html'
 
     def setup_models(self):
-        self.ok_org1 = OrganizationFactory.create(name='OK org 1', slug='org1')
-        self.ok_org2 = OrganizationFactory.create(name='OK org 2', slug='org2')
-        self.unauth_org = OrganizationFactory.create(
-            name='Unauthorized org', slug='unauth-org'
+        self.org1 = OrganizationFactory.create(name='Org 1', slug='org1')
+        self.org2 = OrganizationFactory.create(name='Org 2', slug='org2')
+        self.org3 = OrganizationFactory.create(
+            name='Org 3', slug='org3', access='private'
         )
         self.projs = []
-        self.projs += ProjectFactory.create_batch(2, organization=self.ok_org1)
-        self.projs += ProjectFactory.create_batch(2, organization=self.ok_org2)
-        self.unauth_projs = []
-        self.unauth_projs.append(ProjectFactory.create(
-            name='Unauthorized project',
-            slug='unauth-proj',
-            organization=self.ok_org2
-        ))
-        self.unauth_projs.append(ProjectFactory.create(
-            name='Project in unauthorized org',
-            slug='proj-in-unauth-org',
-            organization=self.unauth_org
-        ))
+        self.projs += ProjectFactory.create_batch(2, organization=self.org1)
+        self.projs += ProjectFactory.create_batch(2, organization=self.org2)
+
         self.priv_proj1 = ProjectFactory.create(
-            organization=self.ok_org1, access='private'
+            organization=self.org1, access='private'
         )
         self.priv_proj2 = ProjectFactory.create(
-            organization=self.ok_org1, access='private'
+            organization=self.org1, access='private'
         )
         self.priv_proj3 = ProjectFactory.create(
-            organization=self.ok_org2, access='private'
+            organization=self.org2, access='private'
         )
         self.archived_proj = ProjectFactory.create(
-            organization=self.ok_org2, archived=True)
-        ProjectFactory.create(organization=self.unauth_org, access='private')
+            organization=self.org2, archived=True)
 
-        # Note: no project.view_private -- that's controlled by
-        # organization membership in the tests.
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('deny', ['project.view'], ['project/unauth-org/*']),
-                clause('deny', ['project.view'], ['project/*/unauth-proj'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
+        # private org with public prj -- is this possible?
+        self.priv_org_prj = ProjectFactory.create(
+            organization=self.org3, access='public')
+
         self.user = UserFactory.create()
-        assigned_policies = self.user.assigned_policies()
-        assigned_policies.append(self.policy)
-        self.user.assign_policies(*assigned_policies)
+
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
+        self.pm_group = Group.objects.get(name='ProjectManager')
+        self.pu_group = Group.objects.get(name='ProjectMember')
 
     @property
     def sort_key(self):
         return lambda p: p.organization.slug + ':' + p.slug
 
     def setup_template_context(self):
-        projs = self.projs + self.unauth_projs
+        projs = self.projs + [self.priv_org_prj]
         return {
             'object_list': sorted(projs, key=self.sort_key),
             'add_allowed': False,
@@ -135,36 +117,50 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.expected_content
 
     def test_get_with_org_membership(self):
-        OrganizationRole.objects.create(organization=self.ok_org1,
-                                        user=self.user)
+        OrganizationRole.objects.create(organization=self.org1,
+                                        user=self.user, group=self.om_group)
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj1, self.priv_proj2])
+        projs = (self.projs + [self.priv_org_prj])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key))
 
     def test_get_with_org_memberships(self):
-        OrganizationRole.objects.create(organization=self.ok_org1,
-                                        user=self.user)
-        OrganizationRole.objects.create(organization=self.ok_org2,
-                                        user=self.user)
+        OrganizationRole.objects.create(organization=self.org1,
+                                        user=self.user,
+                                        group=self.om_group)
+        OrganizationRole.objects.create(organization=self.org2,
+                                        user=self.user,
+                                        group=self.om_group)
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj1, self.priv_proj2, self.priv_proj3])
+        projs = self.projs + [self.priv_org_prj]
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projs, key=self.sort_key))
+
+    def test_get_with_org_admin_and_project_manager(self):
+        OrganizationRole.objects.create(organization=self.org1,
+                                        user=self.user,
+                                        group=self.om_group)
+        ProjectRole.objects.create(project=self.priv_proj1,
+                                   user=self.user, role='PM',
+                                   group=self.pm_group)
+        response = self.request(user=self.user)
+        projs = self.projs + [self.priv_org_prj, self.priv_proj1]
 
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key))
 
     def test_get_with_org_admin(self):
-        OrganizationRole.objects.create(organization=self.ok_org2,
+        OrganizationRole.objects.create(organization=self.org2,
                                         user=self.user,
-                                        admin=True,)
+                                        group=self.oa_group)
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj3, self.archived_proj])
+        projs = (self.projs +
+                 [self.priv_proj3, self.archived_proj, self.priv_org_prj])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
