@@ -150,13 +150,17 @@ class EntityUserSerializer(SuperUserCheck, serializers.Serializer):
         if self.instance:
             self.user = self.instance
         else:
-            users = User.objects.filter(Q(username=value) | Q(email=value))
+            users = User.objects.filter(
+                Q(username=value) | Q(email=value) | Q(phone=value))
             users_count = len(users)
 
             if users_count == 0:
-                error = _("User with username or email {} does not exist")
+                error = _(
+                    "User with username or email or phone {} does not exist")
             elif users_count > 1:
-                error = _("More than one user found for username or email {}")
+                error = _(
+                    "More than one user found for username or email or"
+                    " phone {}")
             else:
                 self.user = users[0]
 

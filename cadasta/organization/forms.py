@@ -184,7 +184,7 @@ class AddOrganizationMemberForm(forms.Form):
     def clean_identifier(self):
         identifier = self.data.get('identifier')
         try:
-            self.user = User.objects.get_from_username_or_email(
+            self.user = User.objects.get_from_username_or_email_or_phone(
                 identifier=identifier)
         except (User.DoesNotExist, User.MultipleObjectsReturned) as e:
             raise forms.ValidationError(e)

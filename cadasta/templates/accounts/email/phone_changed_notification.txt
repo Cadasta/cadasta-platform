@@ -1,0 +1,11 @@
+{% load i18n %}{% autoescape off %}
+
+{% blocktrans %}
+You are receiving this email because a user at Cadasta Platform changed the phone number for the account linked to this email address.
+
+If it wasn't you who changed the phone number, please contact us immediately under security@cadasta.org.
+{% endblocktrans %}
+
+{% blocktrans %}The Cadasta Team. {% endblocktrans %}
+
+{% endautoescape %}
