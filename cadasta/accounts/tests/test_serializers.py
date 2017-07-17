@@ -1,7 +1,6 @@
 import random
 import pytest
 
-from datetime import datetime
 from django.utils.translation import gettext as _
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
@@ -367,12 +366,11 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 class AccountLoginSerializerTest(UserTestCase, TestCase):
     def test_unverified_account(self):
         """Serializer should raise EmailNotVerifiedError exeception when the
-           user has not verified their email address within 48 hours"""
+           user has not verified their email address"""
 
         UserFactory.create(username='sgt_pepper',
                            password='iloveyoko79',
-                           verify_email_by=datetime.now())
-
+                           email_verified=False)
         with pytest.raises(EmailNotVerifiedError):
             serializers.AccountLoginSerializer().validate(attrs={
                 'username': 'sgt_pepper',

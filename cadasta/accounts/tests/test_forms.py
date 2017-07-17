@@ -9,7 +9,7 @@ from django.http import HttpRequest
 from django.db import IntegrityError
 
 from allauth.account.models import EmailAddress
-from allauth.account.utils import send_email_confirmation
+
 from django.test import TestCase
 from django.utils.translation import gettext as _
 from core.tests.utils.files import make_dirs  # noqa
@@ -400,15 +400,12 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
         form = forms.ProfileForm(data, request=request, instance=user)
         form.save()
+        with pytest.raises(EmailAddress.DoesNotExist):
+            EmailAddress.objects.get(email="user1@example.com")
 
-        user = UserFactory.create(username='user2',
-                                  email='user1@example.com')
-        try:
-            send_email_confirmation(request, user)
-        except IntegrityError:
-            assert False
-        else:
-            assert True
+        with pytest.raises(IntegrityError):
+            user = UserFactory.create(username='user2',
+                                      email='user1@example.com')
 
     def test_update_email_with_incorrect_password(self):
         user = UserFactory.create(email='john@beatles.uk',
