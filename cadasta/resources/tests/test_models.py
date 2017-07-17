@@ -164,6 +164,14 @@ class ResourceTest(UserTestCase, FileStorageTestCase, TestCase):
                 'https://s3-us-west-2.amazonaws.com/cadasta-resources'
                 '/icons/xml.png')
 
+    def test_thumbnail_svg(self):
+        resource = ResourceFactory.build(
+            file='http://example.com/dir/filename.svg',
+            mime_type='image/svg+xml')
+        assert (resource.thumbnail ==
+                'https://s3-us-west-2.amazonaws.com/cadasta-resources'
+                '/icons/svg.png')
+
     def test_thumbnail_other(self):
         resource = ResourceFactory.build(
             file='http://example.com/dir/filename.pdf',

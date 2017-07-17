@@ -514,7 +514,30 @@ ICON_LOOKUPS = {
     'image/gif': 'gif',
     'image/tif': 'tiff',
     'image/tiff': 'tiff',
-    'application/gpx+xml': 'gpx'
+    'image/bmp': 'image',
+    'image/x-windows-bmp': 'image',
+    'application/gpx+xml': 'gpx',
+    'application/rtf': 'doc',
+    'application/x-rtf': 'doc',
+    'application/postscript': 'doc',
+    'application/x-troff-msvideo': 'video',
+    'video/avi': 'avi',
+    'video/msvideo': 'wmv',
+    'video/x-msvideo': 'wmv',
+    'video/x-ms-wmv': 'wmv',
+    'video/quicktime': 'video',
+    'application/ogg': 'audio',
+    'image/svg+xml': 'svg',
+    'audio/x-ms-wma': 'audio',
+    'application/vnd.oasis.opendocument.spreadsheet': 'ods',
+    'application/vnd.oasis.opendocument.text': 'odt',
+    'application/vnd.oasis.opendocument.presentation': 'odd',
+    'application/vnd.ms-powerpoint': 'ppt',
+    'application/vnd.openxmlformats-officedocument.presentationml.'
+    'presentation': 'pptx',
+    'application/x-iwork-keynote-sffkey': 'key',
+    'video/x-m4v': 'mp4',
+    'video/x-matroska': 'video',
 }
 
 MIME_LOOKUPS = {
