@@ -11,10 +11,18 @@ import django.contrib.auth.base_user as auth_base
 from allauth.account.signals import password_changed, password_reset
 from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
+from django_otp.models import Device
+from django_otp.oath import TOTP
+from django_otp.util import random_hex, hex_validator
+from binascii import unhexlify
+
+import logging
+import time
 
 from simple_history.models import HistoricalRecords
 from .manager import UserManager
 
+logger = logging.getLogger("accounts.token")
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -33,12 +41,18 @@ def abstract_user_field(name):
 class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     username = abstract_user_field('username')
     full_name = models.CharField(_('full name'), max_length=130, blank=True)
-    email = abstract_user_field('email')
+    email = models.EmailField(
+        _('email address'), blank=True, null=True, default=None, unique=True
+    )
+    phone = models.CharField(
+        _('phone number'), max_length=16, null=True,
+        blank=True, default=None, unique=True
+    )
     is_staff = abstract_user_field('is_staff')
     is_active = abstract_user_field('is_active')
     date_joined = abstract_user_field('date_joined')
     email_verified = models.BooleanField(default=False)
-    verify_email_by = models.DateTimeField(default=now_plus_48_hours)
+    phone_verified = models.BooleanField(default=False)
     change_pw = models.BooleanField(default=True)
     language = models.CharField(max_length=10,
                                 choices=settings.LANGUAGES,
@@ -80,7 +94,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                        ' full_name={obj.full_name}'
                        ' email={obj.email}'
                        ' email_verified={obj.email_verified}'
-                       ' verify_email_by={obj.verify_email_by}>')
+                       ' phone={obj.phone}'
+                       ' phone_verified={obj.phone_verified}>')
         return repr_string.format(obj=self)
 
     def get_display_name(self):
@@ -120,3 +135,66 @@ def password_changed_reset(sender, request, user, **kwargs):
         [user.email],
         fail_silently=False
     )
+
+
+def default_key():
+    return random_hex(20).decode()
+
+
+class VerificationDevice(Device):
+    unverified_phone = models.CharField(max_length=16, unique=True)
+    secret_key = models.CharField(
+        max_length=40,
+        default=default_key,
+        validators=[hex_validator],
+        help_text="Hex-encoded secret key to generate totp tokens.",
+        unique=True,
+    )
+    last_verified_counter = models.BigIntegerField(
+        default=-1,
+        help_text=("The counter value of the latest verified token."
+                   "The next token must be at a higher counter value."
+                   "It makes sure a token is used only once.")
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    verified = models.BooleanField(default=False)
+
+    step = settings.TOTP_TOKEN_VALIDITY
+    digits = settings.TOTP_DIGITS
+
+    class Meta(Device.Meta):
+        verbose_name = "Verification Device"
+
+    @property
+    def bin_key(self):
+        return unhexlify(self.secret_key.encode())
+
+    def totp_obj(self):
+        totp = TOTP(key=self.bin_key, step=self.step, digits=self.digits)
+        totp.time = time.time()
+        return totp
+
+    def generate_challenge(self):
+        totp = self.totp_obj()
+        token = str(totp.token()).zfill(self.digits)
+
+        message = _("Your token for Cadasta is {token_value}."
+                    " It is valid for {time_validity} minutes.")
+        message = message.format(
+            token_value=token, time_validity=self.step // 60)
+
+        logger.info("Token has been sent to %s " % self.unverified_phone)
+        logger.info("%s" % message)
+
+        return token
+
+    def verify_token(self, token):
+        totp = self.totp_obj()
+        if ((totp.t() > self.last_verified_counter) and
+                (totp.token() == token)):
+            self.last_verified_counter = totp.t()
+            verified = True
+            self.save()
+        else:
+            verified = False
+        return verified

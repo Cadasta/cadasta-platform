@@ -180,7 +180,7 @@ class AddOrganizationMemberForm(forms.Form):
     def clean_identifier(self):
         identifier = self.data.get('identifier')
         try:
-            self.user = User.objects.get_from_username_or_email(
+            self.user = User.objects.get_from_username_or_email_or_phone(
                 identifier=identifier)
         except (User.DoesNotExist, User.MultipleObjectsReturned) as e:
             raise forms.ValidationError(e)
@@ -221,8 +221,8 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
     def clean_org_role(self):
         org_role = self.cleaned_data['org_role']
         if (self.org_role_instance.admin and
-           self.current_user == self.user and
-           not self.is_superuser(self.user)):
+            self.current_user == self.user and
+                not self.is_superuser(self.user)):
             if self.data.get('org_role') != 'A':
                 raise forms.ValidationError(
                     _("Organization administrators cannot change their own" +
