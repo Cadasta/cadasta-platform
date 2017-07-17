@@ -39,6 +39,9 @@
       OPBEAT_APPID="{{ opbeat_appID }}"
       OPBEAT_TOKEN="{{ opbeat_token }}"
       SLACK_HOOK="{{ slack_hook }}"
+      TWILIO_ACCOUNT_SID="{{ twilio_account_sid }}"
+      TWILIO_AUTH_TOKEN="{{ twilio_auth_token }}"
+
 
 - name: Enable environment variables for SSH
   become: yes
@@ -66,6 +69,8 @@
       Defaults  env_keep += OPBEAT_APPID
       Defaults  env_keep += OPBEAT_TOKEN
       Defaults  env_keep += SLACK_HOOK
+      Defaults  env_keep += TWILIO_ACCOUNT_SID
+      Defaults  env_keep += TWILIO_AUTH_TOKEN
 
 # This is VERY ugly.  The problem is that Ansible keeps SSH
 # connections open across tasks, so the environment variable changes
