@@ -53,7 +53,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
         try:
             question = Question.objects.get(name=name, questionnaire=q)
             self.fields[field_name].labels_xlang = template_xlang_labels(
-                    question.label_xlat)
+                question.label_xlat)
 
             if question.has_options:
                 choices = QuestionOption.objects.filter(
@@ -62,7 +62,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
                 try:
                     choices, xlang_labels = zip(
                         *[((c[0], c[1].get(default_lang)),
-                          (c[0], c[1])) for c in choices])
+                           (c[0], c[1])) for c in choices])
                 except AttributeError:
                     choices = choices
                     xlang_labels = ''

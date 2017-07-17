@@ -145,3 +145,5 @@ LOGGING = {
         },
     },
 }
+
+SMS_GATEWAY = 'accounts.gateways.TwilioGateway'

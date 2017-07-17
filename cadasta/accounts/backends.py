@@ -1,5 +1,7 @@
 from allauth.account.auth_backends import AuthenticationBackend as Backend
+from django.contrib.auth.backends import ModelBackend
 from .models import User
+from .validators import phone_validator
 
 
 class AuthenticationBackend(Backend):
@@ -17,4 +19,17 @@ class AuthenticationBackend(Backend):
         except User.DoesNotExist:
             pass
 
+        return None
+
+
+class PhoneAuthenticationBackend(ModelBackend):
+    def authenticate(self, **credentials):
+        phone = credentials.get('phone', credentials.get('username'))
+        if phone_validator(phone):
+            try:
+                user = User.objects.get(phone__iexact=phone)
+                if user.check_password(credentials["password"]):
+                    return user
+            except User.DoesNotExist:
+                pass
         return None
