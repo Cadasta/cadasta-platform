@@ -24,9 +24,9 @@ class FixturesData:
         # the first two named users will have superuser access
         named_users = [
             {'username': 'superuser1', 'email': 'superuser1@cadasta.org',
-             'full_name': 'Super User1', 'is_superuser': True},
+             'phone': '+15125550115', 'full_name': 'Super User1'},
             {'username': 'superuser2', 'email': 'superuser2@cadasta.org',
-             'full_name': 'Super User2', 'is_superuser': True}]
+             'phone': '+15125550138', 'full_name': 'Super User2'}]
         # add users with names in languages that need to be tested.
         languages = ['el_GR', 'ja_JP', 'hi_IN', 'hr_HR', 'lt_LT']
         named_users.append({

@@ -1,6 +1,5 @@
 from buckets.serializers import S3Field
 from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 
@@ -123,8 +122,7 @@ class AccountLoginSerializer(djoser_serializers.LoginSerializer):
     def validate(self, attrs):
         attrs = super(AccountLoginSerializer, self).validate(attrs)
 
-        if (not self.user.email_verified and
-                timezone.now() > self.user.verify_email_by):
+        if not self.user.email_verified:
             raise EmailNotVerifiedError
 
         return attrs
