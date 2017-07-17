@@ -10,6 +10,7 @@ class UserFactory(ExtendedFactory):
 
     username = factory.Sequence(lambda n: "testuser%s" % n)
     email = factory.Sequence(lambda n: "email_%s@example.com" % n)
+    phone = factory.Sequence(lambda n: "+123456789%s" % n)
     password = ''
 
     @classmethod

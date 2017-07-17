@@ -29,16 +29,16 @@ class MigrationTestCase(UserTestCase, TestCase):
 
         # Reverse to migrate_from
         call_command('migrate', 'accounts',
-                     '0002_activate_users_20161014_0846')
+                     '0002_activate_users_20161014_0846', '--noinput')
         call_command('migrate', 'organization',
                      '0004_remove_Pb_project_roles')
-        call_command('migrate', self.app, self.migrate_from)
+        call_command('migrate', self.app, self.migrate_from, '--noinput')
 
         # setup pre-migration test data
         self.setUpBeforeMigration(apps_before)
 
         # Run the migration to test
-        call_command('migrate', self.app, self.migrate_to)
+        call_command('migrate', self.app, self.migrate_to, '--noinput')
 
         # get application state post-migration
         self.apps_after = self._get_apps_for_migration(
