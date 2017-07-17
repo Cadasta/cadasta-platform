@@ -435,14 +435,14 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert (_('User with username or email {username} '
+        assert (_('User with username or email or phone {username} '
                   'does not exist').format(username='some-user')
                 in serializer.errors['username'])
 
     def test_set_roles_for_duplicate_username(self):
         org = OrganizationFactory.create()
         user1 = UserFactory.create(email='some-user@some.com')
-        UserFactory.create(email='some-user@some.com')
+        UserFactory.create(username='some-user@some.com')
         data = {'username': user1.email, 'admin': 'true'}
         serializer = serializers.OrganizationUserSerializer(
             data=data, context={'organization': org}
@@ -450,9 +450,10 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert (_('More than one user found for username or email '
-                  '{email}').format(email='some-user@some.com')
-                in serializer.errors['username'])
+        assert (
+            _('More than one user found for username or email or'
+              ' phone {email}').format(email='some-user@some.com')
+            in serializer.errors['username'])
 
     def test_set_role_when_role_exists(self):
         user = UserFactory.create()
@@ -573,7 +574,7 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
 
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
-        assert (_('User with username or email {username} '
+        assert (_('User with username or email or phone {username} '
                   'does not exist').format(username='some-user')
                 in serializer.errors['username'])
 
