@@ -42,3 +42,5 @@ django-otp==0.4.1.1
 twilio==6.9.1
 phonenumbers==8.8.8
 opbeat==3.6.0
+cadasta-workertoolbox==0.1.5
+git+https://github.com/celery/kombu.git@master  # Rm when Kombu 4.0.3 is released and cadasta-workertoolbox version is updated to use that version
