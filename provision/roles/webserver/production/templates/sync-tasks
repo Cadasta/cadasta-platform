@@ -1,0 +1,11 @@
+description "Cadasta Sync Tasks Service"
+start on runlevel [2345]
+stop on runlevel [06]
+
+respawn
+setuid {{ app_user }}
+
+exec {{ virtualenv_path }}bin/python \
+    {{ application_path }}cadasta/manage.py \
+    --settings {{ django_settings }} \
+    sync_tasks
