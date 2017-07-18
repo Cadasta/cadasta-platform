@@ -23,6 +23,7 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': 'john@beatles.uk',
             'password': 'iloveyoko79!',
             'full_name': 'John Lennon',
+            'language': 'fr',
         }
         form = forms.RegisterForm(data)
         form.save()
@@ -207,6 +208,20 @@ class RegisterFormTest(UserTestCase, TestCase):
         assert (_("Username cannot be “add” or “new”.")
                 in form.errors.get('username'))
         assert User.objects.count() == 0
+
+    def test_signup_with_invalid_language(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'password': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+            'language': 'invalid',
+        }
+        form = forms.RegisterForm(data)
+        assert form.is_valid() is False
+        assert User.objects.count() == 0
+        assert ('Language invalid or not available'
+                in form.errors.get('language'))
 
     def test_sanitize(self):
         data = {
