@@ -137,3 +137,12 @@ LOGGING = {
         },
     },
 }
+
+# Async Tooling
+CELERY_BROKER_TRANSPORT = 'sqs'
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'region': 'us-west-2',
+    'queue_name_prefix': '{}-'.format(os.environ['QUEUE-PREFIX']),
+    'wait_time_seconds': 20,
+    'visibility_timeout': 20,
+}
