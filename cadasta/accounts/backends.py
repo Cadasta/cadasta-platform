@@ -14,7 +14,8 @@ class AuthenticationBackend(Backend):
         email = credentials.get('email', credentials.get('username'))
         try:
             user = User.objects.get(email__iexact=email)
-            if user.check_password(credentials["password"]):
+            if (user.check_password(credentials["password"]) and
+                    self.user_can_authenticate(user)):
                 return user
         except User.DoesNotExist:
             pass
