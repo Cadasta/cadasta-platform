@@ -184,7 +184,7 @@ class SpatialUnitTest(UserTestCase, TestCase):
     def test_area(self):
         su = SpatialUnitFactory.create(geometry='SRID=4326;POLYGON \
             ((30 10, 20 20, 20 20, 10 20, 30 10))')
-        assert su.area == '642391915473.73'
+        assert su.area == 642391915473.7279
 
     def test_area_no_geometry(self):
         su = SpatialUnitFactory.create()

@@ -24,10 +24,7 @@ class Exporter(SchemaSelectorMixin):
 
             value = item
             for a in attr.split('.'):
-                if a == 'area':
-                    value = item.area
-                else:
-                    value = getattr(value, a)
+                value = getattr(value, a)
             values[attr] = value
 
         content_type = ContentType.objects.get_for_model(item)

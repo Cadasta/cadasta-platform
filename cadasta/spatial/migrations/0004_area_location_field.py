@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+from django.contrib.gis.db.models.functions import Area, Transform
 
 
 def calculate_area_field(apps, schema_editor):

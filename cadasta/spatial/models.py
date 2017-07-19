@@ -178,6 +178,14 @@ def check_extent(sender, instance, **kwargs):
         reassign_spatial_geometry(instance)
 
 
+@receiver(models.signals.pre_save, sender=SpatialUnit)
+def calculate_area(sender, instance, **kwargs):
+    geom = instance.geometry
+    from django.contrib.gis.geos.polygon import Polygon
+    if geom and isinstance(geom, Polygon) and geom.valid:
+        instance.area = geom.transform(3857, clone=True).area
+
+
 @fix_model_for_attributes
 @permissioned_model
 class SpatialRelationship(RandomIDModel):
