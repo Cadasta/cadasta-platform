@@ -4,28 +4,48 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
+from allauth.account.models import EmailAddress
 
 from core.form_mixins import SanitizeFieldsForm
 from .utils import send_email_update_notification
-from .models import User
-from .validators import check_username_case_insensitive
+from .models import User, VerificationDevice
+from .validators import check_username_case_insensitive, phone_validator
 
 from parsley.decorators import parsleyfy
+from phonenumbers import parse as parse_phone
 
 
 @parsleyfy
 class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(required=False)
+
+    message = _("Phone must have format: +9999999999. Upto 15 digits allowed."
+                " Do not include hyphen or blank spaces in between, at the"
+                " beginning or at the end.")
+    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+                             error_messages={'invalid': message},
+                             required=False)
     password = forms.CharField(widget=forms.PasswordInput())
     MIN_LENGTH = 10
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password',
+        fields = ['username', 'email', 'phone', 'password',
                   'full_name', 'language']
 
     class Media:
         js = ('js/sanitize.js', )
+
+    def clean(self):
+        super(RegisterForm, self).clean()
+
+        email = self.data.get('email')
+        phone = self.data.get('phone')
+
+        if (not phone) and (not email):
+            raise forms.ValidationError(
+                _("You cannot leave both phone and email empty."
+                  " Signup with either phone or email or both."))
 
     def clean_username(self):
         username = self.data.get('username')
@@ -40,14 +60,23 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
         validate_password(password)
         errors = []
 
-        email = self.data.get('email').split('@')
-        if len(email[0]) and email[0].casefold() in password.casefold():
-            errors.append(_("Passwords cannot contain your email."))
+        email = self.data.get('email')
+        if email:
+            email = email.split('@')
+            if email[0].casefold() in password.casefold():
+                errors.append(_("Passwords cannot contain your email."))
 
         username = self.data.get('username')
         if len(username) and username.casefold() in password.casefold():
             errors.append(
                 _("The password is too similar to the username."))
+
+        phone = self.data.get('phone')
+        if phone:
+            if phone_validator(phone):
+                phone = str(parse_phone(phone).national_number)
+                if phone in password:
+                    errors.append(_("Passwords cannot contain your phone."))
 
         if errors:
             raise forms.ValidationError(errors)
@@ -56,10 +85,25 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
 
     def clean_email(self):
         email = self.data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError(
-                _("Another user with this email already exists"))
+        if email:
+            email = email.casefold()
+            if EmailAddress.objects.filter(email=email).exists():
+                raise forms.ValidationError(
+                    _("User with this Email address already exists."))
+        else:
+            email = None
         return email
+
+    def clean_phone(self):
+        phone = self.data.get('phone')
+        if phone:
+            if VerificationDevice.objects.filter(
+                    unverified_phone=phone).exists():
+                raise forms.ValidationError(
+                    _("User with this Phone number already exists."))
+        else:
+            phone = None
+        return phone
 
     def save(self, *args, **kwargs):
         user = super().save(*args, **kwargs)
@@ -174,3 +218,15 @@ class ResetPasswordForm(allauth_forms.ResetPasswordForm):
         email = self.cleaned_data.get('email')
         self.users = User.objects.filter(email=email)
         return email
+
+
+class PhoneVerificationForm(forms.Form):
+    token = forms.CharField(label=_("Token"), max_length=settings.TOTP_DIGITS)
+
+    def clean_token(self):
+        token = self.data.get('token')
+        try:
+            token = int(token)
+        except ValueError:
+            raise forms.ValidationError(_("Token must be a whole number."))
+        return token

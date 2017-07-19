@@ -137,7 +137,8 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = [
     'core.backends.Auth',
     'django.contrib.auth.backends.ModelBackend',
-    'accounts.backends.AuthenticationBackend'
+    'accounts.backends.AuthenticationBackend',
+    'accounts.backends.PhoneAuthenticationBackend'
 ]
 
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'

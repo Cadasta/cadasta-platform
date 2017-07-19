@@ -41,7 +41,12 @@ class AccountRegister(djoser_views.RegistrationView):
         signals.user_registered.send(sender=self.__class__, user=user,
                                      request=self.request)
 
-        send_email_confirmation(self.request._request, user)
+        if user.email:
+            send_email_confirmation(self.request._request, user)
+        if user.phone:
+            verification_device = user.verificationdevice_set.create(
+                unverified_phone=user.phone)
+            verification_device.generate_challenge()
 
 
 class AccountLogin(djoser_views.LoginView):

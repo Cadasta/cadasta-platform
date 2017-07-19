@@ -1,8 +1,22 @@
 from allauth.account.auth_backends import AuthenticationBackend as Backend
+from django.contrib.auth.backends import ModelBackend
 from .models import User
+from .validators import phone_validator
 
 
 class AuthenticationBackend(Backend):
+    def _authenticate_by_username(self, **credentials):
+        username = credentials.get('username')
+        try:
+            user = User.objects.get(username=username)
+            if (user.check_password(credentials["password"]) and
+                    self.user_can_authenticate(user)):
+                return user
+        except User.DoesNotExist:
+            pass
+
+        return None
+
     def _authenticate_by_email(self, **credentials):
         # Even though allauth will pass along `email`, other apps may
         # not respect this setting. For example, when using
@@ -12,9 +26,24 @@ class AuthenticationBackend(Backend):
         email = credentials.get('email', credentials.get('username'))
         try:
             user = User.objects.get(email__iexact=email)
-            if user.check_password(credentials["password"]):
+            if (user.check_password(credentials["password"]) and
+                    self.user_can_authenticate(user)):
                 return user
         except User.DoesNotExist:
             pass
 
+        return None
+
+
+class PhoneAuthenticationBackend(ModelBackend):
+    def authenticate(self, **credentials):
+        phone = credentials.get('phone', credentials.get('username'))
+        if phone_validator(phone):
+            try:
+                user = User.objects.get(phone__iexact=phone)
+                if (user.check_password(credentials["password"]) and
+                        self.user_can_authenticate(user)):
+                    return user
+            except User.DoesNotExist:
+                pass
         return None

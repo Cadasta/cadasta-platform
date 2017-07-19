@@ -2,6 +2,7 @@ import string
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
+import re
 from .models import User
 
 DEFAULT_CHARACTER_TYPES = [
@@ -59,3 +60,11 @@ def check_username_case_insensitive(username):
         raise ValidationError(
             _("A user with that username already exists")
         )
+
+
+def phone_validator(phone):
+    pattern = r'^\+(?:[0-9]?){6,14}[0-9]$'
+    if re.match(pattern=pattern, string=str(phone)) is not None:
+        return True
+    else:
+        return False

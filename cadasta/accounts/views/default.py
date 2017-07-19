@@ -2,8 +2,9 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import FormView
 
-from core.views.generic import UpdateView
+from core.views.generic import UpdateView, CreateView
 from core.views.mixins import SuperUserCheckMixin
 
 import allauth.account.views as allauth_views
@@ -11,8 +12,40 @@ from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 from allauth.account.models import EmailAddress
 
-from ..models import User
+from ..models import User, VerificationDevice
 from .. import forms
+
+
+class AccountRegister(CreateView):
+    model = User
+    form_class = forms.RegisterForm
+    template_name = 'account/signup.html'
+    success_url = reverse_lazy('account:verify_phone')
+
+    def form_valid(self, form):
+        user = form.save(self.request)
+
+        if user.email:
+            send_email_confirmation(self.request, user)
+
+        if user.phone:
+            device = user.verificationdevice_set.create(
+                unverified_phone=user.phone)
+            device.generate_challenge()
+            message = _("Verification Token sent to {phone}")
+            message = message.format(phone=user.phone)
+            messages.add_message(self.request, messages.INFO, message)
+
+        self.request.session['unverified_phone'] = user.phone
+
+        message = _("We have created your account. You should have"
+                    " received an email or a text to verify your account.")
+        messages.add_message(self.request, messages.SUCCESS, message)
+
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        return super().form_invalid(form)
 
 
 class PasswordChangeView(LoginRequiredMixin,
@@ -46,6 +79,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
         emails_to_verify = EmailAddress.objects.filter(
             user=self.object, verified=False).exists()
         context['emails_to_verify'] = emails_to_verify
+        print(context)
         return context
 
     def get_form_kwargs(self, *args, **kwargs):
@@ -86,3 +120,52 @@ class ConfirmEmail(ConfirmEmailView):
         user.save()
 
         return response
+
+
+class ConfirmPhone(FormView):
+    template_name = 'accounts/account_verification.html'
+    form_class = forms.PhoneVerificationForm
+    success_url = reverse_lazy('account:login')
+
+    def get_user(self):
+        phone = self.request.session["unverified_phone"]
+        device = VerificationDevice.objects.get(unverified_phone=phone)
+        user = device.user
+        return user
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.get_user()
+        context['email'] = user.email
+        context['phone'] = user.phone
+        return context
+
+    def post(self, *args, **kwargs):
+        form = self.form_class(self.request.POST)
+        user = self.get_user()
+        device = user.verificationdevice_set.get()
+
+        if form.is_valid():
+            token = form.cleaned_data.get('token')
+            if device.verify_token(token):
+                if user.phone == device.unverified_phone:
+                    user.phone_verified = True
+                else:
+                    user.phone = device.unverified_phone
+                    user.phone_verified = True
+                user.save()
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+
+    def form_valid(self, form, **kwargs):
+        user = self.get_user()
+        message = _("Successfully verified {phone}")
+        message = message.format(phone=user.phone)
+        messages.add_message(self.request, messages.SUCCESS, message)
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        message = _("Invalid token. Enter a valid token.")
+        messages.add_message(self.request, messages.ERROR, message)
+        return super().form_invalid(form)
