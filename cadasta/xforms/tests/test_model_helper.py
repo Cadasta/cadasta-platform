@@ -5,6 +5,7 @@ from django.conf import settings
 from django.test import TestCase
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
 from jsonattrs.management.commands import loadattrtypes
@@ -78,8 +79,11 @@ class XFormModelHelperTest(UserTestCase, TestCase):
                 required=False, omit=False
             )
         self.sanitizeable_questions = ['party_name', 'fname_two']
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         OrganizationRole.objects.create(
-            user=self.user, organization=self.project.organization)
+            user=self.user, group=self.om_group,
+            organization=self.project.organization)
 
     def test_sanitize_submission(self):
         geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
@@ -242,7 +246,8 @@ class XFormModelHelperTest(UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(
-            user=user, organization=self.project.organization, admin=True)
+            user=user, group=self.oa_group,
+            organization=self.project.organization)
 
         (questionnaire,
          parties, party_resources,
@@ -1099,7 +1104,7 @@ class XFormModelHelperTest(UserTestCase, TestCase):
         org_role = OrganizationRole.objects.get(
             user=self.user,
             organization=self.project.organization)
-        org_role.admin = True
+        org_role.group = self.oa_group
         org_role.save()
 
         try:

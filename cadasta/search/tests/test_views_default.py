@@ -2,6 +2,7 @@ import pytest
 import json
 
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.http import Http404
 from django.test import TestCase
 
@@ -38,6 +39,7 @@ class SearchTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
+        self.pm_group = Group.objects.get(name='ProjectManager')
 
     def setup_template_context(self):
         return {
@@ -64,6 +66,7 @@ class SearchTest(ViewTestCase, UserTestCase, TestCase):
         ProjectRole.objects.create(
             project=self.project,
             user=user,
+            group=self.pm_group,
             role='PM',
         )
         response = self.request(user=user)

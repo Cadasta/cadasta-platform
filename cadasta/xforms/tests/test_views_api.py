@@ -5,6 +5,7 @@ import pytest
 from lxml import etree
 
 from django.test import TestCase
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -45,6 +46,8 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
         self.org = OrganizationFactory.create()
         self.prj = ProjectFactory.create(organization=self.org)
         self.superuser_role = Role.objects.get(name='superuser')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def _get_questionnaire(self, id=None, version=None):
         form = self.get_form('xls-form')
@@ -59,14 +62,14 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
 
     def test_get_xforms(self):
         OrganizationRole.objects.create(
-            organization=self.org, user=self.user, admin=True)
+            organization=self.org, user=self.user, group=self.oa_group)
         questionnaire = self._get_questionnaire()
         response = self.request(user=self.user)
 
         assert response.status_code == 200
         assert questionnaire.md5_hash in response.content
         assert ('/collect/formList/{}/'.format(
-                    questionnaire.id) in response.content)
+                questionnaire.id) in response.content)
         assert str(questionnaire.version) in response.content
 
     def test_get_xforms_with_unauthroized_user(self):
@@ -76,7 +79,7 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
         assert response.status_code == 200
         assert questionnaire.md5_hash not in response.content
         assert ('/collect/formList/{}/'.format(
-                    questionnaire.id) not in response.content)
+                questionnaire.id) not in response.content)
 
     def test_get_xforms_with_superuser(self):
         self.user.assign_policies(self.superuser_role)
@@ -86,11 +89,11 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
         assert response.status_code == 200
         assert questionnaire.md5_hash in response.content
         assert ('/collect/formList/{}/'.format(
-                    questionnaire.id) in response.content)
+                questionnaire.id) in response.content)
 
     def test_get_xforms_with_no_superuser(self):
         OrganizationRole.objects.create(
-            organization=self.org, user=self.user, admin=False)
+            organization=self.org, user=self.user, group=self.om_group)
         q1 = self._get_questionnaire(id='form_1', version=2016072516330112)
         q2 = self._get_questionnaire(id='form_2', version=2016072516330113)
         assert Questionnaire.objects.all().count() == 2
@@ -110,7 +113,7 @@ class XFormListTest(APITestCase, UserTestCase, FileStorageTestCase, TestCase):
 
     def test_get_without_data(self):
         OrganizationRole.objects.create(
-            organization=self.org, user=self.user, admin=True)
+            organization=self.org, user=self.user, group=self.oa_group)
         response = self.request(user=self.user)
         assert 'formID' not in response
         assert 'downloadUrl' not in response
@@ -126,9 +129,10 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         self.user = UserFactory.create()
         self.org = OrganizationFactory.create()
         self.prj = ProjectFactory.create(organization=self.org)
+        self.oa_group = Group.objects.get(name='OrgAdmin')
 
         OrganizationRole.objects.create(
-            organization=self.org, user=self.user, admin=True)
+            organization=self.org, user=self.user, group=self.oa_group)
 
     def _create_questionnaire(self, questionnaire_name, version,
                               schema=True):
@@ -719,8 +723,8 @@ class XFormDownloadView(APITestCase, UserTestCase, TestCase):
         assert (response.headers['content-type'][1] ==
                 'application/xml; charset=utf-8')
         assert '<{id} id="{id}" version="{v}"/>'.format(
-                id=self.questionnaire.id_string,
-                v=self.questionnaire.version) in response.content
+               id=self.questionnaire.id_string,
+               v=self.questionnaire.version) in response.content
 
     def test_get_questionnaire_that_does_not_exist(self):
         response = self.request(user=self.user,

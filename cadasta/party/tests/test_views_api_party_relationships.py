@@ -1,5 +1,6 @@
 import json
 from django.test import TestCase
+from django.contrib.auth.models import Group
 
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
@@ -52,6 +53,7 @@ class PartyRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
 
         self.org = OrganizationFactory.create(slug='namati')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(
             slug='test-project', organization=self.org, access='public')
         self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
@@ -143,7 +145,8 @@ class PartyRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_create_private_record_based_on_org_membership(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.om_group)
         response = self.request(user=user, method='POST')
         assert response.status_code == 403
         assert PartyRelationship.objects.count() == 0
@@ -199,6 +202,7 @@ class PartyRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
 
         self.org = OrganizationFactory.create(slug='namati')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(
             slug='test-project', organization=self.org, access='public')
         self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
@@ -280,7 +284,8 @@ class PartyRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
 
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.om_group)
 
         response = self.request(user=user)
         assert response.status_code == 403
@@ -295,6 +300,8 @@ class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
 
         self.org = OrganizationFactory.create(slug='namati')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(
             slug='test-project', organization=self.org, access='public')
         self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
@@ -434,7 +441,8 @@ class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
 
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.om_group)
 
         response = self.request(user=user, method='PATCH')
         assert response.status_code == 403
@@ -451,7 +459,7 @@ class PartyRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org,
                                         user=user,
-                                        admin=True)
+                                        group=self.oa_group)
 
         response = self.request(user=self.user, method='PATCH')
         assert response.status_code == 200
@@ -501,6 +509,8 @@ class PartyRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
 
         self.org = OrganizationFactory.create(slug='namati')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(
             slug='test-project', organization=self.org, access='public')
         self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
@@ -589,7 +599,8 @@ class PartyRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         self.prj.save()
 
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.om_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 403
@@ -603,7 +614,7 @@ class PartyRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org,
                                         user=user,
-                                        admin=True)
+                                        group=self.oa_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204

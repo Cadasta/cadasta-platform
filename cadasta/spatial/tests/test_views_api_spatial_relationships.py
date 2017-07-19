@@ -1,4 +1,6 @@
 import json
+
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
@@ -46,7 +48,7 @@ class SpatialRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
     def setup_models(self, access='public'):
         self.user = UserFactory.create()
         assign_policies(self.user)
-
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su1 = SpatialUnitFactory.create(project=self.prj, type='AP')
         self.su2 = SpatialUnitFactory.create(project=self.prj, type='BU')
@@ -138,7 +140,7 @@ class SpatialRelationshipCreateAPITest(APITestCase, UserTestCase, TestCase):
     def test_create_private_record_based_on_org_membership(self):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
         response = self.request(user=user, method='POST')
         assert response.status_code == 403
         assert SpatialRelationship.objects.count() == 0
@@ -187,7 +189,7 @@ class SpatialRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
     def setup_models(self, access='public'):
         self.user = UserFactory.create()
         assign_policies(self.user)
-
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su1 = SpatialUnitFactory.create(project=self.prj, type='AP')
         self.su2 = SpatialUnitFactory.create(project=self.prj, type='BU')
@@ -269,7 +271,7 @@ class SpatialRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=user)
         assert response.status_code == 403
@@ -283,6 +285,8 @@ class SpatialRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
 
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su1 = SpatialUnitFactory.create(project=self.prj, type='AP')
         self.su2 = SpatialUnitFactory.create(project=self.prj, type='BU')
@@ -426,7 +430,7 @@ class SpatialRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=user, method='PATCH')
         assert response.status_code == 403
@@ -442,8 +446,7 @@ class SpatialRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user,
-                                        admin=True)
+                                        user=user, group=self.oa_group)
 
         response = self.request(user=self.user, method='PATCH')
         assert response.status_code == 200
@@ -488,6 +491,8 @@ class SpatialRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
 
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su1 = SpatialUnitFactory.create(project=self.prj, type='AP')
         self.su2 = SpatialUnitFactory.create(project=self.prj, type='BU')
@@ -577,7 +582,7 @@ class SpatialRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 403
@@ -590,8 +595,7 @@ class SpatialRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user,
-                                        admin=True)
+                                        user=user, group=self.oa_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
