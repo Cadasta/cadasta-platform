@@ -6,7 +6,6 @@ from django.test import TestCase
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
-from tutelary.models import Role
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from organization.models import OrganizationRole, Project
 from organization.serializers import ProjectGeometrySerializer
@@ -83,9 +82,7 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == expected_content
 
     def test_get_with_superuser(self):
-        superuser = UserFactory.create()
-        self.superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(self.superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
         response = self.request(user=superuser)
 
         gj = self._render_geojson(Project.objects.all())

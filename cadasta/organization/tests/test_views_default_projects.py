@@ -172,9 +172,7 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
             add_allowed=True)
 
     def test_get_with_superuser(self):
-        superuser = UserFactory.create()
-        self.superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(self.superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
 
         response = self.request(user=superuser)
         assert response.status_code == 200
@@ -246,8 +244,8 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == self.expected_content
 
     def test_get_with_superuser(self):
-        superuser_role = Role.objects.get(name='superuser')
-        self.user.assign_policies(superuser_role)
+        self.user.is_superuser = True
+        self.user.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_superuser=True,
@@ -373,8 +371,8 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         self.project.access = 'private'
         self.project.save()
 
-        self.superuser_role = Role.objects.get(name='superuser')
-        self.user.assign_policies(self.superuser_role)
+        self.user.is_superuser = True
+        self.user.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_superuser=True,
