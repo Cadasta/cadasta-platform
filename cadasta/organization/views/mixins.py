@@ -239,6 +239,39 @@ class ProjectCreateCheckMixin:
         return context
 
 
+class ProjectListMixin:
+    def get_filtered_queryset(self):
+        user = self.request.user
+        default = Q(access='public', archived=False)
+        all_projects = Project.objects.select_related('organization')
+        if user.is_superuser:
+            return all_projects
+        if user.is_anonymous:
+            return all_projects.filter(default)
+        else:
+            org_roles = user.organizationrole_set.all().select_related(
+                'organization')
+            prj_roles = user.projectrole_set.all().select_related('project')
+            ids = []
+            for role in org_roles:
+                if role.admin:
+                    ids += [prj.id for prj in role.organization.all_projects()]
+                else:
+                    ids += [
+                        prj.id for prj in role.organization.all_projects() if
+                        prj.archived is False]
+            for role in prj_roles:
+                perms = role.permissions
+                prj = role.project
+                if ('project.view.private' in perms and prj.access ==
+                        'private' and not prj.archived):
+                        ids.append(prj.id)
+                if ('project.view.archived' in perms and prj.archived):
+                    ids.append(prj.id)
+            default |= Q(id__in=set(ids))
+            return all_projects.filter(default)
+
+
 class OrgRoleCheckMixin(SuperUserCheckMixin):
     def get_roles(self):
         if not hasattr(self, '_is_member') or not hasattr(self, '_is_admin'):

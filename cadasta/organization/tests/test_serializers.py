@@ -2,7 +2,6 @@ import json
 import random
 import pytest
 from datetime import datetime
-from tutelary.models import Role
 from core.util import slugify
 from django.contrib.auth.models import Group
 from django.test import TestCase

@@ -46,7 +46,5 @@ class PublicRoleTest(UserTestCase, TestCase):
     def test_role_creation(self):
         user = UserFactory.create()
         role = PublicRole.objects.get(user=user)
-        assert role.name == 'public_user'
         assert role.group.name == 'PublicUser'
         assert len(role.permissions) == 5
-        assert role.is_public_user

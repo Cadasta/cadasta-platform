@@ -48,10 +48,13 @@ class ProjectFactory(ExtendedFactory):
 
         if users:
             for u in users:
-                om = Group.objects.get(name="OrgMember")
+                if not OrganizationRole.objects.filter(
+                        organization=self.organization, user=u).exists():
+                    om = Group.objects.get(name='OrgMember')
+                    OrganizationRole.objects.create(
+                        organization=self.organization,
+                        group=om, user=u)
                 pu = Group.objects.get(name="ProjectMember")
-                OrganizationRole.objects.get_or_create(
-                    organization=self.organization, group=om, user=u)
                 ProjectRole.objects.create(project=self, user=u,
                                            group=pu, role='PU')
 

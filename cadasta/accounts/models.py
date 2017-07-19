@@ -5,7 +5,6 @@ from django.db import models
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
-from django.contrib.auth.models import Group
 from django.template.loader import render_to_string
 import django.contrib.auth.models as auth
 import django.contrib.auth.base_user as auth_base

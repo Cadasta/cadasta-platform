@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, Sequence
 
 from accounts.models import PublicRole
 from django.conf import settings
@@ -12,9 +12,12 @@ from django.shortcuts import redirect
 from django.utils.translation import gettext as _
 from jsonattrs.models import Schema, compose_schemas
 from organization.models import OrganizationRole
+from rest_framework.exceptions import NotAuthenticated
 from tutelary import mixins
 
 from .roles import AnonymousUserRole, SuperUserRole
+
+SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
 
 # tutelary
@@ -266,7 +269,15 @@ class APIPermissionRequiredMixin(BaseRolePermissionMixin):
         if hasattr(self, 'permission_denied_message'):
             return (self.permission_denied_message,)
 
+    def _http_method_allowed(self, request):
+        if request.method not in self.allowed_methods:
+            self.http_method_not_allowed(request)
+        if (request.method not in SAFE_METHODS and not
+                request.user.is_authenticated):
+                raise NotAuthenticated
+
     def check_permissions(self, request):
+        self._http_method_allowed(request)
         if not hasattr(self, '_roles'):
             self.get_user_roles()
         # superusers have all permissions
@@ -276,12 +287,20 @@ class APIPermissionRequiredMixin(BaseRolePermissionMixin):
         else:
             if self.request.user.is_superuser:
                 return True
-        perms = self.get_permission_required()
 
-        has_perm = all(False for perm in perms
-                       if perm not in self.permissions)
-        if not has_perm:
-            self.permission_denied(request)
+        perms = self.get_permission_required()
+        msg = self.get_permission_denied_message(
+            default="Permission denied."
+        )
+        if isinstance(msg, Sequence):
+            msg = msg[0]
+        if not perms:
+            self.permission_denied(request, message=msg)
+        else:
+            has_perm = all(False for perm in perms
+                           if perm not in self.permissions)
+            if not has_perm:
+                self.permission_denied(request, message=msg)
 
 
 class SchemaSelectorMixin():

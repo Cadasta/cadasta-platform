@@ -30,21 +30,10 @@ from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
-from tutelary.models import Policy, Role, assign_user_policies
 
 from .. import forms
 from ..views import default
-from .factories import OrganizationFactory, ProjectFactory, clause
-
-
-def assign_policies(user):
-    clauses = {
-        'clause': [
-            clause('allow', ['project.*'], ['project/*/*'])
-        ]
-    }
-    policy = Policy.objects.create(name='allow', body=json.dumps(clauses))
-    assign_user_policies(user, policy)
+from .factories import OrganizationFactory, ProjectFactory
 
 
 class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
@@ -107,11 +96,6 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
-        # Slight weirdness here: an unauthorized user can see *more*
-        # projects than a user authorized with the policy defined
-        # above because the policy includes clauses denying access to
-        # some projects.
-
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
         assert response.content == self.expected_content
@@ -120,7 +104,8 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(organization=self.org1,
                                         user=self.user, group=self.om_group)
         response = self.request(user=self.user)
-        projs = (self.projs + [self.priv_org_prj])
+        projs = (self.projs + [self.priv_org_prj] + [self.priv_proj1,
+                 self.priv_proj2])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -134,13 +119,14 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
                                         user=self.user,
                                         group=self.om_group)
         response = self.request(user=self.user)
-        projs = self.projs + [self.priv_org_prj]
+        projs = (self.projs + [self.priv_org_prj] + [self.priv_proj1,
+                 self.priv_proj2, self.priv_proj3])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key))
 
-    def test_get_with_org_admin_and_project_manager(self):
+    def test_get_with_project_manager(self):
         OrganizationRole.objects.create(organization=self.org1,
                                         user=self.user,
                                         group=self.om_group)
@@ -148,11 +134,24 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
                                    user=self.user, role='PM',
                                    group=self.pm_group)
         response = self.request(user=self.user)
-        projs = self.projs + [self.priv_org_prj, self.priv_proj1]
+        projs = (self.projs + [self.priv_org_prj, self.priv_proj1,
+                 self.priv_proj2])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key))
+
+    def test_get_archived_with_org_admin(self):
+        OrganizationRole.objects.create(organization=self.org2,
+                                        user=self.user,
+                                        group=self.oa_group)
+        response = self.request(user=self.user)
+        projs = (self.projs + [self.priv_org_prj, self.priv_proj3,
+                 self.archived_proj])
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projs, key=self.sort_key), add_allowed=True)
 
     def test_get_with_org_admin(self):
         OrganizationRole.objects.create(organization=self.org2,
@@ -334,7 +333,6 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                 in response.messages)
 
     def test_get_private_project_based_on_org_membership(self):
-        # user doesn't have private project access even if an org member
         OrganizationRole.objects.create(organization=self.project.organization,
                                         group=self.org_member_group,
                                         user=self.user)
@@ -342,10 +340,13 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         self.project.save()
 
         response = self.request(user=self.user)
-        assert response.status_code == 302
-        assert response.location == '/'
-        assert ("You don't have permission to access this project"
-                in response.messages)
+        assert response.status_code == 200
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=False,
+                                       is_allowed_add_resource=False,
+                                       is_project_member=False,
+                                       is_allowed_import=False)
+        assert response.content == expected
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
@@ -870,7 +871,7 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        # assign_policies(user)
         self.project.archived = True
         self.project.save()
 

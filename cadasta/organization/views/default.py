@@ -6,8 +6,7 @@ import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
-from core.mixins import (PermissionRequiredMixin,
-                         RolePermissionRequiredMixin,
+from core.mixins import (RolePermissionRequiredMixin,
                          RoleLoginPermissionRequiredMixin)
 from core.util import random_id
 from core.views import mixins as core_mixins
@@ -371,37 +370,13 @@ class UserActivation(RoleLoginPermissionRequiredMixin, base_generic.View):
 
 class ProjectList(RolePermissionRequiredMixin,
                   mixins.ProjectCreateCheckMixin,
+                  mixins.ProjectListMixin,
                   generic.ListView):
 
     model = Project
     template_name = 'organization/project_list.html'
     permission_required = 'project.list'
     project_create_check_multiple = True
-
-    def get_filtered_queryset(self):
-        user = self.request.user
-        default = Q(access='public', archived=False)
-        all_projects = Project.objects.select_related('organization')
-        if user.is_superuser:
-            return all_projects
-        if user.is_anonymous:
-            return all_projects.filter(default)
-        else:
-            org_admin_roles = user.organizationrole_set.filter(
-                group__name='OrgAdmin').select_related('organization')
-            prj_roles = user.projectrole_set.all().select_related('project')
-            ids = []
-            for role in org_admin_roles:
-                ids += [prj.id for prj in role.organization.all_projects()]
-            for role in prj_roles:
-                perms = role.permissions
-                prj = role.project
-                if (('project.view.private' in perms and prj.access ==
-                     'private') or ('project.view.archived' in perms and
-                                    prj.archived)):
-                    ids.append(prj.id)
-            default |= Q(id__in=ids)
-            return all_projects.filter(default)
 
 
 class ProjectDashboard(RolePermissionRequiredMixin,

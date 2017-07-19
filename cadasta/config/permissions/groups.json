@@ -26,7 +26,8 @@
     "OrgMember": {
         "permissions": [
             "org.create", "org.view", "org.view.private",
-            "org.list", "project.view", "project.list"
+            "org.list", "project.create", "project.view",
+            "project.view.private", "project.list"
         ]
     },
     "ProjectManager": {

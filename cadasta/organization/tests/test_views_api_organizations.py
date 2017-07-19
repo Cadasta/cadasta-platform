@@ -1,14 +1,12 @@
-import json
 
 from django.test import TestCase
-from django.contrib.auth.models import AnonymousUser, Group
+from django.contrib.auth.models import Group
 from rest_framework.exceptions import PermissionDenied
-from tutelary.models import Policy, assign_user_policies
 from skivvy import APITestCase
 
 from core.tests.utils.cases import UserTestCase
 from accounts.tests.factories import UserFactory
-from .factories import OrganizationFactory, clause, ProjectFactory
+from .factories import OrganizationFactory, ProjectFactory
 from ..models import Organization, OrganizationRole
 from ..views import api
 
@@ -17,53 +15,43 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.OrganizationList
 
     def setup_models(self):
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*'])
-            ]
-        }
-        policy = Policy.objects.create(
-            name='test-policy',
-            body=json.dumps(clauses))
         self.user = UserFactory.create()
-        assign_user_policies(self.user, policy)
 
     def test_full_list(self):
-        """
-        It should return all organizations.
-        """
+        """Return all organizations."""
         OrganizationFactory.create_batch(2)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert len(response.content['results']) == 2
         assert 'users' not in response.content['results'][0]
 
-    def test_list_only_one_organization_is_authorized(self):
-        """
-        It should return all authorized organizations.
-        """
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('deny', ['org.view'], ['organization/unauthorized'])
-            ]
-        }
-        policy = Policy.objects.create(name='deny', body=json.dumps(clauses))
-        assign_user_policies(self.user, policy)
-
-        OrganizationFactory.create_from_kwargs([{}, {'slug': 'unauthorized'}])
-
+    def test_full_list_based_on_org_member_role(self):
+        OrganizationFactory.create_batch(2)
+        org1 = OrganizationFactory.create(access='private')
+        org2 = OrganizationFactory.create(archived=True)
+        om = Group.objects.get(name='OrgMember')
+        OrganizationRole.objects.create(
+            organization=org1, user=self.user, group=om)
+        OrganizationRole.objects.create(
+            organization=org2, user=self.user, group=om)
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert len(response.content['results']) == 1
-        assert response.content['results'][0]['slug'] != 'unauthorized'
+        assert len(response.content['results']) == 3
+        assert 'users' not in response.content['results'][0]
+
+    def test_full_list_based_on_org_admin_role(self):
+        OrganizationFactory.create_batch(2)
+        org2 = OrganizationFactory.create(archived=True)
+        oa = Group.objects.get(name='OrgAdmin')
+        OrganizationRole.objects.create(
+            organization=org2, user=self.user, group=oa)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['results']) == 3
+        assert 'users' not in response.content['results'][0]
 
     def test_full_list_with_unauthorized_user(self):
-        """
-        It should return all organizations.
-        """
+        """Return all organizations."""
         OrganizationFactory.create_batch(2)
         response = self.request()
         assert response.status_code == 200
@@ -71,23 +59,20 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         assert 'users' not in response.content['results'][0]
 
     def test_filter_active(self):
-        """
-        It should return only one archived organization.
-        """
+        """Return only one archived organization."""
         org = OrganizationFactory.create(archived=True)
         OrganizationFactory.create(archived=False)
+        oa = Group.objects.get(name='OrgAdmin')
         OrganizationRole.objects.create(organization=org,
                                         user=self.user,
-                                        admin=True)
+                                        group=oa)
         response = self.request(user=self.user, get_data={'archived': True})
         assert response.status_code == 200
         assert len(response.content['results']) == 1
         assert response.content['results'][0]['archived'] is True
 
     def test_search_filter(self):
-        """
-        It should return only two matching organizations.
-        """
+        """Return only two matching organizations."""
         OrganizationFactory.create_from_kwargs([
             {'name': 'A Match'},
             {'description': 'something that matches'},
@@ -120,27 +105,6 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         assert len(response.content['results']) == 3
         names = [org['name'] for org in response.content['results']]
         assert(names == sorted(names, reverse=True))
-
-    def test_permission_filter(self):
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view', 'project.create'],
-                                ['organization/*']),
-                clause('deny', ['project.create'],
-                               ['organization/unauthorized'])
-            ]
-        }
-        policy = Policy.objects.create(name='deny', body=json.dumps(clauses))
-        assign_user_policies(self.user, policy)
-
-        OrganizationFactory.create_from_kwargs([{}, {'slug': 'unauthorized'}])
-
-        response = self.request(user=self.user,
-                                get_data={'permissions': 'project.create'})
-        assert response.status_code == 200
-        assert len(response.content['results']) == 1
-        assert response.content['results'][0]['slug'] != 'unauthorized'
 
 
 class OrganizationCreateAPITest(APITestCase, UserTestCase, TestCase):
@@ -221,10 +185,10 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['id'] == self.org.id
         assert 'users' in response.content
 
-    def test_get_archived_organization_with_unauthorized_user(self):
+    def test_get_archived_organization_with_anonymous_user(self):
         self.org.archived = True
         self.org.save()
-        response = self.request(user=AnonymousUser())
+        response = self.request()
         assert response.status_code == 403
         assert response.content['detail'] == PermissionDenied.default_detail
 
@@ -240,7 +204,9 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_PATCH_with_anonymous_user(self):
         data = {'name': 'Org Name'}
         response = self.request(method='PATCH', post_data=data)
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         self.org.refresh_from_db()
         assert self.org.name == 'Org'
 
@@ -255,7 +221,9 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_PUT_with_anonymous_user(self):
         data = {'name': 'Org Name'}
         response = self.request(method='PUT', post_data=data)
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         self.org.refresh_from_db()
         assert self.org.name == 'Org'
 
@@ -264,13 +232,13 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         data = {'name': 'Org Name'}
         response = self.request(method='PUT', post_data=data, user=user)
         assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
         self.org.refresh_from_db()
         assert self.org.name == 'Org'
 
     def test_update_with_archived_org(self):
         self.org.archived = True
         self.org.save()
-
         data = {'name': 'Org Name'}
         response = self.request(method='PATCH', user=self.user, post_data=data)
         assert response.status_code == 403
@@ -316,12 +284,13 @@ class OrganizationDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert self.org.archived is False
         assert self.project.archived is False
 
-    def test_unarchive_unauthorized_user(self):
+    def test_unarchive_with_unauthorized_user(self):
         self.org.archived = True
         self.org.save()
         data = {'archived': False}
         response = self.request(method='PATCH', user=self.user, post_data=data)
         assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
         self.org.refresh_from_db()
         assert self.org.archived is True
 
@@ -374,13 +343,14 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
                                 post_data={'username': new_user.username})
         assert response.status_code == 400
 
-    def test_add_user_with_unauthorized_user(self):
+    def test_add_user_with_anonymous_user(self):
         new_user = UserFactory.create()
         response = self.request(method='POST',
                                 post_data={'username': new_user.username})
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         assert self.org.users.count() == 3
-        assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_add_user_with_superuser(self):
         superuser = UserFactory.create(is_superuser=True)
@@ -390,8 +360,7 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
                                 post_data={'username': new_user.username})
         assert response.status_code == 201
         assert self.org.users.count() == 4
-        r = OrganizationRole.objects.get(
-            organization=self.org, user=new_user)
+        r = OrganizationRole.objects.get(organization=self.org, user=new_user)
         assert not r.admin
 
     def test_add_user_that_does_not_exist(self):
@@ -417,8 +386,8 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=self.user, method='POST',
                                 post_data={'username': new_user.username})
         assert response.status_code == 403
-        assert self.org.users.count() == 3
         assert response.content['detail'] == PermissionDenied.default_detail
+        assert self.org.users.count() == 3
 
 
 class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
@@ -438,6 +407,9 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
         }
 
     def test_get_user(self):
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        group=self.oa)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content['username'] == self.org_user.username
@@ -460,6 +432,7 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
                                 method='PATCH',
                                 post_data={'admin': 'true'})
         assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.org_user)
         assert role.admin is False
@@ -467,7 +440,9 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_PATCH_user_with_anonymous_user(self):
         response = self.request(method='PATCH',
                                 post_data={'admin': 'true'})
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.org_user)
         assert role.admin is False
@@ -478,6 +453,7 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
                                 method='PUT',
                                 post_data={'admin': 'true'})
         assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.org_user)
         assert role.admin is False
@@ -485,7 +461,9 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
     def test_PUT_user_with_anonymous_user(self):
         response = self.request(method='PUT',
                                 post_data={'admin': 'true'})
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         role = OrganizationRole.objects.get(organization=self.org,
                                             user=self.org_user)
         assert role.admin is False
@@ -543,15 +521,16 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
         assert self.org.users.count() == 2
         assert self.user in self.org.users.all()
 
-    def test_remove_with_unauthorized_user(self):
+    def test_remove_with_anonymous_user(self):
         user_to_remove = UserFactory.create()
         OrganizationRole.objects.create(organization=self.org,
                                         group=self.om,
                                         user=user_to_remove)
         response = self.request(method='DELETE')
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         assert self.org.users.count() == 2
-        assert response.content['detail'] == PermissionDenied.default_detail
 
     def test_remove_user_that_does_not_exist(self):
         OrganizationRole.objects.create(organization=self.org,
@@ -582,5 +561,5 @@ class OrganizationUsersDetailAPITest(APITestCase, UserTestCase, TestCase):
             method='DELETE',
             url_kwargs={'username': user_to_remove.username})
         assert response.status_code == 403
-        assert self.org.users.count() == 2
         assert response.content['detail'] == PermissionDenied.default_detail
+        assert self.org.users.count() == 2

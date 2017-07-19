@@ -1,26 +1,20 @@
-from django.shortcuts import get_object_or_404
-
-from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied, NotAuthenticated
-from rest_framework import generics, filters, status
-from tutelary.mixins import APIPermissionRequiredMixin, PermissionsFilterMixin
-from tutelary.models import check_perms
-from core.mixins import (update_permissions, update_role_permissions,
-                         APIPermissionRequiredMixin as TempAPIPermissionRequiredMixin)
-
 from accounts.models import User
+from core.mixins import APIPermissionRequiredMixin
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from rest_framework import filters, generics, status
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 
-from ..models import Organization, OrganizationRole, ProjectRole
-from .. import serializers
 from . import mixins
+from .. import serializers
+from ..models import Organization, OrganizationRole, ProjectRole, Project
 
 
-class OrganizationList(PermissionsFilterMixin,
-                       APIPermissionRequiredMixin,
+class OrganizationList(APIPermissionRequiredMixin,
                        generics.ListCreateAPIView):
     lookup_url_kwarg = 'organization'
     lookup_field = 'slug'
-    queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
     filter_backends = (filters.DjangoFilterBackend,
                        filters.SearchFilter,
@@ -32,17 +26,31 @@ class OrganizationList(PermissionsFilterMixin,
         'GET': 'org.list',
         'POST': 'org.create',
     }
-    permission_filter_queryset = (lambda self, view, o: ('org.view',)
-                                  if o.archived is False
-                                  else ('org.view_archived',))
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            raise NotAuthenticated
-        return super().post(request, *args, **kwargs)
+    def get_filtered_queryset(self):
+        user = self.request.user
+        default = Q(access='public', archived=False)
+        all_orgs = Organization.objects.all()
+        if user.is_superuser:
+            return all_orgs
+        if user.is_anonymous:
+            return all_orgs.filter(default)
+        org_roles = user.organizationrole_set.all(
+        ).select_related('organization')
+        ids = []
+        for role in org_roles:
+            perms = role.permissions
+            org = role.organization
+            if ('org.view.private' in perms and
+                    org.access == 'private' and not org.archived):
+                ids.append(org.id)
+            if ('org.view.archived' in perms and org.archived):
+                ids.append(org.id)
+        default |= Q(id__in=set(ids))
+        return all_orgs.filter(default)
 
 
-class OrganizationDetail(TempAPIPermissionRequiredMixin,
+class OrganizationDetail(APIPermissionRequiredMixin,
                          mixins.OrganizationMixin,
                          generics.RetrieveUpdateAPIView):
     def view_actions(self, request):
@@ -59,7 +67,7 @@ class OrganizationDetail(TempAPIPermissionRequiredMixin,
             elif is_archived and (is_archived != new_archived):
                 return ('org.update', 'org.unarchive')
             elif is_archived and (is_archived == new_archived):
-                return ''
+                return False
         return 'org.update'
 
     lookup_url_kwarg = 'organization'
@@ -79,7 +87,7 @@ class OrganizationDetail(TempAPIPermissionRequiredMixin,
         return super().get_serializer(*args, **kwargs)
 
 
-class OrganizationUsers(TempAPIPermissionRequiredMixin,
+class OrganizationUsers(APIPermissionRequiredMixin,
                         mixins.OrganizationRoles,
                         generics.ListCreateAPIView):
 
@@ -95,12 +103,13 @@ class OrganizationUsers(TempAPIPermissionRequiredMixin,
     }
 
 
-class OrganizationUsersDetail(TempAPIPermissionRequiredMixin,
+class OrganizationUsersDetail(APIPermissionRequiredMixin,
                               mixins.OrganizationRoles,
                               generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = serializers.OrganizationUserSerializer
     permission_required = {
+        'GET': 'org.users.list',
         'PUT': 'org.users.edit',
         'PATCH': 'org.users.edit',
         'DELETE': 'org.users.remove'
@@ -117,7 +126,7 @@ class OrganizationUsersDetail(TempAPIPermissionRequiredMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserAdminList(TempAPIPermissionRequiredMixin, generics.ListAPIView):
+class UserAdminList(APIPermissionRequiredMixin, generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserAdminSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -129,7 +138,7 @@ class UserAdminList(TempAPIPermissionRequiredMixin, generics.ListAPIView):
     permission_required = 'user.list'
 
 
-class UserAdminDetail(TempAPIPermissionRequiredMixin,
+class UserAdminDetail(APIPermissionRequiredMixin,
                       generics.RetrieveUpdateAPIView):
     serializer_class = serializers.UserAdminSerializer
     queryset = User.objects.all()
@@ -141,11 +150,14 @@ class UserAdminDetail(TempAPIPermissionRequiredMixin,
     }
 
 
-class OrganizationProjectList(PermissionsFilterMixin,
-                              APIPermissionRequiredMixin,
+class OrganizationProjectList(APIPermissionRequiredMixin,
                               mixins.OrgRoleCheckMixin,
-                              mixins.ProjectQuerySetMixin,
                               generics.ListCreateAPIView):
+
+    def post_actions(self, request):
+        return (
+            False if self.get_organization().archived else 'project.create')
+
     org_lookup = 'organization'
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -156,7 +168,7 @@ class OrganizationProjectList(PermissionsFilterMixin,
     ordering_fields = ('name', 'organization', 'country', 'description',)
     permission_required = {
         'GET': 'project.list',
-        'POST': update_permissions('project.create')
+        'POST': post_actions
     }
 
     def get_organization(self):
@@ -176,32 +188,32 @@ class OrganizationProjectList(PermissionsFilterMixin,
 
         return context
 
-    def get_queryset(self):
-        if self.request.method == 'POST':
-            return [self.get_organization()]
+    def get_filtered_queryset(self):
+        user = self.request.user
+        org = Organization.objects.get(slug=self.kwargs['organization'])
+        all_projects = Project.objects.all()
+        default = Q(access='public', archived=False)
 
-        if self.is_administrator:
-            return super().get_queryset().filter(
-                organization__slug=self.kwargs['organization']
-            )
-        else:
-            return super().get_queryset().filter(
-                organization__slug=self.kwargs['organization'],
-                archived=False, access='public'
-            )
+        if user.is_superuser:
+            return all_projects
+        if user.is_anonymous:
+            default &= Q(organization=org)
+            return all_projects.filter(default)
+
+        org_projects = all_projects.filter(organization=org)
+        try:
+            role = OrganizationRole.objects.get(organization=org, user=user)
+            if role.admin:
+                return org_projects
+            else:
+                return org_projects.filter(archived=False)
+        except OrganizationRole.DoesNotExist:
+            return org_projects.filter(default)
 
 
-class ProjectList(PermissionsFilterMixin,
-                  APIPermissionRequiredMixin,
-                  mixins.ProjectQuerySetMixin,
+class ProjectList(APIPermissionRequiredMixin,
+                  mixins.ProjectListMixin,
                   generics.ListAPIView):
-    def permission_filter(self, view, p):
-        if p.archived is True:
-            return ('project.view.archived',)
-        elif p.access == 'private':
-            return ('project.view.private',)
-        else:
-            return ('project.view',)
 
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -211,11 +223,11 @@ class ProjectList(PermissionsFilterMixin,
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
     permission_required = {'GET': 'project.list'}
-    permission_filter_queryset = permission_filter
 
 
-class ProjectDetail(TempAPIPermissionRequiredMixin,
+class ProjectDetail(APIPermissionRequiredMixin,
                     mixins.OrganizationMixin,
+                    mixins.ProjectMixin,
                     generics.RetrieveUpdateAPIView):
     def get_actions(self, request):
         if self.get_object().archived:
@@ -234,13 +246,11 @@ class ProjectDetail(TempAPIPermissionRequiredMixin,
             elif is_archived and (is_archived != new_archived):
                 return ('project.update', 'project.unarchive')
             elif is_archived and (is_archived == new_archived):
-                return ''
+                return False
         return 'project.update'
 
     serializer_class = serializers.ProjectSerializer
     filter_fields = ('archived',)
-    # search_fields = ('name', 'organization', 'country', 'description',)
-    # ordering_fields = ('name', 'organization', 'country', 'description',)
     lookup_url_kwarg = 'project'
     lookup_field = 'slug'
     org_lookup = 'organization'
@@ -249,9 +259,6 @@ class ProjectDetail(TempAPIPermissionRequiredMixin,
         'PATCH': patch_actions,
         'PUT': patch_actions,
     }
-
-    def get_perms_objects(self):
-        return [self.get_object()]
 
     def get_queryset(self):
         return self.get_organization(
@@ -263,19 +270,18 @@ class ProjectDetail(TempAPIPermissionRequiredMixin,
         return super().get_serializer(*args, **kwargs)
 
 
-class ProjectUsers(TempAPIPermissionRequiredMixin,
+class ProjectUsers(APIPermissionRequiredMixin,
                    mixins.ProjectRoles,
                    generics.ListCreateAPIView):
 
     serializer_class = serializers.ProjectUserSerializer
     permission_required = {
         'GET': 'project.users.list',
-        # 'POST': update_permissions'project.users.add')
         'POST': 'project.users.add'
     }
 
 
-class ProjectUsersDetail(TempAPIPermissionRequiredMixin,
+class ProjectUsersDetail(APIPermissionRequiredMixin,
                          mixins.ProjectRoles,
                          generics.RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ProjectUserSerializer

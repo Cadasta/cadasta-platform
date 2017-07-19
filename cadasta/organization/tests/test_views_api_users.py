@@ -134,10 +134,12 @@ class UserDetailAPITest(APITestCase, UserTestCase, TestCase):
         self.test_user.refresh_from_db()
         assert self.test_user.is_active == data.get('is_active')
 
-    def test_update_with_unauthorized_user(self):
+    def test_update_with_anonymous_user(self):
         data = {'full_name': 'Jones'}
         response = self.request(method='PATCH', post_data=data)
-        assert response.status_code == 403
+        assert response.status_code == 401
+        assert (response.content['detail'] ==
+                'Authentication credentials were not provided.')
         self.test_user.refresh_from_db()
         assert self.test_user.full_name != 'Jones'
 
