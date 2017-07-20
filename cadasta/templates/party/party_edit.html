@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load staticfiles %}
 
+{% block page_title %}{% trans "Edit party" %} | {% endblock %}
+
 {% block extra_head %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">

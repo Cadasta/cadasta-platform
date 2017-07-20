@@ -180,6 +180,7 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
 
         project = self.get_project()
         permissions_contexts = (
+            ('party.create', 'is_allowed_add_party'),
             ('spatial.create', 'is_allowed_add_location'),
             ('resource.add', 'is_allowed_add_resource'),
             ('project.import', 'is_allowed_import'),

@@ -75,6 +75,7 @@
             <span class="sr-only">{% trans "Toggle add" %}</span>
           </button>
           <ul class="dropdown-menu">
+            {% if is_allowed_add_party %}<li><a href="{% url 'parties:add' object.organization.slug object.slug %}">{% trans "Add party" %}</a></li>{% endif %}
             {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
             {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
             {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
