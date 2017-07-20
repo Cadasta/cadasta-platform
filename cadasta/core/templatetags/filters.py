@@ -44,3 +44,24 @@ def set_parsley_sanitize(field):
     if type(field.field) == CharField:
         field.field.widget.attrs['data-parsley-sanitize'] = '1'
     return field
+
+
+@register.filter(name='format_area_metric_units')
+def set_format_area_metric_units(area):
+    area = float(area)
+    if area < 1000:
+        return format(area, '.2f') + ' m<sup>2</sup>'
+    else:
+        ha = area/10000
+        return format(ha, '.2f') + ' ha'
+
+
+@register.filter(name='format_area_imperial_units')
+def set_format_area_imperial_units(area):
+    area = float(area)
+    area_ft2 = area * 10.764
+    if area_ft2 < 4356:
+        return format(area_ft2, '.2f') + ' ft<sup>2</sup>'
+    else:
+        ac = area * 0.00024711
+        return format(ac, '.2f') + ' ac'

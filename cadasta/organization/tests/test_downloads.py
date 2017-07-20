@@ -468,23 +468,26 @@ class ShapeTest(UserTestCase, TestCase):
             csvreader = csv.reader(csvfile)
             for i, row in enumerate(csvreader):
                 if i == 0:
-                    assert row == ['id', 'type', 'geom_type']
+                    head = ['id', 'type', 'area', 'geom_type']
+                    assert row == head
                 if i == 1:
-                    assert row == [su1.id, su1.type, 'point']
+                    assert row == [su1.id, su1.type, '', 'point']
                 if i == 2:
-                    assert row == [su2.id, su2.type, 'linestring']
+                    assert row == [su2.id, su2.type, '', 'linestring']
                 if i == 3:
-                    assert row == [su3.id, su3.type, 'polygon']
+                    area = format(su3.area, '.2f')
+                    assert row == [su3.id, su3.type, area, 'polygon']
                 if i == 4:
-                    assert row == [su4.id, su4.type, 'multipoint']
+                    assert row == [su4.id, su4.type, '', 'multipoint']
                 if i == 5:
-                    assert row == [su5.id, su5.type, 'multilinestring']
+                    area = su5.area
+                    assert row == [su5.id, su5.type, '', 'multilinestring']
                 if i == 6:
-                    assert row == [su6.id, su6.type, 'multipolygon']
+                    assert row == [su6.id, su6.type, '', 'multipolygon']
                 if i == 7:
-                    assert row == [su7.id, su7.type, 'empty']
+                    assert row == [su7.id, su7.type, '', 'empty']
                 if i == 8:
-                    assert row == [su8.id, su8.type, 'none']
+                    assert row == [su8.id, su8.type, '', 'none']
 
         # remove this so other tests pass
         os.remove(filename)

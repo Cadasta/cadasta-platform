@@ -423,6 +423,10 @@ class ProjectDashboard(PermissionRequiredMixin,
         members = OrderedDict(sorted(m.items(), key=lambda t: t[0]))
 
         num_locations = self.object.spatial_units.count()
+        total_area = self.object.spatial_units.aggregate(
+           Sum('area'))['area__sum']
+        if total_area:
+            context['total_area'] = total_area
         num_parties = self.object.parties.count()
         num_resources = self.object.resource_set.filter(archived=False).count()
         context['has_content'] = (

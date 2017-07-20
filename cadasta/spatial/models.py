@@ -41,6 +41,8 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     # have a textual description of their location.
     geometry = GeometryField(null=True)
 
+    area = models.FloatField(null=True)
+
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
 
@@ -174,6 +176,14 @@ def check_extent(sender, instance, **kwargs):
 
     if geom and not geom.empty:
         reassign_spatial_geometry(instance)
+
+
+@receiver(models.signals.pre_save, sender=SpatialUnit)
+def calculate_area(sender, instance, **kwargs):
+    geom = instance.geometry
+    from django.contrib.gis.geos.polygon import Polygon
+    if geom and isinstance(geom, Polygon) and geom.valid:
+        instance.area = geom.transform(3857, clone=True).area
 
 
 @fix_model_for_attributes

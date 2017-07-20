@@ -116,6 +116,7 @@ class LocationDetail(LoginPermissionRequiredMixin,
                 pass
 
         location = context['location']
+        context['area'] = location.area
         user = self.request.user
         context['is_allowed_edit_location'] = user.has_perm('spatial.update',
                                                             location)
