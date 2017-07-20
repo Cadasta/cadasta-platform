@@ -484,8 +484,8 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             serializer.save()
 
     def test_signup_with_existing_email_in_EmailAddress(self):
-        user = UserFactory.create(email='sherlock.holmes@bbc.uk')
-        EmailAddress.objects.create(user=user, email=user.email)
+        user = UserFactory.create()
+        EmailAddress.objects.create(user=user, email='sherlock.holmes@bbc.uk')
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
@@ -502,9 +502,9 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             in serializer.errors['email'])
 
     def test_signup_with_existing_phone_in_VerificationDevice(self):
-        user = UserFactory.create(phone='+919327768250')
+        user = UserFactory.create()
         VerificationDevice.objects.create(user=user,
-                                          unverified_phone=user.phone)
+                                          unverified_phone='+919327768250')
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
