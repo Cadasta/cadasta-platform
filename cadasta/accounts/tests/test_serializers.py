@@ -14,7 +14,7 @@ from .. import serializers
 from ..models import User, VerificationDevice
 from ..exceptions import EmailNotVerifiedError
 from core.tests.utils.files import make_dirs  # noqa
-
+from ..messages import phone_format
 from .factories import UserFactory
 
 
@@ -388,11 +388,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         }
         serializer = serializers.RegistrationSerializer(data=data)
         assert serializer.is_valid() is False
-        assert (
-            _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
-            in serializer._errors['phone'])
+        assert phone_format in serializer._errors['phone']
 
         data = {
             'username': 'sherlock',
@@ -406,11 +402,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         serializer = serializers.RegistrationSerializer(data=data)
         assert serializer.is_valid() is False
 
-        assert (
-            _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
-            in serializer._errors['phone'])
+        assert phone_format in serializer._errors['phone']
 
         data = {
             'username': 'sherlock',
@@ -424,11 +416,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         serializer = serializers.RegistrationSerializer(data=data)
         assert serializer.is_valid() is False
 
-        assert (
-            _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
-            in serializer._errors['phone'])
+        assert phone_format in serializer._errors['phone']
 
         data = {
             'username': 'sherlock',
@@ -442,11 +430,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         serializer = serializers.RegistrationSerializer(data=data)
         assert serializer.is_valid() is False
 
-        assert (
-            _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
-            in serializer._errors['phone'])
+        assert phone_format in serializer._errors['phone']
 
         data = {
             'username': 'sherlock',
@@ -460,11 +444,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         serializer = serializers.RegistrationSerializer(data=data)
         assert serializer.is_valid() is False
 
-        assert (
-            _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
-            in serializer._errors['phone'])
+        assert phone_format in serializer._errors['phone']
 
     def test_insensitive_email_check(self):
         UserFactory.create(email='sherlock.holmes@bbc.uk')

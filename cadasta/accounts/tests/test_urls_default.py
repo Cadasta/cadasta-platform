@@ -31,6 +31,7 @@ class UserUrlsTest(TestCase):
         assert resolved.func.__name__ == default.AccountRegister.__name__
 
     def test_verify_phone(self):
-        assert reverse('account:verify_phone') == '/account/verificationpage/'
-        resolved = resolve('/account/verificationpage/')
+        assert reverse(
+            'account:verify_phone') == '/account/accountverification/'
+        resolved = resolve('/account/accountverification/')
         assert resolved.func.__name__ == default.ConfirmPhone.__name__

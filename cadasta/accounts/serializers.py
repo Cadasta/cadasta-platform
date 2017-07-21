@@ -7,12 +7,13 @@ from allauth.account.models import EmailAddress
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
+from phonenumbers import parse as parse_phone
 
 from core.serializers import SanitizeFieldSerializer
 from .models import User, VerificationDevice
 from .validators import check_username_case_insensitive, phone_validator
 from .exceptions import EmailNotVerifiedError
-from phonenumbers import parse as parse_phone
+from .messages import phone_format
 
 
 class RegistrationSerializer(SanitizeFieldSerializer,
@@ -26,12 +27,9 @@ class RegistrationSerializer(SanitizeFieldSerializer,
         allow_null=True,
         required=False
     )
-    message = _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
     phone = serializers.RegexField(
         regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
-        error_messages={'invalid': message},
+        error_messages={'invalid': phone_format},
         validators=[UniqueValidator(
             queryset=User.objects.all(),
             message=_("User with this Phone number already exists.")
@@ -51,12 +49,9 @@ class RegistrationSerializer(SanitizeFieldSerializer,
             'password',
             'language',
             'measurement',
-<<<<<<< HEAD
             'avatar',
-=======
             'email_verified',
             'phone_verified'
->>>>>>> 507901c... Phone registration page, and authentication backend
         )
         extra_kwargs = {
             'password': {'write_only': True},
@@ -140,9 +135,7 @@ class UserSerializer(SanitizeFieldSerializer,
                       "email address")
         )]
     )
-<<<<<<< HEAD
     avatar = S3Field(required=False)
-=======
     language = serializers.ChoiceField(
         choices=settings.LANGUAGES,
         default=settings.LANGUAGE_CODE,
@@ -157,7 +150,6 @@ class UserSerializer(SanitizeFieldSerializer,
             'invalid_choice': _('Measurement system invalid or not available')
         }
     )
->>>>>>> 507901c... Phone registration page, and authentication backend
 
     class Meta:
         model = User

@@ -188,10 +188,10 @@ class VerificationDevice(Device):
 
         return token
 
-    def verify_token(self, token):
+    def verify_token(self, token, tolerance=0):
         totp = self.totp_obj()
         if ((totp.t() > self.last_verified_counter) and
-                (totp.token() == token)):
+                (totp.verify(token, tolerance=tolerance))):
             self.last_verified_counter = totp.t()
             verified = True
             self.save()

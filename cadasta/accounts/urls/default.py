@@ -15,6 +15,6 @@ urlpatterns = [
         name="account_reset_password_from_key"),
     url(r'^password/reset/$', default.PasswordResetView.as_view(),
         name="account_reset_password"),
-    url(r'^verificationpage/$',
+    url(r'^accountverification/$',
         default.ConfirmPhone.as_view(), name='verify_phone'),
 ]

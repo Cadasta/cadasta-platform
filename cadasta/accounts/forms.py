@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
+
 from allauth.account.utils import send_email_confirmation
 from allauth.account import forms as allauth_forms
 from allauth.account.models import EmailAddress
@@ -10,6 +11,7 @@ from core.form_mixins import SanitizeFieldsForm
 from .utils import send_email_update_notification
 from .models import User, VerificationDevice
 from .validators import check_username_case_insensitive, phone_validator
+from .messages import phone_format
 
 from parsley.decorators import parsleyfy
 from phonenumbers import parse as parse_phone
@@ -19,11 +21,8 @@ from phonenumbers import parse as parse_phone
 class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
     email = forms.EmailField(required=False)
 
-    message = _("Phone must have format: +9999999999. Upto 15 digits allowed."
-                " Do not include hyphen or blank spaces in between, at the"
-                " beginning or at the end.")
     phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
-                             error_messages={'invalid': message},
+                             error_messages={'invalid': phone_format},
                              required=False)
     password = forms.CharField(widget=forms.PasswordInput())
     MIN_LENGTH = 10
@@ -228,5 +227,5 @@ class PhoneVerificationForm(forms.Form):
         try:
             token = int(token)
         except ValueError:
-            raise forms.ValidationError(_("Token must be a whole number."))
+            raise forms.ValidationError(_("Token must be a number."))
         return token

@@ -153,6 +153,13 @@ class ConfirmPhone(FormView):
             message = message.format(phone=user.phone)
             messages.add_message(self.request, messages.SUCCESS, message)
             return super().form_valid(form)
+
+        elif device.verify_token(token, tolerance=5):
+            message = _("The token has expired."
+                        " Please click on 'here' to receive the new token.")
+            messages.add_message(self.request, messages.ERROR, message)
+            return super().form_invalid(form)
+
         else:
             return self.form_invalid(form)
 

@@ -2,7 +2,9 @@ import datetime
 from django.core.urlresolvers import reverse_lazy
 from django.test import TestCase
 from django.core import mail
+from django.conf import settings
 from skivvy import ViewTestCase
+from unittest import mock
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
@@ -36,7 +38,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         assert len(mail.outbox) == 1
         user = User.objects.first()
         assert user.check_password('221B@bakerstreet') is True
-        assert '/account/verificationpage/' in response.location
+        assert '/account/accountverification/' in response.location
 
     def test_signs_up_with_invalid(self):
         data = {
@@ -63,7 +65,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         assert User.objects.count() == 1
         assert VerificationDevice.objects.count() == 1
         assert len(mail.outbox) == 0
-        assert 'account/verificationpage/' in response.location
+        assert 'account/accountverification/' in response.location
 
     def test_signs_up_with_email_only(self):
         data = {
@@ -78,7 +80,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         assert User.objects.count() == 1
         assert VerificationDevice.objects.count() == 0
         assert len(mail.outbox) == 1
-        assert 'account/verificationpage/' in response.location
+        assert 'account/accountverification/' in response.location
 
 
 class ProfileTest(ViewTestCase, UserTestCase, TestCase):
@@ -313,7 +315,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         token = self.device.generate_challenge()
         data = {'token': token}
 
-        request = self.factory.post('/account/verificationpage/', data=data)
+        request = self.factory.post('/account/accountverification/', data=data)
         request.session = {"user_id": self.user.id}
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
@@ -324,7 +326,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         assert response.status_code == 302
         assert self.user.phone_verified is True
 
-    def test_unsuccessful_phone_verification(self):
+    def test_unsuccessful_phone_verification_with_invalid_token(self):
         self.device = self.user.verificationdevice_set.create(
             unverified_phone=self.user.phone)
 
@@ -332,7 +334,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         token = str(int(token) - 1)
         data = {'token': token}
 
-        request = self.factory.post('/account/verificationpage/', data=data)
+        request = self.factory.post('/account/accountverification/', data=data)
         request.session = {"user_id": self.user.id}
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
@@ -344,6 +346,29 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         assert response.status_code == 200
         assert self.user.phone_verified is False
 
+    def test_unsuccessful_phone_verification_with_expired_token(self):
+        self._now = 1497657600
+        self.device = self.user.verificationdevice_set.create(
+            unverified_phone=self.user.phone)
+
+        with mock.patch('time.time', return_value=self._now):
+            token = self.device.generate_challenge()
+
+        data = {'token': token}
+        request = self.factory.post(
+            '/account/accountverification/', data=data)
+        request.session = {"user_id": self.user.id}
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+
+        with mock.patch('time.time', return_value=(
+                self._now + settings.TOTP_TOKEN_VALIDITY + 1)):
+            response = default.ConfirmPhone.as_view()(request)
+
+        assert response.status_code == 200
+        self.user.refresh_from_db()
+        assert self.user.phone_verified is False
+
     def test_successful_phone_verification_new_phone(self):
         self.device = self.user.verificationdevice_set.create(
             unverified_phone='+919327768250')
@@ -351,7 +376,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         token = self.device.generate_challenge()
         data = {'token': token}
 
-        request = self.factory.post('/account/verificationpage/', data=data)
+        request = self.factory.post('/account/accountverification/', data=data)
         request.session = {"user_id": self.user.id}
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
