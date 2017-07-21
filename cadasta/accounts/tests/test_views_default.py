@@ -314,7 +314,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         data = {'token': token}
 
         request = self.factory.post('/account/verificationpage/', data=data)
-        request.session = {"unverified_phone": self.user.phone}
+        request.session = {"user_id": self.user.id}
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
         response = default.ConfirmPhone.as_view()(request)
@@ -333,7 +333,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         data = {'token': token}
 
         request = self.factory.post('/account/verificationpage/', data=data)
-        request.session = {"unverified_phone": self.user.phone}
+        request.session = {"user_id": self.user.id}
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
 
@@ -352,7 +352,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         data = {'token': token}
 
         request = self.factory.post('/account/verificationpage/', data=data)
-        request.session = {"unverified_phone": '+919327768250'}
+        request.session = {"user_id": self.user.id}
         messages = FallbackStorage(request)
         setattr(request, '_messages', messages)
         response = default.ConfirmPhone.as_view()(request)
