@@ -34,7 +34,6 @@ class AccountRegister(CreateView):
             device = VerificationDevice.objects.create(
                 user=user, unverified_phone=user.phone)
             device.generate_challenge()
-
             message = _("Verification Token sent to {phone}")
             message = message.format(phone=user.phone)
             messages.add_message(self.request, messages.INFO, message)
@@ -63,9 +62,66 @@ class PasswordResetView(SuperUserCheckMixin,
     form_class = forms.ResetPasswordForm
 
 
+class PasswordResetDoneView(FormView, allauth_views.PasswordResetDoneView):
+    form_class = forms.ResetPasswordDoneTokenForm
+    success_url = reverse_lazy('account:account_reset_password_from_phone')
+
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
+        phone = self.request.session.get('phone', None)
+        if phone:
+            context_data['phone'] = phone
+        return context_data
+
+    def form_valid(self, form):
+        token = form.cleaned_data.get('token')
+        phone = self.request.session["phone"]
+        user = User.objects.get(phone=phone)
+        device = user.verificationdevice_set.get(
+            unverified_phone=phone,
+            label='password_reset')
+        if device.verify_token(token):
+            message = _("Successfully Verified Token."
+                        " You can now reset your password.")
+            messages.add_message(self.request, messages.SUCCESS, message)
+            VerificationDevice.objects.get(
+                user=user,
+                unverified_phone=phone,
+                label='password_reset').delete()
+            return super().form_valid(form)
+        elif device.verify_token(token, tolerance=5):
+            message = _(
+                "Expired token. Please try resetting your password again.")
+            messages.add_message(self.request, messages.ERROR, message)
+            return redirect(reverse_lazy('account:account_reset_password'))
+        else:
+            message = _("Invalid Token. Enter a valid token.")
+            messages.add_message(self.request, messages.ERROR, message)
+            return super().form_invalid(form)
+
+
 class PasswordResetFromKeyView(SuperUserCheckMixin,
                                allauth_views.PasswordResetFromKeyView):
     form_class = forms.ResetPasswordKeyForm
+
+
+class PasswordResetFromPhoneView(FormView, SuperUserCheckMixin):
+    form_class = forms.ResetPasswordKeyForm
+    template_name = 'account/password_reset_from_key.html'
+    success_url = reverse_lazy("account:account_reset_password_from_key_done")
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        phone = self.request.session['phone']
+        user = User.objects.get(phone=phone)
+        form_kwargs["user"] = user
+        return form_kwargs
+
+    def form_valid(self, form):
+        form.save()
+        # send message to user's phone informing that password
+        # was successfully changed.
+        return super().form_valid(form)
 
 
 class AccountProfile(LoginRequiredMixin, UpdateView):
@@ -80,6 +136,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
         emails_to_verify = EmailAddress.objects.filter(
             user=self.object, verified=False).exists()
         phones_to_verify = VerificationDevice.objects.filter(
@@ -183,6 +240,9 @@ class ConfirmPhone(FormView):
         message = _("Successfully verified {phone}")
         message = message.format(phone=user.phone)
         messages.add_message(self.request, messages.SUCCESS, message)
+        VerificationDevice.objects.get(user=user,
+                                       unverified_phone=user.phone,
+                                       label='phone_verify').delete()
         return super().form_valid(form)
 
 
