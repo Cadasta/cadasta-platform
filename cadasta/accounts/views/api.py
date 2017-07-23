@@ -11,8 +11,8 @@ from allauth.account.signals import password_changed
 
 from .. import serializers
 from ..utils import send_email_update_notification
-from ..exceptions import EmailNotVerifiedError
 from ..models import VerificationDevice
+from accounts import exceptions
 
 
 class AccountUser(djoser_views.UserView):
@@ -103,15 +103,21 @@ class AccountLogin(djoser_views.LoginView):
                 data=serializer.errors,
                 status=status.HTTP_401_UNAUTHORIZED,
             )
-        except EmailNotVerifiedError:
+        except exceptions.AccountInactiveError:
             user = serializer.user
             user.is_active = False
             user.save()
-
-            send_email_confirmation(self.request._request, user)
-
+            return Response(
+                data={'detail': _("User account is disabled.")},
+                status=status.HTTP_401_UNAUTHORIZED)
+        except exceptions.EmailNotVerifiedError:
             return Response(
                 data={'detail': _("The email has not been verified.")},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+        except exceptions.PhoneNotVerifiedError:
+            return Response(
+                data={'detail': _("The phone has not been verified.")},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 

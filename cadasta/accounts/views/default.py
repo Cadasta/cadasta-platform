@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView
+from django.shortcuts import redirect
 
 from core.views.generic import UpdateView, CreateView
 from core.views.mixins import SuperUserCheckMixin
@@ -114,13 +115,19 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
 class AccountLogin(LoginView):
     def form_valid(self, form):
+        login = form.cleaned_data['login']
         user = form.user
-        if not user.email_verified:
+
+        if not user.phone_verified and not user.email_verified:
             user.is_active = False
             user.save()
-            send_email_confirmation(self.request, user)
+            return redirect(reverse_lazy('account:resend_token'))
 
-        return super().form_valid(form)
+        if((login == user.email and not user.email_verified) or
+                (login == user.phone and not user.phone_verified)):
+            return redirect(reverse_lazy('account:resend_token'))
+        else:
+            return super().form_valid(form)
 
 
 class ConfirmEmail(ConfirmEmailView):
@@ -167,4 +174,30 @@ class ConfirmPhone(FormView):
         message = _("Successfully verified {phone}")
         message = message.format(phone=user.phone)
         messages.add_message(self.request, messages.SUCCESS, message)
+        return super().form_valid(form)
+
+
+class ResendTokenView(FormView):
+    form_class = forms.ResendTokenForm
+    template_name = 'accounts/resend_token_page.html'
+    success_url = reverse_lazy('account:verify_phone')
+
+    def form_valid(self, form):
+        phone = form.data.get('phone')
+        email = form.data.get('email')
+        if phone:
+            phone_device = VerificationDevice.objects.get(
+                unverified_phone=phone)
+            phone_device.generate_challenge()
+            message = _("Verification Token sent to {phone}")
+            message = message.format(phone=phone)
+            messages.add_message(self.request, messages.SUCCESS, message)
+            self.request.session['user_id'] = phone_device.user.id
+        if email:
+            email_device = EmailAddress.objects.get(email=email)
+            user = email_device.user
+            if user.email != email:
+                user.email = email
+            send_email_confirmation(self.request, user)
+            self.request.session['user_id'] = email_device.user.id
         return super().form_valid(form)

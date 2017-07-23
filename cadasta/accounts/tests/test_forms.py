@@ -1458,3 +1458,84 @@ class PhoneVerificationFormTest(UserTestCase, TestCase):
         form = forms.PhoneVerificationForm(data, user=self.user)
         assert form.is_valid() is False
         assert (_("Token must be a number.") in form.errors.get('token'))
+
+
+class ResendTokenFormTest(UserTestCase, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create(username='sherlock',
+                                       phone='+919327768250',
+                                       email='sherlock.holmes@bbc.uk',
+                                       password='221B@bakerstreet',
+                                       email_verified=True,
+                                       phone_verified=True)
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone='+12345678990')
+        EmailAddress.objects.create(user=self.user,
+                                    email='john.watson@bbc.uk')
+
+    def test_valid_phone(self):
+        data = {'phone': '+12345678990', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is True
+
+    def test_invalid_phone(self):
+        data = {'phone': '12345678990', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        data = {'phone': 'Test Number', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        data = {'phone': '+1 2345678990', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+    def test_phone_already_verified(self):
+        data = {'phone': '+919327768250', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (_("This Phone number has already been verified.")
+                in form.errors.get('phone'))
+
+    def test_phone_not_linked_to_account(self):
+        data = {'phone': '+12345678991', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (_("This Phone number is not linked to any account.")
+                in form.errors.get('phone'))
+
+    def test_empty_phone_submited(self):
+        data = {'phone': '', 'verify_phone': 'Verify Phone'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (_("Enter your registered Phone number to receive the"
+                  " Verification token.") in form.errors.get('phone'))
+
+    def test_email_already_verified(self):
+        data = {
+            'email': 'sherlock.holmes@bbc.uk',
+            'verify_email': 'Verify Email'
+        }
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (_("This Email address has already been verified.")
+                in form.errors.get('email'))
+
+    def test_email_not_linked_to_account(self):
+        data = {'email': 'jim.moriarty@bbc.uk', 'verify_email': 'Verify Email'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (_("This Email address is not linked to any account.")
+                in form.errors.get('email'))
+
+    def test_empty_email_submited(self):
+        data = {'email': '', 'verify_email': 'Verify Email'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (_("Enter your registered Email address to receive the"
+                  " Verification link.") in form.errors.get('email'))

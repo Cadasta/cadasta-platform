@@ -12,8 +12,8 @@ from core.messages import SANITIZE_ERROR
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from .. import serializers
 from ..models import User, VerificationDevice
-from ..exceptions import EmailNotVerifiedError
 from core.tests.utils.files import make_dirs  # noqa
+from accounts import exceptions
 from ..messages import phone_format
 from .factories import UserFactory
 
@@ -913,16 +913,39 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
     def test_unverified_account(self):
-        """Serializer should raise EmailNotVerifiedError exeception when the
+        """Serializer should raise exceptions.EmailNotVerifiedError exeception when the
            user has not verified their email address"""
 
         UserFactory.create(username='sgt_pepper',
                            password='iloveyoko79',
+                           email='john@beatles.uk',
                            email_verified=False)
-        with pytest.raises(EmailNotVerifiedError):
+        with pytest.raises(exceptions.EmailNotVerifiedError):
             serializers.AccountLoginSerializer().validate(attrs={
-                'username': 'sgt_pepper',
+                'username': 'john@beatles.uk',
                 'password': 'iloveyoko79'
+            })
+
+    def test_login_account_with_unverified_phone(self):
+        UserFactory.create(username='sherlock',
+                           password='221B@bakerstreet',
+                           phone='+919327768250',
+                           phone_verified=False)
+        with pytest.raises(exceptions.PhoneNotVerifiedError):
+            serializers.AccountLoginSerializer().validate(attrs={
+                'username': '+919327768250',
+                'password': '221B@bakerstreet'
+            })
+
+    def test_login_account_with_both_unverified_phone_and_email(self):
+        UserFactory.create(username='sherlock',
+                           password='221B@bakerstreet',
+                           phone='+919327768250',
+                           phone_verified=False)
+        with pytest.raises(exceptions.AccountInactiveError):
+            serializers.AccountLoginSerializer().validate(attrs={
+                'username': 'sherlock',
+                'password': '221B@bakerstreet'
             })
 
 

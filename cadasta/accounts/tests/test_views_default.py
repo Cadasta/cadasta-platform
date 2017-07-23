@@ -268,6 +268,7 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
                                        email='john@beatles.uk',
+                                       phone='+919327768250',
                                        password='iloveyoko79')
 
     def test_successful_login(self):
@@ -281,15 +282,105 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_successful_login_with_unverified_user(self):
         self.user.email_verified = False
+        self.user.phone_verified = False
         self.user.save()
 
         data = {'login': 'imagine71', 'password': 'iloveyoko79'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
-        assert 'account/inactive' in response.location
-        assert len(mail.outbox) == 1
+        assert '/account/resendtokenpage/' in response.location
+
         self.user.refresh_from_db()
         assert self.user.is_active is False
+
+    def test_successful_login_with_email_both_unverified(self):
+        self.user.email_verified = False
+        self.user.phone_verified = False
+        self.user.save()
+
+        data = {'login': 'john@beatles.uk', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/resendtokenpage/' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.is_active is False
+
+    def test_successful_login_with_phone_both_unverified(self):
+        self.user.email_verified = False
+        self.user.phone_verified = False
+        self.user.save()
+
+        data = {'login': '+919327768250', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/resendtokenpage/' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.is_active is False
+
+    def test_successful_login_with_username_both_verified(self):
+        self.user.email_verified = True
+        self.user.phone_verified = True
+        self.user.save()
+
+        data = {'login': 'imagine71', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+    def test_successful_login_with_username_only_phone_verified(self):
+        self.user.phone_verified = True
+        self.user.save()
+
+        data = {'login': 'imagine71', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+    def test_successful_login_with_verified_email(self):
+        self.user.email_verified = True
+        self.user.save()
+
+        data = {'login': 'john@beatles.uk', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+    def test_successful_login_with_unverified_email_verified_phone(self):
+        self.user.email_verified = False
+        self.user.phone_verified = True
+        self.user.save()
+
+        data = {'login': 'john@beatles.uk', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/resendtokenpage/' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.is_active is True
+
+    def test_successful_login_with_phone_verified(self):
+        self.user.phone_verified = True
+        self.user.save()
+
+        data = {'login': '+919327768250', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert 'dashboard' in response.location
+
+    def test_successful_login_with_unverified_phone_verified_email(self):
+        self.user.phone_verified = False
+        self.user.email_verified = True
+        self.user.save()
+
+        data = {'login': '+919327768250', 'password': 'iloveyoko79'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/resendtokenpage/' in response.location
+
+        self.user.refresh_from_db()
+        assert self.user.is_active is True
 
 
 class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
@@ -464,3 +555,49 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         assert self.user.phone == '+919327768250'
         assert self.user.phone_verified is True
         assert self.user.is_active is True
+
+
+class ResendTokenViewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ResendTokenView
+
+    def setup_models(self):
+        self.user = UserFactory.create(username='sherlock',
+                                       email='sherlock.holmes@bbc.uk',
+                                       phone='+919327768250',
+                                       password='221B@bakerstreet',
+                                       )
+
+    def test_phone_send_token(self):
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone=self.user.phone)
+        data = {
+            'phone': '+919327768250',
+            'verify_phone': 'Verify Phone'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/accountverification/' in response.location
+
+    def test_email_send_link(self):
+        EmailAddress.objects.create(user=self.user, email=self.user.email)
+        data = {
+            'email': 'sherlock.holmes@bbc.uk',
+            'verify_email': 'Verify Email'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/accountverification/' in response.location
+        assert len(mail.outbox) == 1
+        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+
+    def test_updated_email_send_link(self):
+        EmailAddress.objects.create(user=self.user, email='john.watson@bbc.uk')
+        data = {
+            'email': 'john.watson@bbc.uk',
+            'verify_email': 'Verify Email'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/accountverification/' in response.location
+        assert len(mail.outbox) == 1
+        assert 'john.watson@bbc.uk' in mail.outbox[0].to

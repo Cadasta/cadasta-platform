@@ -300,3 +300,48 @@ class PhoneVerificationForm(forms.Form):
         except ValueError:
             raise forms.ValidationError(_("Token must be a number."))
         return token
+
+
+class ResendTokenForm(forms.Form):
+    email = forms.EmailField(required=False)
+
+    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+                             error_messages={'invalid': phone_format},
+                             required=False)
+
+    def clean_email(self):
+        if self.data.get('verify_email'):
+            email = self.data.get('email')
+            if email:
+                if User.objects.filter(
+                        email=email, email_verified=True).exists():
+                    raise forms.ValidationError(
+                        _("This Email address has already been verified."))
+
+                elif not EmailAddress.objects.filter(
+                        email=email).exists():
+                    raise forms.ValidationError(
+                        _("This Email address is not linked to any account."))
+            else:
+                raise forms.ValidationError(
+                    _("Enter your registered Email address to receive the"
+                        " Verification link."))
+            return email
+
+    def clean_phone(self):
+        if self.data.get('verify_phone'):
+            phone = self.data.get('phone')
+            if phone:
+                if User.objects.filter(
+                        phone=phone, phone_verified=True).exists():
+                    raise forms.ValidationError(
+                        _("This Phone number has already been verified."))
+                elif not VerificationDevice.objects.filter(
+                        unverified_phone=phone).exists():
+                    raise forms.ValidationError(
+                        _("This Phone number is not linked to any account."))
+            else:
+                raise forms.ValidationError(
+                    _("Enter your registered Phone number to receive the"
+                        " Verification token."))
+            return phone

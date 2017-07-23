@@ -21,6 +21,6 @@
       <button type="submit" name="Verify" class="btn btn-primary btn-lg btn-block text-uppercase">{% trans "Verify Token" %}</button>
     </form>
   {% endif %}
-  <p>{% blocktrans %} Click <a href="#">here</a> if you did not receive any email or text.{% endblocktrans %}</p>
+  <p>{% blocktrans %} Click {% endblocktrans %}<a href="{% url 'account:resend_token' %}">{% blocktrans %}here</a> if you did not receive any email or text.{% endblocktrans %}</p>
 </div>
 {% endblock %}

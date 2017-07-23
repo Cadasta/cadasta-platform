@@ -12,7 +12,7 @@ from phonenumbers import parse as parse_phone
 from core.serializers import SanitizeFieldSerializer
 from .models import User, VerificationDevice
 from .validators import check_username_case_insensitive, phone_validator
-from .exceptions import EmailNotVerifiedError
+from . import exceptions
 from .messages import phone_format
 
 
@@ -267,8 +267,18 @@ class AccountLoginSerializer(djoser_serializers.LoginSerializer):
     def validate(self, attrs):
         attrs = super(AccountLoginSerializer, self).validate(attrs)
 
-        if not self.user.email_verified:
-            raise EmailNotVerifiedError
+        if ((attrs['username'] == self.user.username) and
+                ((not self.user.email_verified) and
+                    (not self.user.phone_verified))):
+            raise exceptions.AccountInactiveError
+
+        if (attrs['username'] == self.user.email and
+                (not self.user.email_verified)):
+            raise exceptions.EmailNotVerifiedError
+
+        if (attrs['username'] == self.user.phone and
+                (not self.user.phone_verified)):
+            raise exceptions.PhoneNotVerifiedError
 
         return attrs
 

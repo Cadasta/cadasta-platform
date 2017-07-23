@@ -39,14 +39,14 @@
   <div class="form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
     {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" %}
-    {% if emails_to_verify %}<p class="help-block small">{% trans "The email for this account has been changed recently, but the new email address has not yet been verified. You should have received an email with a link to verify the new email address." %}</p>{% endif %}
+    {% if emails_to_verify %}<p class="help-block small">{% trans "The email for this account has been changed recently, but the new email address has not yet been verified. You should have received an email with a link to verify the new email address.To manually verify the new email address, click" %}<a href="{% url 'account:resend_token' %}">{%trans " here." %}</a></p>{% endif %}
     <div class="error-block">{{ form.email.errors }}</div>
   </div>
 
   <div class="form-group{% if form.phone.errors %} has-error{%endif%}">
   <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
   {% render_field form.phone class+='form-control input-lg'  %}
-    {% if phones_to_verify %}<p class="help-block small">{% trans "The phone for this account has been changed recently, but the new phone number has not yet been verified. To verify the new phone number, click" %}<a href="#">{%trans " here." %}</a></p>{% endif %}
+    {% if phones_to_verify %}<p class="help-block small">{% trans "The phone for this account has been changed recently, but the new phone number has not yet been verified. To verify the new phone number, click" %}<a href="{% url 'account:resend_token' %}">{%trans " here." %}</a></p>{% endif %}
     <div class="error-block">{{ form.phone.errors }}</div>
   </div>
 
