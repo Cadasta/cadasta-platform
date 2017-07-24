@@ -220,8 +220,8 @@ class RegisterFormTest(UserTestCase, TestCase):
         form = forms.RegisterForm(data)
         assert form.is_valid() is False
         assert User.objects.count() == 0
-        assert ('Language invalid or not available'
-                in form.errors.get('language'))
+        assert ('Select a valid choice. invalid is not one of the '
+                'available choices.' in form.errors.get('language'))
 
     def test_sanitize(self):
         data = {

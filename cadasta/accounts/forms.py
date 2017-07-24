@@ -17,13 +17,6 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
     email = forms.EmailField(required=True)
     password = forms.CharField(widget=forms.PasswordInput())
     MIN_LENGTH = 10
-    language = forms.ChoiceField(
-        required=False,
-        choices=settings.LANGUAGES,
-        error_messages={
-            'invalid_choice': _('Language invalid or not available')
-        }
-    )
 
     class Meta:
         model = User
