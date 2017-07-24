@@ -238,8 +238,6 @@ class RegisterFormTest(UserTestCase, TestCase):
         assert form.is_valid() is True
         assert (form.errors.get('password') is None)
 
-        assert User.objects.count() == 0
-
     def test_password_contains_blank_phone(self):
         data = {
             'username': 'sherlock',
@@ -251,7 +249,6 @@ class RegisterFormTest(UserTestCase, TestCase):
         form = forms.RegisterForm(data)
         assert form.is_valid() is True
         assert (form.errors.get('password') is None)
-        assert User.objects.count() == 0
 
     def test_password_contains_phone(self):
         data = {
