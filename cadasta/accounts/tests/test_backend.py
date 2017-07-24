@@ -36,26 +36,6 @@ class AuthBackendTest(UserTestCase, TestCase):
                        'password': 'PlayTh3Trumpet!'}
         assert self.backend._authenticate_by_email(**credentials) == self.user
 
-    def test_login_with_username(self):
-        credentials = {'username': 'kindofblue',
-                       'password': 'PlayTh3Trumpet!'}
-
-        assert self.backend._authenticate_by_username(
-            **credentials) == self.user
-
-    def test_login_for_inactive_account(self):
-        self.user.is_active = False
-        self.user.save()
-        credentials = {'username': 'kindofblue',
-                       'password': 'PlayTh3Trumpet!'}
-
-        assert self.backend._authenticate_by_username(**credentials) is None
-
-    def test_login_with_non_existent_username(self):
-        credentials = {'username': 'alwaysblue_alwaysblue',
-                       'password': 'PlayTh3Trumpet!'}
-        assert self.backend._authenticate_by_username(**credentials) is None
-
 
 class PhoneAuthBackendTest(UserTestCase, TestCase):
     def setUp(self):
@@ -75,7 +55,7 @@ class PhoneAuthBackendTest(UserTestCase, TestCase):
         self.user.save()
         credentials = {'phone': '+912345678990',
                        'password': 'PlayTh3Trumpet!'}
-        assert self.backend.authenticate(**credentials) is None
+        assert self.backend.authenticate(**credentials) == self.user
 
     def test_login_with_non_existent_phone(self):
         credentials = {'phone': '+912345612345',
