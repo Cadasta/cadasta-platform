@@ -310,42 +310,6 @@ class UserSerializerTest(UserTestCase, TestCase):
         assert serializer2.errors['username'] == [
             _("Username cannot be “add” or “new”.")]
 
-    def test_update_with_invalid_language(self):
-        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid() is True
-        user = serializer.save()
-        data = {
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'language': 'invalid',
-        }
-        request = APIRequestFactory().patch('/user/imagine71', data)
-        force_authenticate(request, user=user)
-        serializer2 = serializers.UserSerializer(
-            user, data=data, context={'request': Request(request)}
-        )
-        assert serializer2.is_valid() is False
-        assert ('Language invalid or not available'
-                in serializer2.errors['language'])
-
-    def test_update_with_invalid_measurement_system(self):
-        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
-        assert serializer.is_valid() is True
-        user = serializer.save()
-        data = {
-            'username': 'imagine71',
-            'email': 'john@beatles.uk',
-            'measurement': 'invalid',
-        }
-        request = APIRequestFactory().patch('/user/imagine71', data)
-        force_authenticate(request, user=user)
-        serializer2 = serializers.UserSerializer(
-            user, data=data, context={'request': Request(request)}
-        )
-        assert serializer2.is_valid() is False
-        assert ('Measurement system invalid or not available'
-                in serializer2.errors['measurement'])
-
     def test_sanitize(self):
         user = UserFactory.create(username='imagine71')
         data = {
