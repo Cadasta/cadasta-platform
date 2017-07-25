@@ -14,10 +14,9 @@ from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from accounts.tests.factories import UserFactory
-from resources.models import Resource
 from ..models import ContentObject
 from ..views import default
-from ..forms import ResourceForm, AddResourceFromLibraryForm
+from ..forms import ResourceForm
 from .factories import ResourceFactory
 from .utils import clear_temp  # noqa
 
@@ -55,25 +54,7 @@ class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.resources = ResourceFactory.create_batch(
-            2, content_object=self.project, project=self.project)
-        self.denied = ResourceFactory.create(content_object=self.project,
-                                             project=self.project)
-        ResourceFactory.create()
-
         self.user = UserFactory.create()
-        assign_permissions(self.user, [
-            {
-                'effect': 'deny',
-                'object': ['resource/*/*/' + self.denied.id],
-                'action': ['resource.*'],
-            },
-            {
-                'effect': 'deny',
-                'object': ['resource/*/*/*'],
-                'action': ['resource.unarchive'],
-            },
-        ])
 
     def setup_url_kwargs(self):
         return {
@@ -82,71 +63,42 @@ class ProjectResourcesTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def setup_template_context(self, resources=None):
-        if resources is None:
-            resources = Resource.objects.filter(
-                project=self.project,
-                archived=False).exclude(pk=self.denied.pk)
-
-        resource_list = []
-        if len(resources) > 0:
-            object_id = resources[0].project.id
-            attachments = ContentObject.objects.filter(object_id=object_id)
-            attachment_id_dict = {x.resource.id: x.id for x in attachments}
-            for resource in resources:
-                resource_list.append(resource)
-                attachment_id = attachment_id_dict.get(resource.id, None)
-                setattr(resource, 'attachment_id', attachment_id)
-
-        resource_count = self.project.resource_set.filter(
-            archived=False).count()
-
         return {
-            'object_list': resources,
             'object': self.project,
-            'has_unattached_resources': (
-                resource_count > 0 and
-                resource_count != self.project.resources.count()
-            ),
-            'resource_list': resource_list,
+            'resource_src': reverse(
+                'async:resources:list',
+                args=[self.project.organization.slug, self.project.slug]),
             'is_allowed_add_resource': True
         }
 
     def test_get_list(self):
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_list_with_archived_resource(self):
-        ResourceFactory.create(project=self.project, archived=True)
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_list_with_unattached_resource_using_nonunarchiver(self):
-        ResourceFactory.create(project=self.project)
-        resources = Resource.objects.filter(project=self.project).exclude(
-                                            pk=self.denied.pk)
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        context = self.setup_template_context(resources=resources)
-        expected = self.render_content(**context)
-        assert response.content == expected
-
-    def test_get_list_with_archived_resource_using_unarchiver(self):
         assign_permissions(self.user)
-        ResourceFactory.create(project=self.project, archived=True)
-        resources = Resource.objects.filter(project=self.project)
         response = self.request(user=self.user)
-        context = self.setup_template_context(resources=resources)
-        expected = self.render_content(**context)
-        assert response.content == expected
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_list_with_unattached_resource(self):
+        ResourceFactory.create(
+            project=self.project,
+            content_object=PartyFactory.create(project=self.project))
+        assign_permissions(self.user)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            has_unattached_resources=True)
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=UserFactory.create())
+        assign_permissions(self.user, [
+            {
+                'effect': 'deny',
+                'object': ['project/*/*'],
+                'action': ['resource.add'],
+            },
+        ])
+        response = self.request(user=self.user)
         assert response.status_code == 200
-        context = self.setup_template_context(resources=[])
-        context['is_allowed_add_resource'] = False
-        assert response.content == self.render_content(**context)
+        assert response.content == self.render_content(
+            is_allowed_add_resource=False)
 
     def test_get_with_unauthenticated_user(self):
         response = self.request()
@@ -168,10 +120,6 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        self.attached = ResourceFactory.create(project=self.project,
-                                               content_object=self.project)
-        self.unattached = ResourceFactory.create(project=self.project)
-
         self.user = UserFactory.create()
         assign_permissions(self.user)
 
@@ -182,17 +130,15 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def setup_template_context(self):
-        form = AddResourceFromLibraryForm(content_object=self.project,
-                                          project_id=self.project.id)
         return {'object': self.project,
-                'form': form,
-                'is_allowed_add_resource': True}
-
-    def setup_post_data(self):
-        return {
-            self.attached.id: False,
-            self.unattached.id: True,
-        }
+                'is_allowed_add_resource': True,
+                'resource_src': reverse(
+                    'async:resources:list',
+                    args=[self.project.organization.slug, self.project.slug]),
+                'resource_lib': reverse(
+                    'async:resources:add_to_project',
+                    args=[self.project.organization.slug, self.project.slug]),
+                }
 
     def test_get_list(self):
         response = self.request(user=self.user)
@@ -225,50 +171,6 @@ class ProjectResourcesAddTest(ViewTestCase, UserTestCase, TestCase):
         assert ("You don't have permission to add resources."
                 in response.messages)
 
-    def test_update(self):
-        project_resources = self.project.resources.all()
-        response = self.request(method='POST', user=self.user)
-        assert response.status_code == 302
-        assert response.location == self.expected_success_url
-        assert len(project_resources) == 2
-        assert self.attached in project_resources
-        assert self.unattached in project_resources
-
-    def test_update_with_custom_redirect(self):
-        project_resources = self.project.resources.all()
-        response = self.request(method='POST', user=self.user,
-                                get_data={'next': '/organizations/'})
-        assert response.status_code == 302
-        assert response.location == '/organizations/#resources'
-        assert len(project_resources) == 2
-        assert self.attached in project_resources
-        assert self.unattached in project_resources
-
-    def test_post_with_unauthorized_user(self):
-        response = self.request(method='POST', user=UserFactory.create())
-        assert ("You don't have permission to add resources."
-                in response.messages)
-        assert self.project.resources.count() == 1
-        assert self.project.resources.first() == self.attached
-
-    def test_post_with_unauthenticated_user(self):
-        response = self.request(method='POST')
-        assert response.status_code == 302
-        assert '/account/login/' in response.location
-        assert self.project.resources.count() == 1
-        assert self.project.resources.first() == self.attached
-
-    def test_post_with_archived_project(self):
-        self.project.archived = True
-        self.project.save()
-
-        response = self.request(method='POST', user=self.user)
-        assert response.status_code == 302
-        assert ("You don't have permission to add resources."
-                in response.messages)
-        assert self.project.resources.count() == 1
-        assert self.project.resources.first() == self.attached
-
 
 @pytest.mark.usefixtures('clear_temp')
 @pytest.mark.usefixtures('make_dirs')
@@ -293,7 +195,13 @@ class ProjectResourcesNewTest(ViewTestCase, UserTestCase,
         form = ResourceForm()
         return {'object': self.project,
                 'form': form,
-                'is_allowed_add_resource': True}
+                'is_allowed_add_resource': True,
+                'resource_src': reverse(
+                    'async:resources:list',
+                    args=[self.project.organization.slug, self.project.slug]),
+                'resource_lib': reverse(
+                    'async:resources:add_to_project',
+                    args=[self.project.organization.slug, self.project.slug])}
 
     def setup_post_data(self):
         file = self.get_file('/resources/tests/files/image.jpg', 'rb')

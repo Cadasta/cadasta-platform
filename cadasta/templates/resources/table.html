@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <!-- Resources index -->
-<table class="table table-hover datatable" data-paging-type="simple">
+<table class="table table-hover resource-list" data-paging-type="simple" data-ajax="{{ resource_src }}">
   <thead>
     <tr>
       <th class="col-md-4">{% trans "Resource" %}</th>
@@ -12,72 +12,7 @@
       <th class="col-md-1">&nbsp;</th>
     </tr>
   </thead>
-  <tbody>
-  {% for resource in resource_list %}
-    <tr class="linked linked-resource" data-link-url="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}">
-      <td>
-        <div class="media-left">
-          <img src="{{ resource.thumbnail }}" class="thumb-60">
-        </div>
-        <div class="media-body resource-text">
-          <p>
-            <a href="{% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id %}"><strong>{{ resource.name }}</strong></a>
-            {% if resource.archived %}
-              <span class="label label-danger">{% trans "Deleted" %}</span>
-            {% endif %}
-            <br>{{ resource.original_file }}
-          </p>
-        </div>
-      </td>
-      <td class="hidden-xs hidden-sm">{{ resource.file_type }}</td>
-      <td class="hidden-xs hidden-sm">{{ resource.contributor.username }}<br>{{ resource.contributor.full_name }}</td>
-      <td class="hidden-xs hidden-sm" data-sort="{{ resource.last_updated|date:'U' }}">{{ resource.last_updated }}</td>
-      <td class="hidden-xs hidden-sm">
-        {% if resource.attachment_id %}
-          {% with amount=resource.num_entities|add:"-1" %}
-          {% blocktrans %}{{ amount }} other{% endblocktrans %}
-          {% endwith %}
-        {% else %}
-          {% if resource.num_entities %}
-            {{ resource.num_entities }}
-          {% else %}
-            {% trans "Unattached" %}
-          {% endif %}
-        {% endif %}
-      </td>
-      <td class="text-right">
-        {% if resource.attachment_id %}
-          <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm" role="button">
-              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
-            </button>
-          </form>
-        {% else %}
-          {% if resource.archived %}
-            <button class="btn btn-default btn-sm restore" data-unarchive-url="{% url 'resources:unarchive' object.organization.slug object.slug resource.id %}">{% trans "Restore" %}</button>
-          {% endif %}
-        {% endif %}
-      </td>
-    </tr>
-  {% endfor %}
-  </tbody>
+  <tbody></tbody>
 </table>
 
-<script>
-window.addEventListener('load', function() {
-
-  // Link each resource row to its resource detail page
-  $('tr.linked-resource').bind('click', function(e) {
-    window.document.location = e.currentTarget.dataset.linkUrl;
-  });
-
-  // Activate restore deleted modal on restore buttons
-  $('button.restore').bind('click', function(e) {
-    // This is needed to counter the row-click event handler
-    e.stopPropagation();
-    $('#undelete_resource_confirm .modal-footer a').attr('href', e.currentTarget.dataset.unarchiveUrl + '?next=' + window.location.pathname);
-    $('#undelete_resource_confirm').modal();
-  });
-});
-</script>
+{% include "resources/table_snippets/datatables.html" with large_table=True %}

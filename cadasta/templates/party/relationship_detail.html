@@ -38,7 +38,7 @@
 
     <!-- Relationship resources -->
     <h4>{% trans "Resources" %}</h4>
-    {% if resource_list %}
+    {% if resource_exists %}
       <div class="top-btn pull-right top-add">
         {% if has_unattached_resources %}
         <a class="btn btn-primary btn-sm" href="{% url 'parties:relationship_resource_add' object.organization.slug object.slug relationship.id %}">

@@ -1,0 +1,26 @@
+{% load i18n %}
+
+{% for resource in resources %}
+  {% url 'resources:project_detail' project=project.slug organization=project.organization.slug resource=resource.id as resource_url %}
+  <tr class="linked" onclick="window.document.location='{{ resource_url }}';">
+    <td>
+      <div class="media-left">
+        <img src="{{ resource.thumbnail }}" class="thumb-60">
+      </div>
+      <div class="media-body resource-text">
+        <p>
+          <a href="{{ resource_url }}"><strong>{{ resource.name }}</strong></a>
+          <br><span class="small">{{ resource.original_file }}</span>
+        </p>
+      </div>
+    </td>
+    <td>
+      <form method="POST" action="{% url 'resources:detach' project.organization.slug project.slug resource.id resource.attachment_id %}?next={{ detatch_redirect }}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm pull-right" role="button">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
+        </button>
+      </form>
+    </td>
+  </tr>
+{% endfor %}

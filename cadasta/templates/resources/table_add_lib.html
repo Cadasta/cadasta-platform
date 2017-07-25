@@ -1,20 +1,17 @@
 {% load i18n %}
 
 {% csrf_token %}
-<table class="table table-hover datatable" data-paging-type="simple">
+<table class="table table-hover resource-list" data-paging-type="simple" data-ajax="{{ resource_lib }}">
   <thead>
     <tr>
-      <th class="col-md-1"></th>
       <th class="col-md-4">{% trans "Resource" %}</th>
       <th class="col-md-1 hidden-xs hidden-sm">{% trans "Type" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Contributor" %}</th>
       <th class="col-md-2 hidden-xs hidden-sm">{% trans "Last updated" %}</th>
       <th class="col-md-2">{% trans "Attachments" %}</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
-  {% for field in form %}
-    {{ field }}
-  {% endfor %}
   </tbody>
 </table>

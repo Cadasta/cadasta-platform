@@ -1,0 +1,45 @@
+{% load i18n %}
+
+{% for resource in resources %}
+<tr class="linked linked-resource" data-link-url="{% url 'resources:project_detail' project=project.slug organization=project.organization.slug resource=resource.id %}">
+  <td>
+    <div class="media-left">
+      <img src="{{ resource.thumbnail }}" class="thumb-60">
+    </div>
+    <div class="media-body resource-text">
+      <p>
+        <a href="{% url 'resources:project_detail' project=project.slug organization=project.organization.slug resource=resource.id %}"><strong>{{ resource.name }}</strong></a>
+        {% if resource.archived %}
+          <span class="label label-danger">{% trans "Deleted" %}</span>
+        {% endif %}
+        <br>{{ resource.original_file }}
+      </p>
+    </div>
+  </td>
+  <td class="hidden-xs hidden-sm">{{ resource.file_type }}</td>
+  <td class="hidden-xs hidden-sm">{{ resource.contributor.username }}<br>{{ resource.contributor.full_name }}</td>
+  <td class="hidden-xs hidden-sm" data-sort="{{ resource.last_updated|date:'U' }}">{{ resource.last_updated }}</td>
+  <td class="hidden-xs hidden-sm">
+    {% if resource.num_entities %}
+      {{ resource.num_entities }} other
+    {% else %}
+      {% trans "Unattached" %}
+    {% endif %}
+  </td>
+  <td>
+    <form method="POST" action="{{ resource_lib }}" class="attach">
+      {% csrf_token %}
+      <input type="hidden" name="resource" value="{{ resource.id }}">
+      <button type="submit" class="btn btn-primary btn-sm" role="button">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}
+      </button>
+    </form>
+  </td>
+</tr>
+{% empty %}
+<tr class="linked linked-resource">
+  <td colspan="6">
+    {% trans "No resources matching your query found." %}
+  </td>
+</tr>
+{% endfor %}

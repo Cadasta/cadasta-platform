@@ -7,11 +7,11 @@
 {% block location_extra_script %}
 <script src="{% static 'js/dataTables.forms.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
-{% include 'resources/script_add_lib.html' %}
 {% endblock %}
 
 {% block modals %}
 {% url 'locations:detail' object.organization.slug object.slug location.id as cancel_url %}
 {% url 'locations:resource_new' object.organization.slug object.slug location.id as upload_url %}
 {% include 'resources/modal_add_lib.html' with cancel_url_hash="#resources" %}
+{% include "resources/table_snippets/datatables.html" %}
 {% endblock %}

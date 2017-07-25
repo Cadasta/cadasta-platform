@@ -1,50 +1,49 @@
-{% extends "organization/project_wrapper.html" %}
 {% load i18n %}
-
-{% block page_title %}{% trans "Parties" %} | {% endblock %}
-{% block left-nav %}parties{% endblock %}
-
-{% block content %}
-
-<div class="col-md-12 content-single">
-  <div class="row">
-    <!-- Main text  -->
-    <div class="col-md-12 main-text">
-      <div class="page-title">
-        <h2>{% trans "Parties" %}</h2>
-      </div>
-      <div class="panel panel-default">
-        <div class="panel-body">
-          <table id="party-list" class="table table-hover" data-paging-type="simple" data-src="{% url 'async:party:list' object.organization.slug object.slug %}">
-            <thead>
-              <tr>
-                <th class="col-md-3">{% trans "Name" %}</th>
-                <th class="col-md-9">{% trans "Type" %}</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 window.addEventListener('load', function() {
-  $('#party-list').DataTable({
+  $('.resource-list').DataTable({
     serverSide: true,
+    {% if large_table %}
+    columnDefs: [{
+      targets: 4,
+      orderable: false
+    }],
+    {% endif %}
     drawCallback: function (settings) {
-      var response = this.api().ajax.json().tbody;
-      $('#party-list tbody').html(this.api().ajax.json().tbody);
+      var dataTable = this;
+      var response = dataTable.api().ajax.json().tbody;
+      $(dataTable).find('tbody').html(dataTable.api().ajax.json().tbody);
 
       // Link each resource row to its resource detail page
-      $('tr.linked').bind('click', function(e) {
+      $('tr.linked-resource').bind('click', function(e) {
         window.document.location = e.currentTarget.dataset.linkUrl;
       });
-    },
-    ajax: {
-      url: $('#party-list').attr('data-src'),
+
+      // Activate restore deleted modal on restore buttons
+      $('button.restore').bind('click', function(e) {
+        // This is needed to counter the row-click event handler
+        
+        $('#undelete_resource_confirm .modal-footer a').attr('href', e.currentTarget.dataset.unarchiveUrl + '?next=' + window.location.pathname);
+        $('#undelete_resource_confirm').modal();
+      });
+
+      $('form.attach').bind('click', function (e) {
+        e.stopPropagation();
+      });
+
+      $('form.attach').on('submit', function (e) {
+        e.preventDefault();
+
+        $.ajax({
+          method: 'POST',
+          url: $(this).attr('action'),
+          data: $(this).serializeArray(),
+          success: function (data) {
+            dataTable.api().ajax.reload();
+          }
+        });
+      });
     },
     dom: '<"table-search clearfix"f>t<"table-pagination"p><"table-entries"i><"table-num"l>',
     language: {
@@ -75,4 +74,3 @@ window.addEventListener('load', function() {
   });
 });
 </script>
-{% endblock %}
