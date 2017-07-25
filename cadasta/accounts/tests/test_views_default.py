@@ -325,6 +325,7 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
 
         assert response.status_code == 302
         assert self.user.phone_verified is True
+        assert self.user.is_active is True
 
     def test_unsuccessful_phone_verification_with_invalid_token(self):
         self.device = self.user.verificationdevice_set.create(
@@ -387,3 +388,4 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         assert response.status_code == 302
         assert self.user.phone == '+919327768250'
         assert self.user.phone_verified is True
+        assert self.user.is_active is True

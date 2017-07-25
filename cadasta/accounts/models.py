@@ -193,8 +193,8 @@ class VerificationDevice(Device):
         if ((totp.t() > self.last_verified_counter) and
                 (totp.verify(token, tolerance=tolerance))):
             self.last_verified_counter = totp.t()
-            verified = True
+            self.verified = True
             self.save()
         else:
-            verified = False
-        return verified
+            self.verified = False
+        return self.verified

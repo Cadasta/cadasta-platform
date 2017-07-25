@@ -134,20 +134,21 @@ class ConfirmPhone(FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.get_user()
-        context['email'] = user.email
-        context['phone'] = user.phone
+        if user.emailaddress_set.filter(verified=False).exists():
+            context['email'] = user.email
+        if user.verificationdevice_set.filter(verified=False).exists():
+            context['phone'] = user.phone
         return context
 
     def form_valid(self, form):
+        token = form.cleaned_data.get('token')
         user = self.get_user()
         device = user.verificationdevice_set.get()
-        token = form.cleaned_data.get('token')
         if device.verify_token(token):
-            if user.phone == device.unverified_phone:
-                user.phone_verified = True
-            else:
+            if user.phone != device.unverified_phone:
                 user.phone = device.unverified_phone
-                user.phone_verified = True
+            user.phone_verified = True
+            user.is_active = True
             user.save()
             message = _("Successfully verified {phone}")
             message = message.format(phone=user.phone)
