@@ -1086,36 +1086,3 @@ h1 .label {
     font-size: 12px;
   }
 }
-
-/* =S3 avatar image upload Laura's work
--------------------------------------------------------------- */
-#preview-box {
-  width: 200px;
-  height: 200px;
-  background-color: white;
-  border-radius: 3px;
-  overflow: hidden;
-  position: relative;
-  text-align: center;
-}
-
-#avatar-preview {
-  width: auto;
-  height: 200px;
-  position: absolute;
-  top: -9999px;
-  bottom: -9999px;
-  left: -9999px;
-  right: -9999px;
-  margin: auto;
-}
-
-.s3-buckets > ul.errors {
-  color: $state-danger-text;
-  background-color: $state-danger-bg;
-  border-radius: 3px;
-}
-
-.s3-buckets > .file-links > .file-link {
-  display: none;
-}
