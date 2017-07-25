@@ -53,33 +53,30 @@ class OrganizationList(APIPermissionRequiredMixin,
 class OrganizationDetail(APIPermissionRequiredMixin,
                          mixins.OrganizationMixin,
                          generics.RetrieveUpdateAPIView):
-    def view_actions(self, request):
-        if self.get_object().archived:
-            return 'org.view.archived'
-        return 'org.view'
-
-    def patch_actions(self, request):
-        if hasattr(request, 'data'):
-            is_archived = self.get_object().archived
-            new_archived = request.data.get('archived', is_archived)
-            if not is_archived and (is_archived != new_archived):
-                return ('org.update', 'org.archive')
-            elif is_archived and (is_archived != new_archived):
-                return ('org.update', 'org.unarchive')
-            elif is_archived and (is_archived == new_archived):
-                return False
-        return 'org.update'
 
     lookup_url_kwarg = 'organization'
     lookup_field = 'slug'
     org_lookup = 'organization'
     queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
-    permission_required = {
-        'GET': view_actions,
-        'PATCH': patch_actions,
-        'PUT': patch_actions
-    }
+
+    def get_permission_required(self):
+        request = self.request
+        if request.method == 'GET':
+            if self.get_object().archived:
+                return ('org.view.archived',)
+            return ('org.view',)
+        if request.method in ['PATCH', 'PUT']:
+            if hasattr(request, 'data'):
+                is_archived = self.get_object().archived
+                new_archived = request.data.get('archived', is_archived)
+                if not is_archived and (is_archived != new_archived):
+                    return ('org.update', 'org.archive')
+                elif is_archived and (is_archived != new_archived):
+                    return ('org.update', 'org.unarchive')
+                elif is_archived and (is_archived == new_archived):
+                    return False
+            return ('org.update',)
 
     def get_serializer(self, *args, **kwargs):
         if 'org.users.list' not in self.permissions:
@@ -91,16 +88,17 @@ class OrganizationUsers(APIPermissionRequiredMixin,
                         mixins.OrganizationRoles,
                         generics.ListCreateAPIView):
 
-    def post_actions(self, request):
-        return ('' if self.get_organization().archived else 'org.users.add')
-
     lookup_url_kwarg = 'organization'
     lookup_field = 'slug'
     serializer_class = serializers.OrganizationUserSerializer
-    permission_required = {
-        'GET': 'org.users.list',
-        'POST': post_actions
-    }
+
+    def get_permission_required(self):
+        request = self.request
+        if request.method == 'GET':
+            return ('org.users.list',)
+        if request.method == 'POST':
+            return (() if self.get_organization().archived else
+                    ('org.users.add',))
 
 
 class OrganizationUsersDetail(APIPermissionRequiredMixin,
@@ -154,10 +152,6 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
                               mixins.OrgRoleCheckMixin,
                               generics.ListCreateAPIView):
 
-    def post_actions(self, request):
-        return (
-            False if self.get_organization().archived else 'project.create')
-
     org_lookup = 'organization'
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -166,19 +160,20 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
     filter_fields = ('archived',)
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
-    permission_required = {
-        'GET': 'project.list',
-        'POST': post_actions
-    }
+
+    def get_permission_required(self):
+        request = self.request
+        if request.method == 'GET':
+            return ('project.list',)
+        if request.method == 'POST':
+            return (() if self.get_organization().archived else
+                    ('project.create',))
 
     def get_organization(self):
         if not hasattr(self, 'org'):
             self.org = get_object_or_404(Organization,
                                          slug=self.kwargs['organization'])
         return self.org
-
-    def get_perms_objects(self):
-        return list(self.get_queryset()) + [self.get_organization()]
 
     def get_serializer_context(self, *args, **kwargs):
         org = self.get_organization()
@@ -191,7 +186,7 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
     def get_filtered_queryset(self):
         user = self.request.user
         org = Organization.objects.get(slug=self.kwargs['organization'])
-        all_projects = Project.objects.all()
+        all_projects = Project.objects.filter(organization=org)
         default = Q(access='public', archived=False)
 
         if user.is_superuser:
@@ -229,36 +224,33 @@ class ProjectDetail(APIPermissionRequiredMixin,
                     mixins.OrganizationMixin,
                     mixins.ProjectMixin,
                     generics.RetrieveUpdateAPIView):
-    def get_actions(self, request):
-        if self.get_object().archived:
-            return 'project.view.archived'
-        if self.get_object().public():
-            return 'project.view'
-        else:
-            return 'project.view.private'
-
-    def patch_actions(self, request):
-        if hasattr(request, 'data'):
-            is_archived = self.get_object().archived
-            new_archived = request.data.get('archived', is_archived)
-            if not is_archived and (is_archived != new_archived):
-                return ('project.update', 'project.archive')
-            elif is_archived and (is_archived != new_archived):
-                return ('project.update', 'project.unarchive')
-            elif is_archived and (is_archived == new_archived):
-                return False
-        return 'project.update'
 
     serializer_class = serializers.ProjectSerializer
     filter_fields = ('archived',)
     lookup_url_kwarg = 'project'
     lookup_field = 'slug'
     org_lookup = 'organization'
-    permission_required = {
-        'GET': get_actions,
-        'PATCH': patch_actions,
-        'PUT': patch_actions,
-    }
+
+    def get_permission_required(self):
+        request = self.request
+        if request.method == 'GET':
+            if self.get_object().archived:
+                return ('project.view.archived',)
+            if self.get_object().public():
+                return ('project.view',)
+            else:
+                return ('project.view.private',)
+        if request.method in ['PATCH', 'PUT']:
+            if hasattr(request, 'data'):
+                is_archived = self.get_object().archived
+                new_archived = request.data.get('archived', is_archived)
+                if not is_archived and (is_archived != new_archived):
+                    return ('project.update', 'project.archive')
+                elif is_archived and (is_archived != new_archived):
+                    return ('project.update', 'project.unarchive')
+                elif is_archived and (is_archived == new_archived):
+                    return ()
+            return ('project.update',)
 
     def get_queryset(self):
         return self.get_organization(

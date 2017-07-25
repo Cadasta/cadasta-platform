@@ -13,7 +13,6 @@ from tutelary.models import Policy
 from tutelary.decorators import permissioned_model
 
 from simple_history.models import HistoricalRecords
-from core.models import Role
 from .manager import UserManager
 
 
@@ -101,13 +100,6 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 
 
 @receiver(models.signals.post_save, sender=User)
-def assign_public_user_role(sender, instance, **kwargs):
-    if not PublicRole.objects.filter(user=instance).exists():
-        group = auth.Group.objects.get(name='PublicUser')
-        PublicRole.objects.create(user=instance, group=group)
-
-
-@receiver(models.signals.post_save, sender=User)
 def assign_default_policy(sender, instance, **kwargs):
     policy = Policy.objects.get(name='default')
     assigned_policies = instance.assigned_policies()
@@ -128,16 +120,3 @@ def password_changed_reset(sender, request, user, **kwargs):
         [user.email],
         fail_silently=False
     )
-
-
-class PublicRole(Role):
-
-    group = models.ForeignKey(
-        'auth.Group', related_name='publicuser_roles')
-
-    history = HistoricalRecords()
-
-    def __repr__(self):
-        repr_string = (
-            '<PublicRole id={obj.id} user={obj.user.username}>')
-        return repr_string.format(obj=self)

@@ -13,9 +13,6 @@ from ..views.api import UserAdminList, UserAdminDetail
 class UserListAPITest(APITestCase, UserTestCase, TestCase):
     view_class = UserAdminList
 
-    def setUp(self):
-        super().setUp()
-
     def setup_models(self):
         self.user = UserFactory.create(is_superuser=True)
 

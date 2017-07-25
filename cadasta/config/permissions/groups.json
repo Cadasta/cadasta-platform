@@ -1,16 +1,4 @@
 {
-    "SuperUser": {
-        "permissions": [
-            "org.view", "org.view.private", "org.list", "org.create",
-            "org.update", "org.archive", "org.unarchive", "org.users.list",
-            "org.users.add", "org.users.edit", "org.users.remove",
-            "project.view", "project.view.private", "project.view.archived",
-            "project.list", "project.create", "project.update", "project.archive",
-            "project.unarchive", "project.export", "project.import",
-            "project.users.list", "project.users.add", "project.users.update", "project.users.remove",
-            "spatial.create", "resource.add", "user.create", "user.list", "user.update"
-        ]
-    },
     "OrgAdmin": {
         "permissions": [
             "org.view", "org.view.private", "org.view.archived", "org.list",
@@ -26,8 +14,7 @@
     "OrgMember": {
         "permissions": [
             "org.create", "org.view", "org.view.private",
-            "org.list", "project.create", "project.view",
-            "project.view.private", "project.list"
+            "org.list", "project.view", "project.view.private", "project.list"
         ]
     },
     "ProjectManager": {

@@ -5,14 +5,13 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.db.models import Q, Prefetch
 
-from tutelary.models import check_perms
-
 from core.views.mixins import SuperUserCheckMixin
 from ..models import Organization, Project, OrganizationRole, ProjectRole
 from questionnaires.models import Questionnaire
 
 
 class OrganizationMixin:
+
     def get_organization(self, lookup_kwarg='slug'):
         if lookup_kwarg == 'slug' and hasattr(self, 'org_lookup'):
             lookup_kwarg = self.org_lookup
@@ -20,9 +19,6 @@ class OrganizationMixin:
             self.org = get_object_or_404(Organization,
                                          slug=self.kwargs[lookup_kwarg])
         return self.org
-
-    def get_perms_objects(self):
-        return [self.get_organization()]
 
 
 class OrganizationRoles(OrganizationMixin):
@@ -135,9 +131,6 @@ class ProjectMixin:
 class ProjectRoles(ProjectMixin):
     lookup_field = 'username'
 
-    def get_perms_objects(self):
-        return [self.get_project()]
-
     def get_queryset(self):
         self.prj = self.get_project()
         org = self.prj.organization
@@ -197,8 +190,7 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
             # check permissions against role permissions
             for permission_context in permissions_contexts:
                 context[permission_context[1]] = (
-                    True if permission_context[0]
-                    in self.permissions else False)
+                    permission_context[0] in self.permissions)
             return context
 
 
@@ -219,18 +211,15 @@ class ProjectCreateCheckMixin:
         return self.add_allow
 
     def add_allowed_single(self):
-        return check_perms(self.request.user, ('project.create',),
-                           (self.get_object(),))
+        return 'project.create' in self.permissions
 
     def add_allowed_multiple(self):
         chk = False
         if Organization.objects.exists():
-            u = self.request.user
-            if hasattr(u, 'organizations'):
-                chk = any([
-                    check_perms(u, ('project.create',), (o,))
-                    for o in u.organizations.all()
-                ])
+            user = self.request.user
+            if hasattr(user, 'organizationrole_set'):
+                chk = any(['project.create' in role.permissions
+                          for role in user.organizationrole_set.all()])
         return chk
 
     def get_context_data(self, *args, **kwargs):

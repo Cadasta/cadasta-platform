@@ -53,14 +53,3 @@ class SlugModel:
         self.__original_slug = self.slug
 
         return super().save(*args, **kwargs)
-
-
-class Role(RandomIDModel):
-    class Meta:
-        abstract = True
-
-    user = models.ForeignKey('accounts.User')
-
-    @property
-    def permissions(self):
-        return [perm.codename for perm in self.group.permissions.all()]

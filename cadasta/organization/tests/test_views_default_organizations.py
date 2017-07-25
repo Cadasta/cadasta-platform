@@ -689,6 +689,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
         assert response.status_code == 200
         assert response.content == self.render_content(is_administrator=True,
+                                                       add_allowed=True,
                                                        is_member=True)
 
     def test_get_with_unauthorized_user(self):
@@ -814,7 +815,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             org_role_form=form, project_role_form=prj_form,
-            is_member=True, is_administrator=True)
+            is_member=True, is_administrator=True, add_allowed=True)
 
     def test_post_org_role_with_archived_organization(self):
         self.org.archived = True
@@ -873,7 +874,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             project_role_form=form, org_role_form=org_form,
-            is_member=True, is_administrator=True)
+            is_member=True, is_administrator=True, add_allowed=True)
 
     def test_post_prj_role_with_archived_organization(self):
         self.org.archived = True

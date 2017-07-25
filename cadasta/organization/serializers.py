@@ -176,35 +176,6 @@ class EntityUserSerializer(SuperUserCheck, serializers.Serializer):
             except self.Meta.role_model.DoesNotExist:
                 pass
 
-    # def create(self, validated_data):
-    #     obj = self.context[self.Meta.context_key]
-    #
-    #     role_value = validated_data[self.Meta.role_key]
-    #     if role_value:
-    #         group = Group.objects.get(name='OrgAdmin')
-    #     else:
-    #         group = Group.objects.get(name='OrgMember')
-    #
-    #     create_kwargs = {
-    #         'group': group,
-    #         self.Meta.context_key: obj,
-    #         'user': self.user,
-    #     }
-    #
-    #     self.role = self.Meta.role_model.objects.create(**create_kwargs)
-    #     return self.user
-    #
-    # def update(self, instance, validated_data):
-    #     role = self.get_roles_object(instance)
-    #     role_value = validated_data[self.Meta.role_key]
-    #
-    #     if self.Meta.role_key in validated_data:
-    #         setattr(role, self.Meta.role_key, role_value)
-    #
-    #     role.save()
-    #
-    #     return instance
-
 
 class OrganizationUserSerializer(EntityUserSerializer):
     class Meta:

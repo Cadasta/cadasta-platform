@@ -14,7 +14,7 @@ from shapely.wkt import dumps
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
 
-from core.models import RandomIDModel, SlugModel, Role
+from core.models import RandomIDModel, SlugModel
 from geography.models import WorldBorder
 from resources.mixins import ResourceModelMixin
 from .validators import validate_contact
@@ -36,6 +36,17 @@ ROLE_GROUPS = {
 def get_policy_instance(policy_name, variables):
     policy = Policy.objects.get(name=policy_name)
     return (policy, variables)
+
+
+class Role(RandomIDModel):
+    class Meta:
+        abstract = True
+
+    user = models.ForeignKey('accounts.User')
+
+    @property
+    def permissions(self):
+        return self.group.permissions.values_list('codename', flat=True)
 
 
 @permissioned_model

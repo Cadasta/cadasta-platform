@@ -30,20 +30,9 @@ def update_project_roles(apps, schema_editor):
         project_role.save(update_fields=['group'])
 
 
-def update_public_user_roles(apps, schema_editor):
-    User = apps.get_model("accounts", "User")
-    Group = apps.get_model("auth", "Group")
-    PublicRole = apps.get_model("accounts", "PublicRole")
-    pb_group = Group.objects.get(name="PublicUser")
-    for user in User.objects.all():
-        if not PublicRole.objects.filter(user=user).exists():
-            PublicRole.objects.create(user=user, group=pb_group)
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0007_add_groups'),
         ('organization', '0005_add_group_to_prj_org_roles'),
     ]
 
@@ -52,6 +41,4 @@ class Migration(migrations.Migration):
             update_org_roles, migrations.RunPython.noop),
         migrations.RunPython(
             update_project_roles, migrations.RunPython.noop),
-        migrations.RunPython(
-            update_public_user_roles, migrations.RunPython.noop),
     ]

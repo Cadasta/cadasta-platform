@@ -1,7 +1,6 @@
 import pytest
 
 from accounts.tests.factories import UserFactory
-from accounts.models import PublicRole
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.contrib.messages.storage.fallback import FallbackStorage
@@ -14,7 +13,6 @@ from organization.views import default as org_views
 
 from questionnaires.models import Questionnaire
 from spatial.views.default import LocationsAdd
-from tutelary.models import assign_user_policies
 
 from ..mixins import SchemaSelectorMixin
 
@@ -76,10 +74,7 @@ class PermissionRequiredMixinTest(UserTestCase, TestCase):
 
     def test_login_redirect_from_project_dashboard_to_org_dashboard(self):
         user = UserFactory.create()
-        # remove the default public user role
-        PublicRole.objects.get(user=user).delete()
-        assign_user_policies(user, *[])
-        project = ProjectFactory.create()
+        project = ProjectFactory.create(access='private')
 
         view = org_views.ProjectDashboard.as_view()
 
@@ -134,10 +129,7 @@ class PermissionRequiredMixinTest(UserTestCase, TestCase):
 
     def test_login_redirect_from_org_dashboard_to_dashboard(self):
         user = UserFactory.create()
-        # remove the default public role
-        PublicRole.objects.get(user=user).delete()
-        assign_user_policies(user, *[])
-        org = OrganizationFactory.create()
+        org = OrganizationFactory.create(access='private')
         view = org_views.OrganizationDashboard.as_view()
 
         request = HttpRequest()

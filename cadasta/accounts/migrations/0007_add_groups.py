@@ -6,7 +6,7 @@ from django.db import migrations
 
 
 def create_groups(apps, schema_editor):
-    groups = ['SuperUser', 'OrgAdmin', 'OrgMember', 'ProjectManager',
+    groups = ['OrgAdmin', 'OrgMember', 'ProjectManager',
               'DataCollector', 'ProjectMember', 'PublicUser', 'AnonymousUser']
     Group = apps.get_model("auth", "Group")
     for group in groups:

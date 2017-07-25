@@ -1,6 +1,5 @@
 from collections import OrderedDict, Sequence
 
-from accounts.models import PublicRole
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import mixins as auth_mixins
@@ -10,12 +9,13 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
+from django.utils.functional import cached_property
 from jsonattrs.models import Schema, compose_schemas
 from organization.models import OrganizationRole
 from rest_framework.exceptions import NotAuthenticated
 from tutelary import mixins
 
-from .roles import AnonymousUserRole, SuperUserRole
+from .roles import AnonymousUserRole, PublicUserRole
 
 SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
 
@@ -34,21 +34,7 @@ def update_permissions(permission, obj=None):
     return set_permissions
 
 
-# role based
-def update_role_permissions(permission, obj=None):
-    def set_permissions(self, request):
-        if (hasattr(self, 'get_organization') and
-                self.get_organization().archived):
-            return ''
-        if (hasattr(self, 'get_project') and self.get_project().archived):
-            return ''
-        if obj and self.get_object().archived:
-            return ''
-        return permission
-    return set_permissions
-
-
-# role based object permission check
+# tutelary object permission check
 def check_perms(user, actions, objs, method=None):
     if actions is False:
         return False
@@ -123,18 +109,9 @@ class BaseRolePermissionMixin():
 
         perms = self.permission_required
 
-        # permission_required defined as a dict with either
-        # strings or methods as dict values
         if isinstance(self.permission_required, dict):
             perms = self.permission_required.get(self.request.method, ())
-            if callable(perms) and hasattr(self, perms.__name__):
-                perms = getattr(self, perms.__name__)
 
-        # method assigned directly to permission_required
-        if callable(perms):
-            perms = perms(self.request)
-
-        # string assigned directly to permission_required
         if isinstance(perms, str):
             perms = (perms, )
 
@@ -146,16 +123,12 @@ class BaseRolePermissionMixin():
         else:
             return super().get_queryset()
 
-    def get_user_roles(self):
+    def set_user_roles(self):
         """Set user roles."""
         self._roles = []
         user = self.request.user
-        # check for anonymous and su roles
         if user.is_anonymous:
             self._roles.append(AnonymousUserRole())
-            return
-        elif user.is_superuser:
-            self._roles.append(SuperUserRole())
             return
         # for org mixins get the org role
         if hasattr(self, 'get_organization'):
@@ -173,14 +146,10 @@ class BaseRolePermissionMixin():
                 self._roles.append(self._org_role)
         if hasattr(self, 'get_prj_role') and self.get_prj_role():
             self._roles.append(self._prj_role)
-        # get the default public role
-        try:
-            role = PublicRole.objects.get(user=self.request.user)
-            self._roles.append(role)
-        except PublicRole.DoesNotExist:
-            pass
+        # set he default public role
+        self._roles.append(PublicUserRole())
 
-    @property
+    @cached_property
     def permissions(self):
         # compose permissions for all roles
         self._perms = []
@@ -194,15 +163,11 @@ class BaseRolePermissionMixin():
 class RolePermissionRequiredMixin(BaseRolePermissionMixin,
                                   auth_mixins.PermissionRequiredMixin):
     def has_permission(self):
+        if self.request.user.is_superuser:
+                return True
         if not hasattr(self, '_roles'):
-            self.get_user_roles()
-        # superusers have all permissions
-        if hasattr(self, 'is_superuser'):
-            if self.is_superuser:
-                return True
-        else:
-            if self.request.user.is_superuser:
-                return True
+            self.set_user_roles()
+
         perms = self.get_permission_required()
 
         # replace when we eventually use role authorization backend
@@ -210,8 +175,8 @@ class RolePermissionRequiredMixin(BaseRolePermissionMixin,
         # return all(False for perm in perms
         #            if not user.has_perm(perm, obj=self.permissions))
 
-        return all(False for perm in perms
-                   if perm not in self.permissions)
+        return False if not perms else all(
+            perm in self.permissions for perm in perms)
 
     def handle_no_permission(self):
         msg = _("You don't have permission to perform this action.")
@@ -278,15 +243,10 @@ class APIPermissionRequiredMixin(BaseRolePermissionMixin):
 
     def check_permissions(self, request):
         self._http_method_allowed(request)
+        if self.request.user.is_superuser:
+            return True
         if not hasattr(self, '_roles'):
-            self.get_user_roles()
-        # superusers have all permissions
-        if hasattr(self, 'is_superuser'):
-            if self.is_superuser:
-                return True
-        else:
-            if self.request.user.is_superuser:
-                return True
+            self.set_user_roles()
 
         perms = self.get_permission_required()
         msg = self.get_permission_denied_message(
@@ -294,13 +254,8 @@ class APIPermissionRequiredMixin(BaseRolePermissionMixin):
         )
         if isinstance(msg, Sequence):
             msg = msg[0]
-        if not perms:
+        if not perms or not all(perm in self.permissions for perm in perms):
             self.permission_denied(request, message=msg)
-        else:
-            has_perm = all(False for perm in perms
-                           if perm not in self.permissions)
-            if not has_perm:
-                self.permission_denied(request, message=msg)
 
 
 class SchemaSelectorMixin():

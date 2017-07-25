@@ -1,10 +1,5 @@
 from datetime import datetime
-<<<<<<< HEAD
 from django.conf import settings
-=======
-from core.tests.utils.cases import UserTestCase
-from accounts.models import PublicRole
->>>>>>> WIP: add groups, permissions, role mixin, auth backend and related tests
 from django.test import TestCase
 
 from .factories import UserFactory
@@ -39,12 +34,3 @@ class UserTest(TestCase):
                                  avatar=test_avatar_path,
                                  )
         assert user.avatar_url == user.avatar.url
-
-
-class PublicRoleTest(UserTestCase, TestCase):
-
-    def test_role_creation(self):
-        user = UserFactory.create()
-        role = PublicRole.objects.get(user=user)
-        assert role.group.name == 'PublicUser'
-        assert len(role.permissions) == 5

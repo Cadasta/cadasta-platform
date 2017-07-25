@@ -14,4 +14,4 @@ class LoadPermissionsTest(TestCase):
 
     def test_groups(self):
         groups = Group.objects.all()
-        assert groups.count() == 8
+        assert groups.count() == 7

@@ -357,6 +357,10 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert len(response.content['results']) == 2
+        assert not response.content['results'][0]['archived']
+        assert response.content['results'][0]['access'] == 'public'
+        assert not response.content['results'][1]['archived']
+        assert response.content['results'][1]['access'] == 'private'
 
     def test_search_filter(self):
         """Return only two matching projects."""
