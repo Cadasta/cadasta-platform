@@ -1,7 +1,7 @@
 {% load i18n %}
 
 <!-- Resources index - smaller version for right panel of map -->
-<table class="table table-hover table-condensed datatable" data-paging-type="simple">
+<table class="table table-hover table-condensed resource-list" data-paging-type="simple" data-ajax="{{ resource_src }}">
   <thead>
     <tr>
       <th class="col-md-10">{% trans "Resource" %}</th>
@@ -9,29 +9,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for resource in resource_list %}
-    {% url 'resources:project_detail' project=object.slug organization=object.organization.slug resource=resource.id as resource_url %}
-    <tr class="linked" onclick="window.document.location='{{ resource_url }}';">
-      <td>
-        <div class="media-left">
-          <img src="{{ resource.thumbnail }}" class="thumb-60">
-        </div>
-        <div class="media-body resource-text">
-          <p>
-            <a href="{{ resource_url }}"><strong>{{ resource.name }}</strong></a>
-            <br><span class="small">{{ resource.original_file }}</span>
-          </p>
-        </div>
-      </td>
-      <td>
-        <form method="POST" action="{% url 'resources:detach' object.organization.slug object.slug resource.id resource.attachment_id %}?next={{ request.path }}">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger btn-sm pull-right" role="button">
-            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Detach" %}
-          </button>
-        </form>
-      </td>
-    </tr>
-  {% endfor %}
   </tbody>
 </table>
+
+{% include "resources/table_snippets/datatables.html" %}

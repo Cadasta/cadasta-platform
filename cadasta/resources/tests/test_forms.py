@@ -5,7 +5,7 @@ from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from accounts.tests.factories import UserFactory
 from organization.tests.factories import ProjectFactory
-from ..forms import ResourceForm, AddResourceFromLibraryForm
+from ..forms import ResourceForm
 from .factories import ResourceFactory
 from .utils import clear_temp  # noqa
 
@@ -64,36 +64,3 @@ class ResourceFormTest(UserTestCase, FileStorageTestCase, TestCase):
                             project_id=self.project.id)
         assert form.is_valid() is False
         assert form.errors['name'] is not None
-
-
-@pytest.mark.usefixtures('make_dirs')
-class AddResourceFromLibraryFormTest(UserTestCase, TestCase):
-    def test_init(self):
-        prj = ProjectFactory.create()
-        ResourceFactory.create(project=prj, content_object=prj)
-        res = ResourceFactory.create(project=prj)
-
-        form = AddResourceFromLibraryForm(project_id=prj.id,
-                                          content_object=prj)
-        assert len(form.fields) == 1
-        assert form.fields[res.id].initial is False
-
-    def test_save(self):
-        prj = ProjectFactory.create()
-        prj_res = ResourceFactory.create(project=prj, content_object=prj)
-        res = ResourceFactory.create(project=prj)
-
-        data = {
-            res.id: 'on'
-        }
-
-        form = AddResourceFromLibraryForm(data=data,
-                                          project_id=prj.id,
-                                          content_object=prj)
-
-        assert form.is_valid() is True
-        form.save()
-
-        assert prj.resources.count() == 2
-        assert res in prj.resources
-        assert prj_res in prj.resources

@@ -14,4 +14,5 @@
 {% url 'parties:relationship_detail' object.organization.slug object.slug relationship.id as cancel_url %}
 {% url 'parties:relationship_resource_new' object.organization.slug object.slug relationship.id as upload_url %}
 {% include 'resources/modal_add_lib.html' %}
+{% include "resources/table_snippets/datatables.html" %}
 {% endblock %}

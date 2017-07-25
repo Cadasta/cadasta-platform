@@ -1,0 +1,6 @@
+{% for party in parties %}
+<tr class="linked" data-link-url="{% url 'parties:detail' party.project.organization.slug party.project.slug party.id %}">
+  <td><a href="{% url 'parties:detail' party.project.organization.slug party.project.slug party.id %}">{{ party.name }}</a></td>
+  <td {{ party.type_labels|safe }}>{{ party.get_type_display }}</td>
+</tr>
+{% endfor %}
