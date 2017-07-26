@@ -15,6 +15,13 @@
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
+          {% if is_allowed_add_party %}
+          <div class="top-btn top-add pull-right">
+            <a href="{% url 'parties:add' object.organization.slug object.slug %}" class="btn btn-primary btn-sm">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span class="hidden-xs"> {% trans "Add" %}</span>
+            </a>
+          </div>
+          {% endif %}
           <table class="table table-hover datatable" data-paging-type="simple">
             <thead>
               <tr>

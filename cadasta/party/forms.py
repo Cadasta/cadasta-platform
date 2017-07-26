@@ -1,4 +1,5 @@
 from django.forms import ChoiceField
+from django.utils.translation import ugettext as _
 from core.form_mixins import AttributeModelForm, SanitizeFieldsForm
 from .models import Party, TenureRelationship
 from .choices import TENURE_RELATIONSHIP_TYPES
@@ -6,6 +7,8 @@ from .choices import TENURE_RELATIONSHIP_TYPES
 
 class PartyForm(SanitizeFieldsForm, AttributeModelForm):
     attributes_field = 'attributes'
+    type = ChoiceField(choices=([('', _("Please select a party type"))] +
+                                list(Party.TYPE_CHOICES)))
 
     class Meta:
         model = Party

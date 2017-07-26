@@ -71,6 +71,7 @@ class SearchTest(ViewTestCase, UserTestCase, TestCase):
         expected_content = self.render_content(is_administrator=True,
                                                is_allowed_add_location=True,
                                                is_allowed_add_resource=True,
+                                               is_allowed_add_party=True,
                                                is_project_member=True,
                                                is_allowed_import=True,
                                                is_allowed_download=True)

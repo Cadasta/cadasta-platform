@@ -59,6 +59,9 @@ class PartiesAdd(LoginPermissionRequiredMixin,
         kwargs['project'] = self.get_project()
         return kwargs
 
+    def get_success_url(self):
+        return reverse('parties:list', kwargs=self.kwargs)
+
 
 class PartiesDetail(LoginPermissionRequiredMixin,
                     JsonAttrsMixin,

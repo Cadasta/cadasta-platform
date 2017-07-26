@@ -3,25 +3,15 @@
 {% load filters %}
 {% csrf_token %}
 <div class="form-group{% if form.name.errors %} has-error{% endif %}">
-  <label class="control-label" for="{{ form.name.id_for_label }}" {{ form.name.field.labels_xlang|safe }}>{% trans "Name" %}</label>
+  <label class="control-label required" for="{{ form.name.id_for_label }}" {{ form.name.field.labels_xlang|safe }}>{% trans "Party name" %}</label>
   {% render_field form.name class+="form-control" data-parsley-required="true" data-parsley-sanitize="1" %}
   <div class="error-block">{{ form.name.errors }}</div>
 </div>
 
-{% if form.new_item %}
 <div class="form-group{% if form.type.errors %} has-error{% endif %}">
-  <label class="control-label" for="{{ form.type.id_for_label }}" {{ form.type.field.labels_xlang|safe }}>{% trans "Type" %}</label>
-  {% render_field form.type class+="form-control party-type" data-parsley-required="false" %}
+  <label class="control-label" for="{{ form.type.id_for_label }}" {{ form.type.field.labels_xlang|safe }}>{% trans "Party type" %}</label>
+  {% render_field form.type class+="form-control party-type" data-parsley-required="true" %}
   <div class="error-block">{{ form.type.errors }}</div>
 </div>
-{% else %}
-<div class="form-group">
-  <label class="control-label" for="{{ form.type.id_for_label }}" {{ form.type.field.labels_xlang|safe }}>{% trans "Type" %}</label>
-  <div class="well well-sm" {{ type_choice_labels|safe }}>
-      {{ form.type|display_choice_verbose }}
-  </div>
-  <input type="hidden" value="{{ form.type.value }}" name="type" class="party-type"/>
-</div>
-{% endif %}
 
 {% include "party/party_attrs.html" %}

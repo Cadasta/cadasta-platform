@@ -75,7 +75,8 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected_content = self.render_content(is_allowed_add_party=True)
+        assert response.content == expected_content
 
     def test_get_with_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
@@ -101,6 +102,7 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.render_content(
+            is_allowed_add_party=True,
             object_list=self.parties,
             form_lang_default='en',
             form_langs=[('en', 'English'), ('de', 'German')])
@@ -114,7 +116,8 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected_content = self.render_content(is_allowed_add_party=True)
+        assert response.content == expected_content
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()
@@ -156,7 +159,7 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
 class PartiesAddTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.PartiesAdd
     template = 'party/party_add.html'
-    success_url_name = 'parties:detail'
+    success_url_name = 'parties:list'
     post_data = {
         'name': 'Party',
         'type': 'GR'
@@ -180,8 +183,7 @@ class PartiesAddTest(ViewTestCase, UserTestCase, TestCase):
     def setup_success_url_kwargs(self):
         return {
             'organization': self.project.organization.slug,
-            'project': self.project.slug,
-            'party': self.party_created.id
+            'project': self.project.slug
         }
 
     def test_get_with_authorized_user(self):
