@@ -43,7 +43,7 @@ class ContactsFieldTest(TestCase):
         value = ContactFormset({
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '1',
-            'form-MAX_NUM_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
             'form-0-name': 'Ringo',
             'form-0-email': 'ringo@beatles.uk',
@@ -69,7 +69,7 @@ class ContactsFieldTest(TestCase):
         value = ContactFormset({
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '1',
-            'form-MAX_NUM_FORMS': '0',
+            'form-MIN_NUM_FORMS': '0',
             'form-MAX_NUM_FORMS': '1000',
             'form-0-name': 'Ringo',
             'form-0-email': 'ringo@beatles',

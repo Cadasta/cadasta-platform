@@ -187,8 +187,7 @@ def create_spatial_resource(sender, instance, created, **kwargs):
                 f.seek(0)
                 # need to double check the mime-type here as browser detection
                 # of gpx mime type is not reliable
-                mime = magic.Magic(mime=True)
-                mime_type = str(mime.from_file(f.name), 'utf-8')
+                mime_type = magic.from_file(f.name, mime=True)
                 if mime_type in GPX_MIME_TYPES:
                     processor = GPXProcessor(f.name)
                     layers = processor.get_layers()

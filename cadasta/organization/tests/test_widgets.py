@@ -254,7 +254,7 @@ class ContactsWidgetTest(TestCase):
         data = {
             'contacts-TOTAL_FORMS': '2',
             'contacts-INITIAL_FORMS': '1',
-            'contacts-MAX_NUM_FORMS': '0',
+            'contacts-MIN_NUM_FORMS': '0',
             'contacts-MAX_NUM_FORMS': '1000',
             'contacts-0-name': 'Ringo',
             'contacts-0-email': 'ringo@beatles.uk',

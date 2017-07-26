@@ -27,6 +27,7 @@ DEBUG_TOOLBAR_PANELS = (
 def always(*args):
     return True
 
+
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': always,
 }

@@ -348,7 +348,6 @@ class QuestionManagerTest(TestCase):
 
     def test_create_from_dict(self):
         question_dict = {
-            'hint': 'For this field (type=integer)',
             'label': 'Integer',
             'name': 'my_int',
             'type': 'integer',
