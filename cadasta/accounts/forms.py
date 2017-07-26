@@ -21,7 +21,7 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password',
-                  'full_name']
+                  'full_name', 'language']
 
     class Media:
         js = ('js/sanitize.js', )
@@ -69,18 +69,6 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
 
 class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
-    language = forms.ChoiceField(
-        choices=settings.LANGUAGES,
-        error_messages={
-            'invalid_choice': _('Language invalid or not available')
-        }
-    )
-    measurement = forms.ChoiceField(
-        choices=settings.MEASUREMENTS,
-        error_messages={
-            'invalid_choice': _('Measurement system invalid or not available')
-        }
-    )
 
     class Meta:
         model = User

@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.contrib.auth.password_validation import validate_password
 
-from rest_framework.serializers import ChoiceField, EmailField, ValidationError
+from rest_framework.serializers import EmailField, ValidationError
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 
@@ -74,20 +74,6 @@ class UserSerializer(SanitizeFieldSerializer,
             message=_("Another user is already registered with this "
                       "email address")
         )]
-    )
-    language = ChoiceField(
-        choices=settings.LANGUAGES,
-        default=settings.LANGUAGE_CODE,
-        error_messages={
-            'invalid_choice': _('Language invalid or not available')
-        }
-    )
-    measurement = ChoiceField(
-        choices=settings.MEASUREMENTS,
-        default=settings.MEASUREMENT_DEFAULT,
-        error_messages={
-            'invalid_choice': _('Measurement system invalid or not available')
-        }
     )
 
     class Meta:

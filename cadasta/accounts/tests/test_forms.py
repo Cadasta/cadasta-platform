@@ -23,6 +23,7 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': 'john@beatles.uk',
             'password': 'iloveyoko79!',
             'full_name': 'John Lennon',
+            'language': 'fr',
         }
         form = forms.RegisterForm(data)
         form.save()
@@ -414,40 +415,6 @@ class ProfileFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert ("Please provide the correct password for your account." in
                 form.errors['password'])
-
-    def test_update_with_invalid_language(self):
-        user = UserFactory.create(email='john@beatles.uk',
-                                  password='imagine71',
-                                  language='en')
-        data = {
-            'username': 'imagine71',
-            'email': 'john2@beatles.uk',
-            'full_name': 'John Lennon',
-            'password': 'stg-pepper',
-            'language': 'invalid'
-        }
-        form = forms.ProfileForm(data, instance=user)
-        assert form.is_valid() is False
-        assert user.language == 'en'
-        assert ('Language invalid or not available'
-                in form.errors.get('language'))
-
-    def test_update_user_with_invalid_measurement(self):
-        user = UserFactory.create(email='john@beatles.uk',
-                                  password='imagine71',
-                                  measurement='metric')
-        data = {
-            'username': 'imagine71',
-            'email': 'john2@beatles.uk',
-            'full_name': 'John Lennon',
-            'password': 'stg-pepper',
-            'measurement': 'invalid'
-        }
-        form = forms.ProfileForm(data, instance=user)
-        assert form.is_valid() is False
-        assert user.measurement == 'metric'
-        assert ('Measurement system invalid or not available'
-                in form.errors['measurement'])
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',

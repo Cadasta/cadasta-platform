@@ -325,8 +325,6 @@ class UserSerializerTest(UserTestCase, TestCase):
             user, data=data, context={'request': Request(request)}
         )
         assert serializer2.is_valid() is False
-        assert ('Language invalid or not available'
-                in serializer2.errors['language'])
 
     def test_update_with_invalid_measurement_system(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
@@ -343,8 +341,6 @@ class UserSerializerTest(UserTestCase, TestCase):
             user, data=data, context={'request': Request(request)}
         )
         assert serializer2.is_valid() is False
-        assert ('Measurement system invalid or not available'
-                in serializer2.errors['measurement'])
 
     def test_sanitize(self):
         user = UserFactory.create(username='imagine71')
