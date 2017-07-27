@@ -156,7 +156,7 @@ class VerificationDevice(Device):
                    "The next token must be at a higher counter value."
                    "It makes sure a token is used only once.")
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     verified = models.BooleanField(default=False)
 
     step = settings.TOTP_TOKEN_VALIDITY

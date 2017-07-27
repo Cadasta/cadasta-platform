@@ -9,10 +9,12 @@ from django.http import HttpRequest
 from django.db import IntegrityError
 
 from allauth.account.models import EmailAddress
+from django.conf import settings
 
 from django.test import TestCase
 from django.utils.translation import gettext as _
 from core.tests.utils.files import make_dirs  # noqa
+from unittest import mock
 
 from .. import forms
 from ..models import User, VerificationDevice
@@ -232,7 +234,8 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': '',
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
         }
         form = forms.RegisterForm(data)
         assert form.is_valid() is True
@@ -244,7 +247,8 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': 'sherlock.holmes@bbc.uk',
             'phone': '',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
         }
         form = forms.RegisterForm(data)
         assert form.is_valid() is True
@@ -346,6 +350,19 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         assert User.objects.count() == 0
 
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': ' +919327768250137284721',
+            'password': '221B@bakertstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.RegisterForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        assert User.objects.count() == 0
+
     def test_signup_with_blank_phone_and_email(self):
         data = {
             'username': 'sherlock',
@@ -368,7 +385,8 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': '',
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
         }
         form = forms.RegisterForm(data)
         form.save()
@@ -385,7 +403,8 @@ class RegisterFormTest(UserTestCase, TestCase):
             'email': 'sherlock.holmes@bbc.uk',
             'phone': '',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
         }
         form = forms.RegisterForm(data)
         form.save()
@@ -889,17 +908,73 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
 
 
 class PhoneVerificationFormTest(UserTestCase, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create(username='sherlock',
+                                       phone='+919327768250',
+                                       )
+
     def test_valid_token(self):
+        self.user.is_active = False
+        self.user.save()
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        token = self.user.verificationdevice.generate_challenge()
+
         data = {
-            'token': 123456
+            'token': token
         }
-        form = forms.PhoneVerificationForm(data)
+        form = forms.PhoneVerificationForm(data, user=self.user)
         assert form.is_valid() is True
+        self.user.refresh_from_db()
+        assert self.user.phone_verified is True
+        assert self.user.is_active is True
 
     def test_invalid_token(self):
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        token = self.user.verificationdevice.generate_challenge()
+        token = str(int(token) - 1)
         data = {
-            'token': 'ABCDEF'
+            'token': token
         }
-        form = forms.PhoneVerificationForm(data)
+        form = forms.PhoneVerificationForm(data, user=self.user)
+        assert form.is_valid() is False
+        assert (_("Invalid Token. Enter a valid token.")
+                in form.errors.get('token'))
+
+    def test_expired_token(self):
+        _now = 1497657600
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        with mock.patch('time.time', return_value=_now):
+            token = self.user.verificationdevice.generate_challenge()
+            data = {'token': token}
+
+        with mock.patch('time.time', return_value=(
+                _now + settings.TOTP_TOKEN_VALIDITY + 1)):
+            form = forms.PhoneVerificationForm(data, user=self.user)
+            assert form.is_valid() is False
+            assert (_("The token has expired."
+                      " Please click on 'here' to receive the new token.")
+                    in form.errors.get('token'))
+
+    def test_valid_token_update_phone(self):
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone='+12345678990')
+        token = self.user.verificationdevice.generate_challenge()
+
+        data = {'token': token}
+        form = forms.PhoneVerificationForm(data, user=self.user)
+        assert form.is_valid() is True
+        self.user.refresh_from_db()
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
+    def test_invalid_token_format(self):
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone=self.user.phone)
+        data = {'token': 'TOKEN'}
+        form = forms.PhoneVerificationForm(data, user=self.user)
         assert form.is_valid() is False
         assert (_("Token must be a number.") in form.errors.get('token'))

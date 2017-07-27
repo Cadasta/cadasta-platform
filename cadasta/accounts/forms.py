@@ -222,10 +222,28 @@ class ResetPasswordForm(allauth_forms.ResetPasswordForm):
 class PhoneVerificationForm(forms.Form):
     token = forms.CharField(label=_("Token"), max_length=settings.TOTP_DIGITS)
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
     def clean_token(self):
         token = self.data.get('token')
         try:
             token = int(token)
+            device = self.user.verificationdevice
+            if device.verify_token(token):
+                if self.user.phone != device.unverified_phone:
+                    self.user.phone = device.unverified_phone
+                self.user.phone_verified = True
+                self.user.is_active = True
+                self.user.save()
+            elif device.verify_token(token, tolerance=5):
+                raise forms.ValidationError(
+                    _("The token has expired."
+                        " Please click on 'here' to receive the new token."))
+            else:
+                raise forms.ValidationError(
+                    "Invalid Token. Enter a valid token.")
         except ValueError:
             raise forms.ValidationError(_("Token must be a number."))
         return token

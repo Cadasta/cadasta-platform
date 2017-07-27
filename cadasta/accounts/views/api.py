@@ -12,6 +12,7 @@ from allauth.account.signals import password_changed
 from .. import serializers
 from ..utils import send_email_update_notification
 from ..exceptions import EmailNotVerifiedError
+from ..models import VerificationDevice
 
 
 class AccountUser(djoser_views.UserView):
@@ -44,7 +45,8 @@ class AccountRegister(djoser_views.RegistrationView):
         if user.email:
             send_email_confirmation(self.request._request, user)
         if user.phone:
-            verification_device = user.verificationdevice_set.create(
+            verification_device = VerificationDevice.objects.create(
+                user=user,
                 unverified_phone=user.phone)
             verification_device.generate_challenge()
 

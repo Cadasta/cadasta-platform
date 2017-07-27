@@ -12,7 +12,7 @@ from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 from allauth.account.models import EmailAddress
 
-from ..models import User
+from ..models import User, VerificationDevice
 from .. import forms
 
 
@@ -29,9 +29,10 @@ class AccountRegister(CreateView):
             send_email_confirmation(self.request, user)
 
         if user.phone:
-            device = user.verificationdevice_set.create(
-                unverified_phone=user.phone)
+            device = VerificationDevice.objects.create(
+                user=user, unverified_phone=user.phone)
             device.generate_challenge()
+
             message = _("Verification Token sent to {phone}")
             message = message.format(phone=user.phone)
             messages.add_message(self.request, messages.INFO, message)
@@ -131,40 +132,25 @@ class ConfirmPhone(FormView):
         user = User.objects.get(id=user_id)
         return user
 
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        form_kwargs["user"] = self.get_user()
+        return form_kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.get_user()
         if user.emailaddress_set.filter(verified=False).exists():
             context['email'] = user.email
-        if user.verificationdevice_set.filter(verified=False).exists():
+        if VerificationDevice.objects.filter(
+                user=user, verified=False).exists():
             context['phone'] = user.phone
         return context
 
     def form_valid(self, form):
-        token = form.cleaned_data.get('token')
         user = self.get_user()
-        device = user.verificationdevice_set.get()
-        if device.verify_token(token):
-            if user.phone != device.unverified_phone:
-                user.phone = device.unverified_phone
-            user.phone_verified = True
-            user.is_active = True
-            user.save()
-            message = _("Successfully verified {phone}")
-            message = message.format(phone=user.phone)
-            messages.add_message(self.request, messages.SUCCESS, message)
-            return super().form_valid(form)
-
-        elif device.verify_token(token, tolerance=5):
-            message = _("The token has expired."
-                        " Please click on 'here' to receive the new token.")
-            messages.add_message(self.request, messages.ERROR, message)
-            return super().form_invalid(form)
-
-        else:
-            return self.form_invalid(form)
-
-    def form_invalid(self, form):
-        message = _("Invalid token. Enter a valid token.")
-        messages.add_message(self.request, messages.ERROR, message)
-        return super().form_invalid(form)
+        user.refresh_from_db()
+        message = _("Successfully verified {phone}")
+        message = message.format(phone=user.phone)
+        messages.add_message(self.request, messages.SUCCESS, message)
+        return super().form_valid(form)

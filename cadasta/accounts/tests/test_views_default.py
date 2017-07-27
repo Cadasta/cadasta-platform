@@ -29,7 +29,9 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
             'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
+
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -58,7 +60,8 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
             'email': '',
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -73,7 +76,8 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
             'email': 'sherlock.holmes@bbc.uk',
             'phone': '',
             'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
+            'full_name': 'Sherlock Holmes',
+            'language': 'fr'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -309,8 +313,8 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         self.factory = RequestFactory()
 
     def test_successful_phone_verification(self):
-        self.device = self.user.verificationdevice_set.create(
-            unverified_phone=self.user.phone)
+        self.device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
 
         token = self.device.generate_challenge()
         data = {'token': token}
@@ -328,8 +332,8 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         assert self.user.is_active is True
 
     def test_unsuccessful_phone_verification_with_invalid_token(self):
-        self.device = self.user.verificationdevice_set.create(
-            unverified_phone=self.user.phone)
+        self.device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
 
         token = self.device.generate_challenge()
         token = str(int(token) - 1)
@@ -349,8 +353,8 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
 
     def test_unsuccessful_phone_verification_with_expired_token(self):
         self._now = 1497657600
-        self.device = self.user.verificationdevice_set.create(
-            unverified_phone=self.user.phone)
+        self.device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
 
         with mock.patch('time.time', return_value=self._now):
             token = self.device.generate_challenge()
@@ -371,8 +375,8 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         assert self.user.phone_verified is False
 
     def test_successful_phone_verification_new_phone(self):
-        self.device = self.user.verificationdevice_set.create(
-            unverified_phone='+919327768250')
+        self.device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone='+919327768250')
 
         token = self.device.generate_challenge()
         data = {'token': token}
