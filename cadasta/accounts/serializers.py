@@ -131,9 +131,23 @@ class UserSerializer(SanitizeFieldSerializer,
     email = serializers.EmailField(
         validators=[UniqueValidator(
             queryset=User.objects.all(),
-            message=_("Another user is already registered with this "
-                      "email address")
-        )]
+            message=_("User with this Email address already exists.")
+        )],
+        allow_blank=True,
+        allow_null=True,
+        required=False
+
+    )
+    phone = serializers.RegexField(
+        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        error_messages={'invalid': phone_format},
+        validators=[UniqueValidator(
+            queryset=User.objects.all(),
+            message=_("User with this Phone number already exists.")
+        )],
+        allow_blank=True,
+        allow_null=True,
+        required=False
     )
     avatar = S3Field(required=False)
     language = serializers.ChoiceField(
@@ -157,16 +171,73 @@ class UserSerializer(SanitizeFieldSerializer,
             'username',
             'full_name',
             'email',
-            'email_verified',
+            'phone',
             'last_login',
             'language',
             'measurement',
             'avatar',
+            'email_verified',
+            'phone_verified',
         )
         extra_kwargs = {
-            'email': {'required': True, 'unique': True},
-            'email_verified': {'read_only': True}
+            'email': {'required': False, 'unique': True,
+                      'allow_null': True, 'allow_blank': True},
+            'phone': {'required': False, 'unique': True,
+                      'allow_null': True, 'allow_blank': True},
+            'email_verified': {'read_only': True},
+            'phone_verified': {'read_only': True}
         }
+
+    def validate(self, data):
+        data = super(UserSerializer, self).validate(data)
+        instance = self.instance
+        if instance:
+            email = self.initial_data.get('email', instance.email)
+            phone = self.initial_data.get('phone', instance.phone)
+            if (not phone) and (not email):
+                raise serializers.ValidationError(
+                    _("You cannot leave both phone and email empty."))
+        return data
+
+    def validate_email(self, email):
+        instance = self.instance
+        if (instance and email != instance.email and
+                self.context['request'].user != instance):
+            raise serializers.ValidationError(_("Cannot update email"))
+
+        if instance and instance.email == email:
+            return email
+
+        if email:
+            email = email.casefold()
+            # make sure that the new email updated by a user is not a duplicate
+            # of an unverified email already linked to a different user
+            if EmailAddress.objects.filter(email=email).exists():
+                raise serializers.ValidationError(
+                    _("User with this Email address already exists."))
+        else:
+            email = None
+        return email
+
+    def validate_phone(self, phone):
+        instance = self.instance
+        if (instance and phone != instance.phone and
+                self.context['request'].user != instance):
+            raise serializers.ValidationError(_("Cannot update phone"))
+
+        if instance and instance.phone == phone:
+            return phone
+
+        if phone:
+            # make sure that the new phone updated by a user is not a duplicate
+            # of an unverified phone already linked to a different user
+            if VerificationDevice.objects.filter(
+                    unverified_phone=phone).exists():
+                raise serializers.ValidationError(
+                    _("User with this Phone number already exists."))
+        else:
+            phone = None
+        return phone
 
     def validate_username(self, username):
         instance = self.instance

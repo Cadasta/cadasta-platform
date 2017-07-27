@@ -507,6 +507,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         user = UserFactory.build()
         serializer = serializers.UserSerializer(user)
         assert 'email_verified' in serializer.data
+        assert 'phone_verified' in serializer.data
         assert 'password' not in serializer.data
         assert serializer.data['avatar'] == user.avatar.url
 
@@ -517,6 +518,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
+            'phone': '+919327768250',
             'password': 'iloveyoko79',
             'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00',
@@ -533,6 +535,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         user_obj = User.objects.first()
         assert user_obj.is_active
         assert not user_obj.email_verified
+        assert not user_obj.phone_verified
 
     def test_update_username_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
@@ -552,6 +555,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'USERtwO',
             'email': 'john@beatles.uk',
+            'phone': '+919327768250',
             'password': 'iloveyoko79',
             'full_name': 'John Lennon'
         }
@@ -574,6 +578,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         user = serializer.save()
         update_data1 = {'username': 'imagine71',
                         'email': 'john@beatles.uk',
+                        'phone': '+919327768250',
                         'last_login': '2016-01-01 23:00:00'}
         serializer2 = serializers.UserSerializer(user, data=update_data1)
         assert serializer2.is_valid() is False
@@ -587,6 +592,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
+            'phone': '+919327768250',
             'full_name': 'John Lennon',
         }
         request = APIRequestFactory().patch('/user/imagine71', data)
@@ -643,6 +649,266 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         assert serializer.is_valid() is False
         assert SANITIZE_ERROR in serializer.errors['full_name']
+
+    def test_update_with_blank_phone_and_email(self):
+        user = UserFactory.create(username='sherlock',
+                                  email='sherlock.holmes@bbc.uk',
+                                  phone='+919327768250',
+                                  password='221B@bakerstreet',
+                                  full_name='Sherlock Holmes')
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (_("You cannot leave both phone and email empty.")
+                in serializer.errors['non_field_errors'])
+
+    def test_update_email_fails(self):
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
+        assert serializer.is_valid() is True
+
+        user = serializer.save()
+        other_user = UserFactory.create()
+
+        update_data = {'email': 'sherlock.holmes@bbc.uk'}
+        request = APIRequestFactory().patch('/user/imagine71', update_data)
+        force_authenticate(request, user=other_user)
+
+        serializer2 = serializers.UserSerializer(
+            user, update_data, context={'request': Request(request)}
+        )
+        assert serializer2.is_valid() is False
+        assert (_("Cannot update email") in serializer2.errors['email'])
+
+    def test_update_phone_fails(self):
+        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
+        assert serializer.is_valid() is True
+
+        user = serializer.save()
+        other_user = UserFactory.create()
+
+        update_data = {'phone': '+919067439937'}
+        request = APIRequestFactory().patch('/user/imagine71', update_data)
+        force_authenticate(request, user=other_user)
+
+        serializer2 = serializers.UserSerializer(
+            user, update_data, context={'request': Request(request)}
+        )
+        assert serializer2.is_valid() is False
+        assert (_("Cannot update phone") in serializer2.errors['phone'])
+
+    def test_update_with_invalid_phone(self):
+        user = UserFactory.create(username='sherlock',
+                                  email='sherlock.holmes@bbc.uk',
+                                  phone='+919327768250',
+                                  password='221B@bakerstreet',
+                                  full_name='Sherlock Holmes')
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': 'Test Number',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (phone_format in serializer._errors['phone'])
+
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '9067439937',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (phone_format in serializer._errors['phone'])
+
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+91 9067439937',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (phone_format in serializer._errors['phone'])
+
+    def test_update_with_existing_phone_in_VerificationDevice(self):
+        user = UserFactory.create()
+        VerificationDevice.objects.create(user=user,
+                                          unverified_phone='+919327768250')
+        user1 = UserFactory.create(username='sherlock',
+                                   email='sherlock.holmes@bbc.uk',
+                                   password='221B@bakerstreet',
+                                   full_name='Sherlock Holmes')
+
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user1)
+        serializer = serializers.UserSerializer(
+            user1, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (_("User with this Phone number already exists.")
+                in serializer.errors['phone'])
+
+    def test_update_with_existing_email_in_EmailAddress(self):
+        user = UserFactory.create()
+        EmailAddress.objects.create(user=user,
+                                    email='sherlock.holmes@bbc.uk')
+        user1 = UserFactory.create(username='sherlock',
+                                   phone='+919327768250',
+                                   password='221B@bakerstreet',
+                                   full_name='Sherlock Holmes')
+
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user1)
+        serializer = serializers.UserSerializer(
+            user1, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (_("User with this Email address already exists.")
+                in serializer.errors['email'])
+
+    def test_create_with_existing_email_in_EmailAddress_without_instance(
+            self):
+        user1 = UserFactory.create()
+        EmailAddress.objects.create(user=user1,
+                                    email='sherlock.holmes@bbc.uk')
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+919327768250',
+            'password': '221B@bakerstreet',
+            'full_name': 'John Lennon',
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en',
+            'measurement': 'metric',
+        }
+        serializer = serializers.UserSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert (_("User with this Email address already exists.")
+                in serializer.errors['email'])
+
+    def test_create_with_existing_phone_in_VerificationDevice_without_instance(
+            self):
+        user1 = UserFactory.create()
+        VerificationDevice.objects.create(user=user1,
+                                          unverified_phone='+919327768250')
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+919327768250',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes',
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en',
+            'measurement': 'metric',
+        }
+        serializer = serializers.UserSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert (_("User with this Phone number already exists.")
+                in serializer.errors['phone'])
+
+    def test_create_with_phone_only(self):
+        data = {
+            'username': 'imagine71',
+            'email': '',
+            'phone': '+919327768250',
+            'password': 'iloveyoko79',
+            'full_name': 'John Lennon',
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en',
+            'measurement': 'metric',
+        }
+        serializer = serializers.UserSerializer(data=data)
+        assert serializer.is_valid() is True
+
+        serializer.save()
+        assert User.objects.count() == 1
+
+        user_obj = User.objects.first()
+        assert user_obj.is_active
+        assert not user_obj.phone_verified
+        assert user_obj.email is None
+
+    def test_create_with_email_only(self):
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'phone': '',
+            'password': 'iloveyoko79',
+            'full_name': 'John Lennon',
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en',
+            'measurement': 'metric',
+        }
+        serializer = serializers.UserSerializer(data=data)
+        assert serializer.is_valid() is True
+
+        serializer.save()
+        assert User.objects.count() == 1
+
+        user_obj = User.objects.first()
+        assert user_obj.is_active
+        assert not user_obj.email_verified
+        assert user_obj.phone is None
 
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):

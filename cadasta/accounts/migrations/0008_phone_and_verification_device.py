@@ -28,8 +28,8 @@ class Migration(migrations.Migration):
                 ('verified', models.BooleanField(default=False)),
             ],
             options={
-                'verbose_name': 'Verification Device',
                 'abstract': False,
+                'verbose_name': 'Verification Device',
             },
         ),
         migrations.RemoveField(
