@@ -15,16 +15,10 @@ class UserRole(object):
 class PublicUserRole(UserRole):
 
     def __init__(self):
-        try:
-            self._group = Group.objects.get(name='PublicUser')
-        except Group.DoesNotExist:
-            pass
+        self._group = Group.objects.get(name='PublicUser')
 
 
 class AnonymousUserRole(UserRole):
 
     def __init__(self):
-        try:
-            self._group = Group.objects.get(name='AnonymousUser')
-        except Group.DoesNotExist:
-            pass
+        self._group = Group.objects.get(name='AnonymousUser')

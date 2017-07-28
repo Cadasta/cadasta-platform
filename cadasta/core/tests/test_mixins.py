@@ -1,4 +1,5 @@
 import pytest
+import json
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
@@ -16,7 +17,8 @@ from rest_framework import generics as generic_api
 from rest_framework import exceptions as api_exceptions
 from rest_framework.test import APIRequestFactory, force_authenticate
 from jsonattrs.models import Attribute, Schema
-from organization.tests.factories import OrganizationFactory, ProjectFactory
+from organization.tests.factories import (OrganizationFactory,
+                                          ProjectFactory, clause)
 from organization.views import default as org_views
 
 from questionnaires.models import Questionnaire
@@ -24,8 +26,24 @@ from spatial.views.default import LocationsAdd
 from organization.views.default import OrganizationEdit
 from organization.models import OrganizationRole, ProjectRole
 
-from ..mixins import (SchemaSelectorMixin, RolePermissionRequiredMixin,
-                      PermissionFilterMixin, APIPermissionRequiredMixin)
+from tutelary.models import Policy, assign_user_policies
+
+from ..mixins import (PermissionRequiredMixin, SchemaSelectorMixin,
+                      RolePermissionRequiredMixin, PermissionFilterMixin,
+                      APIPermissionRequiredMixin, update_permissions)
+
+
+def assign_policies(user):
+    clauses = {
+        'clause': [
+            clause('allow', ['org.list', 'org.view_archived']),
+            clause('allow', ['org.*', 'org.*.*'], ['organization/*'])
+        ]
+    }
+    policy = Policy.objects.create(
+        name='allow',
+        body=json.dumps(clauses))
+    assign_user_policies(user, policy)
 
 
 # Tutelary mixin test - to be removed
@@ -85,6 +103,99 @@ class PermissionRequiredMixinTest(UserTestCase, TestCase):
         assert exp_redirect == response['location']
 
 
+# for coverage only -- will be removed with tutelary
+class UpdatePermissionsTest(UserTestCase, TestCase):
+    def test_update_permissions_with_org(self):
+        class MockView(PermissionRequiredMixin, generic.DetailView):
+            def __init__(self, obj, request, user):
+                self.obj = obj
+                self.request = request
+                self.request.user = user
+
+            permission_required = update_permissions('org.view')
+            permission_denied_message = 'Permission denied'
+
+            def get_queryset(self):
+                return []
+
+            def get_object(self):
+                return self.obj
+
+            def get_organization(self):
+                return self.obj
+
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+
+        user = UserFactory.create()
+        assign_policies(user)
+        org = OrganizationFactory.create(archived=True)
+        view = MockView(org, request, user)
+        response = view.dispatch(request)
+        assert response['location'] == '/'
+
+    def test_update_permissions_with_prj(self):
+        class MockView(PermissionRequiredMixin, generic.DetailView):
+            def __init__(self, obj, request, user):
+                self.obj = obj
+                self.request = request
+                self.request.user = user
+
+            permission_required = update_permissions('project.view')
+            permission_denied_message = 'Permission denied'
+
+            def get_queryset(self):
+                return []
+
+            def get_object(self):
+                return self.obj
+
+            def get_project(self):
+                return self.obj
+
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+
+        user = UserFactory.create()
+        assign_policies(user)
+        prj = ProjectFactory.create(archived=True)
+        view = MockView(prj, request, user)
+        response = view.dispatch(request)
+        assert response['location'] == '/'
+
+    def test_update_permissions_with_obj(self):
+        class MockView(PermissionRequiredMixin, generic.DetailView):
+            def __init__(self, obj, request, user):
+                self.obj = obj
+                self.request = request
+                self.request.user = user
+
+            permission_required = update_permissions('project.view', 'obj')
+            permission_denied_message = 'Permission denied'
+
+            def get_queryset(self):
+                return []
+
+            def get_object(self):
+                return self.obj
+
+        request = HttpRequest()
+        setattr(request, 'session', 'session')
+        self.messages = FallbackStorage(request)
+        setattr(request, '_messages', self.messages)
+
+        user = UserFactory.create()
+        assign_policies(user)
+        prj = ProjectFactory.create(archived=True)
+        view = MockView(prj, request, user)
+        response = view.dispatch(request)
+        assert response['location'] == '/'
+
+
 class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
 
     def test_raise_improperly_configured(self):
@@ -94,10 +205,10 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
                 self.request = RequestFactory().get('/check')
                 self.request.user = user
 
-        user1 = UserFactory.create()
+        user = UserFactory.create()
         org = OrganizationFactory.create()
         with pytest.raises(ImproperlyConfigured):
-            MockView(org, user1).has_permission()
+            MockView(org, user).has_permission()
 
     def test_has_permission_with_superuser(self):
         class MockView(RolePermissionRequiredMixin, generic.DetailView):
