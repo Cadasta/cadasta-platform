@@ -34,21 +34,6 @@ def update_permissions(permission, obj=None):
     return set_permissions
 
 
-# tutelary object permission check
-def check_perms(user, actions, objs, method=None):
-    if actions is False:
-        return False
-    if actions is not None:
-        for a in actions:
-            for o in objs:
-                test_obj = None
-                if o is not None:
-                    test_obj = o.get_permissions_object(a)
-                if not user.has_perm(a, test_obj):
-                    return False
-    return True
-
-
 # Tutelary mixin
 class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
 
@@ -71,19 +56,19 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
                     kwargs={'organization': self.kwargs['organization'],
                             'project': self.kwargs['project']}
                 )
-                if redirect_url == self.request.get_full_path():
-                    redirect_url = reverse(
-                        'organization:dashboard',
-                        kwargs={'slug': self.kwargs['organization']}
-                    )
-
-            elif 'slug' in self.kwargs:
-                redirect_url = reverse(
-                    'organization:dashboard',
-                    kwargs={'slug': self.kwargs['slug']}
-                )
-                if redirect_url == self.request.get_full_path():
-                    redirect_url = reverse('core:dashboard')
+            # if redirect_url == self.request.get_full_path():
+            #         redirect_url = reverse(
+            #             'organization:dashboard',
+            #             kwargs={'slug': self.kwargs['organization']}
+            #         )
+            #
+            # elif 'slug' in self.kwargs:
+            #     redirect_url = reverse(
+            #         'organization:dashboard',
+            #         kwargs={'slug': self.kwargs['slug']}
+            #     )
+            #     if redirect_url == self.request.get_full_path():
+            #         redirect_url = reverse('core:dashboard')
 
         return redirect(redirect_url)
 
@@ -217,13 +202,12 @@ class RolePermissionRequiredMixin(BaseRolePermissionMixin,
 # Role permission mixin
 class RoleLoginPermissionRequiredMixin(RolePermissionRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
+        if not request.user.is_authenticated:
             if hasattr(self, 'raise_exception') and self.raise_exception:
                 raise PermissionDenied(self.get_permission_denied_message())
             return redirect_to_login(self.request.get_full_path(),
                                      self.get_login_url(),
                                      self.get_redirect_field_name())
-
         return super().dispatch(request, *args, **kwargs)
 
 
