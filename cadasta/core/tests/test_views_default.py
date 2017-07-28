@@ -44,7 +44,7 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         ProjectFactory.create(organization=self.org, extent=extent)
         ProjectFactory.create(organization=self.org, extent=extent)
         self.private = ProjectFactory.create(
-            name='Private Project',
+            name='Private Project', archived=False,
             access='private', organization=self.org, extent=extent)
         ProjectFactory.create(
             name='Archived Project', archived=True,
@@ -81,7 +81,6 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         ProjectRole.objects.create(
             project=self.private, user=user, group=pm, role='PU')
         response = self.request(user=user)
-
         gj = self._render_geojson(Project.objects.filter(archived=False))
         expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200
