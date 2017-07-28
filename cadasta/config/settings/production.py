@@ -20,7 +20,8 @@ AWS = {
     'BUCKET': os.environ['S3_BUCKET'],
     'ACCESS_KEY': os.environ['S3_ACCESS_KEY'],
     'SECRET_KEY': os.environ['S3_SECRET_KEY'],
-    'REGION': 'us-west-2'
+    'REGION': 'us-west-2',
+    'MAX_FILE_SIZE': 10485760,
 }
 
 DATABASES = {

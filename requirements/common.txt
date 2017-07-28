@@ -20,7 +20,7 @@ django-audit-log==0.7.0
 django-simple-history==1.8.1
 simplejson==3.8.1
 django-widget-tweaks==1.4.1
-django-buckets==0.1.20
+django-buckets==0.1.21
 pyxform-cadasta==0.9.22
 python-magic==0.4.11
 Pillow==3.4.2
