@@ -185,3 +185,16 @@ def validate_questionnaire(json):
 
     if errors:
         return errors
+
+
+valid_relevent = (
+    r"^(?P<is_not>not\()?"
+    "((\$\{\w+\}\s?(=|>|<|>=|<=|!=)\s?(('|\"|“|‘)\w+('|\"|”|’)|[0-9]*))|"
+    "(selected\(\$\{\w+\},\s?(('|\"|“|‘)\w+('|\"|”|’)|[0-9]*)\)))"
+    "(?(is_not)\))$"
+)
+
+
+def validate_relevant(relevant):
+    segments = re.split(r"\sand\s|\sor\s", relevant)
+    return all(re.match(valid_relevent, s) for s in segments)

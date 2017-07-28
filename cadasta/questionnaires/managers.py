@@ -21,6 +21,12 @@ from .validators import validate_accuracy
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
 
+def check_relevant_clause(relevant):
+    if not re.match(r"^\$\{\w+\}=('|\"|”|’)\w+('|\"|”|’)$", relevant):
+        raise InvalidQuestionnaire(
+            [_("Invalid relevant clause: {0}".format(relevant))])
+
+
 def create_children(children, errors=[], project=None,
                     default_language='', kwargs={}):
     if children:
