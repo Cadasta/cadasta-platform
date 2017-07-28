@@ -183,8 +183,8 @@ class VerificationDevice(Device):
         message = message.format(
             token_value=token, time_validity=self.step // 60)
 
-        logger.info("Token has been sent to %s " % self.unverified_phone)
-        logger.info("%s" % message)
+        logger.debug("Token has been sent to %s " % self.unverified_phone)
+        logger.debug("%s" % message)
 
         return token
 
