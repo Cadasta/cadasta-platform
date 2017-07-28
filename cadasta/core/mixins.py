@@ -227,8 +227,26 @@ class RoleLoginPermissionRequiredMixin(RolePermissionRequiredMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
+class PermissionFilterMixin:
+    """Provide permission filtering of API list views."""
+
+    def dispatch(self, request, *args, **kwargs):
+        permissions = request.GET.get('permissions', None)
+        if permissions:
+            actions = tuple(permissions.split(','))
+            self.permission_filter = actions
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        if hasattr(self, 'permission_filter_queryset'):
+            return self.permission_filter_queryset()
+        return super().get_filtered_queryset()
+
+
 # Role permission mixin
 class APIPermissionRequiredMixin(BaseRolePermissionMixin):
+    """Check permission required on API views."""
 
     def get_permission_denied_message(self, default=None):
         if hasattr(self, 'permission_denied_message'):

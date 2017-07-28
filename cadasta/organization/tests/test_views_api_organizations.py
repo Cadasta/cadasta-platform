@@ -106,6 +106,31 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
         names = [org['name'] for org in response.content['results']]
         assert(names == sorted(names, reverse=True))
 
+    def test_permission_filter_with_org_admin(self):
+        OrganizationFactory.create(slug='unauthorized')
+        org = OrganizationFactory.create(archived=True)
+        oa = Group.objects.get(name='OrgAdmin')
+        OrganizationRole.objects.create(organization=org,
+                                        user=self.user,
+                                        group=oa)
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'project.create'})
+        assert response.status_code == 200
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
+
+    def test_permission_filter_with_org_member(self):
+        OrganizationFactory.create(slug='unauthorized')
+        org = OrganizationFactory.create(archived=True)
+        om = Group.objects.get(name='OrgMember')
+        OrganizationRole.objects.create(organization=org,
+                                        user=self.user,
+                                        group=om)
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'project.create'})
+        assert response.status_code == 200
+        assert len(response.content['results']) == 0
+
 
 class OrganizationCreateAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.OrganizationList

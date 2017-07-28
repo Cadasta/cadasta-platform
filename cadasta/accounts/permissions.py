@@ -8,8 +8,8 @@ def load():
 
     PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
-    # Group.objects.all().delete()
-    Permission.objects.all().delete()  # remove all perms here??
+    # Groups added in account migrations
+    Permission.objects.all().delete()
 
     # add permissions
     for ct in [
@@ -35,10 +35,7 @@ def load():
         perm_list = groups[group]['permissions']
         perms = Permission.objects.filter(
             codename__in=perm_list)
-        try:
-            g = Group.objects.get(name=group)
-        except Group.DoesNotExist:
-            g = Group.objects.create(name=group)
+        g, _ = Group.objects.get_or_create(name=group)
         g.permissions.set(perms)
         g.save()
     groups_file.close()

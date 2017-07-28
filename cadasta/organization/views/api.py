@@ -1,5 +1,5 @@
 from accounts.models import User
-from core.mixins import APIPermissionRequiredMixin
+from core.mixins import APIPermissionRequiredMixin, PermissionFilterMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, generics, status
@@ -11,7 +11,8 @@ from .. import serializers
 from ..models import Organization, OrganizationRole, ProjectRole, Project
 
 
-class OrganizationList(APIPermissionRequiredMixin,
+class OrganizationList(PermissionFilterMixin,
+                       APIPermissionRequiredMixin,
                        generics.ListCreateAPIView):
     lookup_url_kwarg = 'organization'
     lookup_field = 'slug'
@@ -27,7 +28,7 @@ class OrganizationList(APIPermissionRequiredMixin,
         'POST': 'org.create',
     }
 
-    def get_filtered_queryset(self):
+    def get_filtered_queryset(self, actions=None):
         user = self.request.user
         default = Q(access='public', archived=False)
         all_orgs = Organization.objects.all()
@@ -35,19 +36,29 @@ class OrganizationList(APIPermissionRequiredMixin,
             return all_orgs
         if user.is_anonymous:
             return all_orgs.filter(default)
-        org_roles = user.organizationrole_set.all(
-        ).select_related('organization')
+
+        org_roles = (user.organizationrole_set.all()
+                     .select_related('organization'))
         ids = []
-        for role in org_roles:
-            perms = role.permissions
-            org = role.organization
-            if ('org.view.private' in perms and
-                    org.access == 'private' and not org.archived):
-                ids.append(org.id)
-            if ('org.view.archived' in perms and org.archived):
-                ids.append(org.id)
-        default |= Q(id__in=set(ids))
-        return all_orgs.filter(default)
+        ids += (org_roles.filter(
+                organization__access='private', organization__archived=False,
+                group__permissions__codename__in=('org.view.private',))
+                .values_list('organization', flat=True))
+        ids += (org_roles.filter(
+                organization__archived=True,
+                group__permissions__codename__in=('org.view.archived',))
+                .values_list('organization', flat=True))
+
+        query = default | Q(id__in=set(ids))
+        return all_orgs.filter(query)
+
+    def permission_filter_queryset(self):
+        if hasattr(self, 'permission_filter'):
+            actions = self.permission_filter
+            return self.get_filtered_queryset().filter(
+                organizationrole__user=self.request.user,
+                organizationrole__group__permissions__codename__in=actions)
+        return self.get_filtered_queryset()
 
 
 class OrganizationDetail(APIPermissionRequiredMixin,
@@ -148,7 +159,8 @@ class UserAdminDetail(APIPermissionRequiredMixin,
     }
 
 
-class OrganizationProjectList(APIPermissionRequiredMixin,
+class OrganizationProjectList(PermissionFilterMixin,
+                              APIPermissionRequiredMixin,
                               mixins.OrgRoleCheckMixin,
                               generics.ListCreateAPIView):
 
@@ -186,27 +198,45 @@ class OrganizationProjectList(APIPermissionRequiredMixin,
     def get_filtered_queryset(self):
         user = self.request.user
         org = Organization.objects.get(slug=self.kwargs['organization'])
-        all_projects = Project.objects.filter(organization=org)
+        org_projects = Project.objects.filter(organization=org)
         default = Q(access='public', archived=False)
-
-        if user.is_superuser:
-            return all_projects
+        if user.is_superuser or self.is_administrator:
+            return org_projects
         if user.is_anonymous:
-            default &= Q(organization=org)
-            return all_projects.filter(default)
-
-        org_projects = all_projects.filter(organization=org)
-        try:
-            role = OrganizationRole.objects.get(organization=org, user=user)
-            if role.admin:
-                return org_projects
-            else:
-                return org_projects.filter(archived=False)
-        except OrganizationRole.DoesNotExist:
             return org_projects.filter(default)
 
+        prj_roles = user.projectrole_set.filter(
+            project__organization=org).select_related('project')
+        if prj_roles:
+            ids = []
+            ids += (prj_roles.filter(
+                project__access='private', project__archived=False,
+                group__permissions__codename__in=('project.view.private',))
+                .values_list('project', flat=True))
+            ids += (prj_roles.filter(
+                project__archived=True,
+                group__permissions__codename__in=('project.view.archived',))
+                .values_list('project', flat=True))
+            query = default | Q(id__in=set(ids))
+            return org_projects.filter(query)
 
-class ProjectList(APIPermissionRequiredMixin,
+        if self.is_member:
+            query = default | Q(access='private', archived=False)
+            return org_projects.filter(query)
+
+        return org_projects.filter(default)
+
+    def permission_filter_queryset(self):
+        if hasattr(self, 'permission_filter'):
+            actions = self.permission_filter
+            return self.get_filtered_queryset().filter(
+                projectrole__user=self.request.user,
+                projectrole__group__permissions__codename__in=actions)
+        return self.get_filtered_queryset()
+
+
+class ProjectList(PermissionFilterMixin,
+                  APIPermissionRequiredMixin,
                   mixins.ProjectListMixin,
                   generics.ListAPIView):
 
@@ -218,6 +248,14 @@ class ProjectList(APIPermissionRequiredMixin,
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
     permission_required = {'GET': 'project.list'}
+
+    def permission_filter_queryset(self):
+        if hasattr(self, 'permission_filter'):
+            actions = self.permission_filter
+            return self.get_filtered_queryset().filter(
+                projectrole__user=self.request.user,
+                projectrole__group__permissions__codename__in=actions)
+        return self.get_filtered_queryset()
 
 
 class ProjectDetail(APIPermissionRequiredMixin,

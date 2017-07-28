@@ -229,6 +229,7 @@ class ProjectCreateCheckMixin:
 
 
 class ProjectListMixin:
+
     def get_filtered_queryset(self):
         user = self.request.user
         default = Q(access='public', archived=False)
@@ -237,28 +238,31 @@ class ProjectListMixin:
             return all_projects
         if user.is_anonymous:
             return all_projects.filter(default)
-        else:
-            org_roles = user.organizationrole_set.all().select_related(
-                'organization')
-            prj_roles = user.projectrole_set.all().select_related('project')
-            ids = []
-            for role in org_roles:
-                if role.admin:
-                    ids += [prj.id for prj in role.organization.all_projects()]
-                else:
-                    ids += [
-                        prj.id for prj in role.organization.all_projects() if
-                        prj.archived is False]
-            for role in prj_roles:
-                perms = role.permissions
-                prj = role.project
-                if ('project.view.private' in perms and prj.access ==
-                        'private' and not prj.archived):
-                        ids.append(prj.id)
-                if ('project.view.archived' in perms and prj.archived):
-                    ids.append(prj.id)
-            default |= Q(id__in=set(ids))
-            return all_projects.filter(default)
+
+        org_roles = (user.organizationrole_set.select_related('organization'))
+        ids = []
+        ids += (org_roles.filter(
+                organization__projects__access='private',
+                organization__projects__archived=False,
+                group__permissions__codename__in=('project.view.private',))
+                .values_list('organization__projects', flat=True))
+        ids += (org_roles.filter(
+                organization__projects__archived=True,
+                group__permissions__codename__in=('project.view.archived',))
+                .values_list('organization__projects', flat=True))
+
+        prj_roles = user.projectrole_set.select_related('project')
+        ids += (prj_roles.filter(
+                project__archived=True,
+                group__permissions__codename__in=('project.view.archived',))
+                .values_list('project', flat=True))
+        ids += (prj_roles.filter(
+                project__access='private', project__archived=False,
+                group__permissions__codename__in=('project.view.private'))
+                .values_list('project', flat=True))
+
+        query = default | Q(id__in=set(ids))
+        return all_projects.filter(query)
 
 
 class OrgRoleCheckMixin(SuperUserCheckMixin):

@@ -299,6 +299,7 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         self.organization = OrganizationFactory.create(slug='habitat')
         self.oa = Group.objects.get(name='OrgAdmin')
         self.om = Group.objects.get(name='OrgMember')
+        self.dc = Group.objects.get(name='DataCollector')
 
     def test_full_list(self):
         """Return all projects."""
@@ -336,25 +337,39 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_filter_archived_with_org_admin(self):
         """Return one archived project."""
-        user = UserFactory.create()
         OrganizationRole.objects.create(
-            organization=self.organization, user=user, group=self.oa)
+            organization=self.organization, user=self.user, group=self.oa)
         ProjectFactory.create(organization=self.organization, archived=True)
         ProjectFactory.create(organization=self.organization, archived=False)
-        response = self.request(user=user, get_data={'archived': True})
+        response = self.request(user=self.user, get_data={'archived': True})
         assert response.status_code == 200
         assert len(response.content['results']) == 1
 
     def test_list_private_with_org_member(self):
         """Return one archived project."""
-        user = UserFactory.create()
         OrganizationRole.objects.create(
-            organization=self.organization, user=user, group=self.om)
+            organization=self.organization, user=self.user, group=self.om)
         ProjectFactory.create(organization=self.organization, archived=True)
         ProjectFactory.create(organization=self.organization, archived=False)
         ProjectFactory.create(
             organization=self.organization, archived=False, access='private')
-        response = self.request(user=user)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['results']) == 2
+        assert not response.content['results'][0]['archived']
+        assert response.content['results'][0]['access'] == 'public'
+        assert not response.content['results'][1]['archived']
+        assert response.content['results'][1]['access'] == 'private'
+
+    def test_list_private_with_project_role(self):
+        """Return one archived project."""
+        ProjectFactory.create(organization=self.organization, archived=True)
+        ProjectFactory.create(organization=self.organization, archived=False)
+        prj = ProjectFactory.create(
+            organization=self.organization, archived=False, access='private')
+        ProjectRole.objects.create(
+            project=prj, user=self.user, role='DC', group=self.dc)
+        response = self.request(user=self.user)
         assert response.status_code == 200
         assert len(response.content['results']) == 2
         assert not response.content['results'][0]['archived']
@@ -408,6 +423,22 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert len(response.content['results']) == 3
 
+    def test_permission_filter(self):
+        ProjectFactory.create(
+            slug='unauthorized', organization=self.organization)
+        prj = ProjectFactory.create(
+            access='private', organization=self.organization)
+        OrganizationRole.objects.create(
+            organization=self.organization, user=self.user, group=self.om)
+        ProjectRole.objects.create(
+            project=prj, user=self.user, group=self.dc, role='DC')
+
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'project.view'})
+        assert response.status_code == 200
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
+
 
 class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
     view_class = api.ProjectList
@@ -416,6 +447,9 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         self.organization = OrganizationFactory.create(
             slug='habitat', add_users=[self.user])
+        self.oa = Group.objects.get(name='OrgAdmin')
+        self.om = Group.objects.get(name='OrgMember')
+        self.dc = Group.objects.get(name='DataCollector')
 
     def test_full_list(self):
         """Return all projects."""
@@ -570,6 +604,20 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         self._check_visible(users, orgs, prjs, users[5], [0, 1, 2, 4, 5])
         self._check_visible(users, orgs, prjs, users[6], [0, 2, 3, 4, 5])
         self._check_visible(users, orgs, prjs, users[7], [0, 1, 2, 3, 4, 5])
+
+    def test_permission_filter(self):
+        ProjectFactory.create(
+            slug='unauthorized', organization=self.organization)
+        prj = ProjectFactory.create(
+            access='private', organization=self.organization)
+        ProjectRole.objects.create(
+            project=prj, user=self.user, group=self.dc, role='DC')
+
+        response = self.request(user=self.user,
+                                get_data={'permissions': 'party.create'})
+        assert response.status_code == 200
+        assert len(response.content['results']) == 1
+        assert response.content['results'][0]['slug'] != 'unauthorized'
 
 
 class ProjectCreateAPITest(APITestCase, UserTestCase, TestCase):
