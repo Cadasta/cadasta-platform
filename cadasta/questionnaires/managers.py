@@ -16,13 +16,13 @@ from core.validators import sanitize_string
 from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 from .exceptions import InvalidQuestionnaire
 from .messages import MISSING_RELEVANT, INVALID_ACCURACY
-from .validators import validate_accuracy
+from .validators import validate_accuracy, validate_relevant
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
 
 def check_relevant_clause(relevant):
-    if not re.match(r"^\$\{\w+\}=('|\"|”|’)\w+('|\"|”|’)$", relevant):
+    if not validate_relevant(relevant):
         raise InvalidQuestionnaire(
             [_("Invalid relevant clause: {0}".format(relevant))])
 

@@ -7,6 +7,7 @@ from rest_framework.compat import six
 from pyxform.builder import create_survey_element_from_dict
 from lxml import etree
 from rest_framework.renderers import BaseRenderer
+
 from questionnaires.managers import fix_languages
 from questionnaires.choices import QUESTION_TYPES
 
