@@ -50,6 +50,9 @@ DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 ROOT_URLCONF = 'config.urls.dev'
 DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
+AWS = {
+    'MAX_FILE_SIZE': 10485760
+}
 
 # Use HTTP for OSM for testing only, to make caching tiles for
 # functional tests a bit simpler.
