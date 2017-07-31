@@ -47,6 +47,19 @@ def validate_type(type, value):
         return isinstance(value, list)
 
 
+valid_relevent = (
+    r"^(?P<is_not>not\()?"
+    "((\$\{\w+\}\s?(=|>|<|>=|<=|!=)\s?(('|\"|“|‘)\w+('|\"|”|’)|[0-9]*))|"
+    "(selected\(\$\{\w+\},\s?(('|\"|“|‘)\w+('|\"|”|’)|[0-9]*)\)))"
+    "(?(is_not)\))$"
+)
+
+
+def validate_relevant(relevant):
+    segments = re.split(r"\sand\s|\sor\s", relevant)
+    return all(re.match(valid_relevent, s) for s in segments)
+
+
 QUESTIONNAIRE_SCHEMA = {
     'title': {'type': 'string', 'required': True},
     'id_string': {'type': 'string', 'required': True},
@@ -64,19 +77,29 @@ QUESTION_SCHEMA = {
     'required': {'type': 'boolean'},
     'constraint': {'type': 'string'},
     'index': {'type': 'integer', 'required': True},
-    'gps_accuracy': {'type': 'number',
-                     'function': validate_accuracy,
-                     'errors': {
-                        'function': _("gps_accuracy must be positve float")
-                     },
-                     'relevant': gps_relevant}
+    'gps_accuracy': {
+        'type': 'number',
+        'function': validate_accuracy,
+        'errors': {
+            'function': _("gps_accuracy must be positve float")
+        },
+        'relevant': gps_relevant
+    },
+    'relevant': {
+        'type': 'string',
+        'function': validate_relevant,
+        'errors': {
+            'function': _("Invalid relevant clause")
+        },
+    }
 }
 
 QUESTION_GROUP_SCHEMA = {
     'name': {'type': 'string', 'required': True},
     'label': {'type': 'string'},
     'type': {'type': 'string', 'required': True},
-    'index': {'type': 'integer', 'required': True}
+    'index': {'type': 'integer', 'required': True},
+    'relevant': {'type': 'string', 'function': validate_relevant}
 }
 
 QUESTION_OPTION_SCHEMA = {
@@ -185,16 +208,3 @@ def validate_questionnaire(json):
 
     if errors:
         return errors
-
-
-valid_relevent = (
-    r"^(?P<is_not>not\()?"
-    "((\$\{\w+\}\s?(=|>|<|>=|<=|!=)\s?(('|\"|“|‘)\w+('|\"|”|’)|[0-9]*))|"
-    "(selected\(\$\{\w+\},\s?(('|\"|“|‘)\w+('|\"|”|’)|[0-9]*)\)))"
-    "(?(is_not)\))$"
-)
-
-
-def validate_relevant(relevant):
-    segments = re.split(r"\sand\s|\sor\s", relevant)
-    return all(re.match(valid_relevent, s) for s in segments)

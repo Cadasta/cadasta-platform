@@ -959,6 +959,37 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert questionnaire.question_groups.count() == 7
         assert Attribute.objects.count() == 13
 
+    def test_invalid_relevant_clause(self):
+        data = {
+            'title': 'yx8sqx6488wbc4yysnkrbnfq',
+            'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
+            'default_language': 'en',
+            'questions': [{
+                'name': "start",
+                'label': 'Label',
+                'type': "ST",
+                'required': False,
+                'constraint': None,
+                'index': 0,
+                'relevant': "$party_type='IN'"
+            }, {
+                'name': "end",
+                'label': 'Label',
+                'type': "EN",
+                'index': 1
+            }]
+        }
+        project = ProjectFactory.create()
+
+        serializer = serializers.QuestionnaireSerializer(
+            data=data,
+            context={'project': project}
+        )
+        with pytest.raises(ValidationError) as e:
+            serializer.is_valid(raise_exception=True)
+        assert ("Invalid relevant clause: $party_type='IN'" in
+                e.value.detail['questions'][0]['relevant'])
+
 
 class QuestionGroupSerializerTest(UserTestCase, TestCase):
     def test_serialize(self):
