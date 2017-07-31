@@ -35,7 +35,6 @@ window.addEventListener('load', function() {
   $('#party-list').DataTable({
     serverSide: true,
     drawCallback: function (settings) {
-      var response = this.api().ajax.json().tbody;
       $('#party-list tbody').html(this.api().ajax.json().tbody);
 
       // Link each resource row to its resource detail page

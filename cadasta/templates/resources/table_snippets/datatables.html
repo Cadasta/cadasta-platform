@@ -12,7 +12,6 @@ window.addEventListener('load', function() {
     {% endif %}
     drawCallback: function (settings) {
       var dataTable = this;
-      var response = dataTable.api().ajax.json().tbody;
       $(dataTable).find('tbody').html(dataTable.api().ajax.json().tbody);
 
       // Link each resource row to its resource detail page
