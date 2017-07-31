@@ -395,6 +395,10 @@ main.container-fluid {
   }
 }
 
+.top-add + .dataTables_wrapper > .table-search {
+  margin-top: -40px;
+}
+
 /* =Table views
 -------------------------------------------------------------- */
 
@@ -797,9 +801,6 @@ section {
       margin-top: 4px;
       padding-bottom: 10px;
       border-bottom: solid 1px $gray-light;
-    }
-    .top-add {
-      margin-bottom: -30px;
     }
   }
   .panel-footer {
