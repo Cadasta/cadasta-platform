@@ -103,7 +103,8 @@ class Resource(RandomIDModel):
     def thumbnail(self):
         if not hasattr(self, '_thumbnail'):
             icon = settings.ICON_LOOKUPS.get(self.mime_type, None)
-            if 'image' in self.mime_type and 'tif' not in self.mime_type:
+            if ('image' in self.mime_type and
+                    all(img not in self.mime_type for img in ['tif', 'svg'])):
                 ext = self.file_name.split('.')[-1]
                 base_url = self.file.url[:self.file.url.rfind('.')]
                 self._thumbnail = base_url + '-128x128.' + ext
@@ -156,7 +157,7 @@ def archive_file(sender, instance, **kwargs):
 
 def create_thumbnails(instance, created):
     if created or instance._original_url != instance.file.url:
-        if 'image' in instance.mime_type:
+        if 'image' in instance.mime_type and 'svg' not in instance.mime_type:
             io.ensure_dirs()
             file_name = instance.file.url.split('/')[-1]
             name = file_name[:file_name.rfind('.')]
