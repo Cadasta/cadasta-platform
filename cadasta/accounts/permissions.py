@@ -8,7 +8,6 @@ def load():
 
     PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
-    # Groups added in account migrations
     Permission.objects.all().delete()
 
     # add permissions
@@ -28,7 +27,7 @@ def load():
         perm_file.close()
 
     # groups already exist in system:
-    # see accounts/migrtions/0004_add_groups
+    # see accounts/migrtions/0007_add_groups
     groups_file = open(PERMISSIONS_DIR + 'groups.json')
     groups = json.loads(groups_file.read())
     for group in groups:

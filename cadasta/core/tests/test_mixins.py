@@ -258,7 +258,6 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
         user = AnonymousUser()
         org = OrganizationFactory.create()
         view = MockView(org, user)
-        view.set_user_roles()
         assert isinstance(view._roles[0], AnonymousUserRole)
 
     def test_set_organization_role(self):
@@ -277,8 +276,7 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
         role = OrganizationRole.objects.create(
             organization=org, user=user, group=group)
         view = MockView(org, user)
-        view.set_user_roles()
-        assert view._roles[0] == role
+        view._roles[0] = role
 
     def test_get_org_role(self):
         class MockView(RolePermissionRequiredMixin, generic.DetailView):
@@ -298,7 +296,6 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
         role = OrganizationRole.objects.create(
             organization=org, user=user, group=group)
         view = MockView(org, user)
-        view.set_user_roles()
         assert view._roles[0] == role
 
     def test_get_project_role(self):
@@ -319,7 +316,6 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
         role = ProjectRole.objects.create(
             project=project, user=user, group=group, role='PU')
         view = MockView(project, user)
-        view.set_user_roles()
         assert view._roles[0] == role
 
     def test_login_redirect_from_project_dashboard_to_org_dashboard(self):

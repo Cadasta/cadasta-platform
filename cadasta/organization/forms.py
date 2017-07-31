@@ -200,10 +200,7 @@ class AddOrganizationMemberForm(forms.Form):
                 _("The role could not be assigned because the data didn't "
                   "validate.")
             )
-        try:
-            group = Group.objects.get(name='OrgMember')
-        except Group.DoesNotExist as e:
-            raise forms.ValidationError(e)
+        group, created = Group.objects.get_or_create(name='OrgMember')
         self.instance = OrganizationRole.objects.create(
             organization=self.organization, user=self.user, group=group)
         return self.instance
@@ -236,11 +233,8 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
         return org_role
 
     def save(self):
-        try:
-            name = ROLE_GROUPS.get(self.data.get('org_role'), 'M')
-            group = Group.objects.get(name=name)
-        except Group.DoesNotExist as e:
-            raise forms.ValidationError(e)
+        name = ROLE_GROUPS.get(self.data.get('org_role'), 'M')
+        group, created = Group.objects.get_or_create(name=name)
         self.org_role_instance.group = group
         self.org_role_instance.save()
 

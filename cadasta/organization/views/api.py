@@ -13,6 +13,7 @@ from ..models import Organization, OrganizationRole, ProjectRole, Project
 
 class OrganizationList(PermissionFilterMixin,
                        APIPermissionRequiredMixin,
+                       mixins.OrganizationListMixin,
                        generics.ListCreateAPIView):
     lookup_url_kwarg = 'organization'
     lookup_field = 'slug'
@@ -27,30 +28,6 @@ class OrganizationList(PermissionFilterMixin,
         'GET': 'org.list',
         'POST': 'org.create',
     }
-
-    def get_filtered_queryset(self, actions=None):
-        user = self.request.user
-        default = Q(access='public', archived=False)
-        all_orgs = Organization.objects.all()
-        if user.is_superuser:
-            return all_orgs
-        if user.is_anonymous:
-            return all_orgs.filter(default)
-
-        org_roles = (user.organizationrole_set.all()
-                     .select_related('organization'))
-        ids = []
-        ids += (org_roles.filter(
-                organization__access='private', organization__archived=False,
-                group__permissions__codename__in=('org.view.private',))
-                .values_list('organization', flat=True))
-        ids += (org_roles.filter(
-                organization__archived=True,
-                group__permissions__codename__in=('org.view.archived',))
-                .values_list('organization', flat=True))
-
-        query = default | Q(id__in=set(ids))
-        return all_orgs.filter(query)
 
     def permission_filter_queryset(self):
         if hasattr(self, 'permission_filter'):

@@ -467,7 +467,7 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
         assert ("Not able to add member. The role already exists." in
                 serializer.errors['username'])
 
-    def test_update_roles_for_user(self):
+    def test_update_roles_for_admin(self):
         user = UserFactory.create()
         org = OrganizationFactory.create(add_users=[user])
         serializer = serializers.OrganizationUserSerializer(
@@ -481,6 +481,21 @@ class OrganizationUserSerializerTest(UserTestCase, TestCase):
 
         role = OrganizationRole.objects.get(user=user, organization=org)
         assert role.admin is True
+
+    def test_update_roles_for_member(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create(add_users=[user])
+        serializer = serializers.OrganizationUserSerializer(
+            user,
+            data={'admin': 'False'},
+            partial=True,
+            context={'organization': org}
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        role = OrganizationRole.objects.get(user=user, organization=org)
+        assert role.admin is False
 
 
 class ProjectUserSerializerTest(UserTestCase, TestCase):

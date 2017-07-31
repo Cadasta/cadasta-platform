@@ -11,6 +11,7 @@ from questionnaires.models import Questionnaire
 
 
 class OrganizationMixin:
+    """Provide lookup method for the current organization."""
 
     def get_organization(self, lookup_kwarg='slug'):
         if lookup_kwarg == 'slug' and hasattr(self, 'org_lookup'):
@@ -22,6 +23,8 @@ class OrganizationMixin:
 
 
 class OrganizationRoles(OrganizationMixin):
+    """Provide queryset and serializer context for organization users."""
+
     lookup_field = 'username'
     org_lookup = 'organization'
 
@@ -39,6 +42,17 @@ class OrganizationRoles(OrganizationMixin):
 
 
 class ProjectMixin:
+    """Provide project related methods, properties and context variables.
+
+       Provides methods for access to:
+       - Current project
+       - Current organization
+       - Users organization and/or project roles
+       - `is_administrator` class attribute
+       - `is_project_member` context variable
+       - `form_lang_default` and `form_langs` context variables
+    """
+
     def get_project(self):
         if not hasattr(self, 'prj'):
             self.prj = get_object_or_404(
@@ -129,6 +143,11 @@ class ProjectMixin:
 
 
 class ProjectRoles(ProjectMixin):
+    """Determin organization and project roles for the current user.
+
+       Used in `ProjectUsers` and `ProjectUsersDetail` api views.
+    """
+
     lookup_field = 'username'
 
     def get_queryset(self):
@@ -166,6 +185,12 @@ class ProjectQuerySetMixin:
 
 
 class ProjectAdminCheckMixin(SuperUserCheckMixin):
+    """Determine if user is a project administrator.
+
+       Adds a set of context variables which determine the available
+       actions the user is allowed to perform using the UI.
+    """
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['is_administrator'] = self.is_administrator
@@ -190,11 +215,20 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
             # check permissions against role permissions
             for permission_context in permissions_contexts:
                 context[permission_context[1]] = (
-                    permission_context[0] in self.permissions)
+                    permission_context[0] in
+                    self.permissions or self.is_administrator)
             return context
 
 
 class ProjectCreateCheckMixin:
+    """Determine if the user is allowed to add project.
+
+       Adds an `add_allowed` context variable. User can either add a project
+       to the current organization if they have permissions, or
+       can add a project if they have permissions on any other organization of
+       which they are a member.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.add_allow = None
@@ -228,7 +262,45 @@ class ProjectCreateCheckMixin:
         return context
 
 
+class OrganizationListMixin:
+    """Provide filtered lists of organizations for default and api views.
+
+       Add's a `get_filtered_queryset` method which returns a filtered
+       queryset containing all orgaizations the current user has access to.
+    """
+
+    def get_filtered_queryset(self, actions=None):
+        user = self.request.user
+        default = Q(access='public', archived=False)
+        all_orgs = Organization.objects.all()
+        if user.is_superuser:
+            return all_orgs
+        if user.is_anonymous:
+            return all_orgs.filter(default)
+
+        org_roles = (user.organizationrole_set.all()
+                     .select_related('organization'))
+        ids = []
+        ids += (org_roles.filter(
+                organization__access='private', organization__archived=False,
+                group__permissions__codename__in=('org.view.private',))
+                .values_list('organization', flat=True))
+        ids += (org_roles.filter(
+                organization__archived=True,
+                group__permissions__codename__in=('org.view.archived',))
+                .values_list('organization', flat=True))
+
+        query = default | Q(id__in=set(ids))
+        return all_orgs.filter(query)
+
+
 class ProjectListMixin:
+    """Provide filtered lists of projects for default and api views.
+
+       Add's a `get_filtered_queryset` method which returns a filtered
+       queryset containing all projects the current user has access to based
+       on the user's current organization and project roles.
+    """
 
     def get_filtered_queryset(self):
         user = self.request.user
@@ -244,28 +316,49 @@ class ProjectListMixin:
         ids += (org_roles.filter(
                 organization__projects__access='private',
                 organization__projects__archived=False,
-                group__permissions__codename__in=('project.view.private',))
+                group__permissions__codename__in=['project.view.private'])
                 .values_list('organization__projects', flat=True))
         ids += (org_roles.filter(
                 organization__projects__archived=True,
-                group__permissions__codename__in=('project.view.archived',))
+                group__permissions__codename__in=['project.view.archived'])
                 .values_list('organization__projects', flat=True))
 
         prj_roles = user.projectrole_set.select_related('project')
-        ids += (prj_roles.filter(
-                project__archived=True,
-                group__permissions__codename__in=('project.view.archived',))
-                .values_list('project', flat=True))
-        ids += (prj_roles.filter(
-                project__access='private', project__archived=False,
-                group__permissions__codename__in=('project.view.private'))
-                .values_list('project', flat=True))
+        # public archived
+        ids += prj_roles.filter(project__archived=True,
+                                project__access='public',
+                                project__extent__isnull=False,
+                                group__permissions__codename__in=[
+                                    'project.view.archived',
+                                    'project.view']
+                                ).values_list('project', flat=True)
 
+        # private active projects
+        ids += prj_roles.filter(project__access='private',
+                                project__archived=False,
+                                project__extent__isnull=False,
+                                group__permissions__codename__in=[
+                                    'project.view.private']
+                                ).values_list('project', flat=True)
+
+        # private archived projects
+        ids += prj_roles.filter(project__access='private',
+                                project__archived=True,
+                                project__extent__isnull=False,
+                                group__permissions__codename__in=[
+                                    'project.view.private',
+                                    'project.view.archived']
+                                ).values_list('project', flat=True)
         query = default | Q(id__in=set(ids))
         return all_projects.filter(query)
 
 
-class OrgRoleCheckMixin(SuperUserCheckMixin):
+class OrgRoleCheckMixin(SuperUserCheckMixin, OrganizationMixin):
+    """Determin user's organization role and add role membership to context.
+
+       Add `is_member` and `is_admin` context variables and class attributes.
+    """
+
     def get_roles(self):
         if not hasattr(self, '_is_member') or not hasattr(self, '_is_admin'):
             self._is_member = False
@@ -282,17 +375,15 @@ class OrgRoleCheckMixin(SuperUserCheckMixin):
 
             if hasattr(self, 'get_organization'):
                 org = self.get_organization()
-            else:
-                org = self.get_object()
-            try:
-                role = OrganizationRole.objects.get(
-                    organization=org,
-                    user=self.request.user,
-                )
-                self._is_member = True
-                self._is_admin = role.admin
-            except OrganizationRole.DoesNotExist:
-                pass
+                try:
+                    role = OrganizationRole.objects.get(
+                        organization=org,
+                        user=self.request.user,
+                    )
+                    self._is_member = True
+                    self._is_admin = role.admin
+                except OrganizationRole.DoesNotExist:
+                    pass
 
         return self._is_member, self._is_admin
 
