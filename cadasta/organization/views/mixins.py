@@ -252,8 +252,11 @@ class ProjectCreateCheckMixin:
         if Organization.objects.exists():
             user = self.request.user
             if hasattr(user, 'organizationrole_set'):
-                chk = any(['project.create' in role.permissions
-                          for role in user.organizationrole_set.all()])
+                org_roles = user.organizationrole_set.all()
+                ids = (org_roles.filter(
+                    group__permissions__codename__in=['project.create'])
+                    .values_list('organization', flat=True))
+                chk = True if ids else False
         return chk
 
     def get_context_data(self, *args, **kwargs):
