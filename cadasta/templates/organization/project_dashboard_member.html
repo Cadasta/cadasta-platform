@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load filters %}
 {% load leaflet_tags %}
 
       <!-- Project Dashboard for project members  -->
@@ -222,6 +223,7 @@
                 {% endif %}
               </div>
               <div class="panel-body">
+
                 {% if is_administrator and not object.description and not object.urls.0 and not object.contacts %}
                   <div class="overlay-wrapper">
                     <div class="overlay">

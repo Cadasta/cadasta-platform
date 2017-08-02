@@ -101,3 +101,18 @@ class FilterTest(TestCase):
         metric_units2 = filters.set_format_area_metric_units(area2)
         assert metric_units1 == expected_value1
         assert metric_units2 == expected_value2
+
+    def test_set_format_area_preferred(self):
+        area = '10004.494'
+        user_measurement1 = 'imperial'
+        user_measurement2 = 'metric'
+        user_measurement3 = None
+        expected_result1 = '2.47 ac'
+        expected_result2 = '1.00 ha'
+        expected_result3 = '1.00 ha'
+        result1 = filters.set_format_area_preferred(area, user_measurement1)
+        result2 = filters.set_format_area_preferred(area, user_measurement2)
+        result3 = filters.set_format_area_preferred(area, user_measurement3)
+        assert result1 == expected_result1
+        assert result2 == expected_result2
+        assert result3 == expected_result3

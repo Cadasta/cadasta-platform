@@ -11,6 +11,9 @@
   <section>
     <div class="page-title">
       <h2 class="short"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</h2>
+      {% if area %}
+        <p>{% trans "Area: " %}{{ area | format_area:user.measurement | safe }} </p>
+      {% endif %}
       <div class="top-btn pull-right">
         <!-- Action buttons -->
         {% if is_allowed_edit_location %}

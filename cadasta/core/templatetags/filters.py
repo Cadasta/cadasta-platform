@@ -46,7 +46,6 @@ def set_parsley_sanitize(field):
     return field
 
 
-@register.filter(name='format_area_metric_units')
 def set_format_area_metric_units(area):
     area = float(area)
     if area < 1000:
@@ -56,7 +55,6 @@ def set_format_area_metric_units(area):
         return format(ha, '.2f') + ' ha'
 
 
-@register.filter(name='format_area_imperial_units')
 def set_format_area_imperial_units(area):
     area = float(area)
     area_ft2 = area * 10.764
@@ -65,3 +63,12 @@ def set_format_area_imperial_units(area):
     else:
         ac = area * 0.00024711
         return format(ac, '.2f') + ' ac'
+
+
+@register.filter(name='format_area')
+def set_format_area_preferred(area, user_measurement):
+    """Set preferred user format. If no preference, set metric"""
+    if user_measurement == 'imperial':
+        return set_format_area_imperial_units(area)
+    else:
+        return set_format_area_metric_units(area)
