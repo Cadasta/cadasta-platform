@@ -9,6 +9,11 @@
 
 {% block extra_script %}
   {{ form.media }}
+  <style type="text/css">
+    .s3-buckets > .file-links > .file-link {
+      display: none;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
