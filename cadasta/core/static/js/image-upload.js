@@ -6,8 +6,11 @@ $(function() {
     $('.file-remove').text('Remove');
 
     $('.file-input').change(function(event) {
+        var accepted = $(this).parents('.s3-buckets').attr('data-accepted-types');
+
         var file = event.target.files.length && event.target.files[0];
-        if (file) {
+
+        if (file && (!accepted || accepted.split(',').indexOf(file.type) !== -1)) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 $('#avatar-preview').attr('src', e.target.result);
