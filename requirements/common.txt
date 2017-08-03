@@ -33,7 +33,7 @@ pylibmc==1.5.2
 awscli==1.11.129
 pandas==0.20.3
 argon2-cffi==16.3.0
-requests==2.18.2
+requests==2.18.3
 pyparsing==2.2.0
 django-compressor==2.1.1
 beautifulsoup4==4.6.0
