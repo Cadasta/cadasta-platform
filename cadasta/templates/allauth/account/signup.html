@@ -56,6 +56,12 @@
     <div class="error-block">{{ form.email.errors }}</div>
   </div>
 
+  <div class="form-group{% if form.phone.errors %} has-error{%endif%}">
+  <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
+  {% render_field form.phone class+='form-control input-lg' data-parsley-santize="1" %}
+  <div class="error-block">{{form.phone.errors}}</div>
+  </div>
+
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
     <label class="control-label" for="id_password">{% trans "Password" %}</label>
     <div class="input-group input-group-lg">
@@ -66,7 +72,7 @@
         </button>
       </span>
     </div>
-    <p class="help-block small hidden">{% trans "Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username or email address." %}</p>
+    <p class="help-block small hidden">{% trans "Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username or email address or phone." %}</p>
     <div class="error-block">{{ form.password.errors }}</div>
   </div>
 
