@@ -37,13 +37,7 @@
               aria-haspopup="true" aria-expanded="false">
                 <img src="/static/img/avatar.jpg" class="avatar thumbnail">
                 <span class="visible-xs-inline glyphicon glyphicon-user"></span>
-                <span class="username visible-sm-inline visible-md-inline visible-lg-inline">
-                  {% if user.full_name %}
-                  {{ user.full_name }}
-                  {% else %}
-                  {{ user.username }}
-                  {% endif %}
-                </span>
+                <span class="username visible-sm-inline visible-md-inline visible-lg-inline">{{ user.get_display_name }}</span>
                 {% if is_superuser %}
                   <span class="badge" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'You have superuser permissions' %}">SU</span>
                 {% endif %}

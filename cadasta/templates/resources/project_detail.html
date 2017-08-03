@@ -48,7 +48,7 @@
                   </tr>
                   <tr>
                     <td class="small text-nowrap">{% trans "Uploaded on" %}:</td>
-                    <td class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.full_name %}{{ date }} by {{ user }}{% endblocktrans %}</td>
+                    <td class="small">{% blocktrans with date=resource.last_updated user=resource.contributor.get_display_name %}{{ date }} by {{ user }}{% endblocktrans %}</td>
                   </tr>
                 </table>
               </div>
