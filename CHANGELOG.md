@@ -1,5 +1,51 @@
 # Change Log
 
+## [v1.11.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.11.0-alpha.1) (2017-07-31)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.10.0...v1.11.0-alpha.1)
+
+**Fixed bugs:**
+
+- Date are inconsistent between display/edit in location [\#1434](https://github.com/Cadasta/cadasta-platform/issues/1434)
+- Inline Manual Icon floats in middle of map; should be to the side [\#1647](https://github.com/Cadasta/cadasta-platform/issues/1647)
+- Incorrect relevant conditions in questionnaires not detected when uploading a xlsform [\#1638](https://github.com/Cadasta/cadasta-platform/issues/1638)
+- Possible to upload a xlsform with an invalid form\_id value [\#1634](https://github.com/Cadasta/cadasta-platform/issues/1634)
+- Plus, minus and other forbidden chars are allowed in text attributes when they are not at the beginning of the string [\#1631](https://github.com/Cadasta/cadasta-platform/issues/1631)
+- Superuser badge doesn't appear [\#1628](https://github.com/Cadasta/cadasta-platform/issues/1628)
+- Getting a platform error when accessing to a location  [\#1579](https://github.com/Cadasta/cadasta-platform/issues/1579)
+- Add translation ability for required questions \(party\_type, party\_name, etc\) [\#1261](https://github.com/Cadasta/cadasta-platform/issues/1261)
+
+**Closed issues:**
+
+- Text Sanitation Bug:: Trying to Upload Form with '---' in the Label to work around the lack of visibility logic on the web [\#1669](https://github.com/Cadasta/cadasta-platform/issues/1669)
+- Add language preference dropdown to registration [\#1654](https://github.com/Cadasta/cadasta-platform/issues/1654)
+- Refactor of project exports using async i/o  [\#1639](https://github.com/Cadasta/cadasta-platform/issues/1639)
+- Ability to add parties without relationships [\#1581](https://github.com/Cadasta/cadasta-platform/issues/1581)
+- Add default unit of measurement to user dashboard [\#1481](https://github.com/Cadasta/cadasta-platform/issues/1481)
+- Add default language selector to user dashboard [\#1480](https://github.com/Cadasta/cadasta-platform/issues/1480)
+- Define requirements for user dashboard [\#1478](https://github.com/Cadasta/cadasta-platform/issues/1478)
+- Project Dashboard [\#1447](https://github.com/Cadasta/cadasta-platform/issues/1447)
+- Resources: Support more MIME types [\#1135](https://github.com/Cadasta/cadasta-platform/issues/1135)
+- Automatic calculation of a polygon area \(for project locations\) [\#811](https://github.com/Cadasta/cadasta-platform/issues/811)
+
+**Merged pull requests:**
+
+- Add file-size limits to resource uploads [\#1675](https://github.com/Cadasta/cadasta-platform/pull/1675) ([oliverroick](https://github.com/oliverroick))
+- Modified data format for query data picker [\#1674](https://github.com/Cadasta/cadasta-platform/pull/1674) ([clash99](https://github.com/clash99))
+- Add party without relationship [\#1668](https://github.com/Cadasta/cadasta-platform/pull/1668) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- add language dropdown at registration [\#1660](https://github.com/Cadasta/cadasta-platform/pull/1660) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Adds more allowed mime types [\#1659](https://github.com/Cadasta/cadasta-platform/pull/1659) ([oliverroick](https://github.com/oliverroick))
+- Add user avatar using directly S3 [\#1655](https://github.com/Cadasta/cadasta-platform/pull/1655) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Use user.is\_superuser to identify superusers [\#1651](https://github.com/Cadasta/cadasta-platform/pull/1651) ([oliverroick](https://github.com/oliverroick))
+- Log and pass on TooBig errors from Memcached \(fixes \#1579\) [\#1650](https://github.com/Cadasta/cadasta-platform/pull/1650) ([alukach](https://github.com/alukach))
+- Update changelog for v1.10.0 [\#1644](https://github.com/Cadasta/cadasta-platform/pull/1644) ([amplifi](https://github.com/amplifi))
+- Tab css and padding fix [\#1642](https://github.com/Cadasta/cadasta-platform/pull/1642) ([clash99](https://github.com/clash99))
+- Fix \#1638: Check for xlsform relevant clause syntax errors [\#1641](https://github.com/Cadasta/cadasta-platform/pull/1641) ([bjohare](https://github.com/bjohare))
+- Fix \#1634: Possible to upload a form with invalid form\_id [\#1640](https://github.com/Cadasta/cadasta-platform/pull/1640) ([bjohare](https://github.com/bjohare))
+- Add backend-tooling for asynchronous tasks [\#1624](https://github.com/Cadasta/cadasta-platform/pull/1624) ([alukach](https://github.com/alukach))
+- Update changelog v1.10-alpha.1 [\#1623](https://github.com/Cadasta/cadasta-platform/pull/1623) ([amplifi](https://github.com/amplifi))
+- VerificationDevice model and Removal of 48hr email verification period [\#1606](https://github.com/Cadasta/cadasta-platform/pull/1606) ([valaparthvi](https://github.com/valaparthvi))
+- Automatic calculation of a polygon area [\#1534](https://github.com/Cadasta/cadasta-platform/pull/1534) ([jnordling](https://github.com/jnordling))
+
 ## [v1.10.0](https://github.com/Cadasta/cadasta-platform/tree/v1.10.0) (2017-07-04)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.10-alpha.1...v1.10.0)
 
