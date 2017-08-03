@@ -1,4 +1,3 @@
-from . import models as spatial_models
 from .exceptions import SpatialRelationshipError
 from party.managers import BaseRelationshipManager
 
@@ -11,25 +10,17 @@ class SpatialRelationshipManager(BaseRelationshipManager):
         su1 = kwargs['su1']
         su2 = kwargs['su2']
         project = kwargs['project']
-        if (su1.geometry is not None and
-                su2.geometry is not None):
-
-            if (kwargs['type'] == 'C' and
-                    su1.geometry.geom_type == 'Polygon'):
-                result = spatial_models.SpatialUnit.objects.filter(
-                    id=su1.id
-                ).filter(
-                    geometry__contains=su2.geometry
-                )
-
-                if len(result) != 0:
-                    self.check_project_constraints(
-                        project=project, left=su1, right=su2)
-                    return super().create(**kwargs)
-                else:
-                    raise SpatialRelationshipError(
-                        """That selected location is not geographically
-                        contained within the parent location""")
+        rel_error = (
+            kwargs['type'] == 'C' and
+            su1.geometry is not None and
+            su2.geometry is not None and
+            su1.geometry.geom_type == 'Polygon' and
+            not su1.geometry.contains(su2.geometry)
+        )
+        if rel_error:
+            raise SpatialRelationshipError(
+                "That selected location is not geographically "
+                "contained within the parent location")
         self.check_project_constraints(
             project=project, left=su1, right=su2)
         return super().create(**kwargs)

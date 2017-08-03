@@ -39,8 +39,9 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
     # Spatial unit geometry is optional: some spatial units may only
     # have a textual description of their location.
-    geometry = GeometryField(null=True)
+    geometry = GeometryField(null=True, geography=True)
 
+    # Area, auto-calculated via trigger (see spatial/migrations/#0005)
     area = models.FloatField(null=True)
 
     # JSON attributes field with management of allowed members.
@@ -170,20 +171,22 @@ def check_extent(sender, instance, **kwargs):
     # (https://trac.osgeo.org/geos/ticket/680)
     # TODO: Rm this check when we're using Django 1.11+ or libgeos 3.6.1+
     # https://github.com/django/django/commit/b90d72facf1e4294df1c2e6b51b26f6879bf2992#diff-181a3ea304dfaf57f1e1d680b32d2b76R248
-    from django.contrib.gis.geos.polygon import Polygon
+    from django.contrib.gis.geos import Polygon
     if isinstance(geom, Polygon) and geom.empty:
         instance.geometry = None
-
     if geom and not geom.empty:
         reassign_spatial_geometry(instance)
 
 
-@receiver(models.signals.pre_save, sender=SpatialUnit)
-def calculate_area(sender, instance, **kwargs):
+@receiver(models.signals.post_save, sender=SpatialUnit)
+def refresh_area(sender, instance, **kwargs):
+    """ Ensure DB-generated area is set on instance """
+    from django.contrib.gis.geos import MultiPolygon, Polygon
     geom = instance.geometry
-    from django.contrib.gis.geos.polygon import Polygon
-    if geom and isinstance(geom, Polygon) and geom.valid:
-        instance.area = geom.transform(3857, clone=True).area
+    if not isinstance(geom, (MultiPolygon, Polygon)):
+        return
+    qs = type(instance)._default_manager.filter(id=instance.id)
+    instance.area = qs.values_list('area', flat=True)[0]
 
 
 @fix_model_for_attributes
