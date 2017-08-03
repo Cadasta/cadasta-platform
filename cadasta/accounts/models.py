@@ -156,7 +156,7 @@ class VerificationDevice(Device):
                    "The next token must be at a higher counter value."
                    "It makes sure a token is used only once.")
     )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     verified = models.BooleanField(default=False)
 
     step = settings.TOTP_TOKEN_VALIDITY
@@ -183,18 +183,18 @@ class VerificationDevice(Device):
         message = message.format(
             token_value=token, time_validity=self.step // 60)
 
-        logger.info("Token has been sent to %s " % self.unverified_phone)
-        logger.info("%s" % message)
+        logger.debug("Token has been sent to %s " % self.unverified_phone)
+        logger.debug("%s" % message)
 
         return token
 
-    def verify_token(self, token):
+    def verify_token(self, token, tolerance=0):
         totp = self.totp_obj()
         if ((totp.t() > self.last_verified_counter) and
-                (totp.token() == token)):
+                (totp.verify(token, tolerance=tolerance))):
             self.last_verified_counter = totp.t()
-            verified = True
+            self.verified = True
             self.save()
         else:
-            verified = False
-        return verified
+            self.verified = False
+        return self.verified
