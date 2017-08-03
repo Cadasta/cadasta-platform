@@ -153,3 +153,7 @@ body.tinted-bg { // photo for login and register forms
   background-color: $state-danger-bg;
   border-radius: 3px;
 }
+
+#profile .s3-buckets > .file-links > .file-link {
+  display: none;
+}
