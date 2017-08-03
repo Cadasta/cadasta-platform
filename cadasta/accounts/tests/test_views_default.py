@@ -2,7 +2,9 @@ import datetime
 from django.core.urlresolvers import reverse_lazy
 from django.test import TestCase
 from django.core import mail
+from django.conf import settings
 from skivvy import ViewTestCase
+from unittest import mock
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase

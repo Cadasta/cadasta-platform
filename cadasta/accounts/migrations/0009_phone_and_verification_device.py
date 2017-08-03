@@ -29,8 +29,8 @@ class Migration(migrations.Migration):
                 ('verified', models.BooleanField(default=False)),
             ],
             options={
-                'abstract': False,
                 'verbose_name': 'Verification Device',
+                'abstract': False,
             },
         ),
         migrations.RemoveField(
@@ -74,6 +74,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='verificationdevice',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]

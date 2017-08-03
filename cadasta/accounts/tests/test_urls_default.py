@@ -27,7 +27,6 @@ class UserUrlsTest(TestCase):
 
     def test_signup(self):
         assert reverse('account:register') == '/account/signup/'
-
         resolved = resolve('/account/signup/')
         assert resolved.func.__name__ == default.AccountRegister.__name__
 
