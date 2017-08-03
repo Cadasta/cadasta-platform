@@ -12,20 +12,8 @@ from jsonattrs.models import create_attribute_types
 
 from . import factories
 from .. import models
-from ..managers import (create_children, create_options, santize_form,
-                        check_relevant_clause)
+from ..managers import create_children, create_options, santize_form
 from ..messages import MISSING_RELEVANT
-
-
-class RelevantSyntaxValidationTest(TestCase):
-    def test_relevant_syntax_valid(self):
-        assert check_relevant_clause("${party_type}='IN'") is None
-
-    def test_relevant_syntax_invalid(self):
-        relevant = "${party_type='IN'}"
-        with pytest.raises(InvalidQuestionnaire) as e:
-            check_relevant_clause(relevant)
-        assert str(e.value) == "Invalid relevant clause: ${party_type='IN'}"
 
 
 class SanitizeFormTest(TestCase):
@@ -179,34 +167,6 @@ class CreateChildrenTest(TestCase):
             questionnaire=questionnaire,
             question_group__isnull=False).count() == 2
 
-    def test_invalid_relevant_clause_in_children(self):
-        questionnaire = factories.QuestionnaireFactory.create()
-        children = [{
-            'label': 'This form showcases the different question',
-            'name': 'intro',
-            'type': 'note'
-        }, {
-            'label': 'Text question type',
-            'name': 'text_questions',
-            'type': 'group',
-            'children': [
-                {
-                    'hint': 'Can be short or long but '
-                            'always one line (type = '
-                            'text)',
-                    'label': 'Text',
-                    'name': 'my_string',
-                    'type': 'text',
-                    'bind': {'relevant': '$geo_type="geoshape"'}  # invalid
-                }
-            ],
-        }]
-
-        with pytest.raises(InvalidQuestionnaire) as e:
-            create_children(children, kwargs={'questionnaire': questionnaire})
-
-        assert str(e.value) == 'Invalid relevant clause: $geo_type="geoshape"'
-
 
 class CreateOptionsTest(TestCase):
 
@@ -344,7 +304,7 @@ class QuestionGroupManagerTest(TestCase):
             'label': 'Basic Select question types',
             'name': 'select_questions',
             'type': 'group',
-            'bind': {'relevant': "${party_type}=”IN”"}
+            'bind': {'relevant': "${party_type}='IN'"}
         }
         questionnaire = factories.QuestionnaireFactory.create()
 
@@ -382,21 +342,6 @@ class QuestionGroupManagerTest(TestCase):
         assert model.type == 'repeat'
         assert model.question_groups.count() == 1
         assert questionnaire.question_groups.count() == 2
-
-    def test_invalid_relevant_clause(self):
-        question_group_dict = {
-            'label': 'Basic Select question types',
-            'name': 'select_questions',
-            'type': 'group',
-            'bind': {'relevant': "$party_type='IN'"}  # invalid
-        }
-        questionnaire = factories.QuestionnaireFactory.create()
-        with pytest.raises(InvalidQuestionnaire) as e:
-            models.QuestionGroup.objects.create_from_dict(
-                dict=question_group_dict,
-                questionnaire=questionnaire
-            )
-        assert str(e.value) == "Invalid relevant clause: $party_type='IN'"
 
 
 class QuestionManagerTest(TestCase):
@@ -452,27 +397,6 @@ class QuestionManagerTest(TestCase):
         assert model.label == question_dict['label']
         assert model.name == question_dict['name']
         assert model.type == 'IN'
-
-    def test_invalid_relevant_clause(self):
-        question_dict = {
-            'hint': 'For this field (type=integer)',
-            'label': 'Integer',
-            'name': 'my_int',
-            'type': 'integer',
-            'default': 'default val',
-            'hint': 'An informative hint',
-            'bind': {
-                'relevant': "$party_id='abc123'",  # invalid
-                'required': 'yes'
-            }
-        }
-        questionnaire = factories.QuestionnaireFactory.create()
-        with pytest.raises(InvalidQuestionnaire) as e:
-            models.Question.objects.create_from_dict(
-                dict=question_dict,
-                questionnaire=questionnaire
-            )
-        assert str(e.value) == "Invalid relevant clause: $party_id='abc123'"
 
 
 class MultilingualQuestionnaireTest(UserTestCase, FileStorageTestCase,

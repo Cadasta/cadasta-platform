@@ -265,7 +265,7 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
                     "default": None,
                     "hint": None,
                     "index": 1,
-                    "relevant": None
+                    "relevant": "${start}>='IN'"
                 },
                 {
                     "id": "rw7mt32858cu2w5urbf9z3a4",
@@ -593,9 +593,6 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
                     "label": "Label",
                     "type": 'group',
                     "index": 13,
-                    "bind": {
-                        "relevant": "$party_type='IN'"
-                    },
                     "questions": [
                         {
                             "id": "8v5znbuyvtyinsdd96ytyrui",
@@ -962,37 +959,6 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert questionnaire.question_groups.count() == 7
         assert Attribute.objects.count() == 13
 
-    def test_invalid_relevant_clause(self):
-        data = {
-            'title': 'yx8sqx6488wbc4yysnkrbnfq',
-            'id_string': 'yx8sqx6488wbc4yysnkrbnfq',
-            'default_language': 'en',
-            'questions': [{
-                'name': "start",
-                'label': 'Label',
-                'type': "ST",
-                'required': False,
-                'constraint': None,
-                'index': 0,
-                'relevant': "$party_type='IN'"
-            }, {
-                'name': "end",
-                'label': 'Label',
-                'type': "EN",
-                'index': 1
-            }]
-        }
-        project = ProjectFactory.create()
-
-        serializer = serializers.QuestionnaireSerializer(
-            data=data,
-            context={'project': project}
-        )
-        serializer.is_valid(raise_exception=True)
-        with pytest.raises(InvalidQuestionnaire) as e:
-            serializer.save()
-        assert str(e.value) == "Invalid relevant clause: $party_type='IN'"
-
 
 class QuestionGroupSerializerTest(UserTestCase, TestCase):
     def test_serialize(self):
@@ -1221,30 +1187,6 @@ class QuestionGroupSerializerTest(UserTestCase, TestCase):
         assert questionnaire.question_groups.count() == 1
         assert Attribute.objects.get(name='number').default == '0'
 
-    def test_question_group_with_invalid_relevant(self):
-        questionnaire = factories.QuestionnaireFactory.create()
-        data = [{
-            'label': 'A group',
-            'name': 'party_attributes_individual',
-            "relevant": "$party_type='IN'",
-            'questions': [{
-                'name': "start",
-                'label': 'Start',
-                'type': "TX",
-                'index': 0
-            }]
-        }]
-        serializer = serializers.QuestionGroupSerializer(
-            data=data,
-            many=True,
-            context={'questionnaire_id': questionnaire.id,
-                     'project': questionnaire.project,
-                     'default_language': 'en'})
-        serializer.is_valid(raise_exception=True)
-        with pytest.raises(InvalidQuestionnaire) as e:
-            serializer.save()
-        assert str(e.value) == "Invalid relevant clause: $party_type='IN'"
-
 
 class QuestionSerializerTest(TestCase):
     def test_serialize(self):
@@ -1383,22 +1325,6 @@ class QuestionSerializerTest(TestCase):
                 assert q.label == 'Another question'
                 assert q.type == 'S1'
                 assert q.options.count() == 1
-
-    def test_create_question_with_invalid_relevant(self):
-        questionnaire = factories.QuestionnaireFactory.create()
-        data = {
-            'label': 'A question',
-            'name': 'question',
-            'type': 'TX',
-            'relevant': "$party_type='IN'"
-        }
-        serializer = serializers.QuestionSerializer(
-            data=data,
-            context={'questionnaire_id': questionnaire.id})
-        serializer.is_valid(raise_exception=True)
-        with pytest.raises(InvalidQuestionnaire) as e:
-            serializer.save()
-        assert str(e.value) == "Invalid relevant clause: $party_type='IN'"
 
 
 class QuestionOptionSerializerTest(TestCase):
