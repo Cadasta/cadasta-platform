@@ -24,3 +24,14 @@ class UserUrlsTest(TestCase):
         resolved = resolve('/account/confirm-email/123/')
         assert resolved.func.__name__ == default.ConfirmEmail.__name__
         assert resolved.kwargs['key'] == '123'
+
+    def test_signup(self):
+        assert reverse('account:register') == '/account/signup/'
+        resolved = resolve('/account/signup/')
+        assert resolved.func.__name__ == default.AccountRegister.__name__
+
+    def test_verify_phone(self):
+        assert reverse(
+            'account:verify_phone') == '/account/accountverification/'
+        resolved = resolve('/account/accountverification/')
+        assert resolved.func.__name__ == default.ConfirmPhone.__name__

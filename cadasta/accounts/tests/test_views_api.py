@@ -4,7 +4,7 @@ from django.test import TestCase
 from skivvy import APITestCase
 
 from core.tests.utils.cases import UserTestCase
-from ..models import User
+from ..models import User, VerificationDevice
 from ..views import api as api_views
 
 from .factories import UserFactory
@@ -74,6 +74,7 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
+            'phone': '+919327768250',
             'password': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }
@@ -94,6 +95,33 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 400
         assert User.objects.count() == 0
         assert len(mail.outbox) == 0
+        assert VerificationDevice.objects.count() == 0
+
+    def test_user_signs_up_with_phone_only(self):
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+919327768250',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 201
+        assert User.objects.count() == 1
+        assert VerificationDevice.objects.count() == 1
+
+    def test_user_signs_up_with_email_only(self):
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 201
+        assert User.objects.count() == 1
+        assert len(mail.outbox) == 1
 
 
 class AccountLoginTest(APITestCase, UserTestCase, TestCase):
