@@ -1,3 +1,6 @@
+import os
+from django.conf import settings
+from . import io
 from PIL import Image
 
 
@@ -91,3 +94,30 @@ def fix_orientation(img):
         return img
     else:
         return img
+
+
+def create_image_thumbnails(instance, s3_image_field_name, size=(150, 150)):
+    """Creates a thumbnail of an image file stored in a S3FileField. It takes
+    an instance of any model, the string of the S3 field name, and a tuple
+    with the desired thumbnail size in pixels (w, h).
+    """
+    image_field = getattr(instance, s3_image_field_name, None)
+    if not image_field or not image_field.url:
+        return
+
+    io.ensure_dirs()
+    image_basename = os.path.basename(image_field.url)
+    name, ext = os.path.splitext(image_basename)
+    thumb_name = name + '-%dx%d' % size + ext
+
+    temp_thumb_path = os.path.join(settings.MEDIA_ROOT, 'temp', thumb_name)
+    upload_path = thumb_name
+
+    file = image_field.open()
+    make(file, size).save(temp_thumb_path)
+
+    if image_field.field.upload_to:
+        upload_path = os.path.join(image_field.field.upload_to, thumb_name)
+
+    with open(temp_thumb_path, 'rb') as thumb_file:
+        image_field.storage.save(upload_path, thumb_file.read())

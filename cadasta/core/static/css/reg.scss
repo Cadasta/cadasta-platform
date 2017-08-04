@@ -128,24 +128,26 @@ body.tinted-bg { // photo for login and register forms
 /* =S3 avatar image-upload work
 -------------------------------------------------------------- */
 #preview-box {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   background-color: white;
   border-radius: 3px;
   overflow: hidden;
   position: relative;
-  text-align: center;
-}
+  text-align: center; }
 
 #avatar-preview {
   width: auto;
-  height: 200px;
+  height: 150px;
   position: absolute;
   top: -9999px;
   bottom: -9999px;
   left: -9999px;
   right: -9999px;
-  margin: auto;
+  margin: auto; }
+
+.s3-buckets .file-input {
+  margin-bottom: 0;
 }
 
 .s3-buckets > ul.errors {

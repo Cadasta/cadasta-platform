@@ -1,3 +1,4 @@
+import os
 from buckets.fields import S3FileField
 from datetime import datetime, timezone, timedelta
 from django.conf import settings
@@ -14,6 +15,7 @@ from tutelary.decorators import permissioned_model
 
 from simple_history.models import HistoricalRecords
 from .manager import UserManager
+from resources.utils.thumbnail import create_image_thumbnails
 
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
@@ -63,6 +65,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
         verbose_name_plural = _('users')
 
     objects = UserManager()
+    __original_avatar_url = None
+    _thumb_size = (150, 150)
 
     class TutelaryMeta:
         perm_type = 'user'
@@ -74,6 +78,10 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                    ('user.update',
                     {'error_message':
                      _("You don't have permission to update user details")})]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_avatar_url = self.avatar_url
 
     def __repr__(self):
         repr_string = ('<User username={obj.username}'
@@ -96,7 +104,31 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 
     @property
     def avatar_url(self):
-        return self.avatar.url or settings.DEFAULT_AVATAR
+        if not self.avatar or not self.avatar.url:
+            return settings.DEFAULT_AVATAR
+        return self.avatar.url
+
+    @property
+    def avatar_thumbnail(self):
+        if not self._avatar_is_custom:
+            return settings.DEFAULT_AVATAR
+        if not hasattr(self, '_thumbnail'):
+            base_url, ext = os.path.splitext(self.avatar_url)
+            self._thumbnail = base_url + '-%dx%d' % self._thumb_size + ext
+        return self._thumbnail
+
+    @property
+    def _avatar_has_changed(self):
+        return self.avatar_url != self.__original_avatar_url
+
+    @property
+    def _avatar_is_custom(self):
+        return self.avatar_url != settings.DEFAULT_AVATAR
+
+    def save(self, *args, **kwargs):
+        if self._avatar_has_changed and self._avatar_is_custom:
+            create_image_thumbnails(self, 'avatar', self._thumb_size)
+        super().save(*args, **kwargs)
 
 
 @receiver(models.signals.post_save, sender=User)
