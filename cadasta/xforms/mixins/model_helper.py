@@ -1,5 +1,8 @@
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.files.storage import get_storage_class
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.db import models as geo_models
+from django.db.models.functions import Cast
 from django.db import transaction
 from django.utils.translation import ugettext as _
 from jsonattrs.models import Attribute, AttributeType
@@ -151,22 +154,28 @@ class ModelHelper():
         location_resources = []
         location_objects = []
 
-        if duplicate:
-            get_or_create_spatial_units = duplicate.spatial_units.get
-        else:
-            get_or_create_spatial_units = SpatialUnit.objects.create
-
         try:
             location_group = self._format_repeat(data, ['location'])
 
             for group in location_group:
                 geom = self._format_geometry(group)
-                location = get_or_create_spatial_units(
+
+                attrs = dict(
                     project=project,
                     type=group['location_type'],
-                    geometry=geom,
                     attributes=self._get_attributes(group, 'location')
                 )
+
+                if duplicate:
+                    geom_type = GEOSGeometry(geom).geom_type
+                    GeometryField = getattr(geo_models, geom_type + 'Field')
+
+                    location = duplicate.spatial_units.annotate(
+                        geom=Cast('geometry', GeometryField())
+                    ).get(geom=geom, **attrs)
+                else:
+                    location = SpatialUnit.objects.create(geometry=geom,
+                                                          **attrs)
 
                 location_resources.append(
                     self._get_resource_names(group, location, 'location')
