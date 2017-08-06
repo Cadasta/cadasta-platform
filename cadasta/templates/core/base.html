@@ -196,54 +196,59 @@
     </div>
     {% block modals %} {% endblock %}
 
+    <!-- <script type="text/javascript" src="{% static 'babel-polyfill/6.26.0/polyfill.min.js' %}"></script> -->
     <script type="text/javascript" src="{% static 'datatables/1.10.8/js/datatables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    <script src="{% static 'js/parsleyConfig.js' %}"></script>
-    <script src="{% static 'js/parsley.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/parsleyConfig.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/parsley.js' %}"></script>
 
     {% block extra_script %}{% endblock %}
     <script>
-    $(document).ready(function () {
-      $('.datatable').DataTable({
-        conditionalPaging: true,
-        "dom": '<"table-search clearfix"f>t<"table-pagination"p><"table-entries"i><"table-num"l>',
-        "language": {
-          "emptyTable":     "{% trans "No data available in table" %}",
-          "info":           "{% trans "Showing _START_ - _END_ of _TOTAL_" %}",
-          "infoEmpty":      "{% trans "Showing 0 - 0 of 0" %}",
-          "infoFiltered":   "{% trans "(filtered from _MAX_ total rows)" %}",
-          "lengthMenu":     '<select class="form-control input-sm">'+
-                            ' <option value="10">{% trans "10 per page" %}</option>'+
-                            ' <option value="25">{% trans "25 per page" %}</option>'+
-                            ' <option value="50">{% trans "50 per page" %}</option>'+
-                            ' <option value="100">{% trans "100 per page" %}</option>'+
-                            '</select>',
-          "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
-          "searchPlaceholder": '{% trans "Search" %}',
-          "zeroRecords":    "{% trans "No matching records found" %}",
-          "paginate": {
-            "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
-            "previous": '<span class="glyphicon glyphicon-triangle-left"></span>',
-            "first":      "{% trans "First" %}",
-            "last":       "{% trans "Last" %}"
-          },
-          "aria": {
-            "sortAscending":  ": {% trans "activate to sort column ascending" %}",
-            "sortDescending": ": {% trans "activate to sort column descending" %}"
+      $(document).ready(function () {
+        $('.datatable').DataTable({
+          conditionalPaging: true,
+          "dom": '<"table-search clearfix"f>t<"table-pagination"p><"table-entries"i><"table-num"l>',
+          "language": {
+            "emptyTable":     "{% trans "No data available in table" %}",
+            "info":           "{% trans "Showing _START_ - _END_ of _TOTAL_" %}",
+            "infoEmpty":      "{% trans "Showing 0 - 0 of 0" %}",
+            "infoFiltered":   "{% trans "(filtered from _MAX_ total rows)" %}",
+            "lengthMenu":     '<select class="form-control input-sm">'+
+                              ' <option value="10">{% trans "10 per page" %}</option>'+
+                              ' <option value="25">{% trans "25 per page" %}</option>'+
+                              ' <option value="50">{% trans "50 per page" %}</option>'+
+                              ' <option value="100">{% trans "100 per page" %}</option>'+
+                              '</select>',
+            "search": '<div class="input-group"><span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>',
+            "searchPlaceholder": '{% trans "Search" %}',
+            "zeroRecords":    "{% trans "No matching records found" %}",
+            "paginate": {
+              "next": '<span class="glyphicon glyphicon-triangle-right"></span>',
+              "previous": '<span class="glyphicon glyphicon-triangle-left"></span>',
+              "first":      "{% trans "First" %}",
+              "last":       "{% trans "Last" %}"
+            },
+            "aria": {
+              "sortAscending":  ": {% trans "activate to sort column ascending" %}",
+              "sortDescending": ": {% trans "activate to sort column descending" %}"
+            }
           }
-        }
+        });
+        $('.dropdown-toggle').dropdown();
+        $('#language').change(function() { this.form.submit(); });
+        $('[data-parsley-required="true"]')
+          .closest('.form-group')
+            .children('label.control-label')
+              .addClass('required');
       });
-      $('.dropdown-toggle').dropdown();
-      $('#language').change(function() { this.form.submit(); });
-      $('[data-parsley-required="true"]')
-        .closest('.form-group')
-          .children('label.control-label')
-            .addClass('required');
-    });
-    window.setTimeout(function() {
-      $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
-    }, 5000);
+      window.setTimeout(function() {
+        $(".alert-success")
+          .fadeTo(500, 0)
+          .slideUp(500, function(){
+            $(this).hide();
+          });
+      }, 5000);
     </script>
     <script>
       // User tracking
