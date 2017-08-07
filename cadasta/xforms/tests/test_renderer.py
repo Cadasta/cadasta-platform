@@ -14,6 +14,7 @@ class XFormRendererTest(TestCase):
             'default': 'some default',
             'hint': 'An informative hint',
             'relevant': '${party_id}="abc123"',
+            'gps_accuracy': 1.5,
             'options': [{
                 'id': "d9pkepyjg4sgaepdytgwkgfv",
                 'name': "WR",
@@ -43,6 +44,7 @@ class XFormRendererTest(TestCase):
                 assert q['choices'] == questions[0]['options']
                 assert q['bind']['required'] == 'yes'
                 assert q['bind']['relevant'] == '${party_id}="abc123"'
+                assert q['control']['accuracyThreshold'] == 1.5
                 assert q['default'] == 'some default'
                 assert q['hint'] == 'An informative hint'
 
