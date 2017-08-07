@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
-from .models import Question
+from .choices import QUESTION_TYPES
 
 
 QUESTIONNAIRE_SCHEMA = {
@@ -19,7 +19,7 @@ QUESTION_SCHEMA = {
     'label': {'type': 'string'},
     'type': {'type': 'string',
              'required': True,
-             'enum': [c[0] for c in Question.TYPE_CHOICES]},
+             'enum': [c[0] for c in QUESTION_TYPES]},
     'required': {'type': 'boolean'},
     'constraint': {'type': 'string'},
     'index': {'type': 'integer', 'required': True}

@@ -9,7 +9,7 @@ from django.contrib.postgres.fields import JSONField
 from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
 
-from . import managers, messages
+from . import managers, messages, choices
 
 
 class MultilingualLabelsMixin:
@@ -123,37 +123,9 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
     class Meta:
         ordering = ('index',)
 
-    TYPE_CHOICES = (('IN', 'integer'),
-                    ('DE', 'decimal'),
-                    ('TX', 'text'),
-                    ('S1', 'select one'),
-                    ('SM', 'select all that apply'),
-                    ('NO', 'note'),
-                    ('GP', 'geopoint'),
-                    ('GT', 'geotrace'),
-                    ('GS', 'geoshape'),
-                    ('DA', 'date'),
-                    ('TI', 'time'),
-                    ('DT', 'dateTime'),
-                    ('CA', 'calculate'),
-                    ('AC', 'acknowledge'),
-                    ('PH', 'photo'),
-                    ('AU', 'audio'),
-                    ('VI', 'video'),
-                    ('BC', 'barcode'),
-
-                    # Meta data
-                    ('ST', 'start'),
-                    ('EN', 'end'),
-                    ('TD', 'today'),
-                    ('DI', 'deviceid'),
-                    ('SI', 'subsciberid'),
-                    ('SS', 'simserial'),
-                    ('PN', 'phonenumber'))
-
     name = models.CharField(max_length=100)
     label_xlat = JSONField(default={})
-    type = models.CharField(max_length=2, choices=TYPE_CHOICES)
+    type = models.CharField(max_length=2, choices=choices.QUESTION_TYPES)
     required = models.BooleanField(default=False)
     default = models.CharField(max_length=100, null=True, blank=True)
     hint = models.CharField(max_length=2500, null=True, blank=True)

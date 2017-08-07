@@ -11,11 +11,11 @@ from .messages import MISSING_RELEVANT
 from .exceptions import InvalidQuestionnaire
 from .validators import validate_questionnaire
 from .managers import fix_labels
-from . import models
+from . import models, choices
 
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
-QUESTION_TYPES = dict(models.Question.TYPE_CHOICES)
+QUESTION_TYPES = dict(choices.QUESTION_TYPES)
 
 
 def create_questions(questions, context):
