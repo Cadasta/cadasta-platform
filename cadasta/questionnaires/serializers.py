@@ -7,9 +7,9 @@ from django.db.utils import IntegrityError
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
-from .messages import MISSING_RELEVANT
+from .messages import MISSING_RELEVANT, INVALID_ACCURACY
 from .exceptions import InvalidQuestionnaire
-from .validators import validate_questionnaire
+from .validators import validate_questionnaire, validate_accuracy
 from .managers import fix_labels
 from . import models, choices
 
@@ -75,9 +75,15 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Question
         fields = ('id', 'name', 'label', 'type', 'required', 'constraint',
-                  'default', 'hint', 'relevant', 'label_xlat', 'index', )
+                  'default', 'hint', 'relevant', 'label_xlat', 'index',
+                  'gps_accuracy')
         read_only_fields = ('id', )
         write_only_fields = ('label_xlat', )
+
+    def validate_gps_accuracy(self, value):
+        if value and not validate_accuracy(value):
+            raise serializers.ValidationError(INVALID_ACCURACY)
+        return value
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)

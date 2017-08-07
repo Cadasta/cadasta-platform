@@ -1193,7 +1193,8 @@ class QuestionSerializerTest(TestCase):
         question = factories.QuestionFactory.create(
             default='some default',
             hint='An informative hint',
-            relevant='${party_id}="abc123"'
+            relevant='${party_id}="abc123"',
+            gps_accuracy=1.5
         )
         serializer = serializers.QuestionSerializer(question)
 
@@ -1206,6 +1207,7 @@ class QuestionSerializerTest(TestCase):
         assert serializer.data['default'] == question.default
         assert serializer.data['hint'] == question.hint
         assert serializer.data['relevant'] == question.relevant
+        assert serializer.data['gps_accuracy'] == question.gps_accuracy
         assert 'options' not in serializer.data
         assert 'questionnaire' not in serializer.data
         assert 'question_group' not in serializer.data
@@ -1252,7 +1254,8 @@ class QuestionSerializerTest(TestCase):
         data = {
             'label': 'A question',
             'name': 'question',
-            'type': 'TX'
+            'type': 'TX',
+            'gps_accuracy': 1.5
         }
         serializer = serializers.QuestionSerializer(
             data=data,
@@ -1264,6 +1267,21 @@ class QuestionSerializerTest(TestCase):
         assert question.label == data['label']
         assert question.type == data['type']
         assert question.name == data['name']
+        assert question.gps_accuracy == data['gps_accuracy']
+
+    def test_create_question_with_invalid_accuracy(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        data = {
+            'label': 'A question',
+            'name': 'question',
+            'type': 'TX',
+            'gps_accuracy': -1.5
+        }
+        serializer = serializers.QuestionSerializer(
+            data=data,
+            context={'questionnaire_id': questionnaire.id})
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
 
     def test_with_options(self):
         questionnaire = factories.QuestionnaireFactory.create()
