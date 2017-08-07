@@ -15,7 +15,8 @@ from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
 from .choices import QUESTION_TYPES
 from .exceptions import InvalidQuestionnaire
-from .messages import MISSING_RELEVANT
+from .messages import MISSING_RELEVANT, INVALID_ACCURACY
+from .validators import validate_accuracy
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -304,10 +305,18 @@ class QuestionManager(models.Manager):
             relevant = bind.get('relevant', None)
             required = True if bind.get('required', 'no') == 'yes' else False
 
+        gps_accuracy = None
+        control = dict.get('control')
+        if control:
+            gps_accuracy = control.get('accuracyThreshold', None)
+            if gps_accuracy and not validate_accuracy(gps_accuracy):
+                raise(InvalidQuestionnaire([INVALID_ACCURACY]))
+
         instance.type = type_dict[dict.get('type')]
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
         instance.required = required
+        instance.gps_accuracy = gps_accuracy
         instance.constraint = dict.get('constraint')
         instance.default = dict.get('default', None)
         instance.hint = dict.get('hint', None)
