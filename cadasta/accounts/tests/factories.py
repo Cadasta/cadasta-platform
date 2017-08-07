@@ -13,11 +13,18 @@ class UserFactory(ExtendedFactory):
     password = ''
 
     @classmethod
-    def _prepare(cls, create, **kwargs):
+    def _build(cls, model_class, *args, **kwargs):
         password = kwargs.pop('password', None)
-        user = super(UserFactory, cls)._prepare(create, **kwargs)
+        user = super()._build(model_class, *args, **kwargs)
         if password:
             user.set_password(password)
-            if create:
-                user.save()
+        return user
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs):
+        password = kwargs.pop('password', None)
+        user = super()._create(model_class, *args, **kwargs)
+        if password:
+            user.set_password(password)
+            user.save()
         return user

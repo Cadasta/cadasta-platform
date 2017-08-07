@@ -25,20 +25,16 @@ class ResourceFactory(ExtendedFactory):
     project = factory.SubFactory(ProjectFactory)
 
     @classmethod
-    def _prepare(cls, create, **kwargs):
-        resource = super()._prepare(create, **kwargs)
-
-        if not resource.file.url:
+    def _after_postgeneration(cls, obj, create, results=None):
+        if not obj.file.url:
             storage = FakeS3Storage()
             file = open(path + '/resources/tests/files/image.jpg', 'rb')
             file_name = storage.save('resources/image.jpg', file.read())
             file.close()
 
-            resource.file = file_name
+            obj.file = file_name
             if create:
-                resource.save()
-
-        return resource
+                obj.save()
 
 
 class SpatialResourceFactory(ExtendedFactory):
