@@ -63,6 +63,10 @@ class ValidateIDStringTest(TestCase):
             "'id_string' cannot be blank or contain whitespace.")
 
 
+def positive(val):
+    return val > 1
+
+
 class ValidateSchemaTest(TestCase):
     SCHEMA = {
         'title': {
@@ -79,6 +83,17 @@ class ValidateSchemaTest(TestCase):
         },
         'no_code': {
             'type': 'string'
+        },
+        'function': {
+            'type': 'number',
+            'function': positive,
+        },
+        'function2': {
+            'type': 'number',
+            'function': positive,
+            'errors': {
+                'function': "Number must be positive"
+            }
         }
     }
 
@@ -94,13 +109,17 @@ class ValidateSchemaTest(TestCase):
         data = {
             'id_string': 123,
             'some_list': 'D',
-            'no_code': '<GotCode>'
+            'no_code': '<GotCode>',
+            'function': -1,
+            'function2': -1,
         }
         errors = validators.validate_schema(self.SCHEMA, data)
         assert 'This field is required.' in errors['title']
         assert 'Value must be of type string.' in errors['id_string']
         assert 'D is not an accepted value.' in errors['some_list']
         assert SANITIZE_ERROR in errors['no_code']
+        assert 'Validator positive did not validate.' in errors['function']
+        assert 'Number must be positive' in errors['function2']
 
 
 class QuestionnaireTestCase(TestCase):
@@ -271,13 +290,16 @@ class QuestionTestCase(TestCase):
             'required': False,
             'constraint': None,
             'options': [{'name': 'Name', 'index': 0}],
-            'index': 1
+            'index': 1,
+            'gps_accuracy': -1.5
         }]
         errors = validators.validate_questions(data)
-        assert errors == [{},
-                          {'name': ['This field is required.'],
-                           'options': [{'label': ['This field is required.']}]}
-                          ]
+        assert errors == [
+            {},
+            {'name': ['This field is required.'],
+             'options': [{'label': ['This field is required.']}],
+             'gps_accuracy': ['gps_accuracy must be positve float']}
+        ]
 
 
 class QuestionOptionTestCase(TestCase):
