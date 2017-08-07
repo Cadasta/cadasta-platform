@@ -10,6 +10,7 @@ from simple_history.models import HistoricalRecords
 from tutelary.decorators import permissioned_model
 
 from . import managers, messages, choices
+from .validators import validate_accuracy
 
 
 class MultilingualLabelsMixin:
@@ -128,6 +129,8 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
     type = models.CharField(max_length=2, choices=choices.QUESTION_TYPES)
     required = models.BooleanField(default=False)
     default = models.CharField(max_length=100, null=True, blank=True)
+    gps_accuracy = models.FloatField(null=True, blank=True,
+                                     validators=[validate_accuracy])
     hint = models.CharField(max_length=2500, null=True, blank=True)
     relevant = models.CharField(max_length=100, null=True, blank=True)
     constraint = models.CharField(max_length=50, null=True, blank=True)
