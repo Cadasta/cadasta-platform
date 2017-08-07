@@ -3,6 +3,24 @@ from core.messages import SANITIZE_ERROR
 from .. import validators
 
 
+class ValidateAccuracyTest(TestCase):
+    def test_positive_float(self):
+        assert validators.validate_accuracy(1.5) is True
+        assert validators.validate_accuracy('1.5') is True
+        assert validators.validate_accuracy(1) is True
+        assert validators.validate_accuracy('1') is True
+
+    def test_negative_float(self):
+        assert validators.validate_accuracy(-1.5) is False
+        assert validators.validate_accuracy('-1.5') is False
+        assert validators.validate_accuracy(-1) is False
+        assert validators.validate_accuracy('-1') is False
+
+    def test_wrong_type(self):
+        assert validators.validate_accuracy(True) is False
+        assert validators.validate_accuracy('Something') is False
+
+
 class ValidateTypeTest(TestCase):
     def test_validate_string(self):
         assert validators.validate_type('string', 'akshdk') is True

@@ -39,6 +39,23 @@ QUESTION_OPTION_SCHEMA = {
 }
 
 
+def validate_accuracy(val):
+    """Returns True if the provided value is a positive float. """
+
+    # bool can be casted to float that's why we check this first
+    if isinstance(val, bool):
+        return False
+
+    try:
+        val = float(val)
+        if val > 0:
+            return True
+    except ValueError:
+        pass
+
+    return False
+
+
 def validate_id_string(json):
     id_string = json.get('id_string', '')
     if not id_string or re.search(r"\s", id_string):
