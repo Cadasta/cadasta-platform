@@ -140,6 +140,11 @@ a > .glyphicon,
   text-decoration: none;
 }
 
+.btn-sm > .glyphicon {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 a:hover > .glyphicon,
 .btn:hover > .glyphicon {
   text-decoration: none;
@@ -529,6 +534,7 @@ table#select-list {
     position: relative;
     overflow: hidden;
     padding: 10px;
+    min-height: 78px;
     > .glyphicon {
       font-size: 56px;
       line-height: 70px;
@@ -549,8 +555,10 @@ table#select-list {
     }
     .tile-content {
       span {
-        font-size: 14px;
+        font-size: 13px;
+        text-align: right;
         display: block;
+        color: #fff;
         opacity: .70;
         -moz-opacity: .70;
         .glyphicon {
@@ -559,6 +567,7 @@ table#select-list {
       }
       .num {
         font-size: 35px;
+        line-height: 38px;
         text-align: right;
         opacity: 1;
         -moz-opacity: 1;
@@ -580,7 +589,7 @@ table#select-list {
   }
 }
 
-a.tile-box.btn, 
+a.tile-box.btn,
 .tile-box-shortcut {
   .tile-content-wrapper > .glyphicon {
       -webkit-transition: all .2s ease-in-out;
@@ -591,7 +600,7 @@ a.tile-box.btn,
   &:hover .tile-content-wrapper > .glyphicon {
     opacity: .70;
     -moz-opacity: .70;
-  } 
+  }
 }
 
 .tile-box.bg-white  { // for white backgrounds
@@ -648,7 +657,7 @@ a.tile-box.btn,
   }
 }
 .overlay-wrapper.map {
-  padding: 15px; 
+  padding: 15px;
   position: absolute;
   top: 0;
   left: 0;
@@ -659,7 +668,7 @@ a.tile-box.btn,
     background: rgba(255, 255, 255, 0.5);
     height: 100%;
     min-height: 100%;
-    padding: 40px 20% 0; 
+    padding: 40px 20% 0;
     margin-bottom: 0;
   }
 }
@@ -766,7 +775,7 @@ section {
   }
   .panel-heading {
     @include clearfix;
-    .glyphicon-cog, 
+    .glyphicon-cog,
     .glyphicon-plus {
       font-size: 18px;
       margin-top: 4px;
@@ -776,14 +785,14 @@ section {
       -moz-opacity: .50;
       float: right;
     }
-    a > .glyphicon-cog, 
+    a > .glyphicon-cog,
     a > .glyphicon-plus {
       -webkit-transition: all .2s ease-in-out;
       -moz-transition: all .2s ease-in-out;
       -ms-transition: all .2s ease-in-out;
       -o-transition: all .2s ease-in-out;
     }
-    a:hover > .glyphicon-cog, 
+    a:hover > .glyphicon-cog,
     a:hover > .glyphicon-plus {
       opacity: .90;
       -moz-opacity: .90;
@@ -820,7 +829,7 @@ section {
   }
   .panel-title-bordered {
     border-bottom: solid 1px $gray-light;
-    padding-bottom: 8px; 
+    padding-bottom: 8px;
     margin-bottom: 8px;
   }
   .panel-subtitle { // applied to h4
@@ -1030,13 +1039,19 @@ h1 .label {
   font-size: 16px;
 }
 
-.entity { // small entity title above link
+.entity, .area { // small entity title above link and area calculation following
   font-size: 14px;
   font-weight: normal;
   color: $gray-medium;
   display: block;
   text-transform: uppercase;
   letter-spacing: 0;
+}
+
+.area { // small area
+  font-size: 13px;
+  display: inline-block;
+  text-transform: none;
 }
 
 .text-wrap .entity { // map popovers

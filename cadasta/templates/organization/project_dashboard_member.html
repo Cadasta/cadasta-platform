@@ -55,7 +55,7 @@
                   <hr class="border-btm">
                   {% blocktrans %}
                   <p>For additional assistance, refer to the <a href="https://docs.cadasta.org/" target="_blank">platform documentation</a> – the answer you need may be in there.</p>
-                  {% endblocktrans %}              
+                  {% endblocktrans %}
                 </div>
               </div>
             </section>
@@ -72,6 +72,7 @@
                       <i class="glyphicon glyphicon-map-marker"></i>
                       <div class="tile-content">
                         <span class="num">{{ num_locations }}</span>
+                        {% if total_area %}<span class="area">{{ total_area | format_area:user.measurement | safe }}</span>{% endif %}
                       </div>
                     </div>
                   </a>
