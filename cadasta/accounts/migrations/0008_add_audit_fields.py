@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0003_add_change_pw'),
+        ('accounts', '0007_add_avatar_field'),
     ]
 
     operations = [

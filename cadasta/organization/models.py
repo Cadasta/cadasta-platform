@@ -331,6 +331,10 @@ class ProjectRole(RandomIDModel):
 
     history = HistoricalRecords()
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     class Meta:
         unique_together = ('project', 'user')
 

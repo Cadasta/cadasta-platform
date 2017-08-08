@@ -222,6 +222,10 @@ class ContentObject(RandomIDModel):
 
     history = HistoricalRecords()
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
 
 @permissioned_model
 class SpatialResource(RandomIDModel):

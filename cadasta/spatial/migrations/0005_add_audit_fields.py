@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('spatial', '0002_auto_20160712_1513'),
+        ('spatial', '0004_area_location_field'),
     ]
 
     operations = [

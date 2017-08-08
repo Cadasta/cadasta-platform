@@ -8,55 +8,77 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('organization', '0003_add_organizationrole_unique'),
+        ('party', '0003_convert_tenuretype_to_charfield'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalorganization',
+            model_name='historicalparty',
             name='created_date',
             field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='historicalorganizationrole',
-            name='created_date',
-            field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='historicalorganizationrole',
+            model_name='historicalparty',
             name='last_updated',
             field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='historicalproject',
+            model_name='historicalpartyrelationship',
             name='created_date',
             field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='organization',
+            model_name='historicalpartyrelationship',
+            name='last_updated',
+            field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='historicaltenurerelationship',
+            name='created_date',
+            field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='historicaltenurerelationship',
+            name='last_updated',
+            field=models.DateTimeField(blank=True, default='2016-01-01 00:00+00', editable=False),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='party',
             name='created_date',
             field=models.DateTimeField(auto_now_add=True, default='2016-01-01 00:00+00'),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='organizationrole',
-            name='created_date',
-            field=models.DateTimeField(auto_now_add=True, default='2016-01-01 00:00+00'),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='organizationrole',
+            model_name='party',
             name='last_updated',
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='project',
+            model_name='partyrelationship',
             name='created_date',
             field=models.DateTimeField(auto_now_add=True, default='2016-01-01 00:00+00'),
             preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='partyrelationship',
+            name='last_updated',
+            field=models.DateTimeField(auto_now=True),
+        ),
+        migrations.AddField(
+            model_name='tenurerelationship',
+            name='created_date',
+            field=models.DateTimeField(auto_now_add=True, default='2016-01-01 00:00+00'),
+            preserve_default=False,
+        ),
+        migrations.AddField(
+            model_name='tenurerelationship',
+            name='last_updated',
+            field=models.DateTimeField(auto_now=True),
         ),
     ]
