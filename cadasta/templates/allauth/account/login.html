@@ -5,7 +5,6 @@
 {% load account socialaccount %}
 
 {% block top-nav %}registration{% endblock %}
-{% block body-class %}{% if not redirect_field_value %} tinted-bg{% endif %}{% endblock %}
 
 {% block title %} | {% trans "Sign In" %}{% endblock %}
 
@@ -26,18 +25,18 @@
 </div>
 {% endif %}
 
-<form class="login-form form-narrow{% if redirect_field_value %} form-2col container{% endif %}" method="POST" action="{% url 'account_login' %}" data-parsley-validate>
- 
-  {% if redirect_field_value %}
+<form class="login-form form-narrow{% if '/projects/' in redirect_field_value %} form-2col container{% endif %}" method="POST" action="{% url 'account_login' %}" data-parsley-validate>
+
+  {% if '/projects/' in redirect_field_value %}
   <div class="col-md-6 form-text">
     <h1>{% blocktrans %}<span class="xlg">Hello.</span><br>Have we met?{% endblocktrans %}</h1>
     <p>{% trans "Because we care about protecting your sensitive data, you must sign in to verify you have the proper permission to view project information. Access to project data is restricted to current project members only.  Please sign in to continue." %}</p>
     <h2>{% trans "No account? No problem!" %}</h2>
-    <p>{% trans "Registration is free and easy." %} <a href="{% url 'account_signup' %}"><strong>{% trans "Create an account now." %}</strong></a></p>
+    <p>{% trans "Registration is free and easy." %} <a href="{% url 'account_signup' %}?next={{ redirect_field_value }}"><strong>{% trans "Create an account now." %}</strong></a></p>
   </div>
   <div class="col-md-6 form-container">
     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-  {% endif %} 
+  {% endif %}
 
     <div class="form-inner">
       <h1>{% trans "Sign in to your account" %}</h1>
@@ -77,11 +76,11 @@
 
       <p class="text-center">
         {% trans "Don't have an account?" %}
-        <a href="{% url 'account_signup' %}">{% trans "Register here" %}</a>
+        <a href="{% url 'account_signup' %}?next={{ redirect_field_value }}">{% trans "Register here" %}</a>
       </p>
     </div>
 
-  {% if redirect_field_value %}
+  {% if '/projects/' in redirect_field_value %}
   </div>
   {% endif %}
 
