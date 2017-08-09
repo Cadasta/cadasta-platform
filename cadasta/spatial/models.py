@@ -179,14 +179,13 @@ def check_extent(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=SpatialUnit)
-def refresh_area(sender, instance, **kwargs):
+def refresh_after_save(sender, instance, **kwargs):
     """ Ensure DB-generated area is set on instance """
     from django.contrib.gis.geos import MultiPolygon, Polygon
     geom = instance.geometry
     if not isinstance(geom, (MultiPolygon, Polygon)):
         return
-    qs = type(instance)._default_manager.filter(id=instance.id)
-    instance.area = qs.values_list('area', flat=True)[0]
+    instance.refresh_from_db()
 
 
 @fix_model_for_attributes
