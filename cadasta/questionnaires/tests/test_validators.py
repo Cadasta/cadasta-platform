@@ -64,7 +64,7 @@ class ValidateIDStringTest(TestCase):
 
 
 def positive(val):
-    return val > 1
+    return val > 0
 
 
 class ValidateSchemaTest(TestCase):
