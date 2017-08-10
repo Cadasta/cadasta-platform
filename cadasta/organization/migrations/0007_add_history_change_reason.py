@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('organization', '0004_remove_Pb_project_roles'),
+        ('organization', '0006_add_project_area_trigger'),
     ]
 
     operations = [

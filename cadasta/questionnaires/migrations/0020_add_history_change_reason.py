@@ -8,17 +8,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('spatial', '0004_area_location_field'),
+        ('questionnaires', '0019_add_gps_accuracy'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicalspatialrelationship',
+            model_name='historicalquestion',
             name='history_change_reason',
             field=models.CharField(max_length=100, null=True),
         ),
         migrations.AddField(
-            model_name='historicalspatialunit',
+            model_name='historicalquestiongroup',
+            name='history_change_reason',
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name='historicalquestionnaire',
+            name='history_change_reason',
+            field=models.CharField(max_length=100, null=True),
+        ),
+        migrations.AddField(
+            model_name='historicalquestionoption',
             name='history_change_reason',
             field=models.CharField(max_length=100, null=True),
         ),
