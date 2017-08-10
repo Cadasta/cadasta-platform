@@ -1274,7 +1274,7 @@ class QuestionSerializerTest(TestCase):
         data = {
             'label': 'A question',
             'name': 'question',
-            'type': 'TX',
+            'type': 'GP',
             'gps_accuracy': -1.5
         }
         serializer = serializers.QuestionSerializer(
@@ -1282,6 +1282,19 @@ class QuestionSerializerTest(TestCase):
             context={'questionnaire_id': questionnaire.id})
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
+
+    def test_create_question_ignore_invalid_accuracy(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        data = {
+            'label': 'A question',
+            'name': 'question',
+            'type': 'TX',
+            'gps_accuracy': -1.5
+        }
+        serializer = serializers.QuestionSerializer(
+            data=data,
+            context={'questionnaire_id': questionnaire.id})
+        assert serializer.is_valid(raise_exception=True) is True
 
     def test_with_options(self):
         questionnaire = factories.QuestionnaireFactory.create()

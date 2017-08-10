@@ -26,3 +26,5 @@ QUESTION_TYPES = (
     ('SI', 'subsciberid'),
     ('SS', 'simserial'),
     ('PN', 'phonenumber'))
+
+XFORM_GEOM_FIELDS = ('GP', 'GT', 'GS', )

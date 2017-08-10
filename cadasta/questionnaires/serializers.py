@@ -81,7 +81,9 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
         write_only_fields = ('label_xlat', )
 
     def validate_gps_accuracy(self, value):
-        if value and not validate_accuracy(value):
+        if (value and
+                self.initial_data.get('type') in choices.XFORM_GEOM_FIELDS and
+                not validate_accuracy(value)):
             raise serializers.ValidationError(INVALID_ACCURACY)
         return value
 

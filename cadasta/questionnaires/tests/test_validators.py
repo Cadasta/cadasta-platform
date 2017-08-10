@@ -21,6 +21,12 @@ class ValidateAccuracyTest(TestCase):
         assert validators.validate_accuracy('Something') is False
 
 
+class GpsRelevvantTest(TestCase):
+    def test_gps_relevant(self):
+        assert validators.gps_relevant({'type': 'GP'}) is True
+        assert validators.gps_relevant({'type': 'IN'}) is False
+
+
 class ValidateTypeTest(TestCase):
     def test_validate_string(self):
         assert validators.validate_type('string', 'akshdk') is True
@@ -120,6 +126,23 @@ class ValidateSchemaTest(TestCase):
         assert SANITIZE_ERROR in errors['no_code']
         assert 'Validator positive did not validate.' in errors['function']
         assert 'Number must be positive' in errors['function2']
+
+    def test_validate_with_relevant(self):
+        def rel(json):
+            return json.get('text') == 'John'
+
+        schema = {
+            'text': {'type': 'string'},
+            'number': {'type': 'number', 'relevant': rel}
+        }
+
+        errors = validators.validate_schema(
+            schema, {'text': 'John', 'number': 'Ringo'})
+        assert 'number' in errors
+
+        errors = validators.validate_schema(
+            schema, {'text': 'Paul', 'number': 'Ringo'})
+        assert 'number' not in errors
 
 
 class QuestionnaireTestCase(TestCase):
@@ -271,7 +294,8 @@ class QuestionTestCase(TestCase):
             'type': "ST",
             'required': False,
             'constraint': None,
-            'index': 0
+            'index': 0,
+            'gps_accuracy': -1.5
         }]
         errors = validators.validate_questions(data)
         assert errors == [{}]
@@ -290,6 +314,12 @@ class QuestionTestCase(TestCase):
             'required': False,
             'constraint': None,
             'options': [{'name': 'Name', 'index': 0}],
+            'index': 1
+        }, {
+            'name': 'geom',
+            'label': 'geom',
+            'type': "GP",
+            'required': False,
             'index': 1,
             'gps_accuracy': -1.5
         }]
@@ -297,8 +327,8 @@ class QuestionTestCase(TestCase):
         assert errors == [
             {},
             {'name': ['This field is required.'],
-             'options': [{'label': ['This field is required.']}],
-             'gps_accuracy': ['gps_accuracy must be positve float']}
+             'options': [{'label': ['This field is required.']}]},
+            {'gps_accuracy': ['gps_accuracy must be positve float']}
         ]
 
 

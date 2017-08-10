@@ -378,8 +378,32 @@ class QuestionManagerTest(TestCase):
 
     def test_create_from_dict_include_accuracy_threshold(self):
         question_dict = {
-            'label': 'Integer',
-            'name': 'my_int',
+            'label': 'point',
+            'name': 'point',
+            'type': 'geopoint',
+            'control': {
+                'accuracyThreshold': 1.5
+            }
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+
+        model = models.Question.objects.create_from_dict(
+            dict=question_dict,
+            questionnaire=questionnaire
+        )
+
+        assert model.question_group is None
+        assert model.questionnaire == questionnaire
+        assert model.label == question_dict['label']
+        assert model.name == question_dict['name']
+        assert model.type == 'GP'
+        assert model.gps_accuracy == 1.5
+
+    def test_create_from_dict_ingnore_accuracy_threshold(self):
+        """For non-geomtrey fields accuracy should be ignored"""
+        question_dict = {
+            'label': 'int',
+            'name': 'int',
             'type': 'integer',
             'control': {
                 'accuracyThreshold': 1.5
@@ -397,13 +421,13 @@ class QuestionManagerTest(TestCase):
         assert model.label == question_dict['label']
         assert model.name == question_dict['name']
         assert model.type == 'IN'
-        assert model.gps_accuracy == 1.5
+        assert model.gps_accuracy is None
 
     def test_create_from_dict_include_accuracy_threshold_as_string(self):
         question_dict = {
-            'label': 'Integer',
-            'name': 'my_int',
-            'type': 'integer',
+            'label': 'point',
+            'name': 'point',
+            'type': 'geopoint',
             'control': {
                 'accuracyThreshold': '1.5'
             }
@@ -419,16 +443,16 @@ class QuestionManagerTest(TestCase):
         assert model.questionnaire == questionnaire
         assert model.label == question_dict['label']
         assert model.name == question_dict['name']
-        assert model.type == 'IN'
+        assert model.type == 'GP'
 
         model.refresh_from_db()
         assert model.gps_accuracy == 1.5
 
     def test_create_from_dict_include_invalid_accuracy(self):
         question_dict = {
-            'label': 'Integer',
-            'name': 'my_int',
-            'type': 'integer',
+            'label': 'point',
+            'name': 'point',
+            'type': 'geopoint',
             'control': {
                 'accuracyThreshold': -1.5
             }

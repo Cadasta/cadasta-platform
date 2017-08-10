@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
-from .choices import QUESTION_TYPES
+from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 
 
 def validate_accuracy(val):
@@ -21,6 +21,10 @@ def validate_accuracy(val):
         pass
 
     return False
+
+
+def gps_relevant(json):
+    return json.get('type') in XFORM_GEOM_FIELDS
 
 
 def validate_id_string(json):
@@ -64,7 +68,8 @@ QUESTION_SCHEMA = {
                      'function': validate_accuracy,
                      'errors': {
                         'function': _("gps_accuracy must be positve float")
-                     }}
+                     },
+                     'relevant': gps_relevant}
 }
 
 QUESTION_GROUP_SCHEMA = {
@@ -86,6 +91,9 @@ def validate_schema(schema, json):
     for key, reqs in schema.items():
         item_errors = []
         item = json.get(key, None)
+
+        if reqs.get('relevant') and not reqs['relevant'](json):
+            continue
 
         if reqs.get('required', False) and item is None:
             item_errors.append(_("This field is required."))

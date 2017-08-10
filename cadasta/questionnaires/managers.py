@@ -13,7 +13,7 @@ from pyxform.errors import PyXFormError
 from pyxform.xls2json import parse_file_to_json
 from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
-from .choices import QUESTION_TYPES
+from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 from .exceptions import InvalidQuestionnaire
 from .messages import MISSING_RELEVANT, INVALID_ACCURACY
 from .validators import validate_accuracy
@@ -307,7 +307,7 @@ class QuestionManager(models.Manager):
 
         gps_accuracy = None
         control = dict.get('control')
-        if control:
+        if control and type_dict[dict.get('type')] in XFORM_GEOM_FIELDS:
             gps_accuracy = control.get('accuracyThreshold', None)
             if gps_accuracy and not validate_accuracy(gps_accuracy):
                 raise(InvalidQuestionnaire([INVALID_ACCURACY]))
