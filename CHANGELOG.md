@@ -1,5 +1,59 @@
 # Change Log
 
+## [v1.11.0](https://github.com/Cadasta/cadasta-platform/tree/v1.11.0) (2017-08-09)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.11.0-alpha.2...v1.11.0)
+
+**Fixed bugs:**
+
+- Area calculation seems really wrong [\#1689](https://github.com/Cadasta/cadasta-platform/issues/1689)
+
+**Closed issues:**
+
+- Possible solution for converting KNU to KNU Unicode \(which is supported in Cadasta\) [\#1552](https://github.com/Cadasta/cadasta-platform/issues/1552)
+- Remove outdated docs in AWS [\#1426](https://github.com/Cadasta/cadasta-platform/issues/1426)
+- Organize project list to show user membership [\#994](https://github.com/Cadasta/cadasta-platform/issues/994)
+
+**Merged pull requests:**
+
+- Bugfix/refactor area calculation [\#1699](https://github.com/Cadasta/cadasta-platform/pull/1699) ([alukach](https://github.com/alukach))
+
+## [v1.11.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.11.0-alpha.2) (2017-08-04)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.11.0-alpha.1...v1.11.0-alpha.2)
+
+**Fixed bugs:**
+
+- Relevant Logic is causing a questionnaire that works on demo not to work on staging [\#1700](https://github.com/Cadasta/cadasta-platform/issues/1700)
+- Upload of XML file fails [\#1691](https://github.com/Cadasta/cadasta-platform/issues/1691)
+- Contributor in resource detail page only uses the full name [\#1690](https://github.com/Cadasta/cadasta-platform/issues/1690)
+- Attaching resources from multiple pages doesn't work [\#1688](https://github.com/Cadasta/cadasta-platform/issues/1688)
+- User avatar: clickable area for upload button [\#1687](https://github.com/Cadasta/cadasta-platform/issues/1687)
+- User avatar: error message\(s\) not cleared [\#1686](https://github.com/Cadasta/cadasta-platform/issues/1686)
+- Default thumbnail images for the new allowed MIME types are missing [\#1685](https://github.com/Cadasta/cadasta-platform/issues/1685)
+- User avatar upload accepts disallowed file types [\#1684](https://github.com/Cadasta/cadasta-platform/issues/1684)
+- File upload: File name is not displayed [\#1681](https://github.com/Cadasta/cadasta-platform/issues/1681)
+- Tab CSS missing active color change [\#1629](https://github.com/Cadasta/cadasta-platform/issues/1629)
+- Date are inconsistent between display/edit in location [\#1434](https://github.com/Cadasta/cadasta-platform/issues/1434)
+- Assigning project roles intermittently throws PermissionSet.DoesNotExist [\#1208](https://github.com/Cadasta/cadasta-platform/issues/1208)
+- File uploads permitted exceeding max size [\#1683](https://github.com/Cadasta/cadasta-platform/issues/1683)
+- String Sanitation - Organization and Project URLs accepts emojis [\#1559](https://github.com/Cadasta/cadasta-platform/issues/1559)
+- Party detail page should have `can\_edit` and `can\_delete` checks [\#1546](https://github.com/Cadasta/cadasta-platform/issues/1546)
+- Superuser role views are different on local host versus other sites [\#1472](https://github.com/Cadasta/cadasta-platform/issues/1472)
+- Superusers can't view private projects in Projects list [\#1470](https://github.com/Cadasta/cadasta-platform/issues/1470)
+
+**Closed issues:**
+
+- Maybe allow GIF images as the user avatar [\#1682](https://github.com/Cadasta/cadasta-platform/issues/1682)
+
+**Merged pull requests:**
+
+- Fixes \#1683 django-buckets file size/error message/static files [\#1701](https://github.com/Cadasta/cadasta-platform/pull/1701) ([amplifi](https://github.com/amplifi))
+- Revert "Fix \#1638: Check for xlsform relevant clause syntax errors \(\#… [\#1697](https://github.com/Cadasta/cadasta-platform/pull/1697) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1690: Display the resource contributor's username if they don't have a full name [\#1696](https://github.com/Cadasta/cadasta-platform/pull/1696) ([seav](https://github.com/seav))
+- Fixes \#1684 -- Do not display image preview when file is not accepted [\#1695](https://github.com/Cadasta/cadasta-platform/pull/1695) ([oliverroick](https://github.com/oliverroick))
+- Fixes \#1681 -- Display file name for resources uploads [\#1694](https://github.com/Cadasta/cadasta-platform/pull/1694) ([oliverroick](https://github.com/oliverroick))
+- Update changelog for v1.11.0-alpha.1 [\#1679](https://github.com/Cadasta/cadasta-platform/pull/1679) ([amplifi](https://github.com/amplifi))
+- Registration with Phone number [\#1662](https://github.com/Cadasta/cadasta-platform/pull/1662) ([valaparthvi](https://github.com/valaparthvi))
+
 ## [v1.11.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.11.0-alpha.1) (2017-07-31)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.10.0...v1.11.0-alpha.1)
 
