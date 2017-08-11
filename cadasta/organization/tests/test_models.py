@@ -182,6 +182,76 @@ class ProjectTest(TestCase):
         assert project.has_records is True
 
 
+class ProjectAreaTest(TestCase):
+    """
+    This test is to check if the Trigger defined in migration
+    0004_add_area_to project is apllied to the DB and if it works as expected
+    when we're adding deleting and updating spatial units.
+
+    See this gist to find what the geometies look like:
+    https://gist.github.com/anonymous/7e5f31d878f758e00cb3fdaddddeb293
+    """
+
+    def setUp(self):
+        self.project = ProjectFactory.create()
+
+        self.su1 = SpatialUnitFactory.build(
+            project=self.project,
+            geometry='POLYGON((12.323006 51.327645,12.322913 '
+                     '51.327355,12.323114 51.327330,12.323189 '
+                     '51.327624,12.323006 51.327645))')
+
+        self.su2 = SpatialUnitFactory.build(
+            project=self.project,
+            geometry='POLYGON((12.323041 51.32775,12.323012 '
+                     '51.327661,12.323197 51.327638,12.323224 '
+                     '51.327727,12.323041 51.32775))')
+
+    def sum_areas(self, *spatial_units):
+        """
+        Returns the sum of all areas rounded to 10 decimals because the DB
+        only stores 10 decimals
+        """
+        return round(sum(s.area for s in spatial_units), 10)
+
+    def test_add_locations(self):
+        self.su1.save()
+        self.project.refresh_from_db()
+        assert self.project.area == self.sum_areas(self.su1)
+
+        self.su2.save()
+        self.project.refresh_from_db()
+        assert self.project.area == self.sum_areas(self.su1, self.su2)
+
+    def test_delete_locations(self):
+        self.su1.save()
+        self.su2.save()
+
+        self.project.refresh_from_db()
+        assert self.project.area == self.sum_areas(self.su1, self.su2)
+
+        self.su1.delete()
+        self.project.refresh_from_db()
+        assert self.project.area == self.sum_areas(self.su2)
+
+    def test_update_locations(self):
+        self.su1.save()
+        self.su2.save()
+
+        self.project.refresh_from_db()
+        assert self.project.area == self.sum_areas(self.su1, self.su2)
+
+        initial_area = self.project.area
+        self.su2.geometry = ('POLYGON((12.32306 51.327866,12.323012 '
+                             '51.327661,12.323197 51.327638,12.323229 '
+                             '51.327732,12.323307 51.327717,12.323331 '
+                             '51.327789,12.32306 51.327866))')
+        self.su2.save()
+        self.project.refresh_from_db()
+        assert initial_area < self.project.area
+        assert self.project.area == self.sum_areas(self.su1, self.su2)
+
+
 class ProjectRoleTest(UserTestCase, TestCase):
     def setUp(self):
         super().setUp()
