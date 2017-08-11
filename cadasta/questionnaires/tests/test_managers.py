@@ -400,7 +400,7 @@ class QuestionManagerTest(TestCase):
         assert model.gps_accuracy == 1.5
 
     def test_create_from_dict_ingnore_accuracy_threshold(self):
-        """For non-geomtrey fields accuracy should be ignored"""
+        """For non-geometry fields accuracy should be ignored"""
         question_dict = {
             'label': 'int',
             'name': 'int',

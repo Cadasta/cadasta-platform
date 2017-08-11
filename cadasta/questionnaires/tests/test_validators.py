@@ -21,7 +21,7 @@ class ValidateAccuracyTest(TestCase):
         assert validators.validate_accuracy('Something') is False
 
 
-class GpsRelevvantTest(TestCase):
+class GpsRelevantTest(TestCase):
     def test_gps_relevant(self):
         assert validators.gps_relevant({'type': 'GP'}) is True
         assert validators.gps_relevant({'type': 'IN'}) is False
