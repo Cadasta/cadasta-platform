@@ -15,9 +15,7 @@
 <link rel="stylesheet" href="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+<link rel="stylesheet" href="{% static 'jquery-ui/1.12.1/css/jquery-ui.min.css' %}">
 {% endblock %}
 
 {% block extra_script %}
@@ -27,8 +25,8 @@
 <script src="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.js' %}"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
-<script src="{% static 'js/jquery-ui.min.js' %}"></script>
-<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
+<script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
+<script src="{% static 'js/form_submit.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
 <script>
