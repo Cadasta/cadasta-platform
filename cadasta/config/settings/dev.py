@@ -104,11 +104,17 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
-        'accounts.token': {
+        'accounts.TwilioGateway': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
+        },
+        'accounts.FakeGateway': {
             'handlers': ['console'],
             'level': 'DEBUG'
-        }
+        },
     },
 }
 
 ES_PORT = '8000'
+
+SMS_GATEWAY = 'accounts.gateways.FakeGateway'

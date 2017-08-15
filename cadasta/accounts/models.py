@@ -16,13 +16,11 @@ from django_otp.oath import TOTP
 from django_otp.util import random_hex, hex_validator
 from binascii import unhexlify
 
-import logging
 import time
 
 from simple_history.models import HistoricalRecords
 from .manager import UserManager
-
-logger = logging.getLogger("accounts.token")
+from .utils import send_sms
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -187,8 +185,7 @@ class VerificationDevice(Device):
         message = message.format(
             token_value=token, time_validity=self.step // 60)
 
-        logger.debug("Token has been sent to %s " % self.unverified_phone)
-        logger.debug("%s" % message)
+        send_sms(to=self.unverified_phone, body=message)
 
         return token
 

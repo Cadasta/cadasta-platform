@@ -22,7 +22,7 @@
               {% csrf_token %}
               {{ form.non_field_errors }}
               <label class="control-label" for="{{ form.identifier.id_for_label }}">
-                {% trans "Enter new member's username or email address" %}
+                {% trans "Enter new member's username or email address or phone" %}
               </label>
               {% render_field form.identifier class+="form-control input-lg" data-parsley-required="true" %}
               <div class="error-block">{{ form.identifier.errors }}</div>
