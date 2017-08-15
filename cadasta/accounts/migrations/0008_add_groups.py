@@ -16,7 +16,7 @@ def create_groups(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0006_add_measurement_field'),
+        ('accounts', '0007_add_avatar_field'),
     ]
 
     operations = [
