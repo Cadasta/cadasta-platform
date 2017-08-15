@@ -141,12 +141,14 @@ table.dataTable {
 
 @media (max-width: 420px) {
   #project-single .dataTables_wrapper .col-sm-6,
-  #organization-single .dataTables_wrapper .col-sm-6 {
+  #organization-single .dataTables_wrapper .col-sm-6,
+  #user-single .dataTables_wrapper .col-sm-6 {
     width: 100% !important; // fix for col-xs-6
     float: left !important;
   }
   #project-single div.dataTables_wrapper div.dataTables_filter,
-  #organization-single div.dataTables_wrapper div.dataTables_filter {
+  #organization-single div.dataTables_wrapper div.dataTables_filter,
+  #user-single div.dataTables_wrapper div.dataTables_filter {
     text-align: left !important;
   }
   .dataTables_wrapper {

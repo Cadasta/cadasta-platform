@@ -343,3 +343,7 @@ class ProjectRoleTest(UserTestCase, TestCase):
         self._has('PU', state=True)
         ProjectRole.objects.get(project=self.project, user=self.user).delete()
         self._has('PU', state=False)
+
+    def test_role_verbose(self):
+        role_instance = self._add_role('DC')
+        assert role_instance.role_verbose == 'Data Collector'

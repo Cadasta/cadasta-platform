@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils import timezone
 
-from core.views.generic import UpdateView
+from core.views.generic import UpdateView, ListView
 from core.views.mixins import SuperUserCheckMixin
 
 import allauth.account.views as allauth_views
@@ -14,6 +14,7 @@ from allauth.account.models import EmailAddress
 
 from ..models import User
 from .. import forms
+from organization.models import ProjectRole
 
 
 class PasswordChangeView(LoginRequiredMixin,
@@ -87,3 +88,47 @@ class ConfirmEmail(ConfirmEmailView):
         user.save()
 
         return response
+
+
+class AccountListProjects(ListView):
+    model = User
+    template_name = 'accounts/user_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        user = self.request.user
+        context = super().get_context_data(**kwargs)
+        context['user_orgs_and_projects'] = list(self._get_orgs(user))
+        return context
+
+    @staticmethod
+    def _get_orgs(user):
+        orgs_by_name = user.organizations.order_by('name').all()
+        for org in orgs_by_name:
+            is_admin = user.organizationrole_set.get(organization=org).admin
+            if is_admin:
+                projects = list(
+                    AccountListProjects._get_all_projects(org))
+                yield (org, is_admin, projects)
+
+            elif not org.archived:
+                projects = list(
+                    AccountListProjects._get_unarchived_projects(org, user))
+                yield (org, is_admin, projects)
+
+    @staticmethod
+    def _get_unarchived_projects(org, user):
+        unarchived_projects = org.all_projects().filter(archived=False)
+        for proj in unarchived_projects:
+            try:
+                role_object = user.projectrole_set.get(project=proj)
+            except ProjectRole.DoesNotExist:
+                role = _('Public User')
+            else:
+                role = role_object.role_verbose
+            yield (proj, role)
+
+    @staticmethod
+    def _get_all_projects(org):
+        role = _('Administrator')
+        for proj in org.all_projects():
+            yield (proj, role)

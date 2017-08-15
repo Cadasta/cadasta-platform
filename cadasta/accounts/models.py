@@ -79,6 +79,10 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                     {'error_message':
                      _("You don't have permission to update user details")})]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_avatar_url = self.avatar_url
+
     def __repr__(self):
         repr_string = ('<User username={obj.username}'
                        ' full_name={obj.full_name}'
@@ -100,7 +104,9 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 
     @property
     def avatar_url(self):
-        return self.avatar.url or settings.DEFAULT_AVATAR
+        if not self.avatar or not self.avatar.url:
+            return settings.DEFAULT_AVATAR
+        return self.avatar.url
 
 
 @receiver(models.signals.post_save, sender=User)

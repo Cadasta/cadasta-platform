@@ -1,0 +1,222 @@
+{% extends "core/base.html" %}
+
+{% load i18n %}
+{% load widget_tweaks %}
+{% load staticfiles %}
+
+{% block top-nav %}user-single{% endblock %}
+
+{% block extra_script %}{% endblock %}
+
+{% block title %} | {% block page_title %}{% endblock %}User dashboard{% endblock %}
+
+{% block main-width %}-fluid{% endblock %}
+
+{% block page-header %}
+
+<!-- User dashboard header -->
+<div class="header page-header">
+  <div class="page-title">
+    <h1>{% trans "My dashboard" %}</h1>
+  </div>
+</div>
+<!-- / user dashboard header -->
+
+{% endblock %}
+
+{% block content %}
+
+<div class="col-md-12 content-single">
+  <div class="row">
+    <!-- main body -->
+    {% if not user.email_verified %}
+      <div role="alert" class="alert alert-dismissible alert-warning">
+        <button type="button" class="close" data-dismiss="alert" aria-label='{% trans "Close" %}'>
+          <span aria-hidden="true">×</span>
+        </button>
+        <p>{% blocktrans %}
+          We’ve noticed your account has not been verified.
+          Please verify your account by <b>{{ user.verify_email_by }}</b>
+          or if you haven’t received your verification link, {% endblocktrans %}
+          <a href="{% url 'account_email' %}">{% trans "request a new one" %}</a>.
+        </p>
+      </div>
+    {% endif %}
+    <div class="main-text">
+      <div class="col-md-8">
+        <!-- Panel with list of organizations and projects -->
+        <section>
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title inline">{% trans "Projects" %}</h3>
+              <a href="{% url 'project:add' %}">
+                <i class="glyphicon glyphicon-plus" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Add project' %}"></i>
+              </a>
+            </div>
+            <div class="panel-body">
+              {% if user_orgs_and_projects %}
+                {% for org, is_admin, projects in user_orgs_and_projects %}
+
+                  <!-- start organization block -->
+                  {% if is_admin or not org.archived %}
+                  <div id="org-wrapper" class="panel panel-default">
+                    <div class="panel-heading">
+                      <h3 class="panel-title">
+                        <a href="{% url 'organization:dashboard' slug=org.slug %}"
+                       data-toggle="tooltip" data-trigger="hover" title="{% trans 'Go to organization dashboard' %}">
+                        {{ org.name }}
+                        </a>
+                        <span class="role small">{% if is_admin %}{% trans "Administrator" %}{% endif %}</span>
+                        {% if org.archived %}
+                          <span class="label label-danger">{% trans "Archived" %}</span>
+                        {% endif %}
+                      </h3>
+                    </div>
+                    <div class="panel-body">
+                      {% if org.description %}<p>{{ org.description }}</p>{% endif %}
+                      {% if projects %}
+                        <table class="table table-hover datatable" data-paging-type="simple">
+                          <thead>
+                          <tr>
+                            <th class="col-md-5">{% trans "Project" %}</th>
+                            <th class="col-md-3 hidden-xs">{% trans "Role" %}</th>
+                            <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
+                            <th class="col-md-2">{% trans "Last updated" %}</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          {% for proj, proj_role in projects %}
+                            <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=org.slug project=proj.slug %}';">
+                              <td>
+                                <h4>
+                                  <a href="{% url 'organization:project-dashboard' organization=org.slug project=proj.slug %}">{{ proj.name }}</a>
+                                  {% if proj.access == "private" %}
+                                    <span class="label label-info">{% trans "Private" %}</span>
+                                  {% endif %}
+                                  {% if proj.archived %}
+                                    <span class="label label-danger">{% trans "Archived" %}</span>
+                                  {% endif %}
+                                </h4>
+                                {% if proj.description %}<p>{{ proj.description }}</p>{% endif %}
+                              </td>
+                              <td class="hidden-xs">{{ proj_role }}</td>
+                              <td class="hidden-xs">{{ proj.country }}</td>
+                              <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+                            </tr>
+                          {% endfor %}
+                          </tbody>
+                        </table>
+                      {% elif is_admin %}
+                        <div class="overlay-wrapper">
+                        <div class="overlay smaller">
+                          <div class="btn-full smaller">
+                            <a class="btn btn-primary" href="{% url 'organization:project-add' org.slug %}" role="button">
+                              <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "Add first project" %}
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      {% else %}
+                        <div class="overlay-wrapper">
+                          <div class="overlay smaller">
+                            <p class="text-center">{% trans "Looks like this organization has no projects. As projects are created, they'll appear here." %}</p>
+                            <div class="btn-full smaller">
+                              <a class="btn btn-primary" href="{% url 'organization:dashboard' slug=org.slug %}" role="button">
+                                <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "View this organization" %}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endif %}
+                  <!-- / organization block -->
+
+                {% endfor %}
+              {% else %}
+                <!-- invitation to add first organization -->
+                <div class="overlay-wrapper">
+                  <div class="overlay">
+                    <span class="glyphicon glyphicon-ok-circle large"></span>
+                    <p class="text-center">{% trans "Your account is all set. Now add your first organization." %}</p>
+                    <div class="btn-full">
+                      <a class="btn btn-primary" href="{% url 'organization:add' %}" role="button">
+                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "Add organization" %}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="col-md-4">
+        <!-- User about -->
+        <section>
+          <div class="panel panel-default panel-about">
+            <div class="panel-topimage">
+              <div id="preview-box">
+                <img src="{{ user.avatar_url }}" alt="{{ user.name }}" id="avatar-preview">
+              </div>
+            </div>
+            <div class="panel-heading">
+              <h3 class="panel-title inline">
+                {% if user.full_name %}
+                  {{ user.full_name }}
+                {% else %}
+                  {{ user.username }}
+                {% endif %}
+              </h3>
+              <a href="{% url 'account:profile' %}">
+                <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Edit profile' %}"></i>
+              </a>
+            </div>
+            <div class="panel-body">
+              <table class="table table-location">
+                <tbody>
+                  <tr>
+                    <td class="col-md-6"><label>{% trans "Username" %}<label></td>
+                    <td class="col-md-6">{{ user.username }}</td>
+                  </tr>
+                  {% if user.email %}
+                    <tr>
+                      <td><label>{% trans "Email" %}<label></td>
+                      <td>{{ user.email }}</td>
+                    </tr>
+                  {% else %}
+                    <tr>
+                      <td></span><label>{% trans "Phone number" %}<label></td>
+                      <td>{{ user.tel }}</td>
+                    </tr>
+                  {% endif %}
+                  <tr>
+                    <td><label>{% trans "Language" %}<label></td>
+                    <td>{{ user.language }}</td>
+                  </tr>
+                  <tr>
+                    <td><label>{% trans "Measurement" %}<label></td>
+                    <td>{{ user.measurement }}</td>
+                  </tr>
+                  <tr>
+                    <td><label>{% trans "Joined on" %}<label></td>
+                    <td>{{ user.date_joined | date }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <!-- / user about -->
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block modals %}{% endblock %}
+
+
+

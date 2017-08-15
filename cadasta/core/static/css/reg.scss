@@ -118,8 +118,8 @@ body.tinted-bg { // photo for login and register forms
 /* =S3 avatar image-upload work
 -------------------------------------------------------------- */
 #preview-box {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   background-color: white;
   border-radius: 3px;
   overflow: hidden;
@@ -129,7 +129,7 @@ body.tinted-bg { // photo for login and register forms
 
 #avatar-preview {
   width: auto;
-  height: 200px;
+  height: 150px;
   position: absolute;
   top: -9999px;
   bottom: -9999px;

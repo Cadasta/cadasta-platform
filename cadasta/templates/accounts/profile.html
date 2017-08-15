@@ -23,9 +23,9 @@
     <label class="control-label" for="{{ form.avatar.id_for_label }}">{% trans "Profile picture" %}</label>
     <div class="well">
       <div id="preview-box" class="center-block">
-        <img src='{{user.avatar_url}}' id="avatar-preview"/>
+        <img src='{{ user.avatar_url }}' id="avatar-preview"/>
       </div>
-      <p class="help-block small">{% trans "For best results upload a square image, ideally 200x200 pixels." %}</p>
+      <p class="help-block small">{% trans "For best results upload a square image." %}</p>
       {% render_field form.avatar class+="form-control input-lg" data-parsley-sanitize="1" %}
     </div>
   </div>

@@ -81,7 +81,8 @@
 -------------------------------------------------------------- */
 
 #project-single .page-header,
-#organization-single .page-header { // navy band on pages for single project or organization
+#organization-single .page-header,
+#user-single .page-header { // navy band on pages for single project, organization, or user
   display: table;
   background: $brand-darkblue;
   height: 100px;
@@ -143,7 +144,8 @@
 
 @media (max-width: $screen-sm-max) {
   #project-single .page-header,
-  #organization-single .page-header {
+  #organization-single .page-header,
+  #user-single .page-header {
     overflow: visible;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -694,6 +696,9 @@
       background-color: $table-bg-hover;
     }
   }
+  .alert-dismissible.alert-warning {
+    margin-top: 10px;
+  }
 }
 
 .overview #project-map .leaflet-clickable { // forces cursor on non-interactive map
@@ -795,6 +800,33 @@ dl.contacts { // contact lists
       font-size: 13px;
       padding-bottom: 4px;
     }
+  }
+}
+
+/*= User Dashboard
+--------------------------------------------------------------*/
+
+#org-wrapper {
+  &.well {
+    background: transparent;
+  }
+  h3 {
+    margin-top: 0;
+    .role {
+      text-transform: none;
+      margin-left: 3px;
+      color: $gray-medium;
+    }
+  }
+  .table-search { // search
+    display: none;
+  }
+  .overlay.smaller {
+    min-height: auto;
+  }
+  .btn-full.smaller {
+    margin: 0;
+    padding: 0;
   }
 }
 

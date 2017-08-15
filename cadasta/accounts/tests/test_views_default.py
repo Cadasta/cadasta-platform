@@ -12,6 +12,8 @@ from allauth.account.forms import ChangePasswordForm
 
 from ..views import default
 from ..forms import ProfileForm
+from organization.models import OrganizationRole, ProjectRole
+from organization.tests.factories import ProjectFactory, OrganizationFactory
 
 
 class ProfileTest(ViewTestCase, UserTestCase, TestCase):
@@ -225,3 +227,55 @@ class PasswordResetViewTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
         assert len(mail.outbox) == 0
+
+
+class AccountListProjectsTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.AccountListProjects
+    template = 'accounts/user_dashboard.html'
+
+    def test_without_organizations(self):
+        user = UserFactory.create()
+
+        response = self.request(user=user)
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user_orgs_and_projects=[])
+
+    def test_with_organizations_without_projects(self):
+        user = UserFactory.create()
+        org = OrganizationFactory.create()
+        orgrole = OrganizationRole.objects.create(organization=org, user=user)
+
+        response = self.request(user=user)
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user_orgs_and_projects=[(org, orgrole.admin, [])])
+
+    def test_with_organizations_and_projects(self):
+        user = UserFactory.create()
+        org1, org2 = OrganizationFactory.create_batch(2)
+
+        proj1, proj2 = ProjectFactory.create_batch(2, organization=org1)
+        proj3 = ProjectFactory.create(organization=org2)
+        proj4 = ProjectFactory.create(organization=org2, archived=False)
+
+        ProjectRole.objects.create(project=proj1, user=user, role='DC')
+        is_not_admin_org1 = OrganizationRole.objects.create(
+            organization=org1, user=user, admin=False).admin
+        is_admin_org2 = OrganizationRole.objects.create(
+            organization=org2, user=user, admin=True).admin
+
+        response = self.request(user=user)
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user_orgs_and_projects=[
+                (org1, is_not_admin_org1, [
+                    (proj1, 'Data Collector'),
+                    (proj2, 'Public User')]),
+                (org2, is_admin_org2, [
+                    (proj3, 'Administrator'),
+                    (proj4, 'Administrator')]),
+                ])
