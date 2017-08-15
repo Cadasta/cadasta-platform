@@ -12,6 +12,8 @@ class UserFactory(ExtendedFactory):
     email = factory.Sequence(lambda n: "email_%s@example.com" % n)
     phone = factory.Sequence(lambda n: "+123456789%s" % n)
     password = ''
+    language = 'en'
+    measurement = 'metric'
 
     @classmethod
     def _prepare(cls, create, **kwargs):
