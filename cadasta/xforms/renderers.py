@@ -7,10 +7,10 @@ from rest_framework.compat import six
 from pyxform.builder import create_survey_element_from_dict
 from lxml import etree
 from rest_framework.renderers import BaseRenderer
-from questionnaires.models import Question
 from questionnaires.managers import fix_languages
+from questionnaires.choices import QUESTION_TYPES
 
-QUESTION_TYPES = dict(Question.TYPE_CHOICES)
+QUESTION_TYPES = dict(QUESTION_TYPES)
 
 
 class XFormListRenderer(renderers.BaseRenderer):
@@ -58,10 +58,6 @@ class XFormListRenderer(renderers.BaseRenderer):
                 self._to_xml(xml, value)
                 xml.endElement(key)
 
-        # elif data is None:
-        #     # Don't output any value
-        #     pass
-
         else:
             xml.characters(smart_text(data))
 
@@ -89,6 +85,14 @@ class XFormRenderer(BaseRenderer):
 
             if bind:
                 q['bind'] = bind
+
+            control = {}
+
+            if q.get('gps_accuracy'):
+                control['accuracyThreshold'] = q.get('gps_accuracy')
+
+            if control:
+                q['control'] = control
 
             children.append(q)
         return children

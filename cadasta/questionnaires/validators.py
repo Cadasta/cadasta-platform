@@ -3,40 +3,28 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
-from .models import Question
+from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 
 
-QUESTIONNAIRE_SCHEMA = {
-    'title': {'type': 'string', 'required': True},
-    'id_string': {'type': 'string', 'required': True},
-    'default_language': {'type': 'string',
-                         'required': True,
-                         'enum': settings.FORM_LANGS.keys()},
-}
+def validate_accuracy(val):
+    """Returns True if the provided value is a positive float. """
 
-QUESTION_SCHEMA = {
-    'name': {'type': 'string', 'required': True},
-    'label': {'type': 'string'},
-    'type': {'type': 'string',
-             'required': True,
-             'enum': [c[0] for c in Question.TYPE_CHOICES]},
-    'required': {'type': 'boolean'},
-    'constraint': {'type': 'string'},
-    'index': {'type': 'integer', 'required': True}
-}
+    # bool can be casted to float that's why we check this first
+    if isinstance(val, bool):
+        return False
 
-QUESTION_GROUP_SCHEMA = {
-    'name': {'type': 'string', 'required': True},
-    'label': {'type': 'string'},
-    'type': {'type': 'string', 'required': True},
-    'index': {'type': 'integer', 'required': True}
-}
+    try:
+        val = float(val)
+        if val > 0:
+            return True
+    except ValueError:
+        pass
 
-QUESTION_OPTION_SCHEMA = {
-    'name': {'type': 'string', 'required': True},
-    'label': {'type': 'string', 'required': True},
-    'index': {'type': 'integer', 'required': True}
-}
+    return False
+
+
+def gps_relevant(json):
+    return json.get('type') in XFORM_GEOM_FIELDS
 
 
 def validate_id_string(json):
@@ -59,21 +47,73 @@ def validate_type(type, value):
         return isinstance(value, list)
 
 
+QUESTIONNAIRE_SCHEMA = {
+    'title': {'type': 'string', 'required': True},
+    'id_string': {'type': 'string', 'required': True},
+    'default_language': {'type': 'string',
+                         'required': True,
+                         'enum': settings.FORM_LANGS.keys()},
+}
+
+QUESTION_SCHEMA = {
+    'name': {'type': 'string', 'required': True},
+    'label': {'type': 'string'},
+    'type': {'type': 'string',
+             'required': True,
+             'enum': [c[0] for c in QUESTION_TYPES]},
+    'required': {'type': 'boolean'},
+    'constraint': {'type': 'string'},
+    'index': {'type': 'integer', 'required': True},
+    'gps_accuracy': {'type': 'number',
+                     'function': validate_accuracy,
+                     'errors': {
+                        'function': _("gps_accuracy must be positve float")
+                     },
+                     'relevant': gps_relevant}
+}
+
+QUESTION_GROUP_SCHEMA = {
+    'name': {'type': 'string', 'required': True},
+    'label': {'type': 'string'},
+    'type': {'type': 'string', 'required': True},
+    'index': {'type': 'integer', 'required': True}
+}
+
+QUESTION_OPTION_SCHEMA = {
+    'name': {'type': 'string', 'required': True},
+    'label': {'type': 'string', 'required': True},
+    'index': {'type': 'integer', 'required': True}
+}
+
+
 def validate_schema(schema, json):
     errors = {}
     for key, reqs in schema.items():
         item_errors = []
         item = json.get(key, None)
 
+        if reqs.get('relevant') and not reqs['relevant'](json):
+            continue
+
         if reqs.get('required', False) and item is None:
             item_errors.append(_("This field is required."))
         elif item:
+
             if not validate_type(reqs.get('type'), item):
                 item_errors.append(
                     _("Value must be of type {}.").format(reqs.get('type')))
+
             if reqs.get('enum') and item not in reqs.get('enum'):
                 item_errors.append(
                     _("{} is not an accepted value.").format(item))
+
+            if reqs.get('function') and not reqs['function'](item):
+                error = _("Validator {} did not validate.").format(
+                    reqs['function'].__name__)
+                if reqs.get('errors') and reqs['errors'].get('function'):
+                    error = reqs['errors']['function']
+                item_errors.append(error)
+
             if not sanitize_string(item):
                 item_errors.append(SANITIZE_ERROR)
 

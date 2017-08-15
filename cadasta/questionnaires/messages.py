@@ -11,3 +11,4 @@ MISSING_RELEVANT = _("Unable to assign question group to model entitity. Make "
                      "sure to add a 'relevant' clause to the question group "
                      "definition when adding more than one question group for "
                      "a model entity.")
+INVALID_ACCURACY = _("Accuracy threshold must be positive float.")

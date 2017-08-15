@@ -376,6 +376,95 @@ class QuestionManagerTest(TestCase):
         assert model.relevant == '${party_id}="abc123"'
         assert model.required is True
 
+    def test_create_from_dict_include_accuracy_threshold(self):
+        question_dict = {
+            'label': 'point',
+            'name': 'point',
+            'type': 'geopoint',
+            'control': {
+                'accuracyThreshold': 1.5
+            }
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+
+        model = models.Question.objects.create_from_dict(
+            dict=question_dict,
+            questionnaire=questionnaire
+        )
+
+        assert model.question_group is None
+        assert model.questionnaire == questionnaire
+        assert model.label == question_dict['label']
+        assert model.name == question_dict['name']
+        assert model.type == 'GP'
+        assert model.gps_accuracy == 1.5
+
+    def test_create_from_dict_ingnore_accuracy_threshold(self):
+        """For non-geometry fields accuracy should be ignored"""
+        question_dict = {
+            'label': 'int',
+            'name': 'int',
+            'type': 'integer',
+            'control': {
+                'accuracyThreshold': 1.5
+            }
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+
+        model = models.Question.objects.create_from_dict(
+            dict=question_dict,
+            questionnaire=questionnaire
+        )
+
+        assert model.question_group is None
+        assert model.questionnaire == questionnaire
+        assert model.label == question_dict['label']
+        assert model.name == question_dict['name']
+        assert model.type == 'IN'
+        assert model.gps_accuracy is None
+
+    def test_create_from_dict_include_accuracy_threshold_as_string(self):
+        question_dict = {
+            'label': 'point',
+            'name': 'point',
+            'type': 'geopoint',
+            'control': {
+                'accuracyThreshold': '1.5'
+            }
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+
+        model = models.Question.objects.create_from_dict(
+            dict=question_dict,
+            questionnaire=questionnaire
+        )
+
+        assert model.question_group is None
+        assert model.questionnaire == questionnaire
+        assert model.label == question_dict['label']
+        assert model.name == question_dict['name']
+        assert model.type == 'GP'
+
+        model.refresh_from_db()
+        assert model.gps_accuracy == 1.5
+
+    def test_create_from_dict_include_invalid_accuracy(self):
+        question_dict = {
+            'label': 'point',
+            'name': 'point',
+            'type': 'geopoint',
+            'control': {
+                'accuracyThreshold': -1.5
+            }
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+
+        with pytest.raises(InvalidQuestionnaire):
+            models.Question.objects.create_from_dict(
+                dict=question_dict,
+                questionnaire=questionnaire
+            )
+
     def test_create_from_dict_with_group(self):
         question_dict = {
             'hint': 'For this field (type=integer)',

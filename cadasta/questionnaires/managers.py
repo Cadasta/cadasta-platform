@@ -11,10 +11,12 @@ from jsonattrs.models import Attribute, AttributeType, Schema
 from pyxform.builder import create_survey_element_from_dict
 from pyxform.errors import PyXFormError
 from pyxform.xls2json import parse_file_to_json
-from .exceptions import InvalidQuestionnaire
-from .messages import MISSING_RELEVANT
 from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
+from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
+from .exceptions import InvalidQuestionnaire
+from .messages import MISSING_RELEVANT, INVALID_ACCURACY
+from .validators import validate_accuracy
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -294,7 +296,7 @@ class QuestionManager(models.Manager):
     def create_from_dict(self, errors=[], index=0, **kwargs):
         dict = kwargs.pop('dict')
         instance = self.model(**kwargs)
-        type_dict = {name: code for code, name in instance.TYPE_CHOICES}
+        type_dict = {name: code for code, name in QUESTION_TYPES}
 
         relevant = None
         required = False
@@ -303,10 +305,18 @@ class QuestionManager(models.Manager):
             relevant = bind.get('relevant', None)
             required = True if bind.get('required', 'no') == 'yes' else False
 
+        gps_accuracy = None
+        control = dict.get('control')
+        if control and type_dict[dict.get('type')] in XFORM_GEOM_FIELDS:
+            gps_accuracy = control.get('accuracyThreshold', None)
+            if gps_accuracy and not validate_accuracy(gps_accuracy):
+                raise(InvalidQuestionnaire([INVALID_ACCURACY]))
+
         instance.type = type_dict[dict.get('type')]
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
         instance.required = required
+        instance.gps_accuracy = gps_accuracy
         instance.constraint = dict.get('constraint')
         instance.default = dict.get('default', None)
         instance.hint = dict.get('hint', None)
