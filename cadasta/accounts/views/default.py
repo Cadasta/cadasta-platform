@@ -73,13 +73,18 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('account:profile')
 
     def get_object(self, *args, **kwargs):
+        self.instance_phone = self.request.user.phone
         return self.request.user
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         emails_to_verify = EmailAddress.objects.filter(
             user=self.object, verified=False).exists()
+        phones_to_verify = VerificationDevice.objects.filter(
+            user=self.object, verified=False).exists()
+
         context['emails_to_verify'] = emails_to_verify
+        context['phones_to_verify'] = phones_to_verify
         return context
 
     def get_form_kwargs(self, *args, **kwargs):
@@ -88,8 +93,17 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
         return form_kwargs
 
     def form_valid(self, form):
+        phone = form.data.get('phone')
         messages.add_message(self.request, messages.SUCCESS,
                              _("Successfully updated profile information"))
+
+        if (phone != self.instance_phone and phone):
+            message = _("Verification Token sent to {phone}")
+            message = message.format(phone=phone)
+            messages.add_message(self.request, messages.INFO, message)
+            self.request.session["user_id"] = self.object.id
+            self.success_url = reverse_lazy('account:verify_phone')
+
         return super().form_valid(form)
 
     def form_invalid(self, form):
