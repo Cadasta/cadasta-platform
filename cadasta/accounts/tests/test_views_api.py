@@ -1,6 +1,8 @@
 from django.core import mail
 from django.test import TestCase
 
+from allauth.account.models import EmailAddress
+
 from skivvy import APITestCase
 
 from core.tests.utils.cases import UserTestCase
@@ -16,7 +18,29 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
                                        email='john@beatles.uk',
-                                       email_verified=True)
+                                       phone='+12345678990',
+                                       email_verified=True,
+                                       phone_verified=True)
+
+    def test_update_profile(self):
+        data = {'email': 'boss@beatles.uk',
+                'phone': '+919327768250',
+                'username': 'imagine71'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 200
+
+        assert len(mail.outbox) == 2
+        assert VerificationDevice.objects.count() == 1
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+12345678990').exists() is False
+        assert 'boss@beatles.uk' in mail.outbox[0].to
+        assert 'john@beatles.uk' in mail.outbox[1].to
+
+        self.user.refresh_from_db()
+        assert self.user.email_verified is True
+        assert self.user.phone_verified is True
+        assert self.user.email == 'john@beatles.uk'
+        assert self.user.phone == '+12345678990'
 
     def test_update_email_address(self):
         """Service should send a verification email when the user updates their
@@ -24,9 +48,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         data = {'email': 'boss@beatles.uk', 'username': 'imagine71'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
+
         assert len(mail.outbox) == 2
         assert 'boss@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to
+
         self.user.refresh_from_db()
         assert self.user.email_verified is True
 
@@ -37,6 +63,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
         assert len(mail.outbox) == 0
+
         self.user.refresh_from_db()
         assert self.user.email_verified is True
 
@@ -44,16 +71,18 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         UserFactory.create(email='boss@beatles.uk')
         data = {'email': 'boss@beatles.uk', 'username': self.user.username}
         response = self.request(method='PUT', post_data=data, user=self.user)
-        self.user.refresh_from_db()
         assert response.status_code == 400
+
+        self.user.refresh_from_db()
         assert self.user.email == 'john@beatles.uk'
         assert self.user.email_verified is True
 
     def test_update_username(self):
         data = {'email': self.user.email, 'username': 'john'}
         response = self.request(method='PUT', post_data=data, user=self.user)
-        self.user.refresh_from_db()
         assert response.status_code == 200
+
+        self.user.refresh_from_db()
         assert self.user.username == 'john'
         assert self.user.email_verified is True
 
@@ -61,10 +90,97 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         UserFactory.create(username='boss')
         data = {'email': self.user.email, 'username': 'boss'}
         response = self.request(method='PUT', post_data=data, user=self.user)
-        self.user.refresh_from_db()
         assert response.status_code == 400
+
+        self.user.refresh_from_db()
         assert self.user.username == 'imagine71'
         assert self.user.email_verified is True
+
+    def test_update_phone_number(self):
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+
+        data = {'phone': '+919327768250', 'username': 'imagine71'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 200
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+12345678990').exists() is False
+
+        self.user.refresh_from_db()
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
+    def test_keep_phone_number(self):
+        data = {'phone': self.user.phone, 'username': 'imagine71'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 200
+
+        self.user.refresh_from_db()
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+        assert VerificationDevice.objects.filter(
+            user=self.user, unverified_phone=self.user.phone).exists() is False
+
+    def test_update_with_existing_phone(self):
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+
+        user2 = UserFactory.create(phone='+919327768250')
+        data = {'phone': user2.phone, 'username': 'imagine71'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 400
+
+        self.user.refresh_from_db()
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
+    def test_update_add_phone_and_remove_email(self):
+        user1 = UserFactory.create(username='sherlock',
+                                   phone=None,
+                                   email='sherlock.holmes@bbc.uk',
+                                   email_verified=True)
+        EmailAddress.objects.create(user=user1, email=user1.email)
+
+        data = {
+            'phone': '+919327768250',
+            'email': '',
+            'username': 'sherlock'
+        }
+        response = self.request(method='PUT', post_data=data, user=user1)
+        assert response.status_code == 200
+
+        user1.refresh_from_db()
+        assert user1.phone == '+919327768250'
+        assert user1.phone_verified is False
+        assert VerificationDevice.objects.count() == 1
+        assert user1.email is None
+        assert user1.email_verified is False
+        assert VerificationDevice.objects.filter(
+            unverified_phone=user1.phone).exists() is True
+
+    def test_update_add_email_and_remove_phone(self):
+        user1 = UserFactory.create(username='sherlock',
+                                   phone='+919327768250',
+                                   email=None,
+                                   phone_verified=True)
+        VerificationDevice.objects.create(user=user1,
+                                          unverified_phone=user1.phone)
+        data = {
+            'phone': '',
+            'email': 'sherlock.holmes@bbc.uk',
+            'username': 'sherlock'
+        }
+        response = self.request(method='PUT', post_data=data, user=user1)
+        assert response.status_code == 200
+
+        user1.refresh_from_db()
+        assert user1.phone is None
+        assert user1.phone_verified is False
+        assert user1.email == 'sherlock.holmes@bbc.uk'
+        assert user1.email_verified is False
+        assert VerificationDevice.objects.count() == 0
+        assert len(mail.outbox) == 1
+        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
 
 
 class AccountSignupTest(APITestCase, UserTestCase, TestCase):

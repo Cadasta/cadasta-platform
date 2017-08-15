@@ -94,7 +94,8 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {
             'form': ProfileForm(instance=self.user),
-            'emails_to_verify': False
+            'emails_to_verify': False,
+            'phones_to_verify': False
         }
 
     def test_get_profile(self):
@@ -136,10 +137,11 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         post_data = {
             'username': 'John',
             'email': user.email,
+            'phone': user.phone,
+            'language': 'en',
+            'measurement': 'metric',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
-            'language': 'en',
-            'measurement': 'metric'
         }
         response = self.request(method='POST', post_data=post_data, user=user)
         response.status_code == 200
@@ -164,11 +166,80 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         post_data = {
             'username': 'Bill',
             'email': user1.email,
+            'phone': user2.phone,
+            'language': 'en',
+            'measurement': 'metric',
             'full_name': 'Bill Bloggs',
         }
 
         response = self.request(method='POST', user=user2, post_data=post_data)
         assert 'Failed to update profile information' in response.messages
+
+    def test_get_profile_with_verified_phone(self):
+        self.user = UserFactory.create(phone_verified=True,
+                                       email_verified=True)
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_profile_with_unverified_phone(self):
+        self.user = UserFactory.create()
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+
+        response = self.request(user=self.user)
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(phones_to_verify=True)
+
+    def test_update_profile_with_duplicate_phone(self):
+        user1 = UserFactory.create(phone='+919327768250')
+        user2 = UserFactory.create(password='221B@bakerstreet')
+        post_data = {
+            'username': user2.username,
+            'email': user2.email,
+            'phone': user1.phone,
+            'language': 'en',
+            'measurement': 'metric',
+            'full_name': 'Sherlock Holmes',
+            'password': '221B@bakerstreet'
+        }
+        response = self.request(method='POST', post_data=post_data, user=user2)
+
+        assert response.status_code == 200
+        assert 'Failed to update profile information' in response.messages
+
+    def test_update_profile_with_phone(self):
+        user = UserFactory.create(password='221B@bakerstreet')
+        post_data = {
+            'username': user.username,
+            'email': user.email,
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'full_name': 'Sherlock Holmes',
+            'password': '221B@bakerstreet'
+        }
+        response = self.request(method='POST', post_data=post_data, user=user)
+        assert response.status_code == 302
+        assert '/account/accountverification/' in response.location
+
+    def test_update_keep_phone(self):
+        user = UserFactory.create(
+            password='221B@bakerstreet')
+        post_data = {
+            'username': user.username,
+            'email': user.email,
+            'phone': user.phone,
+            'language': 'en',
+            'measurement': 'metric',
+            'full_name': 'Sherlock Holmes',
+            'password': '221B@bakerstreet'
+        }
+        response = self.request(method='POST', post_data=post_data, user=user)
+        assert response.status_code == 302
+        assert '/account/profile' in response.location
 
 
 class PasswordChangeTest(ViewTestCase, UserTestCase, TestCase):

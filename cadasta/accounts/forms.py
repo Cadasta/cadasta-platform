@@ -112,11 +112,16 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
 
 
 class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
+    email = forms.EmailField(required=False)
+
+    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+                             error_messages={'invalid': phone_format},
+                             required=False)
     password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'full_name', 'language',
+        fields = ['username', 'email', 'phone', 'full_name', 'language',
                   'measurement', 'avatar']
 
     class Media:
@@ -127,6 +132,16 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.current_email = self.instance.email
+        self.current_phone = self.instance.phone
+
+    def clean(self):
+        super(ProfileForm, self).clean()
+        email = self.data.get('email')
+        phone = self.data.get('phone')
+
+        if not phone and not email:
+            raise forms.ValidationError(
+                _("You cannot leave both phone and email empty."))
 
     def clean_username(self):
         username = self.data.get('username')
@@ -143,25 +158,63 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
             raise forms.ValidationError(
                 _("Please provide the correct password for your account."))
 
+    def clean_phone(self):
+        phone = self.data.get('phone')
+        if phone:
+            if (phone != self.current_phone and
+                VerificationDevice.objects.filter(unverified_phone=phone
+                                                  ).exists()):
+                raise forms.ValidationError(
+                    _("User with this Phone number already exists."))
+        else:
+            phone = None
+        return phone
+
     def clean_email(self):
         email = self.data.get('email')
-        if self.instance.email != email:
-            if User.objects.filter(email=email).exists():
+        if email:
+            email = email.casefold()
+            if (email != self.current_email and
+                    EmailAddress.objects.filter(email=email).exists()):
                 raise forms.ValidationError(
-                    _("Another user with this email already exists"))
+                    _("User with this Email address already exists."))
+        else:
+            email = None
 
         return email
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)
+
         if self.current_email != user.email:
             current_email_set = self.instance.emailaddress_set.all()
             if current_email_set.exists():
                 current_email_set.delete()
 
-            send_email_confirmation(self.request, user)
-            send_email_update_notification(self.current_email)
-            user.email = self.current_email
+            if user.email:
+                send_email_confirmation(self.request, user)
+
+                if self.current_email:
+                    send_email_update_notification(self.current_email)
+                    user.email = self.current_email
+            else:
+                user.email_verified = False
+
+        if self.current_phone != user.phone:
+            current_phone_set = VerificationDevice.objects.filter(
+                user=self.instance)
+            if current_phone_set.exists():
+                current_phone_set.delete()
+
+            if user.phone:
+                device = VerificationDevice.objects.create(
+                    user=self.instance, unverified_phone=user.phone)
+                device.generate_challenge()
+
+                if self.current_phone:
+                    user.phone = self.current_phone
+            else:
+                user.phone_verified = False
 
         user.save()
         return user
