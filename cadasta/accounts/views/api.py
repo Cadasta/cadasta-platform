@@ -23,6 +23,7 @@ class AccountUser(djoser_views.UserView):
         current_email, current_phone = instance.email, instance.phone
         new_email = serializer.validated_data.get('email', instance.email)
         new_phone = serializer.validated_data.get('phone', instance.phone)
+        email_update_message = None
         user = serializer.save()
 
         if current_email != new_email:
@@ -51,12 +52,12 @@ class AccountUser(djoser_views.UserView):
                 device.generate_challenge()
                 if current_phone:
                     user.phone = current_phone
-                    utils.send_sms(self.current_phone, messages.phone_change)
+                    utils.send_sms(current_phone, messages.phone_change)
                 if user.email_verified:
                     utils.send_phone_update_notification(user.email)
             else:
                 user.phone_verified = False
-                utils.send_sms(self.current_phone, messages.phone_delete)
+                utils.send_sms(current_phone, messages.phone_delete)
                 if user.email_verified:
                     utils.send_phone_deleted_notification(user.email)
 
