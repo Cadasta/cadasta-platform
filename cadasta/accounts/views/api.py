@@ -3,6 +3,8 @@ from allauth.account.utils import send_email_confirmation
 from rest_framework.serializers import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 
 from djoser import views as djoser_views
 from djoser import signals
@@ -122,3 +124,21 @@ class SetPasswordView(djoser_views.SetPasswordView):
                               request=self.request._request,
                               user=self.request.user)
         return response
+
+
+class ConfirmPhoneView(GenericAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = serializers.PhoneVerificationSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except ValidationError:
+            return Response(
+                data=serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            data={'detail': 'Phone successfully verified.'},
+            status=status.HTTP_200_OK)
