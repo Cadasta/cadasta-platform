@@ -1,3 +1,4 @@
+from pytest import approx
 from django.conf import settings
 from django.test import TestCase
 
@@ -209,37 +210,36 @@ class ProjectAreaTest(TestCase):
 
     def sum_areas(self, *spatial_units):
         """
-        Returns the sum of all areas rounded to 10 decimals because the DB
-        only stores 10 decimals
+        Returns the sum of all areas of the provided spatial untis
         """
-        return round(sum(s.area for s in spatial_units), 10)
+        return approx(sum(s.area for s in spatial_units), 10)
 
     def test_add_locations(self):
         self.su1.save()
         self.project.refresh_from_db()
-        assert self.project.area == self.sum_areas(self.su1)
+        assert approx(self.project.area) == self.sum_areas(self.su1)
 
         self.su2.save()
         self.project.refresh_from_db()
-        assert self.project.area == self.sum_areas(self.su1, self.su2)
+        assert approx(self.project.area) == self.sum_areas(self.su1, self.su2)
 
     def test_delete_locations(self):
         self.su1.save()
         self.su2.save()
 
         self.project.refresh_from_db()
-        assert self.project.area == self.sum_areas(self.su1, self.su2)
+        assert approx(self.project.area) == self.sum_areas(self.su1, self.su2)
 
         self.su1.delete()
         self.project.refresh_from_db()
-        assert self.project.area == self.sum_areas(self.su2)
+        assert approx(self.project.area) == self.sum_areas(self.su2)
 
-    def test_update_locations(self):
+    def test_update_locations_changing_geometries(self):
         self.su1.save()
         self.su2.save()
 
         self.project.refresh_from_db()
-        assert self.project.area == self.sum_areas(self.su1, self.su2)
+        assert approx(self.project.area) == self.sum_areas(self.su1, self.su2)
 
         initial_area = self.project.area
         self.su2.geometry = ('POLYGON((12.32306 51.327866,12.323012 '
@@ -249,7 +249,7 @@ class ProjectAreaTest(TestCase):
         self.su2.save()
         self.project.refresh_from_db()
         assert initial_area < self.project.area
-        assert self.project.area == self.sum_areas(self.su1, self.su2)
+        assert approx(self.project.area) == self.sum_areas(self.su1, self.su2)
 
 
 class ProjectRoleTest(UserTestCase, TestCase):
