@@ -185,10 +185,10 @@ class ProjectTest(TestCase):
 class ProjectAreaTest(TestCase):
     """
     This test is to check if the Trigger defined in migration
-    0004_add_area_to project is apllied to the DB and if it works as expected
+    0004_add_area_to project is applied to the DB and if it works as expected
     when we're adding deleting and updating spatial units.
 
-    See this gist to find what the geometies look like:
+    See this gist to find what the geometries look like:
     https://gist.github.com/anonymous/7e5f31d878f758e00cb3fdaddddeb293
     """
 
