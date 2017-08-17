@@ -16,7 +16,7 @@
     <link href="{% sass_src 'css/main.scss' %}" rel="stylesheet" type="text/css">
     {% if LANGUAGE_BIDI %}
     <link rel="stylesheet" type="text/css"
-          href="//cdn.rawgit.com/morteza/bootstrap-rtl/v3.3.4/dist/css/bootstrap-rtl.min.css">
+          href="{% static 'bootstrap-rtl/3.3.4/css/bootstrap-rtl.min.css' %}">
     {% endif %}
     {% include "core/tracker.html" %}
     {% block extra_head %}{% endblock %}
