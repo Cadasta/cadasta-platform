@@ -4,6 +4,11 @@
 {% block page_title %}{% trans "Parties" %} | {% endblock %}
 {% block left-nav %}parties{% endblock %}
 
+{% block extra_head %}
+<script crossorigin src="https://unpkg.com/react@15/dist/react.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+{% endblock %}
+
 {% block content %}
 
 <div class="col-md-12 content-single">
@@ -22,10 +27,29 @@
             </a>
           </div>
           {% endif %}
+          <div id="paginated-table"></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_script %}
+<script src="/static/dist/paginated-table.js"></script>
+<script type="text/javascript">
+  var props = {
+    "url": "{% url 'api:v1:party:list' project=object.slug organization=object.organization.slug %}",
+    "columns": [
+      {"label": "Party", "field": "name"},
+      {"label": "Type", "field": "type"}
+    ],
+    "row_component": Row
+  }
+  ReactDOM.render(
+    React.createElement(PaginatedTable, props),
+    document.getElementById('paginated-table')
+  );
+</script>
 {% endblock %}
