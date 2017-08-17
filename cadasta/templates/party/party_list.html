@@ -22,20 +22,6 @@
             </a>
           </div>
           {% endif %}
-          <table class="table table-hover datatable" data-paging-type="simple">
-            <thead>
-              <tr>
-                <th class="col-md-3">{% trans "Name" %}</th>
-                <th class="col-md-9">{% trans "Type" %}</th>
-              </tr>
-            </thead>
-            {% for party in object_list %}
-            <tr class="linked" onclick="window.document.location='{% url 'parties:detail' object.organization.slug object.slug party.id %}';">
-              <td><a href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">{{ party.name }}</a></td>
-              <td {{ party.type_labels|safe }}>{{ party.get_type_display }}</td>
-            </tr>
-            {% endfor %}
-          </table>
         </div>
       </div>
     </div>

@@ -14,32 +14,19 @@ from .. import messages as error_messages
 
 
 class PartiesList(LoginPermissionRequiredMixin,
-                  mixins.PartyQuerySetMixin,
+                  organization_mixins.ProjectMixin,
                   organization_mixins.ProjectAdminCheckMixin,
-                  generic.ListView):
+                  generic.TemplateView):
     template_name = 'party/party_list.html'
     permission_required = 'party.list'
     permission_denied_message = error_messages.PARTY_LIST
-    no_jsonattrs_in_queryset = True
+
+    def get_perms_objects(self):
+        return [self.get_project()]
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        project = context['object']
-
-        if project.current_questionnaire:
-            try:
-                party_type = Question.objects.get(
-                    name='party_type',
-                    questionnaire_id=project.current_questionnaire)
-                party_opts = QuestionOption.objects.filter(question=party_type)
-                party_opts = dict(party_opts.values_list('name', 'label_xlat'))
-
-                for party in context['object_list']:
-                    party.type_labels = template_xlang_labels(
-                        party_opts.get(party.type))
-            except Question.DoesNotExist:
-                pass
-
+        context['object'] = self.get_project()
         return context
 
 

@@ -62,7 +62,7 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         PartyFactory.create()
 
     def setup_template_context(self):
-        return {'object': self.project, 'object_list': self.parties}
+        return {'object': self.project}
 
     def setup_url_kwargs(self):
         return {
@@ -71,47 +71,6 @@ class PartiesListTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        expected_content = self.render_content(is_allowed_add_party=True)
-        assert response.content == expected_content
-
-    def test_get_with_questionnaire(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        self.project.current_questionnaire = questionnaire.id
-        self.project.save()
-
-        party_type_question = q_factories.QuestionFactory.create(
-            questionnaire=questionnaire,
-            name='party_type',
-            label={'en': 'Party type', 'de': 'Party Typ'},
-            type='S1')
-        q_factories.QuestionOptionFactory.create(
-            question=party_type_question,
-            name='IN',
-            label={'en': 'Individual', 'de': 'Einzelperson'})
-
-        for p in self.parties:
-            p.type_labels = ('data-label-de="Einzelperson" '
-                             'data-label-en="Individual"')
-
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
-        assert response.status_code == 200
-        assert response.content == self.render_content(
-            is_allowed_add_party=True,
-            object_list=self.parties,
-            form_lang_default='en',
-            form_langs=[('en', 'English'), ('de', 'German')])
-
-    def test_get_with_incomplete_questionnaire(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        self.project.current_questionnaire = questionnaire.id
-        self.project.save()
-
         user = UserFactory.create()
         assign_policies(user)
         response = self.request(user=user)
