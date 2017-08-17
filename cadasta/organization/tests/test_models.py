@@ -186,10 +186,10 @@ class ProjectTest(TestCase):
 class ProjectAreaTest(TestCase):
     """
     This test is to check if the Trigger defined in migration
-    0004_add_area_to project is applied to the DB and if it works as expected
-    when we're adding deleting and updating spatial units.
+    0006_add_project_area_trigger is applied to the DB and if it works as
+    expected when we're adding deleting and updating spatial units.
 
-    See this gist to find what the geometries look like:
+    See this gist to find out what the geometries look like:
     https://gist.github.com/anonymous/7e5f31d878f758e00cb3fdaddddeb293
     """
 
@@ -212,7 +212,7 @@ class ProjectAreaTest(TestCase):
         """
         Returns the sum of all areas of the provided spatial untis
         """
-        return approx(sum(s.area for s in spatial_units), 10)
+        return approx(sum(s.area for s in spatial_units))
 
     def test_add_locations(self):
         self.su1.save()
