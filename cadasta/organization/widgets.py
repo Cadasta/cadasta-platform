@@ -86,12 +86,12 @@ class PublicPrivateToggle(Widget):
 
     class Media:
         js = (
-            'https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/'
+            '/static/bootstrap-toggle/2.2.2/js/'
             'bootstrap-toggle.min.js',
         )
         css = {
             'all': (
-                'https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/'
+                '/static/bootstrap-toggle/2.2.2/css/'
                 'bootstrap-toggle.min.css',
             )
         }
