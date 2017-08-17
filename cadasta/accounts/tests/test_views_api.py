@@ -187,6 +187,39 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         assert len(mail.outbox) == 1
         assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
 
+    def test_remove_phone_email_unverified(self):
+        user1 = UserFactory.create(username='sherlock',
+                                   email='sherlock.holmes@bbc.uk',
+                                   email_verified=False,
+                                   phone='+919327768250',
+                                   phone_verified=True,
+                                   password='221B@bakerstreet')
+
+        data = {'phone': '', 'username': 'sherlock'}
+        response = self.request(method='PUT', post_data=data, user=user1)
+        assert response.status_code == 200
+        assert len(mail.outbox) == 0
+        user1.refresh_from_db()
+        assert user1.phone is None
+        assert user1.phone_verified is False
+
+    def test_remove_phone_email_verified(self):
+        user1 = UserFactory.create(username='sherlock',
+                                   email='sherlock.holmes@bbc.uk',
+                                   phone='+919327768250',
+                                   email_verified=True,
+                                   phone_verified=True,
+                                   password='221B@bakerstreet')
+
+        data = {'phone': '', 'username': 'sherlock'}
+        response = self.request(method='PUT', post_data=data, user=user1)
+        assert response.status_code == 200
+        assert len(mail.outbox) == 1
+        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+        user1.refresh_from_db()
+        assert user1.phone is None
+        assert user1.phone_verified is False
+
 
 class AccountSignupTest(APITestCase, UserTestCase, TestCase):
     view_class = api_views.AccountRegister
