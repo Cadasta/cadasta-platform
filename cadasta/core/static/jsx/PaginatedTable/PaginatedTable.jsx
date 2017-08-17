@@ -1,6 +1,6 @@
 class Head extends React.Component {
   render() {
-    return <th>{this.props.label}</th>
+    return <th>{this.props.label}</th>;
   }
 }
 
@@ -12,7 +12,7 @@ class Row extends React.Component {
         <td>{this.props.type}</td>
         <td></td>
       </tr>
-    )
+    );
   }
 }
 
@@ -22,7 +22,7 @@ class PaginatedTable extends React.Component {
     this.state = {
       data: [],
       count: 0
-    }
+    };
   }
 
   fetchData() {
@@ -35,12 +35,12 @@ class PaginatedTable extends React.Component {
       this.setState({
         data: data['results'],
         count: data['count'],
-      })
-    })
+      });
+    });
   }
 
   componentDidMount() {
-    this.fetchData()
+    this.fetchData();
   }
 
   render() {
@@ -57,6 +57,6 @@ class PaginatedTable extends React.Component {
           {this.state.data.map(set => React.createElement(RowComponent, set))}
         </tbody>
       </table>
-    )
+    );
   }
 }

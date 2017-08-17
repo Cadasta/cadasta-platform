@@ -42,8 +42,8 @@
   var props = {
     "url": "{% url 'api:v1:party:list' project=object.slug organization=object.organization.slug %}",
     "columns": [
-      {"label": "Party", "field": "name"},
-      {"label": "Type", "field": "type"}
+      {"label": "Party", "field": "name", "sortable": true},
+      {"label": "Type", "field": "type", "sortable": true}
     ],
     "row_component": Row
   }
