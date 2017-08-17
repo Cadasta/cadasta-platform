@@ -1,26 +1,42 @@
 {% extends "core/base.html" %}
+
 {% load i18n %}
+
 {% load widget_tweaks %}
+
 {% block head_title %} {% trans "Account Verification" %}{% endblock %}
+
 {% block content %}
   <div class="narrow">
-    <h1>{% trans "Account Verification" %}</h1>
+    <h1>
+      {% trans "Account Verification" %}
+    </h1>
     {% if email %}
-      <p>{% blocktrans %}To verify your email address, click on the verification link sent to your registered email address.{% endblocktrans %} </p>
+      <p>{% trans "To verify your email address, click on the verification link sent to your registered email address." %}</p>
     {% endif %}
+
     {% if phone %}
-      <p>{% blocktrans %}To verify your phone number, enter the one-time password sent to your registered phone number.{% endblocktrans%}</p>
-      
+      <p>{% trans "To verify your phone number, enter the one-time password sent to your registered phone number." %}</p>
       <form class="form-narrow" action="{% url 'account:verify_phone' %}" method="post">
         {% csrf_token %}
-        <div class="form-group{% if form.token.errors %} has-error{% endif %}">
-        <label class="input-group input-lg" for="{{ form.token.id_for_label }}">{% trans "Token" %}</label>
-        {% render_field form.token class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
-        <div class="error-block">{{ form.token.errors }}</div>
-      </div>
-      <button type="submit" name="Verify" class="btn btn-primary btn-lg btn-block text-uppercase">{% trans "Verify Token" %}</button>
-    </form>
-  {% endif %}
-  <p>{% blocktrans %} Click {% endblocktrans %}<a href="{% url 'account:resend_token' %}">{% blocktrans %}here</a> if you did not receive any email or text.{% endblocktrans %}</p>
-</div>
+        <div class="form-group {% if form.token.errors %} has-error {% endif %}">
+          <label class="input-group input-lg" for="{{ form.token.id_for_label }}">
+            {% trans "Token" %}
+          </label>
+          {% render_field form.token class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
+          <div class="error-block">
+            {{ form.token.errors }}
+          </div>
+        </div>
+        <button type="submit" name="Verify" class="btn btn-primary btn-lg btn-block text-uppercase">
+          {% trans "Verify Token" %}
+        </button>
+      </form>
+    {% endif %}
+  
+    {% url 'account:resend_token' as resend_url %}
+    <p>
+      {% blocktrans %} Click <a href="{{ resend_url }}">here</a> if you did not receive any email or text.{% endblocktrans %}
+    </p>
+  </div>
 {% endblock %}

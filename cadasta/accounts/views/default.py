@@ -15,6 +15,7 @@ from allauth.account.models import EmailAddress
 
 from ..models import User, VerificationDevice
 from .. import forms
+from ..messages import account_inactive, unverified_identifier
 
 
 class AccountRegister(CreateView):
@@ -114,23 +115,31 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
 
 class AccountLogin(LoginView):
+
     def form_valid(self, form):
         login = form.cleaned_data['login']
         user = form.user
 
-        if not user.phone_verified and not user.email_verified:
+        if (login == user.username and
+                not user.phone_verified and
+                not user.email_verified):
             user.is_active = False
             user.save()
+            messages.add_message(
+                self.request, messages.ERROR, account_inactive)
             return redirect(reverse_lazy('account:resend_token'))
 
-        if((login == user.email and not user.email_verified) or
-                (login == user.phone and not user.phone_verified)):
+        if(login == user.email and not user.email_verified or
+                login == user.phone and not user.phone_verified):
+            messages.add_message(
+                self.request, messages.ERROR, unverified_identifier)
             return redirect(reverse_lazy('account:resend_token'))
         else:
             return super().form_valid(form)
 
 
 class ConfirmEmail(ConfirmEmailView):
+
     def post(self, *args, **kwargs):
         response = super().post(*args, **kwargs)
 
@@ -186,18 +195,35 @@ class ResendTokenView(FormView):
         phone = form.data.get('phone')
         email = form.data.get('email')
         if phone:
-            phone_device = VerificationDevice.objects.get(
-                unverified_phone=phone)
-            phone_device.generate_challenge()
-            message = _("Verification Token sent to {phone}")
-            message = message.format(phone=phone)
+            try:
+                phone_device = VerificationDevice.objects.get(
+                    unverified_phone=phone, verified=False)
+                phone_device.generate_challenge()
+                self.request.session['user_id'] = phone_device.user.id
+            except VerificationDevice.DoesNotExist:
+                pass
+            message = _(
+                "Your phone number has been submitted."
+                " If it matches your account on Cadasta Platform, you will"
+                " receive a verification code to confirm your phone.")
             messages.add_message(self.request, messages.SUCCESS, message)
-            self.request.session['user_id'] = phone_device.user.id
+
         if email:
-            email_device = EmailAddress.objects.get(email=email)
-            user = email_device.user
-            if user.email != email:
-                user.email = email
-            send_email_confirmation(self.request, user)
-            self.request.session['user_id'] = email_device.user.id
+            email = email.casefold()
+            try:
+                email_device = EmailAddress.objects.get(
+                    email=email, verified=False)
+                user = email_device.user
+                if not user.email_verified:
+                    user.email = email
+                send_email_confirmation(self.request, user)
+                self.request.session['user_id'] = email_device.user.id
+            except EmailAddress.DoesNotExist:
+                pass
+            message = _(
+                "Your email address has been submitted."
+                " If it matches your account on Cadasta Platform, you will"
+                " receive a verification link to confirm your email.")
+            messages.add_message(self.request, messages.SUCCESS, message)
+
         return super().form_valid(form)

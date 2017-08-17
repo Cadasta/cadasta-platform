@@ -913,8 +913,8 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
     def test_unverified_account(self):
-        """Serializer should raise exceptions.EmailNotVerifiedError exeception when the
-           user has not verified their email address"""
+        """Serializer should raise exceptions.EmailNotVerifiedError exeception
+            when the user has not verified their email address"""
 
         UserFactory.create(username='sgt_pepper',
                            password='iloveyoko79',

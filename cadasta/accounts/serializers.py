@@ -264,26 +264,28 @@ class UserSerializer(SanitizeFieldSerializer,
 
 
 class AccountLoginSerializer(djoser_serializers.LoginSerializer):
+
     def validate(self, attrs):
         attrs = super(AccountLoginSerializer, self).validate(attrs)
 
-        if ((attrs['username'] == self.user.username) and
-                ((not self.user.email_verified) and
-                    (not self.user.phone_verified))):
+        if (attrs['username'] == self.user.username and
+            not self.user.email_verified and
+                not self.user.phone_verified):
             raise exceptions.AccountInactiveError
 
         if (attrs['username'] == self.user.email and
-                (not self.user.email_verified)):
+                not self.user.email_verified):
             raise exceptions.EmailNotVerifiedError
 
         if (attrs['username'] == self.user.phone and
-                (not self.user.phone_verified)):
+                not self.user.phone_verified):
             raise exceptions.PhoneNotVerifiedError
 
         return attrs
 
 
 class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
+
     def validate(self, attrs):
 
         if not self.context['request'].user.change_pw:

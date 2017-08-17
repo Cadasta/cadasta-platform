@@ -1,4 +1,3 @@
-from django.utils.translation import ugettext as _
 from allauth.account.utils import send_email_confirmation
 
 from rest_framework.serializers import ValidationError
@@ -98,31 +97,32 @@ class AccountLogin(djoser_views.LoginView):
         try:
             serializer.is_valid(raise_exception=True)
             return self._action(serializer)
+
         except ValidationError:
-            return Response(
-                data=serializer.errors,
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        except exceptions.AccountInactiveError:
+            error = serializer.errors
+
+        except exceptions.AccountInactiveError as e:
             user = serializer.user
             user.is_active = False
             user.save()
-            return Response(
-                data={'detail': _("User account is disabled.")},
-                status=status.HTTP_401_UNAUTHORIZED)
-        except exceptions.EmailNotVerifiedError:
-            return Response(
-                data={'detail': _("The email has not been verified.")},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        except exceptions.PhoneNotVerifiedError:
-            return Response(
-                data={'detail': _("The phone has not been verified.")},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+            error = e.msg
+
+        except exceptions.EmailNotVerifiedError as e:
+            user = serializer.user
+            error = e.msg
+            send_email_confirmation(self.request._request, user)
+
+        except exceptions.PhoneNotVerifiedError as e:
+            user = serializer.user
+            error = e.msg
+
+        return Response(
+            data={'detail': error},
+            status=status.HTTP_401_UNAUTHORIZED)
 
 
 class SetPasswordView(djoser_views.SetPasswordView):
+
     def _action(self, serializer):
         response = super()._action(serializer)
         password_changed.send(sender=self.request.user.__class__,

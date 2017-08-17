@@ -15,6 +15,7 @@ from allauth.account.forms import ChangePasswordForm
 from accounts.models import User, VerificationDevice
 from ..views import default
 from ..forms import ProfileForm
+from ..messages import account_inactive, unverified_identifier
 from django.test import RequestFactory
 from django.contrib.messages.storage.fallback import FallbackStorage
 
@@ -289,35 +290,25 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
         assert '/account/resendtokenpage/' in response.location
+        assert account_inactive in response.messages
 
         self.user.refresh_from_db()
         assert self.user.is_active is False
 
-    def test_successful_login_with_email_both_unverified(self):
-        self.user.email_verified = False
-        self.user.phone_verified = False
-        self.user.save()
+    def test_unsuccessful_login_with_email(self):
 
         data = {'login': 'john@beatles.uk', 'password': 'iloveyoko79'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
         assert '/account/resendtokenpage/' in response.location
+        assert unverified_identifier in response.messages
 
-        self.user.refresh_from_db()
-        assert self.user.is_active is False
-
-    def test_successful_login_with_phone_both_unverified(self):
-        self.user.email_verified = False
-        self.user.phone_verified = False
-        self.user.save()
-
+    def test_unsuccessful_login_with_phone(self):
         data = {'login': '+919327768250', 'password': 'iloveyoko79'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
         assert '/account/resendtokenpage/' in response.location
-
-        self.user.refresh_from_db()
-        assert self.user.is_active is False
+        assert unverified_identifier in response.messages
 
     def test_successful_login_with_username_both_verified(self):
         self.user.email_verified = True
@@ -338,7 +329,7 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert 'dashboard' in response.location
 
-    def test_successful_login_with_verified_email(self):
+    def test_successful_login_with_email(self):
         self.user.email_verified = True
         self.user.save()
 
@@ -347,20 +338,7 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert 'dashboard' in response.location
 
-    def test_successful_login_with_unverified_email_verified_phone(self):
-        self.user.email_verified = False
-        self.user.phone_verified = True
-        self.user.save()
-
-        data = {'login': 'john@beatles.uk', 'password': 'iloveyoko79'}
-        response = self.request(method='POST', post_data=data)
-        assert response.status_code == 302
-        assert '/account/resendtokenpage/' in response.location
-
-        self.user.refresh_from_db()
-        assert self.user.is_active is True
-
-    def test_successful_login_with_phone_verified(self):
+    def test_successful_login_with_phone(self):
         self.user.phone_verified = True
         self.user.save()
 
@@ -368,19 +346,6 @@ class LoginTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
         assert 'dashboard' in response.location
-
-    def test_successful_login_with_unverified_phone_verified_email(self):
-        self.user.phone_verified = False
-        self.user.email_verified = True
-        self.user.save()
-
-        data = {'login': '+919327768250', 'password': 'iloveyoko79'}
-        response = self.request(method='POST', post_data=data)
-        assert response.status_code == 302
-        assert '/account/resendtokenpage/' in response.location
-
-        self.user.refresh_from_db()
-        assert self.user.is_active is True
 
 
 class ConfirmEmailTest(ViewTestCase, UserTestCase, TestCase):
@@ -572,7 +537,6 @@ class ResendTokenViewTest(ViewTestCase, UserTestCase, TestCase):
                                           unverified_phone=self.user.phone)
         data = {
             'phone': '+919327768250',
-            'verify_phone': 'Verify Phone'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -582,7 +546,6 @@ class ResendTokenViewTest(ViewTestCase, UserTestCase, TestCase):
         EmailAddress.objects.create(user=self.user, email=self.user.email)
         data = {
             'email': 'sherlock.holmes@bbc.uk',
-            'verify_email': 'Verify Email'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -594,10 +557,31 @@ class ResendTokenViewTest(ViewTestCase, UserTestCase, TestCase):
         EmailAddress.objects.create(user=self.user, email='john.watson@bbc.uk')
         data = {
             'email': 'john.watson@bbc.uk',
-            'verify_email': 'Verify Email'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
         assert '/account/accountverification/' in response.location
         assert len(mail.outbox) == 1
         assert 'john.watson@bbc.uk' in mail.outbox[0].to
+
+    def test_already_verified_email(self):
+        EmailAddress.objects.create(
+            user=self.user, verified=True, email=self.user.email)
+        data = {
+            'email': 'john.watson@bbc.uk',
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/accountverification/' in response.location
+        assert len(mail.outbox) == 0
+
+    def test_already_verified_phone(self):
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone=self.user.phone,
+                                          verified=True)
+        data = {
+            'phone': '+919327768250',
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert '/account/accountverification/' in response.location

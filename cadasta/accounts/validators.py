@@ -42,13 +42,13 @@ class CharacterTypePasswordValidator(object):
 
 class EmailSimilarityValidator(object):
     def validate(self, password, user=None):
-        if not user:
+        if not user or not user.email:
             return None
-        if user.email:
-            email = user.email.split('@')
-            if len(email[0]) and email[0].casefold() in password.casefold():
-                raise ValidationError(
-                    _("Passwords cannot contain your email."))
+
+        email = user.email.split('@')
+        if len(email[0]) and email[0].casefold() in password.casefold():
+            raise ValidationError(
+                _("Passwords cannot contain your email."))
 
 
 def check_username_case_insensitive(username):

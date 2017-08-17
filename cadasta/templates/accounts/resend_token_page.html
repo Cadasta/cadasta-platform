@@ -1,47 +1,55 @@
 {% extends "core/base.html" %}
+
 {% load i18n %}
+
 {% load widget_tweaks %}
+
 {% block top-nav %}verify{% endblock %}
+
 {% block title %} | {% trans "Verify Account" %}{% endblock %}
+
 {% block content %}
-  {% if form.non_field_errors %}
-    <div id="messages">
-      {% for message in form.non_field_errors %}
-        <div class="alert alert-dismissible alert-danger"
-          role="alert">
-          <button type="button" class="close" data-dismiss="alert"
-          aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-          </button>
-          {{ message|escape }}
-        </div>
-      {% endfor %}
-    </div>
-  {% endif %}
-  
-  <div class="narrow">
-    <h1>{% trans "Verify Account" %}</h1>
-    <form method='POST' action="{% url 'account:resend_token' %}" class="form form-narrow" data-parsley-validate>
-      {% csrf_token %}
-      {{ form.non_field_errors }}
-      <div class="form-group{% if form.email.errors %} has-error{% endif %}">
-      <h4><label class="control-label" for="id_email">{% trans "Enter your registered Email address to receive a verification link." %}</label></h4>
-      {% render_field form.email class+="form-control input-lg" placeholder="Email" %}
-      <div class="error-block">{{ form.email.errors }}</div>
-    </div>
-    <input type="submit" name="verify_email" value="{% trans 'Verify Email' %}"
-    class="btn btn-primary btn-lg btn-block text-uppercase" />
-  </form>
-  <form method='POST' action="{% url 'account:resend_token' %}" class="form form-narrow" data-parsley-validate>
-    {% csrf_token %}
+<div class="narrow">
+    <h1>
+        {% trans "Verify Account" %}
+    </h1>
     {{ form.non_field_errors }}
-    <div class="form-group{% if form.phone.errors %} has-error{% endif %}">
-    <h4><label class="control-label" for="id_phone">{% trans " Enter your registered Phone number to receive a verification code." %}</label></h4>
-    {% render_field form.phone class+="form-control input-lg" placeholder="Phone" %}
-    <div class="error-block">{{ form.phone.errors }}</div>
-  </div><input type="submit" name="verify_phone" value="{% trans 'Verify Phone' %}"
-  class="btn btn-primary btn-lg btn-block text-uppercase" />
-</form>
+    
+    <form method='POST' action="{% url 'account:resend_token' %}" class="form form-narrow" data-parsley-validate>
+        {% csrf_token %}
+        <div class="form-group{% if form.email.errors %} has-error{% endif %}">
+            <h4>
+              <label class="control-label" for="id_email">
+                {% trans "Enter your registered Email address to receive a verification link." %}
+              </label>
+            </h4>
+            {% render_field form.email class+="form-control input-lg" placeholder="Email" %}
+            <div class="error-block">
+                {{ form.email.errors }}
+            </div>
+        </div>
+        <button type="submit" name="verify_email" class="btn btn-primary btn-lg btn-block text-uppercase">
+            {% trans 'Verify Email' %}
+        </button>
+    </form>
+    
+    <form method='POST' action="{% url 'account:resend_token' %}" class="form form-narrow" data-parsley-validate>
+        {% csrf_token %}
+        <div class="form-group{% if form.phone.errors %} has-error{% endif %}">
+            <h4>
+              <label class="control-label" for="id_phone">
+                {% trans " Enter your registered Phone number to receive a verification code." %}
+              </label>
+            </h4>
+            {% render_field form.phone class+="form-control input-lg" placeholder="Phone" %}
+            <div class="error-block">
+                {{ form.phone.errors }}
+            </div>
+        </div>
+        <button type="submit" name="verify_phone" class="btn btn-primary btn-lg btn-block text-uppercase" >
+            {% trans 'Verify Phone' %}
+        </button>
+    </form>
 </div>
 {% endblock %}
 
