@@ -186,6 +186,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
     current_questionnaire = models.CharField(
         max_length=24, null=True, blank=True
     )
+    area = models.FloatField(default=0)
 
     history = HistoricalRecords()
 

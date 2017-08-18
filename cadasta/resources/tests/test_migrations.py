@@ -30,6 +30,8 @@ class MigrationTestCase(UserTestCase, TestCase):
         # Reverse to migrate_from
         call_command('migrate', 'accounts',
                      '0002_activate_users_20161014_0846')
+        call_command('migrate', 'organization',
+                     '0004_remove_Pb_project_roles')
         call_command('migrate', self.app, self.migrate_from)
 
         # setup pre-migration test data
