@@ -113,7 +113,6 @@ class AccountLogin(djoser_views.LoginView):
             send_email_confirmation(self.request._request, user)
 
         except exceptions.PhoneNotVerifiedError as e:
-            user = serializer.user
             error = e.msg
 
         return Response(
