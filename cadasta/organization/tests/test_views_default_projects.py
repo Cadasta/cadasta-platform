@@ -866,7 +866,8 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
             is_allowed_add_resource=True,
             is_allowed_import=True,
             is_allowed_download=True,
-            is_project_member=True
+            is_project_member=True,
+            is_allowed_add_party=True
         )
 
     def test_get_with_archived_project(self):
@@ -981,7 +982,8 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
                 'is_allowed_add_resource': True,
                 'is_allowed_import': True,
                 'is_allowed_download': True,
-                'is_project_member': True}
+                'is_project_member': True,
+                'is_allowed_add_party': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -1258,7 +1260,8 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
                 'is_allowed_add_resource': True,
                 'is_allowed_import': True,
                 'is_allowed_download': True,
-                'is_project_member': True}
+                'is_project_member': True,
+                'is_allowed_add_party': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
@@ -1479,7 +1482,8 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'is_allowed_add_resource': True,
                 'is_allowed_import': True,
                 'is_allowed_download': True,
-                'is_project_member': True}
+                'is_project_member': True,
+                'is_allowed_add_party': True}
 
     def test_get_with_authorized_user(self):
         ProjectRole.objects.create(

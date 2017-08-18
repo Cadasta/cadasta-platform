@@ -169,19 +169,19 @@ class ProjectRoles(ProjectMixin):
         return context
 
 
-class ProjectQuerySetMixin:
-    def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Project.objects.all()
+# class ProjectQuerySetMixin:
+#     def get_queryset(self):
+#         if self.request.user.is_superuser:
+#             return Project.objects.all()
 
-        if hasattr(self.request.user, 'organizations'):
-            orgs = self.request.user.organizations.all()
-            if len(orgs) > 0:
-                return Project.objects.filter(
-                    Q(access='public') | Q(organization__in=orgs)
-                )
+#         if hasattr(self.request.user, 'organizations'):
+#             orgs = self.request.user.organizations.all()
+#             if len(orgs) > 0:
+#                 return Project.objects.filter(
+#                     Q(access='public') | Q(organization__in=orgs)
+#                 )
 
-        return Project.objects.filter(access='public')
+#         return Project.objects.filter(access='public')
 
 
 class ProjectAdminCheckMixin(SuperUserCheckMixin):
