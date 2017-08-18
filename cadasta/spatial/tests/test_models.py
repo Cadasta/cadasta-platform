@@ -188,7 +188,7 @@ class SpatialUnitTest(UserTestCase, TestCase):
 
     def test_area_no_geometry(self):
         su = SpatialUnitFactory.create()
-        assert su.area is None
+        assert su.area == 0
 
     def test_get_absolute_url(self):
         su = SpatialUnitFactory.create()

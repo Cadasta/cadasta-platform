@@ -471,22 +471,22 @@ class ShapeTest(UserTestCase, TestCase):
                     head = ['id', 'type', 'area', 'geom_type']
                     assert row == head
                 if i == 1:
-                    assert row == [su1.id, su1.type, '', 'point']
+                    assert row == [su1.id, su1.type, '0.0', 'point']
                 if i == 2:
-                    assert row == [su2.id, su2.type, '', 'linestring']
+                    assert row == [su2.id, su2.type, '0.0', 'linestring']
                 if i == 3:
                     assert row == [su3.id, su3.type, str(su3.area), 'polygon']
                 if i == 4:
-                    assert row == [su4.id, su4.type, '', 'multipoint']
+                    assert row == [su4.id, su4.type, '0.0', 'multipoint']
                 if i == 5:
-                    assert row == [su5.id, su5.type, '', 'multilinestring']
+                    assert row == [su5.id, su5.type, '0.0', 'multilinestring']
                 if i == 6:
                     assert row == [su6.id, su6.type, str(su6.area),
                                    'multipolygon']
                 if i == 7:
-                    assert row == [su7.id, su7.type, '', 'empty']
+                    assert row == [su7.id, su7.type, '0.0', 'empty']
                 if i == 8:
-                    assert row == [su8.id, su8.type, '', 'none']
+                    assert row == [su8.id, su8.type, '0.0', 'none']
 
         # remove this so other tests pass
         os.remove(filename)
