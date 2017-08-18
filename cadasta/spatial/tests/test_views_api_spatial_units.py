@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from rest_framework.exceptions import PermissionDenied
 from tutelary.models import Policy, assign_user_policies
@@ -51,6 +52,8 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def setup_url_kwargs(self):
         return {
@@ -175,7 +178,7 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         SpatialUnitFactory.create(project=self.prj)
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
         response = self.request(user=user)
         assert response.status_code == 200
 
@@ -196,7 +199,7 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         SpatialUnitFactory.create(project=self.prj, type='RW')
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user, admin=True)
+                                        user=user, group=self.oa_group)
 
         self.prj.archived = True
         self.prj.save()
@@ -211,6 +214,7 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def setup_url_kwargs(self):
         return {
@@ -303,7 +307,7 @@ class SpatialUnitCreateAPITest(APITestCase, UserTestCase, TestCase):
     def test_create_private_record_based_on_org_membership(self):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
         response = self.request(user=user, method='POST')
         assert response.status_code == 403
         assert SpatialUnit.objects.count() == 0
@@ -358,6 +362,7 @@ class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su = SpatialUnitFactory(project=self.prj)
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def setup_url_kwargs(self):
         return {
@@ -434,7 +439,7 @@ class SpatialUnitDetailAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=user)
         assert response.status_code == 403
@@ -449,6 +454,8 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su = SpatialUnitFactory(project=self.prj, type='PA')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def setup_url_kwargs(self):
         return {
@@ -580,7 +587,7 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=user, method='PATCH')
         assert response.status_code == 403
@@ -595,8 +602,7 @@ class SpatialUnitUpdateAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user,
-                                        admin=True)
+                                        user=user, group=self.oa_group)
 
         response = self.request(user=self.user, method='PATCH')
         assert response.status_code == 200
@@ -646,6 +652,8 @@ class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.su = SpatialUnitFactory(project=self.prj, type='PA')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def setup_url_kwargs(self):
         return {
@@ -729,7 +737,7 @@ class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 403
@@ -742,8 +750,7 @@ class SpatialUnitDeleteAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user,
-                                        admin=True)
+                                        user=user, group=self.oa_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204

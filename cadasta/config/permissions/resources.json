@@ -1,0 +1,9 @@
+{
+    "content_type": "resources.resource",
+    "permissions": {
+        "resource_add": {
+            "name": "Add Resource",
+            "codename": "resource.add"
+        }
+    }
+}

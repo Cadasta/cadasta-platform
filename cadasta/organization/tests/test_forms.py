@@ -9,6 +9,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
@@ -237,8 +238,9 @@ class AddOrganizationMemberFormTest(UserTestCase, TestCase):
         self._save(identifier='some-user', ok=False)
 
     def test_add_already_member_user(self):
+        group = Group.objects.get(name="OrgMember")
         OrganizationRole.objects.create(
-            organization=self.org, user=self.user)
+            organization=self.org, user=self.user, group=group)
         self._save(identifier_field='username', ok=False)
 
 
@@ -249,10 +251,12 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
         self.user = UserFactory.create()
         self.org_member = UserFactory.create()
         self.org = OrganizationFactory.create()
+        self.om_group = Group.objects.get(name="OrgMember")
+        self.oa_group = Group.objects.get(name="OrgAdmin")
         self.org_role_user = OrganizationRole.objects.create(
-            organization=self.org, user=self.user)
+            organization=self.org, user=self.user, group=self.om_group)
         self.org_role_member = OrganizationRole.objects.create(
-            organization=self.org, user=self.org_member)
+            organization=self.org, user=self.org_member, group=self.om_group)
         self.prj_1 = ProjectFactory.create(organization=self.org)
         self.prj_2 = ProjectFactory.create(organization=self.org)
         self.prj_3 = ProjectFactory.create(organization=self.org)
@@ -292,10 +296,13 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
 
         data = {'org_role': 'A'}
 
-        org_role = OrganizationRole.objects.create(organization=org, user=user)
+        org_role = OrganizationRole.objects.create(
+            organization=org, user=user, group=self.om_group)
         OrganizationRole.objects.create(
-            organization=org, user=current_user, admin=True)
+            organization=org, user=current_user, group=self.oa_group)
         form = forms.EditOrganizationMemberForm(org, user, current_user, data,)
+
+        assert not org_role.admin
 
         form.save()
         org_role.refresh_from_db()
@@ -307,10 +314,12 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
         # Should fail, since admins are not allowed to alter
         # their own permissions.
 
+        # make the user an org admin
+        self.org_role_user.group = self.oa_group
+        self.org_role_user.save()
+
         data = {'org_role': 'M'}
 
-        self.org_role_user.admin = True
-        self.org_role_user.save()
         form = forms.EditOrganizationMemberForm(
             self.org, self.user, self.user, data)
         assert not form.is_valid()
@@ -322,10 +331,13 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
     def test_assign_and_unassign_admin_role(self):
         # Assert that changing the admin role
         # doesn't affect project permissions
+        dc_group = Group.objects.get(name="DataCollector")
+        pm_group = Group.objects.get(name="ProjectManager")
         ProjectRole.objects.create(
-            project=self.prj_1, user=self.org_member, role='DC')
+            project=self.prj_1, user=self.org_member,
+            group=dc_group, role='DC')
         ProjectRole.objects.create(
-            project=self.prj_2, user=self.user, role='PM')
+            project=self.prj_2, user=self.user, group=pm_group, role='PM')
 
         data = {
             'org_role': 'M',
@@ -420,22 +432,25 @@ class EditOrganizationMemberProjectPermissionForm(UserTestCase, TestCase):
         self.user = UserFactory.create()
         self.org_member = UserFactory.create()
         self.org = OrganizationFactory.create()
+        self.om_group = Group.objects.get(name="OrgMember")
         self.org_role_user = OrganizationRole.objects.create(
-            organization=self.org, user=self.user)
+            organization=self.org, user=self.user, group=self.om_group)
         self.org_role_member = OrganizationRole.objects.create(
-            organization=self.org, user=self.org_member)
+            organization=self.org, user=self.org_member, group=self.om_group)
         self.prj_1 = ProjectFactory.create(organization=self.org)
         self.prj_2 = ProjectFactory.create(organization=self.org)
         self.prj_3 = ProjectFactory.create(organization=self.org)
         self.prj_4 = ProjectFactory.create(organization=self.org)
         self.prjs = [self.prj_1, self.prj_2, self.prj_3, self.prj_4]
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def test_init(self):
         # Test to make sure that the initial forms for all users
         # aren't affected by changing one user.
+        pm_group = Group.objects.get(name="ProjectManager")
         for prj in self.prjs:
             ProjectRole.objects.create(
-                project=prj, user=self.org_member, role='PM')
+                project=prj, user=self.org_member, group=pm_group, role='PM')
 
         data = {
             self.prj_1.id: 'DC',
@@ -465,7 +480,7 @@ class EditOrganizationMemberProjectPermissionForm(UserTestCase, TestCase):
 
     def test_edit_project_roles(self):
         ProjectRole.objects.create(
-            project=self.prj_4, user=self.user, role='PM')
+            project=self.prj_4, user=self.user, group=self.pm_group, role='PM')
 
         data = {
             self.prj_1.id: 'DC',
@@ -502,9 +517,10 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
         super().setUp()
         self.org = OrganizationFactory.create()
         self.user = UserFactory.create()
+        self.oa_group = Group.objects.get(name='OrgAdmin')
 
         OrganizationRole.objects.create(
-            organization=self.org, user=self.user, admin=True
+            organization=self.org, user=self.user, group=self.oa_group
         )
         self.data = {
             'organization': self.org.slug,
@@ -577,7 +593,7 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
     def test_add_new_project_with_blank_org_choice(self):
         second_org = OrganizationFactory.create()
         OrganizationRole.objects.create(
-            organization=second_org, user=self.user, admin=True
+            organization=second_org, user=self.user, group=self.oa_group
         )
         form = forms.ProjectAddDetails(user=self.user)
         choices = form.fields['organization'].choices
@@ -587,7 +603,7 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
     def test_add_new_project_without_blank_org_choice_with_chosen_org(self):
         second_org = OrganizationFactory.create()
         OrganizationRole.objects.create(
-            organization=second_org, user=self.user, admin=True
+            organization=second_org, user=self.user, group=self.oa_group
         )
         form = forms.ProjectAddDetails(user=self.user, org_is_chosen=True)
         choices = form.fields['organization'].choices
@@ -831,6 +847,7 @@ class UpdateProjectRolesTest(UserTestCase, TestCase):
         super().setUp()
         self.project = ProjectFactory.create()
         self.user = UserFactory.create()
+        self.dc_role = Group.objects.get(name="DataCollector")
 
     def test_create_new_role(self):
         """New ProjectRole instance should be created when role != Pb"""
@@ -851,12 +868,13 @@ class UpdateProjectRolesTest(UserTestCase, TestCase):
         ProjectRole.objects.create(
             project=self.project,
             user=self.user,
+            group=self.dc_role,
             role='DC')
         forms.create_update_or_delete_project_role(
-            self.project.id, self.user, 'PM')
+            self.project.id, self.user, 'PU')
 
         role = ProjectRole.objects.get(project=self.project, user=self.user)
-        assert role.role == 'PM'
+        assert role.role == 'PU'
 
     def test_delete_existing_role(self):
         """If role is updated to Pb (public user) the Project Role instance
@@ -864,6 +882,7 @@ class UpdateProjectRolesTest(UserTestCase, TestCase):
         ProjectRole.objects.create(
             project=self.project,
             user=self.user,
+            group=self.dc_role,
             role='DC')
         forms.create_update_or_delete_project_role(
             self.project.id, self.user, 'Pb')
@@ -876,32 +895,31 @@ class ProjectEditPermissionsTest(UserTestCase, TestCase):
         super().setUp()
         self.project = ProjectFactory.create()
 
-        self.super_user = UserFactory.create()
-        OrganizationRole.objects.create(user=self.super_user,
-                                        organization=self.project.organization,
-                                        admin=False)
-        su_role = Role.objects.get(name='superuser')
-        self.super_user.assign_policies(su_role)
+        self.super_user = UserFactory.create(is_superuser=True)
 
         self.org_admin = UserFactory.create()
+        self.oa_group = Group.objects.get(name='OrgAdmin')
         OrganizationRole.objects.create(user=self.org_admin,
                                         organization=self.project.organization,
-                                        admin=True)
+                                        group=self.oa_group)
         self.project_user_1 = UserFactory.create()
+        self.om_group = Group.objects.get(name='OrgMember')
+        self.dc_group = Group.objects.get(name='DataCollector')
         OrganizationRole.objects.create(user=self.project_user_1,
                                         organization=self.project.organization,
-                                        admin=False)
+                                        group=self.om_group)
         ProjectRole.objects.create(user=self.project_user_1,
                                    project=self.project,
+                                   group=self.dc_group,
                                    role='DC')
         self.project_user_2 = UserFactory.create()
         OrganizationRole.objects.create(user=self.project_user_2,
                                         organization=self.project.organization,
-                                        admin=False)
+                                        group=self.om_group)
 
     def test_init(self):
         form = forms.ProjectEditPermissions(instance=self.project)
-        assert len(form.fields) == 4
+        assert len(form.fields) == 3
 
         for k, field in form.fields.items():
             if field.user == self.project_user_2:
@@ -909,8 +927,6 @@ class ProjectEditPermissionsTest(UserTestCase, TestCase):
             elif field.user == self.project_user_1:
                 assert field.initial == 'DC'
             elif field.user == self.org_admin:
-                assert field.initial == 'A'
-            elif field.user == self.super_user:
                 assert field.initial == 'A'
 
     def test_save(self):

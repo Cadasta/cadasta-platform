@@ -1,0 +1,33 @@
+{
+    "content_type": "spatial.spatialunit",
+    "permissions": {
+        "spatial_view": {
+            "name": "View Location",
+            "codename": "spatial.view"
+        },
+        "spatial_list": {
+            "name": "List Locations",
+            "codename": "spatial.list"
+        },
+        "spatial_create": {
+            "name": "Create Location",
+            "codename": "spatial.create"
+        },
+        "spatial_delete": {
+            "name": "Delete Location",
+            "codename": "spatial.delete"
+        },
+        "spatial_update": {
+            "name": "Update Location",
+            "codename": "spatial.update"
+        },
+        "spatial_resources_add": {
+            "name": "Add Location Resources",
+            "codename": "spatial.resources.add"
+        },
+        "spatial_resources_remove": {
+            "name": "Remove Location Resources",
+            "codename": "spatial.resources.remove"
+        }
+    }
+}

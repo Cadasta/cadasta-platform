@@ -54,7 +54,7 @@
                   <hr class="border-btm">
                   {% blocktrans %}
                   <p>For additional assistance, refer to the <a href="https://docs.cadasta.org/" target="_blank">platform documentation</a> – the answer you need may be in there.</p>
-                  {% endblocktrans %}              
+                  {% endblocktrans %}
                 </div>
               </div>
             </section>
@@ -289,6 +289,7 @@
           {% endif %}
 
           <!-- Project team members -->
+          {% if is_administrator %}
           <section>
             <div class="panel panel-default">
               <div class="panel-heading">
@@ -327,5 +328,6 @@
               </div>
             </div>
           </section>
+          {% endif %}
         </div>
       </div>

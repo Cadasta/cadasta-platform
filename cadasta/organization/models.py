@@ -1,6 +1,5 @@
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.db import models
 from django_countries.fields import CountryField
 from django.contrib.postgres.fields import JSONField, ArrayField
@@ -15,15 +14,23 @@ from shapely.wkt import dumps
 from tutelary.decorators import permissioned_model
 from tutelary.models import Policy
 
-from core.models import RandomIDModel, SlugModel
+from core.models import RandomIDModel, SlugModel, Role
 from geography.models import WorldBorder
 from resources.mixins import ResourceModelMixin
 from .validators import validate_contact
 from .choices import ROLE_CHOICES, ACCESS_CHOICES
 from . import messages
 
-
-PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
+ROLE_GROUPS = {
+    'A': 'OrgAdmin',
+    'M': 'OrgMember',
+    'Pb': 'PublicUser',
+    'PU': 'ProjectMember',
+    'DC': 'DataCollector',
+    'PM': 'ProjectManager',
+    'SU': 'SuperUser',
+    'AN': 'AnonymousUser'
+}
 
 
 def get_policy_instance(policy_name, variables):
@@ -112,19 +119,24 @@ class Organization(SlugModel, RandomIDModel):
         return self.projects.all()
 
 
-class OrganizationRole(RandomIDModel):
+class OrganizationRole(Role):
     organization = models.ForeignKey(Organization)
-    user = models.ForeignKey('accounts.User')
-    admin = models.BooleanField(default=False)
+    group = models.ForeignKey(
+        'auth.Group', related_name='organization_roles')
 
     history = HistoricalRecords()
 
     class Meta:
         unique_together = ('organization', 'user')
 
+    @property
+    def admin(self):
+        return self.group.name == 'OrgAdmin'
+
     def __repr__(self):
         repr_string = ('<OrganizationRole id={obj.id} user={obj.user.username}'
                        ' organization={obj.organization.slug}'
+                       ' group={obj.group.name}'
                        ' admin={obj.admin}>')
         return repr_string.format(obj=self)
 
@@ -309,12 +321,13 @@ def check_extent(sender, instance, **kwargs):
         reassign_project_extent(instance)
 
 
-class ProjectRole(RandomIDModel):
+class ProjectRole(Role):
     project = models.ForeignKey(Project)
-    user = models.ForeignKey('accounts.User')
     role = models.CharField(max_length=2,
                             choices=ROLE_CHOICES,
                             default='PU')
+    group = models.ForeignKey(
+        'auth.Group', related_name='project_roles')
 
     history = HistoricalRecords()
 
@@ -324,6 +337,7 @@ class ProjectRole(RandomIDModel):
     def __repr__(self):
         repr_string = ('<ProjectRole id={obj.id} user={obj.user.username}'
                        ' project={obj.project.slug}'
+                       ' group={obj.group}'
                        ' role={obj.role}>')
         return repr_string.format(obj=self)
 

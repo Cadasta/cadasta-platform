@@ -4,12 +4,15 @@ from buckets.test.storage import FakeS3Storage
 from core.tests.factories import PolicyFactory
 from jsonattrs.models import create_attribute_types
 
+from accounts.permissions import load as load_permissions
+
 
 class UserTestCase:
     def setUp(self):
         super().setUp()
         PolicyFactory.load_policies()
         create_attribute_types()
+        load_permissions()
 
 
 class FileStorageTestCase:

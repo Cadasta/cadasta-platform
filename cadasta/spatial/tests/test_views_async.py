@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from tutelary.models import Policy, assign_user_policies
@@ -49,6 +50,8 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         self.user = UserFactory.create()
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
 
     def setup_url_kwargs(self):
         return {
@@ -168,7 +171,7 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         SpatialUnitFactory.create(project=self.prj)
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
         response = self.request(user=user)
         assert response.status_code == 200
 
@@ -189,7 +192,7 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         SpatialUnitFactory.create(project=self.prj, type='RW')
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user, admin=True)
+                                        user=user, group=self.oa_group)
 
         self.prj.archived = True
         self.prj.save()

@@ -1,13 +1,14 @@
 import json
 from skivvy import ViewTestCase
 
+from django.contrib.auth.models import Group
 from django.http import HttpRequest
 from django.test import TestCase
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
 from organization.tests.factories import OrganizationFactory, ProjectFactory
-from organization.models import OrganizationRole, Project
+from organization.models import OrganizationRole, Project, ProjectRole
 from organization.serializers import ProjectGeometrySerializer
 
 from ..views.default import Dashboard, IndexPage, server_error
@@ -42,8 +43,8 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
                   '-5.1031494140625000 8.1299292850467957))')
         ProjectFactory.create(organization=self.org, extent=extent)
         ProjectFactory.create(organization=self.org, extent=extent)
-        ProjectFactory.create(
-            name='Private Project',
+        self.private = ProjectFactory.create(
+            name='Private Project', archived=False,
             access='private', organization=self.org, extent=extent)
         ProjectFactory.create(
             name='Archived Project', archived=True,
@@ -61,11 +62,25 @@ class DashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
 
-    def test_private_projects_rendered_when_org_member_is_signed_in(self):
+    def test_all_projects_rendered_when_org_admin_is_signed_in(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        om = Group.objects.get(name='OrgAdmin')
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=user,
+                                        group=om)
         response = self.request(user=user)
 
+        gj = self._render_geojson(Project.objects.all())
+        expected_content = self.render_content(is_superuser=False, geojson=gj)
+        assert response.status_code == 200
+        assert response.content == expected_content
+
+    def test_private_project_rendered_when_project_member_is_signed_in(self):
+        user = UserFactory.create()
+        pm = Group.objects.get(name='ProjectMember')
+        ProjectRole.objects.create(
+            project=self.private, user=user, group=pm, role='PU')
+        response = self.request(user=user)
         gj = self._render_geojson(Project.objects.filter(archived=False))
         expected_content = self.render_content(is_superuser=False, geojson=gj)
         assert response.status_code == 200

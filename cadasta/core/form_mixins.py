@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import get_language
 from jsonattrs.mixins import template_xlang_labels
 from jsonattrs.forms import form_field_from_name
-from tutelary.models import Role
 
 from core.validators import sanitize_string
 from questionnaires.models import Questionnaire, Question, QuestionOption
@@ -52,11 +51,7 @@ class SuperUserCheck:
         self._su_role = None
 
     def is_superuser(self, user):
-        if not hasattr(self, 'su_role'):
-            self.su_role = Role.objects.get(name='superuser')
-
-        return any([isinstance(pol, Role) and pol == self.su_role
-                    for pol in user.assigned_policies()])
+        return user.is_superuser
 
 
 class AttributeFormMixin(SchemaSelectorMixin):
@@ -68,7 +63,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
         try:
             question = Question.objects.get(name=name, questionnaire=q)
             self.fields[field_name].labels_xlang = template_xlang_labels(
-                    question.label_xlat)
+                question.label_xlat)
 
             if question.has_options:
                 choices = QuestionOption.objects.filter(

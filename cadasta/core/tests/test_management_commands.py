@@ -5,6 +5,7 @@ from core.tests.factories import PolicyFactory
 from ..fixtures import FixturesData
 from tutelary.models import Policy
 from accounts.models import User
+from accounts.permissions import load as load_role_permissions
 from organization.models import Organization, Project
 from spatial.models import SpatialUnit, SpatialRelationship
 from core.management.commands import loadsite
@@ -22,6 +23,7 @@ class FixturesTest(TestCase):
         # Just for test coverage...
         PolicyFactory.load_policies(force=True)
         create_attribute_types()
+        load_role_permissions()
         data.add_test_users_and_roles()
         data.add_test_projects()
         data.add_test_spatial_units()

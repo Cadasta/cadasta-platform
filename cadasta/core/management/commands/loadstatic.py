@@ -4,6 +4,7 @@ from core.management.commands import loadsite
 from accounts.management.commands import loadpolicies
 from geography.management.commands import loadcountries
 from jsonattrs.management.commands import loadattrtypes
+from accounts.management.commands import loadpermissions
 
 
 class Command(BaseCommand):
@@ -32,3 +33,5 @@ class Command(BaseCommand):
         loadpolicies.Command().handle(force=options['force'])
         print('LOADING ATTRIBUTE TYPES\n')
         loadattrtypes.Command().handle(force=options['force'])
+        print('LOADING PERMISSIONS AND GROUPS\n')
+        loadpermissions.Command().handle(force=options['force'])

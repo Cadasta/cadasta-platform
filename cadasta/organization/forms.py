@@ -9,6 +9,7 @@ from core.util import slugify
 from core.messages import SANITIZE_ERROR
 from django import forms
 from django.conf import settings
+from django.contrib.auth.models import Group
 from django.contrib.gis import forms as gisforms
 from django.contrib.postgres import forms as pg_forms
 from django.db import transaction
@@ -17,14 +18,14 @@ from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
 from leaflet.forms.widgets import LeafletWidget
 from questionnaires.models import Questionnaire
-from tutelary.models import check_perms
 
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
 # from .download.resources import ResourceExporter
 from .download.shape import ShapeExporter
 from .download.xls import XLSExporter
 from organization import fields as org_fields
-from .models import Organization, OrganizationRole, Project, ProjectRole
+from .models import (ROLE_GROUPS, Organization, OrganizationRole,
+                     Project, ProjectRole)
 
 FORM_CHOICES = (('Pb', _('Public User')),) + ROLE_CHOICES
 QUESTIONNAIRE_TYPES = [
@@ -36,10 +37,12 @@ QUESTIONNAIRE_TYPES = [
 
 def create_update_or_delete_project_role(project, user, role):
     if role != 'Pb':
+        name = ROLE_GROUPS.get(role, 'ProjectMember')
+        group = Group.objects.get(name=name)
         ProjectRole.objects.update_or_create(
             user=user,
             project_id=project,
-            defaults={'role': role})
+            defaults={'role': role, 'group': group})
     else:
         ProjectRole.objects.filter(user=user,
                                    project_id=project).delete()
@@ -160,11 +163,11 @@ class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
         instance.save()
 
         if is_create:
+            group = Group.objects.get(name="OrgAdmin")
             OrganizationRole.objects.create(
                 organization=instance,
                 user=self.user,
-                admin=True
-            )
+                group=group)
 
         return instance
 
@@ -197,9 +200,9 @@ class AddOrganizationMemberForm(forms.Form):
                 _("The role could not be assigned because the data didn't "
                   "validate.")
             )
-
+        group, created = Group.objects.get_or_create(name='OrgMember')
         self.instance = OrganizationRole.objects.create(
-            organization=self.organization, user=self.user)
+            organization=self.organization, user=self.user, group=group)
         return self.instance
 
 
@@ -230,7 +233,9 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
         return org_role
 
     def save(self):
-        self.org_role_instance.admin = self.data.get('org_role') == 'A'
+        name = ROLE_GROUPS.get(self.data.get('org_role'), 'M')
+        group, created = Group.objects.get_or_create(name=name)
+        self.org_role_instance.group = group
         self.org_role_instance.save()
 
 
@@ -301,11 +306,12 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
             self.orgs = Organization.objects.filter(
                 archived=False).order_by('name')
         else:
-            qs = self.user.organizations.filter(
-                archived=False).order_by('name')
             self.orgs = [
-                o for o in qs
-                if check_perms(self.user, ('project.create',), (o,))
+                role.organization for role in
+                OrganizationRole.objects.filter(
+                    user=self.user, group__name='OrgAdmin',
+                    organization__archived=False
+                ).select_related('organization').order_by('organization__name')
             ]
         choices = [(o.slug, o.name) for o in self.orgs]
         if not org_is_chosen and len(choices) > 1:
@@ -419,8 +425,7 @@ class PermissionsForm(SuperUserCheck):
         if not hasattr(self, 'admins'):
             self.admins = [
                 role.user for role in OrganizationRole.objects.filter(
-                    organization=self.organization,
-                    admin=True
+                    organization=self.organization, group__name='OrgAdmin'
                 ).select_related('user')
             ]
 

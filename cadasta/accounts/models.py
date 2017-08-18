@@ -84,8 +84,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
         return repr_string.format(obj=self)
 
     def get_display_name(self):
-        """
-        Returns the display name.
+        """Return the display name.
+
         If full name is present then return full name as display name
         else return username.
         """

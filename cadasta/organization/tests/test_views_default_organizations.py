@@ -1,9 +1,6 @@
-import json
-
 from django.test import TestCase
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 
-from tutelary.models import Policy, Role, assign_user_policies
 from skivvy import ViewTestCase
 
 from core.tests.utils.cases import UserTestCase
@@ -11,20 +8,7 @@ from accounts.tests.factories import UserFactory
 from ..views import default
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 from .. import forms
-from .factories import OrganizationFactory, ProjectFactory, clause
-
-
-def assign_policies(user):
-    clauses = {
-        'clause': [
-            clause('allow', ['org.list']),
-            clause('allow', ['org.*', 'org.*.*'], ['organization/*'])
-        ]
-    }
-    policy = Policy.objects.create(
-        name='allow',
-        body=json.dumps(clauses))
-    assign_user_policies(user, policy)
+from .factories import OrganizationFactory, ProjectFactory
 
 
 class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
@@ -34,28 +18,17 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.orgs = OrganizationFactory.create_batch(2)
         self.archived_org = OrganizationFactory.create(archived=True)
+        self.private_org = OrganizationFactory.create(access='private')
         unauthorized = OrganizationFactory.create(slug='unauthorized')
         self.public_orgs = self.orgs + [unauthorized]
-        self.all_orgs = self.orgs + [unauthorized] + [self.archived_org]
+        self.all_orgs = (self.orgs + [unauthorized] +
+                         [self.archived_org] + [self.private_org])
 
         # Annotate each org with the number of projects
         for org in self.all_orgs:
             org.num_projects = 0
 
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('deny', ['org.view'], ['organization/unauthorized'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
         self.user = UserFactory.create()
-        assigned_policies = self.user.assigned_policies()
-        assigned_policies.append(self.policy)
-        self.user.assign_policies(*assigned_policies)
 
     def setup_template_context(self):
         return {
@@ -68,7 +41,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(self.orgs, key=lambda p: p.slug))
+            object_list=sorted(self.public_orgs, key=lambda p: p.slug))
 
     def test_get_without_user(self):
         response = self.request()
@@ -79,11 +52,38 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_archived_with_admin_user(self):
         adminuser = UserFactory.create()
+        group = Group.objects.get(name="OrgAdmin")
         OrganizationRole.objects.create(
-            organization=self.archived_org, user=adminuser, admin=True)
+            organization=self.archived_org, user=adminuser, group=group)
         response = self.request(user=adminuser)
         assert response.status_code == 200
-        assert response.content == self.render_content(user=adminuser)
+        object_list = self.public_orgs + [self.archived_org]
+        assert response.content == self.render_content(
+            user=adminuser,
+            object_list=sorted(object_list, key=lambda p: p.slug))
+
+    def test_get_archived_with_org_member(self):
+        org_member = UserFactory.create()
+        group = Group.objects.get(name="OrgMember")
+        OrganizationRole.objects.create(
+            organization=self.archived_org, user=org_member, group=group)
+        response = self.request(user=org_member)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user=org_member,
+            object_list=sorted(self.public_orgs, key=lambda p: p.slug))
+
+    def test_get_private_with_org_member(self):
+        org_member = UserFactory.create()
+        group = Group.objects.get(name="OrgMember")
+        OrganizationRole.objects.create(
+            organization=self.private_org, user=org_member, group=group)
+        response = self.request(user=org_member)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            user=org_member,
+            object_list=sorted(
+                self.public_orgs + [self.private_org], key=lambda p: p.slug))
 
     def test_num_projects_attribute(self):
         # Add projects and annotate num_projects for self.orgs
@@ -94,7 +94,7 @@ class OrganizationListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(self.orgs, key=lambda p: p.slug))
+            object_list=sorted(self.public_orgs, key=lambda p: p.slug))
 
     def test_get_with_superuser(self):
         superuser = UserFactory.create(is_superuser=True)
@@ -110,16 +110,7 @@ class OrganizationAddTest(ViewTestCase, UserTestCase, TestCase):
     template_context = {'form': forms.OrganizationForm()}
 
     def setup_models(self):
-        clauses = {
-            'clause': [
-                clause('allow', ['org.create'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
         self.user = UserFactory.create()
-        assign_user_policies(self.user, self.policy)
 
     def setup_post_data(self):
         return {
@@ -171,17 +162,8 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         self.private_proj = ProjectFactory.create(
             organization=self.org, access='private')
         self.all_projects = self.projs + [self.private_proj]
-
-        clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
+        self.org_member_group = Group.objects.get(name='OrgMember')
         self.user = UserFactory.create()
 
     def setup_url_kwargs(self):
@@ -198,7 +180,6 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def test_get_org_with_authorized_user(self):
-        assign_user_policies(self.user, self.policy)
         response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -211,7 +192,8 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_org_with_org_membership(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.org_member_group)
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -220,7 +202,6 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_org_with_new_org(self):
         new_org = OrganizationFactory.create()
-        assign_user_policies(self.user, self.policy)
         response = self.request(user=self.user,
                                 url_kwargs={'slug': new_org.slug})
         assert response.status_code == 200
@@ -232,7 +213,6 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=superuser)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            member=True,
             is_superuser=True,
             is_administrator=True,
             add_allowed=True,
@@ -244,12 +224,11 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(
             organization=self.org,
             user=org_admin,
-            admin=True
+            group=self.org_admin_group
         )
         response = self.request(user=org_admin)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            member=True,
             is_superuser=False,
             is_administrator=True,
             add_allowed=True,
@@ -277,14 +256,13 @@ class OrganizationDashboardTest(ViewTestCase, UserTestCase, TestCase):
         OrganizationRole.objects.create(
             organization=self.org,
             user=org_admin,
-            admin=True
+            group=self.org_admin_group
         )
         self.org.archived = True
         self.org.save()
         response = self.request(user=org_admin)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            member=True,
             is_superuser=False,
             is_administrator=True,
             add_allowed=True,
@@ -309,6 +287,7 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.org = OrganizationFactory.create()
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug}
@@ -321,7 +300,11 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
         response = self.request(user=user)
 
         assert response.status_code == 200
@@ -342,7 +325,11 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
 
         response = self.request(method='POST', user=user)
         assert response.status_code == 302
@@ -377,7 +364,6 @@ class OrganizationEditTest(ViewTestCase, UserTestCase, TestCase):
         self.org.archived = True
         self.org.save()
         user = UserFactory.create()
-        assign_policies(user)
         response = self.request(user=user)
 
         assert response.status_code == 302
@@ -392,13 +378,18 @@ class OrganizationArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.org = OrganizationFactory.create()
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug}
 
     def test_archive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
 
         response = self.request(user=user)
         self.org.refresh_from_db()
@@ -429,8 +420,11 @@ class OrganizationArchiveTest(ViewTestCase, UserTestCase, TestCase):
     def test_archive_cascade_to_projects(self):
         project = ProjectFactory.create(organization=self.org)
         user = UserFactory.create()
-        assign_policies(user)
-
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
         response = self.request(user=user)
         self.org.refresh_from_db()
         project.refresh_from_db()
@@ -448,13 +442,18 @@ class OrganizationUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.view = default.OrganizationUnarchive.as_view()
         self.org = OrganizationFactory.create(archived=True)
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug}
 
     def test_unarchive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
 
         response = self.request(user=user)
         self.org.refresh_from_db()
@@ -485,7 +484,11 @@ class OrganizationUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
     def test_unarchive_cascade_to_projects(self):
         project = ProjectFactory.create(organization=self.org, archived=True)
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
 
         response = self.request(user=user)
         self.org.refresh_from_db()
@@ -505,6 +508,7 @@ class OrganizationMembersTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.users = UserFactory.create_batch(2)
         self.org = OrganizationFactory.create(add_users=self.users)
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
 
     def setup_template_context(self):
         return {'organization': self.org}
@@ -514,11 +518,19 @@ class OrganizationMembersTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
 
+        response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_superuser=False,
+            is_administrator=True,
+            add_allowed=True,
+            is_member=True)
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -543,6 +555,7 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.org = OrganizationFactory.create()
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug}
@@ -555,7 +568,11 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
         response = self.request(user=user)
 
         assert response.status_code == 200
@@ -576,7 +593,6 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_organization(self):
         user = UserFactory.create()
-        assign_policies(user)
         self.org.archived = True
         self.org.save()
         response = self.request(user=user)
@@ -588,7 +604,11 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         user_to_add = UserFactory.create(username='add_me')
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org,
+            user=user,
+            group=self.org_admin_group
+        )
 
         response = self.request(method='POST', user=user)
 
@@ -622,7 +642,6 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
     def test_post_with_archived_organization(self):
         user = UserFactory.create()
         user_to_add = UserFactory.create(username='add_me')
-        assign_policies(user)
         self.org.archived = True
         self.org.save()
 
@@ -644,6 +663,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         self.member = UserFactory.create()
         self.org = OrganizationFactory.create(add_users=[self.member])
         self.prj = ProjectFactory.create(organization=self.org)
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
+        self.org_member_group = Group.objects.get(name="OrgMember")
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug, 'username': self.member.username}
@@ -662,12 +683,14 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        OrganizationRole.objects.create(organization=self.org, user=self.user)
-        assign_policies(self.user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, group=self.org_admin_group)
         response = self.request(user=self.user)
 
         assert response.status_code == 200
-        assert response.content == self.render_content(is_member=True)
+        assert response.content == self.render_content(is_administrator=True,
+                                                       add_allowed=True,
+                                                       is_member=True)
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.user)
@@ -692,8 +715,6 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                                        is_member=True)
 
     def test_get_with_archived_organization(self):
-        OrganizationRole.objects.create(organization=self.org, user=self.user)
-        assign_policies(self.user)
         self.org.archived = True
         self.org.save()
         response = self.request(user=self.user)
@@ -703,7 +724,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                 in response.messages)
 
     def test_post_org_role_with_authorized_user(self):
-        assign_policies(self.user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, group=self.org_admin_group)
         response = self.request(
             method='POST', user=self.user, post_data={'org_role': 'A'})
 
@@ -715,16 +737,18 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert role.admin is True
 
     def test_post_org_role_redirect(self):
-        assign_policies(self.user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, group=self.org_admin_group)
         response = self.request(
             method='POST', user=self.user, post_data={'org_role': 'M'})
 
         assert response.status_code == 302
         assert ('/organizations/{}/members/{}/'.format(
-                  self.org.slug, self.member) in response.location)
+                self.org.slug, self.member) in response.location)
 
     def test_post_prj_role_redirect(self):
-        assign_policies(self.user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, group=self.org_admin_group)
         response = self.request(
             method='POST', user=self.user, post_data={self.prj.id: 'DC'})
 
@@ -755,8 +779,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_superuser(self):
         superuser = UserFactory.create()
-        superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(superuser_role)
+        superuser.is_superuser = True
+        superuser.save()
         response = self.request(method='POST',
                                 post_data={'org_role': 'A'},
                                 user=superuser)
@@ -779,22 +803,21 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_org_role_with_invalid_form(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.org_admin_group)
         response = self.request(method='POST', user=user,
                                 post_data={'org_role': 'X'})
 
         form = forms.EditOrganizationMemberForm(
-                self.org, self.member, self.user, {'org_role': 'X'},)
+            self.org, self.member, self.user, {'org_role': 'X'},)
         prj_form = forms.EditOrganizationMemberProjectPermissionForm(
-                self.org, self.member, self.user, {'org_role': 'X'},)
+            self.org, self.member, self.user, {'org_role': 'X'},)
         assert response.status_code == 200
         assert response.content == self.render_content(
             org_role_form=form, project_role_form=prj_form,
-            is_member=True)
+            is_member=True, is_administrator=True, add_allowed=True)
 
     def test_post_org_role_with_archived_organization(self):
-        assign_policies(self.user)
         self.org.archived = True
         self.org.save()
 
@@ -808,7 +831,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert role.admin is False
 
     def test_post_prj_role_with_authorized_user(self):
-        assign_policies(self.user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, group=self.org_admin_group)
         response = self.request(
             method='POST', user=self.user, post_data={self.prj.id: 'PM'})
         assert response.status_code == 302
@@ -838,22 +862,21 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_prj_role_with_invalid_form(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.org_admin_group)
         response = self.request(method='POST', user=user,
                                 post_data={self.prj.id: 'X'})
 
         org_form = forms.EditOrganizationMemberForm(
-                self.org, self.member, self.user, {self.prj.id: 'X'},)
+            self.org, self.member, self.user, {self.prj.id: 'X'},)
         form = forms.EditOrganizationMemberProjectPermissionForm(
-                self.org, self.member, self.user, {self.prj.id: 'X'},)
+            self.org, self.member, self.user, {self.prj.id: 'X'},)
         assert response.status_code == 200
         assert response.content == self.render_content(
             project_role_form=form, org_role_form=org_form,
-            is_member=True)
+            is_member=True, is_administrator=True, add_allowed=True)
 
     def test_post_prj_role_with_archived_organization(self):
-        assign_policies(self.user)
         self.org.archived = True
         self.org.save()
 
@@ -866,7 +889,8 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
             project=self.prj, user=self.member).exists() is False)
 
     def test_post_prj_role_with_archived_project(self):
-        assign_policies(self.user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=self.user, group=self.org_admin_group)
         self.prj.archived = True
         self.prj.save()
 
@@ -883,13 +907,15 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.member = UserFactory.create()
         self.org = OrganizationFactory.create(add_users=[self.member])
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug, 'username': self.member.username}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        OrganizationRole.objects.create(
+            organization=self.org, user=user, group=self.org_admin_group)
         response = self.request(user=user)
 
         role = OrganizationRole.objects.filter(organization=self.org,
@@ -923,7 +949,6 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_organization(self):
         user = UserFactory.create()
-        assign_policies(user)
         self.org.archived = True
         self.org.save()
         response = self.request(user=user)

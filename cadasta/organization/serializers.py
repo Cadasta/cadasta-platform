@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db.models import Q
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import Group
 from core.util import slugify
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
@@ -11,7 +12,8 @@ from core.form_mixins import SuperUserCheck
 from core import serializers as core_serializers
 from accounts.models import User
 from accounts.serializers import UserSerializer
-from .models import Organization, Project, OrganizationRole, ProjectRole
+from .models import (Organization, Project, OrganizationRole,
+                     ProjectRole, ROLE_GROUPS)
 from .forms import create_update_or_delete_project_role
 
 
@@ -37,11 +39,11 @@ class OrganizationSerializer(core_serializers.SanitizeFieldSerializer,
 
     def create(self, *args, **kwargs):
         org = super(OrganizationSerializer, self).create(*args, **kwargs)
-
+        group = Group.objects.get(name="OrgAdmin")
         OrganizationRole.objects.create(
             organization=org,
             user=self.context['request'].user,
-            admin=True
+            group=group
         )
 
         return org
@@ -174,31 +176,6 @@ class EntityUserSerializer(SuperUserCheck, serializers.Serializer):
             except self.Meta.role_model.DoesNotExist:
                 pass
 
-    def create(self, validated_data):
-        obj = self.context[self.Meta.context_key]
-
-        role_value = validated_data[self.Meta.role_key]
-
-        create_kwargs = {
-            self.Meta.role_key: role_value,
-            self.Meta.context_key: obj,
-            'user': self.user,
-        }
-
-        self.role = self.Meta.role_model.objects.create(**create_kwargs)
-        return self.user
-
-    def update(self, instance, validated_data):
-        role = self.get_roles_object(instance)
-        role_value = validated_data[self.Meta.role_key]
-
-        if self.Meta.role_key in validated_data:
-            setattr(role, self.Meta.role_key, role_value)
-
-        role.save()
-
-        return instance
-
 
 class OrganizationUserSerializer(EntityUserSerializer):
     class Meta:
@@ -206,6 +183,7 @@ class OrganizationUserSerializer(EntityUserSerializer):
         context_key = 'organization'
         role_key = 'admin'
     admin = serializers.BooleanField()
+    group = serializers.PrimaryKeyRelatedField(read_only=True)
 
     def validate_admin(self, role_value):
         if 'request' in self.context:
@@ -238,6 +216,36 @@ class OrganizationUserSerializer(EntityUserSerializer):
             admin = data
 
         return admin
+
+    def create(self, validated_data):
+        obj = self.context[self.Meta.context_key]
+
+        role_value = validated_data[self.Meta.role_key]
+        if role_value:
+            group = Group.objects.get(name='OrgAdmin')
+        else:
+            group = Group.objects.get(name='OrgMember')
+
+        create_kwargs = {
+            'group': group,
+            self.Meta.context_key: obj,
+            'user': self.user,
+        }
+
+        self.role = self.Meta.role_model.objects.create(**create_kwargs)
+        return self.user
+
+    def update(self, instance, validated_data):
+        role = self.get_roles_object(instance)
+        role_value = validated_data[self.Meta.role_key]
+        if role_value:
+            role.group = Group.objects.get(name='OrgAdmin')
+        else:
+            role.group = Group.objects.get(name='OrgMember')
+
+        role.save()
+
+        return instance
 
 
 class ProjectUserSerializer(EntityUserSerializer):
@@ -300,6 +308,24 @@ class ProjectUserSerializer(EntityUserSerializer):
             user_role = data
 
         return user_role
+
+    def create(self, validated_data):
+        obj = self.context[self.Meta.context_key]
+
+        role_value = validated_data[self.Meta.role_key]
+
+        group = Group.objects.get(
+            name=ROLE_GROUPS.get(role_value, 'ProjectMember'))
+
+        create_kwargs = {
+            'group': group,
+            self.Meta.context_key: obj,
+            'user': self.user,
+            'role': role_value
+        }
+
+        self.role = self.Meta.role_model.objects.create(**create_kwargs)
+        return self.user
 
     def update(self, instance, validated_data):
         role = validated_data[self.Meta.role_key]

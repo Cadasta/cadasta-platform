@@ -1,15 +1,40 @@
-from collections import OrderedDict
+from collections import OrderedDict, Sequence
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import mixins as auth_mixins
+from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.translation import gettext as _
+from django.utils.functional import cached_property
 from jsonattrs.models import Schema, compose_schemas
+from organization.models import OrganizationRole
+from rest_framework.exceptions import NotAuthenticated
 from tutelary import mixins
 
+from .roles import AnonymousUserRole, PublicUserRole
 
+SAFE_METHODS = ('GET', 'HEAD', 'OPTIONS')
+
+
+# tutelary
+def update_permissions(permission, obj=None):
+    def set_permissions(self, request, view=None):
+        if (hasattr(self, 'get_organization') and
+                self.get_organization().archived):
+            return False
+        if (hasattr(self, 'get_project') and self.get_project().archived):
+            return False
+        if obj and self.get_object().archived:
+            return False
+        return permission
+    return set_permissions
+
+
+# Tutelary mixin
 class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
 
     def handle_no_permission(self):
@@ -18,6 +43,138 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
                              msg[0] if len(msg) > 0 and len(msg[0]) > 0
                              else _("You don't have permission "
                                     "for this action."))
+
+        referer = self.request.META.get('HTTP_REFERER')
+        redirect_url = self.request.META.get('HTTP_REFERER', '/')
+
+        if (referer and '/account/login/' in referer and
+                not self.request.user.is_anonymous):
+
+            if 'organization' in self.kwargs and 'project' in self.kwargs:
+                redirect_url = reverse(
+                    'organization:project-dashboard',
+                    kwargs={'organization': self.kwargs['organization'],
+                            'project': self.kwargs['project']}
+                )
+
+        return redirect(redirect_url)
+
+
+# Tutelary mixin
+class LoginPermissionRequiredMixin(PermissionRequiredMixin,
+                                   mixins.LoginPermissionRequiredMixin):
+    pass
+
+
+# Role permission mixin
+class BaseRolePermissionMixin():
+    """Role based permission check mixin.
+
+       Implementers should provide one of the following:
+       - a `get_permission_required` method returning an `iterable` containing
+         the permissions required to access the view.
+       - a `permission_required` attribute which is either a `dict` mapping
+         request methods to the required permission (as a string):
+            `permission_required` = {'GET': 'project.view'}
+       - a `permission_required` attribute returning a single string
+
+       Views that return a filtered queryset should implement
+       `get_filtered_queryset`.
+
+       Proivides accesss to the current users set of `OrganizationRole` and
+       `ProjectRole` instances.
+
+       Provides a `permissions` attribute which composes a unique set of all
+       permissions assigned by the users organization and project roles.
+    """
+
+    def get_permission_required(self):
+        if (not hasattr(self, 'permission_required') or
+           self.permission_required is None):
+            raise ImproperlyConfigured(
+                '{0} is missing the permission_required attribute. Define '
+                '{0}.permission_required, or override '
+                '{0}.get_permission_required().'.format(
+                    self.__class__.__name__)
+            )
+
+        perms = self.permission_required
+
+        if isinstance(self.permission_required, dict):
+            perms = self.permission_required.get(self.request.method, ())
+
+        if isinstance(perms, str):
+            perms = (perms, )
+
+        return perms
+
+    def get_queryset(self):
+        if hasattr(self, 'get_filtered_queryset'):
+            return self.get_filtered_queryset()
+        else:
+            return super().get_queryset()
+
+    @cached_property
+    def _roles(self):
+        _roles = []
+        user = self.request.user
+        if user.is_anonymous:
+            _roles.append(AnonymousUserRole())
+            return _roles
+        # for org mixins get the org role
+        if hasattr(self, 'get_organization'):
+            try:
+                role = OrganizationRole.objects.get(
+                    organization=self.get_organization(),
+                    user=self.request.user,
+                )
+                _roles.append(role)
+            except OrganizationRole.DoesNotExist:
+                pass
+        # for project mixins get org and project roles
+        if hasattr(self, 'get_org_role') and self.get_org_role():
+            if self._org_role not in _roles:
+                _roles.append(self._org_role)
+        if hasattr(self, 'get_prj_role') and self.get_prj_role():
+            _roles.append(self._prj_role)
+        # set he default public role
+        _roles.append(PublicUserRole())
+        return _roles
+
+    @cached_property
+    def permissions(self):
+        # compose permissions for all roles
+        self._perms = []
+        [self._perms.extend(role.permissions) for role in self._roles]
+        perms = sorted(set(self._perms))
+        return perms
+
+
+# Role permission mixin
+class RolePermissionRequiredMixin(BaseRolePermissionMixin,
+                                  auth_mixins.PermissionRequiredMixin):
+    """Determine if the user has view permissions."""
+
+    def has_permission(self):
+        if self.request.user.is_superuser:
+                return True
+
+        perms = self.get_permission_required()
+
+        # replace when we eventually use role authorization backend
+        # user = self.request.user
+        # return all(False for perm in perms
+        #            if not user.has_perm(perm, obj=self.permissions))
+
+        return False if not perms else all(
+            perm in self.permissions for perm in perms)
+
+    def handle_no_permission(self):
+        msg = _("You don't have permission to perform this action.")
+        if hasattr(self, 'permission_denied_message'):
+            msg = self.get_permission_denied_message()
+        messages.add_message(
+            self.request, messages.WARNING, msg)
 
         referer = self.request.META.get('HTTP_REFERER')
         redirect_url = self.request.META.get('HTTP_REFERER', '/')
@@ -48,22 +205,72 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
         return redirect(redirect_url)
 
 
-class LoginPermissionRequiredMixin(PermissionRequiredMixin,
-                                   mixins.LoginPermissionRequiredMixin):
-    pass
+# Role permission mixin
+class RoleLoginPermissionRequiredMixin(RolePermissionRequiredMixin):
+    """Ensure user is logged in."""
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            if getattr(self, 'raise_exception', False):
+                raise PermissionDenied(self.get_permission_denied_message())
+            return redirect_to_login(self.request.get_full_path(),
+                                     self.get_login_url(),
+                                     self.get_redirect_field_name())
+        return super().dispatch(request, *args, **kwargs)
 
 
-def update_permissions(permission, obj=None):
-    def set_permissions(self, request, view=None):
-        if (hasattr(self, 'get_organization') and
-                self.get_organization().archived):
-            return False
-        if (hasattr(self, 'get_project') and self.get_project().archived):
-            return False
-        if obj and self.get_object().archived:
-            return False
-        return permission
-    return set_permissions
+class PermissionFilterMixin:
+    """Provide permission filtering of API list views.
+
+       Objects can be filtered based on user permssions provided as
+       http GET request parameters, eg `/projects/?permissions=party.create`
+       will list all project where the user has 'party.create' permissions.
+
+       Implementers should provide a `permission_filter_queryset` method.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        permissions = request.GET.get('permissions', None)
+        if permissions:
+            actions = tuple(permissions.split(','))
+            self.permission_filter = actions
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        if hasattr(self, 'permission_filter_queryset'):
+            return self.permission_filter_queryset()
+        return super().get_filtered_queryset()
+
+
+# Role permission mixin
+class APIPermissionRequiredMixin(BaseRolePermissionMixin):
+    """Check permission required on API views."""
+
+    def get_permission_denied_message(self, default=None):
+        if hasattr(self, 'permission_denied_message'):
+            return (self.permission_denied_message,)
+
+    def _http_method_allowed(self, request):
+        if request.method not in self.allowed_methods:
+            self.http_method_not_allowed(request)
+        if (request.method not in SAFE_METHODS and not
+                request.user.is_authenticated):
+                raise NotAuthenticated
+
+    def check_permissions(self, request):
+        self._http_method_allowed(request)
+        if self.request.user.is_superuser:
+            return True
+
+        perms = self.get_permission_required()
+        msg = self.get_permission_denied_message(
+            default="Permission denied."
+        )
+        if isinstance(msg, Sequence):
+            msg = msg[0]
+        if not perms or not all(perm in self.permissions for perm in perms):
+            self.permission_denied(request, message=msg)
 
 
 class SchemaSelectorMixin():

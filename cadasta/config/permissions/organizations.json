@@ -1,0 +1,53 @@
+{
+    "content_type": "organization.organization",
+    "permissions": {
+        "org_list": {
+            "name": "List Organizations",
+            "codename": "org.list"
+        },
+        "org_view": {
+            "name": "View Organization",
+            "codename": "org.view"
+        },
+        "org_view_private": {
+            "name": "View Private Organization",
+            "codename": "org.view.private"
+        },
+        "org_view_archived": {
+            "name": "View Archived Organization",
+            "codename": "org.view.archived"
+        },
+        "org_create": {
+            "name": "Create Organization",
+            "codename": "org.create"
+        },
+        "org_update": {
+            "name": "Update Organization",
+            "codename": "org.update"
+        },
+        "org_archive": {
+            "name": "Archive Organization",
+            "codename": "org.archive"
+        },
+        "org_unarchive": {
+            "name": "Unarchive Organization",
+            "codename": "org.unarchive"
+        },
+        "org.users.list": {
+            "name": "List Organization Users",
+            "codename": "org.users.list"
+        },
+        "org_users_add": {
+            "name": "Add Organization Users",
+            "codename": "org.users.add"
+        },
+        "org_users_edit": {
+            "name": "Edit Organization Users",
+            "codename": "org.users.edit"
+        },
+        "org_users_remove": {
+            "name": "Remove Organizations Users",
+            "codename": "org.users.remove"
+        }
+    }
+}

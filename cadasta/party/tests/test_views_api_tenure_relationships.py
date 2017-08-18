@@ -1,18 +1,19 @@
 import json
-from django.test import TestCase
-from rest_framework.exceptions import PermissionDenied
-from skivvy import APITestCase
 
 from accounts.tests.factories import UserFactory
-from core.tests.utils.cases import UserTestCase, FileStorageTestCase
-from organization.tests.factories import ProjectFactory, clause
+from core.tests.utils.cases import FileStorageTestCase, UserTestCase
+from django.contrib.auth.models import Group
+from django.test import TestCase
 from organization.models import OrganizationRole
-from resources.tests.factories import ResourceFactory
-from resources.models import Resource
-from spatial.tests.factories import SpatialUnitFactory
-from party.tests.factories import PartyFactory, TenureRelationshipFactory
+from organization.tests.factories import ProjectFactory, clause
 from party.models import TenureRelationship
+from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from party.views import api
+from resources.models import Resource
+from resources.tests.factories import ResourceFactory
+from rest_framework.exceptions import PermissionDenied
+from skivvy import APITestCase
+from spatial.tests.factories import SpatialUnitFactory
 from tutelary.models import Policy, assign_user_policies
 
 
@@ -50,7 +51,8 @@ class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create()
         assign_policies(self.user)
-
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.party1 = PartyFactory.create(project=self.prj, name='Landowner')
         self.su2 = SpatialUnitFactory.create(project=self.prj, type='PA')
@@ -142,7 +144,7 @@ class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
     def test_create_private_record_based_on_org_membership(self):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
         response = self.request(user=user, method='POST')
         assert response.status_code == 403
         assert TenureRelationship.objects.count() == 0
@@ -182,7 +184,7 @@ class TenureRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create()
         assign_policies(self.user)
-
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         party = PartyFactory.create(project=self.prj, name='Landowner')
         spatial_unit = SpatialUnitFactory.create(project=self.prj, type='PA')
@@ -264,7 +266,7 @@ class TenureRelationshipDetailAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=user)
         assert response.status_code == 403
@@ -277,7 +279,8 @@ class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create()
         assign_policies(self.user)
-
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.party = PartyFactory.create(project=self.prj)
         self.spatial_unit = SpatialUnitFactory.create(project=self.prj)
@@ -421,7 +424,7 @@ class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(user=user, method='PATCH')
         assert response.status_code == 403
@@ -438,7 +441,7 @@ class TenureRelationshipUpdateAPITest(APITestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
                                         user=user,
-                                        admin=True)
+                                        group=self.oa_group)
 
         response = self.request(user=user, method='PATCH')
         assert response.status_code == 200
@@ -482,7 +485,8 @@ class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create()
         assign_policies(self.user)
-
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
         self.prj = ProjectFactory.create(slug='test-project', access='public')
         self.party = PartyFactory.create(project=self.prj)
         self.spatial_unit = SpatialUnitFactory.create(project=self.prj)
@@ -573,7 +577,7 @@ class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
-                                        user=user)
+                                        user=user, group=self.om_group)
 
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 403
@@ -587,7 +591,7 @@ class TenureRelationshipDeleteAPITest(APITestCase, UserTestCase, TestCase):
         user = UserFactory.create()
         OrganizationRole.objects.create(organization=self.prj.organization,
                                         user=user,
-                                        admin=True)
+                                        group=self.oa_group)
         response = self.request(method='DELETE', user=user)
         assert response.status_code == 204
         assert TenureRelationship.objects.count() == 0
@@ -610,8 +614,7 @@ class TenureRelationshipResourceListAPITest(APITestCase, FileStorageTestCase,
         self.user = UserFactory.create()
         assign_policies(self.user)
         self.prj = ProjectFactory.create(slug='test-project', access='public')
-        self.tenure = TenureRelationshipFactory.create(
-                        project=self.prj)
+        self.tenure = TenureRelationshipFactory.create(project=self.prj)
         self.resources = ResourceFactory.create_batch(
             2, project=self.prj, content_object=self.tenure)
         ResourceFactory.create(project=self.prj)

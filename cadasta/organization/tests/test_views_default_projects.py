@@ -7,7 +7,7 @@ from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.gis.geos import Point
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -30,21 +30,10 @@ from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
-from tutelary.models import Policy, Role, assign_user_policies
 
 from .. import forms
 from ..views import default
-from .factories import OrganizationFactory, ProjectFactory, clause
-
-
-def assign_policies(user):
-    clauses = {
-        'clause': [
-            clause('allow', ['project.*'], ['project/*/*'])
-        ]
-    }
-    policy = Policy.objects.create(name='allow', body=json.dumps(clauses))
-    assign_user_policies(user, policy)
+from .factories import OrganizationFactory, ProjectFactory
 
 
 class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
@@ -52,62 +41,44 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
     template = 'organization/project_list.html'
 
     def setup_models(self):
-        self.ok_org1 = OrganizationFactory.create(name='OK org 1', slug='org1')
-        self.ok_org2 = OrganizationFactory.create(name='OK org 2', slug='org2')
-        self.unauth_org = OrganizationFactory.create(
-            name='Unauthorized org', slug='unauth-org'
+        self.org1 = OrganizationFactory.create(name='Org 1', slug='org1')
+        self.org2 = OrganizationFactory.create(name='Org 2', slug='org2')
+        self.org3 = OrganizationFactory.create(
+            name='Org 3', slug='org3', access='private'
         )
         self.projs = []
-        self.projs += ProjectFactory.create_batch(2, organization=self.ok_org1)
-        self.projs += ProjectFactory.create_batch(2, organization=self.ok_org2)
-        self.unauth_projs = []
-        self.unauth_projs.append(ProjectFactory.create(
-            name='Unauthorized project',
-            slug='unauth-proj',
-            organization=self.ok_org2
-        ))
-        self.unauth_projs.append(ProjectFactory.create(
-            name='Project in unauthorized org',
-            slug='proj-in-unauth-org',
-            organization=self.unauth_org
-        ))
+        self.projs += ProjectFactory.create_batch(2, organization=self.org1)
+        self.projs += ProjectFactory.create_batch(2, organization=self.org2)
+
         self.priv_proj1 = ProjectFactory.create(
-            organization=self.ok_org1, access='private'
+            organization=self.org1, access='private'
         )
         self.priv_proj2 = ProjectFactory.create(
-            organization=self.ok_org1, access='private'
+            organization=self.org1, access='private'
         )
         self.priv_proj3 = ProjectFactory.create(
-            organization=self.ok_org2, access='private'
+            organization=self.org2, access='private'
         )
         self.archived_proj = ProjectFactory.create(
-            organization=self.ok_org2, archived=True)
-        ProjectFactory.create(organization=self.unauth_org, access='private')
+            organization=self.org2, archived=True)
 
-        # Note: no project.view_private -- that's controlled by
-        # organization membership in the tests.
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('deny', ['project.view'], ['project/unauth-org/*']),
-                clause('deny', ['project.view'], ['project/*/unauth-proj'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
+        # private org with public prj -- is this possible?
+        self.priv_org_prj = ProjectFactory.create(
+            organization=self.org3, access='public')
+
         self.user = UserFactory.create()
-        assigned_policies = self.user.assigned_policies()
-        assigned_policies.append(self.policy)
-        self.user.assign_policies(*assigned_policies)
+
+        self.oa_group = Group.objects.get(name='OrgAdmin')
+        self.om_group = Group.objects.get(name='OrgMember')
+        self.pm_group = Group.objects.get(name='ProjectManager')
+        self.pu_group = Group.objects.get(name='ProjectMember')
 
     @property
     def sort_key(self):
         return lambda p: p.organization.slug + ':' + p.slug
 
     def setup_template_context(self):
-        projs = self.projs + self.unauth_projs
+        projs = self.projs + [self.priv_org_prj]
         return {
             'object_list': sorted(projs, key=self.sort_key),
             'add_allowed': False,
@@ -125,46 +96,70 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
-        # Slight weirdness here: an unauthorized user can see *more*
-        # projects than a user authorized with the policy defined
-        # above because the policy includes clauses denying access to
-        # some projects.
-
         response = self.request(user=UserFactory.create())
         assert response.status_code == 200
         assert response.content == self.expected_content
 
     def test_get_with_org_membership(self):
-        OrganizationRole.objects.create(organization=self.ok_org1,
-                                        user=self.user)
+        OrganizationRole.objects.create(organization=self.org1,
+                                        user=self.user, group=self.om_group)
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj1, self.priv_proj2])
+        projs = (self.projs + [self.priv_org_prj] + [self.priv_proj1,
+                 self.priv_proj2])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key))
 
     def test_get_with_org_memberships(self):
-        OrganizationRole.objects.create(organization=self.ok_org1,
-                                        user=self.user)
-        OrganizationRole.objects.create(organization=self.ok_org2,
-                                        user=self.user)
+        OrganizationRole.objects.create(organization=self.org1,
+                                        user=self.user,
+                                        group=self.om_group)
+        OrganizationRole.objects.create(organization=self.org2,
+                                        user=self.user,
+                                        group=self.om_group)
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj1, self.priv_proj2, self.priv_proj3])
+        projs = (self.projs + [self.priv_org_prj] + [self.priv_proj1,
+                 self.priv_proj2, self.priv_proj3])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
             object_list=sorted(projs, key=self.sort_key))
 
-    def test_get_with_org_admin(self):
-        OrganizationRole.objects.create(organization=self.ok_org2,
+    def test_get_with_project_manager(self):
+        OrganizationRole.objects.create(organization=self.org1,
                                         user=self.user,
-                                        admin=True,)
+                                        group=self.om_group)
+        ProjectRole.objects.create(project=self.priv_proj1,
+                                   user=self.user, role='PM',
+                                   group=self.pm_group)
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj3, self.archived_proj])
+        projs = (self.projs + [self.priv_org_prj, self.priv_proj1,
+                 self.priv_proj2])
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projs, key=self.sort_key))
+
+    def test_get_archived_with_org_admin(self):
+        OrganizationRole.objects.create(organization=self.org2,
+                                        user=self.user,
+                                        group=self.oa_group)
+        response = self.request(user=self.user)
+        projs = (self.projs + [self.priv_org_prj, self.priv_proj3,
+                 self.archived_proj])
+
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projs, key=self.sort_key), add_allowed=True)
+
+    def test_get_with_org_admin(self):
+        OrganizationRole.objects.create(organization=self.org2,
+                                        user=self.user,
+                                        group=self.oa_group)
+        response = self.request(user=self.user)
+        projs = (self.projs +
+                 [self.priv_proj3, self.archived_proj, self.priv_org_prj])
 
         assert response.status_code == 200
         assert response.content == self.render_content(
@@ -189,22 +184,11 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        clauses = {
-            'clause': [
-                clause('allow',
-                       ['project.list'],
-                       ['organization/*']),
-                clause('allow',
-                       ['project.view', 'project.view_private'],
-                       ['project/*/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         self.user = UserFactory.create()
-        self.user.assign_policies(self.policy)
+        self.org_admin_group = Group.objects.get(name='OrgAdmin')
+        self.org_member_group = Group.objects.get(name='OrgMember')
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
 
     def setup_template_context(self):
         return {
@@ -261,7 +245,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=self.user,
-            admin=True
+            group=self.org_admin_group
         )
         members = {self.user.username: 'Administrator'}
         response = self.request(user=self.user)
@@ -279,6 +263,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         role = ProjectRole.objects.create(
             project=self.project,
             user=self.user,
+            group=self.pm_group,
             role='PM',
         )
         response = self.request(user=self.user)
@@ -313,11 +298,22 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == self.expected_content
 
     def test_get_private_project(self):
+        ProjectRole.objects.create(
+            project=self.project,
+            user=self.user,
+            group=self.pu_group,
+            role='PU',
+        )
         self.project.access = 'private'
         self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=False,
+                                       is_allowed_add_resource=False,
+                                       is_project_member=True,
+                                       is_allowed_import=False)
+        assert response.content == expected
 
     def test_get_private_project_with_unauthenticated_user(self):
         self.project.access = 'private'
@@ -328,40 +324,34 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                 in response.messages)
 
     def test_get_private_project_without_permission(self):
-        # Note, no project.view_private!
-        restricted_clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*'])
-            ]
-        }
-        restricted_policy = Policy.objects.create(
-            name='restricted',
-            body=json.dumps(restricted_clauses))
-        self.user.assign_policies(restricted_policy)
-
         self.project.access = 'private'
         self.project.save()
         response = self.request()
         assert response.status_code == 302
+        assert response.location == '/'
         assert ("You don't have permission to access this project"
                 in response.messages)
 
     def test_get_private_project_based_on_org_membership(self):
         OrganizationRole.objects.create(organization=self.project.organization,
+                                        group=self.org_member_group,
                                         user=self.user)
         self.project.access = 'private'
         self.project.save()
 
         response = self.request(user=self.user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=False,
+                                       is_allowed_add_resource=False,
+                                       is_project_member=False,
+                                       is_allowed_import=False)
+        assert response.content == expected
 
     def test_get_private_project_with_other_org_membership(self):
         org = OrganizationFactory.create()
-        OrganizationRole.objects.create(organization=org, user=self.user)
+        OrganizationRole.objects.create(
+            organization=org, user=self.user, group=self.org_member_group)
         self.project.access = 'private'
         self.project.save()
 
@@ -371,11 +361,10 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                 in response.messages)
 
     def test_get_private_project_with_superuser(self):
-        self.project.access = 'private'
-        self.project.save()
-
         self.user.is_superuser = True
         self.user.save()
+        self.project.access = 'private'
+        self.project.save()
         response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_superuser=True,
@@ -410,7 +399,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         OrganizationRole.objects.create(
             organization=self.project.organization,
             user=org_admin,
-            admin=True
+            group=self.org_admin_group
         )
         members = {org_admin.username: 'Administrator'}
         self.project.archived = True
@@ -466,26 +455,15 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.create'], ['organization/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
         setattr(self.request, '_messages', self.messages)
 
         self.user = UserFactory.create()
         self.unauth_user = UserFactory.create()
-        self.superuser = UserFactory.create()
-        self.superuser.assign_policies(Role.objects.get(name='superuser'))
+        self.superuser = UserFactory.create(is_superuser=True)
 
         setattr(self.request, 'user', self.user)
-        assign_user_policies(self.user, self.policy)
 
         self.org = OrganizationFactory.create(
             name='Test Org', slug='test-org'
@@ -501,10 +479,15 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             {'username': 'org_non_member_2'},
             {'username': 'org_non_member_3'},
             {'username': 'org_non_member_4'}])
+
+        self.oa_group = Group.objects.get(name="OrgAdmin")
+        self.om_group = Group.objects.get(name="OrgMember")
+
         for idx in range(6):
+            group = self.oa_group if idx < 2 else self.om_group
             OrganizationRole.objects.create(organization=self.org,
                                             user=self.users[idx],
-                                            admin=(idx < 2))
+                                            group=group)
 
     def _get(self, status=None, check_content=False, login_redirect=False):
         response = self.client.get(reverse('project:add'))
@@ -533,8 +516,8 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         self._get(status=302, login_redirect=True)
 
     def test_get_from_initial_with_org(self):
-        """ If users create a project from an organization directly, the
-            initial field value will be set the the `organization` value
+        """If users create a project from an organization directly, the
+            initial field value will be the `organization` value
             provided with the URL kwargs.
         """
         view = default.ProjectAddWizard()
@@ -545,8 +528,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert form_initial.get('organization') == self.org.slug
 
     def test_get_from_initial_with_archived_org(self):
-        """ If users create a project from an archived organization, if fails.
-        """
+        """If users create a project from an archived organization, fail"""
         self.org.archived = True
         self.org.save()
         self.org.refresh_from_db()
@@ -560,7 +542,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert '/projects/new/' not in response['location']
 
     def test_get_from_initial_with_no_org(self):
-        """ If a project is created from scratch, no the initial value for
+        """If a project is created from scratch, no the initial value for
             `organization must be empty.
         """
         view = default.ProjectAddWizard()
@@ -722,7 +704,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         second_org = OrganizationFactory.create(name="Second Org")
         OrganizationRole.objects.create(organization=second_org,
                                         user=self.users[0],
-                                        admin=True)
+                                        group=self.oa_group)
         self.client.force_login(self.users[0])
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
@@ -764,6 +746,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
+
         details_post_data = self.DETAILS_POST_DATA.copy()
         details_post_data['details-name'] = project_name
         details_response = self.client.post(
@@ -805,7 +788,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             self.EXTENTS_POST_DATA
         )
         assert extents_response.status_code == 200
-        self.DETAILS_POST_DATA['details-questionaire'] = self.get_form(
+        self.DETAILS_POST_DATA['details-questionnaire'] = self.get_form(
             'xls-form')
         details_response = self.client.post(
             reverse('organization:project-add',
@@ -854,6 +837,9 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
+        self.dc_group = Group.objects.get(name="DataCollector")
 
     def setup_url_kwargs(self):
         return {
@@ -869,15 +855,24 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user, group=self.pm_group, role='PM')
 
         response = self.request(user=user)
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(
+            is_administrator=True,
+            is_allowed_add_location=True,
+            is_allowed_add_resource=True,
+            is_allowed_import=True,
+            is_allowed_download=True,
+            is_project_member=True,
+            is_allowed_add_party=True
+        )
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        # assign_policies(user)
         self.project.archived = True
         self.project.save()
 
@@ -900,7 +895,9 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user, group=self.dc_group, role='DC')
+
         response = self.request(user=user, method='POST')
         assert response.status_code == 302
         assert self.expected_success_url in response.location
@@ -928,7 +925,8 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user, group=self.pu_group, role='PU')
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -960,6 +958,9 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         self.project = ProjectFactory.create(current_questionnaire='abc')
         self.questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project, id='abc')
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
+        self.dc_group = Group.objects.get(name="DataCollector")
 
     def setup_url_kwargs(self):
         return {
@@ -975,12 +976,21 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
                     initial={'questionnaire': self.questionnaire.xls_form.url,
                              'original_file': self.questionnaire.original_file}
                 ),
-                'is_allowed_import': True}
+                'is_allowed_import': True,
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_import': True,
+                'is_allowed_download': True,
+                'is_project_member': True,
+                'is_allowed_add_party': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
-
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
@@ -988,7 +998,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_get_empty_questionnaire_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         self.project.current_questionnaire = ''
         self.project.save()
@@ -1002,7 +1015,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_get_with_blocked_questionnaire_upload(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         SpatialUnitFactory.create(project=self.project)
 
         response = self.request(user=user)
@@ -1014,7 +1030,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user)
         form = forms.ProjectEditDetails(
@@ -1038,7 +1057,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         self.project.archived = True
         self.project.save()
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pu_group, role='PU'
+        )
 
         response = self.request(user=user)
         assert response.status_code == 302
@@ -1047,7 +1069,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': ''})
 
@@ -1061,7 +1086,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': ''})
 
@@ -1074,7 +1102,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_empty_questionnaire_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user, method='POST')
 
         assert response.status_code == 302
@@ -1087,7 +1118,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_invalid_form(self):
         question = self.get_form('xls-form-invalid')
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': question})
@@ -1108,7 +1142,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_update_missing_relevant(self):
         question = self.get_form('t_questionnaire_missing_relevant')
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': question})
@@ -1127,7 +1164,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_private_project_form(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=user, method='POST',
                                 post_data={'access': ['on']})
@@ -1164,7 +1204,6 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -1184,15 +1223,21 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-
         self.project_user = UserFactory.create()
+
+        self.om_group = Group.objects.get(name="OrgMember")
+        self.pm_group = Group.objects.get(name="ProjectManager")
+        self.pu_group = Group.objects.get(name="ProjectMember")
+        self.dc_group = Group.objects.get(name="DataCollector")
+
         OrganizationRole.objects.create(
             organization=self.project.organization,
-            user=self.project_user
+            user=self.project_user, group=self.om_group
         )
         self.project_role = ProjectRole.objects.create(
             project=self.project,
             user=self.project_user,
+            group=self.dc_group,
             role='DC'
         )
 
@@ -1209,11 +1254,22 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
         return {'project': self.project,
                 'object': self.project,
                 'form': forms.ProjectEditPermissions(instance=self.project),
-                'is_allowed_import': True}
+                'is_allowed_import': True,
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_import': True,
+                'is_allowed_download': True,
+                'is_project_member': True,
+                'is_allowed_add_party': True}
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group,
+            role='PM'
+        )
 
         response = self.request(user=user)
         assert response.status_code == 200
@@ -1233,8 +1289,6 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
-
         self.project.archived = True
         self.project.save()
         response = self.request(user=user)
@@ -1244,7 +1298,11 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group,
+            role='PM'
+        )
         response = self.request(user=user, method='POST')
 
         assert self.expected_success_url in response.location
@@ -1271,7 +1329,6 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -1288,6 +1345,7 @@ class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create()
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_url_kwargs(self):
         return {
@@ -1297,7 +1355,10 @@ class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_archive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1332,6 +1393,7 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.project = ProjectFactory.create(archived=True)
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_url_kwargs(self):
         return {
@@ -1341,7 +1403,10 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_unarchive_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        ProjectRole.objects.create(
+            project=self.project, user=user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1372,7 +1437,6 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_unarchive_with_archived_organization(self):
         user = UserFactory.create()
-        assign_policies(user)
 
         self.project.refresh_from_db()
         self.project.organization.archived = True
@@ -1399,6 +1463,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         geometry = 'SRID=4326;POINT (30 10)'
         SpatialUnitFactory.create(project=self.project, geometry=geometry)
         self.user = UserFactory.create()
+        self.pm_group = Group.objects.get(name="ProjectManager")
 
     def setup_url_kwargs(self):
         return {
@@ -1411,10 +1476,20 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'object': self.project,
                 'form': forms.DownloadForm(project=self.project,
                                            user=self.user),
-                'is_allowed_import': True}
+                'is_allowed_import': True,
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_import': True,
+                'is_allowed_download': True,
+                'is_project_member': True,
+                'is_allowed_add_party': True}
 
     def test_get_with_authorized_user(self):
-        assign_policies(self.user)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
 
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -1432,7 +1507,10 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
 
     def test_post_with_authorized_user(self):
-        assign_policies(self.user)
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
         assert (response.headers['content-disposition'][1] ==
@@ -1463,16 +1541,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('allow', ['project.import'], ['project/*/*']),
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
+        self.pm_group = Group.objects.get(name='ProjectManager')
 
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
@@ -1482,7 +1551,6 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.unauth_user = UserFactory.create()
 
         setattr(self.request, 'user', self.user)
-        assign_user_policies(self.user, self.policy)
 
         self.org = OrganizationFactory.create(
             name='Test Org', slug='test-org'
@@ -1596,6 +1664,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             assert remove_csrf(expected) == remove_csrf(content)
 
     def test_initial_get_valid(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         self._get(status=200, check_content=True)
 
@@ -1607,6 +1679,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self._get(status=302, login_redirect=True)
 
     def test_full_flow_valid(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
@@ -1684,6 +1760,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             name='BB',
             label='BB Label')
 
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv_custom, 'rb')
         file = SimpleUploadedFile('test_custom.csv', csvfile.read(),
@@ -1745,6 +1825,11 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_full_flow_valid_xls(self):
         mime = 'application/vnd.openxmlformats-'
         'officedocument.spreadsheetml.sheet'
+
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         xlsfile = self.get_file(self.valid_xls, 'rb')
         file = SimpleUploadedFile('test_download.xlsx', xlsfile.read(), mime)
@@ -1808,6 +1893,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert resource.original_file == 'test_download.xlsx'
 
     def test_full_flow_invalid_value(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.invalid_csv, 'rb')
         file = SimpleUploadedFile('test_invalid.csv', csvfile.read(),
@@ -1850,6 +1939,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             project_id=proj.pk).count() == 0
 
     def test_full_flow_invalid_file_type(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
@@ -1892,6 +1985,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             project_id=proj.pk).count() == 0
 
     def test_wizard_goto_step(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
 
         # post first page data
@@ -1962,6 +2059,10 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert select_defaults_response.status_code == 200
 
     def test_full_flow_valid_no_resource(self):
+        ProjectRole.objects.create(
+            project=self.project, user=self.user,
+            group=self.pm_group, role='PM'
+        )
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
