@@ -437,8 +437,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == self.render_content(has_content=True,
                                                        num_locations=1,
                                                        num_parties=1,
-                                                       num_resources=1,
-                                                       total_area=642391915500)
+                                                       num_resources=1)
 
     def test_get_with_labels(self):
         file = self.get_file(

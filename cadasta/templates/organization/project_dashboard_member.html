@@ -72,7 +72,9 @@
                       <i class="glyphicon glyphicon-map-marker"></i>
                       <div class="tile-content">
                         <span class="num">{{ num_locations }}</span>
-                        {% if total_area %}<span class="area">{{ total_area | format_area:user.measurement | safe }}</span>{% endif %}
+                        {% if project.area %}
+                          <span class="area">{{ project.area | format_area:user.measurement | safe }}</span>
+                        {% endif %}
                       </div>
                     </div>
                   </a>
