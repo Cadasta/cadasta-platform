@@ -1393,6 +1393,14 @@ class ResetPasswordKeyFormTest(UserTestCase, TestCase):
         assert (_("Passwords cannot contain your phone.")
                 in form.errors.get('password'))
 
+    def test_password_change_without_user(self):
+        data = {'password': 'iloveyoko79!'}
+        form = forms.ResetPasswordKeyForm(data)
+        assert form.is_valid() is False
+        assert (_(
+            "The password for this user can not be changed.")
+            in form.errors.get('password'))
+
 
 class ResetPasswordFormTest(UserTestCase, TestCase):
 
@@ -1446,98 +1454,75 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
             unverified_phone='+919327768250',
             label='password_reset').exists() is False
 
+    def test_empty_submit(self):
+        data = {
+            'phone': '',
+        }
 
-class ResetPasswordDoneTokenFormTest(UserTestCase, TestCase):
-
-    def test_valid_token(self):
-        data = {'token': '123456'}
-        form = forms.ResetPasswordDoneTokenForm(data)
-        assert form.is_valid() is True
-
-    def test_invalid_token(self):
-        data = {'token': 'ABCDEF'}
-        form = forms.ResetPasswordDoneTokenForm(data)
+        form = forms.ResetPasswordForm(data)
         assert form.is_valid() is False
-        assert (_("Token must be a number.")
-                in form.errors['token'])
+        assert (_("You cannot leave both phone and email empty.")
+                in form.errors.get('__all__'))
+
+        data = {
+            'email': '',
+        }
+
+        form = forms.ResetPasswordForm(data)
+        assert form.is_valid() is False
+        assert (_("You cannot leave both phone and email empty.")
+                in form.errors.get('__all__'))
 
 
-class PhoneVerificationFormTest(UserTestCase, TestCase):
+class TokenVerificationFormTest(UserTestCase, TestCase):
 
     def setUp(self):
         super().setUp()
-        self.user = UserFactory.create(username='sherlock',
-                                       phone='+919327768250',
-                                       )
+        self.user = UserFactory.create()
+        self.device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
 
     def test_valid_token(self):
-        self.user.is_active = False
-        self.user.save()
-        VerificationDevice.objects.create(
-            user=self.user, unverified_phone=self.user.phone)
-        device = self.user.verificationdevice_set.get(label='phone_verify')
-        token = device.generate_challenge()
-
-        data = {
-            'token': token
-        }
-        form = forms.PhoneVerificationForm(data, user=self.user)
+        token = self.device.generate_challenge()
+        data = {'token': token}
+        form = forms.TokenVerificationForm(data=data, device=self.device)
         assert form.is_valid() is True
-        self.user.refresh_from_db()
-        assert self.user.phone_verified is True
-        assert self.user.is_active is True
 
     def test_invalid_token(self):
-        VerificationDevice.objects.create(
-            user=self.user, unverified_phone=self.user.phone)
-        device = self.user.verificationdevice_set.get(label='phone_verify')
-        token = device.generate_challenge()
+        token = self.device.generate_challenge()
         token = str(int(token) - 1)
-        data = {
-            'token': token
-        }
-        form = forms.PhoneVerificationForm(data, user=self.user)
+        data = {'token': token}
+        form = forms.TokenVerificationForm(data=data, device=self.device)
         assert form.is_valid() is False
         assert (_("Invalid Token. Enter a valid token.")
                 in form.errors.get('token'))
 
     def test_expired_token(self):
-        _now = 1497657600
-        VerificationDevice.objects.create(
-            user=self.user, unverified_phone=self.user.phone)
-        with mock.patch('time.time', return_value=_now):
-            device = self.user.verificationdevice_set.get(label='phone_verify')
-            token = device.generate_challenge()
+        now = 1497657600
+        with mock.patch('time.time', return_value=now):
+            token = self.device.generate_challenge()
             data = {'token': token}
-
         with mock.patch('time.time', return_value=(
-                _now + settings.TOTP_TOKEN_VALIDITY + 1)):
-            form = forms.PhoneVerificationForm(data, user=self.user)
+                now + settings.TOTP_TOKEN_VALIDITY + 1)):
+            form = forms.TokenVerificationForm(data=data, device=self.device)
             assert form.is_valid() is False
             assert (_("The token has expired."
                       " Please click on 'here' to receive the new token.")
                     in form.errors.get('token'))
 
-    def test_valid_token_update_phone(self):
-        VerificationDevice.objects.create(
-            user=self.user, unverified_phone='+12345678990')
-        device = self.user.verificationdevice_set.get(label='phone_verify')
-        token = device.generate_challenge()
-
-        data = {'token': token}
-        form = forms.PhoneVerificationForm(data, user=self.user)
-        assert form.is_valid() is True
-        self.user.refresh_from_db()
-        assert self.user.phone == '+12345678990'
-        assert self.user.phone_verified is True
-
     def test_invalid_token_format(self):
-        VerificationDevice.objects.create(user=self.user,
-                                          unverified_phone=self.user.phone)
         data = {'token': 'TOKEN'}
-        form = forms.PhoneVerificationForm(data, user=self.user)
+        form = forms.TokenVerificationForm(data=data, device=self.device)
         assert form.is_valid() is False
         assert (_("Token must be a number.") in form.errors.get('token'))
+
+    def test_token_without_device(self):
+        data = {'token': '123456'}
+        form = forms.TokenVerificationForm(data=data, device=None)
+        assert form.is_valid() is False
+        assert (_("The token could not be verified."
+                  " Please click on 'here' to try again.")
+                in form.errors.get('token'))
 
 
 class ResendTokenFormTest(UserTestCase, TestCase):
