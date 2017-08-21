@@ -182,7 +182,7 @@ def check_extent(sender, instance, **kwargs):
 @receiver(models.signals.post_save, sender=SpatialUnit)
 def refresh_after_save(sender, instance, **kwargs):
     """ Ensure DB-generated area is set on instance """
-    if not isinstance(instance.geometry, (MultiPolygon, Polygon)):
+    if isinstance(instance.geometry, (MultiPolygon, Polygon)):
         instance.refresh_from_db()
 
 
