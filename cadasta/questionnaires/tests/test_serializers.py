@@ -987,7 +987,7 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         with pytest.raises(ValidationError) as e:
             serializer.is_valid(raise_exception=True)
-        assert ("Invalid relevant clause: $party_type='IN'" in
+        assert ("Invalid relevant clause" in
                 e.value.detail['questions'][0]['relevant'])
 
 

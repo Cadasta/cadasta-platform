@@ -10,7 +10,7 @@ from jsonattrs.models import Attribute, AttributeType, Schema
 from .messages import MISSING_RELEVANT, INVALID_ACCURACY
 from .exceptions import InvalidQuestionnaire
 from .validators import validate_questionnaire, validate_accuracy
-from .managers import fix_labels, check_relevant_clause
+from .managers import fix_labels
 from . import models, choices
 
 
