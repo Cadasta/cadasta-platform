@@ -2,6 +2,7 @@ from core.models import RandomIDModel
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
 from django.contrib.gis.db.models import GeometryField
+from django.contrib.gis.geos import MultiPolygon, Polygon
 from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.encoding import iri_to_uri
@@ -179,14 +180,10 @@ def check_extent(sender, instance, **kwargs):
 
 
 @receiver(models.signals.post_save, sender=SpatialUnit)
-def refresh_area(sender, instance, **kwargs):
+def refresh_after_save(sender, instance, **kwargs):
     """ Ensure DB-generated area is set on instance """
-    from django.contrib.gis.geos import MultiPolygon, Polygon
-    geom = instance.geometry
-    if not isinstance(geom, (MultiPolygon, Polygon)):
-        return
-    qs = type(instance)._default_manager.filter(id=instance.id)
-    instance.area = qs.values_list('area', flat=True)[0]
+    if isinstance(instance.geometry, (MultiPolygon, Polygon)):
+        instance.refresh_from_db()
 
 
 @fix_model_for_attributes
