@@ -48,7 +48,7 @@
       <td><p>{{ user.username }}</p><p>{{ user.full_name }}</p></td>
       <td>{{ user.email }}</td>
       <td>{{ user.org_names|safe }}</td>
-      <td>{{ user.last_login|default_if_none:"&mdash;" }}</td>
+      <td data-sort="{{ user.last_login|date:'U' }}">{{ user.last_login|default_if_none:"&mdash;" }}</td>
       <td>
         <form method="POST"
               action="{% url user.is_active|yesno:'user:deactivate,user:activate' user.username %}">
