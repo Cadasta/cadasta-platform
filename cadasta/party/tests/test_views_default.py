@@ -25,7 +25,7 @@ from ..views import default
 from .factories import PartyFactory, TenureRelationshipFactory
 
 
-def assign_policies(user):
+def assign_policies(user, deny_edit_delete_permissions=False):
     clauses = {
         'clause': [
             {
@@ -45,6 +45,14 @@ def assign_policies(user):
             }
         ]
     }
+    if deny_edit_delete_permissions:
+        deny_clause = {
+            'effect': 'deny',
+            'object': ['party/*/*/*'],
+            'action': ['party.update', 'party.delete']
+        }
+        clauses['clause'].append(deny_clause)
+
     policy = Policy.objects.create(
         name='allow',
         body=json.dumps(clauses))
@@ -304,6 +312,8 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'object': self.project,
                 'party': self.party,
+                'is_allowed_delete_party': True,
+                'is_allowed_update_party': True,
                 'attributes': (('Test field', 'test', ),
                                ('Test field 2', 'Choice 2', ),
                                ('Test field 3', 'Choice 1, Choice 3', ))}
@@ -321,6 +331,15 @@ class PartyDetailTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+
+    def test_get_with_authorized_user_but_cannot_update_nor_delete(self):
+        user = UserFactory.create()
+        assign_policies(user, True)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        expected_content = self.render_content(is_allowed_delete_party=False,
+                                               is_allowed_update_party=False)
+        assert response.content == expected_content
 
     def test_get_with_incomplete_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
