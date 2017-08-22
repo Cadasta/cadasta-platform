@@ -111,7 +111,7 @@ class PasswordResetFromPhoneView(FormView, SuperUserCheckMixin):
         try:
             user_id = self.request.session['password_reset_id']
             user = User.objects.get(id=user_id)
-            form_kwargs["user"] = user
+            form_kwargs['user'] = user
         except KeyError:
             message = _(
                 "You must first verify your token before resetting password."
@@ -167,7 +167,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
             message = _("Verification Token sent to {phone}")
             message = message.format(phone=phone)
             messages.add_message(self.request, messages.INFO, message)
-            self.request.session["phone_verify_id"] = self.object.id
+            self.request.session['phone_verify_id'] = self.object.id
             self.success_url = reverse_lazy('account:verify_phone')
 
         return super().form_valid(form)

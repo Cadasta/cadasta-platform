@@ -299,7 +299,7 @@ class ResetPasswordForm(allauth_forms.ResetPasswordForm):
     def save(self, request, **kwargs):
         phone = self.data.get('phone')
         if phone:
-            request.session["phone"] = phone
+            request.session['phone'] = phone
             try:
                 user = User.objects.get(phone=phone)
                 device = user.verificationdevice_set.get_or_create(
@@ -321,24 +321,25 @@ class TokenVerificationForm(forms.Form):
 
     def clean_token(self):
         token = self.data.get('token')
-        try:
-            token = int(token)
-            device = self.device
-            if device.verify_token(token):
-                return token
-            elif device.verify_token(token=token, tolerance=5):
-                raise forms.ValidationError(
-                    _("The token has expired."
-                        " Please click on 'here' to receive the new token."))
-            else:
-                raise forms.ValidationError(
-                    "Invalid Token. Enter a valid token.")
-        except ValueError:
-            raise forms.ValidationError(_("Token must be a number."))
-        except AttributeError:
+        device = self.device
+        if not device:
             raise forms.ValidationError(
                 _("The token could not be verified."
                     " Please click on 'here' to try again."))
+        try:
+            token = int(token)
+        except ValueError:
+            raise forms.ValidationError(_("Token must be a number."))
+
+        if device.verify_token(token):
+            return token
+        elif device.verify_token(token=token, tolerance=5):
+            raise forms.ValidationError(
+                _("The token has expired."
+                  " Please click on 'here' to receive the new token."))
+        else:
+            raise forms.ValidationError(
+                "Invalid Token. Enter a valid token.")
         return token
 
 
