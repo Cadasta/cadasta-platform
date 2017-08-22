@@ -24,10 +24,10 @@ DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
 
 # Use HTTP for OSM for testing only, to make caching tiles for
 # functional tests a bit simpler.
-LEAFLET_CONFIG['TILES'][0] = (
-    LEAFLET_CONFIG['TILES'][0][0],
+LEAFLET_CONFIG['TILES'][0] = (                            # NOQA
+    LEAFLET_CONFIG['TILES'][0][0],                        # NOQA
     'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    LEAFLET_CONFIG['TILES'][0][2]
+    LEAFLET_CONFIG['TILES'][0][2]                         # NOQA
 )
 
 CACHES = {

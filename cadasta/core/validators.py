@@ -31,6 +31,7 @@ def validate_json(value, schema):
     if message_dict:
         raise JsonValidationError(message_dict)
 
+
 emojis = re.compile(
     u'.*[\U0001F004\U0001F0CF\U0001F170-\U0001F171\U0001F17E\U0001F17F'
     '\U0001F18E\U0001F191-\U0001F19A\U0001F1E6-\U0001F1FF'

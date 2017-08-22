@@ -1,14 +1,14 @@
 import os
 from .default import *  # NOQA
 
-INSTALLED_APPS += (
+INSTALLED_APPS += (  # NOQA
     'opbeat.contrib.django',
 )
 
 MIDDLEWARE_CLASSES = (
     'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
     'opbeat.contrib.django.middleware.Opbeat404CatchMiddleware',
-) + MIDDLEWARE_CLASSES
+) + MIDDLEWARE_CLASSES  # NOQA
 
 DEBUG = False
 
