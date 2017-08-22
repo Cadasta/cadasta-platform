@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load filters %}
 {% load leaflet_tags %}
 
       <!-- Project Overview for non-project members  -->
@@ -39,7 +40,7 @@
                 </div>
               </div>
             </section>
-            
+
           {% elif user.is_authenticated %}
             <!-- Project restriction message -->
             <div class="alert alert-info alert-full alert-dismissible" role="alert">
@@ -58,9 +59,10 @@
                     <div class="tile-box bg-primary">
                       <div class="tile-header">{% trans "Locations" %}</div>
                       <div class="tile-content-wrapper">
-                        <i class="glyphicon glyphicon-map"></i>
+                        <i class="glyphicon glyphicon-map-marker"></i>
                         <div class="tile-content">
                           <span class="num">{{ num_locations }}</span>
+                          {% if total_area %}<span class="area">{{ total_area | format_area:user.measurement | safe }}</span>{% endif %}
                         </div>
                       </div>
                     </div>

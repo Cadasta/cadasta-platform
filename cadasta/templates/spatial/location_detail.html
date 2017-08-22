@@ -10,7 +10,13 @@
 <div class="col-md-4 detail">
   <section>
     <div class="page-title">
-      <h2 class="short"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</h2>
+      <h2 class="short">
+        <span class="entity">{% trans "Location" %} </span>
+        {{ location.name }}
+        {% if location.area %}
+          <span class="area">{{ location.area | format_area:user.measurement | safe }} </span>
+        {% endif %}
+      </h2>
       <div class="top-btn pull-right">
         <!-- Action buttons -->
         {% if is_allowed_edit_location %}
