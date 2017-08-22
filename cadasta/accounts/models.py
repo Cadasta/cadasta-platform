@@ -57,6 +57,8 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     last_updated = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
+    _dict_languages = dict(settings.LANGUAGES)
+    _dict_measurements = dict(settings.MEASUREMENTS)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email', 'full_name']
@@ -78,10 +80,6 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
                    ('user.update',
                     {'error_message':
                      _("You don't have permission to update user details")})]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__original_avatar_url = self.avatar_url
 
     def __repr__(self):
         repr_string = ('<User username={obj.username}'
@@ -107,6 +105,15 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
         if not self.avatar or not self.avatar.url:
             return settings.DEFAULT_AVATAR
         return self.avatar.url
+
+    @property
+    def language_verbose(self):
+        language_code = self.language.split('-')[0]
+        return self._dict_languages[language_code]
+
+    @property
+    def measurement_verbose(self):
+        return self._dict_measurements[self.measurement]
 
 
 @receiver(models.signals.post_save, sender=User)
