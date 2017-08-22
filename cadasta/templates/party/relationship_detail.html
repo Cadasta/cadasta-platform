@@ -9,11 +9,15 @@
       <h2><a href="{% url 'locations:detail' object.organization.slug object.slug location.id %}"><span class="entity">{% trans "Location" %} </span>{{ location.name }}</a></h2>
       <hr class="border-btm">
       <h3 class="inline">{% trans "Relationship Detail" %}</h3>
-      <div class="top-btn pull-right">
-        <!-- Action buttons -->
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}" title="{% trans 'Edit relationship' %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-        <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}" title="{% trans 'Delete relationship' %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
-      </div>
+        <div class="top-btn pull-right">
+          <!-- Action buttons -->
+          {% if is_allowed_update_rel %}
+            <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_edit' object.organization.slug object.slug relationship.id %}" title="{% trans 'Edit relationship' %}" aria-label="{% trans 'Edit relationship' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          {% endif %}
+          {% if is_allowed_delete_rel %}
+            <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:relationship_delete' object.organization.slug object.slug relationship.id %}" title="{% trans 'Delete relationship' %}" aria-label="{% trans 'Delete relationship' %}"><span class="glyphicon glyphicon-trash"></span></a>
+          {% endif %}
+        </div>
     </div>
 
     <!-- Relationship information -->

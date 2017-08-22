@@ -46,12 +46,20 @@ def assign_policies(user, deny_edit_delete_permissions=False):
         ]
     }
     if deny_edit_delete_permissions:
-        deny_clause = {
-            'effect': 'deny',
-            'object': ['party/*/*/*'],
-            'action': ['party.update', 'party.delete']
-        }
-        clauses['clause'].append(deny_clause)
+        deny_clauses = [
+            {
+                'effect': 'deny',
+                'object': ['party/*/*/*'],
+                'action': ['party.update', 'party.delete'],
+            },
+            {
+                'effect': 'deny',
+                'object': ['tenure_rel/*/*/*'],
+                'action': ['tenure_rel.update', 'tenure_rel.delete'],
+            }
+        ]
+
+        clauses['clause'].extend(deny_clauses)
 
     policy = Policy.objects.create(
         name='allow',
@@ -1140,6 +1148,8 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
         return {'object': self.project,
                 'relationship': self.relationship,
                 'location': self.relationship.spatial_unit,
+                'is_allowed_delete_rel': True,
+                'is_allowed_update_rel': True,
                 'attributes': (('Test field', 'test', ),
                                ('Test field 2', 'Choice 2', ),
                                ('Test field 3', 'Choice 1, Choice 3', ))}
@@ -1157,6 +1167,15 @@ class PartyRelationshipDetailTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.expected_content
+
+    def test_get_with_authorized_user_but_cannot_update_nor_delete(self):
+        user = UserFactory.create()
+        assign_policies(user, True)
+        response = self.request(user=user)
+        assert response.status_code == 200
+        expected_content = self.render_content(is_allowed_delete_rel=False,
+                                               is_allowed_update_rel=False)
+        assert response.content == expected_content
 
     def test_get_with_incomplete_questionnaire(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
