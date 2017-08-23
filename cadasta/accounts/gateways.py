@@ -13,7 +13,7 @@ class TwilioGateway(object):
     def __init__(self,
                  account_sid=settings.TWILIO_ACCOUNT_SID,
                  auth_token=settings.TWILIO_AUTH_TOKEN,
-                 from_phone_number_list=settings.TWILIO_PHONE_NUMBER_LIST):
+                 from_phone_number_list=[]):
 
         self.client = Client(account_sid, auth_token)
         self.from_phone_number_list = from_phone_number_list
