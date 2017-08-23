@@ -42,7 +42,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     geometry = GeometryField(null=True, geography=True)
 
     # Area, auto-calculated via trigger (see spatial/migrations/#0005)
-    area = models.FloatField(null=True)
+    area = models.FloatField(default=0)
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
