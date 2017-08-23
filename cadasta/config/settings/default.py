@@ -575,5 +575,29 @@ ES_MAX_RESULTS = 10000
 TOTP_TOKEN_VALIDITY = 3600
 TOTP_DIGITS = 6
 
+SMS_GATEWAY = 'accounts.gateways.FakeGateway'
+
 TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
 TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'accounts.FakeGateway': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        },
+    },
+}

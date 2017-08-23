@@ -116,5 +116,3 @@ LOGGING = {
 }
 
 ES_PORT = '8000'
-
-SMS_GATEWAY = 'accounts.gateways.FakeGateway'

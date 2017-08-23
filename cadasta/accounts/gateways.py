@@ -4,7 +4,6 @@ import logging
 from django.conf import settings
 from twilio.rest import Client, TwilioException
 
-twilio_logger = logging.getLogger(name='accounts.TwilioGateway')
 fake_logger = logging.getLogger(name='accounts.FakeGateway')
 
 
@@ -25,15 +24,9 @@ class TwilioGateway(object):
                 to=to,
                 from_=random.choice(self.from_phone_number_list),
                 body=body)
-            uri = 'https://api.twilio.com' + message.uri
-            response = self.client.request(method='GET', uri=uri)
-            twilio_logger.info("Message sent successfully:{response}".format(
-                response=response))
 
         except TwilioException as e:
             message = e
-            twilio_logger.debug(
-                'Twilio Message not sent: {error}'.format(error=message.msg))
 
         return message
 
