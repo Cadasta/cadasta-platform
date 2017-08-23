@@ -882,15 +882,16 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
 
     def setup_models(self):
         self.member = UserFactory.create()
-        self.org = OrganizationFactory.create(add_users=[self.member])
+        self.user = UserFactory.create()
+        self.org = OrganizationFactory.create(add_users=[self.member,
+                                                         self.user])
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug, 'username': self.member.username}
 
     def test_get_with_authorized_user(self):
-        user = UserFactory.create()
-        assign_policies(user)
-        response = self.request(user=user)
+        assign_policies(self.user)
+        response = self.request(user=self.user)
 
         role = OrganizationRole.objects.filter(organization=self.org,
                                                user=self.member).exists()
@@ -901,8 +902,7 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
         assert role is False
 
     def test_get_with_unauthorized_user(self):
-        user = UserFactory.create()
-        response = self.request(user=user)
+        response = self.request(user=self.user)
 
         role = OrganizationRole.objects.filter(organization=self.org,
                                                user=self.member).exists()
@@ -922,11 +922,10 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
         assert role is True
 
     def test_get_with_archived_organization(self):
-        user = UserFactory.create()
-        assign_policies(user)
+        assign_policies(self.user)
         self.org.archived = True
         self.org.save()
-        response = self.request(user=user)
+        response = self.request(user=self.user)
 
         role = OrganizationRole.objects.filter(organization=self.org,
                                                user=self.member).exists()
@@ -934,3 +933,21 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
         assert ("You don't have permission to remove members from this "
                 "organization" in response.messages)
         assert role is True
+
+    def test_get_with_admin_self_removing(self):
+        role_current_user = OrganizationRole.objects.get(organization=self.org,
+                                                         user=self.member)
+        role_current_user.admin = True
+        role_current_user.save(update_fields=["admin"])
+
+        response = self.request(user=self.member)
+
+        role_still_exists = OrganizationRole.objects.filter(
+            organization=self.org, user=self.member).exists()
+
+        assert response.status_code == 302
+        assert role_still_exists is True
+        assert ('/organizations/{}/members/{}/'.format(
+                  self.org.slug, self.member.username) in response.location)
+        assert ("Administrators cannot remove themselves."
+                in response.messages)
