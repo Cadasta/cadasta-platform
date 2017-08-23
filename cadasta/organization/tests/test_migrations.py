@@ -3,8 +3,6 @@ from django.core.management import call_command
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader
 
-from organization.tests.factories import ProjectFactory
-
 
 class MigrationTestCase(TestCase):
     migrate_from = '0005_add_area_to_project'
@@ -32,8 +30,8 @@ class MigrationTestCase(TestCase):
         call_command('migrate', 'organization', self.migrate_from)
 
         org = Organization.objects.create(name='Test Org')
-        ProjectFactory.create(name='No Locations Proj', organization=org)
-        project = ProjectFactory.create(name='Test Proj', organization=org)
+        Project.objects.create(id=1, name='No Locations Proj', organization=org)
+        project = Project.objects.create(id=2, name='Test Proj', organization=org)
 
         su1 = SpatialUnit.objects.create(
             id='abc',
