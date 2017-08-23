@@ -1,7 +1,5 @@
 from django.test import TestCase
 from django.conf import settings
-# from accounts.gateways.twilio import TwilioGateway
-# from accounts.gateways.fake import FakeGateway
 from accounts.gateways import TwilioGateway, FakeGateway
 from django.test.utils import override_settings
 from unittest import mock
