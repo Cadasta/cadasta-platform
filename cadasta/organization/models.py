@@ -174,6 +174,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
     description = models.TextField(null=True, blank=True)
     # logo = models.ImageField(blank=True, upload_to='/image/logo')
     archived = models.BooleanField(default=False)
+    archived_by_org = models.BooleanField(default=False)
     urls = ArrayField(models.URLField(), default=[])
     contacts = JSONField(validators=[validate_contact], default=[],
                          null=True, blank=True)

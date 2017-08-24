@@ -482,8 +482,10 @@ class OrganizationUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
         assert self.org.archived is True
 
-    def test_unarchive_cascade_to_projects(self):
-        project = ProjectFactory.create(organization=self.org, archived=True)
+    def test_unarchive_when_projects_were_archived_by_org(self):
+        project = ProjectFactory.create(organization=self.org,
+                                        archived=True,
+                                        archived_by_org=True)
         user = UserFactory.create()
         assign_policies(user)
 
@@ -496,6 +498,23 @@ class OrganizationUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
                 in response.location)
         assert self.org.archived is False
         assert project.archived is False
+
+    def test_unarchive_when_projects_were_not_archived_by_org(self):
+        project = ProjectFactory.create(organization=self.org,
+                                        archived=True,
+                                        archived_by_org=False)
+        user = UserFactory.create()
+        assign_policies(user)
+
+        response = self.request(user=user)
+        self.org.refresh_from_db()
+        project.refresh_from_db()
+
+        assert response.status_code == 302
+        assert ('/organizations/{}/'.format(self.org.slug)
+                in response.location)
+        assert self.org.archived is False
+        assert project.archived is True
 
 
 class OrganizationMembersTest(ViewTestCase, UserTestCase, TestCase):

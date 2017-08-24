@@ -139,8 +139,18 @@ class OrgArchiveView(LoginPermissionRequiredMixin,
         self.object.archived = self.do_archive
         self.object.save()
         for project in self.object.projects.all():
-            project.archived = self.do_archive
-            project.save()
+            unarchiving_org = True if not self.do_archive else False
+
+            if self.do_archive and not project.archived:
+                project.archived_by_org = True
+                project.archived = self.do_archive
+                project.save()
+
+            if unarchiving_org and project.archived_by_org:
+                project.archived_by_org = False
+                project.archived = self.do_archive
+                project.save()
+
         return redirect(self.get_success_url())
 
 
