@@ -8,8 +8,7 @@
 
 {% block extra_head %}
 {{ block.super }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.9/select2-bootstrap.min.css" />
+<link rel="stylesheet" href="{% static 'select2/4.0.3/css/select2.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
@@ -17,36 +16,35 @@
 
 {% block location_extra_script %}
   {{ form.media }}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+  <script src="{% static 'select2/4.0.3/js/select2.min.js' %}"></script>
   <script src="{% static 'js/form_submit.js' %}"></script>
   <script src="{% static 'js/jquery-ui.min.js' %}"></script>
   <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
   <script>
-$(document).ready(function() {
-  var template = function(party) {
-    if (!party.id) {
-      return party.text;
-    }
-    return $(
-      '<div class="party-option">' +
-      '<strong class="party-name">' + party.text + '</strong>' +
-      '<span class="party-type">' + party.element.dataset.type + '</span>' +
-      '</div>'
-    );
-  };
-  $("#party-select").select2({
-    minimumResultsForSearch: 6,
-    templateResult: template,
-    theme: "bootstrap",
-  });
-
-  $('.datepicker').datepicker({
-    yearRange: "c-200:c+200",
-    dateFormat: "yy-mm-dd",
-    changeMonth: true,
-    changeYear: true,
-  });
-});
+    $(document).ready(function() {
+      var template = function(party) {
+        if (!party.id) {
+          return party.text;
+        }
+        return $(
+          '<div class="party-option">' +
+          '<strong class="party-name">' + party.text + '</strong>' +
+          '<span class="party-type">' + party.element.dataset.type + '</span>' +
+          '</div>'
+        );
+      };
+      $("#party-select").select2({
+        minimumResultsForSearch: 6,
+        templateResult: template,
+        theme: "bootstrap",
+      });
+      $('.datepicker').datepicker({
+        yearRange: "c-200:c+200",
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,
+        changeYear: true,
+      });
+    });
   </script>
 {% endblock %}
 
