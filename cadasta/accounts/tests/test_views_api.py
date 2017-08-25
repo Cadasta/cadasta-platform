@@ -184,8 +184,9 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         assert user1.email == 'sherlock.holmes@bbc.uk'
         assert user1.email_verified is False
         assert VerificationDevice.objects.count() == 0
-        assert len(mail.outbox) == 1
+        assert len(mail.outbox) == 2
         assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+        assert 'sherlock.holmes@bbc.uk' in mail.outbox[1].to
 
     def test_remove_phone_email_unverified(self):
         user1 = UserFactory.create(username='sherlock',
@@ -198,10 +199,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         data = {'phone': '', 'username': 'sherlock'}
         response = self.request(method='PUT', post_data=data, user=user1)
         assert response.status_code == 200
-        assert len(mail.outbox) == 0
+        assert len(mail.outbox) == 1
         user1.refresh_from_db()
         assert user1.phone is None
         assert user1.phone_verified is False
+        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
 
     def test_remove_phone_email_verified(self):
         user1 = UserFactory.create(username='sherlock',

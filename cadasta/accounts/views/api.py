@@ -53,15 +53,15 @@ class AccountUser(djoser_views.UserView):
                 if current_phone:
                     user.phone = current_phone
                     utils.send_sms(current_phone, messages.phone_change)
-                if user.email_verified:
+                if user.email:
                     utils.send_phone_update_notification(user.email)
             else:
                 user.phone_verified = False
                 utils.send_sms(current_phone, messages.phone_delete)
-                if user.email_verified:
+                if user.email:
                     utils.send_phone_deleted_notification(user.email)
 
-        if user.phone_verified and email_update_message:
+        if user.phone and email_update_message:
             utils.send_sms(to=user.phone, body=email_update_message)
         user.save()
 

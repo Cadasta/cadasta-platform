@@ -216,15 +216,15 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                 if self.current_phone:
                     utils.send_sms(self.current_phone, messages.phone_change)
                     user.phone = self.current_phone
-                if user.email_verified:
+                if user.email:
                     utils.send_phone_update_notification(user.email)
             else:
                 user.phone_verified = False
                 utils.send_sms(self.current_phone, messages.phone_delete)
-                if user.email_verified:
+                if user.email:
                     utils.send_phone_deleted_notification(user.email)
 
-        if user.phone_verified and email_update_message:
+        if user.phone and email_update_message:
             utils.send_sms(user.phone, email_update_message)
         user.save()
         return user

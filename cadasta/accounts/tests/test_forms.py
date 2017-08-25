@@ -1039,9 +1039,9 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user.email_verified is False
         assert EmailAddress.objects.count() == 1
         assert VerificationDevice.objects.count() == 0
-        assert len(mail.outbox) == 1
+        assert len(mail.outbox) == 2
         assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
-        # notify user via sms about phone deletion
+        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
 
     def test_update_phone_and_remove_email(self):
         user = UserFactory.create(username='sherlock',
