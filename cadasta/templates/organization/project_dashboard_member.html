@@ -7,7 +7,7 @@
 
           <h2>Project Dashboard</h2>
 
-          {% if is_administrator and not has_content and not project.extent and not questionnaire %}
+          {% if is_superuser or is_project_manager and not has_content and not project.extent and not questionnaire %}
             <!-- Project introduction -->
             <section>
               <div class="panel panel-default">
@@ -106,7 +106,7 @@
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h3 class="panel-title inline">{% trans "Project Map" %}</h3>
-                {% if is_administrator %}
+                {% if is_superuser or is_project_manager %}
                   <a href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">
                     <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="right" title="{% trans 'Edit project map' %}">
                     </i>
@@ -117,7 +117,7 @@
                 {% endif %}
               </div>
               <div class="panel-body">
-                {% if not project.extent and is_administrator and num_locations == 0%}
+                {% if not project.extent and is_superuser or is_project_manager and num_locations == 0%}
                   <div class="overlay-wrapper map">
                     <div class="overlay">
                       {% blocktrans %}
@@ -136,7 +136,7 @@
             </div>
           </section>
 
-          {% if is_administrator %}
+          {% if is_superuser or is_project_manager %}
             <!-- Project schema -->
             <section>
               <div class="panel panel-default">
@@ -215,14 +215,14 @@
             <div class="panel panel-default panel-about">
               <div class="panel-heading">
                 <h3 class="panel-title inline">{% trans "About this project" %}</h3>
-                {% if is_administrator %}
+                {% if is_superuser or is_project_manager %}
                   <a href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">
                     <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Edit project details' %}"></i>
                   </a>
                 {% endif %}
               </div>
               <div class="panel-body">
-                {% if is_administrator and not object.description and not object.urls.0 and not object.contacts %}
+                {% if is_superuser and is_project_manager and not object.description and not object.urls.0 and not object.contacts %}
                   <div class="overlay-wrapper">
                     <div class="overlay">
                       {% blocktrans %}
@@ -265,7 +265,7 @@
             </div>
           </section>
 
-          {% if is_administrator %}
+          {% if is_superuser or is_project_manager %}
             <!-- Project import export -->
             <section>
               <div class="panel panel-default panel-about">
@@ -289,7 +289,7 @@
           {% endif %}
 
           <!-- Project team members -->
-          {% if is_administrator %}
+          {% if is_superuser and is_project_manager %}
           <section>
             <div class="panel panel-default">
               <div class="panel-heading">

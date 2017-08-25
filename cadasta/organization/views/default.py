@@ -78,8 +78,7 @@ class OrganizationAdd(RoleLoginPermissionRequiredMixin, generic.CreateView):
 
 
 class OrganizationDashboard(RolePermissionRequiredMixin,
-                            mixins.OrgRoleCheckMixin,
-                            mixins.ProjectCreateCheckMixin,
+                            mixins.OrganizationMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
 
@@ -101,19 +100,17 @@ class OrganizationDashboard(RolePermissionRequiredMixin,
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data()
-        if self.is_superuser:
+        if request.user.is_superuser:
             projects = self.object.all_projects()
         else:
-            projects = self.object.public_projects()
-            if hasattr(self.request.user, 'organizations'):
-                orgs = self.request.user.organizations.all()
-                for org in orgs:
-                    if org.slug == self.kwargs['slug']:
-                        if self.is_administrator:
-                            projects = self.object.all_projects()
-                        else:
-                            projects = self.object.all_projects().filter(
-                                archived=False)
+            org_role = self.roles.get('org_role', None)
+            if org_role and org_role.admin:
+                projects = self.object.all_projects()
+            elif org_role:
+                projects = self.object.all_projects().filter(
+                    archived=False)
+            else:
+                projects = self.object.public_projects()
 
         context['projects'] = projects
         return super(generic.DetailView, self).render_to_response(context)
@@ -167,8 +164,9 @@ class OrganizationUnarchive(OrgArchiveView):
 
 
 class OrganizationMembers(RoleLoginPermissionRequiredMixin,
-                          mixins.OrgRoleCheckMixin,
-                          mixins.ProjectCreateCheckMixin,
+                          mixins.OrganizationMixin,
+                          #   mixins.OrgRoleCheckMixin,
+                          #   mixins.ProjectCreateCheckMixin,
                           core_mixins.CacheObjectMixin,
                           generic.DetailView):
     model = Organization

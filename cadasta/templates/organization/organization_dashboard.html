@@ -14,7 +14,7 @@
 
 <div class="col-md-12 content-single">
   <div class="row">
-    {% if is_member %}
+    {% if is_org_member or is_org_admin or is_superuser %}
       {% include 'organization/organization_dashboard_member.html' %}
     {% else %}
       {% include 'organization/organization_dashboard_nonmember.html' %}
@@ -23,4 +23,3 @@
 </div>
 
 {% endblock %}
-

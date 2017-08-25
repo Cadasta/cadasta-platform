@@ -34,7 +34,7 @@
 
     switch_layer_controls(map, options);
 
-    {% if is_project_member or is_superuser %}
+    {% if is_project_member %}
       var projectUser = true;
     {% else %}
       var projectUser = false;

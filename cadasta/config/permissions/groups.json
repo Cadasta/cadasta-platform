@@ -23,7 +23,7 @@
             "project.list", "project.create", "project.update", "project.archive",
             "project.unarchive", "project.export", "project.import", "project.users.list",
             "project.users.add", "project.users.update", "project.users.remove",
-            "spatial.create", "resource.add"
+            "spatial.create", "resource.add", "party.create"
         ]
     },
     "DataCollector": {

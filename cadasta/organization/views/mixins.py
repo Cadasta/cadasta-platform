@@ -11,7 +11,7 @@ from questionnaires.models import Questionnaire
 
 
 class OrganizationMixin:
-    """Provide lookup method for the current organization."""
+    """Provide a lookup method for the current organization."""
 
     def get_organization(self, lookup_kwarg='slug'):
         if lookup_kwarg == 'slug' and hasattr(self, 'org_lookup'):
@@ -143,7 +143,7 @@ class ProjectMixin:
 
 
 class ProjectRoles(ProjectMixin):
-    """Determin organization and project roles for the current user.
+    """Determine organization and project roles for the current user.
 
        Used in `ProjectUsers` and `ProjectUsersDetail` api views.
     """
@@ -204,19 +204,10 @@ class ProjectAdminCheckMixin(SuperUserCheckMixin):
         )
         project = self.get_project()
         if not hasattr(self, '_roles'):
-            # delegate permission check to tutelary backend
-            # remove this when tutelary is removed
             for permission_context in permissions_contexts:
                 context[permission_context[1]] = user.has_perm(
                     permission_context[0], project
                 )
-            return context
-        else:
-            # check permissions against role permissions
-            for permission_context in permissions_contexts:
-                context[permission_context[1]] = (
-                    permission_context[0] in
-                    self.permissions or self.is_administrator)
             return context
 
 

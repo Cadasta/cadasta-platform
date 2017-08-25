@@ -13,7 +13,7 @@
 <!-- Single project header -->
 <div class="header page-header">
   <div class="page-title">
-    <h1 class="{% if is_administrator or is_allowed_add_location or is_allowed_add_resource %}short{% endif %}">
+    <h1 class="{% if is_superuser or is_project_manager %}short{% endif %}">
       <a href="{% url 'organization:dashboard' slug=object.organization.slug %}" class="org-name">{{ object.organization.name }}</a>
       {{ object.name }}
       {% if object.access == "private" %}
@@ -38,7 +38,7 @@
       {% endif %}
 
       <!-- More actions menu -->
-      {% if is_administrator %}
+      {% if is_superuser or is_org_admin or is_project_manager %}
         <div class="dropdown pull-right btn-add">
           <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
@@ -64,37 +64,36 @@
 
       <!-- Add locations menu -->
       <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block">
-        {% if is_allowed_add_location %}
+        {% if 'spatial.create' in permissions or is_superuser %}
           <a class="btn btn-primary" href="{% url 'locations:add' object.organization.slug object.slug %}" aria-label="{% trans 'Add location' %}">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add location" %}
           </a>
         {% endif %}
-        {% if is_allowed_add_resource or is_allowed_import %}
+        {% if 'project.import' in permissions or is_superuser %}
           <button type="button" class="btn btn-primary btn-rt dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="caret"></span>
             <span class="sr-only">{% trans "Toggle add" %}</span>
           </button>
           <ul class="dropdown-menu">
-            {% if is_allowed_add_party %}<li><a href="{% url 'parties:add' object.organization.slug object.slug %}">{% trans "Add party" %}</a></li>{% endif %}
-            {% if is_allowed_add_resource %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
-            {% if is_allowed_add_resource and is_allowed_import %}<li role="separator" class="divider"></li>{% endif %}
-            {% if is_allowed_import %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
+            {% if 'resource.add' in permissions or is_superuser %}<li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>{% endif %}
+            {% if 'resource.add' and 'project.import' in permissions or is_superuser %}<li role="separator" class="divider"></li>{% endif %}
+            {% if 'project.import' in permissions or is_superuser %}<li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>{% endif %}
           </ul>
         {% endif %}
       </div>
 
       <!-- Single add button for smaller screens-->
       <div class="dropdown pull-right visible-xs-inline">
-        {% if is_allowed_add_location or is_allowed_add_resource %}
+        {% if 'spatial.create' or 'project.import' in permissions or is_superuser %}
         <a data-target="#" data-toggle="dropdown" class="btn btn-primary btn-add dropdown-toggle" role="button" aria-label="{% trans 'Add location' %}">
           <span class="glyphicon glyphicon-plus"></span>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
-          {% if is_allowed_add_location %}
+          {% if 'spatial.create' in permissions or is_superuser %}
           <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
           {% endif %}
           <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
-          {% if is_allowed_add_resource %}
+          {% if 'resource.add' in permissions or is_superuser %}
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           {% endif %}
           <li role="separator" class="divider"></li>

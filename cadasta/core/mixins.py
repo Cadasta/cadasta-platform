@@ -86,6 +86,8 @@ class BaseRolePermissionMixin():
 
        Provides a `permissions` attribute which composes a unique set of all
        permissions assigned by the users organization and project roles.
+
+       Provides role related template context variables.
     """
 
     def get_permission_required(self):
@@ -115,11 +117,11 @@ class BaseRolePermissionMixin():
             return super().get_queryset()
 
     @cached_property
-    def _roles(self):
-        _roles = []
+    def roles(self):
+        _roles = {}
         user = self.request.user
         if user.is_anonymous:
-            _roles.append(AnonymousUserRole())
+            _roles['anonymous_user'] = AnonymousUserRole()
             return _roles
         # for org mixins get the org role
         if hasattr(self, 'get_organization'):
@@ -128,26 +130,50 @@ class BaseRolePermissionMixin():
                     organization=self.get_organization(),
                     user=self.request.user,
                 )
-                _roles.append(role)
+                _roles['org_role'] = role
             except OrganizationRole.DoesNotExist:
                 pass
         # for project mixins get org and project roles
         if hasattr(self, 'get_org_role') and self.get_org_role():
             if self._org_role not in _roles:
-                _roles.append(self._org_role)
+                _roles['org_role'] = self._org_role
         if hasattr(self, 'get_prj_role') and self.get_prj_role():
-            _roles.append(self._prj_role)
+            _roles['prj_role'] = self._prj_role
         # set he default public role
-        _roles.append(PublicUserRole())
+        _roles['public_role'] = PublicUserRole()
         return _roles
 
     @cached_property
     def permissions(self):
-        # compose permissions for all roles
+        """Compose permissions for all roles."""
         self._perms = []
-        [self._perms.extend(role.permissions) for role in self._roles]
+        [self._perms.extend(role.permissions) for role in self.roles.values()]
         perms = sorted(set(self._perms))
         return perms
+
+    def get_context_data(self, *args, **kwargs):
+        """Add user permissions and roles to template context."""
+        context = super().get_context_data(*args, **kwargs)
+        org_role = self.roles.get('org_role', None)
+        prj_role = self.roles.get('prj_role', None)
+        context['permissions'] = self.permissions
+        context['is_superuser'] = self.request.user.is_superuser
+        context['is_anonymous_user'] = self.request.user.is_anonymous()
+        context['is_public_user'] = (
+            True if self.roles.get('public_role', False) else False)
+        context['is_org_member'] = True if org_role else False
+        context['is_org_admin'] = (
+            True if org_role and org_role.admin else False)
+        context['is_project_member'] = True if prj_role else False
+        context['is_project_user'] = (
+            True if prj_role and prj_role.is_project_user else False)
+        context['is_data_collector'] = (
+            True if prj_role and prj_role.is_data_collector else False)
+        context['is_mobile_user'] = (
+            True if prj_role and prj_role.is_mobile_user else False)
+        context['is_project_manager'] = (
+            True if prj_role and prj_role.is_project_manager else False)
+        return context
 
 
 # Role permission mixin

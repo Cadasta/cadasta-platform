@@ -9,7 +9,7 @@
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h3 class="panel-title inline">{% trans "Projects" %}</h3>
-                {% if is_administrator %}
+                {% if is_org_admin or is_superuser %}
                   <a href="{% url 'organization:project-add' organization.slug %}">
                     <i class="glyphicon glyphicon-plus" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Add project' %}"></i>
                   </a>
@@ -40,7 +40,7 @@
                             {% endif %}
                           </h4>
                           <p>{{ proj.description }}</p>
-                        </td>   
+                        </td>
                         <td class="hidden-xs">{{ proj.country }}</td>
                         <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
                         <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
@@ -49,7 +49,7 @@
                     </tbody>
                   </table>
                 {% else %}
-                  {% if add_allowed %}
+                  {% if is_org_admin or is_superuser %}
                     <!-- Starter text -->
                     <div class="overlay-wrapper">
                       <div class="overlay">
@@ -95,14 +95,14 @@
               {% endif %}
               <div class="panel-heading">
                 <h3 class="panel-title inline">{% trans "About this org" %}</h3>
-                {% if is_administrator %}
+                {% if is_org_admin or is_superuser %}
                   <a href="{% url 'organization:edit' organization.slug %}">
                     <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Edit project details' %}"></i>
                   </a>
                 {% endif %}
               </div>
               <div class="panel-body">
-                {% if is_administrator and not organization.description and not organization.urls.0 and not organization.contacts %}
+                {% if is_org_admin or is_superuser and not organization.description and not organization.urls.0 and not organization.contacts %}
                   <div class="overlay-wrapper">
                     <div class="overlay">
                       <p>{% trans "This organization needs a description. Would you like to add one now?" %}</p>
@@ -124,7 +124,7 @@
                       <dd class="clearfix">
                         {% if contact.email %}
                         <a href="mailto:{{ contact.email }}" class="break">
-                          <i class="glyphicon glyphicon-envelope"></i> 
+                          <i class="glyphicon glyphicon-envelope"></i>
                          {{ contact.email }}
                         </a>
                         {% endif %}
@@ -148,7 +148,7 @@
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h3 class="panel-title inline">{% trans "Members" %}</h3>
-                {% if is_administrator %}
+                {% if is_org_admin or is_superuser %}
                   <a href="{% url 'organization:members' organization.slug %}">
                     <i class="glyphicon glyphicon-cog" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Manage team members' %}"></i>
                   </a>

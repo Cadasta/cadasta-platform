@@ -2,6 +2,7 @@ import itertools
 import math
 from core.util import slugify
 from django.db import models
+from django.utils.functional import cached_property
 
 from .util import random_id, ID_FIELD_LENGTH
 
@@ -61,6 +62,6 @@ class Role(RandomIDModel):
 
     user = models.ForeignKey('accounts.User')
 
-    @property
+    @cached_property
     def permissions(self):
         return self.group.permissions.values_list('codename', flat=True)

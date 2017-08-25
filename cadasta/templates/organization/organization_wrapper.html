@@ -8,14 +8,14 @@
 
 {% block title %} | {% block page_title %}{% endblock %}{{ organization.name }} {% endblock %}
 
-{% block main-width %}-fluid{% if is_member %} show-sidebar{% endif %}{% endblock %}
+{% block main-width %}-fluid{% if is_org_member %} show-sidebar{% endif %}{% endblock %}
 
 {% block page-header %}
 
 <!-- Single organization header -->
 <div class="header page-header">
   <div class="page-title">
-      <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
+      <h1 class="{% if is_org_admin or is_superuser %}short{% endif %}">
         {{ organization.name }}
         {% if organization.archived %}
           <span class="label label-danger">
@@ -27,7 +27,7 @@
     <div class="top-btn">
 
       <!-- More options menu -->
-      {% if is_administrator %}
+      {% if is_org_admin or is_superuser %}
       <div class="dropdown pull-right btn-add">
         <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
           <span class="more-menu glyphicon glyphicon-option-vertical"></span>
@@ -38,7 +38,7 @@
         </button>
         <ul class="dropdown-menu" aria-labelledby="dLabel">
           <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
-          {% if is_administrator %}
+          {% if is_org_admin or is_superuser %}
           <li role="separator" class="divider"></li>
           <li>
             {% if organization.archived %}
@@ -53,7 +53,7 @@
       {% endif %}
 
       <!-- Split add button -->
-      {% if add_allowed %}
+      {% if is_org_admin or is_superuser %}
         <div class="btn-group pull-right btn-add visible-sm-inline visible-md-inline visible-lg-block" aria-label="{% trans 'Add project' %}">
           <a href="{% url 'organization:project-add' organization.slug %}" class="btn btn-primary">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Add project" %}
@@ -92,7 +92,7 @@
 
 {% block sub-nav %}
 
-{% if is_member %}
+{% if is_org_member or is_org_admin or is_superuser %}
   <!-- Sidebar -->
   <div id="sidebar" class="{% block left-nav %}{% endblock %}">
     <ul class="nav nav-sidebar">

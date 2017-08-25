@@ -341,6 +341,22 @@ class ProjectRole(Role):
                        ' role={obj.role}>')
         return repr_string.format(obj=self)
 
+    @property
+    def is_project_user(self):
+        return self.role == 'PU'
+
+    @property
+    def is_data_collector(self):
+        return self.role == 'DC'
+
+    @property
+    def is_mobile_user(self):
+        return self.role == 'MU'
+
+    @property
+    def is_project_manager(self):
+        return self.role == 'PM'
+
 
 def assign_prj_policies(role, delete=False):
     assigned_policies = role.user.assigned_policies()

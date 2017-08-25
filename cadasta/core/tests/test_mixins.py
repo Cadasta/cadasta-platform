@@ -46,6 +46,13 @@ def assign_policies(user):
     assign_user_policies(user, policy)
 
 
+class BaseMockView(RolePermissionRequiredMixin):
+    def __init__(self, obj, request, user):
+        self.obj = obj
+        self.request = request
+        self.request.user = user
+
+
 # Tutelary mixin test - to be removed
 class PermissionRequiredMixinTest(UserTestCase, TestCase):
 
@@ -199,92 +206,70 @@ class UpdatePermissionsTest(UserTestCase, TestCase):
 class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
 
     def test_raise_improperly_configured(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
+        class MockView(BaseMockView, generic.DetailView):
+            pass
 
         user = UserFactory.create()
         org = OrganizationFactory.create()
+        request = RequestFactory().get('/check')
         with pytest.raises(ImproperlyConfigured):
-            MockView(org, user).has_permission()
+            MockView(org, request, user).has_permission()
 
     def test_has_permission_with_superuser(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
+        class MockView(BaseMockView, generic.DetailView):
+            pass
 
         user = UserFactory.create(is_superuser=True)
         org = OrganizationFactory.create()
-        assert MockView(org, user).has_permission()
+        request = RequestFactory().get('/check')
+        assert MockView(org, request, user).has_permission()
 
     def test_get_permission_required_from_dict(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
+        class MockView(BaseMockView, generic.DetailView):
             permission_required = {'GET': 'some.permission'}
 
         user = UserFactory.create()
         org = OrganizationFactory.create()
+        request = RequestFactory().get('/check')
         assert ('some.permission',) == MockView(
-            org, user).get_permission_required()
+            org, request, user).get_permission_required()
 
     def test_get_queryset(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
-
+        class MockView(BaseMockView, generic.DetailView):
             def get_filtered_queryset(self):
                 return []
 
         user = UserFactory.create()
         org = OrganizationFactory.create()
-        assert [] == MockView(org, user).get_queryset()
+        request = RequestFactory().get('/check')
+        assert [] == MockView(org, request, user).get_queryset()
 
     def test_set_anonymous_user_role(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
+        class MockView(BaseMockView, generic.DetailView):
+            pass
 
         user = AnonymousUser()
         org = OrganizationFactory.create()
-        view = MockView(org, user)
-        assert isinstance(view._roles[0], AnonymousUserRole)
+        request = RequestFactory().get('/check')
+        view = MockView(org, request, user)
+        assert isinstance(view.roles['anonymous_user'], AnonymousUserRole)
 
     def test_set_organization_role(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
-
+        class MockView(BaseMockView, generic.DetailView):
             def get_organization(self):
                 return self.obj
 
         user = UserFactory.create()
         org = OrganizationFactory.create()
+        request = RequestFactory().get('/check')
         group = Group.objects.get(name='OrgMember')
         role = OrganizationRole.objects.create(
             organization=org, user=user, group=group)
-        view = MockView(org, user)
-        view._roles[0] = role
+        view = MockView(org, request, user)
+        view.roles['org_role'] = role
 
     def test_get_org_role(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
-
+        class MockView(BaseMockView, generic.DetailView):
             def get_org_role(self):
                 self._org_role = OrganizationRole.objects.get(
                     organization=self.obj, user=self.request.user)
@@ -293,18 +278,14 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
         user = UserFactory.create()
         org = OrganizationFactory.create()
         group = Group.objects.get(name='OrgMember')
+        request = RequestFactory().get('/check')
         role = OrganizationRole.objects.create(
             organization=org, user=user, group=group)
-        view = MockView(org, user)
-        assert view._roles[0] == role
+        view = MockView(org, request, user)
+        assert view.roles['org_role'] == role
 
     def test_get_project_role(self):
-        class MockView(RolePermissionRequiredMixin, generic.DetailView):
-            def __init__(self, obj, user):
-                self.obj = obj
-                self.request = RequestFactory().get('/check')
-                self.request.user = user
-
+        class MockView(BaseMockView, generic.DetailView):
             def get_prj_role(self):
                 self._prj_role = ProjectRole.objects.get(
                     project=self.obj, user=self.request.user)
@@ -313,10 +294,11 @@ class RolePermissionRequiredMixinTest(UserTestCase, TestCase):
         user = UserFactory.create()
         project = ProjectFactory.create()
         group = Group.objects.get(name='ProjectMember')
+        request = RequestFactory().get('/check')
         role = ProjectRole.objects.create(
             project=project, user=user, group=group, role='PU')
-        view = MockView(project, user)
-        assert view._roles[0] == role
+        view = MockView(project, request, user)
+        assert view.roles['prj_role'] == role
 
     def test_login_redirect_from_project_dashboard_to_org_dashboard(self):
         user = UserFactory.create()
