@@ -932,6 +932,5 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
                                                user=self.member).exists()
         assert response.status_code == 302
         assert ("You don't have permission to remove members from this "
-                "organization"
-                in response.messages)
+                "organization" in response.messages)
         assert role is True
