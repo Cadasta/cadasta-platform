@@ -187,7 +187,7 @@
     </div>
     {% block modals %} {% endblock %}
 
-    <script type="text/javascript" src="https://cdn.datatables.net/r/bs-3.3.5/jqc-1.11.3,dt-1.10.8/datatables.min.js"></script>
+    <script type="text/javascript" src="{% static 'datatables/1.10.8/js/datatables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dataTables.conditionalPaging.js' %}"></script>
     <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     <script src="{% static 'js/parsleyConfig.js' %}"></script>
