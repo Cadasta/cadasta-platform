@@ -577,8 +577,8 @@ TOTP_DIGITS = 6
 
 SMS_GATEWAY = 'accounts.gateways.FakeGateway'
 
-TWILIO_ACCOUNT_SID = os.environ['TWILIO_ACCOUNT_SID']
-TWILIO_AUTH_TOKEN = os.environ['TWILIO_AUTH_TOKEN']
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 
 LOGGING = {
     'version': 1,
