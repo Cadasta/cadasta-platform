@@ -30,7 +30,10 @@ class MigrationTestCase(TestCase):
         call_command('migrate', 'organization', self.migrate_from)
 
         org = Organization.objects.create(name='Test Org')
-        project = Project.objects.create(name='Test Proj', organization=org)
+        Project.objects.create(
+            id=1, name='No Locations Proj', organization=org)
+        project = Project.objects.create(
+            id=2, name='Test Proj', organization=org)
 
         su1 = SpatialUnit.objects.create(
             id='abc',

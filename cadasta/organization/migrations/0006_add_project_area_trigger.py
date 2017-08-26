@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             (
-                'UPDATE organization_project SET area = (SELECT sum(area) from spatial_spatialunit where "spatial_spatialunit".project_id = "organization_project".id)'
+                'UPDATE organization_project SET area = (SELECT COALESCE(sum(area), 0) from spatial_spatialunit where "spatial_spatialunit".project_id = "organization_project".id)'
             ),
             reverse_sql=migrations.RunSQL.noop
         ),
