@@ -13,36 +13,40 @@ addons:
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
   - sudo -E apt-get -yq update &>> ~/apt-get-update.log
-  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install squid3
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install squid3; fi
   - sudo apt-get -yq install libgdal-dev
   - gdal-config --version
-  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
   - export C_INCLUDE_PATH=/usr/include/gdal
   - export CPLUS_INCLUDE_PATH=/usr/include/gdal
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo apt-get -yq install xvfb chromium-browser chromium-chromedriver; fi
+  - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then export PATH=/usr/lib/chromium-browser:$PATH; fi
 
 install:
   - pip install tox==2.3.1
 
 before_script:
-  - sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf
-  - sudo service squid3 restart
-  - export http_proxy=http://localhost:3128/
-  - export https_proxy=https://localhost:3128/
   - export DJANGO_SETTINGS_MODULE=config.settings.travis
-  - psql template1 postgres -c 'create extension hstore;'
-  - psql -c 'create database cadasta;' -U postgres
-  - psql -U postgres -d cadasta -c "create extension postgis;"
-  - mkdir cadasta/geography/data
-  - export WBDATA=ne_10m_admin_0_countries.zip
-  - export DATADIR=cadasta/geography/data
-  - wget -O $DATADIR/$WBDATA https://cadasta-miscellaneous.s3.amazonaws.com/$WBDATA
-  - unzip $DATADIR/$WBDATA -d $DATADIR
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo service squid3 restart; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export http_proxy=http://localhost:3128/; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export https_proxy=https://localhost:3128/; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then psql template1 postgres -c 'create extension hstore;'; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then psql -c 'create database cadasta;' -U postgres; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then psql -U postgres -d cadasta -c "create extension postgis;"; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then mkdir cadasta/geography/data; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export WBDATA=ne_10m_admin_0_countries.zip; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export DATADIR=cadasta/geography/data; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then wget -O $DATADIR/$WBDATA https://cadasta-miscellaneous.s3.amazonaws.com/$WBDATA; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then unzip $DATADIR/$WBDATA -d $DATADIR; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then echo '<span class="site-name">Travis</span>' > cadasta/templates/core/identifier.html; fi
 
 env:
   matrix:
     - TOX_ENV=py35-flake8
-    - TOX_ENV=py35-django1.9-migration
-    - TOX_ENV=py35-django1.9-unit
+    - TOX_ENV=py35-django-migration
+    - TOX_ENV=py35-django-unit
+    - TOX_ENV=py35-functional
 
 matrix:
   fast_finish: true

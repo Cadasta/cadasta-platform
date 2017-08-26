@@ -5,6 +5,14 @@
   with_items:
       - xvfb
       - squid3
+      - chromium-browser
+      - chromium-chromedriver
+
+- name: Add path to ChromeDriver
+  become: yes
+  become_user: "{{ app_user }}"
+  lineinfile: dest=/home/vagrant/.bashrc
+              line="export PATH=/usr/lib/chromium-browser:$PATH"
 
 - name: Download Firefox 46 install bundle
   become: yes
