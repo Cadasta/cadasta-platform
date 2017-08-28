@@ -340,7 +340,6 @@ class TokenVerificationForm(forms.Form):
         else:
             raise forms.ValidationError(
                 "Invalid Token. Enter a valid token.")
-        return token
 
 
 class ResendTokenForm(forms.Form):
