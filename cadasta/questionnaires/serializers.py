@@ -7,11 +7,10 @@ from django.db.utils import IntegrityError
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
-from .messages import MISSING_RELEVANT, INVALID_ACCURACY
+from .messages import MISSING_RELEVANT, INVALID_ACCURACY, INVALID_RELEVANT
 from .exceptions import InvalidQuestionnaire
-from .validators import validate_questionnaire, validate_accuracy
 from .managers import fix_labels
-from . import models, choices
+from . import models, choices, validators
 
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
@@ -83,8 +82,13 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
     def validate_gps_accuracy(self, value):
         if (value and
                 self.initial_data.get('type') in choices.XFORM_GEOM_FIELDS and
-                not validate_accuracy(value)):
+                not validators.validate_accuracy(value)):
             raise serializers.ValidationError(INVALID_ACCURACY)
+        return value
+
+    def validate_relevant(self, value):
+        if (value and not validators.validate_relevant(value)):
+            raise serializers.ValidationError(INVALID_RELEVANT.format(value))
         return value
 
     def to_representation(self, instance):
@@ -129,6 +133,11 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
                   'question_groups', 'label_xlat', 'relevant', 'index', )
         read_only_fields = ('id', 'questions', 'question_groups', )
         write_only_fields = ('label_xlat', )
+
+    def validate_relevant(self, value):
+        if (value and not validators.validate_relevant(value)):
+            raise serializers.ValidationError(INVALID_RELEVANT.format(value))
+        return value
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -238,7 +247,7 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
         )
 
     def validate_json(self, json, raise_exception=False):
-        errors = validate_questionnaire(json)
+        errors = validators.validate_questionnaire(json)
         self._validated_data = json
         self._errors = {}
 

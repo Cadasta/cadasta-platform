@@ -11,6 +11,7 @@ from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 
 from . import factories
 from .. import serializers
+from ..messages import INVALID_RELEVANT
 from ..models import Questionnaire, QuestionOption, QuestionGroup
 
 
@@ -1160,6 +1161,30 @@ class QuestionGroupSerializerTest(UserTestCase, TestCase):
                 serializer.save()
         assert questionnaire.question_groups.count() == 0
 
+    def test_invalid_relevant(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        data = [{
+                    'label': 'A group',
+                    'name': 'party_attributes_individual',
+                    'relevant': '$party="IN"',
+                    'questions': [{
+                        'name': "start",
+                        'label': 'Start',
+                        'type': "TX",
+                        'index': 0
+                    }]
+                }]
+        serializer = serializers.QuestionGroupSerializer(
+            data=data,
+            many=True,
+            context={'questionnaire_id': questionnaire.id,
+                     'project': questionnaire.project,
+                     'default_language': 'en'})
+
+        assert serializer.is_valid() is False
+        assert (INVALID_RELEVANT.format('$party="IN"') in
+                serializer.errors[0]['relevant'])
+
     def test_bulk_create_group(self):
         questionnaire = factories.QuestionnaireFactory.create()
         data = [{
@@ -1387,6 +1412,23 @@ class QuestionSerializerTest(TestCase):
                 assert q.label == 'Another question'
                 assert q.type == 'S1'
                 assert q.options.count() == 1
+
+    def test_invalid_relevant(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        data = [{
+            'label': 'A question',
+            'name': 'question',
+            'type': 'TX',
+            'relevant': '$party="IN"',
+        }]
+        serializer = serializers.QuestionSerializer(
+            data=data,
+            many=True,
+            context={'questionnaire_id': questionnaire.id})
+
+        assert serializer.is_valid() is False
+        assert (INVALID_RELEVANT.format('$party="IN"') in
+                serializer.errors[0]['relevant'])
 
 
 class QuestionOptionSerializerTest(TestCase):

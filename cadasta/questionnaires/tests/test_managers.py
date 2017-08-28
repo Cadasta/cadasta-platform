@@ -456,7 +456,6 @@ class QuestionManagerTest(TestCase):
 
     def test_invalid_relevant_clause(self):
         question_dict = {
-            'hint': 'For this field (type=integer)',
             'label': 'Integer',
             'name': 'my_int',
             'type': 'integer',
