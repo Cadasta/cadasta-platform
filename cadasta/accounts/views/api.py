@@ -1,4 +1,3 @@
-from django.utils.translation import ugettext as _
 from allauth.account.utils import send_email_confirmation
 
 from rest_framework.serializers import ValidationError
@@ -11,8 +10,8 @@ from allauth.account.signals import password_changed
 
 from .. import serializers
 from ..utils import send_email_update_notification
-from ..exceptions import EmailNotVerifiedError
 from ..models import VerificationDevice
+from accounts import exceptions
 
 
 class AccountUser(djoser_views.UserView):
@@ -98,25 +97,31 @@ class AccountLogin(djoser_views.LoginView):
         try:
             serializer.is_valid(raise_exception=True)
             return self._action(serializer)
+
         except ValidationError:
-            return Response(
-                data=serializer.errors,
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-        except EmailNotVerifiedError:
+            error = serializer.errors
+
+        except exceptions.AccountInactiveError as e:
             user = serializer.user
             user.is_active = False
             user.save()
+            error = e.msg
 
+        except exceptions.EmailNotVerifiedError as e:
+            user = serializer.user
+            error = e.msg
             send_email_confirmation(self.request._request, user)
 
-            return Response(
-                data={'detail': _("The email has not been verified.")},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
+        except exceptions.PhoneNotVerifiedError as e:
+            error = e.msg
+
+        return Response(
+            data={'detail': error},
+            status=status.HTTP_401_UNAUTHORIZED)
 
 
 class SetPasswordView(djoser_views.SetPasswordView):
+
     def _action(self, serializer):
         response = super()._action(serializer)
         password_changed.send(sender=self.request.user.__class__,
