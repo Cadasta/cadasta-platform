@@ -31,7 +31,7 @@ class MigrationTestCase(UserTestCase, TestCase):
         call_command('migrate', 'accounts',
                      '0002_activate_users_20161014_0846', '--noinput')
         call_command('migrate', 'organization',
-                     '0004_remove_Pb_project_roles')
+                     '0004_remove_Pb_project_roles', '--noinput')
         call_command('migrate', self.app, self.migrate_from, '--noinput')
 
         # setup pre-migration test data
