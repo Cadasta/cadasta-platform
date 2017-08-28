@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView
 from django.shortcuts import redirect
+from django.utils.html import format_html
 
 from core.views.generic import UpdateView, CreateView
 from core.views.mixins import SuperUserCheckMixin
@@ -34,12 +35,11 @@ class AccountRegister(CreateView):
             device = VerificationDevice.objects.create(
                 user=user, unverified_phone=user.phone)
             device.generate_challenge()
-
             message = _("Verification Token sent to {phone}")
             message = message.format(phone=user.phone)
             messages.add_message(self.request, messages.INFO, message)
 
-        self.request.session['user_id'] = user.id
+        self.request.session['phone_verify_id'] = user.id
 
         message = _("We have created your account. You should have"
                     " received an email or a text to verify your account.")
@@ -63,9 +63,73 @@ class PasswordResetView(SuperUserCheckMixin,
     form_class = forms.ResetPasswordForm
 
 
+class PasswordResetDoneView(FormView, allauth_views.PasswordResetDoneView):
+    """ If the user opts to reset password with phone, this view will display
+     a form to verify the password reset token. """
+    form_class = forms.TokenVerificationForm
+    success_url = reverse_lazy('account:account_reset_password_from_phone')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['phone'] = self.request.session.get('phone', None)
+        return context
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        phone = self.request.session.get('phone', None)
+        try:
+            form_kwargs['device'] = VerificationDevice.objects.get(
+                unverified_phone=phone, label='password_reset')
+        except VerificationDevice.DoesNotExist:
+            pass
+        return form_kwargs
+
+    def form_valid(self, form):
+        device = form.device
+        message = _("Successfully Verified Token."
+                    " You can now reset your password.")
+        messages.add_message(self.request, messages.SUCCESS, message)
+        del self.request.session['phone']
+        self.request.session['password_reset_id'] = device.user_id
+        device.delete()
+        return super().form_valid(form)
+
+
 class PasswordResetFromKeyView(SuperUserCheckMixin,
                                allauth_views.PasswordResetFromKeyView):
     form_class = forms.ResetPasswordKeyForm
+
+
+class PasswordResetFromPhoneView(FormView, SuperUserCheckMixin):
+    """ This view will allow user to reset password once a user has
+     successfully verified the password reset token. """
+    form_class = forms.ResetPasswordKeyForm
+    template_name = 'account/password_reset_from_key.html'
+    success_url = reverse_lazy("account:account_reset_password_from_key_done")
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        try:
+            user_id = self.request.session['password_reset_id']
+            user = User.objects.get(id=user_id)
+            form_kwargs['user'] = user
+        except KeyError:
+            message = _(
+                "You must first verify your token before resetting password."
+                " Click <a href='{url}'>here</a> to get the password reset"
+                " verification token. ")
+            message = format_html(message.format(
+                url=reverse_lazy('account:account_reset_password')))
+            messages.add_message(self.request, messages.ERROR, message)
+
+        return form_kwargs
+
+    def form_valid(self, form):
+        form.save()
+        self.request.session.pop('password_reset_id', None)
+        # send message to user's phone informing that password
+        # was successfully changed.
+        return super().form_valid(form)
 
 
 class AccountProfile(LoginRequiredMixin, UpdateView):
@@ -80,6 +144,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
         emails_to_verify = EmailAddress.objects.filter(
             user=self.object, verified=False).exists()
         phones_to_verify = VerificationDevice.objects.filter(
@@ -103,7 +168,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
             message = _("Verification Token sent to {phone}")
             message = message.format(phone=phone)
             messages.add_message(self.request, messages.INFO, message)
-            self.request.session["user_id"] = self.object.id
+            self.request.session['phone_verify_id'] = self.object.id
             self.success_url = reverse_lazy('account:verify_phone')
 
         return super().form_valid(form)
@@ -154,35 +219,45 @@ class ConfirmEmail(ConfirmEmailView):
 
 class ConfirmPhone(FormView):
     template_name = 'accounts/account_verification.html'
-    form_class = forms.PhoneVerificationForm
+    form_class = forms.TokenVerificationForm
     success_url = reverse_lazy('account:login')
 
-    def get_user(self):
-        user_id = self.request.session['user_id']
-        user = User.objects.get(id=user_id)
-        return user
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        user_id = self.request.session.get('phone_verify_id', None)
+
+        emails_to_verify = EmailAddress.objects.filter(
+            user_id=user_id, verified=False).exists()
+        phones_to_verify = VerificationDevice.objects.filter(
+            user_id=user_id, label='phone_verify').exists()
+        context['phone'] = phones_to_verify
+        context['email'] = emails_to_verify
+
+        return context
 
     def get_form_kwargs(self, *args, **kwargs):
         form_kwargs = super().get_form_kwargs(*args, **kwargs)
-        form_kwargs["user"] = self.get_user()
+        user_id = self.request.session.get('phone_verify_id', None)
+        try:
+            form_kwargs['device'] = VerificationDevice.objects.get(
+                user_id=user_id, label='phone_verify')
+        except VerificationDevice.DoesNotExist:
+            pass
         return form_kwargs
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.get_user()
-        if user.emailaddress_set.filter(verified=False).exists():
-            context['email'] = user.email
-        if VerificationDevice.objects.filter(
-                user=user, verified=False).exists():
-            context['phone'] = user.phone
-        return context
-
     def form_valid(self, form):
-        user = self.get_user()
-        user.refresh_from_db()
+        device = form.device
+        user = device.user
+        if user.phone != device.unverified_phone:
+            user.phone = device.unverified_phone
+        user.phone_verified = True
+        user.is_active = True
+        user.save()
+        device.delete()
         message = _("Successfully verified {phone}")
         message = message.format(phone=user.phone)
         messages.add_message(self.request, messages.SUCCESS, message)
+        self.request.session.pop('phone_verify_id', None)
         return super().form_valid(form)
 
 
@@ -199,7 +274,7 @@ class ResendTokenView(FormView):
                 phone_device = VerificationDevice.objects.get(
                     unverified_phone=phone, verified=False)
                 phone_device.generate_challenge()
-                self.request.session['user_id'] = phone_device.user.id
+                self.request.session['phone_verify_id'] = phone_device.user.id
             except VerificationDevice.DoesNotExist:
                 pass
             message = _(
@@ -217,7 +292,7 @@ class ResendTokenView(FormView):
                 if not user.email_verified:
                     user.email = email
                 send_email_confirmation(self.request, user)
-                self.request.session['user_id'] = email_device.user.id
+                self.request.session['phone_verify_id'] = email_device.user.id
             except EmailAddress.DoesNotExist:
                 pass
             message = _(

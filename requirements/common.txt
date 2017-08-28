@@ -39,5 +39,5 @@ django-compressor==2.0
 beautifulsoup4==4.5.3
 gpxpy==1.1.2
 django-otp==0.3.11
-twilio==6.3.0
+twilio==6.5.0
 phonenumbers==8.5.2
