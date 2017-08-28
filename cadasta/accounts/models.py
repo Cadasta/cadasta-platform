@@ -142,7 +142,7 @@ def default_key():
 
 
 class VerificationDevice(Device):
-    unverified_phone = models.CharField(max_length=16, unique=True)
+    unverified_phone = models.CharField(max_length=16)
     secret_key = models.CharField(
         max_length=40,
         default=default_key,
@@ -156,7 +156,11 @@ class VerificationDevice(Device):
                    "The next token must be at a higher counter value."
                    "It makes sure a token is used only once.")
     )
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    label = models.CharField(max_length=20,
+                             choices=(('phone_verify', _("Verify Phone")),
+                                      ('password_reset', _("Reset Password"))),
+                             default='phone_verify')
     verified = models.BooleanField(default=False)
 
     step = settings.TOTP_TOKEN_VALIDITY

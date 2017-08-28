@@ -71,11 +71,10 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
                 _("The password is too similar to the username."))
 
         phone = self.data.get('phone')
-        if phone:
-            if phone_validator(phone):
-                phone = str(parse_phone(phone).national_number)
-                if phone in password:
-                    errors.append(_("Passwords cannot contain your phone."))
+        if phone and phone_validator(phone):
+            phone = str(parse_phone(phone).national_number)
+            if phone in password:
+                errors.append(_("Passwords cannot contain your phone."))
 
         if errors:
             raise forms.ValidationError(errors)
@@ -193,7 +192,6 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 
             if user.email:
                 send_email_confirmation(self.request, user)
-
                 if self.current_email:
                     send_email_update_notification(self.current_email)
                     user.email = self.current_email
@@ -210,7 +208,6 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                 device = VerificationDevice.objects.create(
                     user=self.instance, unverified_phone=user.phone)
                 device.generate_challenge()
-
                 if self.current_phone:
                     user.phone = self.current_phone
             else:
@@ -221,8 +218,9 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 
 
 class ChangePasswordMixin:
+
     def clean_password(self):
-        if not self.user.change_pw:
+        if not self.user or not self.user.change_pw:
             raise forms.ValidationError(_("The password for this user can not "
                                           "be changed."))
 
@@ -234,6 +232,12 @@ class ChangePasswordMixin:
             raise forms.ValidationError(
                 _("The password is too similar to the username."))
 
+        phone = self.user.phone
+        if phone and phone_validator(phone):
+            phone = str(parse_phone(phone).national_number)
+            if phone in password:
+                raise forms.ValidationError(
+                    _("Passwords cannot contain your phone."))
         return password
 
     def save(self):
@@ -266,40 +270,76 @@ class ResetPasswordKeyForm(ChangePasswordMixin,
 
 
 class ResetPasswordForm(allauth_forms.ResetPasswordForm):
+    email = forms.EmailField(required=False)
+
+    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+                             error_messages={'invalid': phone_format},
+                             required=False)
+
+    def clean(self):
+        if not self.data.get('email') and not self.data.get('phone'):
+            raise forms.ValidationError(_(
+                "You cannot leave both phone and email empty."))
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        self.users = User.objects.filter(email=email)
+        if email:
+            email = email.casefold()
+            self.users = User.objects.filter(email=email)
+        else:
+            email = None
         return email
 
+    def clean_phone(self):
+        phone = self.data.get('phone')
+        if not phone:
+            phone = None
+        return phone
 
-class PhoneVerificationForm(forms.Form):
+    def save(self, request, **kwargs):
+        phone = self.data.get('phone')
+        if phone:
+            request.session['phone'] = phone
+            try:
+                user = User.objects.get(phone=phone)
+                device = user.verificationdevice_set.get_or_create(
+                    unverified_phone=phone, label='password_reset')
+                device[0].generate_challenge()
+            except User.DoesNotExist:
+                pass
+            return phone
+        else:
+            super().save(request, **kwargs)
+
+
+class TokenVerificationForm(forms.Form):
     token = forms.CharField(label=_("Token"), max_length=settings.TOTP_DIGITS)
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.device = kwargs.pop('device', None)
         super().__init__(*args, **kwargs)
 
     def clean_token(self):
         token = self.data.get('token')
+        device = self.device
+        if not device:
+            raise forms.ValidationError(
+                _("The token could not be verified."
+                    " Please click on 'here' to try again."))
         try:
             token = int(token)
-            device = self.user.verificationdevice
-            if device.verify_token(token):
-                if self.user.phone != device.unverified_phone:
-                    self.user.phone = device.unverified_phone
-                self.user.phone_verified = True
-                self.user.is_active = True
-                self.user.save()
-            elif device.verify_token(token, tolerance=5):
-                raise forms.ValidationError(
-                    _("The token has expired."
-                        " Please click on 'here' to receive the new token."))
-            else:
-                raise forms.ValidationError(
-                    "Invalid Token. Enter a valid token.")
         except ValueError:
             raise forms.ValidationError(_("Token must be a number."))
-        return token
+
+        if device.verify_token(token):
+            return token
+        elif device.verify_token(token=token, tolerance=5):
+            raise forms.ValidationError(
+                _("The token has expired."
+                  " Please click on 'here' to receive the new token."))
+        else:
+            raise forms.ValidationError(
+                "Invalid Token. Enter a valid token.")
 
 
 class ResendTokenForm(forms.Form):

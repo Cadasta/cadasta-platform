@@ -14,6 +14,7 @@ DEFAULT_CHARACTER_TYPES = [
 
 
 class CharacterTypePasswordValidator(object):
+
     def __init__(self, character_types=DEFAULT_CHARACTER_TYPES,
                  unique_types=3):
         self.character_types = character_types
@@ -41,6 +42,7 @@ class CharacterTypePasswordValidator(object):
 
 
 class EmailSimilarityValidator(object):
+
     def validate(self, password, user=None):
         if not user or not user.email:
             return None
