@@ -329,24 +329,24 @@ class PhoneVerificationSerializer(serializers.Serializer,
             token = int(token)
             device = VerificationDevice.objects.get(
                 unverified_phone=phone, verified=False)
-            user = device.user
-            if device.verify_token(token):
-                if user.phone != phone:
-                    user.phone = phone
-                user.phone_verified = True
-                user.is_active = True
-                user.save()
-                device.delete()
-                return token
-            elif device.verify_token(token=token, tolerance=5):
-                raise serializers.ValidationError(
-                    _("The token has expired."))
-            else:
-                raise serializers.ValidationError(
-                    _("Invalid Token. Enter a valid token."))
         except ValueError:
             raise serializers.ValidationError(_("Token must be a number."))
-
         except VerificationDevice.DoesNotExist:
             raise serializers.ValidationError(
                 "Phone is already verified or not linked to any user account.")
+
+        user = device.user
+        if device.verify_token(token):
+            if user.phone != phone:
+                user.phone = phone
+            user.phone_verified = True
+            user.is_active = True
+            user.save()
+            device.delete()
+            return token
+        elif device.verify_token(token=token, tolerance=5):
+            raise serializers.ValidationError(
+                _("The token has expired."))
+        else:
+            raise serializers.ValidationError(
+                _("Invalid Token. Enter a valid token."))
