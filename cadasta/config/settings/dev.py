@@ -104,10 +104,14 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG'
         },
-        'accounts.token': {
+        'accounts.TwilioGateway': {
+            'handlers': ['file'],
+            'level': 'DEBUG'
+        },
+        'accounts.FakeGateway': {
             'handlers': ['console'],
             'level': 'DEBUG'
-        }
+        },
     },
 }
 
