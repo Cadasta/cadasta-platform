@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView
+from django.shortcuts import redirect
 from django.utils.html import format_html
 
 from core.views.generic import UpdateView, CreateView
