@@ -23,6 +23,7 @@ from .factories import UserFactory
 
 
 class RegisterFormTest(UserTestCase, TestCase):
+
     def test_valid_data(self):
         data = {
             'username': 'imagine71',
@@ -1155,6 +1156,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
 
 class ChangePasswordFormTest(UserTestCase, TestCase):
+
     def test_valid_data(self):
         user = UserFactory.create(password='beatles4Lyfe!')
 
@@ -1271,6 +1273,7 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
 
 
 class ResetPasswordKeyFormTest(UserTestCase, TestCase):
+
     def test_valid_data(self):
         user = UserFactory.create(password='beatles4Lyfe!')
 
@@ -1367,6 +1370,7 @@ class ResetPasswordKeyFormTest(UserTestCase, TestCase):
 
 
 class ResetPasswordFormTest(UserTestCase, TestCase):
+
     def test_email_not_sent_reset(self):
         data = {
             'email': 'john@thebeatles.uk'
@@ -1388,6 +1392,7 @@ class ResetPasswordFormTest(UserTestCase, TestCase):
 
 
 class PhoneVerificationFormTest(UserTestCase, TestCase):
+
     def setUp(self):
         super().setUp()
         self.user = UserFactory.create(username='sherlock',
@@ -1458,3 +1463,37 @@ class PhoneVerificationFormTest(UserTestCase, TestCase):
         form = forms.PhoneVerificationForm(data, user=self.user)
         assert form.is_valid() is False
         assert (_("Token must be a number.") in form.errors.get('token'))
+
+
+class ResendTokenFormTest(UserTestCase, TestCase):
+
+    def test_invalid_phone(self):
+        data = {'phone': '12345678990'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        data = {'phone': 'Test Number'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        data = {'phone': '+1 2345678990'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+    def test_submit_empty(self):
+        data = {'email': ''}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (
+            _("You cannot leave both phone and email empty.")
+            in form.errors.get('__all__'))
+
+        data = {'phone': ''}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (
+            _("You cannot leave both phone and email empty.")
+            in form.errors.get('__all__'))

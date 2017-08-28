@@ -42,7 +42,7 @@ class CharacterTypePasswordValidator(object):
 
 class EmailSimilarityValidator(object):
     def validate(self, password, user=None):
-        if not user:
+        if not user or not user.email:
             return None
 
         email = user.email.split('@')

@@ -300,3 +300,16 @@ class PhoneVerificationForm(forms.Form):
         except ValueError:
             raise forms.ValidationError(_("Token must be a number."))
         return token
+
+
+class ResendTokenForm(forms.Form):
+    email = forms.EmailField(required=False)
+
+    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+                             error_messages={'invalid': phone_format},
+                             required=False)
+
+    def clean(self):
+        if not self.data.get('email') and not self.data.get('phone'):
+            raise forms.ValidationError(
+                _("You cannot leave both phone and email empty."))
