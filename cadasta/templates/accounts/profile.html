@@ -56,13 +56,6 @@
 
   </div>
 
-  <div class="form-group{% if form.phone.errors %} has-error{%endif%}">
-  <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
-  {% render_field form.phone class+='form-control input-lg'  %}
-    {% if phones_to_verify %}<p class="help-block small">{% trans "The phone for this account has been changed recently, but the new phone number has not yet been verified. To verify the new phone number, click" %}<a href="#">{%trans " here." %}</a></p>{% endif %}
-    <div class="error-block">{{ form.phone.errors }}</div>
-  </div>
-
   <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
     <label class="control-label" for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}</label>
     {% render_field form.full_name class+="form-control input-lg" data-parsley-sanitize="1" %}
