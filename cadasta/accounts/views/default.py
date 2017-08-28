@@ -274,7 +274,7 @@ class ResendTokenView(FormView):
                 phone_device = VerificationDevice.objects.get(
                     unverified_phone=phone, verified=False)
                 phone_device.generate_challenge()
-                self.request.session['user_id'] = phone_device.user.id
+                self.request.session['phone_verify_id'] = phone_device.user.id
             except VerificationDevice.DoesNotExist:
                 pass
             message = _(
@@ -292,7 +292,7 @@ class ResendTokenView(FormView):
                 if not user.email_verified:
                     user.email = email
                 send_email_confirmation(self.request, user)
-                self.request.session['user_id'] = email_device.user.id
+                self.request.session['phone_verify_id'] = email_device.user.id
             except EmailAddress.DoesNotExist:
                 pass
             message = _(
