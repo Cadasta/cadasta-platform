@@ -246,6 +246,7 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
                                        email='john@beatles.uk',
+                                       phone='+919327768250',
                                        password='iloveyoko79!')
 
     def test_successful_login(self):
@@ -257,21 +258,75 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert 'auth_token' in response.content
 
-    def test_unsuccessful_login(self):
-        """The view should return a token to authenticate API calls"""
+    def test_unsuccessful_login_incorrect_password(self):
+        """The view should not return a token to authenticate API calls"""
         data = {'username': 'imagine71', 'password': 'iloveyoko78!'}
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 401
 
     def test_login_with_unverified_email(self):
         """The view should return an error message if the User email
-        has not been verified. An email with a verification link
-        should be have been sent to the user."""
-        data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
+        has not been verified."""
+        data = {'username': 'john@beatles.uk', 'password': 'iloveyoko79!'}
         response = self.request(method='POST', post_data=data, user=self.user)
         assert response.status_code == 401
         assert 'auth_token' not in response.content
-        assert len(mail.outbox) == 1
+        assert (
+            response.content['detail'] == "The email has not been verified.")
+
+    def test_unsuccessful_login_with_username_both_unverified(self):
+        data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 401
+        assert (
+            response.content['detail'] == "User account is disabled.")
+
+    def test_successful_login_with_username_both_verified(self):
+        self.user.email_verified = True
+        self.user.phone_verified = True
+        self.user.save()
+        data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'auth_token' in response.content
+
+    def test_successful_login_with_username_only_phone_verified(self):
+        self.user.phone_verified = True
+        self.user.save()
+
+        data = {'username': 'imagine71', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'auth_token' in response.content
+
+    def test_successful_login_with_verified_email(self):
+        self.user.email_verified = True
+        self.user.save()
+
+        data = {'username': 'john@beatles.uk', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'auth_token' in response.content
+
+    def test_successful_login_with_verified_phone(self):
+        self.user.phone_verified = True
+        self.user.save()
+
+        data = {'username': '+919327768250', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'auth_token' in response.content
+
+    def test_unsuccessful_login_with_unverified_phone(self):
+        self.user.email_verified = True
+        self.user.phone_verified = False
+        self.user.save()
+        data = {'username': '+919327768250', 'password': 'iloveyoko79!'}
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 401
+        assert 'auth_token' not in response.content
+        assert (
+            response.content['detail'] == "The phone has not been verified.")
 
 
 class AccountSetPasswordViewTest(APITestCase, UserTestCase, TestCase):

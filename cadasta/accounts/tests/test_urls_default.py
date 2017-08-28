@@ -35,3 +35,8 @@ class UserUrlsTest(TestCase):
             'account:verify_phone') == '/account/accountverification/'
         resolved = resolve('/account/accountverification/')
         assert resolved.func.__name__ == default.ConfirmPhone.__name__
+
+    def test_resend_token(self):
+        assert reverse('account:resend_token') == '/account/resendtokenpage/'
+        resolved = resolve('/account/resendtokenpage/')
+        assert resolved.func.__name__ == default.ResendTokenView.__name__
