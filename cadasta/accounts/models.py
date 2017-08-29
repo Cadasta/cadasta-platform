@@ -21,6 +21,7 @@ import time
 from simple_history.models import HistoricalRecords
 from .manager import UserManager
 from .utils import send_sms
+from . import messages as account_message
 
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
@@ -126,13 +127,16 @@ def assign_default_policy(sender, instance, **kwargs):
 def password_changed_reset(sender, request, user, **kwargs):
     msg_body = render_to_string(
         'accounts/email/password_changed_notification.txt')
-    send_mail(
-        _("Change of password at Cadasta Platform"),
-        msg_body,
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email],
-        fail_silently=False
-    )
+    if user.email:
+        send_mail(
+            _("Change of password at Cadasta Platform"),
+            msg_body,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False
+        )
+    if user.phone:
+        send_sms(user.phone, account_message.password_change_or_reset)
 
 
 def default_key():
