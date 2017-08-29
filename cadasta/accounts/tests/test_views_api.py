@@ -1,5 +1,7 @@
 from django.core import mail
 from django.test import TestCase
+from django.conf import settings
+from unittest import mock
 
 from allauth.account.models import EmailAddress
 
@@ -391,3 +393,78 @@ class AccountSetPasswordViewTest(APITestCase, UserTestCase, TestCase):
         assert 'john@beatles.uk' in mail.outbox[0].to
         self.user.refresh_from_db()
         assert self.user.check_password('iloveyoko80!') is True
+
+
+class ConfirmPhoneViewTest(APITestCase, UserTestCase, TestCase):
+    view_class = api_views.ConfirmPhoneView
+
+    def setup_models(self):
+        self.user = UserFactory.create(phone='+919327762850',
+                                       password='221B@bakerstreet')
+        self.device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+
+    def test_successful_phone_verification(self):
+        token = self.device.generate_challenge()
+        data = {
+            'phone': self.user.phone,
+            'token': token
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'Phone successfully verified.' in response.content['detail']
+        self.user.refresh_from_db()
+        assert self.user.phone_verified is True
+
+    def test_successful_new_phone_verification(self):
+        self.device.unverified_phone = '+12345678990'
+        self.device.save()
+        token = self.device.generate_challenge()
+        data = {
+            'phone': '+12345678990',
+            'token': token
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert 'Phone successfully verified.' in response.content['detail']
+        self.user.refresh_from_db()
+        assert self.user.phone == '+12345678990'
+
+    def test_unsuccessful_phone_verification_invalid_token(self):
+        token = self.device.generate_challenge()
+        token = str(int(token) - 1)
+        data = {
+            'phone': self.user.phone,
+            'token': token
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 400
+        assert (
+            "Invalid Token. Enter a valid token." in response.content['token'])
+
+    def test_unsuccessful_phone_verification_expired_token(self):
+        now = 1497657600
+        with mock.patch('time.time', return_value=now):
+            token = self.device.generate_challenge()
+            data = {
+                'phone': self.user.phone,
+                'token': token
+            }
+        with mock.patch('time.time',
+                        return_value=(now + settings.TOTP_TOKEN_VALIDITY + 1)):
+            response = self.request(method='POST', post_data=data)
+            assert response.status_code == 400
+            assert (
+                "The token has expired." in response.content['token'])
+
+    def test_unsuccessful_phone_verification_non_existent_phone(self):
+        token = self.device.generate_challenge()
+        data = {
+            'phone': '+12345678990',
+            'token': token
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 400
+        assert (
+            "Phone is already verified or not linked to any user account."
+            in response.content['token'])

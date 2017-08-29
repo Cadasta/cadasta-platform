@@ -1,12 +1,14 @@
 import random
 import pytest
 
+from django.conf import settings
 from django.utils.translation import gettext as _
 from django.test import TestCase
 # from django.db import IntegrityError
 from allauth.account.models import EmailAddress
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
+from unittest import mock
 
 from core.messages import SANITIZE_ERROR
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
@@ -30,6 +32,7 @@ BASIC_TEST_DATA = {
 
 
 class RegistrationSerializerTest(UserTestCase, TestCase):
+
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = serializers.RegistrationSerializer(user)
@@ -503,6 +506,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
+
     def test_field_serialization(self):
         user = UserFactory.build()
         serializer = serializers.UserSerializer(user)
@@ -912,6 +916,7 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
+
     def test_unverified_account(self):
         """Serializer should raise exceptions.EmailNotVerifiedError exeception
             when the user has not verified their email address"""
@@ -950,6 +955,7 @@ class AccountLoginSerializerTest(UserTestCase, TestCase):
 
 
 class ChangePasswordSerializerTest(UserTestCase, TestCase):
+
     def test_user_can_change_pw(self):
         user = UserFactory.create(password='beatles4Lyfe!', change_pw=True)
         request = APIRequestFactory().patch('/user/imagine71', {})
@@ -1108,3 +1114,127 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         assert serializer.is_valid() is False
         assert (_("Passwords cannot contain your phone.")
                 in serializer._errors['new_password'])
+
+
+class PhoneVerificationSerializerTest(UserTestCase, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.user = UserFactory.create(phone='+919327768250')
+
+    def test_valid_token_and_phone(self):
+        self.user.is_active = False
+        self.user.save()
+        device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        token = device.generate_challenge()
+        data = {
+            'phone': self.user.phone,
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is True
+        self.user.refresh_from_db()
+        assert self.user.phone_verified is True
+        assert self.user.is_active is True
+        assert VerificationDevice.objects.count() == 0
+
+    def test_update_phone(self):
+        device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone='+12345678990')
+        token = device.generate_challenge()
+        data = {
+            'phone': '+12345678990',
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is True
+        self.user.refresh_from_db()
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+        assert VerificationDevice.objects.count() == 0
+
+    def test_invalid_token(self):
+        device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        token = device.generate_challenge()
+        token = str(int(token) - 1)
+        data = {
+            'phone': '+919327768250',
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert(_("Invalid Token. Enter a valid token.")
+               in serializer._errors.get('token'))
+
+    def test_expired_token(self):
+        device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        now = 1497657600
+        with mock.patch('time.time', return_value=now):
+            token = device.generate_challenge()
+        data = {
+            'phone': self.user.phone,
+            'token': token
+        }
+        with mock.patch('time.time',
+                        return_value=(now + settings.TOTP_TOKEN_VALIDITY + 1)):
+            serializer = serializers.PhoneVerificationSerializer(data=data)
+            assert serializer.is_valid() is False
+        assert (
+            _("The token has expired.") in serializer._errors.get('token'))
+
+    def test_invalid_token_format(self):
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        data = {
+            'phone': '+12345678990',
+            'token': 'token'
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert(_("Token must be a number.")
+               in serializer._errors.get('token'))
+
+    def test_unlinked_phone(self):
+        device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        token = device.generate_challenge()
+        data = {
+            'phone': '+12345678990',
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert (
+            _("Phone is already verified or not linked to any user account.")
+            in serializer._errors.get('token'))
+
+    def test_invalid_phone_format(self):
+        device = VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
+        token = device.generate_challenge()
+        data = {
+            'phone': '9327768250',
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert phone_format in serializer._errors.get('phone')
+
+        data = {
+            'phone': '+91 9327768250',
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert phone_format in serializer._errors.get('phone')
+
+        data = {
+            'phone': 'Test Number',
+            'token': token
+        }
+        serializer = serializers.PhoneVerificationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert phone_format in serializer._errors.get('phone')
