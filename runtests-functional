@@ -11,6 +11,7 @@ then
     cd ..
     ./manage.py migrate
     ./manage.py loadstatic
+    ./manage.py loadfunctestfixtures
     ./manage.py runserver 0.0.0.0:8000 &
     cd ..
     sleep 5  # Wait for the Django server to start up
