@@ -292,13 +292,14 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
     permission_denied_message = error_messages.ORG_USERS_REMOVE
 
     def admin_is_deleting_themselves(self):
-        organization = Organization.objects.get(slug=self.kwargs['slug'])
         member_to_remove = self.kwargs['username']
         user = self.request.user.username
+        if user != member_to_remove:
+            return False
         user_is_admin = OrganizationRole.objects.get(
-            organization=organization,
+            organization__slug=self.kwargs['slug'],
             user=self.request.user).admin
-        return user_is_admin and user == member_to_remove
+        return user_is_admin
 
     def get_object(self):
         return OrganizationRole.objects.get(
@@ -319,9 +320,7 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
         if self.admin_is_deleting_themselves():
             messages.add_message(self.request, messages.ERROR,
                                  _("Administrators cannot remove themselves."))
-            return redirect('organization:members_edit',
-                            slug=self.kwargs['slug'],
-                            username=self.kwargs['username'])
+            return redirect('organization:members_edit', **self.kwargs)
         return super().delete(*args, **kwargs)
 
 
