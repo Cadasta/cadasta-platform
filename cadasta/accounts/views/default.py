@@ -13,6 +13,7 @@ import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 from allauth.account.models import EmailAddress
+from allauth.account import signals
 
 from ..models import User, VerificationDevice
 from .. import forms
@@ -127,8 +128,9 @@ class PasswordResetFromPhoneView(FormView, SuperUserCheckMixin):
     def form_valid(self, form):
         form.save()
         self.request.session.pop('password_reset_id', None)
-        # send message to user's phone informing that password
-        # was successfully changed.
+        signals.password_reset.send(sender=form.user.__class__,
+                                    request=self.request,
+                                    user=form.user)
         return super().form_valid(form)
 
 

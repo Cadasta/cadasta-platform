@@ -19,10 +19,6 @@ from .messages import phone_format
 class RegistrationSerializer(SanitizeFieldSerializer,
                              djoser_serializers.UserRegistrationSerializer):
     email = serializers.EmailField(
-        validators=[UniqueValidator(
-            queryset=User.objects.all(),
-            message=_("User with this Email address already exists.")
-        )],
         allow_blank=True,
         allow_null=True,
         required=False
@@ -75,7 +71,8 @@ class RegistrationSerializer(SanitizeFieldSerializer,
     def validate_email(self, email):
         if email:
             email = email.casefold()
-            if EmailAddress.objects.filter(email=email).exists():
+            if (EmailAddress.objects.filter(email=email).exists() or
+                    User.objects.filter(email=email).exists()):
                 raise serializers.ValidationError(
                     _("User with this Email address already exists."))
         else:
@@ -129,10 +126,6 @@ class RegistrationSerializer(SanitizeFieldSerializer,
 class UserSerializer(SanitizeFieldSerializer,
                      djoser_serializers.UserSerializer):
     email = serializers.EmailField(
-        validators=[UniqueValidator(
-            queryset=User.objects.all(),
-            message=_("User with this Email address already exists.")
-        )],
         allow_blank=True,
         allow_null=True,
         required=False
@@ -212,7 +205,8 @@ class UserSerializer(SanitizeFieldSerializer,
             email = email.casefold()
             # make sure that the new email updated by a user is not a duplicate
             # of an unverified email already linked to a different user
-            if EmailAddress.objects.filter(email=email).exists():
+            if (EmailAddress.objects.filter(email=email).exists() or
+                    User.objects.filter(email=email).exists()):
                 raise serializers.ValidationError(
                     _("User with this Email address already exists."))
         else:

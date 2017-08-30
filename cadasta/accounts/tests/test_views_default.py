@@ -510,6 +510,8 @@ class PasswordResetFromPhoneViewTest(UserTestCase, TestCase):
         assert response.status_code == 302
         self.user.refresh_from_db()
         assert self.user.check_password('i@msher!0cked') is True
+        assert len(mail.outbox) == 1
+        assert self.user.email in mail.outbox[0].to
 
     def test_password_set_without_password_reset_id(self):
         data = {'password': 'i@msher!0cked'}

@@ -4,7 +4,6 @@ import pytest
 from django.conf import settings
 from django.utils.translation import gettext as _
 from django.test import TestCase
-# from django.db import IntegrityError
 from allauth.account.models import EmailAddress
 from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.request import Request
@@ -461,10 +460,9 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'Sherlock Holmes'
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert serializer.is_valid() is True
-
-        # with pytest.raises(IntegrityError):
-        #     serializer.save()
+        assert serializer.is_valid() is False
+        assert (_("User with this Email address already exists.")
+                in serializer.errors['email'])
 
     def test_signup_with_existing_email_in_EmailAddress(self):
         user = UserFactory.create()
@@ -913,6 +911,30 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user_obj.is_active
         assert not user_obj.email_verified
         assert user_obj.phone is None
+
+    def test_update_insensitive_email_check(self):
+        UserFactory.create(email='sherlock.holmes@bbc.uk')
+        user = UserFactory.create(username='sherlock',
+                                  phone='+919327768250',
+                                  password='221B@bakerstreet')
+        data = {
+            'username': 'sherlock',
+            'email': 'SHERLOCK.HOLMES@BBC.UK',
+            'phone': '+919327768250',
+            'password': '221B@bakerstreet',
+            'full_name': 'John Lennon',
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en',
+            'measurement': 'metric',
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert (_("User with this Email address already exists.")
+                in serializer.errors['email'])
 
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
