@@ -40,3 +40,16 @@ class UserLanguageMiddlewareTest(TestCase):
         assert 1 == mock_translation.activate.call_count
         assert 'fr' == session_lang[self.LANGUAGE_SESSION_KEY]
         assert res is self.mock_response
+
+    @patch.object(middleware, 'translation')
+    def test_process_response_wsgi_request(self, mock_translation):
+        """
+        If Auth middleware isn't reached (eg if we return a redirect to
+        an endpoint with an appended slash if a slash is ommited from a
+        URL and settings.APPEND_SLASH=True), request will be a
+        WSGIRequest that does not contain a user property.
+        """
+        del self.mock_request.user
+        res = self.ulm.process_response(self.mock_request, self.mock_response)
+        assert 0 == mock_translation.activate.call_count
+        assert res is self.mock_response
