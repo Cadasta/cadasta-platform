@@ -135,13 +135,14 @@ class OrgArchiveView(LoginPermissionRequiredMixin,
         return reverse('organization:dashboard', kwargs=self.kwargs)
 
     def archive(self):
-        assert hasattr(self, 'do_archive'), "Please set do_archive attribute"
+        assert hasattr(self, 'do_archive'), 'Please set do_archive attribute'
         self.object = self.get_object()
         self.object.archived = self.do_archive
         self.object.save()
-        for project in self.object.projects.all():
-            project.archived = self.do_archive
-            project.save()
+        if self.do_archive:
+            for project in self.object.projects.all():
+                project.archived = True
+                project.save()
         return redirect(self.get_success_url())
 
 
