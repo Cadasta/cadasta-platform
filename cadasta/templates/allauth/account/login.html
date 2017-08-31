@@ -76,7 +76,7 @@
 
       <p class="text-center">
         {% trans "Don't have an account?" %}
-        <a href="{% url 'account_signup' %}?next={{ redirect_field_value }}">{% trans "Register here" %}</a>
+        <a href="{% url 'account_signup' %}{% if redirect_field_value %}?next={{ redirect_field_value }}{% endif %}">{% trans "Register here" %}</a>
       </p>
     </div>
 
