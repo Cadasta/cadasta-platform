@@ -37,7 +37,8 @@
 {% endblock %}
 
 {% block extra_script %}
-<script src="/static/dist/paginated-table.js"></script>
+<script src="/static/dist/PaginatedTable.min.js"></script>
+<script src="/static/dist/PartyRow.min.js"></script>
 <script type="text/javascript">
   var props = {
     "url": "{% url 'api:v1:party:list' project=object.slug organization=object.organization.slug %}",
@@ -45,7 +46,7 @@
       {"label": "Party", "field": "name", "sortable": true},
       {"label": "Type", "field": "type", "sortable": true}
     ],
-    "row_component": Row
+    "row_component": PartyRow
   }
   ReactDOM.render(
     React.createElement(PaginatedTable, props),

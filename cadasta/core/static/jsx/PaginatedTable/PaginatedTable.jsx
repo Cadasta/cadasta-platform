@@ -4,18 +4,6 @@ class Head extends React.Component {
   }
 }
 
-class Row extends React.Component {
-  render() {
-    return (
-      <tr>
-        <td>{this.props.name}</td>
-        <td>{this.props.type}</td>
-        <td></td>
-      </tr>
-    );
-  }
-}
-
 class PaginatedTable extends React.Component {
   constructor(props) {
     super(props);

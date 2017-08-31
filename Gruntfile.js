@@ -8,14 +8,22 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'cadasta/core/static/dist/paginated-table.js': 'cadasta/core/static/jsx/PaginatedTable/PaginatedTable.jsx'
+          'cadasta/core/static/dist/PaginatedTable.js': 'cadasta/core/static/jsx/PaginatedTable/PaginatedTable.jsx',
+          'cadasta/core/static/dist/PartyRow.js': 'cadasta/core/static/jsx/PaginatedTable/PartyRow.jsx'
         }
       }
     },
     uglify: {
       build: {
-        src: 'cadasta/core/static/dist/paginated-table.js',
-        dest: 'cadasta/core/static/dist/paginated-table.min.js'
+        files: [{
+          expand: true,
+          cwd: 'cadasta/core/static/dist',
+          src: '*.js',
+          dest: 'cadasta/core/static/dist',
+          rename: function (dst, src) {
+            return dst + '/' + src.replace('.js', '.min.js');
+          }
+        }]
       }
     },
     eslint: {
