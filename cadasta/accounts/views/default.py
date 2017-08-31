@@ -48,9 +48,6 @@ class AccountRegister(CreateView):
 
         return super().form_valid(form)
 
-    def form_invalid(self, form):
-        return super().form_invalid(form)
-
 
 class PasswordChangeView(LoginRequiredMixin,
                          SuperUserCheckMixin,
@@ -90,7 +87,7 @@ class PasswordResetDoneView(FormView, allauth_views.PasswordResetDoneView):
         message = _("Successfully Verified Token."
                     " You can now reset your password.")
         messages.add_message(self.request, messages.SUCCESS, message)
-        del self.request.session['phone']
+        self.request.session.pop('phone', None)
         self.request.session['password_reset_id'] = device.user_id
         device.delete()
         return super().form_valid(form)
@@ -282,7 +279,7 @@ class ResendTokenView(FormView):
             message = _(
                 "Your phone number has been submitted."
                 " If it matches your account on Cadasta Platform, you will"
-                " receive a verification code to confirm your phone.")
+                " receive a verification token to confirm your phone.")
             messages.add_message(self.request, messages.SUCCESS, message)
 
         if email:

@@ -290,6 +290,8 @@ class AccountLoginTest(APITestCase, UserTestCase, TestCase):
                                        email='john@beatles.uk',
                                        phone='+919327768250',
                                        password='iloveyoko79!')
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
 
     def test_successful_login(self):
         """The view should return a token to authenticate API calls"""

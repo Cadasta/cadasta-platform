@@ -113,10 +113,9 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         device = self.sherlock.verificationdevice_set.get(
             unverified_phone=self.sherlock.phone)
 
-        with mock.patch('time.time', return_value=self._now):
-            token = device.generate_challenge()
-            verified_once = device.verify_token(int(token))
-            verified_twice = device.verify_token(int(token))
+        token = device.generate_challenge()
+        verified_once = device.verify_token(int(token))
+        verified_twice = device.verify_token(int(token))
 
         assert verified_once is True
         assert verified_twice is False
@@ -128,9 +127,8 @@ class VerificationDeviceTest(UserTestCase, TestCase):
         device_john = self.john.verificationdevice_set.get(
             unverified_phone=self.john.phone)
 
-        with mock.patch('time.time', return_value=self._now):
-            token = device_sherlock.generate_challenge()
-            verified = device_john.verify_token(int(token))
+        token = device_sherlock.generate_challenge()
+        verified = device_john.verify_token(int(token))
 
         assert verified is False
 

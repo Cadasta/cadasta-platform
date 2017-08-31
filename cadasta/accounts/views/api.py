@@ -34,10 +34,10 @@ class AccountUser(djoser_views.UserView):
                 email_set.delete()
             if new_email:
                 send_email_confirmation(self.request._request, user)
+                email_update_message = messages.email_change
                 if current_email:
                     user.email = current_email
                     utils.send_email_update_notification(current_email)
-                    email_update_message = messages.email_delete
             else:
                 user.email_verified = False
                 utils.send_email_deleted_notification(current_email)
@@ -109,7 +109,10 @@ class AccountLogin(djoser_views.LoginView):
             send_email_confirmation(self.request._request, user)
 
         except exceptions.PhoneNotVerifiedError as e:
+            user = serializer.user
             error = e.msg
+            device = user.verificationdevice_set.get(label='phone_verify')
+            device.generate_challenge()
 
         return Response(
             data={'detail': error},
