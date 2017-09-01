@@ -33,6 +33,10 @@ class OrganizationSerializer(core_serializers.SanitizeFieldSerializer,
         if slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
+        not_unique = Organization.objects.filter(name__iexact=value)
+        if not_unique:
+            raise serializers.ValidationError(
+                _("Organization with this name already exists."))
         return value
 
     def create(self, *args, **kwargs):
@@ -81,7 +85,7 @@ class ProjectSerializer(core_serializers.SanitizeFieldSerializer,
             org_slug = self.instance.organization.slug
         queryset = Project.objects.filter(
             organization__slug=org_slug,
-            name=value,
+            name__iexact=value,
         )
         if is_create:
             not_unique = queryset.exists()
@@ -201,6 +205,7 @@ class EntityUserSerializer(SuperUserCheck, serializers.Serializer):
 
 
 class OrganizationUserSerializer(EntityUserSerializer):
+
     class Meta:
         role_model = OrganizationRole
         context_key = 'organization'
@@ -241,6 +246,7 @@ class OrganizationUserSerializer(EntityUserSerializer):
 
 
 class ProjectUserSerializer(EntityUserSerializer):
+
     class Meta:
         role_model = ProjectRole
         context_key = 'project'
