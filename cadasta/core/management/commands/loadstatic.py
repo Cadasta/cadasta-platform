@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from core.management.commands import loadsite
-from accounts.management.commands import loadpolicies
+from accounts.management.commands import loadpolicies, loadpermissions
 from geography.management.commands import loadcountries
 from jsonattrs.management.commands import loadattrtypes
 
@@ -30,5 +30,7 @@ class Command(BaseCommand):
         loadcountries.Command().handle(force=options['force'])
         print('LOADING POLICIES\n')
         loadpolicies.Command().handle(force=options['force'])
+        print('LOADING PERMISSIONS\n')
+        loadpermissions.Command().handle()
         print('LOADING ATTRIBUTE TYPES\n')
         loadattrtypes.Command().handle(force=options['force'])
