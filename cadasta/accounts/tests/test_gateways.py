@@ -27,28 +27,15 @@ class TwilioGatewayTest(TestCase):
             body=body,
             from_='+123')
 
-    def test_message_sent_successfully(self):
-        twiliobj = TwilioGateway(
-            account_sid=settings.TWILIO_ACCOUNT_SID,
-            auth_token=settings.TWILIO_AUTH_TOKEN,
-            from_phone_number_list=['+15005550006', ]
-        )
-        to = '+919327768250'
-        body = 'Test message send successfully'
-        message = twiliobj.send_sms(to, body)
-        assert message.status == 'queued'
-        assert message.sid is not None
-
-    def test_message_send_to_invalid_number(self):
-        twiliobj = TwilioGateway(
-            account_sid=settings.TWILIO_ACCOUNT_SID,
-            auth_token=settings.TWILIO_AUTH_TOKEN,
-            from_phone_number_list=['+15005550006', ]
-        )
-        to = '+15005550001'
-        body = 'This is an invalid phone number!'
-        message = twiliobj.send_sms(to, body)
-        assert message.status == 400
+    def test_gateway_exception(self):
+        twilio = TwilioGateway(account_sid='SID',
+                               auth_token='TOKEN',
+                               from_phone_number_list=['+123'])
+        body = 'Testing Twilio SMS gateway!'
+        to = '+456'
+        response = twilio.send_sms(to, body)
+        assert response.status == 404
+        assert 'Unable to create record' in response.msg
 
 
 class FakeGatewayTest(TestCase):
