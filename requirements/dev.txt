@@ -2,11 +2,11 @@
 pytest-django==3.1.2
 factory-boy==2.9.2
 pytest-cov==2.5.1
-selenium==3.4.3
+selenium==3.5.0
 transifex-client==0.12.4
 tox==2.7.0
 flake8==3.4.1
 django-debug-toolbar==1.8
-django-extensions==1.8.1
+django-extensions==1.9.0
 django-skivvy==0.1.8
 ipython==6.1.0

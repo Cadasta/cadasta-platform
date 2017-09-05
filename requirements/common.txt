@@ -1,8 +1,8 @@
 Django==1.10.7  # rq.filter: <1.11.0
-djangorestframework==3.3.3
+djangorestframework==3.6.4
 psycopg2==2.7.3
 djoser==0.6.0
-django-allauth==0.32.0
+django-allauth==0.33.0
 django-cors-headers==2.1.0
 django-filter==1.0.4
 django-crispy-forms==1.6.1
@@ -30,11 +30,11 @@ pytz==2017.2
 shapely==1.5.17.post1
 gdal==1.10.0  # rq.filter: <2.0.0
 pylibmc==1.5.2
-awscli==1.11.129
+awscli==1.11.141
 pandas==0.20.3
 argon2-cffi==16.3.0
-requests==2.18.3
+requests==2.18.4
 pyparsing==2.2.0
-django-compressor==2.1.1
+django-compressor==2.2
 beautifulsoup4==4.6.0
 gpxpy==1.1.2

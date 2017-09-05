@@ -124,7 +124,7 @@ class OrganizationSerializerTest(UserTestCase, TestCase):
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
-            'name': ["Organization with this name already exists."]
+            'name': ["organization with this name already exists."]
         }
 
     def test_update_with_duplicate_organization_name(self):
@@ -145,7 +145,7 @@ class OrganizationSerializerTest(UserTestCase, TestCase):
         with pytest.raises(ValidationError):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
-            'name': ["Organization with this name already exists."]
+            'name': ["organization with this name already exists."]
         }
 
     def test_sanitize_stings(self):
