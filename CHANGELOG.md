@@ -1,5 +1,59 @@
 # Change Log
 
+## [v1.12.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.12.0-alpha.2) (2017-08-31)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.0-alpha.1...v1.12.0-alpha.2)
+
+**Fixed bugs:**
+
+- 500 when retrieving available forms from ODK  [\#1753](https://github.com/Cadasta/cadasta-platform/issues/1753)
+- AttributeError: 'WSGIRequest' object has no attribute 'user' [\#1746](https://github.com/Cadasta/cadasta-platform/issues/1746)
+
+**Merged pull requests:**
+
+- Handle situations where request has no User object, closes \#1746 [\#1765](https://github.com/Cadasta/cadasta-platform/pull/1765) ([alukach](https://github.com/alukach))
+
+## [v1.12.0-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.12.0-alpha.1) (2017-08-26)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.11.0...v1.12.0-alpha.1)
+
+**Fixed bugs:**
+
+- Incorrect error messaging when importing file [\#1741](https://github.com/Cadasta/cadasta-platform/issues/1741)
+- Staging: Date is Broken [\#1718](https://github.com/Cadasta/cadasta-platform/issues/1718)
+- Column sort by Last Login not working correctly [\#1704](https://github.com/Cadasta/cadasta-platform/issues/1704)
+- Follow-up fix for automatic calculation of area [\#1658](https://github.com/Cadasta/cadasta-platform/issues/1658)
+- When changing the user-preferred language, the alert message is in the previous language [\#1630](https://github.com/Cadasta/cadasta-platform/issues/1630)
+- Error importing files \(xlsx format\) due to some incoherent data  [\#1584](https://github.com/Cadasta/cadasta-platform/issues/1584)
+
+**Closed issues:**
+
+- Add redirect values to  sign in and register links in header [\#1671](https://github.com/Cadasta/cadasta-platform/issues/1671)
+- Include areas in project dashboard and location detail pages [\#1666](https://github.com/Cadasta/cadasta-platform/issues/1666)
+- Enhancement: Add forgot password link to the change password page. [\#1188](https://github.com/Cadasta/cadasta-platform/issues/1188)
+- Support GPS with Accuracy in XLSForm [\#597](https://github.com/Cadasta/cadasta-platform/issues/597)
+
+**Merged pull requests:**
+
+- Fix migration failure [\#1737](https://github.com/Cadasta/cadasta-platform/pull/1737) ([alukach](https://github.com/alukach))
+- Moved select2 js and css from cdn [\#1736](https://github.com/Cadasta/cadasta-platform/pull/1736) ([clash99](https://github.com/clash99))
+- Address \#233: add management command for database reset [\#1730](https://github.com/Cadasta/cadasta-platform/pull/1730) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Move datatables file local and update path [\#1729](https://github.com/Cadasta/cadasta-platform/pull/1729) ([clash99](https://github.com/clash99))
+- Area calc fix [\#1728](https://github.com/Cadasta/cadasta-platform/pull/1728) ([oliverroick](https://github.com/oliverroick))
+- Fix \#1704: Add correct last login sorting to the user list [\#1727](https://github.com/Cadasta/cadasta-platform/pull/1727) ([seav](https://github.com/seav))
+- Fixes \#1630:: translate success form message with new selected language [\#1726](https://github.com/Cadasta/cadasta-platform/pull/1726) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Address \#1264:: Add preview in resource edit page [\#1725](https://github.com/Cadasta/cadasta-platform/pull/1725) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Moved bootstrap-rtl.css local and adjusted path [\#1724](https://github.com/Cadasta/cadasta-platform/pull/1724) ([clash99](https://github.com/clash99))
+- Move bootstrap toggle files locally and adjust paths [\#1723](https://github.com/Cadasta/cadasta-platform/pull/1723) ([clash99](https://github.com/clash99))
+- Update contributing guidelines with reference to Decision Records repo [\#1720](https://github.com/Cadasta/cadasta-platform/pull/1720) ([amplifi](https://github.com/amplifi))
+- Project area trigger [\#1716](https://github.com/Cadasta/cadasta-platform/pull/1716) ([oliverroick](https://github.com/oliverroick))
+- Moved leaflet-geocoder-mapzen files from cdn to our server [\#1714](https://github.com/Cadasta/cadasta-platform/pull/1714) ([clash99](https://github.com/clash99))
+- Adding return path to upper right buttons [\#1713](https://github.com/Cadasta/cadasta-platform/pull/1713) ([clash99](https://github.com/clash99))
+- Update changelog for v1.11.0 [\#1711](https://github.com/Cadasta/cadasta-platform/pull/1711) ([amplifi](https://github.com/amplifi))
+- Update django-simple-history [\#1707](https://github.com/Cadasta/cadasta-platform/pull/1707) ([seav](https://github.com/seav))
+- Fixes \#1666 showing calculated areas with user measurement system [\#1706](https://github.com/Cadasta/cadasta-platform/pull/1706) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Adds support for accuracyThreshold [\#1703](https://github.com/Cadasta/cadasta-platform/pull/1703) ([oliverroick](https://github.com/oliverroick))
+- Add phone to User Profile [\#1698](https://github.com/Cadasta/cadasta-platform/pull/1698) ([valaparthvi](https://github.com/valaparthvi))
+- Update some dependencies flagged by Requires.io [\#1676](https://github.com/Cadasta/cadasta-platform/pull/1676) ([seav](https://github.com/seav))
+
 ## [v1.11.0](https://github.com/Cadasta/cadasta-platform/tree/v1.11.0) (2017-08-09)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.11.0-alpha.2...v1.11.0)
 
