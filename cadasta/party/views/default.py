@@ -137,7 +137,10 @@ class PartiesDetail(LoginPermissionRequiredMixin,
                 if location_opts:
                     rel.location_labels = template_xlang_labels(
                         location_opts.get(rel.spatial_unit.type))
-
+        context['is_allowed_update_party'] = self.request.user.has_perm(
+            'party.update', context['party'])
+        context['is_allowed_delete_party'] = self.request.user.has_perm(
+            'party.delete', context['party'])
         return context
 
 
