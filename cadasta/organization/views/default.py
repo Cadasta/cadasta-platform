@@ -24,6 +24,7 @@ from resources.models import ContentObject, Resource
 from core.form_mixins import get_types
 from party.choices import TENURE_RELATIONSHIP_TYPES
 from spatial.choices import TYPE_CHOICES
+from django.contrib import messages
 
 from . import mixins
 from ..choices import ROLE_CHOICES
@@ -290,6 +291,16 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
     permission_required = update_permissions('org.users.remove')
     permission_denied_message = error_messages.ORG_USERS_REMOVE
 
+    def admin_is_deleting_themselves(self):
+        member_to_remove = self.kwargs['username']
+        user = self.request.user.username
+        if user != member_to_remove:
+            return False
+        user_is_admin = OrganizationRole.objects.get(
+            organization__slug=self.kwargs['slug'],
+            user=self.request.user).admin
+        return user_is_admin
+
     def get_object(self):
         return OrganizationRole.objects.get(
             organization__slug=self.kwargs['slug'],
@@ -303,7 +314,14 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
         )
 
     def get(self, *args, **kwargs):
-        return self.post(*args, **kwargs)
+        return self.delete(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.admin_is_deleting_themselves():
+            messages.add_message(self.request, messages.ERROR,
+                                 _("Administrators cannot remove themselves."))
+            return redirect('organization:members_edit', **self.kwargs)
+        return super().delete(*args, **kwargs)
 
 
 class UserList(LoginPermissionRequiredMixin, generic.ListView):
