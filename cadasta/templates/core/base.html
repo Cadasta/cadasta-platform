@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load sass_tags %}
 {% load staticfiles %}
+{% load tags %}
 
 {% get_current_language_bidi as LANGUAGE_BIDI %}
 
@@ -57,8 +58,12 @@
             <!-- New user menu -->
             <div class="divider pull-left"></div>
             <div class="btn-group" role="group">
-              <a href="{% url 'account_login' %}?next={{ request.path }}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a>
-              <a href="{% url 'account_signup' %}?next={{ request.path }}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
+              {% if request.path != '/account/signup/' and request.path != '/account/login/'  %}
+                {% define request.path as redirect_url %}
+              {% endif %}
+              
+              <a href="{% url 'account_login' %}{% if redirect_url %}?next={{ request.path }}{% endif %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a>
+              <a href="{% url 'account_signup' %}{% if redirect_url %}?next={{ request.path }}{% endif %}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
             </div>
             {% endif %}
           </div>
