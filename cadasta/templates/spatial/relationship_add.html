@@ -42,33 +42,6 @@
         changeYear: true,
       });
     });
-=======
-  $(document).ready(function() {
-    var template = function(party) {
-      if (!party.id) {
-        return party.text;
-      }
-      return $(
-        '<div class="party-option">' +
-        '<strong class="party-name">' + party.text + '</strong>' +
-        '<span class="party-type">' + party.element.dataset.type + '</span>' +
-        '</div>'
-      );
-    };
-    $("#party-select").select2({
-      minimumResultsForSearch: 6,
-      templateResult: template,
-      theme: "bootstrap",
-    });
-
-    $('.datepicker').datepicker({
-      yearRange: "c-200:c+200",
-      dateFormat: "yy-mm-dd",
-      changeMonth: true,
-      changeYear: true,
-    });
-  });
->>>>>>> Moving jquery ui local and updating file structure
   </script>
 {% endblock %}
 
