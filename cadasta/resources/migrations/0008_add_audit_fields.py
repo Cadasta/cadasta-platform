@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resources', '0006_randomize_imported_filenames'),
+        ('resources', '0007_add_history_change_reason'),
     ]
 
     operations = [

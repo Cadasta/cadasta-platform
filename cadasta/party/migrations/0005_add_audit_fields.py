@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('party', '0003_convert_tenuretype_to_charfield'),
+        ('party', '0004_add_history_change_reason'),
     ]
 
     operations = [
