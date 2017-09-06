@@ -21,7 +21,7 @@ before_install:
   - export CPLUS_INCLUDE_PATH=/usr/include/gdal
 
 install:
-  - pip install tox==2.3.1
+  - pip install tox==2.8.1
 
 before_script:
   - sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf
