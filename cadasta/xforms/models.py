@@ -30,6 +30,10 @@ class XFormSubmission(RandomIDModel):
         TenureRelationship, related_name='xform_submissions',
       )
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     def __repr__(self):
         repr_string = ('<XFormSubmission id={obj.id}'
                        ' user={obj.user.username}'

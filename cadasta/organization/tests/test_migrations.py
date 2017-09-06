@@ -22,7 +22,7 @@ class MigrationTestCase(TestCase):
     def test_migration(self):
         apps_before = self._get_apps_for_migration([
             ('organization', self.migrate_from),
-            ('spatial', '0005_recalculate_area')])
+            ('spatial', '0009_add_audit_fields')])
         Organization = apps_before.get_model('organization', 'Organization')
         Project = apps_before.get_model('organization', 'Project')
         SpatialUnit = apps_before.get_model('spatial', 'SpatialUnit')
@@ -41,7 +41,9 @@ class MigrationTestCase(TestCase):
             type='PA',
             geometry='POLYGON((12.323006 51.327645,12.322913 '
                      '51.327355,12.323114 51.327330,12.323189 '
-                     '51.327624,12.323006 51.327645))')
+                     '51.327624,12.323006 51.327645))',
+            created_date='2016-01-01 00:00+00',
+            last_updated='2016-01-01 00:00+00')
         su1.refresh_from_db()
         su2 = SpatialUnit.objects.create(
             id='def',
@@ -49,7 +51,9 @@ class MigrationTestCase(TestCase):
             type='PA',
             geometry='POLYGON((12.323041 51.32775,12.323012 '
                      '51.327661,12.323197 51.327638,12.323224 '
-                     '51.327727,12.323041 51.32775))')
+                     '51.327727,12.323041 51.32775))',
+            created_date='2016-01-01 00:00+00',
+            last_updated='2016-01-01 00:00+00')
         su2.refresh_from_db()
 
         call_command('migrate', 'organization', self.migrate_to)

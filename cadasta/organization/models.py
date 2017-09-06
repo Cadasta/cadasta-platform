@@ -46,7 +46,11 @@ class Organization(SlugModel, RandomIDModel):
     # TEMPORARY:
     logo = models.URLField(null=True)
     # logo = TemporalForeignKey('Resource')
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+
     access = models.CharField(
         default="public", choices=ACCESS_CHOICES, max_length=8
     )
@@ -116,6 +120,10 @@ class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)
     user = models.ForeignKey('accounts.User')
     admin = models.BooleanField(default=False)
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
 
@@ -187,6 +195,10 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
         max_length=24, null=True, blank=True
     )
     area = models.FloatField(default=0)
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
 
@@ -318,6 +330,10 @@ class ProjectRole(RandomIDModel):
                             default='PU')
 
     history = HistoricalRecords()
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('project', 'user')

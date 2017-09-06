@@ -57,6 +57,10 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         related_name='relationships_set',
     )
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     history = HistoricalRecords()
 
     class Meta:
@@ -222,6 +226,10 @@ class SpatialRelationship(RandomIDModel):
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
     objects = managers.SpatialRelationshipManager()
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
 

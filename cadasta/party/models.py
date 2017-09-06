@@ -85,6 +85,10 @@ class Party(ResourceModelMixin, RandomIDModel):
         related_name='tenure_relationships'
     )
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     history = HistoricalRecords()
 
     class Meta:
@@ -177,6 +181,10 @@ class PartyRelationship(RandomIDModel):
 
     objects = managers.PartyRelationshipManager()
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     history = HistoricalRecords()
 
     class TutelaryMeta:
@@ -242,6 +250,10 @@ class TenureRelationship(ResourceModelMixin,
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
     objects = managers.TenureRelationshipManager()
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
 

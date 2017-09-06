@@ -48,6 +48,10 @@ class Resource(RandomIDModel):
 
     objects = ResourceManager()
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
     history = HistoricalRecords()
 
     class Meta:
@@ -218,6 +222,10 @@ class ContentObject(RandomIDModel):
 
     history = HistoricalRecords()
 
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
+
 
 @permissioned_model
 class SpatialResource(RandomIDModel):
@@ -256,6 +264,10 @@ class SpatialResource(RandomIDModel):
         srid=4326, blank=True, null=True
     )
     attributes = JSONAttributeField(default={})
+
+    # Audit history
+    created_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __repr__(self):
         repr_string = ('<SpatialResource id={obj.id}'
