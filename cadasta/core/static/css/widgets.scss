@@ -11,14 +11,6 @@
     position: relative;
     top: 22px;
   }
-  & > div:nth-child(2) {
-    width: 40px;
-    text-align: right;
-  }
-  & > div:last-child {
-    width: 40px;
-    text-align: left;
-  }
 }
 
 @media (max-width: $screen-xs-max) {
