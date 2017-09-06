@@ -482,7 +482,7 @@ class OrganizationUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/login/' in response.location
         assert self.org.archived is True
 
-    def test_unarchive_cascade_to_projects(self):
+    def test_unarchive_does_not_cascade_to_projects(self):
         project = ProjectFactory.create(organization=self.org, archived=True)
         user = UserFactory.create()
         assign_policies(user)
@@ -495,7 +495,7 @@ class OrganizationUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
         assert ('/organizations/{}/'.format(self.org.slug)
                 in response.location)
         assert self.org.archived is False
-        assert project.archived is False
+        assert project.archived is True
 
 
 class OrganizationMembersTest(ViewTestCase, UserTestCase, TestCase):
