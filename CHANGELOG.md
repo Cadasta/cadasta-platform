@@ -1,5 +1,38 @@
 # Change Log
 
+## [v1.12.1-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1-alpha.1) (2017-09-06)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.0...v1.12.1-alpha.1)
+
+**Fixed bugs:**
+
+- Already archived projects get unarchived when org is unarchived [\#820](https://github.com/Cadasta/cadasta-platform/issues/820)
+- Invalid redirect on account registration [\#1747](https://github.com/Cadasta/cadasta-platform/issues/1747)
+- Goes to new user even when not logged in as a guest user. [\#1731](https://github.com/Cadasta/cadasta-platform/issues/1731)
+- Party detail page shows edit and delete buttons to project users [\#1693](https://github.com/Cadasta/cadasta-platform/issues/1693)
+- Relationship detail page shows edit and delete buttons to project users [\#1680](https://github.com/Cadasta/cadasta-platform/issues/1680)
+- UI bug with Italian translation [\#1649](https://github.com/Cadasta/cadasta-platform/issues/1649)
+- Organization admins can remove themselves through the URL [\#1544](https://github.com/Cadasta/cadasta-platform/issues/1544)
+
+**Closed issues:**
+
+- Add last\_updated for all tables [\#1138](https://github.com/Cadasta/cadasta-platform/issues/1138)
+
+**Merged pull requests:**
+
+- Removed private toggle widget css breaking translations [\#1772](https://github.com/Cadasta/cadasta-platform/pull/1772) ([clash99](https://github.com/clash99))
+- Updated transifex files [\#1771](https://github.com/Cadasta/cadasta-platform/pull/1771) ([clash99](https://github.com/clash99))
+- Fixes \#1747 -- Provide redirect only when not on sign-up or login page [\#1769](https://github.com/Cadasta/cadasta-platform/pull/1769) ([oliverroick](https://github.com/oliverroick))
+- Update changelog for v1.12.0-alpha.2 [\#1768](https://github.com/Cadasta/cadasta-platform/pull/1768) ([amplifi](https://github.com/amplifi))
+- fix bug \#820: unarchiving organization does not cascade to projects [\#1744](https://github.com/Cadasta/cadasta-platform/pull/1744) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Update some dependencies flagged by Requires.io II [\#1743](https://github.com/Cadasta/cadasta-platform/pull/1743) ([seav](https://github.com/seav))
+- Fixes \#1544: Org admins cannot remove themselves through the URL [\#1742](https://github.com/Cadasta/cadasta-platform/pull/1742) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Fixes \#1693: displays edit and delete button in party detail page only if has permission [\#1735](https://github.com/Cadasta/cadasta-platform/pull/1735) ([laura-barluzzi](https://github.com/laura-barluzzi))
+- Moving jquery ui local and updating file structure \(datepicker\) [\#1733](https://github.com/Cadasta/cadasta-platform/pull/1733) ([clash99](https://github.com/clash99))
+- Resolves \#1138 Add last\_updated for tables [\#1705](https://github.com/Cadasta/cadasta-platform/pull/1705) ([amplifi](https://github.com/amplifi))
+
+## [v1.12.0](https://github.com/Cadasta/cadasta-platform/tree/v1.12.0) (2017-08-31)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.0-alpha.2...v1.12.0)
+
 ## [v1.12.0-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.12.0-alpha.2) (2017-08-31)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.0-alpha.1...v1.12.0-alpha.2)
 
