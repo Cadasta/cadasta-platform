@@ -10,16 +10,13 @@
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'select2/4.0.3/css/select2.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
 {% endblock %}
 
 {% block location_extra_script %}
   {{ form.media }}
   <script src="{% static 'select2/4.0.3/js/select2.min.js' %}"></script>
+  <script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
   <script src="{% static 'js/form_submit.js' %}"></script>
-  <script src="{% static 'js/jquery-ui.min.js' %}"></script>
-  <script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
   <script>
     $(document).ready(function() {
       var template = function(party) {
@@ -45,6 +42,33 @@
         changeYear: true,
       });
     });
+=======
+  $(document).ready(function() {
+    var template = function(party) {
+      if (!party.id) {
+        return party.text;
+      }
+      return $(
+        '<div class="party-option">' +
+        '<strong class="party-name">' + party.text + '</strong>' +
+        '<span class="party-type">' + party.element.dataset.type + '</span>' +
+        '</div>'
+      );
+    };
+    $("#party-select").select2({
+      minimumResultsForSearch: 6,
+      templateResult: template,
+      theme: "bootstrap",
+    });
+
+    $('.datepicker').datepicker({
+      yearRange: "c-200:c+200",
+      dateFormat: "yy-mm-dd",
+      changeMonth: true,
+      changeYear: true,
+    });
+  });
+>>>>>>> Moving jquery ui local and updating file structure
   </script>
 {% endblock %}
 

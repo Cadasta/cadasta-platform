@@ -6,16 +6,13 @@
 
 {% block extra_head %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/jquery-ui.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.structure.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/jquery-ui.theme.min.css' %}">
+<link rel="stylesheet" href="{% static 'jquery-ui/1.12.1/css/jquery-ui.min.css' %}">
 {% endblock %}
 
 {% block extra_script %}
 {{ block.super }}
 {{ form.media }}
-<script src="{% static 'js/jquery-ui.min.js' %}"></script>
-<script src="https://cdn.rawgit.com/jquery/jquery-ui/1.12.1/ui/i18n/datepicker-{{ LANGUAGE_CODE }}{% if LANGUAGE_CODE == 'en' %}-GB{% endif %}.js"></script>
+<script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
 <script>
   $(document).ready(function () {
     $('.datepicker').datepicker({
