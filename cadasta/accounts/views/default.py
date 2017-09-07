@@ -1,3 +1,4 @@
+from itertools import groupby
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
@@ -14,7 +15,7 @@ from allauth.account.models import EmailAddress
 
 from ..models import User
 from .. import forms
-from organization.models import ProjectRole
+from organization.models import Project
 
 
 class PasswordChangeView(LoginRequiredMixin,
@@ -102,6 +103,62 @@ class AccountListProjects(ListView):
 
     @staticmethod
     def _get_orgs(user):
+        user_orgs = set(user.organizations.all())
+
+        all_projectroles_user_is_admin = user.projectrole_set.filter(
+            project__organization__organizationrole__admin=True,
+            project__organization__organizationrole__user=user
+        )
+
+        active_projectroles_user_is_not_admin = user.projectrole_set.filter(
+            project__organization__organizationrole__admin=False,
+            project__organization__organizationrole__user=user,
+            project__organization__archived=False,
+            project__archived=False,
+        )
+
+        is_admin__qs = (
+            [True, all_projectroles_user_is_admin],
+            [False, active_projectroles_user_is_not_admin]
+        )
+
+        for is_admin, qs in is_admin__qs:
+            qs = qs.prefetch_related('project', 'project__organization')
+
+            def get_org(pr): return pr.project.organization
+            for org, projectroles in groupby(qs, get_org):
+                user_orgs.remove(org)
+                if is_admin:
+                    admin_role = _('Administrator')
+                    yield (
+                        org, is_admin,
+                        [(pr.project, admin_role) for pr in projectroles]
+                    )
+                else:
+                    yield (
+                        org, is_admin,
+                        [(pr.project, pr.role_verbose) for pr in projectroles]
+                    )
+        if user_orgs:
+            # Projects where there are no project roles
+            public_user_projects = Project.objects.filter(
+                organization__users=user
+            ).exclude(projectrole__user=user).prefetch_related('organization')
+
+            def get_org(proj): return proj.organization
+            for org, projects in groupby(public_user_projects, get_org):
+                yield (
+                    org, False, [(pr, _('Public User')) for pr in projects]
+                )
+
+            # Organization without projects
+            for org in user_orgs:
+                is_admin = org.organizationrole_set.get(user=user).admin
+                yield(org, is_admin, [])
+
+'''
+    @staticmethod
+    def _get_orgs(user):
         orgs_by_name = user.organizations.order_by('name').all()
         for org in orgs_by_name:
             is_admin = user.organizationrole_set.get(organization=org).admin
@@ -132,3 +189,4 @@ class AccountListProjects(ListView):
         role = _('Administrator')
         for proj in org.all_projects():
             yield (proj, role)
+'''
