@@ -16,7 +16,7 @@ def create_groups(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0008_add_history_change_reason'),
+        ('accounts', '0009_add_audit_fields'),
     ]
 
     operations = [

@@ -34,8 +34,8 @@ def update_project_roles(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('organization', '0008_add_groups_to_roles'),
-        ('accounts', '0009_add_groups'),
+        ('organization', '0009_add_groups_to_roles'),
+        ('accounts', '0010_add_groups'),
     ]
 
     operations = [

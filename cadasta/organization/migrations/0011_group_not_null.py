@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('organization', '0009_populate_groups'),
+        ('organization', '0010_populate_groups'),
     ]
 
     operations = [

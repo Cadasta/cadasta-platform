@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('auth', '0008_alter_user_username_max_length'),
-        ('organization', '0007_add_history_change_reason'),
+        ('organization', '0008_add_audit_fields'),
     ]
 
     operations = [
