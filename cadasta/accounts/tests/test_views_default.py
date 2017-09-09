@@ -14,8 +14,6 @@ from accounts.models import User, VerificationDevice
 from ..views import default
 from ..forms import ProfileForm
 from ..messages import account_inactive, unverified_identifier
-from django.test import RequestFactory
-from django.contrib.messages.storage.fallback import FallbackStorage
 
 
 class RegisterTest(ViewTestCase, UserTestCase, TestCase):
@@ -442,15 +440,14 @@ class PasswordResetViewTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
 
 
-class PasswordResetDoneViewTest(UserTestCase, TestCase):
+class PasswordResetDoneViewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.PasswordResetDoneView
 
-    def setUp(self):
-        super().setUp()
+    def setup_models(self):
         self.user = UserFactory.create(phone='+919327768250',
                                        email='sherlock.holmes@bbc.uk',
                                        phone_verified=True,
                                        email_verified=True)
-        self.factory = RequestFactory()
         self.device = VerificationDevice.objects.create(
             user=self.user,
             unverified_phone=self.user.phone,
@@ -459,54 +456,48 @@ class PasswordResetDoneViewTest(UserTestCase, TestCase):
     def test_successful_token_verification(self):
         token = self.device.generate_challenge()
         data = {'token': token}
-        request = self.factory.post('/account/password/reset/done/', data=data)
-        request.session = {"phone": self.user.phone}
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = default.PasswordResetDoneView.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={"phone": self.user.phone})
+
         assert response.status_code == 302
-        assert '/account/password/reset/phone/' in response.url
+        assert '/account/password/reset/phone/' in response.location
         assert VerificationDevice.objects.filter(
             user=self.user, label='password_reset').exists() is False
-        assert 'phone' not in request.session
 
     def test_without_phone(self):
         token = self.device.generate_challenge()
         data = {'token': token}
-        request = self.factory.post('/account/password/reset/done/', data=data)
-        setattr(request, 'session', {})
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = default.PasswordResetDoneView.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={})
         assert response.status_code == 200
 
     def test_with_unknown_phone(self):
         token = self.device.generate_challenge()
         data = {'token': token}
-        request = self.factory.post('/account/password/reset/done/', data=data)
-        request.session = {"phone": '+12345678990'}
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = default.PasswordResetDoneView.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={"phone": '+12345678990'})
+
         assert response.status_code == 200
 
 
-class PasswordResetFromPhoneViewTest(UserTestCase, TestCase):
+class PasswordResetFromPhoneViewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.PasswordResetFromPhoneView
 
-    def setUp(self):
-        super().setUp()
+    def setup_models(self):
         self.user = UserFactory.create(password='221B@bakerstreet')
-        self.factory = RequestFactory()
 
     def test_password_successfully_set(self):
         data = {'password': 'i@msher!0cked'}
-        request = self.factory.post(
-            '/account/password/reset/phone/', data=data)
-        request.session = {"password_reset_id": self.user.id}
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-
-        response = default.PasswordResetFromPhoneView.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={"password_reset_id": self.user.id})
         assert response.status_code == 302
         self.user.refresh_from_db()
         assert self.user.check_password('i@msher!0cked') is True
@@ -515,25 +506,21 @@ class PasswordResetFromPhoneViewTest(UserTestCase, TestCase):
 
     def test_password_set_without_password_reset_id(self):
         data = {'password': 'i@msher!0cked'}
-        request = self.factory.post(
-            '/account/password/reset/phone/', data=data)
-        setattr(request, 'session', {})
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-
-        response = default.PasswordResetFromPhoneView.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={})
         assert response.status_code == 200
         self.user.refresh_from_db()
         assert self.user.check_password('i@msher!0cked') is False
 
 
-class ConfirmPhoneViewTest(UserTestCase, TestCase):
+class ConfirmPhoneViewTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.ConfirmPhone
 
-    def setUp(self):
-        super().setUp()
+    def setup_models(self):
         self.user = UserFactory.create(phone='+919327768250')
         EmailAddress.objects.create(user=self.user, email=self.user.email)
-        self.factory = RequestFactory()
 
     def test_successful_phone_verification(self):
         device = VerificationDevice.objects.create(
@@ -541,11 +528,10 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         token = device.generate_challenge()
 
         data = {'token': token}
-        request = self.factory.post('/account/accountverification/', data=data)
-        request.session = {'phone_verify_id': self.user.id}
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = default.ConfirmPhone.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={'phone_verify_id': self.user.id})
         assert response.status_code == 302
 
         self.user.refresh_from_db()
@@ -561,11 +547,10 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         token = device.generate_challenge()
 
         data = {'token': token}
-        request = self.factory.post('/account/accountverification/', data=data)
-        request.session = {'phone_verify_id': self.user.id}
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = default.ConfirmPhone.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={'phone_verify_id': self.user.id})
         assert response.status_code == 302
 
         self.user.refresh_from_db()
@@ -582,11 +567,10 @@ class ConfirmPhoneViewTest(UserTestCase, TestCase):
         token = device.generate_challenge()
 
         data = {'token': token}
-        request = self.factory.post('/account/accountverification/', data=data)
-        setattr(request, 'session', {})
-        messages = FallbackStorage(request)
-        setattr(request, '_messages', messages)
-        response = default.ConfirmPhone.as_view()(request)
+        response = self.request(
+            method='POST',
+            post_data=data,
+            session_data={})
         assert response.status_code == 200
 
 
