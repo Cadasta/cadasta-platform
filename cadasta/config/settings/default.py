@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'xforms',
     'search',
 
+    'django_filters',
     'crispy_forms',
     'parsley',
     'widget_tweaks',
