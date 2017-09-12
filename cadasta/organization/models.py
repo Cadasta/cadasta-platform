@@ -24,14 +24,10 @@ from . import messages
 
 
 ROLE_GROUPS = {
-    'A': 'OrgAdmin',
-    'M': 'OrgMember',
     'Pb': 'PublicUser',
     'PU': 'ProjectMember',
     'DC': 'DataCollector',
-    'PM': 'ProjectManager',
-    'SU': 'SuperUser',
-    'AN': 'AnonymousUser'
+    'PM': 'ProjectManager'
 }
 
 
