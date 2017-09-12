@@ -297,16 +297,16 @@ class ProjectRoleTest(UserTestCase, TestCase):
         assert repr(role) == ('<ProjectRole id=abc123 user=john project=prj '
                               'role=DC>')
 
-    def test_assgin_prj_member_group(self):
+    def test_assign_prj_member_group(self):
         role = ProjectRole.objects.create(user=self.user, project=self.project)
         assert role.group.name == 'ProjectMember'
 
-    def test_assgin_prj_collector_group(self):
+    def test_assign_prj_collector_group(self):
         role = ProjectRole.objects.create(user=self.user, project=self.project,
                                           role='DC')
         assert role.group.name == 'DataCollector'
 
-    def test_assgin_prj_manager_group(self):
+    def test_assign_prj_manager_group(self):
         role = ProjectRole.objects.create(user=self.user, project=self.project,
                                           role='PM')
         assert role.group.name == 'ProjectManager'

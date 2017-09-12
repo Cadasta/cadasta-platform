@@ -13,7 +13,7 @@
             {"name": "List Organization Users", "codename": "org.users.list"},
             {"name": "Add Organization Users", "codename": "org.users.add"},
             {"name": "Edit Organization Users", "codename": "org.users.edit"},
-            {"name": "Remove Organizations Users", "codename": "org.users.remove"}
+            {"name": "Remove Organization Users", "codename": "org.users.remove"}
         ]
     },
     {
@@ -29,7 +29,7 @@
             {"name": "Unarchive Project", "codename": "project.unarchive"},
             {"name": "Project Export", "codename": "project.export"},
             {"name": "Project Import", "codename": "project.import"},
-            {"name": "Project Users List", "codename": "project.users.list"},
+            {"name": "List Project Users", "codename": "project.users.list"},
             {"name": "Add Project Users", "codename": "project.users.add"},
             {"name": "Update Project Users", "codename": "project.users.update"},
             {"name": "Remove Project Users", "codename": "project.users.remove"}
