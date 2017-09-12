@@ -31,6 +31,6 @@ class Command(BaseCommand):
         print('LOADING POLICIES\n')
         loadpolicies.Command().handle(force=options['force'])
         print('LOADING PERMISSIONS\n')
-        loadpermissions.Command().handle()
+        loadpermissions.Command().handle(force=options['force'])
         print('LOADING ATTRIBUTE TYPES\n')
         loadattrtypes.Command().handle(force=options['force'])

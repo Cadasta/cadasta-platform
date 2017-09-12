@@ -9,9 +9,7 @@ PERMISSIONED_APPS = ('organization', )
 PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
 
 
-def create_permissions():
-    Permission.objects.all().delete()
-
+def create_permissions(force=False):
     for app in PERMISSIONED_APPS:
         perm_file = open(PERMISSIONS_DIR + app + '.json')
         models = json.loads(perm_file.read())
@@ -22,10 +20,24 @@ def create_permissions():
                 app_label=app_label, model=model)
 
             for perm in m['permissions']:
-                Permission.objects.create(
-                    name=perm['name'],
-                    content_type=content_type,
-                    codename=perm['codename'])
+                create = False
+                try:
+                    perm_obj = Permission.objects.get(
+                        name=perm['name'],
+                        content_type=content_type,
+                        codename=perm['codename'])
+
+                    if force:
+                        perm_obj.delete()
+                        create = True
+                except Permission.DoesNotExist:
+                    create = True
+
+                if create:
+                    Permission.objects.create(
+                        name=perm['name'],
+                        content_type=content_type,
+                        codename=perm['codename'])
         perm_file.close()
 
 
@@ -44,6 +56,13 @@ def assign_permissions():
 class Command(BaseCommand):
     help = """Loads permission data."""
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--force',
+            action='store_true',
+            dest='force',
+            default=False)
+
     def handle(self, *args, **options):
-        create_permissions()
+        create_permissions(force=options['force'])
         assign_permissions()
