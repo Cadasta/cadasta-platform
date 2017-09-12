@@ -16,11 +16,17 @@ DATABASES = {
 }
 
 DJOSER.update({  # NOQA
+    'DOMAIN': 'localhost:8000',
     'SEND_ACTIVATION_EMAIL': False,
 })
 
+EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+
 ROOT_URLCONF = 'config.urls.dev'
 DEFAULT_FILE_STORAGE = 'buckets.test.storage.FakeS3Storage'
+AWS = {
+    'MAX_FILE_SIZE': 10485760
+}
 
 # Use HTTP for OSM for testing only, to make caching tiles for
 # functional tests a bit simpler.
