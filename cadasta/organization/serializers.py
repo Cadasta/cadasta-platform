@@ -33,7 +33,7 @@ class OrganizationSerializer(core_serializers.SanitizeFieldSerializer,
         if slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
-        not_unique = Organization.objects.filter(name__iexact=value)
+        not_unique = Organization.objects.filter(name__iexact=value).exists()
         if not_unique:
             raise serializers.ValidationError(
                 _("Organization with this name already exists."))
