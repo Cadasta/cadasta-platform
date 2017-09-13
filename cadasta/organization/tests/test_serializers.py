@@ -14,7 +14,7 @@ from core.tests.utils.cases import UserTestCase
 from core.messages import SANITIZE_ERROR
 from accounts.tests.factories import UserFactory
 from .. import serializers
-from ..models import OrganizationRole, ProjectRole, Project
+from ..models import OrganizationRole, ProjectRole
 from .factories import OrganizationFactory, ProjectFactory
 
 
