@@ -145,19 +145,6 @@ $(document).ready(function () {
 
 {% endblock %}
 
-{% block step_content_buttons %}
-<div class="btn-group btn-reverse" role="group">
-  <button class="btn btn-primary pull-right" type="submit">
-    {% trans 'Next' %}
-    <span class="glyphicon glyphicon-triangle-right"></span>
-  </button>
-  <button class="btn btn-default btn-details-previous" type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">
-    <span class="glyphicon glyphicon-triangle-left"></span>
-    {% trans "Previous" %}
-  </button>
-</div>
-{% endblock %}
-
 {% block step_content_3 %}
 
       </div>

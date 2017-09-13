@@ -265,7 +265,8 @@ class ProjectAddPage(Page):
         submit_button.click()
 
     def click_previous_details(self):
-        previous_button = self.BY_CLASS('btn-details-previous')
+        assert self.is_on_subpage('details')
+        previous_button = self.BY_CLASS('btn-previous')
         self.test.click_through(previous_button,
                                 (By.CLASS_NAME, 'project-extent-map'))
 
