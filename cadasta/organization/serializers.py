@@ -76,25 +76,17 @@ class ProjectSerializer(core_serializers.SanitizeFieldSerializer,
             raise serializers.ValidationError(
                 _("Project name cannot be “Add” or “New”."))
 
-        # Check that name is unique org-wide
+        # Check that name is unique globally
         # (Explicit validation: see comment in the Meta class)
         is_create = not self.instance
-        if is_create:
-            org_slug = self.context['organization'].slug
-        else:
-            org_slug = self.instance.organization.slug
-        queryset = Project.objects.filter(
-            organization__slug=org_slug,
-            name__iexact=value,
-        )
+        queryset = Project.objects.filter(name__iexact=value)
         if is_create:
             not_unique = queryset.exists()
         else:
             not_unique = queryset.exclude(id=self.instance.id).exists()
         if not_unique:
             raise serializers.ValidationError(
-                _("Project with this name already exists "
-                  "in this organization."))
+                _("Project with this name already exists"))
 
         return value
 

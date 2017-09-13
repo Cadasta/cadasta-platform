@@ -316,7 +316,7 @@ class ProjectSerializerTest(TestCase):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
             'name': [
-                "Project with this name already exists in this organization."]
+                "Project with this name already exists"]
         }
 
     def test_duplicate_project_name_in_another_org(self):
@@ -330,12 +330,12 @@ class ProjectSerializerTest(TestCase):
             data=data,
             context={'organization': another_org}
         )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-
-        project_instance = serializer.instance
-        assert project_instance.name == existing_project.name
-        assert Project.objects.count() == 2
+        with pytest.raises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+        assert serializer.errors == {
+            'name': [
+                "Project with this name already exists"]
+        }
 
     def test_update_with_duplicate_project_name(self):
         project_1 = ProjectFactory.create()
@@ -352,7 +352,7 @@ class ProjectSerializerTest(TestCase):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
             'name': [
-                "Project with this name already exists in this organization."]
+                "Project with this name already exists"]
         }
 
     def test_unicode_slug(self):
@@ -399,7 +399,7 @@ class ProjectSerializerTest(TestCase):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
             'name': [
-                "Project with this name already exists in this organization."]
+                "Project with this name already exists"]
         }
 
     def test_update_with_duplicate_project_name_case_insensitive(self):
@@ -417,7 +417,7 @@ class ProjectSerializerTest(TestCase):
             serializer.is_valid(raise_exception=True)
         assert serializer.errors == {
             'name': [
-                "Project with this name already exists in this organization."]
+                "Project with this name already exists"]
         }
 
 
