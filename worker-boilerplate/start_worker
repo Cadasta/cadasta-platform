@@ -1,1 +1,0 @@
-celery -A app worker -Q export,celery "$@"

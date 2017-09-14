@@ -1,2 +1,0 @@
-cadasta-workertoolbox==0.1.5
-git+https://github.com/celery/kombu.git@master  # Rm when Kombu 4.0.3 is released and cadasta-workertoolbox version is updated to use that version
