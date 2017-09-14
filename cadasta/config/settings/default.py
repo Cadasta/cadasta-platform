@@ -106,7 +106,8 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.views.api.exception_handler',
     'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'HTML_SELECT_CUTOFF': 100,
 }
 
 SITE_NAME = 'Cadasta'
