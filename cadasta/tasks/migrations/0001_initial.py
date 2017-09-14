@@ -56,4 +56,9 @@ class Migration(migrations.Migration):
                 'db_table': 'celery_taskmeta',
             },
         ),
+        # Set sequence name to match sequence expected by Celery DB Result Backend
+        migrations.RunSQL(
+            [("ALTER SEQUENCE celery_taskmeta_id_seq RENAME TO task_id_sequence;")],
+            [("ALTER SEQUENCE task_id_sequence RENAME TO celery_taskmeta_id_seq;")]
+        ),
     ]
