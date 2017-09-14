@@ -1,5 +1,7 @@
 {% load i18n %}
+{% load i18n %}
 {% load filters %}
+{% load humanize %}
 {% load leaflet_tags %}
 
       <!-- Project Dashboard for project members  -->
@@ -226,7 +228,6 @@
                 {% endif %}
               </div>
               <div class="panel-body">
-
                 {% if is_administrator and not object.description and not object.urls.0 and not object.contacts %}
                   <div class="overlay-wrapper">
                     <div class="overlay">
@@ -289,7 +290,47 @@
                     </a>
                   {% endif %}
                 </div>
-              </div>
+                {% if recent_exports %}
+                  <div class="panel-heading">
+                    <h3 class="panel-title inline">
+                      {% trans "Recent Exports" %}
+                    </h3>
+                  </div>
+                  <!-- Recent exports -->
+                  <div class="panel-body">
+                    <table class="table table-location">
+                      <tbody>
+                        {% for task in recent_exports %}
+                          <tr>
+                            <td>
+                              <span title="{{ task.created_date.isoformat }}">
+                                {{ task.created_date|naturaltime }}
+                              </span>
+                            </td>
+                            <td>
+                              {% if task.overall_status == 'SUCCESS' %}
+                                <ul class="list-inline">
+                                {% for result in task.overall_results %}
+                                  {% for link in result.links %}
+                                    <li>
+                                      <a href="{{ link.url }}">
+                                        <samp>{{ link.text }}</samp>
+                                      </a>
+                                    </li>
+                                  {% endfor %}
+                                {% endfor %}
+                                </ul>
+                              {% else %}
+                                {{ task.overall_status|title }}
+                              {% endif %}
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              {% endif %}
             </section>
           {% endif %}
 

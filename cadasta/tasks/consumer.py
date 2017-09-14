@@ -28,7 +28,8 @@ class Worker(ConsumerMixin):
         try:
             return self._handle_task(body, message)
         except:
-            logger.exception("Failed to process message: %r", message)
+            logger.exception(
+                "Failed to process message: %r", message)
         finally:
             logger.info("ACKing message %r", message)
             if self.connection.as_uri().lower().startswith('sqs://'):
@@ -54,22 +55,28 @@ class Worker(ConsumerMixin):
         logger.debug("Handling task message %r", body)
         args, kwargs, options = message.decode()
         task_id = message.headers['id']
+        task_type = message.headers['task']
 
-        # Add default properties
+        # Add additional option data from headers to properties
         option_keys = ['eta', 'expires', 'retries', 'timelimit']
         message.properties.update(
             **{k: v for k, v in message.headers.items()
                if k in option_keys and v not in (None, [None, None])})
 
+        props = message.properties
         _, created = BackgroundTask.objects.get_or_create(
             task_id=task_id,
             defaults={
-                'type': message.headers['task'],
+                'type': task_type,
                 'input_args': args,
                 'input_kwargs': kwargs,
-                'options': message.properties,
+                'options': props,
                 'parent_id': message.headers['parent_id'],
                 'root_id': message.headers['root_id'],
+                'creator_id': props.get('creator_id'),
+                'related_content_type_id':
+                    props.get('related_content_type_id'),
+                'related_object_id': props.get('related_object_id'),
             }
         )
         if created:
