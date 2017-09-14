@@ -41,6 +41,10 @@ class ProjectResources(APIPermissionRequiredMixin,
     permission_filter_queryset = filter_archived_resources
     use_resource_library_queryset = True
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related(
+            'content_objects__content_type')
+
 
 class ProjectResourcesDetail(APIPermissionRequiredMixin,
                              mixins.ResourceObjectMixin,
