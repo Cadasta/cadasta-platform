@@ -13,7 +13,7 @@ from party.models import (PartyRelationship,
 from spatial.models import SpatialRelationship
 from party import serializers
 from resources.serializers import ResourceSerializer
-from spatial.serializers import SpatialRelationshipReadSerializer
+from spatial.serializers import SpatialRelationshipDetailSerializer
 from . import mixins
 from organization.views.mixins import ProjectMixin
 
@@ -144,21 +144,24 @@ class RelationshipList(APIPermissionRequiredMixin,
 
         return Response(paginate_results(
             request,
-            (spatial_rels, SpatialRelationshipReadSerializer),
-            (party_rels, serializers.PartyRelationshipReadSerializer),
-            (tenure_rels, serializers.TenureRelationshipReadSerializer),
+            (spatial_rels, SpatialRelationshipDetailSerializer),
+            (party_rels, serializers.PartyRelationshipDetailSerializer),
+            (tenure_rels, serializers.TenureRelationshipDetailSerializer),
         ))
 
     def get_perms_objects(self):
         return [self.get_project()]
 
 
-class PartyRelationshipCreate(APIPermissionRequiredMixin,
-                              mixins.PartyRelationshipQuerySetMixin,
-                              generics.CreateAPIView):
+class PartyRelationshipList(APIPermissionRequiredMixin,
+                            mixins.PartyRelationshipQuerySetMixin,
+                            generics.ListCreateAPIView):
 
-    permission_required = update_permissions('party_rel.create')
-    serializer_class = serializers.PartyRelationshipWriteSerializer
+    permission_required = {
+        'GET': 'party_rel.list',
+        'POST': update_permissions('party_rel.create')
+    }
+    serializer_class = serializers.PartyRelationshipSerializer
 
     def get_perms_objects(self):
         return [self.get_project()]
@@ -179,21 +182,24 @@ class PartyRelationshipDetail(APIPermissionRequiredMixin,
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
-            return serializers.PartyRelationshipWriteSerializer
+            return serializers.PartyRelationshipSerializer
         else:
-            return serializers.PartyRelationshipReadSerializer
+            return serializers.PartyRelationshipDetailSerializer
 
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TenureRelationshipCreate(APIPermissionRequiredMixin,
-                               mixins.TenureRelationshipQuerySetMixin,
-                               generics.CreateAPIView):
+class TenureRelationshipList(APIPermissionRequiredMixin,
+                             mixins.TenureRelationshipQuerySetMixin,
+                             generics.ListCreateAPIView):
 
-    permission_required = update_permissions('tenure_rel.create')
-    serializer_class = serializers.TenureRelationshipWriteSerializer
+    permission_required = {
+        'GET': 'tenure_rel.list',
+        'POST': update_permissions('tenure_rel.create')
+    }
+    serializer_class = serializers.TenureRelationshipSerializer
 
     def get_perms_objects(self):
         return [self.get_project()]
@@ -214,9 +220,9 @@ class TenureRelationshipDetail(APIPermissionRequiredMixin,
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
-            return serializers.TenureRelationshipWriteSerializer
+            return serializers.TenureRelationshipSerializer
         else:
-            return serializers.TenureRelationshipReadSerializer
+            return serializers.TenureRelationshipDetailSerializer
 
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()

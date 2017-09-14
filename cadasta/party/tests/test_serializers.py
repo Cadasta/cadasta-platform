@@ -201,7 +201,7 @@ class PartySerializerTest(UserTestCase, TestCase):
         assert e.value.detail['attributes']
 
 
-class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
+class TenureRelationshipSerializer(UserTestCase, TestCase):
     def test_valid_attributes(self):
         project = ProjectFactory.create(name='Test Project')
         su = SpatialUnitFactory.create(project=project)
@@ -237,7 +237,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
                 'age': 2
             }
         }
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project}
         )
@@ -253,7 +253,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
             'party': party.id
         }
 
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project})
         assert serializer.is_valid() is True
@@ -268,7 +268,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
             'party': party.id
         }
 
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project})
         assert serializer.is_valid() is False
@@ -297,7 +297,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
             'party': party.id
         }
 
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project})
         assert serializer.is_valid() is True
@@ -324,7 +324,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
             'party': party.id
         }
 
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project})
         assert serializer.is_valid() is False
@@ -366,7 +366,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
                 'age': 'Blah'
             }
         }
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project}
         )
@@ -408,7 +408,7 @@ class TenureRelationshipWriteSerializer(UserTestCase, TestCase):
                 'age': 2
             }
         }
-        serializer = serializers.TenureRelationshipWriteSerializer(
+        serializer = serializers.TenureRelationshipSerializer(
             data=data,
             context={'project': project}
         )

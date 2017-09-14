@@ -121,9 +121,9 @@ class PartyUrlTest(TestCase):
 
 class RelationshipUrlTest(TestCase):
 
-    def generic_test_project_relationship_create(self, rel_class, view):
+    def generic_test_project_relationship_list(self, rel_class, view):
         actual = reverse(
-            version_ns('relationship:{}_rel_create'.format(rel_class)),
+            version_ns('relationship:{}_rel_list'.format(rel_class)),
             kwargs={
                 'organization': 'habitat',
                 'project': '123abc',
@@ -164,17 +164,17 @@ class RelationshipUrlTest(TestCase):
         assert resolved.kwargs['{}_rel_id'.format(rel_class)] == (
             '654321654321654321654321')
 
-    def test_project_spatial_relationship_create(self):
-        self.generic_test_project_relationship_create(
-            'spatial', api2.SpatialRelationshipCreate)
+    def test_project_spatial_relationship_list(self):
+        self.generic_test_project_relationship_list(
+            'spatial', api2.SpatialRelationshipList)
 
-    def test_project_party_relationship_create(self):
-        self.generic_test_project_relationship_create(
-            'party', api.PartyRelationshipCreate)
+    def test_project_party_relationship_list(self):
+        self.generic_test_project_relationship_list(
+            'party', api.PartyRelationshipList)
 
-    def test_project_tenure_relationship_create(self):
-        self.generic_test_project_relationship_create(
-            'tenure', api.TenureRelationshipCreate)
+    def test_project_tenure_relationship_list(self):
+        self.generic_test_project_relationship_list(
+            'tenure', api.TenureRelationshipList)
 
     def test_project_spatial_relationship_detail(self):
         self.generic_test_project_relationship_detail(

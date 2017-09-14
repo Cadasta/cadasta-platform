@@ -43,7 +43,7 @@ class XFormSubmissionSerializer(FieldSelectorSerializer,
 
     parties = party_serializer.PartySerializer(read_only=True, many=True)
     spatial_units = SpatialUnitSerializer(read_only=True, many=True)
-    tenure_relationships = party_serializer.TenureRelationshipReadSerializer(
+    tenure_relationships = party_serializer.TenureRelationshipDetailSerializer(
         read_only=True, many=True)
 
     def create(self, validated_data):
