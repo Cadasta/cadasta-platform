@@ -1,12 +1,15 @@
 from celery import states
-from core.models import RandomIDModel
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
+from django.db.models.expressions import F
 from django.utils.translation import ugettext_lazy as _
 from django.utils.functional import lazy
+
+from core.util import ID_FIELD_LENGTH
+from core.models import RandomIDModel
 
 from .celery import app
 from .utils import fields as utils
@@ -61,8 +64,10 @@ class BackgroundTask(RandomIDModel):
         validators=[utils.is_type(dict)])
 
     related_content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, null=True, blank=True)
-    related_object_id = models.PositiveIntegerField(null=True, blank=True)
+        ContentType, on_delete=models.CASCADE, related_name='+',
+        null=True, blank=True)
+    related_object_id = models.CharField(
+        max_length=ID_FIELD_LENGTH, null=True, blank=True)
     related_object = GenericForeignKey(
         'related_content_type', 'related_object_id')
 
@@ -71,7 +76,7 @@ class BackgroundTask(RandomIDModel):
         on_delete=models.CASCADE, blank=True, null=True)
     root = models.ForeignKey(
         'self', related_name='descendents', to_field='task_id',
-        on_delete=models.CASCADE, blank=True, null=True)
+        on_delete=models.CASCADE)
     immutable = models.NullBooleanField(
         _("If arguments are immutable (only applies to chained tasks)."))
 
@@ -110,3 +115,32 @@ class BackgroundTask(RandomIDModel):
     @input_kwargs.setter
     def input_kwargs(self, value):
         self.input['kwargs'] = value
+
+    @property
+    def family(self):
+        """ Return all tasks with matching root id (including self) """
+        return self.__class__._default_manager.filter(root_id=self.root_id)
+
+    @property
+    def overall_status(self):
+        # chord_unlock doesn't add use result backed, so best to ignore
+        subtasks = self.family.exclude(type='celery.chord_unlock')
+        subtasks = subtasks.annotate(_status=F('result__status'))
+        # If we are to get distinct _status values, we must order_by('_status')
+        subtasks = subtasks.order_by('_status')
+        statuses = subtasks.values_list('_status', flat=True)
+        statuses = statuses.distinct()
+        num_statuses = len(statuses)
+        if num_statuses > 1:
+            if 'FAILURE' in statuses:
+                return 'FAILURE'
+            return 'STARTED'
+        # It's possible for all statuses to equal None, in which case we
+        # can call them 'PENDING'.
+        return statuses[0] or 'PENDING'
+
+    @property
+    def overall_results(self):
+        """ Return results of any tasks where is_result is set to True """
+        results = self.family.filter(options__is_result=True)
+        return results.values_list('result__result', flat=True)

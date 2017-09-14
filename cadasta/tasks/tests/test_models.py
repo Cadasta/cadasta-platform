@@ -28,14 +28,14 @@ class TestBackgroundTaskModel(TestCase):
         """ Ensure that invalid input args will raise validation error """
         with self.assertRaises(ValidationError) as context:
             BackgroundTaskFactory.build(
-                id=None, type='foo.bar', input={'args': None},
+                type='foo.bar', input={'args': None},
                 creator=self.user
             ).save()
         assert context.exception.error_dict.get('input')
 
         with self.assertRaises(ValidationError) as context:
             BackgroundTaskFactory.build(
-                id=None, type='foo.bar', input={'args': {}},
+                type='foo.bar', input={'args': {}},
                 creator=self.user
             ).save()
         assert context.exception.error_dict.get('input')
@@ -44,14 +44,14 @@ class TestBackgroundTaskModel(TestCase):
         """ Ensure that invalid input kwargs will raise validation error """
         with self.assertRaises(ValidationError) as context:
             BackgroundTaskFactory.build(
-                id=None, type='foo.bar', input={'kwargs': None},
+                type='foo.bar', input={'kwargs': None},
                 creator=self.user
             ).save()
         assert context.exception.error_dict.get('input')
 
         with self.assertRaises(ValidationError) as context:
             BackgroundTaskFactory.build(
-                id=None, type='foo.bar', input={'kwargs': []},
+                type='foo.bar', input={'kwargs': []},
                 creator=self.user
             ).save()
         assert context.exception.error_dict.get('input')
@@ -62,7 +62,7 @@ class TestBackgroundTaskModel(TestCase):
         # Missing kwargs
         with self.assertRaises(ValidationError) as context:
             BackgroundTaskFactory.build(
-                id=None, type='foo.bar', input={'args': []},
+                type='foo.bar', input={'args': []},
                 creator=self.user
             ).save()
         assert context.exception.error_dict.get('input')
@@ -70,14 +70,14 @@ class TestBackgroundTaskModel(TestCase):
         # Missing args
         with self.assertRaises(ValidationError) as context:
             BackgroundTaskFactory.build(
-                id=None, type='foo.bar', input={'kwargs': {}},
+                type='foo.bar', input={'kwargs': {}},
                 creator=self.user
             ).save()
         assert context.exception.error_dict.get('input')
 
         # All good
         BackgroundTaskFactory.build(
-            id=None, type='foo.bar', input={'args': [], 'kwargs': {}},
+            type='foo.bar', input={'args': [], 'kwargs': {}},
             creator=self.user
         ).save()
 
@@ -98,3 +98,41 @@ class TestBackgroundTaskModel(TestCase):
         task.input_kwargs = kwargs
         assert task.input_kwargs == kwargs
         assert task.input == {'args': [], 'kwargs': kwargs}
+
+    def test_overall_status_no_result(self):
+        task1 = BackgroundTaskFactory.create()
+        # No results, then PENDING
+        assert task1.overall_status == 'PENDING'
+
+    def test_overall_status_many_results(self):
+        task1 = BackgroundTaskFactory.create()
+        TaskResultFactory.create(task_id=task1.task_id, status='SUCCESS')
+        task2 = BackgroundTaskFactory.create(root_id=task1.task_id)
+        # If multiple statuses and none of which are FAILURE, then STARTED
+        assert task1.overall_status == task2.overall_status
+        assert task1.overall_status == 'STARTED'
+
+        # If multiple statuses and one of which are FAILURE, then FAILURE
+        TaskResultFactory.create(task_id=task2.task_id, status='FAILURE')
+        assert task1.overall_status == task2.overall_status
+        assert task1.overall_status == 'FAILURE'
+
+    def test_overall_results(self):
+        task1 = BackgroundTaskFactory.create()
+        TaskResultFactory.create(task_id=task1.task_id, status='SUCCESS')
+        task2 = BackgroundTaskFactory.create(
+            root_id=task1.task_id,
+            options={'is_result': True}
+        )
+
+        assert list(task1.overall_results) == list(task2.overall_results)
+        assert list(task1.overall_results) == [None]
+
+        out = [{"link": "https://google.com", "text": "Google.com"}]
+        TaskResultFactory.create(
+            task_id=task2.task_id,
+            status='SUCCESS',
+            result=out
+        )
+        assert list(task1.overall_results) == list(task2.overall_results)
+        assert list(task1.overall_results) == [out]
