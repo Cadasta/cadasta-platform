@@ -1,4 +1,5 @@
 from itertools import groupby
+from collections import defaultdict
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
@@ -98,70 +99,81 @@ class AccountListProjects(ListView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
-        context['user_orgs_and_projects'] = list(self._get_orgs(user))
+        groupped_orgs = defaultdict(list)
+
+        for org, is_admin, projects in self._get_orgs(user):
+            groupped_orgs[(org, is_admin)].extend(projects)
+
+        result = [(org, is_admin, projects)
+                  for ((org, is_admin), projects) in groupped_orgs.items()]
+
+        context['user_orgs_and_projects'] = result
         return context
 
     @staticmethod
     def _get_orgs(user):
-        all_active_user_orgs = set(user.organizations.order_by('name').all(
-            ).exclude(archived=True))
+        # Handle Projects without in-db ProjectRoles
 
-        # projects for which user is org admin
-        all_projects_user_is_org_admin = Project.objects.filter(
+        # 1st call: projects for which user is org admin (including archived
+        # projects and archived orgs)
+        org_admin_project = Project.objects.filter(
             organization__organizationrole__user=user,
             organization__organizationrole__admin=True
         )
 
-        # projects for which user has a project role
-        all_projects_where_user_has_projectrole = Project.objects.filter(
-            organization__organizationrole__user=user,
-            organization__organizationrole__admin=False,
-            organization__archived=False,
-            archived=False,
-        ).exclude(projectrole__role__isnull=True
-                  ).exclude(projectrole__role__exact='')
+        public_user_projects = set()
 
-        # projects for which user is a project public user
-        public_user_projects = Project.objects.filter(
-            organization__users=user,
-            organization__organizationrole__admin=False,
-            projectrole__role__isnull=True,
-            organization__archived=False,
+        # 2nd call: organizations where user is a member and not admin
+        user_orgs_not_admin = user.organizations.filter(
+            organizationrole__user=user,
+            organizationrole__admin=False,
             archived=False,
-        ).prefetch_related('organization')
+        ).prefetch_related('projects').all()
+
+        # 3rd call: projects linked to the user
+        user_projects = user.project_set.all()
+        for org in user_orgs_not_admin:
+            for project in org.projects.all():
+                if not project.archived and project not in user_projects:
+                    public_user_projects.add(project)
 
         is_admin__qs = (
-            [True, False, all_projects_user_is_org_admin],
-            [False, True, all_projects_where_user_has_projectrole],
-            [False, False, public_user_projects]
+            [True, org_admin_project],
+            [False, public_user_projects]
         )
+        for is_admin, qs in is_admin__qs:
 
-        for is_admin, pr_exist, qs in is_admin__qs:
+            def get_org(proj):
+                return proj.organization
 
-            def get_org(proj): return proj.organization
             for org, projects in groupby(qs, get_org):
+                role = _('Administrator') if is_admin else _('Public User')
+                yield (
+                    org, is_admin, [(proj, role) for proj in projects]
+                )
 
-                if is_admin:
-                    admin_role = _('Administrator')
-                    yield (
-                        org, is_admin,
-                        [(proj, admin_role) for proj in projects]
-                    )
-                elif pr_exist:
-                    yield (
-                        org, is_admin,
-                        [(proj, user.projectrole_set.get(
-                            project=proj).role_verbose)
-                            for proj in projects]
-                    )
-                else:
-                    yield (
-                        org, is_admin,
-                        [(pr, _('Public User')) for pr in projects]
-                    )
-                all_active_user_orgs.discard(org)
+        # 4rd call: Projects with in-db ProjectRoles
+        proj_roles = user.projectrole_set.filter(
+            project__organization__organizationrole__admin=False,
+            project__organization__organizationrole__user=user,
+            project__organization__archived=False,
+            project__archived=False,
+        )
+        proj_roles = proj_roles.prefetch_related('project')
+        proj_roles = proj_roles.prefetch_related('project__organization')
 
-        if len(all_active_user_orgs) != 0:
-            for org in all_active_user_orgs:
-                yield (org, user.organizationrole_set.get(
-                    organization=org).admin, [])
+        def get_org(pr):
+            return pr.project.organization
+
+        for org, project_roles in groupby(proj_roles, get_org):
+            yield (
+                org, False,
+                [(role.project, role.role_verbose) for role in project_roles]
+            )
+
+        # 5th call: Orgs without Projects
+        qs = user.organizationrole_set.filter(organization__projects=None)
+        qs = qs.exclude(organization__archived=True, admin=False)
+        qs = qs.prefetch_related('organization')
+        for org_role in qs:
+            yield (org_role.organization, org_role.admin, [])
