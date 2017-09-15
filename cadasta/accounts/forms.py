@@ -35,17 +35,6 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
     class Media:
         js = ('js/sanitize.js', )
 
-    def clean(self):
-        super(RegisterForm, self).clean()
-
-        email = self.data.get('email')
-        phone = self.data.get('phone')
-
-        if (not phone) and (not email):
-            raise forms.ValidationError(
-                _("You cannot leave both phone and email empty."
-                  " Signup with either phone or email or both."))
-
     def clean_username(self):
         username = self.data.get('username')
         check_username_case_insensitive(username)
@@ -361,8 +350,3 @@ class ResendTokenForm(forms.Form):
     phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
                              error_messages={'invalid': messages.phone_format},
                              required=False)
-
-    def clean(self):
-        if not self.data.get('email') and not self.data.get('phone'):
-            raise forms.ValidationError(
-                _("You cannot leave both phone and email empty."))

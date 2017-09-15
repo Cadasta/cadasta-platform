@@ -15,6 +15,16 @@
     $("input[name='password']").on('focus', function() {
       $(this).parent().next(".help-block").removeClass("hidden");
     });
+    $("#phone-btn").click(function(){
+        $("#phone-div").removeClass("hidden");
+        $("#email-div").addClass("hidden");
+        document.getElementById("id_email").value='';
+    });
+    $("#email-btn").click(function(){
+        $("#email-div").removeClass("hidden");
+        $("#phone-div").addClass("hidden");
+        document.getElementById("id_phone").value='';
+    });
   });
 </script>
 <script src="{% static 'js/password_widget.js' %}"></script>
@@ -40,7 +50,7 @@
 {% endif %}
 
 <form class="account-register form-narrow" id="signup_form" method="POST"
-      action="{% url 'account_signup' %}" data-parsley-validate>
+      action="{% url 'account_signup' %}" data-parsley-validate data-parsley-excluded=":hidden">
   <h1>{% trans "Register for a free account" %}</h1>
   {% csrf_token %}
 
@@ -50,16 +60,22 @@
     <div class="error-block">{{ form.username.errors }}</div>
   </div>
 
-  <div class="form-group{% if form.email.errors %} has-error{% endif %}">
+  <div id="email-div" class="form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="id_email">{% trans "Email" %}</label>
-    {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" %}
+    {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" data-parsley-required="true" %}
     <div class="error-block">{{ form.email.errors }}</div>
+    <div>
+      <a style="cursor: pointer;" class="pull-right" id="phone-btn">{% trans "I want to register with my phone" %}</a>
+    </div>
   </div>
 
-  <div class="form-group{% if form.phone.errors %} has-error{%endif%}">
-  <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
-  {% render_field form.phone class+='form-control input-lg' data-parsley-santize="1" %}
-  <div class="error-block">{{form.phone.errors}}</div>
+  <div id="phone-div" class="form-group{% if form.phone.errors %} has-error{%endif%} hidden">
+    <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
+    {% render_field form.phone class+='form-control input-lg' data-parsley-santize="1" data-parsley-required="true" placeholder="+9999999999" %}
+    <div class="error-block">{{form.phone.errors}}</div>
+    <div>
+      <a style="cursor: pointer;" class="pull-right" id="email-btn">{% trans "I want to register with my email" %}</a>
+    </div>
   </div>
 
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
