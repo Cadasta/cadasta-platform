@@ -1,0 +1,38 @@
+[
+    {
+        "content_type": "organization.organization",
+        "permissions": [
+            {"name": "List Organizations", "codename": "org.list"},
+            {"name": "View Organization", "codename": "org.view"},
+            {"name": "View Private Organization", "codename": "org.view.private"},
+            {"name": "View Archived Organization", "codename": "org.view.archived"},
+            {"name": "Create Organization", "codename": "org.create"},
+            {"name": "Update Organization", "codename": "org.update"},
+            {"name": "Archive Organization", "codename": "org.archive"},
+            {"name": "Unarchive Organization", "codename": "org.unarchive"},
+            {"name": "List Organization Users", "codename": "org.users.list"},
+            {"name": "Add Organization Users", "codename": "org.users.add"},
+            {"name": "Edit Organization Users", "codename": "org.users.edit"},
+            {"name": "Remove Organization Users", "codename": "org.users.remove"}
+        ]
+    },
+    {
+        "content_type": "organization.project",
+        "permissions": [
+            {"name": "View Project", "codename": "project.view"},
+            {"name": "View Private Project", "codename": "project.view.private"},
+            {"name": "View Archived Project", "codename": "project.view.archived"},
+            {"name": "List Projects", "codename": "project.list"},
+            {"name": "Create Project", "codename": "project.create"},
+            {"name": "Update Project", "codename": "project.update"},
+            {"name": "Archive Project", "codename": "project.archive"},
+            {"name": "Unarchive Project", "codename": "project.unarchive"},
+            {"name": "Project Export", "codename": "project.export"},
+            {"name": "Project Import", "codename": "project.import"},
+            {"name": "List Project Users", "codename": "project.users.list"},
+            {"name": "Add Project Users", "codename": "project.users.add"},
+            {"name": "Update Project Users", "codename": "project.users.update"},
+            {"name": "Remove Project Users", "codename": "project.users.remove"}
+        ]
+    }
+]

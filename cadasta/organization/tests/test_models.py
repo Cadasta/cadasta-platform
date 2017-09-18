@@ -59,6 +59,29 @@ class OrganizationRoleTest(UserTestCase, TestCase):
         role.save()
         assert self.user.has_perm('org.update', self.org) is after
 
+    def test_admin_group_assignment(self):
+        role = OrganizationRole.objects.create(
+            organization=self.no_user_org, user=self.user, admin=True)
+        assert role.group.name == 'OrgAdmin'
+
+    def test_member_group_assignment(self):
+        role = OrganizationRole.objects.create(
+            organization=self.no_user_org, user=self.user)
+        assert role.group.name == 'OrgMember'
+
+    def test_update_group_assignment(self):
+        role = OrganizationRole.objects.create(
+            organization=self.no_user_org, user=self.user)
+        assert role.group.name == 'OrgMember'
+
+        role.admin = True
+        role.save()
+        assert role.group.name == 'OrgAdmin'
+
+        role.admin = False
+        role.save()
+        assert role.group.name == 'OrgMember'
+
     def test_assign_new_admin(self):
         OrganizationRole.objects.create(
             organization=self.no_user_org, user=self.user, admin=True)
@@ -273,6 +296,29 @@ class ProjectRoleTest(UserTestCase, TestCase):
         role = ProjectRole(id='abc123', user=user, project=project, role='DC')
         assert repr(role) == ('<ProjectRole id=abc123 user=john project=prj '
                               'role=DC>')
+
+    def test_assign_prj_member_group(self):
+        role = ProjectRole.objects.create(user=self.user, project=self.project)
+        assert role.group.name == 'ProjectMember'
+
+    def test_assign_prj_collector_group(self):
+        role = ProjectRole.objects.create(user=self.user, project=self.project,
+                                          role='DC')
+        assert role.group.name == 'DataCollector'
+
+    def test_assign_prj_manager_group(self):
+        role = ProjectRole.objects.create(user=self.user, project=self.project,
+                                          role='PM')
+        assert role.group.name == 'ProjectManager'
+
+    def test_update_role_group(self):
+        role = ProjectRole.objects.create(user=self.user, project=self.project,
+                                          role='PM')
+        assert role.group.name == 'ProjectManager'
+
+        role.role = 'DC'
+        role.save()
+        assert role.group.name == 'DataCollector'
 
     def _has(self, role, state=True):
         assert (self.roles[role] in self.user.assigned_policies()) is state
