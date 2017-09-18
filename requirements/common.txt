@@ -39,4 +39,4 @@ pyparsing==2.2.0
 django-compressor==2.2
 beautifulsoup4==4.6.0
 gpxpy==1.1.2
-cadasta-workertoolbox==0.1.14
+cadasta-workertoolbox==0.1.16
