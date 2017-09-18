@@ -10,4 +10,4 @@ django-debug-toolbar==1.8
 django-extensions==1.9.0
 django-skivvy==0.1.8
 ipython==6.1.0
-git+https://github.com/Cadasta/cadasta-test.git@master
+git+https://github.com/Cadasta/cadasta-test.git@accounts
