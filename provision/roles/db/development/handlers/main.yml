@@ -3,7 +3,7 @@
   become_user: postgres
   postgresql_privs: role="worker"
                     privs="SELECT,INSERT,UPDATE"
-                    objs="celery_taskmeta,celery_tasksetmeta"
+                    objs="celery_taskmeta"
                     db="cadasta"
   listen: migrations called
 

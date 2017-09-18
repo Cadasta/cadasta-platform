@@ -4,7 +4,7 @@
                     login_user="postgres" login_password="postgres"
                     role="worker"
                     privs="SELECT,INSERT,UPDATE"
-                    objs="celery_taskmeta,celery_tasksetmeta"
+                    objs="celery_taskmeta"
                     db="cadasta"
   listen: migrations called
 
