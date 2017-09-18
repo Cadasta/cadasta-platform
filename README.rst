@@ -15,7 +15,7 @@ Install:
     * Version 1.8.1
     * If you are behind a proxy, you may need to install and configure the `vagrant-proxyconf <https://rubygems.org/gems/vagrant-proxyconf/versions/1.5.2>`_ plugin
 * `Ansible <http://www.ansible.com/>`_
-    * Version 2.1.3.0
+    * Version 2.2+
     * For Linux and Mac, install Ansible 2 via pip
     * For Windows (unsupported), go through `Ansible Documentation <http://docs.ansible.com/ansible/intro_windows.html>`_ or this `blog <https://www.jeffgeerling.com/blog/running-ansible-within-windows>`_
 
@@ -29,9 +29,9 @@ Provision the VM::
 SSH into the VM (automatically activates the Python virtual environment)::
 
   vagrant ssh
-  
-Enter the cadasta directory and start the server:: 
- 
+
+Enter the cadasta directory and start the server::
+
   cd cadasta
   ./runserver
 
@@ -64,8 +64,8 @@ Do this::
   ...
 
   vagrant up --provider=aws ...
-  
-  
+
+
 .. |build-status-image| image:: https://secure.travis-ci.org/Cadasta/cadasta-platform.svg?branch=master
    :target: http://travis-ci.org/Cadasta/cadasta-platform?branch=master
 .. |req-status-image| image:: https://requires.io/github/Cadasta/cadasta-platform/requirements.svg?branch=master
