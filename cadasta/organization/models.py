@@ -1,6 +1,6 @@
+from django.contrib.auth.models import Group
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
-from django.conf import settings
 from django.db import models
 from django_countries.fields import CountryField
 from django.contrib.postgres.fields import JSONField, ArrayField
@@ -23,7 +23,12 @@ from .choices import ROLE_CHOICES, ACCESS_CHOICES
 from . import messages
 
 
-PERMISSIONS_DIR = settings.BASE_DIR + '/permissions/'
+ROLE_GROUPS = {
+    'Pb': 'PublicUser',
+    'PU': 'ProjectMember',
+    'DC': 'DataCollector',
+    'PM': 'ProjectManager'
+}
 
 
 def get_policy_instance(policy_name, variables):
@@ -120,6 +125,7 @@ class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)
     user = models.ForeignKey('accounts.User')
     admin = models.BooleanField(default=False)
+    group = models.ForeignKey('auth.Group', related_name='project_roles')
 
     # Audit history
     created_date = models.DateTimeField(auto_now_add=True)
@@ -135,6 +141,11 @@ class OrganizationRole(RandomIDModel):
                        ' organization={obj.organization.slug}'
                        ' admin={obj.admin}>')
         return repr_string.format(obj=self)
+
+    def save(self, *args, **kwargs):
+        key = 'OrgAdmin' if self.admin else 'OrgMember'
+        self.group = Group.objects.get(name=key)
+        return super().save(*args, **kwargs)
 
 
 def assign_org_policies(instance, delete=False):
@@ -328,6 +339,7 @@ class ProjectRole(RandomIDModel):
     role = models.CharField(max_length=2,
                             choices=ROLE_CHOICES,
                             default='PU')
+    group = models.ForeignKey('auth.Group', related_name='organization_roles')
 
     history = HistoricalRecords()
 
@@ -343,6 +355,10 @@ class ProjectRole(RandomIDModel):
                        ' project={obj.project.slug}'
                        ' role={obj.role}>')
         return repr_string.format(obj=self)
+
+    def save(self, *args, **kwargs):
+        self.group = Group.objects.get(name=ROLE_GROUPS[self.role])
+        return super().save(*args, **kwargs)
 
 
 def assign_prj_policies(role, delete=False):
