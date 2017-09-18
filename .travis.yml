@@ -26,6 +26,7 @@ before_install:
 
 install:
   - pip install tox==2.8.1
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo apt-get -yq install chromium-browser chromium-chromedriver; fi
 
 before_script:
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf; fi
@@ -40,6 +41,7 @@ before_script:
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then export DATADIR=cadasta/geography/data; fi
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then wget -O $DATADIR/$WBDATA https://cadasta-miscellaneous.s3.amazonaws.com/$WBDATA; fi
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then unzip $DATADIR/$WBDATA -d $DATADIR; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then export PATH=/usr/lib/chromium-browser:$PATH; fi
   - if [[ $TOX_ENV == 'py35-functional' ]]; then echo '<span class="site-name">Travis</span>' > cadasta/templates/core/identifier.html; fi
 
 env:
