@@ -20,11 +20,13 @@
     <div class="row">
       <div class="col-md-12 page-title">
         <h1>{% trans "Organizations" %}</h1>
+        {% if not user.is_anonymous %}
         <div class="top-btn pull-right">
           <a href="{% url 'organization:add' %}" class="btn btn-primary add-org">
             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><span class="hidden-xs"> {% trans "Add" %}</span>
           </a>
         </div>
+        {% endif %}
       </div>
     </div>
   </div>

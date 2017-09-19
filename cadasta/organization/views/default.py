@@ -10,11 +10,12 @@ from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
 from core.util import random_id
 from core.views import mixins as core_mixins
+from core.views import auth
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Sum, When, Case, IntegerField
+from django.db.models import Sum, When, Case, IntegerField, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
@@ -34,35 +35,52 @@ from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
-class OrganizationList(PermissionRequiredMixin, generic.ListView):
+class OrganizationList(generic.ListView):
     model = Organization
     template_name = 'organization/organization_list.html'
-    permission_required = 'org.list'
-    permission_filter_queryset = (lambda self, view, o: ('org.view',)
-                                  if o.archived is False
-                                  else ('org.view_archived',))
 
-    # This queryset annotation is needed to avoid generating a query for each
-    # organization in order to count the number of projects per org
-    queryset = Organization.objects.annotate(
-        num_projects=Sum(
-            Case(
-                When(projects__archived=False, then=1),
-                default=0,
-                output_field=IntegerField(),
-            ),
-        ),
-    )
+    def _annotate(self, orgs):
+        return orgs.annotate(
+            num_projects=Sum(
+                Case(
+                    When(projects__archived=False, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            )
+        )
+
+    def get_queryset(self):
+        user = self.request.user
+        default = Q(access='public', archived=False)
+        all_orgs = Organization.objects.all()
+
+        if user.is_superuser:
+            return self._annotate(all_orgs)
+
+        if user.is_anonymous:
+            return self._annotate(all_orgs.filter(default))
+
+        org_roles = (user.organizationrole_set.all()
+                     .select_related('organization'))
+        ids = []
+        ids += (org_roles.filter(
+                organization__access='private', organization__archived=False,
+                group__permissions__codename__in=('org.view.private',))
+                .values_list('organization', flat=True))
+        ids += (org_roles.filter(
+                organization__archived=True,
+                group__permissions__codename__in=('org.view.archived',))
+                .values_list('organization', flat=True))
+
+        query = default | Q(id__in=set(ids))
+        return self._annotate(all_orgs.filter(query))
 
 
-class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
+class OrganizationAdd(auth.LoginRequiredMixin, generic.CreateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_add.html'
-    permission_required = 'org.create'
-
-    def get_perms_objects(self):
-        return []
 
     def get_success_url(self):
         return reverse(
@@ -76,21 +94,19 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
         return kwargs
 
 
-class OrganizationDashboard(PermissionRequiredMixin,
+class OrganizationDashboard(auth.OrganizationPermissionMixin,
                             mixins.OrgRoleCheckMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
-
-    def get_actions(self, view, request):
-        if self.get_object().archived:
-            return 'org.view_archived'
-        return 'org.view'
-
     model = Organization
     template_name = 'organization/organization_dashboard.html'
-    permission_required = get_actions
     permission_denied_message = error_messages.ORG_VIEW
+
+    def get_permission_required(self):
+        if self.get_object().archived:
+            return 'org.view.archived'
+        return 'org.view'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -113,20 +129,28 @@ class OrganizationDashboard(PermissionRequiredMixin,
         return super(generic.DetailView, self).render_to_response(context)
 
 
-class OrganizationEdit(LoginPermissionRequiredMixin,
+class OrganizationEdit(auth.LoginRequiredMixin,
+                       auth.OrganizationPermissionMixin,
                        core_mixins.CacheObjectMixin,
                        generic.UpdateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_edit.html'
-    permission_required = update_permissions('org.update', True)
+    permission_required = 'org.update'
     permission_denied_message = error_messages.ORG_EDIT
 
     def get_success_url(self):
         return reverse('organization:dashboard', kwargs=self.kwargs)
 
+    def test_func(self):
+        if self.get_object().archived:
+            return False
 
-class OrgArchiveView(LoginPermissionRequiredMixin,
+        return super().test_func()
+
+
+class OrgArchiveView(auth.LoginRequiredMixin,
+                     auth.OrganizationPermissionMixin,
                      core_mixins.ArchiveMixin,
                      generic.DetailView):
     model = Organization
