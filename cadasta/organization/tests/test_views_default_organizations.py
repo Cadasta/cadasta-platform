@@ -468,10 +468,11 @@ class OrganizationMembersTest(ViewTestCase, UserTestCase, TestCase):
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
         assign_policies(user)
+        assign_org_role(organization=self.org, user=user, admin=False)
         response = self.request(user=user)
 
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == self.render_content(is_member=True)
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
@@ -508,7 +509,7 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_org_role(organization=self.org, user=user, admin=True)
         response = self.request(user=user)
 
         assert response.status_code == 200
@@ -541,7 +542,7 @@ class OrganizationMembersAddTest(ViewTestCase, UserTestCase, TestCase):
     def test_post_with_authorized_user(self):
         user = UserFactory.create()
         user_to_add = UserFactory.create(username='add_me')
-        assign_policies(user)
+        assign_org_role(organization=self.org, user=user, admin=True)
 
         response = self.request(method='POST', user=user)
 
@@ -615,12 +616,12 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         }
 
     def test_get_with_authorized_user(self):
-        OrganizationRole.objects.create(organization=self.org, user=self.user)
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         response = self.request(user=self.user)
 
         assert response.status_code == 200
-        assert response.content == self.render_content(is_member=True)
+        assert response.content == self.render_content(is_member=True,
+                                                       is_administrator=True)
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.user)
@@ -645,7 +646,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                                                        is_member=True)
 
     def test_get_with_archived_organization(self):
-        OrganizationRole.objects.create(organization=self.org, user=self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         assign_policies(self.user)
         self.org.archived = True
         self.org.save()
@@ -656,7 +657,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                 in response.messages)
 
     def test_post_org_role_with_authorized_user(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         response = self.request(
             method='POST', user=self.user, post_data={'org_role': 'A'})
 
@@ -668,7 +669,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert role.admin is True
 
     def test_post_org_role_redirect(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         response = self.request(
             method='POST', user=self.user, post_data={'org_role': 'M'})
 
@@ -677,7 +678,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
                   self.org.slug, self.member) in response.location)
 
     def test_post_prj_role_redirect(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         response = self.request(
             method='POST', user=self.user, post_data={self.prj.id: 'DC'})
 
@@ -707,9 +708,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert role.admin is False
 
     def test_post_with_superuser(self):
-        superuser = UserFactory.create()
-        superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
         response = self.request(method='POST',
                                 post_data={'org_role': 'A'},
                                 user=superuser)
@@ -732,7 +731,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_org_role_with_invalid_form(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        assign_org_role(organization=self.org, user=user, admin=True)
         assign_policies(user)
         response = self.request(method='POST', user=user,
                                 post_data={'org_role': 'X'})
@@ -744,10 +743,10 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             org_role_form=form, project_role_form=prj_form,
-            is_member=True)
+            is_member=True, is_administrator=True)
 
     def test_post_org_role_with_archived_organization(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         self.org.archived = True
         self.org.save()
 
@@ -761,7 +760,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert role.admin is False
 
     def test_post_prj_role_with_authorized_user(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         response = self.request(
             method='POST', user=self.user, post_data={self.prj.id: 'PM'})
         assert response.status_code == 302
@@ -791,7 +790,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_prj_role_with_invalid_form(self):
         user = UserFactory.create()
-        OrganizationRole.objects.create(organization=self.org, user=user)
+        assign_org_role(organization=self.org, user=user, admin=True)
         assign_policies(user)
         response = self.request(method='POST', user=user,
                                 post_data={self.prj.id: 'X'})
@@ -803,7 +802,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             project_role_form=form, org_role_form=org_form,
-            is_member=True)
+            is_member=True, is_administrator=True)
 
     def test_post_prj_role_with_archived_organization(self):
         assign_policies(self.user)
@@ -836,14 +835,13 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.member = UserFactory.create()
         self.user = UserFactory.create()
-        self.org = OrganizationFactory.create(add_users=[self.member,
-                                                         self.user])
+        self.org = OrganizationFactory.create(add_users=[self.member])
 
     def setup_url_kwargs(self):
         return {'slug': self.org.slug, 'username': self.member.username}
 
     def test_get_with_authorized_user(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         response = self.request(user=self.user)
 
         role = OrganizationRole.objects.filter(organization=self.org,
@@ -875,7 +873,7 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
         assert role is True
 
     def test_get_with_archived_organization(self):
-        assign_policies(self.user)
+        assign_org_role(organization=self.org, user=self.user, admin=True)
         self.org.archived = True
         self.org.save()
         response = self.request(user=self.user)
@@ -891,7 +889,7 @@ class OrganizationMembersRemoveTest(ViewTestCase, UserTestCase, TestCase):
         role_current_user = OrganizationRole.objects.get(organization=self.org,
                                                          user=self.member)
         role_current_user.admin = True
-        role_current_user.save(update_fields=["admin"])
+        role_current_user.save()
 
         response = self.request(user=self.member)
 

@@ -182,7 +182,8 @@ class OrganizationUnarchive(OrgArchiveView):
     do_archive = False
 
 
-class OrganizationMembers(LoginPermissionRequiredMixin,
+class OrganizationMembers(auth.LoginRequiredMixin,
+                          auth.OrganizationPermissionMixin,
                           mixins.OrgRoleCheckMixin,
                           mixins.ProjectCreateCheckMixin,
                           core_mixins.CacheObjectMixin,
@@ -194,12 +195,13 @@ class OrganizationMembers(LoginPermissionRequiredMixin,
 
 
 class OrganizationMembersAdd(mixins.OrganizationMixin,
-                             LoginPermissionRequiredMixin,
+                             auth.LoginRequiredMixin,
+                             auth.OrganizationPermissionMixin,
                              generic.CreateView):
     model = OrganizationRole
     form_class = forms.AddOrganizationMemberForm
     template_name = 'organization/organization_members_add.html'
-    permission_required = update_permissions('org.users.add')
+    permission_required = 'org.users.add'
     permission_denied_message = error_messages.ORG_USERS_ADD
 
     def get_context_data(self, *args, **kwargs):
@@ -224,7 +226,8 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
-                              LoginPermissionRequiredMixin,
+                              auth.LoginRequiredMixin,
+                              auth.OrganizationPermissionMixin,
                               mixins.OrgRoleCheckMixin,
                               mixins.ProjectCreateCheckMixin,
                               core_mixins.CacheObjectMixin,
@@ -236,7 +239,7 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     template_name = 'organization/organization_members_edit.html'
     project_form_class = forms.EditOrganizationMemberProjectPermissionForm
     org_role_form_class = forms.EditOrganizationMemberForm
-    permission_required = update_permissions('org.users.edit')
+    permission_required = 'org.users.edit'
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
@@ -309,9 +312,16 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         form.save()
         return super().form_valid(form)
 
+    def test_func(self):
+        if self.get_organization().archived:
+            return False
+
+        return super().test_func()
+
 
 class OrganizationMembersRemove(mixins.OrganizationMixin,
-                                LoginPermissionRequiredMixin,
+                                auth.LoginRequiredMixin,
+                                auth.OrganizationPermissionMixin,
                                 generic.DeleteView):
     permission_required = update_permissions('org.users.remove')
     permission_denied_message = error_messages.ORG_USERS_REMOVE
@@ -347,6 +357,12 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
                                  _("Administrators cannot remove themselves."))
             return redirect('organization:members_edit', **self.kwargs)
         return super().delete(*args, **kwargs)
+
+    def test_func(self):
+        if self.get_organization().archived:
+            return False
+
+        return super().test_func()
 
 
 class UserList(LoginPermissionRequiredMixin, generic.ListView):
