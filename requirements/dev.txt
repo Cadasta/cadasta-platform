@@ -4,7 +4,7 @@ factory-boy==2.9.2
 pytest-cov==2.5.1
 selenium==3.5.0
 transifex-client==0.12.4
-tox==2.7.0
+tox==2.8.1
 flake8==3.4.1
 django-debug-toolbar==1.8
 django-extensions==1.9.0
