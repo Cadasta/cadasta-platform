@@ -272,10 +272,10 @@ class AccountListProjectsTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 200
         assert response.content == self.render_content(
             user_orgs_and_projects=[
-                (org2, is_admin_org2, [
-                    (proj3, 'Administrator'),
-                    (proj4, 'Administrator')]),
                 (org1, is_not_admin_org1, [
                     (proj2, 'Public User'),
                     (proj1, 'Data Collector')]),
+                (org2, is_admin_org2, [
+                    (proj3, 'Administrator'),
+                    (proj4, 'Administrator')]),
                 ])
