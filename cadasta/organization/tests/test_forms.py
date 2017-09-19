@@ -202,6 +202,20 @@ class OrganizationTest(UserTestCase, TestCase):
         assert form.errors.get('name') is not None
         assert form.errors.get('description') is not None
 
+    def test_duplicate_name_error_case_insensitive(self):
+        self.data['description'] = 'Org description #1'
+        self._save(self.data)
+        org1 = Organization.objects.first()
+        assert org1.slug == 'org'
+
+        self.data['name'] = 'ORG'
+        self.data['description'] = 'Org description #2'
+        form = forms.OrganizationForm(self.data, user=UserFactory.create())
+        assert form.is_valid() is False
+        assert ("Organization with this name already exists."
+                in form.errors['name'])
+        assert Organization.objects.count() == 1
+
 
 class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 
@@ -607,6 +621,15 @@ class ProjectAddDetailsTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert form.errors['name']
 
+    def test_add_new_project_with_duplicate_name_case_insensitive(self):
+        existing_project = ProjectFactory.create(organization=self.org)
+        data = self.data.copy()
+        data['name'] = existing_project.name.upper()
+        form = forms.ProjectAddDetails(data=data, user=self.user)
+        assert not form.is_valid()
+        assert ("Project with this name already exists in this organization."
+                in form.errors['name'])
+
 
 @pytest.mark.usefixtures('make_dirs')
 class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
@@ -823,6 +846,16 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         form = forms.ProjectEditDetails(instance=self.project, data=data)
         assert form.is_valid() is False
         assert form.errors['name']
+
+    def test_update_project_with_duplicate_name_case_insensitive(self):
+        another_project = ProjectFactory.create(
+            organization=self.project.organization)
+        data = self.data.copy()
+        data['name'] = another_project.name.upper()
+        form = forms.ProjectEditDetails(instance=self.project, data=data)
+        assert not form.is_valid()
+        assert ("Project with this name already exists in this organization."
+                in form.errors['name'])
 
 
 class UpdateProjectRolesTest(UserTestCase, TestCase):

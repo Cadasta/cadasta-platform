@@ -151,6 +151,10 @@ class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
 
+        not_unique = Organization.objects.filter(name__iexact=name)
+        if not_unique:
+            raise forms.ValidationError(
+                self.fields['name'].error_messages['unique'])
         return name
 
     def save(self, *args, **kwargs):
@@ -221,8 +225,8 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
     def clean_org_role(self):
         org_role = self.cleaned_data['org_role']
         if (self.org_role_instance.admin and
-           self.current_user == self.user and
-           not self.is_superuser(self.user)):
+            self.current_user == self.user and
+                not self.is_superuser(self.user)):
             if self.data.get('org_role') != 'A':
                 raise forms.ValidationError(
                     _("Organization administrators cannot change their own" +
@@ -235,6 +239,7 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
 
 
 class EditOrganizationMemberProjectPermissionForm(forms.Form):
+
     def __init__(self, org, user, current_user, data=None, *args, **kwargs):
         super(EditOrganizationMemberProjectPermissionForm, self).__init__(
             data, *args, **kwargs)
@@ -275,6 +280,7 @@ class ProjectAddExtents(forms.ModelForm):
 
 
 class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
+
     class Media:
         js = ('js/file-upload.js', 'js/sanitize.js')
 
@@ -327,7 +333,7 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
         if self.cleaned_data.get('organization'):
             not_unique = Project.objects.filter(
                 organization__slug=self.cleaned_data['organization'],
-                name=name,
+                name__iexact=name,
             ).exists()
             if not_unique:
                 raise forms.ValidationError(
@@ -403,7 +409,7 @@ class ProjectEditDetails(SanitizeFieldsForm, forms.ModelForm):
         # unique_together validation cannot occur in the proper page)
         not_unique = Project.objects.filter(
             organization__slug=self.instance.organization.slug,
-            name=name,
+            name__iexact=name,
         ).exclude(id=self.instance.id).exists()
         if not_unique:
             raise forms.ValidationError(
