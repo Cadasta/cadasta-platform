@@ -3,45 +3,33 @@
 {% load i18n %}
 
 {% block title %} | {% trans "Add project" %} {% block page_title %}{% endblock %} {% endblock %}
+
+{% block main-width %}-fluid{% endblock %}
+
 {% block top-nav %}project-wizard{% endblock %}
 
 {% block content %}
 
 <form action="" method="post" data-parsley-validate data-parsley-excluded=":hidden">
 {% csrf_token %}
-  <div class="row">
-    {% block step_content_1 %}{% endblock %}
+
+  {% block step_content_1 %}{% endblock %}
 
   <div class="page-title">
     <div class="wizard pull-right">
       <ul class="steps">
         <li class="{{ wizard_step_classes.extent }}">
-          <a>
-          <label class="wizard-step">1</label>
-          <span class="wizard-description">
-            {% trans "Draw Map" %}
-          </span>
-          </a>
+          <a><label class="wizard-step">1</label></a>
         </li>
         <li class="{{ wizard_step_classes.details }}">
-          <a>
-          <label class="wizard-step">2</label>
-          <span class="wizard-description">
-            {% trans "Add Details" %}
-          </span>
-          </a>
+          <a><label class="wizard-step">2</label></a>
         </li>
         <li class="{{ wizard_step_classes.permissions }}">
-          <a>
-          <label class="wizard-step">3</label>
-          <span class="wizard-description">
-            {% trans "Assign Team" %}
-          </span>
-          </a>
+          <a><label class="wizard-step">3</label></a>
         </li>
       </ul>
     </div>
-    <h1 class="new-project-page pull-left">{% trans "Add project" %}</h1>
+    <h2>{% trans "Add project" %}</h2>
   </div>
   <div class="panel panel-default">
     <div class="panel-body">
@@ -67,7 +55,6 @@
     {% block step_content_3 %}{% endblock %}
   </div>
 
-  </div>
 </form>
 
 {% endblock %}

@@ -44,9 +44,6 @@ div.org-logo {
     clear: both;
     margin: 10px 0;
   }
-  .btn-full {
-    padding: 20px 0;
-  }
 }
 
 #projects-permissions, .form-inline {
@@ -84,12 +81,12 @@ div.org-logo {
 }
 
 @media (max-width: $screen-sm-max) {
-  .row-height, .col-height { 
+  .row-height, .col-height {
     display: block;
   }
   #organization-single {
     .row-height {
-      display: table; 
+      display: table;
       margin: 0 auto;
       background: #fff;
     }

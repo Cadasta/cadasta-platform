@@ -5,36 +5,32 @@
 
 {% block content %}
 
-<div class="col-sm-12 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
     <!-- Main text  -->
     <div class="col-md-12 main-text">
       <div class="page-title">
         <h2 class="short">{% trans "Party detail" %}</h2>
-          <div class="top-btn pull-right">
-            <!-- Action buttons -->
-            {% if is_allowed_update_party %}
-              <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:edit' object.organization.slug object.slug party.id %}" title="{% trans 'Edit party' %}" aria-label="{% trans 'Edit party' %}"><span class="glyphicon glyphicon-pencil"></span></a>
-            {% endif %}
-            {% if is_allowed_delete_party %}
-              <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:delete' object.organization.slug object.slug party.id %}" title="{% trans 'Delete party' %}" aria-label="{% trans 'Delete party' %}"><span class="glyphicon glyphicon-trash"></span></a>
-            {% endif %}
-          </div>
-
-
+        <div class="top-btn pull-right">
+          <!-- Action buttons -->
+          {% if is_allowed_update_party %}
+            <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:edit' object.organization.slug object.slug party.id %}" title="{% trans 'Edit party' %}" aria-label="{% trans 'Edit party' %}"><span class="glyphicon glyphicon-pencil"></span></a>
+          {% endif %}
+          {% if is_allowed_delete_party %}
+            <a class="btn btn-default btn-action btn-sm" href="{% url 'parties:delete' object.organization.slug object.slug party.id %}" title="{% trans 'Delete party' %}" aria-label="{% trans 'Delete party' %}"><span class="glyphicon glyphicon-trash"></span></a>
+          {% endif %}
+        </div>
       </div>
       <div class="panel panel-default">
         <div class="panel-body">
-
           <h2><span class="entity">{% trans "Party" %} </span>{{ party.name }}</h2>
-
           <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active"><a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">{% trans "Overview" %}</a></li>
             <li role="presentation"><a href="#relationships" aria-controls="relationships" role="tab" data-toggle="tab">{% trans "Relationships" %}</a></li>
             <li role="presentation"><a  href="#resources" aria-controls="resources" role="tab" data-toggle="tab">{% trans "Resources" %}</a></li>
           </ul>
-
           <div class="tab-content">
+
             <!-- Party information -->
             <div role="tabpanel" class="tab-pane active" id="overview">
               <table class="table table-location">
@@ -48,10 +44,10 @@
                     <td {{ type_choice_labels|safe }}>{{ party.get_type_display }}</td>
                   </tr>
                   {% for attr in attributes %}
-                  <tr>
-                    <td><label {{ attr.2|safe }}>{{ attr.0 }}</label></td>
-                    <td {{ attr.3|safe }}>{{ attr.1 }}</td>
-                  </tr>
+                    <tr>
+                      <td><label {{ attr.2|safe }}>{{ attr.0 }}</label></td>
+                      <td {{ attr.3|safe }}>{{ attr.1 }}</td>
+                    </tr>
                   {% endfor %}
                 </tbody>
               </table>
@@ -61,58 +57,59 @@
             <!-- Party relationships -->
             <div role="tabpanel" class="tab-pane" id="relationships">
               {% if relationships %}
-              <table class="table table-hover datatable" data-paging-type="simple">
-                <thead>
-                  <tr>
-                    <th>{% trans "Relationship" %}</th>
-                    <th>{% trans "Location Type" %}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for rel in relationships %}
-                  {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
-                  <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
-                    <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
-                    <td><a href="{% url 'locations:detail' object.organization.slug object.slug rel.spatial_unit.id %}" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.location_type_label }}</a></td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <div>
-                <p>{% trans "This party does not have any relationships and is not connected to any locations." %}</p>
-              </div>
-            {% endif %}
+                <table class="table table-hover datatable" data-paging-type="simple">
+                  <thead>
+                    <tr>
+                      <th>{% trans "Relationship" %}</th>
+                      <th>{% trans "Location Type" %}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for rel in relationships %}
+                    {% url 'parties:relationship_detail' object.organization.slug object.slug rel.id as relationship_url %}
+                    <tr class="linked" onclick="window.document.location='{{ relationship_url }}';">
+                      <td><a href="{{ relationship_url }}" {{ rel.type_labels|safe }}>{{ rel.tenure_type_label }}</a></td>
+                      <td><a href="{% url 'locations:detail' object.organization.slug object.slug rel.spatial_unit.id %}" {{ rel.location_labels|safe }}>{{ rel.spatial_unit.location_type_label }}</a></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              {% else %}
+                <div>
+                  <p>{% trans "This party does not have any relationships and is not connected to any locations." %}</p>
+                </div>
+              {% endif %}
             </div>
             <!-- /party relationships -->
 
             <!-- Party resources -->
             <div role="tabpanel" class="tab-pane" id="resources">
-            {% if resource_list %}
-              <div class="top-btn pull-right top-add">
-                {% if has_unattached_resources %}
-                <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
-                {% else %}
-                <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
-                {% endif %}
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
-              </div>
-              {% include 'resources/table.html' %}
-            {% else %}
-              <div>
-                <p>{% trans "This party does not have any attached resources. To attach a resource, select the button below." %}</p>
-                <div class="btn-full">
+              {% if resource_list %}
+                <div class="top-btn pull-right top-add">
                   {% if has_unattached_resources %}
-                  <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                    <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
                   {% else %}
-                  <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
+                    <a class="btn btn-primary btn-sm" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
                   {% endif %}
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
                 </div>
-              </div>
-            {% endif %}
+                {% include 'resources/table.html' %}
+              {% else %}
+                <div>
+                  <p>{% trans "This party does not have any attached resources. To attach a resource, select the button below." %}</p>
+                  <div class="btn-full">
+                    {% if has_unattached_resources %}
+                      <a class="btn btn-primary" href="{% url 'parties:resource_add' object.organization.slug object.slug party.id %}">
+                    {% else %}
+                      <a class="btn btn-primary" href="{% url 'parties:resource_new' object.organization.slug object.slug party.id %}">
+                    {% endif %}
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
+                   </div>
+                </div>
+              {% endif %}
             </div>
             <!-- /party resources -->
+
           </div>
         </div>
       </div>

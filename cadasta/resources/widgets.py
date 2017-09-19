@@ -23,7 +23,7 @@ class ResourceWidget(CheckboxInput):
         '      {resource.contributor.username}<br>'
         '      {resource.contributor.full_name}</td>'
         '  <td class="hidden-xs hidden-sm">{date_updated}</td>'
-        '  <td>{attachment_text}</td>'
+        '  <td class="hidden-xs hidden-sm">{attachment_text}</td>'
         '</tr>'
     )
 

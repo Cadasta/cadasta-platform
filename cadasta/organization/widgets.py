@@ -6,8 +6,8 @@ class ProjectRoleWidget(Select):
     html = (
         '<tr>'
         '  <td>'
-        '    <p>{username}</p>'
-        '    <p>{full_name}</p>'
+        '    <strong>{username}</strong><br>'
+        '    {full_name}'
         '  </td>'
         '  <td class="hidden-xs hidden-sm">{email}</td>'
         '  <td>'

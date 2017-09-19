@@ -53,7 +53,7 @@ class ResourceWidgetTest(UserTestCase, TestCase):
             '      john<br>'
             '      John Lennon</td>'
             '  <td class="hidden-xs hidden-sm">{updated}</td>'
-            '  <td>Attached to 1 other entity</td>'
+            '  <td class="hidden-xs hidden-sm">Attached to 1 other entity</td>'
         )
         widget = ResourceWidget(resource=self.resource)
         rendered = widget.render('file', True)

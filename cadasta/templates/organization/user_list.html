@@ -45,7 +45,7 @@
     </thead>
     {% for user in object_list %}
     <tr class="{{ user.is_active|yesno:_("disabled,active") }}">
-      <td><p>{{ user.username }}</p><p>{{ user.full_name }}</p></td>
+      <td><strong>{{ user.username }}</strong><br>{{ user.full_name }}</td>
       <td>{{ user.email }}</td>
       <td>{{ user.org_names|safe }}</td>
       <td data-sort="{{ user.last_login|date:'U' }}">{{ user.last_login|default_if_none:"&mdash;" }}</td>

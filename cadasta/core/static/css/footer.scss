@@ -14,8 +14,18 @@ footer {
   padding-top: 4px;
   z-index: 1000;
   overflow: hidden;
+  @media (max-width: $screen-xs-max) {
+    position: relative;
+    top: 0;
+    display: block;
+    overflow: visible;
+    height: auto;
+  }
   .copy {
     float: left;
+    @media (max-width: 420px) {
+      font-size: 9px;
+    }
   }
   select.input-sm {
     height: 18px;
@@ -30,45 +40,7 @@ footer {
     display: inline-block;
     padding-left: 24px;
     float: right;
-  }
-  .footer-links {
-    float: right;
-  }
-  .list-inline > li {
-    padding-left: 24px;
-    text-align: right;
-  }
-}
-
-@media (max-width: $screen-sm-max) {
-  footer {
-    position: relative;
-    top: 0;
-    display: block;
-    overflow: visible;
-    height: auto;
-    .footer-links {
-      float: left;
-      clear: both;
-      font-size: 10px;
-    }
-    .list-inline > li {
-      padding-left: 5px;
-      float: left;
-    }
-  }
-  #dashboard footer, #registration footer {
-    position: absolute;
-    bottom: 0;
-    top: auto;
-    height: 30px;
-    overflow: hidden;
-  }
-}
-
-@media (max-width: 400px) {
-  footer {
-    form.language {
+    @media (max-width: 420px) {
       display: block;
       padding-left: 0;
       padding-bottom: 8px;
@@ -77,15 +49,32 @@ footer {
         font-size: 9px;
       }
     }
-    .copy {
-      font-size: 9px;
+  }
+  .footer-links {
+    float: right;
+    @media (max-width: $screen-sm-max) {
+      float: left;
+      clear: both;
+      font-size: 10px;
     }
   }
-  #registration footer {
-    position: relative;
-    top: 0;
-    display: block;
-    overflow: visible;
-    height: auto;
+  .list-inline > li {
+    padding-left: 24px;
+    text-align: right;
+    @media (max-width: $screen-sm-max) {
+      padding-left: 5px;
+      float: left;
+    }
   }
 }
+
+#dashboard footer {
+  @media (max-width: $screen-sm-max) {
+    position: absolute;
+    bottom: 0;
+    top: auto;
+    height: auto;
+    overflow: hidden;
+  }
+}
+

@@ -6,6 +6,8 @@
 
 {% block page_title %}| {% trans "Add details" %}{% endblock %}
 
+{% block main-width %}{% endblock %}
+
 {% block extra_script %}
 {{ form.media }}
 <script src="{% static 'js/form_submit.js' %}"></script>
@@ -26,13 +28,13 @@ $(document).ready(function () {
 </script>
 {% endblock %}
 
-{% block main-width %} container{% endblock %}
-
 {% block step_content_1 %}
 
-  <!-- Main wizard  -->
-  <div class="col-md-12 main-wizard">
-
+  <!-- Main wizard: details  -->
+  <div class="col-md-12 content-single">
+    <div class="row">
+      <!-- Main wizard text -->
+      <div class="col-md-12 main-text">
 {% endblock %}
 
 {% block step_title %}{% trans "1. General Information" %}{% endblock %}
@@ -54,16 +56,16 @@ $(document).ready(function () {
             </div>
 
             <div class="row{% if display_org %} hidden{% endif %}">
-              <div class="col-md-9">
+              <div class="col-lg-9">
                 <div class="row">
-                  <div class="col-sm-8">
+                  <div class="col-sm-7">
                     <div class="form-group{% if wizard.form.organization.errors %} has-error{% endif %}">
                       <label class="control-label" for="{{ wizard.form.organization.id_for_label }}">{% trans "Select organization" %}</label>
                       {% render_field wizard.form.organization class+="form-control" data-parsley-required="true" %}
                       <div class="error-block">{{ wizard.form.organization.errors }}</div>
                     </div>
                   </div>
-                  <div class="col-sm-4 hidden-xs">
+                  <div class="col-sm-5 hidden-xs">
                     <div id="org-wrapper">
                       <img class="org-logo" id="org-logo" style="display:none;" src="/" />
                     </div>
@@ -73,16 +75,16 @@ $(document).ready(function () {
             </div>
 
             <div class="row">
-              <div class="col-md-9">
+              <div class="col-lg-9">
                 <div class="row">
-                  <div class="col-sm-8">
+                  <div class="col-sm-7">
                     <div class="form-group{% if wizard.form.name.errors %} has-error{% endif %}">
                       <label class="control-label" for="{{ wizard.form.name.id_for_label }}">{% trans "Project name" %}</label>
                       {% render_field wizard.form.name class+="form-control" data-parsley-required="true" data-parsley-sanitize="1" %}
                       <div class="error-block">{{ wizard.form.name.errors }}</div>
                     </div>
                   </div>
-                  <div class="col-sm-4">
+                  <div class="col-sm-5">
                     {{ wizard.form.access.errors }}
                     {{ wizard.form.access }}
                   </div>
@@ -91,7 +93,7 @@ $(document).ready(function () {
             </div>
 
             <div class="row">
-              <div class="col-md-9">
+              <div class="col-lg-9">
                 <div class="form-group{% if wizard.form.description.errors %} has-error{% endif %}">
                   <label class="control-label" for="{{ wizard.form.description.id_for_label }}">{% trans "Project description" %}</label>
                   {% render_field wizard.form.description class+="form-control" data-parsley-sanitize="1" %}
@@ -108,7 +110,7 @@ $(document).ready(function () {
 
             <h3>{% trans "2. Questionnaire" %}</h3>
             <div class="row">
-              <div class="col-md-9">
+              <div class="col-lg-9">
                 <div class="form-group{% if wizard.form.questionnaire.errors %} has-error{% endif %}">
                   <label class="control-label" for="{{ wizard.form.questionnaire.id_for_label }}">{% trans "Select the questionnaire file to use for this project" %}</label>
                   <div class="well file-well">
@@ -147,8 +149,8 @@ $(document).ready(function () {
 
 {% block step_content_3 %}
 
+        </div>
       </div>
     </div>
-    <!-- / main wizard  -->
-
+    <!-- / main wizard text -->
 {% endblock %}

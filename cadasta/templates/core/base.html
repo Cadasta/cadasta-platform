@@ -28,7 +28,7 @@
       <header class="header" role="banner">
         <div class="container-fluid">
           <div id="logo" class="pull-left">
-            <a href="/"><img src="{% static 'img/logo-white.png' %}" /></a>{% include "core/identifier.html" %}
+            <a href="/" aria-label="Return to home page"><img src="{% static 'img/logo-white.png' %}" alt="Return to home page" /></a>{% include "core/identifier.html" %}
           </div>
           <div class="reg-links pull-right">
             {% if user.is_authenticated %}
@@ -61,7 +61,7 @@
               {% if request.path != '/account/signup/' and request.path != '/account/login/'  %}
                 {% define request.path as redirect_url %}
               {% endif %}
-              
+
               <a href="{% url 'account_login' %}{% if redirect_url %}?next={{ request.path }}{% endif %}" class="btn btn-reg" aria-label="Sign in">{% trans "Sign in" %}</a>
               <a href="{% url 'account_signup' %}{% if redirect_url %}?next={{ request.path }}{% endif %}" class="btn btn-reg" aria-label="Register">{% trans "Register" %}</a>
             </div>

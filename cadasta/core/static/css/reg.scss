@@ -3,10 +3,13 @@
 
 body.tinted-bg { // photo for login and register forms
   background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
-  background-size: cover; 
+  background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
   -webkit-background-size: cover;
+  @media (max-width: $screen-sm-max) {
+    background: $body-bg;
+  }
 }
 
 .form-narrow, .narrow {
@@ -24,6 +27,16 @@ body.tinted-bg { // photo for login and register forms
   -moz-box-shadow: 0 1px 1px rgba(0,0,0,.05);
   -webkit-box-shadow: 0 1px 1px rgba(0,0,0,.05);
   box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  @media (max-width: $screen-md-max) {
+    margin-top: 15px;
+    padding: 10px 15px;
+  }
+  @media (max-width: $screen-sm-max) {
+    max-width: 90%;
+  }
+  @media (max-width: 420px) {
+    margin: 15px;
+  }
   h1 {
     text-align: center;
     margin: 4px auto 24px;
@@ -63,42 +76,17 @@ body.tinted-bg { // photo for login and register forms
   max-width: 970px;
   padding: 40px;
   margin-bottom: 50px;
-  .form-text {
-    margin-top: 20px;
-    padding-bottom: 20px;
-    padding-right: 40px;
-    border-right: solid 1px $table-border-color;
-    h1 {
-      text-align: left;
-    }
-    h2 {
-      font-size: 24px;
-      font-weight: 500;
-      margin-top: 40px;
+  h1 {
+    text-align: left;
+  }
+  .form-container {
+    border-left: 1px solid $gray-light;
+    @media (max-width: $screen-sm-max) {
+      border: none;
     }
   }
-   .form-inner { // forms in one column
-    max-width: 460px;
-    padding-left: 40px;
-    margin: 0 auto;
-  }
-}
-
-@media (max-width: $screen-md-max) {
-  .form-narrow { 
-    margin-top: 15px;
-    padding: 10px 15px;
-  }
-  .form-group {
-    margin-bottom: 10px;
-  }
-  .form-narrow .btn-block {
-    margin-bottom: 8px;
-  }
-}
-
-@media (max-width: $screen-sm-max) {
-  .form-2col { // wide layout with 2 columns
+  @media (max-width: $screen-sm-max) {
+    max-width: 90%;
     padding: 20px;
     .form-text {
       border-right: none;
@@ -110,18 +98,20 @@ body.tinted-bg { // photo for login and register forms
         margin-top: auto;
       }
     }
-     .form-inner { // forms in one column
+  }
+  .form-inner { // forms in one column
+    max-width: 460px;
+    padding-left: 40px;
+    margin: 0 auto;
+    @media (max-width: $screen-sm-max) {
       padding-left: 0;
     }
   }
 }
 
-@media (max-width: 400px) {
-  .form-narrow {
-    margin: 15px;
-  }
-  body.tinted-bg {
-    background: $body-bg;
+.form-group { // minimize spacing between fields on smaller screens
+  @media (max-width: $screen-md-max) {
+    margin-bottom: 14px;
   }
 }
 

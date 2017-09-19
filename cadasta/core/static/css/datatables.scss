@@ -17,21 +17,21 @@ table.dataTable{clear:both;margin-top:6px !important;margin-bottom:6px !importan
 -------------------------------------------------------------- */
 
 .dataTables_wrapper {
+  clear: both;
   @include clearfix;
   div.dataTables_info {
-    padding-top: 10px !important;
+    padding-top: 10px;
   }
   .table-search { // search
     .dataTables_filter {
       float: left;
-    }
-    label {
-      float: left;
-      text-align: left;
-      margin-right: 10px;
-    }
-    input {
-      margin-left: 0 !important;
+      label {
+        float: left;
+        margin-right: 10px;
+      }
+      input {
+        margin-left: 0;
+      }
     }
   }
   .table-entries { // number of entries
@@ -68,6 +68,24 @@ table.dataTable{clear:both;margin-top:6px !important;margin-bottom:6px !importan
     .pagination > .active > a, .pagination > .active > a:focus, .pagination > .active > a:hover, .pagination > .active > span, .pagination > .active > span:focus, .pagination > .active > span:hover {
       background-color: $gray-light;
       border-color: #ddd;
+    }
+  }
+  table.dataTable thead {
+    .sorting::after {
+      content: initial;
+    }
+    .sorting_asc::after, .sorting_desc::after {
+      position: relative;
+      left: 8px;
+      display: inline-block;
+      font-size: 10px;
+      top: 1px;
+    }
+    .sorting_asc::after {
+      content: "\e253";
+    }
+    .sorting_desc::after {
+      content: "\e252";
     }
   }
 }
@@ -121,7 +139,7 @@ table.dataTable {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   #project-single .dataTables_wrapper .col-sm-6,
   #organization-single .dataTables_wrapper .col-sm-6 {
     width: 100% !important; // fix for col-xs-6
