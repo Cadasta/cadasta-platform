@@ -255,7 +255,13 @@ class PartyRelationshipDetail(LoginPermissionRequiredMixin,
                         option.label_xlat)
                 except QuestionOption.DoesNotExist:
                     pass
-
+        user = self.request.user
+        context['is_allowed_delete_rel'] = user.has_perm(
+            'tenure_rel.delete', context['relationship']
+        )
+        context['is_allowed_update_rel'] = user.has_perm(
+            'tenure_rel.update', context['relationship']
+        )
         return context
 
 
