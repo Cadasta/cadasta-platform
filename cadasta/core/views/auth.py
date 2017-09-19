@@ -122,7 +122,7 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
             'Instances of PermissionRequiredMixin must implement method '
             '"get_perms"')
 
-    def test_func(self):
+    def has_permission(self):
         """
         Returns True if all required permissions are met by the user's
         permissions as returned by `get_perms`.
@@ -133,6 +133,21 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
 
         perms = self.get_perms()
         return all(perm in perms for perm in permissions_required)
+
+    def test_func(self):
+        """
+        `test_func` is the entry point for UserPassesTestMixin to validate
+        user's permissions on a view.
+
+        It always returns `True` if the user is a superuser (superuser can do
+        everything in the platform); otherwise it returns the value of
+        `has_permission`.
+        """
+        user = self.request.user
+        if not user.is_anonymous and user.is_superuser:
+            return True
+
+        return self.has_permission()
 
 
 class OrganizationPermissionMixin(PermissionRequiredMixin):

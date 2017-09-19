@@ -1,4 +1,5 @@
 import pytest
+from unittest.mock import Mock
 from django.http import HttpRequest
 from django.test import TestCase
 from django.views.generic import View
@@ -88,9 +89,9 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         view = TestView()
         with pytest.raises(ImproperlyConfigured):
-            view.test_func()
+            view.get_perms()
 
-    def test_test_func_with_string(self):
+    def test_has_permission_with_string(self):
         """
         permission_required can be defined as a string
         """
@@ -101,9 +102,9 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', )
 
         view = TestView()
-        assert view.test_func() is True
+        assert view.has_permission() is True
 
-    def test_test_func_with_tuple(self):
+    def test_has_permission_with_tuple(self):
         """
         permission_required can be defined as a tuple
         """
@@ -114,9 +115,9 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'other.perm')
 
         view = TestView()
-        assert view.test_func() is True
+        assert view.has_permission() is True
 
-    def test_test_func_with_list(self):
+    def test_has_permission_with_list(self):
         """
         permission_required can be defined as a list
         """
@@ -127,9 +128,9 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'other.perm')
 
         view = TestView()
-        assert view.test_func() is True
+        assert view.has_permission() is True
 
-    def test_test_func_permission_denied(self):
+    def test_has_permission_permission_denied(self):
         """
         The permission returned from get_perms does not match the one defined
         in permission_required.
@@ -141,9 +142,9 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('other.perm', )
 
         view = TestView()
-        assert view.test_func() is False
+        assert view.has_permission() is False
 
-    def test_test_func_permission_denied_with_list(self):
+    def test_has_permission_permission_denied_with_list(self):
         """
         All permissions defined in permission_required must be present in the
         return value of get_perms.
@@ -155,9 +156,9 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'another.perm')
 
         view = TestView()
-        assert view.test_func() is False
+        assert view.has_permission() is False
 
-    def test_test_func_permission_denied_only_one_perm(self):
+    def test_has_permission_permission_denied_only_one_perm(self):
         """
         All permissions defined in permission_required must be present in the
         return value of get_perms.
@@ -169,6 +170,44 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', )
 
         view = TestView()
+        assert view.has_permission() is False
+
+    def test_test_with_superuser(self):
+        """
+        For superuser test_func should always return True even if permission
+        would be denied otherwise.
+        """
+        user = UserFactory.create(is_superuser=True)
+        request = Mock()
+        request.user = user
+
+        class TestView(PermissionRequiredMixin, View):
+            permission_required = ['some.perm']
+
+            def get_perms(self):
+                return ('other.perm', )
+
+        view = TestView()
+        view.request = request
+        assert view.test_func() is True
+
+    def test_test_with_standarduser(self):
+        """
+        For standard users test_func should always return False if permission
+        is denied.
+        """
+        user = UserFactory.create()
+        request = Mock()
+        request.user = user
+
+        class TestView(PermissionRequiredMixin, View):
+            permission_required = ['some.perm']
+
+            def get_perms(self):
+                return ('other.perm', )
+
+        view = TestView()
+        view.request = request
         assert view.test_func() is False
 
     def test_raise_permission_denied(self):
