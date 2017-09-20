@@ -151,7 +151,7 @@ class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
 
-        not_unique = Organization.objects.filter(name__iexact=name)
+        not_unique = Organization.objects.filter(name__iexact=name).exists()
         if not_unique:
             raise forms.ValidationError(
                 self.fields['name'].error_messages['unique'])
@@ -331,14 +331,10 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
         # (Explicit validation because we are using a wizard and the
         # unique_together validation cannot occur in the proper page)
         if self.cleaned_data.get('organization'):
-            not_unique = Project.objects.filter(
-                organization__slug=self.cleaned_data['organization'],
-                name__iexact=name,
-            ).exists()
+            not_unique = Project.objects.filter(name__iexact=name).exists()
             if not_unique:
                 raise forms.ValidationError(
-                    _("Project with this name already exists "
-                      "in this organization."))
+                    _("Project with this name already exists"))
 
         return name
 
@@ -408,13 +404,10 @@ class ProjectEditDetails(SanitizeFieldsForm, forms.ModelForm):
         # (Explicit validation because we are using a wizard and the
         # unique_together validation cannot occur in the proper page)
         not_unique = Project.objects.filter(
-            organization__slug=self.instance.organization.slug,
-            name__iexact=name,
-        ).exclude(id=self.instance.id).exists()
+            name__iexact=name).exclude(id=self.instance.id).exists()
         if not_unique:
             raise forms.ValidationError(
-                _("Project with this name already exists "
-                  "in this organization."))
+                _("Project with this name already exists"))
 
         return name
 
