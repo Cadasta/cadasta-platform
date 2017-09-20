@@ -1,5 +1,6 @@
 {% extends "core/base.html" %}
 
+{% load staticfiles %}
 {% load i18n %}
 
 {% load widget_tweaks %}
@@ -9,20 +10,7 @@
 {% block title %} | {% trans "Verify Account" %}{% endblock %}
 
 {% block extra_script %}
-<script type="text/javascript">
-  $(document).ready(function() {
-    $("#phone-btn").click(function(){
-        $("#phone-div").removeClass("hidden");
-        $("#email-div").addClass("hidden");
-        document.getElementById("id_email").value='';
-    });
-    $("#email-btn").click(function(){
-        $("#email-div").removeClass("hidden");
-        $("#phone-div").addClass("hidden");
-        document.getElementById("id_phone").value='';
-    });
-  });
-</script>
+<script src="{% static 'js/togglePhoneEmail.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -30,7 +18,7 @@
     <h1>
         {% trans "Verify Account" %}
     </h1>
-    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form form-narrow" data-parsley-validate data-parsley-excluded=":hidden">
+    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form" data-parsley-validate data-parsley-excluded=":hidden">
         {% csrf_token %}
         <div id="email-div" class="form-group{% if form.email.errors %} has-error{% endif %}">
             <p>{% trans "A new verification link will be sent to the following email address."%}</p>

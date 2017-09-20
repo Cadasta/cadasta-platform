@@ -15,20 +15,11 @@
     $("input[name='password']").on('focus', function() {
       $(this).parent().next(".help-block").removeClass("hidden");
     });
-    $("#phone-btn").click(function(){
-        $("#phone-div").removeClass("hidden");
-        $("#email-div").addClass("hidden");
-        document.getElementById("id_email").value='';
-    });
-    $("#email-btn").click(function(){
-        $("#email-div").removeClass("hidden");
-        $("#phone-div").addClass("hidden");
-        document.getElementById("id_phone").value='';
-    });
   });
 </script>
 <script src="{% static 'js/password_widget.js' %}"></script>
 <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
+<script src="{% static 'js/togglePhoneEmail.js' %}"></script>
 {{ form.media }}
 {% endblock %}
 
