@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
 
-from tutelary.models import Policy, Role, assign_user_policies
+from tutelary.models import Policy, assign_user_policies
 from skivvy import ViewTestCase
 
 from core.tests.utils.cases import UserTestCase

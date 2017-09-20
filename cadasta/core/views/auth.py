@@ -40,6 +40,7 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
 
     Views that use the mixin must implement the method `get_perms`.
     """
+    permission_denied_message = _("You don't have permission for this action.")
 
     def handle_no_permission(self):
         """
@@ -155,7 +156,6 @@ class OrganizationPermissionMixin(PermissionRequiredMixin):
     Mixin that provides the user's permissions for within organization.
     """
     org_slug = 'slug'
-    permission_denied_message = _("You don't have permission for this action.")
 
     def get_perms(self):
         if self.request.user.is_anonymous():

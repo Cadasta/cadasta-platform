@@ -323,7 +323,7 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
                                 auth.LoginRequiredMixin,
                                 auth.OrganizationPermissionMixin,
                                 generic.DeleteView):
-    permission_required = update_permissions('org.users.remove')
+    permission_required = 'org.users.remove'
     permission_denied_message = error_messages.ORG_USERS_REMOVE
 
     def admin_is_deleting_themselves(self):
