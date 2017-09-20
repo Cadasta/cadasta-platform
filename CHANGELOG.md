@@ -1,5 +1,36 @@
 # Change Log
 
+## [v1.12.1](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1) (2017-09-11)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.1-alpha.3...v1.12.1)
+
+## [v1.12.1-alpha.3](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1-alpha.3) (2017-09-11)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.1-alpha.2...v1.12.1-alpha.3)
+
+**Fixed bugs:**
+
+- Org admin cannot archive own project [\#1752](https://github.com/Cadasta/cadasta-platform/issues/1752)
+
+**Closed issues:**
+
+- Download Project :: Not downloading all fields-- only ones with values [\#1778](https://github.com/Cadasta/cadasta-platform/issues/1778)
+
+**Merged pull requests:**
+
+- Fix \#1780: Add django-filter to INSTALLED\_APPS [\#1787](https://github.com/Cadasta/cadasta-platform/pull/1787) ([seav](https://github.com/seav))
+- Update changelog to v1.12.1-alpha.1 [\#1777](https://github.com/Cadasta/cadasta-platform/pull/1777) ([amplifi](https://github.com/amplifi))
+- code cleanup [\#1767](https://github.com/Cadasta/cadasta-platform/pull/1767) ([valaparthvi](https://github.com/valaparthvi))
+
+## [v1.12.1-alpha.2](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1-alpha.2) (2017-09-06)
+[Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.1-alpha.1...v1.12.1-alpha.2)
+
+**Fixed bugs:**
+
+- Already archived projects get unarchived when org is unarchived [\#820](https://github.com/Cadasta/cadasta-platform/issues/820)
+
+**Merged pull requests:**
+
+- Clean up JS [\#1779](https://github.com/Cadasta/cadasta-platform/pull/1779) ([amplifi](https://github.com/amplifi))
+
 ## [v1.12.1-alpha.1](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1-alpha.1) (2017-09-06)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.0...v1.12.1-alpha.1)
 
