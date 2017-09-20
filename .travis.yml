@@ -9,11 +9,15 @@ addons:
   apt:
     packages:
       - postgresql-9.4-postgis-2.3
+  browserstack:
+    username: eugenealvinvilla1
+    access_key:
+      secure: "NLmJhajU4jcL094ipfsPHMio8gcxVGmDB31xFAg8znBKp8BoEh/fnAK572F7s5zU+c9KwsfyDd5njEaN6/nU7VzCyfZ+825ukwpO6O8lNtq21YdJO+L6dc6QTP3DgECO2EjtoeSgmDqxUbk4/QwiPE7J/rqx6nStvAaIm4qwykCvXZwGWMft/NsZGYpugMndGp/uEmSNC7P11iOGsfG5l3MwZ6pYTrtbJPTWbcHwHelUT4sEumrPdGTReUdqCJYeovKJgxFQgie2szAmFKPBQoRNSrH9RCHDQCFoNF1U5eDvKnne8OPbxMTcU0nSPs27aML7q+T1DWUMV0m6pOcHvqCS9GbEFdeISouof9JWxnEWhcrmy07/0uJOjyi2VP8GM1+psXndPRWYFWqOouOLX0i19W4VTWCyk47ItaHTHRaB+3fpx4IUjf2wF1HkzI4kr/pTrnWt+s2KMTnx1aGnS9oTJ5oKNbYXs0+KLiTOrKWUrh6IK8pzBa2dmMVQ18cEHP1pgNJp+9ksPuIYFzn2jEla6Pq9ZQ4MQhEWZVznu1ZsztU5T7KLHACa4wsOmcma4JTgtJMwp1yMlW0+WpsyxtfCeWbwsnQ86fi/PUCmYpsKr95tfkfVcRN6xcnUrooEMivfoP1GlKO4m4XEOylrGujwB56umIVVz6n0M1c8abU="
 
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
   - sudo -E apt-get -yq update &>> ~/apt-get-update.log
-  - sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install squid3
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo -E apt-get -yq --no-install-suggests --no-install-recommends --force-yes install squid3; fi
   - sudo apt-get -yq install libgdal-dev
   - gdal-config --version
   - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
@@ -24,25 +28,29 @@ install:
   - pip install tox==2.8.1
 
 before_script:
-  - sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf
-  - sudo service squid3 restart
-  - export http_proxy=http://localhost:3128/
-  - export https_proxy=https://localhost:3128/
-  - export DJANGO_SETTINGS_MODULE=config.settings.travis
-  - psql template1 postgres -c 'create extension hstore;'
-  - psql -c 'create database cadasta;' -U postgres
-  - psql -U postgres -d cadasta -c "create extension postgis;"
-  - mkdir cadasta/geography/data
-  - export WBDATA=ne_10m_admin_0_countries.zip
-  - export DATADIR=cadasta/geography/data
-  - wget -O $DATADIR/$WBDATA https://cadasta-miscellaneous.s3.amazonaws.com/$WBDATA
-  - unzip $DATADIR/$WBDATA -d $DATADIR
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo service squid3 restart; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export http_proxy=http://localhost:3128/; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export https_proxy=https://localhost:3128/; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then psql template1 postgres -c 'create extension hstore;'; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then psql -c 'create database cadasta;' -U postgres; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then psql -U postgres -d cadasta -c "create extension postgis;"; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then mkdir cadasta/geography/data; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export WBDATA=ne_10m_admin_0_countries.zip; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then export DATADIR=cadasta/geography/data; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then wget -O $DATADIR/$WBDATA https://cadasta-miscellaneous.s3.amazonaws.com/$WBDATA; fi
+  - if [[ $TOX_ENV != 'py35-flake8' ]]; then unzip $DATADIR/$WBDATA -d $DATADIR; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then echo '<span class="site-name">Travis</span>' > cadasta/templates/core/identifier.html; fi
 
 env:
   matrix:
     - TOX_ENV=py35-flake8
-    - TOX_ENV=py35-django1.9-migration
-    - TOX_ENV=py35-django1.9-unit
+    - TOX_ENV=py35-django-migration
+    - TOX_ENV=py35-django-unit
+    - TOX_ENV=py35-functional CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome BROWSERSTACK_USERNAME=eugenealvinvilla1
+  global:
+    - DJANGO_SETTINGS_MODULE=config.settings.travis
+    - secure: hQjB6YEpq1OL97l3EOmzgC6Z23y3H57sRl7NkX7I69dySXdMBOnYK7qHkldqYf9PE76s17tra8rW9FLpmZ0IpvAphbfaURqXoXHe0JYGVIBhPpgCqdcyGpcGYpmuVWn4Wp+3/x5Eukok122xt9WpjPbJWSJNtpbKdBYkM19aOXC1nt/MQ07WQj5DBAOBmJ3xPjhXyNeXuiGFqDBtgMj2e7zGvBKQU43aANxWLRj4ormfqS0Ege7buqhwaTQHIxA0J5m4al2Bd9JcZOcD9rCJW4PC6Er7XDx8CiPj1h0+wO7ZH49FinSj/2n5iq87Xc6QWANlCDR8ojShOCWKTcqe54PzVBeziM4vU1Z0KI64F12JJICCYNlEolXG+HL1KDU+ZcFie9ZiiRgoM0iW3kXojI9+JTPBZIOvGbFSC2VeaeCpoJxnAibBoOACKe84Ffh71P7jfwuw2gKM2lV7Z0ygy/juTMTvI/soMfl3EFtZrWSN3LEZgKgG3egh9w0pmzS3NgF3+VJlJ7h6VbhlrQ8tKK5BxNbQEp0RPiU4pL90sn5U2HoKIbHQ7f0/I1RY4UUuBu01/Um/mKKaSDq8jS7/NTBFhX90PGEfX0YO4KE8iVwajLrqUoGUCa1Jc0RWyO4Y2jedWO10dSh3m/daEDartLagkUIMuzEhDLTnGpjp7Ts=
 
 matrix:
   fast_finish: true
