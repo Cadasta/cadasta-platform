@@ -165,8 +165,10 @@ class AccountListProjects(ListView):
             )
 
         # Orgs without Projects
-        qs = user.organizationrole_set.filter(organization__projects=None)
-        qs = qs.exclude(organization__archived=True, admin=False)
-        qs = qs.prefetch_related('organization')
-        for org_role in qs:
+        org_roles = user.organizationrole_set.filter(
+            organization__projects=None,
+            organization__archived=False,
+            admin=True
+        ).prefetch_related('organization')
+        for org_role in org_roles:
             yield (org_role.organization, org_role.admin, [])
