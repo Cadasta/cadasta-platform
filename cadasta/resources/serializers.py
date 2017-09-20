@@ -7,13 +7,24 @@ from core.serializers import SanitizeFieldSerializer
 from .models import ContentObject, Resource, SpatialResource
 
 
+class ContentObjectSerializer(serializers.ModelSerializer):
+    id = serializers.CharField(source='object_id')
+    type = serializers.CharField(source='content_type.model')
+
+    class Meta:
+        model = ContentObject
+        fields = ('id', 'type')
+
+
 class ResourceSerializer(SanitizeFieldSerializer, serializers.ModelSerializer):
     file = S3Field()
+    links = ContentObjectSerializer(
+        many=True, required=False, source='content_objects')
 
     class Meta:
         model = Resource
         fields = ('id', 'name', 'description', 'file', 'original_file',
-                  'archived', 'mime_type', )
+                  'archived', 'mime_type', 'links')
         read_only_fields = ('id', )
         extra_kwargs = {'mime_type': {'required': False}}
 
