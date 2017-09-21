@@ -9,11 +9,17 @@
       - libpq-dev # Required for Ansible to interact with postgres
       - python-psycopg2 # Required for Ansible to interact with postgres
 
-- name: Allow password authentication for local socket users
+- name: Allow password authentication for local/remote socket users
   become: yes
   become_user: root
   register: pg_hba
   copy: src=pg_hba.conf dest=/etc/postgresql/9.4/main/pg_hba.conf force=yes
+
+- name: Listen for external connections
+  become: yes
+  become_user: root
+  register: postgresql_conf
+  copy: src=postgresql.conf dest=/etc/postgresql/9.4/main/postgresql.conf force=yes
 
 - name: Restart Postgres
   become: yes
@@ -24,7 +30,7 @@
 - name: Create database
   become: yes
   become_user: postgres
-  postgresql_db: login_user="postgres" name="cadasta"
+  postgresql_db: name="cadasta"
 
 # This test is needed because of a bad interaction between the way
 # that the Ansible postgresql_user modules works and the way that
@@ -41,19 +47,22 @@
 - name: Create database user
   become: yes
   become_user: postgres
-  postgresql_user: login_user="postgres"
-                   name="cadasta" password="cadasta"
+  postgresql_user: name="cadasta" password="cadasta"
                    state=present role_attr_flags=SUPERUSER,CREATEDB
   when: user_test.stdout.find('0') != -1
 
 - name: Provide user with DB permissions
   become: yes
   become_user: postgres
-  postgresql_user: login_user="postgres"
-                   user="cadasta" db="cadasta" priv=ALL
+  postgresql_user: user="cadasta" db="cadasta" priv=ALL
 
 - name: Install PostGIS on DB
   become: yes
   become_user: postgres
-  postgresql_ext: login_user="postgres"
-                  name=postgis db="cadasta"
+  postgresql_ext: name=postgis db="cadasta"
+
+- name: Create worker user
+  become: yes
+  become_user: postgres
+  postgresql_user: name="worker" password="cadasta"
+                   state=present
