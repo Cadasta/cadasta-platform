@@ -107,6 +107,10 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
+- name: Trigger "migrations called" signal
+  command: echo "Migrations have been called"
+  notify: migrations called
+
 - name: Install Bootstrap for SASS processing
   become: yes
   become_user: "{{ app_user }}"
