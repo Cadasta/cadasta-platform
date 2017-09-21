@@ -43,8 +43,8 @@ def assign_policies(user):
     user.assign_policies(policy)
 
 
-class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
-    view_class = api.TenureRelationshipCreate
+class TenureRelationshipListTestCase(APITestCase, UserTestCase, TestCase):
+    view_class = api.TenureRelationshipList
     record_model = TenureRelationship
 
     def setup_models(self):
@@ -67,6 +67,32 @@ class TenureRelationshipCreateTestCase(APITestCase, UserTestCase, TestCase):
             'spatial_unit': self.su2.id,
             'tenure_type': 'WR'
         }
+
+    def test_full_list(self):
+        TenureRelationshipFactory.create_batch(
+            2, project=self.prj, party=self.party1, spatial_unit=self.su2)
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert len(response.content['results']) == 2
+
+    def test_full_list_with_unauthorized_user(self):
+        TenureRelationshipFactory.create(
+            project=self.prj, party=self.party1, spatial_unit=self.su2)
+        response = self.request()
+        assert response.status_code == 403
+        assert response.content['detail'] == PermissionDenied.default_detail
+
+    def test_get_full_list_organization_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'organization': 'some-org'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
+
+    def test_get_full_list_project_does_not_exist(self):
+        response = self.request(user=self.user,
+                                url_kwargs={'project': 'some-prj'})
+        assert response.status_code == 404
+        assert response.content['detail'] == "Project not found."
 
     def test_create_valid_record(self):
         response = self.request(user=self.user, method='POST')

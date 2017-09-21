@@ -105,12 +105,15 @@ class SpatialUnitResourceDetail(APIPermissionRequiredMixin,
         return self.detach_resource(self.kwargs['location'])
 
 
-class SpatialRelationshipCreate(APIPermissionRequiredMixin,
-                                mixins.SpatialRelationshipQuerySetMixin,
-                                generics.CreateAPIView):
+class SpatialRelationshipList(APIPermissionRequiredMixin,
+                              mixins.SpatialRelationshipQuerySetMixin,
+                              generics.ListCreateAPIView):
 
-    permission_required = update_permissions('spatial_rel.create')
-    serializer_class = serializers.SpatialRelationshipWriteSerializer
+    permission_required = {
+        'GET': 'spatial_rel.list',
+        'POST': update_permissions('spatial_rel.create')
+    }
+    serializer_class = serializers.SpatialRelationshipSerializer
 
     def get_perms_objects(self):
         return [self.get_project()]
@@ -131,9 +134,9 @@ class SpatialRelationshipDetail(APIPermissionRequiredMixin,
 
     def get_serializer_class(self):
         if self.request.method == 'PATCH':
-            return serializers.SpatialRelationshipWriteSerializer
+            return serializers.SpatialRelationshipSerializer
         else:
-            return serializers.SpatialRelationshipReadSerializer
+            return serializers.SpatialRelationshipDetailSerializer
 
     def destroy(self, request, *args, **kwargs):
         self.get_object().delete()

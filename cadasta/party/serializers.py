@@ -3,7 +3,7 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from .models import Party, PartyRelationship, TenureRelationship
+from . import models
 from core import serializers as core_serializers
 from .choices import TENURE_RELATIONSHIP_TYPES
 from spatial.serializers import SpatialUnitSerializer
@@ -17,35 +17,20 @@ class PartySerializer(core_serializers.JSONAttrsSerializer,
     attrs_selector = 'type'
 
     class Meta:
-        model = Party
+        model = models.Party
         fields = ('id', 'name', 'type', 'attributes', )
         read_only_fields = ('id', )
 
     def create(self, validated_data):
         project = self.context['project']
-        return Party.objects.create(
+        return models.Party.objects.create(
             project=project, **validated_data)
 
 
-class PartyRelationshipReadSerializer(serializers.ModelSerializer):
-
-    party1 = PartySerializer(fields=('id', 'name', 'type'))
-    party2 = PartySerializer(fields=('id', 'name', 'type'))
-    rel_class = serializers.SerializerMethodField()
+class PartyRelationshipSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = PartyRelationship
-        fields = ('rel_class', 'id', 'party1', 'party2', 'type', 'attributes')
-        read_only_fields = ('id',)
-
-    def get_rel_class(self, obj):
-        return 'party'
-
-
-class PartyRelationshipWriteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PartyRelationship
+        model = models.PartyRelationship
         fields = ('id', 'party1', 'party2', 'type', 'attributes')
         read_only_fields = ('id',)
 
@@ -69,34 +54,32 @@ class PartyRelationshipWriteSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         project = self.context['project']
-        return PartyRelationship.objects.create(
+        return models.PartyRelationship.objects.create(
             project=project, **validated_data)
 
 
-class TenureRelationshipReadSerializer(serializers.ModelSerializer):
+class PartyRelationshipDetailSerializer(serializers.ModelSerializer):
 
-    party = PartySerializer(fields=('id', 'name', 'type'))
-    spatial_unit = SpatialUnitSerializer(fields=(
-        'id', 'name', 'geometry', 'type'))
+    party1 = PartySerializer(fields=('id', 'name', 'type'))
+    party2 = PartySerializer(fields=('id', 'name', 'type'))
     rel_class = serializers.SerializerMethodField()
 
     class Meta:
-        model = TenureRelationship
-        fields = ('rel_class', 'id', 'party', 'spatial_unit', 'tenure_type',
-                  'attributes')
+        model = models.PartyRelationship
+        fields = ('rel_class', 'id', 'party1', 'party2', 'type', 'attributes')
         read_only_fields = ('id',)
 
     def get_rel_class(self, obj):
-        return 'tenure'
+        return 'party'
 
 
-class TenureRelationshipWriteSerializer(
+class TenureRelationshipSerializer(
         core_serializers.JSONAttrsSerializer,
         core_serializers.SanitizeFieldSerializer,
         serializers.ModelSerializer):
 
     class Meta:
-        model = TenureRelationship
+        model = models.TenureRelationship
         fields = ('id', 'party', 'spatial_unit', 'tenure_type', 'attributes')
         read_only_fields = ('id',)
 
@@ -131,5 +114,22 @@ class TenureRelationshipWriteSerializer(
 
     def create(self, validated_data):
         project = self.context['project']
-        return TenureRelationship.objects.create(
+        return models.TenureRelationship.objects.create(
             project=project, **validated_data)
+
+
+class TenureRelationshipDetailSerializer(serializers.ModelSerializer):
+
+    party = PartySerializer(fields=('id', 'name', 'type'))
+    spatial_unit = SpatialUnitSerializer(fields=(
+        'id', 'name', 'geometry', 'type'))
+    rel_class = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.TenureRelationship
+        fields = ('rel_class', 'id', 'party', 'spatial_unit', 'tenure_type',
+                  'attributes')
+        read_only_fields = ('id',)
+
+    def get_rel_class(self, obj):
+        return 'tenure'
