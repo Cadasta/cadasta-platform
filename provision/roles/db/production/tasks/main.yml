@@ -40,3 +40,10 @@
   postgresql_ext: login_host="{{ db_host }}"
                   login_user="postgres" login_password="postgres"
                   name=postgis db="cadasta"
+
+- name: Create worker user
+  postgresql_user: login_host="{{ db_host }}"
+                   login_user="postgres" login_password="postgres"
+                   name="worker" password="cadasta"
+                   state=present role_attr_flags=NOSUPERUSER
+  when: user_test.stdout.find('0') != -1
