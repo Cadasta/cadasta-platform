@@ -411,39 +411,47 @@ class ShapeTest(UserTestCase, TestCase):
 
         su1 = SpatialUnitFactory.create(
             project=project,
+            type='AP',
             geometry='SRID=4326;POINT (30 10)',
             attributes={'geom_type': 'point'})
         su2 = SpatialUnitFactory.create(
             project=project,
+            type='BU',
             geometry='SRID=4326;LINESTRING (30 10, 10 30, 40 40)',
             attributes={'geom_type': 'linestring'})
         su3 = SpatialUnitFactory.create(
             project=project,
+            type='CB',
             geometry='SRID=4326;POLYGON ((30 10, 40 40, 20 40, 10 20, 30 10))',
             attributes={'geom_type': 'polygon'})
         su4 = SpatialUnitFactory.create(
             project=project,
+            type='MI',
             geometry='SRID=4326;'
                      'MULTIPOINT ((10 40), (40 30), (20 20), (30 10))',
             attributes={'geom_type': 'multipoint'})
         su5 = SpatialUnitFactory.create(
             project=project,
+            type='NP',
             geometry='SRID=4326;'
                      'MULTILINESTRING ((10 10, 20 20, 10 40),'
                      '(40 40, 30 30, 40 20, 30 10))',
             attributes={'geom_type': 'multilinestring'})
         su6 = SpatialUnitFactory.create(
             project=project,
+            type='PA',
             geometry='SRID=4326;'
                      'MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),'
                      '((15 5, 40 10, 10 20, 5 10, 15 5)))',
             attributes={'geom_type': 'multipolygon'})
         su7 = SpatialUnitFactory.create(
             project=project,
+            type='RW',
             geometry='SRID=4326;POLYGON EMPTY',
             attributes={'geom_type': 'empty'})
         su8 = SpatialUnitFactory.create(
             project=project,
+            type='UC',
             geometry=None,
             attributes={'geom_type': 'none'})
 
@@ -493,7 +501,7 @@ class ShapeTest(UserTestCase, TestCase):
 
     def test_write_features_empty(self):
         project = ProjectFactory.create()
-        dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file4')
+        dst_dir = os.path.join(settings.MEDIA_ROOT, 'temp/file7')
         if not os.path.exists(dst_dir):
             os.makedirs(dst_dir)
         filename = os.path.join(dst_dir, 'locations.csv')
