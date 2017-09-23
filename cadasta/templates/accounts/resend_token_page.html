@@ -10,6 +10,7 @@
 {% block title %} | {% trans "Verify Account" %}{% endblock %}
 
 {% block extra_script %}
+<script src="{% static 'js/parsleyAddValidator.js' %}"></script>
 <script src="{% static 'js/togglePhoneEmail.js' %}"></script>
 {% endblock %}
 
@@ -18,29 +19,29 @@
     <h1>
         {% trans "Verify Account" %}
     </h1>
-    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form" data-parsley-validate data-parsley-excluded=":hidden">
+    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form" data-parsley-validate>
         {% csrf_token %}
-        <div id="email-div" class="form-group{% if form.email.errors %} has-error{% endif %}">
-            <p>{% trans "A new verification link will be sent to the following email address."%}</p>
-            <label class="control-label" for="id_email">{% trans "Enter Email" %}</label>
-            {% render_field form.email class+="form-control input-lg" data-parsley-required="true"%}
+        <div id="email-div" class="clearfix form-group{% if form.email.errors %} has-error{% endif %}">
+            <p>{% trans "To receive a new verification link enter your email address."%}</p>
+            <label class="control-label" for="id_email">{% trans "Email" %}</label>
+            {% render_field form.email class+="form-control input-lg" data-parsley-required="true" data-parsley-errors-container="error-block" %}
             <div class="error-block">
                 {{ form.email.errors }}
             </div>
             <div>
-                <a style="cursor: pointer;" class="pull-right" id="phone-btn">{% trans "I want to verify my phone" %}</a>
+                <a class="btn btn-xs btn-link pull-right" id="phone-btn">{% trans "I want to verify my phone" %}</a>
             </div>
         </div>
 
-        <div id="phone-div" class="form-group{% if form.phone.errors %} has-error{% endif %} hidden">
-            <p>{% trans "A new verification token will be sent to the following phone number."%}</p>
-            <label class="control-label" for="id_phone">{% trans "Enter Phone" %}</label>
-            {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true"%}
+        <div id="phone-div" class="clearfix form-group{% if form.phone.errors %} has-error{% endif %} hidden">
+            <p>{% trans "To receive a new verification token enter your phone number."%}</p>
+            <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
+            {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phonelength="15" data-parsley-phoneplus="1" data-parsley-errors-container="error-block" %}
             <div class="error-block">
                 {{ form.phone.errors }}
             </div>
             <div>
-                <a style="cursor: pointer;" class="pull-right" id="email-btn">{% trans "I want to verify my email" %}</a>
+                <a class="btn btn-xs btn-link pull-right" id="email-btn">{% trans "I want to verify my email" %}</a>
             </div>
         </div>
         <button type="submit" class="btn btn-primary btn-lg btn-block text-uppercase" >
