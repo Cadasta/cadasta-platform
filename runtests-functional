@@ -18,7 +18,14 @@ then
   fi
 
   # Run all the things
-  ./runtests.py --functional
+  if [[ -n $TRAVIS ]]
+  then
+    # Run file upload tests using the local ChromeDriver
+    export CADASTA_TEST_WEBDRIVER=Firefox
+    ./runtests.py --functional -m uploads
+  else
+    ./runtests.py --functional
+  fi
   ret=$?
 
   # Clean up on Travis

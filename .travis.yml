@@ -13,6 +13,7 @@ addons:
     username: eugenealvinvilla1
     access_key:
       secure: "NLmJhajU4jcL094ipfsPHMio8gcxVGmDB31xFAg8znBKp8BoEh/fnAK572F7s5zU+c9KwsfyDd5njEaN6/nU7VzCyfZ+825ukwpO6O8lNtq21YdJO+L6dc6QTP3DgECO2EjtoeSgmDqxUbk4/QwiPE7J/rqx6nStvAaIm4qwykCvXZwGWMft/NsZGYpugMndGp/uEmSNC7P11iOGsfG5l3MwZ6pYTrtbJPTWbcHwHelUT4sEumrPdGTReUdqCJYeovKJgxFQgie2szAmFKPBQoRNSrH9RCHDQCFoNF1U5eDvKnne8OPbxMTcU0nSPs27aML7q+T1DWUMV0m6pOcHvqCS9GbEFdeISouof9JWxnEWhcrmy07/0uJOjyi2VP8GM1+psXndPRWYFWqOouOLX0i19W4VTWCyk47ItaHTHRaB+3fpx4IUjf2wF1HkzI4kr/pTrnWt+s2KMTnx1aGnS9oTJ5oKNbYXs0+KLiTOrKWUrh6IK8pzBa2dmMVQ18cEHP1pgNJp+9ksPuIYFzn2jEla6Pq9ZQ4MQhEWZVznu1ZsztU5T7KLHACa4wsOmcma4JTgtJMwp1yMlW0+WpsyxtfCeWbwsnQ86fi/PUCmYpsKr95tfkfVcRN6xcnUrooEMivfoP1GlKO4m4XEOylrGujwB56umIVVz6n0M1c8abU="
+  firefox: '55.0'
 
 before_install:
   - export DEBIAN_FRONTEND=noninteractive
@@ -26,6 +27,8 @@ before_install:
 
 install:
   - pip install tox==2.8.1
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo tar -zxvf /tmp/geckodriver.tar.gz -C /usr/local/bin/; fi
 
 before_script:
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf; fi
