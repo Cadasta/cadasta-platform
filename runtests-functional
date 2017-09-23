@@ -20,12 +20,8 @@ then
   # Run all the things
   if [[ -n $TRAVIS ]]
   then
-    # BrowserStack cannot handle local file uploads
-    export CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome
-    ./runtests.py --functional -m 'not uploads'
-
     # Run file upload tests using the local ChromeDriver
-    export CADASTA_TEST_WEBDRIVER=Chrome
+    export CADASTA_TEST_WEBDRIVER=Firefox
     ./runtests.py --functional -m uploads
   else
     ./runtests.py --functional
