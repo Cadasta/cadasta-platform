@@ -27,6 +27,8 @@ before_install:
 install:
   - pip install tox==2.8.1
   - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo apt-get -yq install chromium-browser chromium-chromedriver; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo cp /usr/lib/chromium-browser/libffmpeg.so /usr/lib/; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo cp /usr/lib/chromium-browser/libffmpeg.so /usr/local/lib/; fi
 
 before_script:
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf; fi
