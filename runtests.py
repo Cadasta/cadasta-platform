@@ -136,6 +136,8 @@ if __name__ == "__main__":
                 # `runtests.py TestCase [flags]`
                 # `runtests.py test_function [flags]`
                 pytest_args = ['tests', '-k', pytest_args[0]] + pytest_args[1:]
+        elif run_functional:
+            pytest_args = PYTEST_ARGS_FUNCTIONAL[style] + pytest_args
     else:
         if run_tests:
             pytest_args = PYTEST_ARGS[style]

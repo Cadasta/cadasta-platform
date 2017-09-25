@@ -8,6 +8,11 @@
       - chromium-browser
       - chromium-chromedriver
 
+- name: Make Chromium dependency visible to Chromium
+  become: yes
+  become_user: root
+  copy: src=/usr/lib/chromium-browser/libffmpeg.so dest=/usr/lib/libffmpeg.so owner=root mode=644
+
 - name: Add path to ChromeDriver
   become: yes
   become_user: "{{ app_user }}"
