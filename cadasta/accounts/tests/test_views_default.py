@@ -229,8 +229,8 @@ class PasswordResetViewTest(ViewTestCase, UserTestCase, TestCase):
         assert len(mail.outbox) == 0
 
 
-class AccountListProjectsTest(ViewTestCase, UserTestCase, TestCase):
-    view_class = default.AccountListProjects
+class UserDashboardTest(ViewTestCase, UserTestCase, TestCase):
+    view_class = default.UserDashboard
     template = 'accounts/user_dashboard.html'
 
     def test_without_organizations(self):

@@ -34,11 +34,13 @@
         <button type="button" class="close" data-dismiss="alert" aria-label='{% trans "Close" %}'>
           <span aria-hidden="true">×</span>
         </button>
+        {% url 'account_email' as email_url %}
         <p>{% blocktrans %}
           We’ve noticed your account has not been verified.
           Please verify your account by <b>{{ user.verify_email_by }}</b>
-          or if you haven’t received your verification link, {% endblocktrans %}
-          <a href="{% url 'account_email' %}">{% trans "request a new one" %}</a>.
+          or if you haven’t received your verification link,
+           <a href="{{ email_url }}">request a new one</a>.
+          {% endblocktrans %}
         </p>
       </div>
     {% endif %}
@@ -48,10 +50,7 @@
         <section>
           <div class="panel panel-default">
             <div class="panel-heading">
-              <h3 class="panel-title inline">{% trans "Projects" %}</h3>
-              <a href="{% url 'project:add' %}">
-                <i class="glyphicon glyphicon-plus" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Add project' %}"></i>
-              </a>
+              <h3 class="panel-title">{% trans "Projects" %}</h3>
             </div>
             <div class="panel-body">
               {% if user_orgs_and_projects %}
@@ -107,26 +106,14 @@
                           </tbody>
                         </table>
                       {% elif is_admin %}
-                        <div class="overlay-wrapper">
-                        <div class="overlay smaller">
-                          <div class="btn-full smaller">
-                            <a class="btn btn-primary" href="{% url 'organization:project-add' org.slug %}" role="button">
-                              <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "Add first project" %}
-                            </a>
-                          </div>
+                        <p class="text-center">{% trans "This organization is all set. Now add your first project." %}</p>
+                        <div class="btn-full smaller">
+                          <a class="btn btn-primary" href="{% url 'organization:project-add' org.slug %}" role="button">
+                            <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "Add a project" %}
+                          </a>
                         </div>
-                      </div>
                       {% else %}
-                        <div class="overlay-wrapper">
-                          <div class="overlay smaller">
-                            <p class="text-center">{% trans "Looks like this organization has no projects. As projects are created, they'll appear here." %}</p>
-                            <div class="btn-full smaller">
-                              <a class="btn btn-primary" href="{% url 'organization:dashboard' slug=org.slug %}" role="button">
-                                <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "View this organization" %}
-                              </a>
-                            </div>
-                          </div>
-                        </div>
+                        <p>{% trans "Looks like this organization has no projects. As projects are created, they'll appear here." %}</p>
                       {% endif %}
                     </div>
                   </div>

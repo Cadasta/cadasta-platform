@@ -71,6 +71,8 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
 
 class AccountLogin(LoginView):
+    success_url = reverse_lazy('account:dashboard')
+
     def form_valid(self, form):
         user = form.user
         if not user.email_verified and timezone.now() > user.verify_email_by:
@@ -94,7 +96,7 @@ class ConfirmEmail(ConfirmEmailView):
         return response
 
 
-class AccountListProjects(ListView):
+class UserDashboard(ListView):
     model = User
     template_name = 'accounts/user_dashboard.html'
 
@@ -126,8 +128,8 @@ class AccountListProjects(ListView):
             organization__organizationrole__admin=True
         )
 
-        # Projects for which user is not an org admin, niether project nor org
-        # are archived, and user not directly associatted with project (i.e.
+        # Projects for which user is not an org admin, neither project nor org
+        # are archived, and user not directly associated with project (i.e.
         # user has no project role)
         public_user_projects = Project.objects.filter(
             organization__organizationrole__user=user,
@@ -167,8 +169,7 @@ class AccountListProjects(ListView):
         # Orgs without Projects
         org_roles = user.organizationrole_set.filter(
             organization__projects=None,
-            organization__archived=False,
-            admin=True
+            organization__archived=False
         ).prefetch_related('organization')
         for org_role in org_roles:
             yield (org_role.organization, org_role.admin, [])

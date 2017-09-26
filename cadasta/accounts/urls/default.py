@@ -14,6 +14,6 @@ urlpatterns = [
         name="account_reset_password_from_key"),
     url(r'^password/reset/$', default.PasswordResetView.as_view(),
         name="account_reset_password"),
-    url(r'^dashboard/$', default.AccountListProjects.as_view(),
+    url(r'^dashboard/$', default.UserDashboard.as_view(),
         name='dashboard'),
 ]

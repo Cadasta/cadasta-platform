@@ -512,7 +512,7 @@ a.tile-box.btn,
   z-index: 2;
   width: 100%;
   .overlay {
-    background: rgba(14, 48, 94, 0.1);
+    background: #f2f4f7;
     min-height: 150px;
     padding: 20px;
     text-align: center;
@@ -548,6 +548,7 @@ a.tile-box.btn,
 
   }
 }
+
 .overlay-wrapper.map {
   padding: 15px;
   position: absolute;
@@ -562,6 +563,44 @@ a.tile-box.btn,
     min-height: 100%;
     padding: 40px 20% 0;
     margin-bottom: 0;
+  }
+}
+
+/*= User Dashboard
+--------------------------------------------------------------*/
+
+#org-wrapper {
+  &.well {
+    background: transparent;
+  }
+  h3 {
+    margin-top: 0;
+    .role {
+      text-transform: none;
+      margin-left: 3px;
+      color: $gray-medium;
+    }
+  }
+  .table-search { // search
+    display: none;
+  }
+  .overlay.smaller {
+    min-height: auto;
+  }
+  .btn-full.smaller {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+#user-single #org-wrapper {
+  .panel-heading {
+    padding: 10px 15px;
+    background-color: $body-bg;
+  }
+  p {
+    font-size: 14px;
+    min-width: auto;
   }
 }
 

@@ -803,33 +803,6 @@ dl.contacts { // contact lists
   }
 }
 
-/*= User Dashboard
---------------------------------------------------------------*/
-
-#org-wrapper {
-  &.well {
-    background: transparent;
-  }
-  h3 {
-    margin-top: 0;
-    .role {
-      text-transform: none;
-      margin-left: 3px;
-      color: $gray-medium;
-    }
-  }
-  .table-search { // search
-    display: none;
-  }
-  .overlay.smaller {
-    min-height: auto;
-  }
-  .btn-full.smaller {
-    margin: 0;
-    padding: 0;
-  }
-}
-
 /* =Tooltips
 -------------------------------------------------------------- */
 
