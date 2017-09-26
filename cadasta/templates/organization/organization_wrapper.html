@@ -11,29 +11,24 @@
 {% block main-width %}-fluid{% if is_member %} show-sidebar{% endif %}{% endblock %}
 
 {% block page-header %}
-
 <!-- Single organization header -->
 <div class="header page-header">
   <div class="page-title">
-      <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
-        {{ organization.name }}
-        {% if organization.archived %}
-          <span class="label label-danger">
-            {% trans "Archived" %}
-          </span>
-        {% endif %}
-      </h1>
+    <h1 class="{% if is_administrator or add_allowed %}short{% endif %}">
+      {{ organization.name }}
+      {% if organization.archived %}
+        <span class="label label-danger">
+          {% trans "Archived" %}
+        </span>
+      {% endif %}
+    </h1>
 
     <div class="top-btn">
-
       <!-- More options menu -->
       {% if is_administrator %}
         <div class="dropdown pull-right btn-add">
-          <a data-target="#" data-toggle="dropdown" class="dropdown-toggle visible-xs-inline" role="button" aria-label="{% trans 'More actions' %}">
-            <span class="more-menu glyphicon glyphicon-option-vertical"></span>
-          </a>
-          <button type="button" class="btn btn-primary dropdown-toggle visible-sm-inline visible-md-inline visible-lg-block" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
-            <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
+          <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-label="{% trans 'More actions' %}" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-cog"></span><span class="caret"></span>
           </button>
           <ul class="dropdown-menu" aria-labelledby="dLabel">
             <li><a class="edit" href="{% url 'organization:edit' organization.slug %}">{% trans "Edit organization" %}</a></li>
@@ -68,8 +63,8 @@
 
         <!-- Single add button for smaller screens-->
         <div class="dropdown pull-right visible-xs-inline">
-          <a data-target="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle" role="button">
-            <span class="glyphicon glyphicon-plus"></span> <span class="caret"></span>
+          <a data-target="#" data-toggle="dropdown" class="btn btn-primary btn-add dropdown-toggle" role="button" aria-label="{% trans 'Add project' %}">
+            <span class="glyphicon glyphicon-plus"></span>
           </a>
           <ul class="dropdown-menu" aria-labelledby="dLabel">
             <li>
