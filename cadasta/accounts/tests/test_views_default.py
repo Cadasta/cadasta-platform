@@ -469,10 +469,7 @@ class PasswordResetDoneViewTest(ViewTestCase, UserTestCase, TestCase):
     def test_without_phone(self):
         token = self.device.generate_challenge()
         data = {'token': token}
-        response = self.request(
-            method='POST',
-            post_data=data,
-            session_data={})
+        response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
 
     def test_with_unknown_phone(self):
@@ -506,10 +503,7 @@ class PasswordResetFromPhoneViewTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_password_set_without_password_reset_id(self):
         data = {'password': 'i@msher!0cked'}
-        response = self.request(
-            method='POST',
-            post_data=data,
-            session_data={})
+        response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
         self.user.refresh_from_db()
         assert self.user.check_password('i@msher!0cked') is False
@@ -567,10 +561,7 @@ class ConfirmPhoneViewTest(ViewTestCase, UserTestCase, TestCase):
         token = device.generate_challenge()
 
         data = {'token': token}
-        response = self.request(
-            method='POST',
-            post_data=data,
-            session_data={})
+        response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
 
 
