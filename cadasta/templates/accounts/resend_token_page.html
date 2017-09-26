@@ -19,7 +19,7 @@
     <h1>
         {% trans "Verify Account" %}
     </h1>
-    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form" data-parsley-validate>
+    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form" data-parsley-validate data-parsley-excluded=":hidden">
         {% csrf_token %}
         <div id="email-div" class="clearfix form-group{% if form.email.errors %} has-error{% endif %}">
             <p>{% trans "To receive a new verification link enter your email address."%}</p>
