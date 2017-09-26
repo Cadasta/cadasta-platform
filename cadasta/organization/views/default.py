@@ -52,29 +52,29 @@ class OrganizationList(generic.ListView):
 
     def get_queryset(self):
         user = self.request.user
-        default = Q(access='public', archived=False)
         all_orgs = Organization.objects.all()
+
+        public_orgs = Q(access='public', archived=False)
+        private_orgs = Q(
+            access='private',
+            archived=False,
+            organizationrole__user=user,
+            organizationrole__group__permissions__codename='org.view.private',
+        )
+        archived_orgs = Q(
+            archived=True,
+            organizationrole__user=user,
+            organizationrole__group__permissions__codename='org.view.archived',
+        )
 
         if user.is_superuser:
             return self._annotate(all_orgs)
 
         if user.is_anonymous:
-            return self._annotate(all_orgs.filter(default))
+            return self._annotate(all_orgs.filter(public_orgs))
 
-        org_roles = (user.organizationrole_set.all()
-                     .select_related('organization'))
-        ids = []
-        ids += (org_roles.filter(
-                organization__access='private', organization__archived=False,
-                group__permissions__codename__in=('org.view.private',))
-                .values_list('organization', flat=True))
-        ids += (org_roles.filter(
-                organization__archived=True,
-                group__permissions__codename__in=('org.view.archived',))
-                .values_list('organization', flat=True))
-
-        query = default | Q(id__in=set(ids))
-        return self._annotate(all_orgs.filter(query))
+        user_orgs = all_orgs.filter(public_orgs | private_orgs | archived_orgs)
+        return self._annotate(user_orgs)
 
 
 class OrganizationAdd(auth.LoginRequiredMixin, generic.CreateView):
