@@ -2,12 +2,12 @@
 pytest-django==3.1.2
 factory-boy==2.9.2
 pytest-cov==2.5.1
-selenium==3.5.0
+selenium==3.6.0
 transifex-client==0.12.4
-tox==2.8.1
+tox==2.8.2
 flake8==3.4.1
 django-debug-toolbar==1.8
-django-extensions==1.9.0
-django-skivvy==0.1.8
-ipython==6.1.0
+django-extensions==1.9.1
+django-skivvy==0.1.9
+ipython==6.2.0
 git+https://github.com/Cadasta/cadasta-test.git@v0.2.2
