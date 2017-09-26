@@ -26,7 +26,7 @@
                     </select>
                 </div>
                 <div class="form-group col-md-4{% if wizard.form.party_type_field.errors %} has-error{% endif %}">
-                    <label class="control-label padded" for="{{ wizard.form.party_type_field.id_for_label }}">
+                    <label class="control-label" for="{{ wizard.form.party_type_field.id_for_label }}">
                         {% blocktrans %}Select the <span class="highlight">Party type</span> field{% endblocktrans %}
                     </label>
                     <select id="party_type_field" class="form-control" name="select_defaults-party_type_field">
@@ -67,7 +67,7 @@
                     </select>
                 </div>
                 <div class="form-group col-md-4{% if wizard.form.location_type_field.errors %} has-error{% endif %}">
-                    <label class="control-label padded" for="{{ wizard.form.location_type_field.id_for_label }}">
+                    <label class="control-label" for="{{ wizard.form.location_type_field.id_for_label }}">
                         {% blocktrans %}Select the <span class="highlight">Location type</span> field{% endblocktrans %}
                     </label>
                     <select id="location_type_field" class="form-control" name="select_defaults-location_type_field">

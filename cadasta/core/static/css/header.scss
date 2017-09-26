@@ -31,6 +31,9 @@ header {
       top: 2px;
       left: 4px;
       letter-spacing: -0.2px;
+      @media (max-width: 400px) { // to avoid hamburger menu falling off
+        display: none;
+      }
     }
   }
   .nav {
@@ -141,7 +144,7 @@ header {
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   header #logo {
     font-size: 12px;
   }

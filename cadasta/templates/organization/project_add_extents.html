@@ -34,25 +34,27 @@
 
 {% block step_content_1 %}
 
+  <!-- Main wizard: extents  -->
   <div class="col-md-12 content-single">
-    <!-- Extent map  -->
-    <div class="col-md-8 map">
-      <div id="project_map" class="project-extent-map">
-        {{ wizard.management_form }}
-        {% if wizard.form.forms %}
-          {{ wizard.form.management_form }}
-          {% for form in wizard.form.forms %}
-            {{ form }}
-          {% endfor %}
-        {% else %}
-          {{ wizard.form }}
-        {% endif %}
+    <div class="row">
+      <!-- Extent map  -->
+      <div class="col-md-8 map">
+        <div id="project_map" class="project-extent-map">
+          {{ wizard.management_form }}
+          {% if wizard.form.forms %}
+            {{ wizard.form.management_form }}
+            {% for form in wizard.form.forms %}
+              {{ form }}
+            {% endfor %}
+          {% else %}
+            {{ wizard.form }}
+          {% endif %}
+        </div>
       </div>
-    </div>
-    <!-- / extent map -->
+      <!-- / extent map -->
 
-    <!-- Wizard detail  -->
-    <div class="col-md-4 detail detail-edit">
+      <!-- Wizard detail  -->
+      <div class="col-md-4 detail detail-edit">
 
 {% endblock %}
 
@@ -71,8 +73,9 @@
 
 {% block step_content_3 %}
 
+        </div>
       </div>
+      <!-- / wizard detail -->
     </div>
-    <!-- / wizard detail -->
   </div>
 {% endblock %}

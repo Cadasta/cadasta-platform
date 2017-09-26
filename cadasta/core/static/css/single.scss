@@ -77,18 +77,6 @@
   }
 }
 
-@media (max-width: $screen-xs-max) {
-  .page-title h1, .page-title h2, h1, h2 {
-    font-size: 1.4em;
-  }
-  .page-title h2, h2 {
-    font-size: 1.2em;
-  }
-  h3 {
-    font-size: 1.0em;
-  }
-}
-
 /* =Page header single project or organizations
 -------------------------------------------------------------- */
 
@@ -145,6 +133,9 @@
       padding-right: 15px;
       .btn-add {
         margin-right: 14px;
+        @media (max-width: $screen-xs-min) {
+          margin-right: 8px;
+        }
       }
     }
   }
@@ -428,7 +419,7 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 420px) {
   #sidebar {
     height: 60px;
     .nav-sidebar > li {
@@ -585,7 +576,10 @@
     margin: 20px auto;
   }
   .btn-block {
-    margin: 10px auto;
+    margin: 4px auto;
+    @media (max-width: $screen-sm-min) {
+      font-size: 14px;
+    }
   }
   .page-title {
     padding-bottom: 0;
@@ -597,7 +591,10 @@
   .map { // main panel map
     height: 100%;
     min-height: 100%;
-    padding-right: 0;
+    @media (min-width: $screen-md-min) { // leave gutter for touch screens
+      padding-right: 0;
+      padding-left: 0;
+    }
     #project_map, #id_extent_map, #id_extents_extent_map {
       height: 100%;
       min-height: 100%;
@@ -708,6 +705,7 @@
 body.map .content-single {
   overflow-y: hidden;
   > .row { // for map to expand need height
+    margin-left: 0;
     margin-right: 0;
   }
 }
@@ -718,9 +716,6 @@ body.map .content-single {
     .map {
       height: 400px;
       min-height: 400px;
-    }
-    .detail {
-      padding-left: 35px;
     }
     .main-text {
       padding: 10px 30px;

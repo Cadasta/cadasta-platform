@@ -26,8 +26,8 @@ class ProjectRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
-            '    <p>bob</p>'
-            '    <p>Bob Smith</p>'
+            '    <strong>bob</strong><br>'
+            '    Bob Smith'
             '  </td>'
             '  <td class="hidden-xs hidden-sm">me@example.com</td>'
             '  <td>'
@@ -50,8 +50,8 @@ class ProjectRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
-            '    <p>bob</p>'
-            '    <p>Bob Smith</p>'
+            '    <strong>bob</strong><br>'
+            '    Bob Smith'
             '  </td>'
             '  <td class="hidden-xs hidden-sm">me@example.com</td>'
             '  <td>'
@@ -72,8 +72,8 @@ class ProjectRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
-            '    <p>bob</p>'
-            '    <p>Bob Smith</p>'
+            '    <strong>bob</strong><br>'
+            '    Bob Smith'
             '  </td>'
             '  <td class="hidden-xs hidden-sm">me@example.com</td>'
             '  <td>'

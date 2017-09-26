@@ -80,13 +80,13 @@
 
 {% block content %}
 
-<div class="col-sm-12 content-single">
+<div class="col-md-12 content-single">
   <div class="row">
-    <!-- Start overview map  -->
+    <!-- Start location map  -->
     <div class="col-md-8 map">
       {% leaflet_map "project-map" callback="locations_map_init" %}
     </div>
-    <!-- / end overview map -->
+    <!-- / end location map -->
     <!-- Overview detail  -->
     {% block location_panel %}{% endblock %}
     <!-- / overview detail -->
