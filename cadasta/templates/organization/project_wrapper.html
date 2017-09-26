@@ -93,7 +93,9 @@
           {% if is_allowed_add_location %}
           <li><a href="{% url 'locations:add' object.organization.slug object.slug %}">{% trans "Add location" %}</a></li>
           {% endif %}
-          <!--<li><a href="#">{% trans "Add party" %}</a></li>-->
+          {% if is_allowed_add_party %}
+          <li><a href="{% url 'parties:add' object.organization.slug object.slug %}">{% trans "Add party" %}</a></li>
+          {% endif %}
           {% if is_allowed_add_resource %}
           <li><a href="{% url 'resources:project_add_existing' object.organization.slug object.slug %}">{% trans "Add resource" %}</a></li>
           {% endif %}
