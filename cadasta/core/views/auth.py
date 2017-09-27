@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.utils.translation import gettext as _
-from organization.models import Organization, OrganizationRole
+from organization.models import Organization, OrganizationRole, ProjectRole
 
 
 class LoginRequiredMixin(auth_mixins.LoginRequiredMixin):
@@ -153,7 +153,7 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
 
 class OrganizationPermissionMixin(PermissionRequiredMixin):
     """
-    Mixin that provides the user's permissions for within organization.
+    Mixin that provides the user's permissions for within a organization.
     """
     org_slug = 'slug'
 
@@ -173,3 +173,40 @@ class OrganizationPermissionMixin(PermissionRequiredMixin):
             # The user is authenticated but not member of the organization.
             group = Group.objects.get(name='PublicUser')
             return group.permissions.values_list('codename', flat=True)
+
+
+class ProjectPermissionMixin(PermissionRequiredMixin):
+    """
+    Mixin that provides the user's permissions for within project.
+    """
+    org_slug = 'organization'
+    prj_slug = 'project'
+
+    def get_perms(self):
+        if self.request.user.is_anonymous():
+            # The user is not authenticated.
+            group = Group.objects.get(name='AnonymousUser')
+            return group.permissions.values_list('codename', flat=True)
+
+        try:
+            # The user is member of the organization.
+            org_role = OrganizationRole.objects.get(
+                organization__slug=self.kwargs[self.org_slug],
+                user=self.request.user)
+        except OrganizationRole.DoesNotExist:
+            # The user is authenticated but not member of the organization.
+            group = Group.objects.get(name='PublicUser')
+            return group.permissions.values_list('codename', flat=True)
+
+        try:
+            prj_role = ProjectRole.objects.get(
+                project__slug=self.kwargs[self.prj_slug],
+                user=self.request.user)
+            org_perms = org_role.group.permissions.values_list('codename',
+                                                               flat=True)
+            prj_perms = prj_role.group.permissions.values_list('codename',
+                                                               flat=True)
+            return list(set(org_perms) | set(prj_perms))
+        except ProjectRole.DoesNotExist:
+            return org_role.group.permissions.values_list('codename',
+                                                          flat=True)
