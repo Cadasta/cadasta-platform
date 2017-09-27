@@ -1210,6 +1210,9 @@ class ContactsFormTest(UserTestCase, TestCase):
 
 class DownloadFormTest(UserTestCase, TestCase):
 
+    def test_init(self):
+        forms.DownloadForm()
+
     def test_get_shape_download(self):
         data = {'type': 'shp'}
         form = forms.DownloadForm(data=data)
