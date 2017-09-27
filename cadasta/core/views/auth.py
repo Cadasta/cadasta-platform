@@ -151,6 +151,17 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
         return self.has_permission()
 
 
+class SuperUserRequiredMixin(LoginRequiredMixin, PermissionRequiredMixin):
+    """
+    This mixin should be added to views that grant access to superusers only.
+    """
+    def test_func(self):
+        """
+        Returns True if the user is a superuser, the permission is granted.
+        """
+        return self.request.user.is_superuser
+
+
 class OrganizationPermissionMixin(PermissionRequiredMixin):
     """
     Mixin that provides the user's permissions for within organization.
