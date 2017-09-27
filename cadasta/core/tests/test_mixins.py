@@ -75,8 +75,7 @@ class PermissionRequiredMixinTest(UserTestCase, TestCase):
 
     def test_login_redirect_from_project_dashboard_to_org_dashboard(self):
         user = UserFactory.create()
-        assign_user_policies(user, *[])
-        project = ProjectFactory.create()
+        project = ProjectFactory.create(archived=True)
 
         view = org_views.ProjectDashboard.as_view()
 

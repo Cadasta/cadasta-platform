@@ -447,23 +447,23 @@ class ProjectList(PermissionRequiredMixin,
         return super().render_to_response(context)
 
 
-class ProjectDashboard(PermissionRequiredMixin,
+class ProjectDashboard(auth.ProjectPermissionMixin,
                        mixins.ProjectAdminCheckMixin,
                        mixins.ProjectMixin,
                        generic.DetailView):
 
-    def get_actions(self, view):
-        if self.prj.archived:
-            return 'project.view_archived'
-        if self.prj.public():
-            return 'project.view'
-        else:
-            return 'project.view_private'
-
     model = Project
     template_name = 'organization/project_dashboard.html'
-    permission_required = {'GET': get_actions}
     permission_denied_message = error_messages.PROJ_VIEW
+
+    def get_permission_required(self):
+        project = self.get_project()
+        if project.archived:
+            return 'project.view.archived'
+        if project.public():
+            return 'project.view'
+        else:
+            return 'project.view.private'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -693,9 +693,10 @@ class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
 
 class ProjectEdit(mixins.ProjectMixin,
                   mixins.ProjectAdminCheckMixin,
-                  LoginPermissionRequiredMixin):
+                  auth.LoginRequiredMixin,
+                  auth.ProjectPermissionMixin):
     model = Project
-    permission_required = update_permissions('project.update', True)
+    permission_required = 'project.update'
 
     def get_object(self):
         return self.get_project()
@@ -709,11 +710,31 @@ class ProjectEditGeometry(ProjectEdit, generic.UpdateView):
     template_name = 'organization/project_edit_geometry.html'
     permission_denied_message = error_messages.PROJ_EDIT
 
+    def test_func(self):
+        """
+        If the project is archived, users should not be able to edit the
+        project's details.
+        """
+        if self.get_object().archived:
+            return False
+
+        return super().test_func()
+
 
 class ProjectEditDetails(ProjectEdit, generic.UpdateView):
     form_class = forms.ProjectEditDetails
     template_name = 'organization/project_edit_details.html'
     permission_denied_message = error_messages.PROJ_EDIT
+
+    def test_func(self):
+        """
+        If the project is archived, users should not be able to edit the
+        project's details.
+        """
+        if self.get_object().archived:
+            return False
+
+        return super().test_func()
 
     def get_initial(self):
         initial = super().get_initial()
@@ -749,6 +770,16 @@ class ProjectEditPermissions(ProjectEdit, generic.UpdateView):
     template_name = 'organization/project_edit_permissions.html'
     permission_denied_message = error_messages.PROJ_EDIT
 
+    def test_func(self):
+        """
+        If the project is archived, users should not be able to edit the
+        project's details.
+        """
+        if self.get_object().archived:
+            return False
+
+        return super().test_func()
+
 
 class ProjectArchive(ProjectEdit,
                      core_mixins.ArchiveMixin,
@@ -761,14 +792,14 @@ class ProjectArchive(ProjectEdit,
 class ProjectUnarchive(ProjectEdit,
                        core_mixins.ArchiveMixin,
                        generic.DetailView):
-
-    def patch_actions(self, request, view=None):
-        if self.get_organization().archived:
-            return False
-        return 'project.unarchive'
-    permission_required = patch_actions
     permission_denied_message = error_messages.PROJ_UNARCHIVE
     do_archive = False
+
+    def get_permission_required(self):
+        if self.get_organization().archived:
+            return False
+        print('get_permission_required')
+        return 'project.unarchive'
 
 
 class ProjectDataDownload(mixins.ProjectMixin,

@@ -47,6 +47,20 @@ def assign_policies(user):
     assign_user_policies(user, policy)
 
 
+def assign_role(project, user, org_admin=False, prj_role=None):
+        OrganizationRole.objects.create(
+            organization=project.organization,
+            user=user,
+            admin=org_admin
+        )
+        if prj_role:
+            ProjectRole.objects.create(
+                project=project,
+                user=user,
+                role=prj_role,
+            )
+
+
 class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.ProjectList
     template = 'organization/project_list.html'
@@ -189,22 +203,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
 
     def setup_models(self):
         self.project = ProjectFactory.create()
-        clauses = {
-            'clause': [
-                clause('allow',
-                       ['project.list'],
-                       ['organization/*']),
-                clause('allow',
-                       ['project.view', 'project.view_private'],
-                       ['project/*/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         self.user = UserFactory.create()
-        self.user.assign_policies(self.policy)
 
     def setup_template_context(self):
         return {
@@ -227,11 +226,6 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             'organization': self.project.organization.slug,
             'project': self.project.slug
         }
-
-    def test_get_with_authorized_user(self):
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=UserFactory.create())
@@ -258,11 +252,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == expected
 
     def test_get_with_org_admin(self):
-        OrganizationRole.objects.create(
-            organization=self.project.organization,
-            user=self.user,
-            admin=True
-        )
+        assign_role(self.project, self.user, org_admin=True)
         members = {self.user.username: 'Administrator'}
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -276,20 +266,44 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == expected
 
     def test_get_with_project_manager(self):
-        role = ProjectRole.objects.create(
-            project=self.project,
-            user=self.user,
-            role='PM',
-        )
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         response = self.request(user=self.user)
         assert response.status_code == 200
-        members = {self.user.username: role.get_role_display()}
+        members = {self.user.username: 'Project Manager'}
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
                                        is_allowed_add_party=True,
                                        is_project_member=True,
                                        is_allowed_import=True,
+                                       members=members)
+        assert response.content == expected
+
+    def test_get_with_data_collector(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='DC')
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        members = {self.user.username: 'Data Collector'}
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=True,
+                                       is_allowed_add_resource=True,
+                                       is_allowed_add_party=True,
+                                       is_project_member=True,
+                                       is_allowed_import=False,
+                                       members=members)
+        assert response.content == expected
+
+    def test_get_with_project_user(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PU')
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        members = {self.user.username: 'Project User'}
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=False,
+                                       is_allowed_add_resource=False,
+                                       is_allowed_add_party=False,
+                                       is_project_member=True,
+                                       is_allowed_import=False,
                                        members=members)
         assert response.content == expected
 
@@ -313,11 +327,21 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == self.expected_content
 
     def test_get_private_project(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PU')
         self.project.access = 'private'
         self.project.save()
         response = self.request(user=self.user)
+        members = {self.user.username: 'Project User'}
+        expected = self.render_content(is_administrator=False,
+                                       is_allowed_add_location=False,
+                                       is_allowed_add_resource=False,
+                                       is_allowed_add_party=False,
+                                       is_project_member=True,
+                                       is_allowed_import=False,
+                                       members=members)
+
         assert response.status_code == 200
-        assert response.content == self.expected_content
+        assert response.content == expected
 
     def test_get_private_project_with_unauthenticated_user(self):
         self.project.access = 'private'
@@ -327,31 +351,8 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert ("You don't have permission to access this project"
                 in response.messages)
 
-    def test_get_private_project_without_permission(self):
-        # Note, no project.view_private!
-        restricted_clauses = {
-            'clause': [
-                clause('allow', ['org.list']),
-                clause('allow', ['org.view'], ['organization/*']),
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*'])
-            ]
-        }
-        restricted_policy = Policy.objects.create(
-            name='restricted',
-            body=json.dumps(restricted_clauses))
-        self.user.assign_policies(restricted_policy)
-
-        self.project.access = 'private'
-        self.project.save()
-        response = self.request()
-        assert response.status_code == 302
-        assert ("You don't have permission to access this project"
-                in response.messages)
-
     def test_get_private_project_based_on_org_membership(self):
-        OrganizationRole.objects.create(organization=self.project.organization,
-                                        user=self.user)
+        assign_role(self.project, self.user, org_admin=False)
         self.project.access = 'private'
         self.project.save()
 
@@ -388,6 +389,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert response.content == expected
 
     def test_get_archived_project_with_unauthorized_user(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.project.archived = True
         self.project.save()
 
@@ -396,7 +398,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         assert ("You don't have permission to access this project"
                 in response.messages)
 
-    def test_get_archived_project_with_unauthentic_user(self):
+    def test_get_archived_project_with_unauthenticated_user(self):
         self.project.archived = True
         self.project.save()
 
@@ -406,16 +408,11 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
                 in response.messages)
 
     def test_get_archived_project_with_org_admin(self):
-        org_admin = UserFactory.create()
-        OrganizationRole.objects.create(
-            organization=self.project.organization,
-            user=org_admin,
-            admin=True
-        )
-        members = {org_admin.username: 'Administrator'}
+        assign_role(self.project, self.user, org_admin=True)
+        members = {self.user.username: 'Administrator'}
         self.project.archived = True
         self.project.save()
-        response = self.request(user=org_admin)
+        response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
@@ -864,11 +861,24 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
         return {'project': self.project,
                 'object': self.project,
                 'form': forms.ProjectAddExtents(instance=self.project),
-                'is_allowed_import': True}
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_add_party': True,
+                'is_allowed_import': True,
+                'is_project_member': True}
 
-    def test_get_with_authorized_user(self):
+    def test_get_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
 
         response = self.request(user=user)
         assert response.status_code == 200
@@ -876,7 +886,7 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         self.project.archived = True
         self.project.save()
 
@@ -887,6 +897,7 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
         response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to update this project"
@@ -897,9 +908,21 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
-    def test_post_with_authorized_user(self):
+    def test_post_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
+
+        response = self.request(user=user, method='POST')
+        assert response.status_code == 302
+        assert self.expected_success_url in response.location
+        self.project.refresh_from_db()
+        assert (json.loads(self.project.extent.json) ==
+                json.loads(self.post_data.get('extent')))
+
+    def test_post_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
+
         response = self.request(user=user, method='POST')
         assert response.status_code == 302
         assert self.expected_success_url in response.location
@@ -909,6 +932,8 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
+
         response = self.request(user=user, method='POST')
         assert response.status_code == 302
 
@@ -927,7 +952,7 @@ class ProjectEditGeometryTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -974,11 +999,25 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
                     initial={'questionnaire': self.questionnaire.xls_form.url,
                              'original_file': self.questionnaire.original_file}
                 ),
-                'is_allowed_import': True}
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_add_party': True,
+                'is_allowed_import': True,
+                'is_project_member': True}
 
-    def test_get_with_authorized_user(self):
+    def test_get_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+        assert 'Select the questionnaire' in self.expected_content
+
+    def test_get_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
 
         response = self.request(user=user)
         assert response.status_code == 200
@@ -987,7 +1026,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_get_empty_questionnaire_with_authorized_user(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
 
         self.project.current_questionnaire = ''
         self.project.save()
@@ -1001,7 +1040,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_get_with_blocked_questionnaire_upload(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         SpatialUnitFactory.create(project=self.project)
 
         response = self.request(user=user)
@@ -1013,7 +1052,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
 
         response = self.request(user=user)
         form = forms.ProjectEditDetails(
@@ -1023,7 +1062,10 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         assert response.content == self.render_content(form=form)
 
     def test_get_with_unauthorized_user(self):
-        response = self.request(user=UserFactory.create())
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
+        response = self.request(user=user)
+
         assert response.status_code == 302
         assert ("You don't have permission to update this project"
                 in response.messages)
@@ -1037,16 +1079,16 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
         self.project.archived = True
         self.project.save()
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
 
         response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to update this project"
                 in response.messages)
 
-    def test_post_with_authorized_user(self):
+    def test_post_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': ''})
 
@@ -1060,7 +1102,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': ''})
 
@@ -1073,7 +1115,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_empty_questionnaire_with_blocked_questionnaire_upload(self):
         SpatialUnitFactory.create(project=self.project)
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         response = self.request(user=user, method='POST')
 
         assert response.status_code == 302
@@ -1086,7 +1128,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_post_invalid_form(self):
         question = self.get_form('xls-form-invalid')
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
 
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': question})
@@ -1107,7 +1149,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
     def test_update_missing_relevant(self):
         question = self.get_form('t_questionnaire_missing_relevant')
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
 
         response = self.request(user=user, method='POST',
                                 post_data={'questionnaire': question})
@@ -1126,7 +1168,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_private_project_form(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
 
         response = self.request(user=user, method='POST',
                                 post_data={'access': ['on']})
@@ -1143,6 +1185,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
         response = self.request(user=user, method='POST')
 
         assert response.status_code == 302
@@ -1163,7 +1206,7 @@ class ProjectEditDetailsTest(ViewTestCase, UserTestCase,
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -1208,11 +1251,24 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
         return {'project': self.project,
                 'object': self.project,
                 'form': forms.ProjectEditPermissions(instance=self.project),
-                'is_allowed_import': True}
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_add_party': True,
+                'is_allowed_import': True,
+                'is_project_member': True}
 
-    def test_get_with_authorized_user(self):
+    def test_get_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
+
+        response = self.request(user=user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
 
         response = self.request(user=user)
         assert response.status_code == 200
@@ -1220,6 +1276,7 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
         response = self.request(user=user)
         assert response.status_code == 302
         assert ("You don't have permission to update this project"
@@ -1232,7 +1289,7 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
 
         self.project.archived = True
         self.project.save()
@@ -1241,10 +1298,21 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
         assert ("You don't have permission to update this project"
                 in response.messages)
 
-    def test_post_with_authorized_user(self):
+    def test_post_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         response = self.request(user=user, method='POST')
+
+        assert self.expected_success_url in response.location
+        self.project_role.refresh_from_db()
+        assert self.project_role.role == 'PM'
+
+    def test_post_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
+        response = self.request(user=user,
+                                method='POST',
+                                post_data={user.username: 'PM'})
 
         assert self.expected_success_url in response.location
         self.project_role.refresh_from_db()
@@ -1252,6 +1320,7 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
         response = self.request(user=user, method='POST')
         assert response.status_code == 302
 
@@ -1270,7 +1339,7 @@ class ProjectEditPermissionsTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_post_with_archived_project(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
         self.project.archived = True
         self.project.save()
         response = self.request(user=user, method='POST')
@@ -1294,9 +1363,22 @@ class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
             'project': self.project.slug
         }
 
-    def test_archive_with_authorized_user(self):
+    def test_archive_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
+        response = self.request(user=user)
+
+        self.project.refresh_from_db()
+
+        assert response.status_code == 302
+        assert ('/organizations/{}/projects/{}/'.format(
+            self.project.organization.slug, self.project.slug)
+            in response.location)
+        assert self.project.archived is True
+
+    def test_archive_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1309,6 +1391,7 @@ class ProjectArchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_archive_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1338,9 +1421,22 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
             'project': self.project.slug
         }
 
-    def test_unarchive_with_authorized_user(self):
+    def test_unarchive_with_org_admin(self):
         user = UserFactory.create()
-        assign_policies(user)
+        assign_role(self.project, user, org_admin=True)
+        response = self.request(user=user)
+
+        self.project.refresh_from_db()
+
+        assert response.status_code == 302
+        assert ('/organizations/{}/projects/{}/'.format(
+            self.project.organization.slug, self.project.slug)
+            in response.location)
+        assert self.project.archived is False
+
+    def test_unarchive_with_project_manager(self):
+        user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='PM')
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1353,6 +1449,7 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_unarchive_with_unauthorized_user(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=False, prj_role='DC')
         response = self.request(user=user)
 
         self.project.refresh_from_db()
@@ -1371,6 +1468,7 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_unarchive_with_archived_organization(self):
         user = UserFactory.create()
+        assign_role(self.project, user, org_admin=True)
         assign_policies(user)
 
         self.project.refresh_from_db()

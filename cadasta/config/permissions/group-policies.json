@@ -31,7 +31,7 @@
         "permissions": [
             "org.view", "org.view.private", "org.list", "org.create",
             "project.view", "project.view.private", "project.list",
-            "project.update", "party.create", "party.list", "tenure.rel.list",
+            "party.create", "party.list", "tenure.rel.list",
             "tenure.rel.create", "spatial.list", "spatial.create"
         ]
     }, {

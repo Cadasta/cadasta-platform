@@ -31,11 +31,6 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
                     kwargs={'organization': self.kwargs['organization'],
                             'project': self.kwargs['project']}
                 )
-                if redirect_url == self.request.get_full_path():
-                    redirect_url = reverse(
-                        'organization:dashboard',
-                        kwargs={'slug': self.kwargs['organization']}
-                    )
 
         return redirect(redirect_url)
 
