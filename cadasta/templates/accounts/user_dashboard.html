@@ -29,21 +29,6 @@
 <div class="col-md-12 content-single">
   <div class="row">
     <!-- main body -->
-    {% if not user.email_verified %}
-      <div role="alert" class="alert alert-dismissible alert-warning">
-        <button type="button" class="close" data-dismiss="alert" aria-label='{% trans "Close" %}'>
-          <span aria-hidden="true">×</span>
-        </button>
-        {% url 'account_email' as email_url %}
-        <p>{% blocktrans %}
-          We’ve noticed your account has not been verified.
-          Please verify your account by <b>{{ user.verify_email_by }}</b>
-          or if you haven’t received your verification link,
-           <a href="{{ email_url }}">request a new one</a>.
-          {% endblocktrans %}
-        </p>
-      </div>
-    {% endif %}
     <div class="main-text">
       <div class="col-md-8">
         <!-- Panel with list of organizations and projects -->
@@ -77,9 +62,9 @@
                         <table class="table table-hover datatable" data-paging-type="simple">
                           <thead>
                           <tr>
-                            <th class="col-md-5">{% trans "Project" %}</th>
-                            <th class="col-md-3 hidden-xs">{% trans "Role" %}</th>
-                            <th class="col-md-2 hidden-xs">{% trans "Country" %}</th>
+                            <th class="col-md-7">{% trans "Project" %}</th>
+                            <th class="col-md-2 hidden-xs">{% trans "Role" %}</th>
+                            <th class="col-md-1 hidden-xs">{% trans "Country" %}</th>
                             <th class="col-md-2">{% trans "Last updated" %}</th>
                           </tr>
                           </thead>
@@ -161,6 +146,13 @@
               </a>
             </div>
             <div class="panel-body">
+              {% if not user.email_verified %}
+                <!-- Unverified account message -->
+                <div class="alert alert-info alert-full" role="alert">
+                  {% url 'account_email' as email_url %}
+                  {% blocktrans %}We’ve noticed your account has not been verified. If you haven’t received your verification link, please <a href="{{ email_url }}">request a new one</a>.{% endblocktrans %}
+                </div>
+              {% endif %}
               <table class="table table-location">
                 <tbody>
                   <tr>
