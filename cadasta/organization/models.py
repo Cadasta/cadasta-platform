@@ -125,7 +125,7 @@ class OrganizationRole(RandomIDModel):
     organization = models.ForeignKey(Organization)
     user = models.ForeignKey('accounts.User')
     admin = models.BooleanField(default=False)
-    group = models.ForeignKey('auth.Group', related_name='project_roles')
+    group = models.ForeignKey('auth.Group', related_name='organization_roles')
 
     # Audit history
     created_date = models.DateTimeField(auto_now_add=True)
@@ -339,7 +339,7 @@ class ProjectRole(RandomIDModel):
     role = models.CharField(max_length=2,
                             choices=ROLE_CHOICES,
                             default='PU')
-    group = models.ForeignKey('auth.Group', related_name='organization_roles')
+    group = models.ForeignKey('auth.Group', related_name='project_roles')
 
     history = HistoricalRecords()
     _dict_role_choices = dict(ROLE_CHOICES)

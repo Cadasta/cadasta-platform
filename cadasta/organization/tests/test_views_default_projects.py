@@ -30,15 +30,14 @@ from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
-from tutelary.models import Policy
 
 from .. import forms
 from ..views import default
-from .factories import OrganizationFactory, ProjectFactory, clause
+from .factories import OrganizationFactory, ProjectFactory
 
 
 def assign_role(project, user, org_admin=False, prj_role=None):
-        OrganizationRole.objects.create(
+        OrganizationRole.objects.get_or_create(
             organization=project.organization,
             user=user,
             admin=org_admin
@@ -56,132 +55,115 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
     template = 'organization/project_list.html'
 
     def setup_models(self):
-        self.ok_org1 = OrganizationFactory.create(name='OK org 1', slug='org1')
-        self.ok_org2 = OrganizationFactory.create(name='OK org 2', slug='org2')
-        self.unauth_org = OrganizationFactory.create(
-            name='Unauthorized org', slug='unauth-org'
-        )
-        self.projs = []
-        self.projs += ProjectFactory.create_batch(2, organization=self.ok_org1)
-        self.projs += ProjectFactory.create_batch(2, organization=self.ok_org2)
-        self.unauth_projs = []
-        self.unauth_projs.append(ProjectFactory.create(
-            name='Unauthorized project',
-            slug='unauth-proj',
-            organization=self.ok_org2
-        ))
-        self.unauth_projs.append(ProjectFactory.create(
-            name='Project in unauthorized org',
-            slug='proj-in-unauth-org',
-            organization=self.unauth_org
-        ))
-        self.priv_proj1 = ProjectFactory.create(
-            organization=self.ok_org1, access='private'
-        )
-        self.priv_proj2 = ProjectFactory.create(
-            organization=self.ok_org1, access='private'
-        )
-        self.priv_proj3 = ProjectFactory.create(
-            organization=self.ok_org2, access='private'
-        )
-        self.archived_proj = ProjectFactory.create(
-            organization=self.ok_org2, archived=True)
-        ProjectFactory.create(organization=self.unauth_org, access='private')
-
-        # Note: no project.view_private -- that's controlled by
-        # organization membership in the tests.
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('deny', ['project.view'], ['project/unauth-org/*']),
-                clause('deny', ['project.view'], ['project/*/unauth-proj'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
         self.user = UserFactory.create()
-        assigned_policies = self.user.assigned_policies()
-        assigned_policies.append(self.policy)
-        self.user.assign_policies(*assigned_policies)
+        self.org_1 = OrganizationFactory.create()
+        self.public_prj_1 = ProjectFactory.create(access='public',
+                                                  organization=self.org_1)
+        self.private_prj_1 = ProjectFactory.create(access='private',
+                                                   organization=self.org_1)
+        self.archived_prj_1 = ProjectFactory.create(archived=True,
+                                                    organization=self.org_1)
+
+        self.org_2 = OrganizationFactory.create()
+        self.public_prj_2 = ProjectFactory.create(access='public',
+                                                  organization=self.org_2)
+        self.private_prj_2 = ProjectFactory.create(access='private',
+                                                   organization=self.org_2)
+        self.archived_prj_2 = ProjectFactory.create(archived=True,
+                                                    organization=self.org_2)
 
     @property
     def sort_key(self):
         return lambda p: p.organization.slug + ':' + p.slug
 
     def setup_template_context(self):
-        projs = self.projs + self.unauth_projs
         return {
-            'object_list': sorted(projs, key=self.sort_key),
             'add_allowed': False,
             'is_superuser': False,
         }
 
-    def test_get_with_valid_user(self):
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_with_unauthenticated_user(self):
-        response = self.request(user=self.user)
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_with_unauthorized_user(self):
-        # Slight weirdness here: an unauthorized user can see *more*
-        # projects than a user authorized with the policy defined
-        # above because the policy includes clauses denying access to
-        # some projects.
-
-        response = self.request(user=UserFactory.create())
-        assert response.status_code == 200
-        assert response.content == self.expected_content
-
-    def test_get_with_org_membership(self):
-        OrganizationRole.objects.create(organization=self.ok_org1,
-                                        user=self.user)
-        response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj1, self.priv_proj2])
-
-        assert response.status_code == 200
-        assert response.content == self.render_content(
-            object_list=sorted(projs, key=self.sort_key))
-
-    def test_get_with_org_memberships(self):
-        OrganizationRole.objects.create(organization=self.ok_org1,
-                                        user=self.user)
-        OrganizationRole.objects.create(organization=self.ok_org2,
-                                        user=self.user)
-        response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj1, self.priv_proj2, self.priv_proj3])
-
-        assert response.status_code == 200
-        assert response.content == self.render_content(
-            object_list=sorted(projs, key=self.sort_key))
-
     def test_get_with_org_admin(self):
-        OrganizationRole.objects.create(organization=self.ok_org2,
+        OrganizationRole.objects.create(organization=self.org_1,
                                         user=self.user,
-                                        admin=True,)
+                                        admin=True)
+        projects = [self.public_prj_1,
+                    self.private_prj_1,
+                    self.archived_prj_1,
+                    self.public_prj_2]
         response = self.request(user=self.user)
-        projs = (self.projs + self.unauth_projs +
-                 [self.priv_proj3, self.archived_proj])
-
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(projs, key=self.sort_key),
+            object_list=sorted(projects, key=self.sort_key),
             add_allowed=True)
 
-    def test_get_with_superuser(self):
-        superuser = UserFactory.create(is_superuser=True)
-
-        response = self.request(user=superuser)
+    def test_get_with_org_member(self):
+        OrganizationRole.objects.create(organization=self.org_1,
+                                        user=self.user)
+        projects = [self.public_prj_1,
+                    self.private_prj_1,
+                    self.public_prj_2]
+        response = self.request(user=self.user)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(Project.objects.all(), key=self.sort_key),
+            object_list=sorted(projects, key=self.sort_key))
+
+    def test_get_with_project_manager(self):
+        assign_role(self.public_prj_1, self.user, prj_role='PM')
+        assign_role(self.private_prj_1, self.user, prj_role='PM')
+        assign_role(self.archived_prj_1, self.user, prj_role='PM')
+
+        projects = [self.public_prj_1,
+                    self.private_prj_1,
+                    self.archived_prj_1,
+                    self.public_prj_2]
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projects, key=self.sort_key))
+
+    def test_get_with_other_project_user(self):
+        assign_role(self.public_prj_1, self.user, prj_role='DC')
+        assign_role(self.private_prj_1, self.user, prj_role='DC')
+        assign_role(self.archived_prj_1, self.user, prj_role='DC')
+
+        projects = [self.public_prj_1,
+                    self.private_prj_1,
+                    self.public_prj_2]
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projects, key=self.sort_key))
+
+    def test_get_with_public_user(self):
+        projects = [self.public_prj_1,
+                    self.public_prj_2]
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projects, key=self.sort_key))
+
+    def test_get_with_unauthenticated_user(self):
+        projects = [self.public_prj_1,
+                    self.public_prj_2]
+        response = self.request()
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projects, key=self.sort_key))
+
+    def test_get_with_super_user(self):
+        self.user.is_superuser = True
+        self.user.save()
+
+        projects = [self.public_prj_1,
+                    self.private_prj_1,
+                    self.archived_prj_1,
+                    self.public_prj_2,
+                    self.private_prj_2,
+                    self.archived_prj_2]
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.render_content(
+            object_list=sorted(projects, key=self.sort_key),
             add_allowed=True,
             is_superuser=True)
 
