@@ -6,8 +6,7 @@ import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
-from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
-                         update_permissions)
+from core.mixins import LoginPermissionRequiredMixin, PermissionRequiredMixin
 from core.util import random_id
 from core.views import mixins as core_mixins
 from core.views import auth
@@ -803,12 +802,13 @@ class ProjectUnarchive(ProjectEdit,
 
 
 class ProjectDataDownload(mixins.ProjectMixin,
-                          LoginPermissionRequiredMixin,
+                          auth.LoginRequiredMixin,
+                          auth.ProjectPermissionMixin,
                           mixins.ProjectAdminCheckMixin,
                           base_generic.edit.FormMixin,
                           generic.DetailView):
     template_name = 'organization/project_download.html'
-    permission_required = 'project.download'
+    permission_required = 'project.export'
     permission_denied_message = error_messages.PROJ_DOWNLOAD
     form_class = forms.DownloadForm
 
@@ -845,7 +845,8 @@ DATA_IMPORT_TEMPLATES = {
 
 
 class ProjectDataImportWizard(mixins.ProjectMixin,
-                              LoginPermissionRequiredMixin,
+                              auth.LoginRequiredMixin,
+                              auth.ProjectPermissionMixin,
                               mixins.ProjectAdminCheckMixin,
                               wizard.SessionWizardView):
     permission_required = 'project.import'
@@ -885,9 +886,6 @@ class ProjectDataImportWizard(mixins.ProjectMixin,
             'user': self.request.user,
             'project': self.get_project()
         }
-
-    def get_perms_objects(self):
-        return [self.get_project()]
 
     def get_template_names(self):
         return [DATA_IMPORT_TEMPLATES[self.steps.current]]

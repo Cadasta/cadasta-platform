@@ -37,16 +37,6 @@ from ..views import default
 from .factories import OrganizationFactory, ProjectFactory, clause
 
 
-def assign_policies(user):
-    clauses = {
-        'clause': [
-            clause('allow', ['project.*'], ['project/*/*'])
-        ]
-    }
-    policy = Policy.objects.create(name='allow', body=json.dumps(clauses))
-    assign_user_policies(user, policy)
-
-
 def assign_role(project, user, org_admin=False, prj_role=None):
         OrganizationRole.objects.create(
             organization=project.organization,
@@ -1469,7 +1459,6 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
     def test_unarchive_with_archived_organization(self):
         user = UserFactory.create()
         assign_role(self.project, user, org_admin=True)
-        assign_policies(user)
 
         self.project.refresh_from_db()
         self.project.organization.archived = True
@@ -1508,10 +1497,22 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'object': self.project,
                 'form': forms.DownloadForm(project=self.project,
                                            user=self.user),
-                'is_allowed_import': True}
+                'is_administrator': True,
+                'is_allowed_add_location': True,
+                'is_allowed_add_resource': True,
+                'is_allowed_add_party': True,
+                'is_allowed_import': True,
+                'is_project_member': True}
 
-    def test_get_with_authorized_user(self):
-        assign_policies(self.user)
+    def test_get_with_org_admin(self):
+        assign_role(self.project, self.user, org_admin=True)
+
+        response = self.request(user=self.user)
+        assert response.status_code == 200
+        assert response.content == self.expected_content
+
+    def test_get_with_project_manager(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
 
         response = self.request(user=self.user)
         assert response.status_code == 200
@@ -1519,6 +1520,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
 
     def test_get_with_unauthorized_user(self):
         response = self.request(user=self.user)
+        assign_role(self.project, self.user, org_admin=False, prj_role='DC')
         assert response.status_code == 302
         assert ("You don't have permission to export data from this project"
                 in response.messages)
@@ -1528,8 +1530,18 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
-    def test_post_with_authorized_user(self):
-        assign_policies(self.user)
+    def test_post_with_org_admin(self):
+        assign_role(self.project, self.user, org_admin=True)
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 200
+        assert (response.headers['content-disposition'][1] ==
+                'attachment; filename={}.xlsx'.format(self.project.slug))
+        assert (response.headers['content-type'][1] ==
+                'application/vnd.openxmlformats-officedocument.'
+                'spreadsheetml.sheet')
+
+    def test_post_with_prj_manager(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         response = self.request(user=self.user, method='POST')
         assert response.status_code == 200
         assert (response.headers['content-disposition'][1] ==
@@ -1539,6 +1551,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'spreadsheetml.sheet')
 
     def test_post_with_unauthorized_user(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='DC')
         response = self.request(user=self.user, method='POST')
         assert response.status_code == 302
         assert ("You don't have permission to export data from this project"
@@ -1560,26 +1573,13 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.list'], ['organization/*']),
-                clause('allow', ['project.view'], ['project/*/*']),
-                clause('allow', ['project.import'], ['project/*/*']),
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
         setattr(self.request, '_messages', self.messages)
 
         self.user = UserFactory.create()
-        self.unauth_user = UserFactory.create()
 
         setattr(self.request, 'user', self.user)
-        assign_user_policies(self.user, self.policy)
 
         self.org = OrganizationFactory.create(
             name='Test Org', slug='test-org'
@@ -1692,18 +1692,26 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             )
             assert remove_csrf(expected) == remove_csrf(content)
 
-    def test_initial_get_valid(self):
+    def test_initial_get_valid_with_org_admin(self):
+        assign_role(self.project, self.user, org_admin=True)
+        self.client.force_login(self.user)
+        self._get(status=200, check_content=True)
+
+    def test_initial_get_valid_with_project_manager(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.client.force_login(self.user)
         self._get(status=200, check_content=True)
 
     def test_initial_get_with_unauthorized_user(self):
-        self.client.force_login(self.unauth_user)
+        assign_role(self.project, self.user, org_admin=False, prj_role='DC')
+        self.client.force_login(self.user)
         self._get(status=302, check_content=False)
 
     def test_initial_get_with_unauthenticated_user(self):
         self._get(status=302, login_redirect=True)
 
     def test_full_flow_valid(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
@@ -1762,6 +1770,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert len(random_filename.split('.')[0].strip('/')) == 24
 
     def test_full_flow_valid_custom_types(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project)
         question = q_factories.QuestionFactory.create(
@@ -1840,6 +1849,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert len(random_filename.split('.')[0].strip('/')) == 24
 
     def test_full_flow_valid_xls(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         mime = 'application/vnd.openxmlformats-'
         'officedocument.spreadsheetml.sheet'
         self.client.force_login(self.user)
@@ -1905,6 +1915,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert resource.original_file == 'test_download.xlsx'
 
     def test_full_flow_invalid_value(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.client.force_login(self.user)
         csvfile = self.get_file(self.invalid_csv, 'rb')
         file = SimpleUploadedFile('test_invalid.csv', csvfile.read(),
@@ -1947,6 +1958,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             project_id=proj.pk).count() == 0
 
     def test_full_flow_invalid_file_type(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.client.force_login(self.user)
         invalid_file = self.get_file(self.invalid_file_type, 'rb')
         file = SimpleUploadedFile(
@@ -1989,6 +2001,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             project_id=proj.pk).count() == 0
 
     def test_wizard_goto_step(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.client.force_login(self.user)
 
         # post first page data
@@ -2059,6 +2072,7 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
         assert select_defaults_response.status_code == 200
 
     def test_full_flow_valid_no_resource(self):
+        assign_role(self.project, self.user, org_admin=False, prj_role='PM')
         self.client.force_login(self.user)
         csvfile = self.get_file(self.valid_csv, 'rb')
         file = SimpleUploadedFile('test.csv', csvfile.read(), 'text/csv')
