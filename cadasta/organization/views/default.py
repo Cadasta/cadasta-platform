@@ -512,25 +512,13 @@ PROJECT_ADD_TEMPLATES = {
 }
 
 
-def add_wizard_permission_required(self, view, request):
-    if 'organization' in self.kwargs:
-        if Organization.objects.get(
-                slug=self.kwargs.get('organization')).archived:
-            return False
-    if request.method != 'POST':
-        return ()
-    session = request.session.get('wizard_project_add_wizard', None)
-    if session is None or 'details' not in session['step_data']:
-        return ()
-    else:
-        return 'project.create'
-
-
 class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
-                       LoginPermissionRequiredMixin,
+                       auth.LoginRequiredMixin,
+                       auth.OrganizationPermissionMixin,
                        wizard.SessionWizardView):
-    permission_required = add_wizard_permission_required
+    # permission_required = add_wizard_permission_required
     form_list = PROJECT_ADD_FORMS
+    org_slug = 'org_in_form'
 
     class RevalidationError(Exception):
 
@@ -539,6 +527,33 @@ class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
             self.form = form
             self.kwargs = kwargs
 
+    def get_permission_required(self):
+        if self.request.method != 'POST':
+            return ()
+
+        session = self.request.session.get('wizard_project_add_wizard', None)
+        if session is None or 'details' not in session['step_data']:
+            return ()
+        else:
+            return 'project.create'
+
+    def test_func(self):
+        if 'organization' in self.kwargs:
+            if Organization.objects.get(
+                    slug=self.kwargs.get('organization')).archived:
+                return False
+
+        return super().test_func()
+
+    def get_perms(self):
+        session = self.request.session.get('wizard_project_add_wizard', None)
+        if session is None or 'details' not in session['step_data']:
+            return []
+        else:
+            slug = session['step_data']['details']['details-organization'][0]
+            self.kwargs['org_in_form'] = slug
+            return super().get_perms()
+
     def get_form_initial(self, step):
         initial = super().get_form_initial(step)
 
@@ -546,14 +561,6 @@ class ProjectAddWizard(core_mixins.SuperUserCheckMixin,
             initial['organization'] = self.kwargs.get('organization')
 
         return initial
-
-    def get_perms_objects(self):
-        session = self.request.session.get('wizard_project_add_wizard', None)
-        if session is None or 'details' not in session['step_data']:
-            return []
-        else:
-            slug = session['step_data']['details']['details-organization'][0]
-            return [Organization.objects.get(slug=slug)]
 
     def get_template_names(self):
         return [PROJECT_ADD_TEMPLATES[self.steps.current]]

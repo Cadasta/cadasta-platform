@@ -285,8 +285,7 @@ class ProjectAddExtents(forms.ModelForm):
         fields = ['extent']
 
 
-class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
-
+class ProjectAddDetails(SanitizeFieldsForm, forms.Form):
     class Media:
         js = ('js/file-upload.js', 'js/sanitize.js')
 
@@ -309,7 +308,7 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
         org_is_chosen = kwargs.pop('org_is_chosen', None)
         super().__init__(*args, **kwargs)
 
-        if self.is_superuser(self.user):
+        if self.user.is_superuser:
             self.orgs = Organization.objects.filter(
                 archived=False).order_by('name')
         else:

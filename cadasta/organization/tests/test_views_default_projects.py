@@ -30,7 +30,7 @@ from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
-from tutelary.models import Policy, Role, assign_user_policies
+from tutelary.models import Policy
 
 from .. import forms
 from ..views import default
@@ -452,26 +452,13 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         self.request = HttpRequest()
         setattr(self.request, 'method', 'GET')
 
-        clauses = {
-            'clause': [
-                clause('allow', ['project.create'], ['organization/*'])
-            ]
-        }
-        self.policy = Policy.objects.create(
-            name='allow',
-            body=json.dumps(clauses))
-
         setattr(self.request, 'session', 'session')
         self.messages = FallbackStorage(self.request)
         setattr(self.request, '_messages', self.messages)
 
         self.user = UserFactory.create()
-        self.unauth_user = UserFactory.create()
-        self.superuser = UserFactory.create()
-        self.superuser.assign_policies(Role.objects.get(name='superuser'))
 
         setattr(self.request, 'user', self.user)
-        assign_user_policies(self.user, self.policy)
 
         self.org = OrganizationFactory.create(
             name='Test Org', slug='test-org'
@@ -508,11 +495,17 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
             assert remove_csrf(expected) == remove_csrf(content)
 
     def test_initial_get_valid(self):
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
         self.client.force_login(self.user)
         self._get(status=200, check_content=True)
 
     def test_initial_get_with_unauthorized_user(self):
-        self.client.force_login(self.unauth_user)
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=False)
+        self.client.force_login(self.user)
         self._get(status=200, check_content=True)
 
     def test_initial_get_with_unauthenticated_user(self):
@@ -609,7 +602,53 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
     }
 
     def test_full_flow_valid(self):
-        self.client.force_login(self.users[0])
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
+        self.client.force_login(self.user)
+        extents_response = self.client.post(
+            reverse('project:add'), self.EXTENTS_POST_DATA
+        )
+        assert extents_response.status_code == 200
+        self.DETAILS_POST_DATA['details-questionnaire'] = self.get_form(
+            'xls-form')
+        self.DETAILS_POST_DATA['details-original_file'] = 'original.xls'
+        details_response = self.client.post(
+            reverse('project:add'), self.DETAILS_POST_DATA
+        )
+        assert details_response.status_code == 200
+        permissions_response = self.client.post(
+            reverse('project:add'), self.PERMISSIONS_POST_DATA
+        )
+        assert permissions_response.status_code == 302
+        assert ('/organizations/test-org/projects/test-project/' in
+                permissions_response['location'])
+
+        proj = Project.objects.get(organization=self.org, name='Test Project')
+        assert proj.slug == 'test-project'
+        assert proj.description == 'This is a test project'
+        assert len(proj.contacts) == 1
+        assert proj.contacts[0]['name'] == "John Lennon"
+        assert proj.contacts[0]['email'] == 'john@beatles.co.uk'
+        assert ProjectRole.objects.filter(project=proj).count() == 3
+        for r in ProjectRole.objects.filter(project=proj):
+            if r.user.username == 'org_member_1':
+                assert r.role == 'PM'
+            elif r.user.username == 'org_member_2':
+                assert r.role == 'DC'
+            elif r.user.username == 'org_member_3':
+                assert r.role == 'PU'
+            else:
+                assert False
+
+        questionnaire = Questionnaire.objects.get(project=proj)
+        assert questionnaire.original_file == 'original.xls'
+
+    def test_full_flow_valid_with_superuser(self):
+        self.user.is_superuser = True
+        self.user.save()
+
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -649,7 +688,10 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert questionnaire.original_file == 'original.xls'
 
     def test_wizard_previous(self):
-        self.client.force_login(self.users[0])
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -662,10 +704,13 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert details_response.status_code == 200
 
     def test_flow_with_archived_organization(self):
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
         self.org.archived = True
         self.org.save()
 
-        self.client.force_login(self.users[0])
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -681,7 +726,10 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         }
 
     def test_full_flow_invalid_xlsform(self):
-        self.client.force_login(self.users[0])
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -706,10 +754,13 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_flow_with_org_is_chosen_function(self):
         second_org = OrganizationFactory.create(name="Second Org")
-        OrganizationRole.objects.create(organization=second_org,
-                                        user=self.users[0],
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
                                         admin=True)
-        self.client.force_login(self.users[0])
+        OrganizationRole.objects.create(organization=second_org,
+                                        user=self.user,
+                                        admin=True)
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -740,12 +791,16 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
         assert details_response.status_code == 200
 
     def test_full_flow_long_slug(self):
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
+
         project_name = (
             "Very Long Name For The Purposes of Testing That"
             " Slug Truncation Functions Correctly"
         )
         expected_slug = 'very-long-name-for-the-purposes-of-testing-that-sl'
-        self.client.force_login(self.superuser)
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('project:add'), self.EXTENTS_POST_DATA
         )
@@ -784,7 +839,10 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
                 assert False
 
     def test_full_flow_with_organization_valid(self):
-        self.client.force_login(self.users[0])
+        OrganizationRole.objects.create(organization=self.org,
+                                        user=self.user,
+                                        admin=True)
+        self.client.force_login(self.user)
         extents_response = self.client.post(
             reverse('organization:project-add',
                     kwargs={'organization': self.org.slug}),
