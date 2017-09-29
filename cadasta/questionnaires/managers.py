@@ -199,7 +199,9 @@ class QuestionnaireManager(models.Manager):
                     original_file=original_file,
                     project=project
                 )
-                json = parse_file_to_json(instance.xls_form.file.name)
+                xls_file = instance.xls_form.file
+                json = parse_file_to_json(xls_file.name)
+                xls_file.close()
 
                 id_string = json['id_string']
                 if re.search(r"\s", id_string):

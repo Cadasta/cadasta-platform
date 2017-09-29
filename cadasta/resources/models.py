@@ -177,8 +177,10 @@ def create_thumbnails(instance, created):
             thumb.save(write_path)
             if instance.file.field.upload_to:
                 name = instance.file.field.upload_to + '/' + name
-            instance.file.storage.save(name + '-128x128.' + ext,
-                                       open(write_path, 'rb').read())
+            with open(write_path, 'rb') as src:
+                instance.file.storage.save(name + '-128x128.' + ext,
+                                           src.read())
+            file.close()
 
 
 @receiver(models.signals.post_save, sender=Resource)
@@ -187,7 +189,9 @@ def create_spatial_resource(sender, instance, created, **kwargs):
         if instance.mime_type in GPX_MIME_TYPES:
             temp = io.ensure_dirs()
             with tempfile.NamedTemporaryFile(mode='wb', dir=temp) as f:
-                f.write(instance.file.open().read())
+                instance_file = instance.file.open()
+                f.write(instance_file.read())
+                instance_file.close()
                 f.seek(0)
                 # need to double check the mime-type here as browser detection
                 # of gpx mime type is not reliable

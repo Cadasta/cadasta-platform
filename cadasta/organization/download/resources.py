@@ -69,7 +69,10 @@ class ResourceExporter():
                     r.original_file = zip_fname
 
                 res_data.append(self.pack_resource_data(r))
-                myzip.write(r.file.open().name, arcname=zip_fname)
+
+                resource_file = r.file.open()
+                myzip.write(resource_file.name, arcname=zip_fname)
+                resource_file.close()
             resources_xls = self.make_resource_worksheet(f_name, res_data)
             myzip.write(resources_xls, arcname='resources.xlsx')
             myzip.close()

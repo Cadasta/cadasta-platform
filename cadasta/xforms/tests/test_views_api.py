@@ -359,6 +359,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         QuestionFactory.create(name='party_name',
                                questionnaire=questionnaire,
                                type='TX')
+
         # testing submitting with a missing xml_submission_file
         data = self._invalid_submission(form='This is not an xml form!')
         response = self.request(method='POST', user=self.user, post_data=data,

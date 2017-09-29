@@ -25,6 +25,7 @@ class XLSExporter(Exporter):
         # Finalize
         xls_path = os.path.splitext(es_dump_path)[0] + '.xlsx'
         self.workbook.save(filename=xls_path)
+        f.close()
         return xls_path, MIME_TYPE
 
     def write_xls_row(self, entity, metadatum):
