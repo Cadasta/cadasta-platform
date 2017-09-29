@@ -75,5 +75,8 @@ FORM_LANGS = {
     'uk': _("Ukrainian"),
     'ur': _("Urdu"),
     'vi': _("Vietnamese"),
-    'kar': _("S'gaw Karen")
+    'kar': _("S'gaw Karen"),
+    'aym': _("Aymara"),
+    'cab': _("Garifuna"),
+    'ori': _("Odia"),
 }
