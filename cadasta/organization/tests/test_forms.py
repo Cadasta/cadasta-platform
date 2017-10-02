@@ -664,12 +664,12 @@ class ProjectEditDetailsTest(UserTestCase, FileStorageTestCase, TestCase):
         form = forms.ProjectEditDetails(instance=project, data=data)
         form.save()
 
-        # project.refresh_from_db()
-        # assert project.name == data['name']
-        # questionnaire = project.questionnaires.get(
-        #     id=project.current_questionnaire)
-        # assert questionnaire.xls_form.url == data['questionnaire']
-        # assert questionnaire.original_file == data['original_file']
+        project.refresh_from_db()
+        assert project.name == data['name']
+        questionnaire = project.questionnaires.get(
+            id=project.current_questionnaire)
+        assert questionnaire.xls_form.url == data['questionnaire']
+        assert questionnaire.original_file == data['original_file']
 
     def test_add_invalid_questionnaire(self):
         project = ProjectFactory.create()
