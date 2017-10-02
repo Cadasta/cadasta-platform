@@ -186,7 +186,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
                 file_name=image_name,
                 file_type='png')
             img_stream = img_file.read()
-            img = InMemoryUploadedFile(
+            img_uploaded = InMemoryUploadedFile(
                 file=io.BytesIO(img_stream),
                 field_name=image_name,
                 name='{}.png'.format(image_name),
@@ -195,14 +195,14 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
                 charset='utf-8',
             )
             img_file.close()
-            data[img.name] = img
+            data[img_uploaded.name] = img_uploaded
 
         for audio_name in audio:
             audio_file = self._get_resource(
                 file_name=audio_name,
                 file_type='mp3')
             audio_stream = audio_file.read()
-            audio = InMemoryUploadedFile(
+            audio_uploaded = InMemoryUploadedFile(
                 file=io.BytesIO(audio_stream),
                 field_name=audio_name,
                 name='{}.mp3'.format(audio_name),
@@ -210,7 +210,7 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
                 size=len(audio_stream),
                 charset='utf-8',
             )
-            data[audio.name] = audio
+            data[audio_uploaded.name] = audio_uploaded
             audio_file.close()
 
         if file:
