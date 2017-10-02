@@ -26,7 +26,7 @@ before_install:
   - export CPLUS_INCLUDE_PATH=/usr/include/gdal
 
 install:
-  - pip install tox==2.8.1
+  - pip install tox==2.8.2
   - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz; fi
   - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo tar -zxvf /tmp/geckodriver.tar.gz -C /usr/local/bin/; fi
 
