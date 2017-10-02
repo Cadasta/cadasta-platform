@@ -33,3 +33,17 @@ class UserTest(TestCase):
                                  avatar=test_avatar_path,
                                  )
         assert user.avatar_url == user.avatar.url
+
+    def test_language_verbose_property(self):
+        user = UserFactory.build(username='John',
+                                 email='john@beatles.uk',
+                                 language='en',
+                                 )
+        assert user.language_verbose == 'English'
+
+    def test_measurement_verbose_property(self):
+        user = UserFactory.build(username='John',
+                                 email='john@beatles.uk',
+                                 measurement='metric',
+                                 )
+        assert user.measurement_verbose == 'Metric'

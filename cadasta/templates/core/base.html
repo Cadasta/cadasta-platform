@@ -46,6 +46,9 @@
               </button>
               <ul class="dropdown-menu">
                 <li>
+                  <a href="{% url 'account:dashboard' %}">{% trans "My dashboard" %}</a>
+                </li>
+                <li>
                   <a href="{% url 'account:profile' %}">{% trans "Edit profile" %}</a>
                 </li>
                 <li role="separator" class="divider"></li>

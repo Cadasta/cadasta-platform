@@ -81,7 +81,8 @@
 -------------------------------------------------------------- */
 
 #project-single .page-header,
-#organization-single .page-header { // navy band on pages for single project or organization
+#organization-single .page-header,
+#user-single .page-header { // navy band on pages for single project, organization, or user
   display: table;
   background: $brand-darkblue;
   height: 100px;
@@ -143,7 +144,8 @@
 
 @media (max-width: $screen-sm-max) {
   #project-single .page-header,
-  #organization-single .page-header {
+  #organization-single .page-header,
+  #user-single .page-header {
     overflow: visible;
     padding-top: 8px;
     padding-bottom: 8px;
@@ -693,6 +695,9 @@
       cursor: pointer;
       background-color: $table-bg-hover;
     }
+  }
+  .alert-dismissible.alert-warning {
+    margin-top: 10px;
   }
 }
 

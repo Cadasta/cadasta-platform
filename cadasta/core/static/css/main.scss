@@ -219,7 +219,8 @@ body.tinted-bg #page-content { // for bg image
 #registration #page-content,
 #project-single #page-content,
 #project-wizard.map #page-content,
-#organization-single #page-content { // for single project and org pages with left subnav
+#organization-single #page-content,
+#user-single #page-content { // for single project, org, and user pages with or without left subnav
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
@@ -244,6 +245,7 @@ body.tinted-bg #page-content { // for bg image
   #project-single #page-content,
   #project-wizard.page #page-content,
   #organization-single #page-content,
+  #user-single #page-content,
   #registration #page-content {
     position: relative;
     top: 0;
@@ -510,7 +512,7 @@ a.tile-box.btn,
   z-index: 2;
   width: 100%;
   .overlay {
-    background: rgba(14, 48, 94, 0.1);
+    background: #f2f4f7;
     min-height: 150px;
     padding: 20px;
     text-align: center;
@@ -546,6 +548,7 @@ a.tile-box.btn,
 
   }
 }
+
 .overlay-wrapper.map {
   padding: 15px;
   position: absolute;
@@ -560,6 +563,44 @@ a.tile-box.btn,
     min-height: 100%;
     padding: 40px 20% 0;
     margin-bottom: 0;
+  }
+}
+
+/*= User Dashboard
+--------------------------------------------------------------*/
+
+#org-wrapper {
+  &.well {
+    background: transparent;
+  }
+  h3 {
+    margin-top: 0;
+    .role {
+      text-transform: none;
+      margin-left: 3px;
+      color: $gray-medium;
+    }
+  }
+  .table-search { // search
+    display: none;
+  }
+  .overlay.smaller {
+    min-height: auto;
+  }
+  .btn-full.smaller {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+#user-single #org-wrapper {
+  .panel-heading {
+    padding: 10px 15px;
+    background-color: $body-bg;
+  }
+  p {
+    font-size: 14px;
+    min-width: auto;
   }
 }
 
@@ -655,6 +696,26 @@ section {
   .panel-topimage { // above header that spans panel
     padding-bottom: 20px;
     border-bottom: 1px solid $table-border-color;
+    #preview-box {
+      margin: 20px auto 10px auto;
+      width: 150px;
+      height: 150px;
+      background-color: white;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      text-align: center;
+    }
+    #avatar-preview {
+      width: auto;
+      height: 150px;
+      position: absolute;
+      top: -9999px;
+      bottom: -9999px;
+      left: -9999px;
+      right: -9999px;
+      margin: auto;
+    }
   }
   .panel-heading {
     @include clearfix;
