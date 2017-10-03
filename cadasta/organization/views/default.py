@@ -757,7 +757,8 @@ class ProjectDataDownload(mixins.ProjectMixin,
         message = {
             'res': "Scheduled export of project resources.",
             'xls': "Scheduled export of project records in XLS format.",
-            'shp': "Scheduled export of project locations as Shapefiles.",
+            'shp': ("Scheduled export of project records in XLS format and "
+                    "as Shapefiles."),
             'all': "Scheduled export of project resources and records.",
         }
         messages.add_message(
