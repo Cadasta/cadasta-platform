@@ -2,29 +2,29 @@ import importlib
 import os
 from collections import OrderedDict
 
-import core.views.generic as generic
 import django.views.generic as base_generic
-import formtools.wizard.views as wizard
-from accounts.models import User
-from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
-                         update_permissions)
-from core.util import random_id
-from core.views import mixins as core_mixins
+from django.contrib import messages
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Sum, When, Case, IntegerField
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
+
+from accounts.models import User
+import core.views.generic as generic
+from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
+                         update_permissions)
+from core.util import random_id
+from core.views import mixins as core_mixins
+from core.form_mixins import get_types
+import formtools.wizard.views as wizard
 from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.models import Questionnaire
 from resources.models import ContentObject, Resource
-from core.form_mixins import get_types
 from party.choices import TENURE_RELATIONSHIP_TYPES
 from spatial.choices import TYPE_CHOICES
-from django.contrib import messages
 
 from . import mixins
 from ..choices import ROLE_CHOICES
@@ -32,6 +32,7 @@ from .. import messages as error_messages
 from .. import forms
 from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
+from ..tasks import schedule_project_export
 
 
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
@@ -744,22 +745,28 @@ class ProjectDataDownload(mixins.ProjectMixin,
     def get_object(self):
         return self.get_project()
 
-    def get_form_kwargs(self, *args, **kwargs):
-        kwargs = super().get_form_kwargs(*args, **kwargs)
-        kwargs['project'] = self.object
-        kwargs['user'] = self.request.user
-        return kwargs
-
-    def post(self, request, *args, **kwargs):
+    def post(self, request, organization, project):
         self.object = self.get_object()
         form = self.get_form()
-        if form.is_valid():
-            path, mime_type = form.get_file()
-            filename, ext = os.path.splitext(path)
-            response = HttpResponse(open(path, 'rb'), content_type=mime_type)
-            response['Content-Disposition'] = ('attachment; filename=' +
-                                               self.object.slug + ext)
-            return response
+        if not form.is_valid():
+            return self.form_invalid(form)
+
+        output_type = form.cleaned_data['type']
+        schedule_project_export(self.object, request.user, output_type)
+
+        message = {
+            'res': "Scheduled export of project resources.",
+            'xls': "Scheduled export of project records in XLS format.",
+            'shp': ("Scheduled export of project records in XLS format and "
+                    "as Shapefiles."),
+            'all': "Scheduled export of project resources and records.",
+        }
+        messages.add_message(
+            self.request, messages.SUCCESS,
+            _(message[output_type]))
+        return redirect('organization:project-dashboard',
+                        organization=organization,
+                        project=project)
 
 
 DATA_IMPORT_FORMS = [('select_file', forms.SelectImportForm),
