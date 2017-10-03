@@ -1,6 +1,5 @@
 import random
 from string import ascii_lowercase
-from zipfile import ZipFile
 
 import pytest
 from pytest import raises
@@ -8,17 +7,12 @@ from pytest import raises
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
 from core.tests.utils.files import make_dirs  # noqa
-from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
-from jsonattrs.models import Attribute, AttributeType, Schema
-from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
-from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
-from resources.utils.io import ensure_dirs
 from spatial.tests.factories import SpatialUnitFactory
 from tutelary.models import Role
 
@@ -1214,121 +1208,37 @@ class ContactsFormTest(UserTestCase, TestCase):
         assert 'error-name' in html
 
 
-@pytest.mark.usefixtures('make_dirs')
-@pytest.mark.usefixtures('clear_temp')
 class DownloadFormTest(UserTestCase, TestCase):
 
-    def test_init(self):
-        ensure_dirs()
-        user = UserFactory.build()
-        project = ProjectFactory.build()
-        form = forms.DownloadForm(project, user)
-        assert form.project == project
-        assert form.user == user
-
     def test_get_shape_download(self):
-        ensure_dirs()
         data = {'type': 'shp'}
-        user = UserFactory.create()
-        project = ProjectFactory.create()
-        content_type = ContentType.objects.get(app_label='spatial',
-                                               model='spatialunit')
-        schema = Schema.objects.create(
-            content_type=content_type,
-            selectors=(project.organization.id, project.id))
-        attr_type = AttributeType.objects.get(name='text')
-        Attribute.objects.create(
-            schema=schema,
-            name='key', long_name='Test field',
-            attr_type=attr_type, index=0,
-            required=False, omit=False
-        )
-
-        su1 = SpatialUnitFactory.create(
-            project=project,
-            geometry='POINT (1 1)',
-            attributes={'key': 'value 1'})
-        SpatialUnitFactory.create(
-            project=project,
-            geometry='SRID=4326;'
-                     'MULTIPOLYGON (((30 20, 45 40, 10 40, 30 20)),'
-                     '((15 5, 40 10, 10 20, 5 10, 15 5)))',
-            attributes={'key': 'value 2'})
-        party = PartyFactory.create(project=project)
-        TenureRelationshipFactory.create(
-            spatial_unit=su1, party=party, project=project)
-
-        form = forms.DownloadForm(project, user, data=data)
+        form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        path, mime = form.get_file()
-        assert '{}-{}'.format(project.id, user.id) in path
-        assert (mime == 'application/zip')
-
-        with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 12
-            assert 'point.dbf' in testzip.namelist()
-            assert 'point.prj' in testzip.namelist()
-            assert 'point.shp' in testzip.namelist()
-            assert 'point.shx' in testzip.namelist()
-            assert 'multipolygon.dbf' in testzip.namelist()
-            assert 'multipolygon.prj' in testzip.namelist()
-            assert 'multipolygon.shp' in testzip.namelist()
-            assert 'multipolygon.shx' in testzip.namelist()
-            assert 'relationships.csv' in testzip.namelist()
-            assert 'parties.csv' in testzip.namelist()
-            assert 'locations.csv' in testzip.namelist()
-            assert 'README.txt' in testzip.namelist()
+        assert form.cleaned_data == data
 
     def test_get_xls_download(self):
-        ensure_dirs()
         data = {'type': 'xls'}
-        user = UserFactory.create()
-        project = ProjectFactory.create()
-        geometry = 'SRID=4326;POINT (30 10)'
-        SpatialUnitFactory.create(project=project, geometry=geometry)
-        form = forms.DownloadForm(project, user, data=data)
+        form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        path, mime = form.get_file()
-        assert '{}-{}'.format(project.id, user.id) in path
-        assert (mime == 'application/vnd.openxmlformats-officedocument.'
-                        'spreadsheetml.sheet')
+        assert form.cleaned_data == data
 
     def xtest_get_resources_download(self):
-        ensure_dirs()
         data = {'type': 'res'}
-        user = UserFactory.create()
-        project = ProjectFactory.create()
-        form = forms.DownloadForm(project, user, data=data)
+        form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        path, mime = form.get_file()
-        assert '{}-{}'.format(project.id, user.id) in path
-        assert mime == 'application/zip'
+        assert form.cleaned_data == data
 
-    def xtest_get_all_download(self):
-        ensure_dirs()
+    def test_get_all_download(self):
         data = {'type': 'all'}
-        user = UserFactory.create()
-        project = ProjectFactory.create()
-        geometry = 'SRID=4326;POINT (30 10)'
-        SpatialUnitFactory.create(project=project, geometry=geometry)
-        res = ResourceFactory.create(project=project)
-
-        form = forms.DownloadForm(project, user, data=data)
+        form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        path, mime = form.get_file()
-        assert '{}-{}'.format(project.id, user.id) in path
-        assert mime == 'application/zip'
+        assert form.cleaned_data == data
 
-        with ZipFile(path, 'r') as testzip:
-            assert len(testzip.namelist()) == 8
-            assert res.original_file in testzip.namelist()
-            assert 'resources.xlsx' in testzip.namelist()
-            assert 'data.xlsx' in testzip.namelist()
-            assert 'README.txt' in testzip.namelist()
-            assert 'point.shx' in testzip.namelist()
-            assert 'point.shp' in testzip.namelist()
-            assert 'point.prj' in testzip.namelist()
-            assert 'point.dbf' in testzip.namelist()
+    def test_invalid_download(self):
+        data = {'type': 'mp3'}
+        form = forms.DownloadForm(data=data)
+        assert form.is_valid() is False
+        assert form.cleaned_data == {}
 
 
 class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):

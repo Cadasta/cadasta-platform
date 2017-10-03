@@ -1,6 +1,4 @@
 import mimetypes
-import time
-# from zipfile import ZipFile
 
 from accounts.models import User
 from buckets.widgets import S3FileUploadWidget
@@ -20,9 +18,6 @@ from questionnaires.models import Questionnaire
 from tutelary.models import check_perms
 
 from .choices import ADMIN_CHOICES, ROLE_CHOICES
-# from .download.resources import ResourceExporter
-from .download.shape import ShapeExporter
-from .download.xls import XLSExporter
 from organization import fields as org_fields
 from .models import Organization, OrganizationRole, Project, ProjectRole
 
@@ -480,49 +475,10 @@ class DownloadForm(forms.Form):
     CHOICES = (
         ('shp', 'SHP'),
         ('xls', 'XLS'),
-        # ('res', 'Resources'),
-        # ('all', 'All data'),
+        ('res', 'Resources'),
+        ('all', 'All data'),
     )
-    type = forms.ChoiceField(choices=CHOICES, initial='xls')
-
-    def __init__(self, project, user, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.project = project
-        self.user = user
-
-    def get_file(self):
-        t = round(time.time() * 1000)
-
-        file_name = '{}-{}-{}'.format(self.project.id, self.user.id, t)
-        type = self.cleaned_data['type']
-
-        if type == 'shp':
-            e = ShapeExporter(self.project)
-            path, mime = e.make_download(file_name + '-shp')
-        elif type == 'xls':
-            e = XLSExporter(self.project)
-            path, mime = e.make_download(file_name + '-xls')
-        # elif type == 'res':
-        #     e = ResourceExporter(self.project)
-        #     path, mime = e.make_download(file_name + '-res')
-        # elif type == 'all':
-        #     res_exporter = ResourceExporter(self.project)
-        #     xls_exporter = XLSExporter(self.project)
-        #     shp_exporter = ShapeExporter(self.project)
-        #     path, mime = res_exporter.make_download(file_name + '-res')
-        #     data_path, _ = xls_exporter.make_download(file_name + '-xls')
-        #     shp_path, _ = shp_exporter.make_download(file_name + '-shp')
-        #     dupes = ['locations.csv', 'parties.csv', 'relationships.csv']
-        #     with ZipFile(path, 'a') as myzip:
-        #         myzip.write(data_path, arcname='data.xlsx')
-        #         with ZipFile(shp_path, 'r') as shp_zip:
-        #             for name in shp_zip.namelist():
-        #                 if name not in dupes:
-        #                     myzip.writestr(name, shp_zip.read(name))
-        #             shp_zip.close()
-        #         myzip.close()
-
-        return path, mime
+    type = forms.ChoiceField(choices=CHOICES, initial='all')
 
 
 class SelectImportForm(SanitizeFieldsForm, forms.Form):
