@@ -1214,31 +1214,31 @@ class DownloadFormTest(UserTestCase, TestCase):
         data = {'type': 'shp'}
         form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        assert form.data == data
+        assert form.cleaned_data == data
 
     def test_get_xls_download(self):
         data = {'type': 'xls'}
         form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        assert form.data == data
+        assert form.cleaned_data == data
 
     def xtest_get_resources_download(self):
         data = {'type': 'res'}
         form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        assert form.data == data
+        assert form.cleaned_data == data
 
     def test_get_all_download(self):
         data = {'type': 'all'}
         form = forms.DownloadForm(data=data)
         assert form.is_valid() is True
-        assert form.data == data
+        assert form.cleaned_data == data
 
     def test_invalid_download(self):
         data = {'type': 'mp3'}
         form = forms.DownloadForm(data=data)
         assert form.is_valid() is False
-        assert form.data == data
+        assert form.cleaned_data == {}
 
 
 class SelectImportFormTest(UserTestCase, FileStorageTestCase, TestCase):
