@@ -75,6 +75,7 @@ class ResourceExporter():
                 myzip.write(xls_path, arcname='resources.xlsx')
 
             myzip.close()
+            f.close()
 
         return zip_path, MIME_TYPE
 

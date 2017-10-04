@@ -43,6 +43,7 @@ class ShapeExporter(Exporter):
                 break
             self.process_entity(
                 type_line, source_line, self.write_csv_row_and_shp)
+        f.close()
 
         # Clean up
         for metadatum in self.metadata.values():

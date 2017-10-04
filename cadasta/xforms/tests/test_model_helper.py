@@ -839,9 +839,9 @@ class XFormModelHelperTest(TestCase):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test attaching resources
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-        file = open(
-            path + '/xforms/tests/files/test_image_one.png', 'rb'
-        ).read()
+        with open(path +
+                  '/xforms/tests/files/test_image_one.png', 'rb') as src:
+            file = src.read()
 
         data = InMemoryUploadedFile(
             file=io.BytesIO(file),
@@ -872,9 +872,9 @@ class XFormModelHelperTest(TestCase):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test without content object
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
-        file = open(
-            path + '/xforms/tests/files/test_image_two.png', 'rb'
-        ).read()
+        with open(path +
+                  '/xforms/tests/files/test_image_two.png', 'rb') as src:
+            file = src.read()
 
         data = InMemoryUploadedFile(
             file=io.BytesIO(file),
@@ -996,9 +996,11 @@ class XFormModelHelperTest(TestCase):
     def test_format_create_resource(self):
         party = PartyFactory.create(project=self.project)
         file_name = 'test_image_two.png'
-        file = open(
-            path + '/xforms/tests/files/test_image_two.png', 'rb'
-        ).read()
+
+        with open(path +
+                  '/xforms/tests/files/test_image_one.png', 'rb') as src:
+            file = src.read()
+
         file_data = InMemoryUploadedFile(
             file=io.BytesIO(file),
             field_name='test_image_two',

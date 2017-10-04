@@ -25,8 +25,9 @@ class PolicyFactory(factory.django.DjangoModelFactory):
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
         body_file = os.path.join(cls.directory, kwargs.pop('file', None))
-        kwargs['body'] = open(body_file).read()
-        return kwargs
+        with open(body_file) as body:
+            kwargs['body'] = body.read()
+            return kwargs
 
     def load_policies(force=True):
         load.run(force)

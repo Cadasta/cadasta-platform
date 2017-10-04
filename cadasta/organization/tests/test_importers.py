@@ -299,6 +299,7 @@ class CSVImportTest(UserTestCase, FileStorageTestCase, TestCase):
             '/organization/tests/files/uttaran_test.xlsx', 'rb')
         form = self.storage.save('xls-forms/uttaran_test.xlsx',
                                  xlscontent.read())
+        xlscontent.close()
         Questionnaire.objects.create_from_form(
             xls_form=form,
             project=self.project
