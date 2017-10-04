@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 FORM_LANGS = {
     'af': _("Afrikaans"),
     'ar': _("Arabic"),
+    'ay': _("Aymara"),
     'az': _("Azerbaijani"),
     'be': _("Belarusian"),
     'bg': _("Bulgarian"),
@@ -11,6 +12,7 @@ FORM_LANGS = {
     'br': _("Breton"),
     'bs': _("Bosnian"),
     'ca': _("Catalan"),
+    'cab': _("Garifuna"),
     'cs': _("Czech"),
     'cy': _("Welsh"),
     'da': _("Danish"),
@@ -39,6 +41,7 @@ FORM_LANGS = {
     'it': _("Italian"),
     'ja': _("Japanese"),
     'ka': _("Georgian"),
+    'kar': _("S'gaw Karen"),
     'kk': _("Kazakh"),
     'km': _("Khmer"),
     'kn': _("Kannada"),
@@ -55,6 +58,7 @@ FORM_LANGS = {
     'ne': _("Nepali"),
     'nl': _("Dutch"),
     'nn': _("Norwegian (Nynorsk)"),
+    'or': _("Odia"),
     'os': _("Ossetian"),
     'pa': _("Eastern Punjabi"),
     'pl': _("Polish"),
@@ -74,9 +78,5 @@ FORM_LANGS = {
     'tt': _("Tatar"),
     'uk': _("Ukrainian"),
     'ur': _("Urdu"),
-    'vi': _("Vietnamese"),
-    'kar': _("S'gaw Karen"),
-    'ay': _("Aymara"),
-    'cab': _("Garifuna"),
-    'or': _("Odia"),
+    'vi': _("Vietnamese")
 }
