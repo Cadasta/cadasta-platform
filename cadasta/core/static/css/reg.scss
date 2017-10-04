@@ -59,13 +59,6 @@ body.tinted-bg { // photo for login and register forms
   .btn-full {
     background: transparent;
     border-top: 1px solid $table-border-color;
-    text-align: center;
-    padding: 20px;
-    clear: both;
-    margin: 20px 0;
-    .btn {
-      min-width: 100px;
-    }
     .btn-group .btn {
       margin: 0;
     }
@@ -74,7 +67,6 @@ body.tinted-bg { // photo for login and register forms
 
 .form-2col { // wide layout with 2 columns
   max-width: 970px;
-  padding: 40px;
   margin-bottom: 50px;
   h1 {
     text-align: left;
@@ -113,6 +105,13 @@ body.tinted-bg { // photo for login and register forms
   @media (max-width: $screen-md-max) {
     margin-bottom: 14px;
   }
+}
+
+.panel.form-narrow {
+    padding: 0;
+    .panel-body {
+      padding: 30px 40px 10px 40px;
+    }
 }
 
 /* =S3 avatar image-upload work

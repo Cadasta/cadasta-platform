@@ -5,7 +5,7 @@
 
 {% block top-nav %}profile{% endblock %}
 
-{% block title %} | {% trans "Profile" %}{% endblock %}
+{% block title %} | {% trans "Edit Profile" %}{% endblock %}
 
 {% block extra_script %}
   {{ form.media }}
@@ -13,79 +13,87 @@
 
 {% block content %}
 
-<form class="profile-form form-narrow" method="POST"
-      action="{% url 'account:profile' %}" data-parsley-validate>
-  <h1>{% trans "Update your profile" %}</h1>
+<form class="profile-form" method="POST" action="{% url 'account:profile' %}" data-parsley-validate>
   {% csrf_token %}
-  {{ form.non_field_errors }}
-
-  <div class="form-group{% if form.avatar.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.avatar.id_for_label }}">{% trans "Profile picture" %}</label>
-    <div class="well">
-      <div id="preview-box" class="center-block">
-        <img src='{{ user.avatar_url }}' id="avatar-preview"/>
+  <div class="panel panel-default form-narrow form-2col">
+    <div class="panel-body">
+      {{ form.non_field_errors }}
+      <h1>{% trans "Update your profile" %}</h1>
+      <div class="row">
+        <div class="col-md-8">
+          <!-- input profile fields -->
+          <div class="form-group{% if form.username.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
+            {% render_field form.username class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
+            <div class="error-block">{{ form.username.errors }}</div>
+          </div>
+          <div class="form-group{% if form.email.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
+            {% render_field form.email class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
+            {% if emails_to_verify %}<p class="help-block small">{% trans "The email for this account has been changed recently, but the new email address has not yet been verified. You should have received an email with a link to verify the new email address." %}</p>{% endif %}
+            <div class="error-block">{{ form.email.errors }}</div>
+          </div>
+          <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}</label>
+            {% render_field form.full_name class+="form-control input-lg" data-parsley-sanitize="1" %}
+            <div class="error-block">{{ form.full_name.errors }}</div>
+          </div>
+          <div class="form-group{% if form.language.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.language.id_for_label }}">{% trans "Your preferred language" %}</label>
+            {% render_field form.language class+="form-control input-lg" %}
+            <div class="error-block">{{ form.language.errors }}</div>
+          </div>
+          <div class="form-group{% if form.measurement.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.measurement.id_for_label }}">{% trans "Your preferred measurement system" %}</label>
+            {% render_field form.measurement class+="form-control input-lg" %}
+            <div class="error-block">{{ form.measurement.errors }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <!-- input profile avatar -->
+          <div class="form-group{% if form.avatar.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.avatar.id_for_label }}">{% trans "Profile picture" %}</label>
+            <div class="well text-center">
+              <div id="preview-box" class="center-block">
+                <img src="{{ user.avatar_url }}" id="avatar-preview" />
+              </div>
+              <p class="help-block small">{% trans "For best results upload a square image, ideally 200x200 pixels." %}</p>
+              {% render_field form.avatar class+="form-control input-lg" data-parsley-sanitize="1" %}
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="help-block small">{% trans "For best results upload a square image." %}</p>
-      {% render_field form.avatar class+="form-control input-lg" data-parsley-sanitize="1" %}
+      <div class="row">
+        <div class="col-md-8">
+          <div class="well form-group {% if form.password.errors %} has-error{% endif %}">
+            <label class="control-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+            <p class="help-block small">{% trans "Please enter your password to verify your identity." %}</p>
+            {% render_field form.password class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
+            <div class="error-block">{{ form.password.errors }}</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h5>{% trans "Password options" %}</h5>
+          <ul>
+              <li>
+                <a href="{% url 'account_change_password' %}">
+                  {% trans "Change password" %}
+                </a>
+              </li>
+              <li>
+                <a href="{% url 'account_reset_password' %}">
+                  {% trans "Reset password" %}
+                </a>
+              </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel-footer panel-buttons text-center">
+      <button name="update" type="submit" class="btn btn-primary">{% trans "Save" %}</button>
+      <a href="{% url 'account:dashboard' %}" class="btn btn-default">{% trans "Cancel" %}</a>
     </div>
   </div>
-
-  <div class="form-group{% if form.username.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.username.id_for_label }}">{% trans "Username" %}</label>
-    {% render_field form.username class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
-    <div class="error-block">{{ form.username.errors }}</div>
-  </div>
-
-  <div class="form-group{% if form.email.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.email.id_for_label }}">{% trans "Email" %}</label>
-    {% render_field form.email class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
-    {% if emails_to_verify %}<p class="help-block small">{% trans "The email for this account has been changed recently, but the new email address has not yet been verified. You should have received an email with a link to verify the new email address." %}</p>{% endif %}
-    <div class="error-block">{{ form.email.errors }}</div>
-  </div>
-
-  <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.full_name.id_for_label }}">{% trans "Full name" %}</label>
-    {% render_field form.full_name class+="form-control input-lg" data-parsley-sanitize="1" %}
-    <div class="error-block">{{ form.full_name.errors }}</div>
-  </div>
-
-  <div class="form-group{% if form.language.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.language.id_for_label }}">{% trans "Your preferred language" %}</label>
-    {% render_field form.language class+="form-control input-lg" %}
-    <div class="error-block">{{ form.language.errors }}</div>
-  </div>
-
-  <div class="form-group{% if form.measurement.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.measurement.id_for_label }}">{% trans "Your preferred measurement system" %}</label>
-    {% render_field form.measurement class+="form-control input-lg" %}
-    <div class="error-block">{{ form.measurement.errors }}</div>
-  </div>
-
-  <div class="well form-group {% if form.password.errors %} has-error{% endif %}">
-    <label class="control-label" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
-    <p class="help-block small">{% trans "Please enter your password to verify your identity." %}</p>
-    {% render_field form.password class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
-    <div class="error-block">{{ form.password.errors }}</div>
-  </div>
-
-  <button name="update" type="submit"
-          class="btn btn-primary btn-lg btn-block text-uppercase">
-    {% trans "Update profile" %}
-  </button>
-
-  <h5>{% trans "Password options" %}</h5>
-  <ul>
-    <li>
-      <a href="{% url 'account_change_password' %}">
-        {% trans "Change password" %}
-      </a>
-    </li>
-    <li>
-      <a href="{% url 'account_reset_password' %}">
-        {% trans "Reset password" %}
-      </a>
-    </li>
-  </ul>
 </form>
 
 {% endblock %}
