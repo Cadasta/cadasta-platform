@@ -1,4 +1,4 @@
-- name: Install Xvfb and Squid
+- name: Install Xvfb, Squid, Chromium
   become: yes
   become_user: root
   apt: pkg={{ item }} state=installed update_cache=yes
@@ -11,7 +11,11 @@
 - name: Make Chromium dependency visible to Chromium
   become: yes
   become_user: root
-  copy: src=/usr/lib/chromium-browser/libffmpeg.so dest=/usr/lib/libffmpeg.so owner=root mode=644
+  copy: src=/usr/lib/chromium-browser/libffmpeg.so
+        dest=/usr/lib/libffmpeg.so
+        owner=root
+        mode=644
+        remote_src=true
 
 - name: Add path to ChromeDriver
   become: yes
