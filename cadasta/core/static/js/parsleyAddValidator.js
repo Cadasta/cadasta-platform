@@ -46,15 +46,15 @@
         return false;
       }
     }, 2)
-    .addMessage('phoneplus', gettext('Your phone number must start with +, followed by a country code and phone number.'));
+    .addMessage('phoneplus', gettext('Your phone number must start with +, followed by a country code and phone number with no spaces or punctuation.'));
 
   // checks phone number length is between min and exceed max length
   window.Parsley
     .addValidator('phonelength', function (value, requirement) {
       var term = $("#id_phone").val();
-      if ((term.length < 5)||(term.length > requirement)) {
+      if ((term.length < 6)||(term.length > requirement)) {
         return false;
       }
     }, 1)
-    .addMessage('phonelength', gettext('Your phone number must contain between 5 and %s characters.'));
+    .addMessage('phonelength', gettext('Your phone number must contain between 5 and 14 digits.'));
 

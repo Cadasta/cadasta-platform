@@ -15,14 +15,6 @@
     $("input[name='password']").on('focus', function() {
       $(this).parent().next(".help-block").removeClass("hidden");
     });
-    if (sessionStorage.getItem('phone')){
-      $("#phone-div").removeClass("hidden");
-      $("#email-div").addClass("hidden");
-      }
-    else{
-      $("#email-div").removeClass("hidden");
-      $("#phone-div").addClass("hidden");
-      }
   });
 </script>
 <script src="{% static 'js/password_widget.js' %}"></script>
@@ -59,21 +51,21 @@
     <div class="error-block">{{ form.username.errors }}</div>
   </div>
 
-  <div id="email-div" class="clearfix form-group{% if form.email.errors %} has-error{% endif %}">
+  <div id="email-div" class="verifyDiv email clearfix form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="id_email">{% trans "Email" %}</label>
     {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" data-parsley-required="true" data-parsley-errors-container="error-block" %}
     <div class="error-block">{{ form.email.errors }}</div>
     <div>
-      <a class="btn btn-xs btn-link pull-right" id="phone-btn">{% trans "I want to register with my phone" %}</a>
+      <a href="javascript:void(0)" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="phone" id="phone-btn">{% trans "I want to register with my phone" %}</a>
     </div>
   </div>
 
-  <div id="phone-div" class="clearfix form-group{% if form.phone.errors %} has-error{%endif%} hidden">
+  <div id="phone-div" class="verifyDiv phone hidden clearfix form-group{% if form.phone.errors %} has-error{%endif%} hidden">
     <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
     {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phonelength="15" data-parsley-phoneplus="1" data-parsley-errors-container="error-block" %}
     <div class="error-block">{{form.phone.errors}}</div>
     <div>
-      <a class="btn btn-xs btn-link pull-right" id="email-btn">{% trans "I want to register with my email" %}</a>
+      <a href="javascript:void(0)" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="email" id="email-btn">{% trans "I want to register with my email" %}</a>
     </div>
   </div>
 

@@ -2,9 +2,9 @@ from django.utils.translation import ugettext as _
 
 
 phone_format = _(
-    "Phone numbers must be provided in the format +9999999999."
-    " Up to 15 digits allowed. Do not include hyphen or"
-    " blank spaces in between, at the beginning or at the end."
+    "Your phone number must start with +, followed by a "
+    " country code and phone number with no spaces or "
+    " punctuation. It must contain between 5 and 14 digits."
 )
 
 account_inactive = _(
