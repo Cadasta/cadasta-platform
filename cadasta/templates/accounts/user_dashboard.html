@@ -148,7 +148,7 @@
               </a>
             </div>
             <div class="panel-body">
-              {% if not user.email_verified %}
+              {% if user.email and not user.email_verified or user.phone and not user.phone_verified %}
                 <!-- Unverified account message -->
                 <div class="alert alert-info alert-full" role="alert">
                   {% url 'account:resend_token' as resend_url %}
