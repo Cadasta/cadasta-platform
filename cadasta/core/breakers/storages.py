@@ -1,4 +1,5 @@
 from functools import partial
+import weakref
 
 from django.core.cache import cache
 import pybreaker
@@ -18,19 +19,27 @@ def get_offline_cache_errors():
 
 class CircuitBreakerCacheStorage(pybreaker.CircuitBreakerStorage):
     """
-    Defines the underlying storage for a circuit breaker - the underlying
-    implementation should be in a subclass that overrides the method this
-    class defines.
+    A cache-based storage for pybreaker. If cache retrieval fails (in the event
+    of an infrastructure failure) the storage defaults to its provided
+    fallback_state.
     """
     BASE_NAMESPACE = 'pybreaker'
+    __NAMESPACES = weakref.WeakValueDictionary()
 
     def __init__(self, namespace, fallback_state=pybreaker.STATE_CLOSED):
         """
-        Creates a new instance with the given `state` and `redis` object. The
-        redis object should be similar to pyredis' StrictRedis class. If there
-        are any connection issues with cache, the `fallback_circuit_state` is
-        used to determine the state of the circuit.
+        Creates a new instance with the given `namespace` and an optional
+        `fallback_state` object. The namespace is used to identify the circuit
+        breaker within the cache and therefore must be different from any other
+        circuit breaker namespaces. If there are any connection issues with
+        cache, the `fallback_circuit_state` is used to determine the state of
+        the circuit.
         """
+        assert namespace not in self.__NAMESPACES, (
+            "Attempt to create circuit breaker for already-used namespace "
+            "{!r}".format(namespace))
+        self.__NAMESPACES[namespace] = self
+
         super(CircuitBreakerCacheStorage, self).__init__(namespace)
         self._namespace_name = namespace
         self._fallback_state = fallback_state

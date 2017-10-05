@@ -7,13 +7,16 @@ from core.breakers import breaker, listeners, storages
 
 
 class BreakersTest(TestCase):
+
     def test_expected_errors(self):
-        cb = breaker.CircuitBreaker('test', expected_errors=(AttributeError,))
+        cb = breaker.CircuitBreaker(
+            'test', expected_errors=(AttributeError,), state_storage=None)
         assert cb.expected_errors == (
             pybreaker.CircuitBreakerError, AttributeError)
 
     def test_repr(self):
-        assert str(breaker.CircuitBreaker('test')) == '<CircuitBreaker: test>'
+        cb = breaker.CircuitBreaker('test', state_storage=None)
+        assert str(cb) == '<CircuitBreaker: test>'
 
     def test_is_open(self):
         cb = breaker.CircuitBreaker(
@@ -107,6 +110,11 @@ class StorageTest(TestCase):
 
     def test_namespace(self):
         assert self._get_storage().namespace == 'pybreaker:testStorage'
+
+    def test_duplicate_namespace(self):
+        x = self._get_storage()  # NOQA
+        with self.assertRaises(AssertionError):
+            self._get_storage()
 
     def test_state_namespace(self):
         assert self._get_storage()._state_namespace == (

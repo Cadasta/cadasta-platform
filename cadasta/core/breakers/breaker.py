@@ -7,12 +7,12 @@ from .listeners import LogListener
 class CircuitBreaker(pybreaker.CircuitBreaker):
     def __init__(self, name, expected_errors=(), **kwargs):
         # Set defaults
-        kwargs['state_storage'] = (
-            kwargs.get('state_storage') or CacheStorage(name))
-        kwargs['listeners'] = (
-            kwargs.get('listeners') or [LogListener()])
-        kwargs['exclude'] = (
-            kwargs.get('exclude') or [KeyboardInterrupt])
+        if 'state_storage' not in kwargs:
+            kwargs['state_storage'] = CacheStorage(name)
+        if 'listeners' not in kwargs:
+            kwargs['listeners'] = [LogListener()]
+        if 'exclude' not in kwargs:
+            kwargs['exclude'] = [KeyboardInterrupt]
 
         self.name = name
         # Convenience attribute to allow codebase to easily catch and
