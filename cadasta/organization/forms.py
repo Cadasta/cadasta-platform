@@ -4,7 +4,7 @@ import time
 
 from accounts.models import User
 from buckets.widgets import S3FileUploadWidget
-from core.form_mixins import SuperUserCheck, SanitizeFieldsForm
+from core.form_mixins import SanitizeFieldsForm
 from core.util import slugify
 from core.messages import SANITIZE_ERROR
 from django import forms
@@ -213,7 +213,7 @@ class AddOrganizationMemberForm(forms.Form):
         return self.instance
 
 
-class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
+class EditOrganizationMemberForm(forms.Form):
     org_role = forms.ChoiceField(choices=ADMIN_CHOICES)
 
     def __init__(self, org, user, current_user, data=None, *args, **kwargs):
@@ -222,6 +222,7 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
         self.organization = org
         self.user = user
         self.current_user = current_user
+
         self.org_role_instance = OrganizationRole.objects.get(
             user=user,
             organization=self.organization)
@@ -231,8 +232,8 @@ class EditOrganizationMemberForm(SuperUserCheck, forms.Form):
     def clean_org_role(self):
         org_role = self.cleaned_data['org_role']
         if (self.org_role_instance.admin and
-            self.current_user == self.user and
-                not self.is_superuser(self.user)):
+                self.current_user == self.user and
+                not self.user.is_superuser):
             if self.data.get('org_role') != 'A':
                 raise forms.ValidationError(
                     _("Organization administrators cannot change their own" +
@@ -285,7 +286,7 @@ class ProjectAddExtents(forms.ModelForm):
         fields = ['extent']
 
 
-class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
+class ProjectAddDetails(SanitizeFieldsForm, forms.Form):
 
     class Media:
         js = ('js/file-upload.js', 'js/sanitize.js')
@@ -309,7 +310,7 @@ class ProjectAddDetails(SanitizeFieldsForm, SuperUserCheck, forms.Form):
         org_is_chosen = kwargs.pop('org_is_chosen', None)
         super().__init__(*args, **kwargs)
 
-        if self.is_superuser(self.user):
+        if self.user.is_superuser:
             self.orgs = Organization.objects.filter(
                 archived=False).order_by('name')
         else:
@@ -418,7 +419,7 @@ class ProjectEditDetails(SanitizeFieldsForm, forms.ModelForm):
         return name
 
 
-class PermissionsForm(SuperUserCheck):
+class PermissionsForm:
 
     def check_admin(self, user):
         if not hasattr(self, 'admins'):
@@ -429,7 +430,7 @@ class PermissionsForm(SuperUserCheck):
                 ).select_related('user')
             ]
 
-        return self.is_superuser(user) or user in self.admins
+        return user.is_superuser or user in self.admins
 
     def set_fields(self):
         for user in self.organization.users.all():

@@ -925,12 +925,10 @@ class ProjectEditPermissionsTest(UserTestCase, TestCase):
         super().setUp()
         self.project = ProjectFactory.create()
 
-        self.super_user = UserFactory.create()
+        self.super_user = UserFactory.create(is_superuser=True)
         OrganizationRole.objects.create(user=self.super_user,
                                         organization=self.project.organization,
                                         admin=False)
-        su_role = Role.objects.get(name='superuser')
-        self.super_user.assign_policies(su_role)
 
         self.org_admin = UserFactory.create()
         OrganizationRole.objects.create(user=self.org_admin,

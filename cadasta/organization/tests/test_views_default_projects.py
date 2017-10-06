@@ -30,7 +30,7 @@ from resources.utils.io import ensure_dirs
 from skivvy import ViewTestCase
 from spatial.models import SpatialUnit
 from spatial.tests.factories import SpatialUnitFactory
-from tutelary.models import Policy, Role, assign_user_policies
+from tutelary.models import Policy, assign_user_policies
 
 from .. import forms
 from ..views import default
@@ -480,8 +480,7 @@ class ProjectAddTest(UserTestCase, FileStorageTestCase, TestCase):
 
         self.user = UserFactory.create()
         self.unauth_user = UserFactory.create()
-        self.superuser = UserFactory.create()
-        self.superuser.assign_policies(Role.objects.get(name='superuser'))
+        self.superuser = UserFactory.create(is_superuser=True)
 
         setattr(self.request, 'user', self.user)
         assign_user_policies(self.user, self.policy)

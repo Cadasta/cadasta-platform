@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from django.contrib.auth.models import AnonymousUser
 
-from tutelary.models import Policy, Role, assign_user_policies
+from tutelary.models import Policy, assign_user_policies
 from skivvy import ViewTestCase
 
 from core.tests.utils.cases import UserTestCase
@@ -754,9 +754,7 @@ class OrganizationMembersEditTest(ViewTestCase, UserTestCase, TestCase):
         assert role.admin is False
 
     def test_post_with_superuser(self):
-        superuser = UserFactory.create()
-        superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
         response = self.request(method='POST',
                                 post_data={'org_role': 'A'},
                                 user=superuser)
