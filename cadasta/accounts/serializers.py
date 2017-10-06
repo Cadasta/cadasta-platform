@@ -24,7 +24,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
         required=False
     )
     phone = serializers.RegexField(
-        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        regex=r'^\+[0-9]{5,14}$',
         error_messages={'invalid': phone_format},
         validators=[UniqueValidator(
             queryset=User.objects.all(),
@@ -132,7 +132,7 @@ class UserSerializer(SanitizeFieldSerializer,
 
     )
     phone = serializers.RegexField(
-        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        regex=r'^\+[0-9]{5,14}$',
         error_messages={'invalid': phone_format},
         validators=[UniqueValidator(
             queryset=User.objects.all(),
@@ -309,7 +309,7 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
 class PhoneVerificationSerializer(serializers.Serializer,
                                   SanitizeFieldSerializer):
     phone = serializers.RegexField(
-        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        regex=r'^\+[0-9]{5,14}$',
         error_messages={'invalid': phone_format},
         required=True
     )

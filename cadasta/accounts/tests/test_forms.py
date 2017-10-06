@@ -309,7 +309,7 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'phone': '+91 9327768250',
+            'phone': ' +91 9327768250 ',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes'
         }
@@ -321,7 +321,7 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'phone': ' +919327768250 ',
+            'phone': '+919327768250137284721',
             'password': '221B@bakertstreet',
             'full_name': 'Sherlock Holmes'
         }
@@ -333,8 +333,8 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'phone': ' +919327768250137284721',
-            'password': '221B@bakertstreet',
+            'phone': '+1234',
+            'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes'
         }
         form = forms.RegisterForm(data)
@@ -820,6 +820,46 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
             'phone': '9327768250',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.ProfileForm(data=data, instance=user)
+        assert form.is_valid() is False
+        assert (phone_format in form.errors.get('phone'))
+
+        data = {
+            'username': 'sherlock',
+            'phone': '+91-9067439937',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.ProfileForm(data=data, instance=user)
+        assert form.is_valid() is False
+        assert (phone_format in form.errors.get('phone'))
+
+        data = {
+            'username': 'sherlock',
+            'phone': ' +91 9327768250 ',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.ProfileForm(data=data, instance=user)
+        assert form.is_valid() is False
+        assert (phone_format in form.errors.get('phone'))
+
+        data = {
+            'username': 'sherlock',
+            'phone': '+919327768250137284721',
+            'password': '221B@bakertstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.ProfileForm(data=data, instance=user)
+        assert form.is_valid() is False
+        assert (phone_format in form.errors.get('phone'))
+
+        data = {
+            'username': 'sherlock',
+            'phone': '+1234',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes'
         }
@@ -1502,7 +1542,22 @@ class ResendTokenFormTest(UserTestCase, TestCase):
         assert form.is_valid() is False
         assert phone_format in form.errors.get('phone')
 
-        data = {'phone': '+1 2345678990'}
+        data = {'phone': ' +1 2345678990 '}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        data = {'phone': '+12345678790123456890'}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert phone_format in form.errors.get('phone')
+
+        data = {
+            'username': 'sherlock',
+            'phone': '+1234',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
         form = forms.ResendTokenForm(data)
         assert form.is_valid() is False
         assert phone_format in form.errors.get('phone')

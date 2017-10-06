@@ -21,7 +21,7 @@ from phonenumbers import parse as parse_phone
 class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
     email = forms.EmailField(required=False)
 
-    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+    phone = forms.RegexField(regex=r'^\+[0-9]{5,14}$',
                              error_messages={'invalid': messages.phone_format},
                              required=False)
     password = forms.CharField(widget=forms.PasswordInput())
@@ -102,7 +102,7 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
 class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     email = forms.EmailField(required=False)
 
-    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+    phone = forms.RegexField(regex=r'^\+[0-9]{5,14}$',
                              error_messages={'invalid': messages.phone_format},
                              required=False)
     password = forms.CharField(widget=forms.PasswordInput())
@@ -274,7 +274,7 @@ class ResetPasswordKeyForm(ChangePasswordMixin,
 class ResetPasswordForm(allauth_forms.ResetPasswordForm):
     email = forms.EmailField(required=False)
 
-    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+    phone = forms.RegexField(regex=r'^\+[0-9]{5,14}$',
                              error_messages={'invalid': messages.phone_format},
                              required=False)
 
@@ -347,6 +347,6 @@ class TokenVerificationForm(forms.Form):
 class ResendTokenForm(forms.Form):
     email = forms.EmailField(required=False)
 
-    phone = forms.RegexField(regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+    phone = forms.RegexField(regex=r'^\+[0-9]{5,14}$',
                              error_messages={'invalid': messages.phone_format},
                              required=False)
