@@ -31,83 +31,85 @@
     <!-- main body -->
     <div class="main-text">
       <div class="col-md-8">
+        <h2>{% trans "Organizations & Projects" %}</h2>
         <!-- Panel with list of organizations and projects -->
         <section>
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <h3 class="panel-title">{% trans "Projects" %}</h3>
-            </div>
-            <div class="panel-body">
-              {% if user_orgs_and_projects %}
-                {% for org, is_admin, projects in user_orgs_and_projects %}
+          {% if user_orgs_and_projects %}
+            {% for org, is_admin, projects in user_orgs_and_projects %}
 
-                  <!-- start organization block -->
-                  {% if is_admin or not org.archived %}
-                  <div id="org-wrapper" class="panel panel-default">
-                    <div class="panel-heading">
-                      <h3 class="panel-title">
-                        <a href="{% url 'organization:dashboard' slug=org.slug %}"
-                       data-toggle="tooltip" data-trigger="hover" title="{% trans 'Go to organization dashboard' %}">
-                        {{ org.name }}
-                        </a>
-                        <span class="role small">{% if is_admin %}{% trans "Administrator" %}{% endif %}</span>
-                        {% if org.archived %}
-                          <span class="label label-danger">{% trans "Archived" %}</span>
-                        {% endif %}
-                      </h3>
-                    </div>
-                    <div class="panel-body">
-                      {% if org.description %}<p>{{ org.description }}</p>{% endif %}
-                      {% if projects %}
-                        <table class="table table-hover datatable" data-paging-type="simple">
-                          <thead>
-                          <tr>
-                            <th class="col-md-7">{% trans "Project" %}</th>
-                            <th class="col-md-2 hidden-xs">{% trans "Role" %}</th>
-                            <th class="col-md-1 hidden-xs">{% trans "Country" %}</th>
-                            <th class="col-md-2">{% trans "Last updated" %}</th>
-                          </tr>
-                          </thead>
-                          <tbody>
-                          {% for proj, proj_role in projects %}
-                            <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=org.slug project=proj.slug %}';">
-                              <td>
-                                <h4>
-                                  <a href="{% url 'organization:project-dashboard' organization=org.slug project=proj.slug %}">{{ proj.name }}</a>
-                                  {% if proj.access == "private" %}
-                                    <span class="label label-info">{% trans "Private" %}</span>
-                                  {% endif %}
-                                  {% if proj.archived %}
-                                    <span class="label label-danger">{% trans "Archived" %}</span>
-                                  {% endif %}
-                                </h4>
-                                {% if proj.description %}<p>{{ proj.description }}</p>{% endif %}
-                              </td>
-                              <td class="hidden-xs">{{ proj_role }}</td>
-                              <td class="hidden-xs">{{ proj.country }}</td>
-                              <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
-                            </tr>
-                          {% endfor %}
-                          </tbody>
-                        </table>
-                      {% elif is_admin %}
+              <!-- start organization block -->
+              {% if is_admin or not org.archived %}
+              <div id="org-wrapper" class="panel panel-default">
+                <div class="panel-heading">
+                  <h3 class="panel-title">
+                    <a href="{% url 'organization:dashboard' slug=org.slug %}"
+                   data-toggle="tooltip" data-trigger="hover" title="{% trans 'Go to organization dashboard' %}">
+                    {{ org.name }}
+                    </a>
+                    <span class="role small">{% if is_admin %}{% trans "Administrator" %}{% endif %}</span>
+                    {% if org.archived %}
+                      <span class="label label-danger">{% trans "Archived" %}</span>
+                    {% endif %}
+                  </h3>
+                </div>
+                <div class="panel-body">
+                  {% if org.description %}<p>{{ org.description }}</p>{% endif %}
+                  {% if projects %}
+                    <table class="table table-hover datatable" data-paging-type="simple">
+                      <thead>
+                      <tr>
+                        <th class="col-md-7">{% trans "Project" %}</th>
+                        <th class="col-md-2 hidden-xs">{% trans "Role" %}</th>
+                        <th class="col-md-1 hidden-xs">{% trans "Country" %}</th>
+                        <th class="col-md-2">{% trans "Last updated" %}</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      {% for proj, proj_role in projects %}
+                        <tr class="linked" onclick="window.document.location='{% url 'organization:project-dashboard' organization=org.slug project=proj.slug %}';">
+                          <td>
+                            <h4>
+                              <a href="{% url 'organization:project-dashboard' organization=org.slug project=proj.slug %}">{{ proj.name }}</a>
+                              {% if proj.access == "private" %}
+                                <span class="label label-info">{% trans "Private" %}</span>
+                              {% endif %}
+                              {% if proj.archived %}
+                                <span class="label label-danger">{% trans "Archived" %}</span>
+                              {% endif %}
+                            </h4>
+                            {% if proj.description %}<p>{{ proj.description }}</p>{% endif %}
+                          </td>
+                          <td class="hidden-xs">{{ proj_role }}</td>
+                          <td class="hidden-xs">{{ proj.country }}</td>
+                          <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                    </table>
+                  {% elif is_admin %}
+                    <div class="overlay-wrapper">
+                      <div class="overlay">
                         <p class="text-center">{% trans "This organization is all set. Now add your first project." %}</p>
                         <div class="btn-full smaller">
                           <a class="btn btn-primary" href="{% url 'organization:project-add' org.slug %}" role="button">
                             <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> {% trans "Add a project" %}
                           </a>
                         </div>
-                      {% else %}
-                        <p>{% trans "Looks like this organization has no projects. As projects are created, they'll appear here." %}</p>
-                      {% endif %}
+                      </div>
                     </div>
-                  </div>
+                  {% else %}
+                    <p>{% trans "Looks like this organization has no projects. As projects are created, they'll appear here." %}</p>
                   {% endif %}
-                  <!-- / organization block -->
+                </div>
+              </div>
+              {% endif %}
+              <!-- / organization block -->
 
-                {% endfor %}
-              {% else %}
-                <!-- invitation to add first organization -->
+            {% endfor %}
+          {% else %}
+            <!-- invitation to add first organization -->
+            <div class="panel panel-default">
+              <div class="panel-body">
                 <div class="overlay-wrapper">
                   <div class="overlay">
                     <span class="glyphicon glyphicon-ok-circle large"></span>
@@ -119,9 +121,9 @@
                     </div>
                   </div>
                 </div>
-              {% endif %}
+              </div>
             </div>
-          </div>
+          {% endif %}
         </section>
       </div>
       <div class="col-md-4">

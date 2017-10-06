@@ -517,7 +517,6 @@ a.tile-box.btn,
     padding: 20px;
     text-align: center;
     vertical-align: middle;
-    margin-bottom: 10px;
     border-radius: 4px;
     &.no-bg {
       background: transparent;
@@ -596,10 +595,9 @@ a.tile-box.btn,
 #user-single #org-wrapper {
   .panel-heading {
     padding: 10px 15px;
-    background-color: $body-bg;
+    border-bottom: 1px solid $body-bg;
   }
   p {
-    font-size: 14px;
     min-width: auto;
   }
 }
