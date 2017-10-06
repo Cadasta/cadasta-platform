@@ -1,5 +1,39 @@
 # Change Log
 
+## [v1.13.0](https://github.com/Cadasta/cadasta-platform/tree/v1.13.0-alpha.1) (alpha.1, 2017-10-06)
+
+### Added
+
+- User Dashboard (#1721)
+- Add list functionality to Relationship endpoints (#1793)
+- Adds languages: Odia, Aymara, Garifuna (#1827)
+- Included add party in responsive menu (#1818)
+- Functional tests
+  - Add management command to load functional test fixtures (#1774)
+  - Integrate cadasta-test as a Travis CI build using BrowserStack (#1766)
+  - Accommodate User Accounts functional tests (#1788)
+  - Accommodate Organization functional tests (#1808)
+  - Accommodate Project functional tests (#1831)
+
+### Changed
+
+- Removed type=submit to previous buttons and moved buttons into wrapper (#1790)
+- Add links field to resources serializer (#1794)
+- Limit length of select list for browsable api (#1795)
+- CSS fixes and linting (#1814)
+- Updated menu to replace old ellipsis with cog (#1819)
+- Reduce number of ResourceWarning when running tests (#1828)
+- Update dependencies (#1781, #1821)
+
+### Fixed
+
+- displays edit and delete buttons only if user has permission (#1738)
+- BugFix #1745, case insensitive org/project name (#1770, #1809)
+- Support Django Debug Toolbar for dev setups (#1803)
+- Fix #1776: Make unit test deterministic (#1815)
+- Bugfix: Copy libffmpeg.so from remote source (#1832)
+- Makes review checklist checkable (#1833)
+
 ## [v1.12.1](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1) (2017-09-11)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.1-alpha.3...v1.12.1)
 
