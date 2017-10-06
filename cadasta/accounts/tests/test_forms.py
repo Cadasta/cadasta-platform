@@ -343,6 +343,22 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         assert User.objects.count() == 0
 
+    def test_signup_with_blank_phone_and_email(self):
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.RegisterForm(data)
+        assert form.is_valid() is False
+        assert (_("You cannot leave both phone and email empty."
+                  " Signup with either phone or email or both.")
+                in form.errors.get('__all__'))
+
+        assert User.objects.count() == 0
+
     def test_signup_with_phone_only(self):
         data = {
             'username': 'sherlock',
@@ -1561,3 +1577,18 @@ class ResendTokenFormTest(UserTestCase, TestCase):
         form = forms.ResendTokenForm(data)
         assert form.is_valid() is False
         assert phone_format in form.errors.get('phone')
+
+    def test_submit_empty(self):
+        data = {'email': ''}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (
+            _("You cannot leave both phone and email empty.")
+            in form.errors.get('__all__'))
+
+        data = {'phone': ''}
+        form = forms.ResendTokenForm(data)
+        assert form.is_valid() is False
+        assert (
+            _("You cannot leave both phone and email empty.")
+            in form.errors.get('__all__'))
