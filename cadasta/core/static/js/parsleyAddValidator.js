@@ -38,23 +38,33 @@
   // checks phone number starts with a plus
   window.Parsley
     .addValidator('phoneplus', function(value, requirement) {
-      var term = $("#id_phone").val();
-      var checkLength = ((term.length)-1);
-      var regex = new RegExp("[+]([0-9]){" + checkLength + "}");
+      var regex = new RegExp("^[+]");
       var check = + regex.test(value);
       if (check < 1) {
         return false;
       }
-    }, 2)
-    .addMessage('phoneplus', gettext('Your phone number must start with +, followed by a country code and phone number with no spaces or punctuation.'));
+    }, 3)
+    .addMessage('phoneplus', gettext('Your phone number must start with +.'));
 
-  // checks phone number length is between min and exceed max length
+  // checks phone number has between 6 and 15 characters
   window.Parsley
-    .addValidator('phonelength', function (value, requirement) {
-      var term = $("#id_phone").val();
-      if ((term.length < 6)||(term.length > requirement)) {
+    .addValidator('phonelength', function(value, requirement) {
+      var check = value.length;
+      if ((check < 6) || (check > requirement)) {
+        return false;
+      }
+    }, 2)
+    .addMessage('phonelength', gettext('Your phone number must have between 5 and 15 digits.'));
+
+  // checks phone number is all numbers without spaces or punctuation
+  window.Parsley
+    .addValidator('phonenumber', function(value, requirement) {
+      var regex = new RegExp("[+]([0-9]*$)");
+      var check = + regex.test(value);
+      if (check < 1) {
         return false;
       }
     }, 1)
-    .addMessage('phonelength', gettext('Your phone number must contain between 5 and 14 digits.'));
+    .addMessage('phonenumber', gettext('Your phone number must start with +, followed by a country code and phone number without spaces or punctuation. '));
+
 
