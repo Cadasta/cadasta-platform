@@ -33,10 +33,17 @@ class OrganizationSerializer(core_serializers.SanitizeFieldSerializer,
         if slugify(value, allow_unicode=True) in invalid_names:
             raise serializers.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
-        not_unique = Organization.objects.filter(name__iexact=value).exists()
+
+        is_create = not self.instance
+        queryset = Organization.objects.filter(name__iexact=value)
+        if is_create:
+            not_unique = queryset.exists()
+        else:
+            not_unique = queryset.exclude(id=self.instance.id).exists()
         if not_unique:
             raise serializers.ValidationError(
                 _("Organization with this name already exists."))
+
         return value
 
     def create(self, *args, **kwargs):
