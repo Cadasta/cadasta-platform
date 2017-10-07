@@ -15,6 +15,9 @@
     $("input[name='password']").on('focus', function() {
       $(this).parent().next(".help-block").removeClass("hidden");
     });
+    $("input[id='id_phone']").on('focus', function() {
+      $(this).next(".help-block").removeClass("hidden");
+    });
   });
 </script>
 <script src="{% static 'js/password_widget.js' %}"></script>
@@ -53,26 +56,28 @@
 
   <div id="email-div" class="verifyDiv email clearfix form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="id_email">{% trans "Email" %}</label>
-    {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" data-parsley-required="true" data-parsley-errors-container="error-block" %}
+    {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" data-parsley-required="true" %}
     <div class="error-block">{{ form.email.errors }}</div>
     <div>
-      <a href="javascript:void(0)" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="phone" id="phone-btn">{% trans "I want to register with my phone" %}</a>
+      <a href="#phone-div" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="phone" id="phone-btn">{% trans "I want to register with my phone" %}</a>
     </div>
   </div>
 
   <div id="phone-div" class="verifyDiv phone hidden clearfix form-group{% if form.phone.errors %} has-error{%endif%} hidden">
     <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
-    {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phonelength="15" data-parsley-phoneplus="1" data-parsley-errors-container="error-block" %}
+    {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phoneplus="1" data-parsley-phonelength="16" data-parsley-phonenumber="1" data-parsley-errors-container="#phone-errors" %}
+    <p class="help-block small hidden">{% trans "Phone numbers must start with a +, followed by a country code and phone number without spaces or punctuation. Phone numbers must contain between 5 and 15 digits." %}</p>
+    <div id="phone-errors"></div>
     <div class="error-block">{{form.phone.errors}}</div>
-    <div>
-      <a href="javascript:void(0)" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="email" id="email-btn">{% trans "I want to register with my email" %}</a>
+    <div class="clearfix">
+      <a href="#email-div" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="email" id="email-btn">{% trans "I want to register with my email" %}</a>
     </div>
   </div>
 
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
     <label class="control-label" for="id_password">{% trans "Password" %}</label>
     <div class="input-group input-group-lg">
-      {% render_field form.password class+="form-control" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" data-parsley-sanitize="1" %}
+      {% render_field form.password class+="form-control" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" data-parsley-sanitize="1" data-parsley-errors-container="#password-errors" %}
       <span class="input-group-btn">
         <button class="btn" type="button">
           <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
@@ -80,6 +85,7 @@
       </span>
     </div>
     <p class="help-block small hidden">{% trans "Passwords must have a minimum of 10 characters and contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.  Passwords cannot contain the username, email address, or phone." %}</p>
+    <div id="password-errors"></div>
     <div class="error-block">{{ form.password.errors }}</div>
   </div>
 

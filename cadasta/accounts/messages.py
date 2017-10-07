@@ -3,8 +3,8 @@ from django.utils.translation import ugettext as _
 
 phone_format = _(
     "Your phone number must start with +, followed by a "
-    " country code and phone number with no spaces or "
-    " punctuation. It must contain between 5 and 14 digits."
+    " country code and phone number without spaces or "
+    " punctuation. It must contain between 5 and 15 digits."
 )
 
 account_inactive = _(

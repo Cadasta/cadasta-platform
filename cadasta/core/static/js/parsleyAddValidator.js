@@ -35,7 +35,7 @@
     }, 2)
     .addMessage('emailfield', gettext('Your password cannot contain your email mailbox name.'));
 
-  // checks phone number starts with a plus followed by 0-9 numbers
+  // checks phone number starts with a plus
   window.Parsley
     .addValidator('phoneplus', function(value, requirement) {
       var term = $("#id_phone").val();

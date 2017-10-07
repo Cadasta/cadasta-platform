@@ -5,7 +5,8 @@ $(document).ready(function() {
     $('.verifyDiv').addClass('hidden');
     $('.' + verifyToShow).removeClass('hidden');
   }
-  $('.show-verifyDiv').click(function(){
+  $('.show-verifyDiv').click(function(event){
+    event.preventDefault();
     var verifyToShow = $(this).data('verify');
      $('.verifyDiv').addClass('hidden');
      $('.verifyDiv').find('input').val('');
