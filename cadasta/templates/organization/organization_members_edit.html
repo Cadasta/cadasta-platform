@@ -25,7 +25,12 @@
                 <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
               </div>
               <div class="member-detail">
-                <h4>{{ object.username }}</h4>
+                <h4>
+                  {{ object.username }}
+                  {% if object.is_superuser %}
+                    <span class="badge" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'This user has superuser permissions' %}">SU</span>
+                  {% endif %}
+                </h4>
                 <p>{{ object.full_name }}<br>
                 {{ object.email }}<br>
                 <span class="small help-block">{% trans "Last login:" %} {{ object.last_login }}</span></p>
@@ -34,7 +39,7 @@
                 {% csrf_token %}
                 <div class="form-group member-role{% if org_role_form.org_role.errors %} has-error{% endif %}">
                   <label class="control-label" for="{{ org_role_form.org_role.id_for_label }}">{% trans "Role" %}</label>
-                  {% if current_user %}
+                  {% if current_user or object.is_superuser %}
                   <p><strong>{% trans "Administrator" %}</strong></p>
                   {% else %}
                   {% render_field org_role_form.org_role class+="form-control" data-parsley-required="true" %}
@@ -81,7 +86,7 @@
                   </tbody>
                 </table>
               </div>
-              {% if not org_admin %}
+              {% if not org_admin and not object.is_superuser %}
               <div class="panel-footer panel-buttons text-center">
                 <button type="submit" class="btn btn-primary" name="submit">{% trans "Save" %}</button>
                 <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
