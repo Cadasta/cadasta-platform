@@ -245,7 +245,7 @@ class TenureRelationship(ResourceModelMixin,
     spatial_unit = models.ForeignKey(SpatialUnit, on_delete=models.CASCADE)
 
     # Tenure relationships type: used to manage range of allowed attributes
-    tenure_type = models.CharField(max_length=10)
+    tenure_type = models.CharField(max_length=100)
 
     # JSON attributes field with management of allowed members.
     attributes = JSONAttributeField(default={})
