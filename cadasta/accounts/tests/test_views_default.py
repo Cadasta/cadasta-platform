@@ -233,6 +233,12 @@ class UserDashboardTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.UserDashboard
     template = 'accounts/user_dashboard.html'
 
+    def test_with_anonymous_user(self):
+        response = self.request()
+
+        assert response.status_code == 302
+        assert '/account/login/' in response.location
+
     def test_without_organizations(self):
         user = UserFactory.create()
 

@@ -96,7 +96,7 @@ class ConfirmEmail(ConfirmEmailView):
         return response
 
 
-class UserDashboard(ListView):
+class UserDashboard(LoginRequiredMixin, ListView):
     model = User
     template_name = 'accounts/user_dashboard.html'
 
