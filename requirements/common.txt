@@ -7,9 +7,9 @@ django-cors-headers==2.1.0
 django-filter==1.0.4
 django-crispy-forms==1.6.1
 django-parsley==0.6
-django-formtools==2.0
-django-countries==4.6.2
-django-leaflet==0.18.1  # rq.filter: =0.18.1
+django-formtools==2.1
+django-countries==5.0
+django-leaflet==0.18.1  # rq.filter: <=0.18.1
 django-sass-processor==0.5.5
 djangorestframework-gis==0.11.2
 jsonschema==2.6.0
@@ -23,14 +23,14 @@ django-widget-tweaks==1.4.1
 django-buckets==0.1.22
 pyxform-cadasta==0.9.22
 python-magic==0.4.13
-Pillow==4.2.1
+Pillow==4.3.0
 django-jsonattrs==0.1.23
 openpyxl==2.4.8
 pytz==2017.2
 shapely==1.6.1
 gdal==1.10.0  # rq.filter: <2.0.0
 pylibmc==1.5.2
-awscli==1.11.159
+awscli==1.11.167
 pandas==0.20.3
 argon2-cffi==16.3.0
 requests==2.18.4
