@@ -11,6 +11,7 @@ from django.db import transaction
 from django.db.models import Sum, When, Case, IntegerField
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 
 from accounts.models import User
 import core.views.generic as generic
@@ -32,7 +33,7 @@ from .. import messages as error_messages
 from .. import forms
 from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
-from ..tasks import schedule_project_export
+from ..tasks import schedule_project_export, export
 
 
 class OrganizationList(PermissionRequiredMixin, generic.ListView):
@@ -451,6 +452,12 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_parties'] = num_parties
         context['num_resources'] = num_resources
         context['members'] = members
+
+        exports = self.object.tasks.filter(type=export.name)
+        exports = exports.select_related('result').order_by('-created_date')
+        last_week = timezone.now() - timezone.timedelta(days=7)
+        exports = exports.filter(created_date__gte=last_week)[:5]
+        context['recent_exports'] = exports
         try:
             context['questionnaire'] = Questionnaire.objects.get(
                 id=self.object.current_questionnaire)
