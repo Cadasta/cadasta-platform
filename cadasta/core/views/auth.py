@@ -53,7 +53,7 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
         - The platform dashboard if the user tried to access an organization
           dashboard
         - The organization dashboard if the user tried to access an
-          organization page or a project dashbaord.
+          organization page or a project dashboard.
         - The project dashboard if the user tried to access a project page.
         """
         if hasattr(self, 'raise_exception') and self.raise_exception:
@@ -116,8 +116,8 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
         """
         An abstract method, which must be overwritten by the implementing view.
 
-        If implemented it should return a list of permission code names the
-        user has for the given view.
+        It should return a list of permission code names the user has for
+        the given view.
         """
         raise ImproperlyConfigured(
             'Instances of PermissionRequiredMixin must implement method '

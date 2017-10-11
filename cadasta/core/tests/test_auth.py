@@ -6,6 +6,7 @@ from django.views.generic import View
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.contrib.messages.api import get_messages
 from skivvy import ViewTestCase
 
 from accounts.tests.factories import UserFactory
@@ -66,20 +67,6 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         view = TestView()
         assert view.get_permission_required() == 'some.perm'
 
-    def test_get_permission_required_defined(self):
-        """
-        If get_permission_required is implemented it has prefenence over
-        permission_required.
-        """
-        class TestView(PermissionRequiredMixin, View):
-            permission_required = 'some.perm'
-
-            def get_permission_required(self):
-                return 'other.perm'
-
-        view = TestView()
-        assert view.get_permission_required() == 'other.perm'
-
     def test_get_perms_not_defined(self):
         """
         Instances of PermissionRequiredMixin must implement get_perms
@@ -130,6 +117,38 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         view = TestView()
         assert view.has_permission() is True
 
+    def test_has_no_permission_with_permission_required_method(self):
+        """
+        has_permssions should use return value of get_permission_required
+        """
+        class TestView(PermissionRequiredMixin, View):
+            permission_required = 'some.perm'
+
+            def get_perms(self):
+                return ['some.perm']
+
+            def get_permission_required(self):
+                return 'other.perm'
+
+        view = TestView()
+        assert view.has_permission() is False
+
+    def test_has_permission_with_permission_required_method(self):
+        """
+        has_permssions should use return value of get_permission_required
+        """
+        class TestView(PermissionRequiredMixin, View):
+            permission_required = 'some.perm'
+
+            def get_perms(self):
+                return ['other.perm']
+
+            def get_permission_required(self):
+                return 'other.perm'
+
+        view = TestView()
+        assert view.has_permission() is True
+
     def test_has_permission_permission_denied(self):
         """
         The permission returned from get_perms does not match the one defined
@@ -168,6 +187,34 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
             def get_perms(self):
                 return ('some.perm', )
+
+        view = TestView()
+        assert view.has_permission() is False
+
+    def test_has_permission_permission_granted_for_list(self):
+        """
+        All permissions defined in permission_required must be present in the
+        return value of get_perms.
+        """
+        class TestView(PermissionRequiredMixin, View):
+            permission_required = ['some.perm', 'other.perm']
+
+            def get_perms(self):
+                return ('some.perm', 'other.perm', 'third.perm')
+
+        view = TestView()
+        assert view.has_permission() is True
+
+    def test_has_permission_permission_denied_for_list(self):
+        """
+        All permissions defined in permission_required must be present in the
+        return value of get_perms.
+        """
+        class TestView(PermissionRequiredMixin, View):
+            permission_required = ['some.perm', 'other.perm']
+
+            def get_perms(self):
+                return ('some.perm', 'third.perm')
 
         view = TestView()
         assert view.has_permission() is False
@@ -251,6 +298,8 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                                 request_meta={'HTTP_REFERER': referer})
         assert response.status_code == 302
         assert response.location == referer
+        assert ("You don't have permission for this action." in
+                response.messages)
 
     def test_login_redirect_to_project_dashboard(self):
         """
@@ -280,6 +329,8 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                                kwargs=url_kwargs)
         assert response.status_code == 302
         assert response.location == exp_redirect
+        assert ("You don't have permission for this action." in
+                response.messages)
 
     def test_login_redirect_from_project_dashboard_to_org_dashboard(self):
         """
@@ -317,6 +368,8 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         response = view(request, **kwargs)
         assert response.status_code == 302
         assert exp_redirect == response['location']
+        messages = [str(m) for m in get_messages(request)]
+        assert "You don't have permission for this action." in messages
 
     def test_login_redirect_to_organization_dashboard(self):
         """
@@ -346,6 +399,8 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                                kwargs=url_kwargs)
         assert response.status_code == 302
         assert response.location == exp_redirect
+        assert ("You don't have permission for this action." in
+                response.messages)
 
     def test_login_redirect_from_org_dashboard_to_dashboard(self):
         """
@@ -382,3 +437,5 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         response = view(request, **kwargs)
         assert response.status_code == 302
         assert exp_redirect == response['location']
+        messages = [str(m) for m in get_messages(request)]
+        assert "You don't have permission for this action." in messages
