@@ -201,6 +201,41 @@ class OrganizationSerializerTest(UserTestCase, TestCase):
             'name': ["Organization with this name already exists."]
         }
 
+    def test_update_org_name_with_different_case(self):
+        org_1 = OrganizationFactory.create()
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        data = {'name': org_1.name.upper()}
+        serializer = serializers.OrganizationSerializer(
+            org_1,
+            data=data,
+            partial=True,
+            context={'request': request}
+        )
+        assert serializer.is_valid() is True
+        assert serializer.errors.get('name') is None
+        serializer.save()
+        org_1.refresh_from_db()
+        assert org_1.name == org_1.name.upper()
+
+    def test_update_org_check_for_org_name_error(self):
+        org_1 = OrganizationFactory.create()
+        request = APIRequestFactory().post('/')
+        user = UserFactory.create()
+        setattr(request, 'user', user)
+
+        data = {'description': 'Checking for errors in name!'}
+        serializer = serializers.OrganizationSerializer(
+            org_1,
+            data=data,
+            partial=True,
+            context={'request': request}
+        )
+        assert serializer.is_valid() is True
+        assert serializer.errors.get('name') is None
+
 
 class ProjectSerializerTest(TestCase):
     def test_project_is_set(self):

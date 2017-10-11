@@ -216,6 +216,25 @@ class OrganizationTest(UserTestCase, TestCase):
                 in form.errors['name'])
         assert Organization.objects.count() == 1
 
+    def test_update_org_name_with_different_case(self):
+        self._save(self.data)
+        self.data['name'] = 'ORG'
+        org = Organization.objects.first()
+        form = forms.OrganizationForm(self.data, instance=org)
+        assert form.is_valid() is True
+        assert form.errors.get('name') is None
+        form.save()
+        org.refresh_from_db()
+        assert org.name == 'ORG'
+
+    def test_update_org_check_for_org_name_error(self):
+        self._save(self.data)
+        org = Organization.objects.first()
+        self.data['description'] = 'Checking for errors in name!'
+        form = forms.OrganizationForm(self.data, instance=org)
+        assert form.is_valid() is True
+        assert form.errors.get('name') is None
+
 
 class AddOrganizationMemberFormTest(UserTestCase, TestCase):
 

@@ -151,10 +151,16 @@ class OrganizationForm(SanitizeFieldsForm, forms.ModelForm):
             raise forms.ValidationError(
                 _("Organization name cannot be “Add” or “New”."))
 
-        not_unique = Organization.objects.filter(name__iexact=name).exists()
+        is_create = not self.instance.id
+        queryset = Organization.objects.filter(name__iexact=name)
+        if is_create:
+            not_unique = queryset.exists()
+        else:
+            not_unique = queryset.exclude(id=self.instance.id).exists()
         if not_unique:
             raise forms.ValidationError(
                 self.fields['name'].error_messages['unique'])
+
         return name
 
     def save(self, *args, **kwargs):
