@@ -1,39 +1,51 @@
 #!/bin/bash
 
-if [[ -z $TRAVIS || ($TRAVIS_EVENT_TYPE == pull_request && $TRAVIS_BRANCH == master) ]]
+# If this is not a Travis build, just execute runtests.py
+if [[ -z $TRAVIS ]]
 then
+  ./runtests.py --functional
+
+# We are on a Travis build
+else
 
   # Perform any final installations and setups before running tests on Travis
-  if [[ -n $TRAVIS ]]
+  cd cadasta/core
+  npm install bootstrap-sass
+  cd ..
+  ./manage.py migrate
+  ./manage.py loadstatic
+  ./manage.py loadfunctestfixtures
+  ./manage.py runserver 0.0.0.0:8000 &
+  until curl http://0:8000 -f; do sleep .1; done  # Wait for the Django server to start up
+  cd ..
+
+  # Run the test suite in the Travis VM for PRs
+  if [[ $TRAVIS_EVENT_TYPE == pull_request && $TRAVIS_BRANCH == master ]]
   then
-    cd cadasta/core
-    npm install bootstrap-sass
-    cd ..
-    ./manage.py migrate
-    ./manage.py loadstatic
-    ./manage.py loadfunctestfixtures
-    ./manage.py runserver 0.0.0.0:8000 &
-    cd ..
-    sleep 5  # Wait for the Django server to start up
+    export CADASTA_TEST_WEBDRIVER=Firefox
+    ./runtests.py --functional
+    ret=$?
   fi
 
-  # Run all the things
-  if [[ -n $TRAVIS ]]
+  # Run the test suite via BrowserStack (as much as possible) for commits to master
+  if [[ $TRAVIS_EVENT_TYPE == push && $TRAVIS_BRANCH == master ]]
   then
     # BrowserStack cannot handle local file uploads
     export CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome
     ./runtests.py --functional -m 'not uploads'
+    ret=$?
 
-    # Run file upload tests using the local ChromeDriver
-    export CADASTA_TEST_WEBDRIVER=Firefox
-    ./runtests.py --functional -m uploads
-  else
-    ./runtests.py --functional
+    if [[ $ret == 0 ]]
+    then
+      # Run file upload tests using the local WebDriver
+      export CADASTA_TEST_WEBDRIVER=Firefox
+      ./runtests.py --functional -m uploads
+      ret=$?
+    fi
   fi
-  ret=$?
 
-  # Clean up on Travis
-  if [[ -n $TRAVIS ]]; then killall python; fi  # Kill the Django server
+  # Kill the Django server
+  killall python
 
   exit $ret
 fi
