@@ -10,11 +10,12 @@ from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
 from core.util import random_id
 from core.views import mixins as core_mixins
+from core.views import auth
 from django.conf import settings
 from django.core.files.storage import DefaultStorage, FileSystemStorage
 from django.core.urlresolvers import reverse
 from django.db import transaction
-from django.db.models import Sum, When, Case, IntegerField
+from django.db.models import Sum, When, Case, IntegerField, Q
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
@@ -34,35 +35,52 @@ from ..importers.exceptions import DataImportError
 from ..models import Organization, OrganizationRole, Project, ProjectRole
 
 
-class OrganizationList(PermissionRequiredMixin, generic.ListView):
+class OrganizationList(generic.ListView):
     model = Organization
     template_name = 'organization/organization_list.html'
-    permission_required = 'org.list'
-    permission_filter_queryset = (lambda self, view, o: ('org.view',)
-                                  if o.archived is False
-                                  else ('org.view_archived',))
 
-    # This queryset annotation is needed to avoid generating a query for each
-    # organization in order to count the number of projects per org
-    queryset = Organization.objects.annotate(
-        num_projects=Sum(
-            Case(
-                When(projects__archived=False, then=1),
-                default=0,
-                output_field=IntegerField(),
-            ),
-        ),
-    )
+    def _annotate(self, orgs):
+        return orgs.annotate(
+            num_projects=Sum(
+                Case(
+                    When(projects__archived=False, then=1),
+                    default=0,
+                    output_field=IntegerField()
+                )
+            )
+        )
+
+    def get_queryset(self):
+        user = self.request.user
+        all_orgs = Organization.objects.all()
+
+        public_orgs = Q(access='public', archived=False)
+        private_orgs = Q(
+            access='private',
+            archived=False,
+            organizationrole__user=user,
+            organizationrole__group__permissions__codename='org.view.private',
+        )
+        archived_orgs = Q(
+            archived=True,
+            organizationrole__user=user,
+            organizationrole__group__permissions__codename='org.view.archived',
+        )
+
+        if user.is_superuser:
+            return self._annotate(all_orgs)
+
+        if user.is_anonymous:
+            return self._annotate(all_orgs.filter(public_orgs))
+
+        user_orgs = all_orgs.filter(public_orgs | private_orgs | archived_orgs)
+        return self._annotate(user_orgs)
 
 
-class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
+class OrganizationAdd(auth.LoginRequiredMixin, generic.CreateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_add.html'
-    permission_required = 'org.create'
-
-    def get_perms_objects(self):
-        return []
 
     def get_success_url(self):
         return reverse(
@@ -76,21 +94,19 @@ class OrganizationAdd(LoginPermissionRequiredMixin, generic.CreateView):
         return kwargs
 
 
-class OrganizationDashboard(PermissionRequiredMixin,
+class OrganizationDashboard(auth.OrganizationPermissionMixin,
                             mixins.OrgRoleCheckMixin,
                             mixins.ProjectCreateCheckMixin,
                             core_mixins.CacheObjectMixin,
                             generic.DetailView):
-
-    def get_actions(self, view, request):
-        if self.get_object().archived:
-            return 'org.view_archived'
-        return 'org.view'
-
     model = Organization
     template_name = 'organization/organization_dashboard.html'
-    permission_required = get_actions
     permission_denied_message = error_messages.ORG_VIEW
+
+    def get_permission_required(self):
+        if self.get_object().archived:
+            return 'org.view.archived'
+        return 'org.view'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -113,20 +129,28 @@ class OrganizationDashboard(PermissionRequiredMixin,
         return super(generic.DetailView, self).render_to_response(context)
 
 
-class OrganizationEdit(LoginPermissionRequiredMixin,
+class OrganizationEdit(auth.LoginRequiredMixin,
+                       auth.OrganizationPermissionMixin,
                        core_mixins.CacheObjectMixin,
                        generic.UpdateView):
     model = Organization
     form_class = forms.OrganizationForm
     template_name = 'organization/organization_edit.html'
-    permission_required = update_permissions('org.update', True)
+    permission_required = 'org.update'
     permission_denied_message = error_messages.ORG_EDIT
 
     def get_success_url(self):
         return reverse('organization:dashboard', kwargs=self.kwargs)
 
+    def test_func(self):
+        if self.get_object().archived:
+            return False
 
-class OrgArchiveView(LoginPermissionRequiredMixin,
+        return super().test_func()
+
+
+class OrgArchiveView(auth.LoginRequiredMixin,
+                     auth.OrganizationPermissionMixin,
                      core_mixins.ArchiveMixin,
                      generic.DetailView):
     model = Organization
@@ -158,7 +182,8 @@ class OrganizationUnarchive(OrgArchiveView):
     do_archive = False
 
 
-class OrganizationMembers(LoginPermissionRequiredMixin,
+class OrganizationMembers(auth.LoginRequiredMixin,
+                          auth.OrganizationPermissionMixin,
                           mixins.OrgRoleCheckMixin,
                           mixins.ProjectCreateCheckMixin,
                           core_mixins.CacheObjectMixin,
@@ -170,12 +195,13 @@ class OrganizationMembers(LoginPermissionRequiredMixin,
 
 
 class OrganizationMembersAdd(mixins.OrganizationMixin,
-                             LoginPermissionRequiredMixin,
+                             auth.LoginRequiredMixin,
+                             auth.OrganizationPermissionMixin,
                              generic.CreateView):
     model = OrganizationRole
     form_class = forms.AddOrganizationMemberForm
     template_name = 'organization/organization_members_add.html'
-    permission_required = update_permissions('org.users.add')
+    permission_required = 'org.users.add'
     permission_denied_message = error_messages.ORG_USERS_ADD
 
     def get_context_data(self, *args, **kwargs):
@@ -200,7 +226,8 @@ class OrganizationMembersAdd(mixins.OrganizationMixin,
 
 
 class OrganizationMembersEdit(mixins.OrganizationMixin,
-                              LoginPermissionRequiredMixin,
+                              auth.LoginRequiredMixin,
+                              auth.OrganizationPermissionMixin,
                               mixins.OrgRoleCheckMixin,
                               mixins.ProjectCreateCheckMixin,
                               core_mixins.CacheObjectMixin,
@@ -212,7 +239,7 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
     template_name = 'organization/organization_members_edit.html'
     project_form_class = forms.EditOrganizationMemberProjectPermissionForm
     org_role_form_class = forms.EditOrganizationMemberForm
-    permission_required = update_permissions('org.users.edit')
+    permission_required = 'org.users.edit'
     permission_denied_message = error_messages.ORG_USERS_EDIT
 
     def get_success_url(self):
@@ -285,11 +312,18 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         form.save()
         return super().form_valid(form)
 
+    def test_func(self):
+        if self.get_organization().archived:
+            return False
+
+        return super().test_func()
+
 
 class OrganizationMembersRemove(mixins.OrganizationMixin,
-                                LoginPermissionRequiredMixin,
+                                auth.LoginRequiredMixin,
+                                auth.OrganizationPermissionMixin,
                                 generic.DeleteView):
-    permission_required = update_permissions('org.users.remove')
+    permission_required = 'org.users.remove'
     permission_denied_message = error_messages.ORG_USERS_REMOVE
 
     def admin_is_deleting_themselves(self):
@@ -323,6 +357,12 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
                                  _("Administrators cannot remove themselves."))
             return redirect('organization:members_edit', **self.kwargs)
         return super().delete(*args, **kwargs)
+
+    def test_func(self):
+        if self.get_organization().archived:
+            return False
+
+        return super().test_func()
 
 
 class UserList(LoginPermissionRequiredMixin, generic.ListView):

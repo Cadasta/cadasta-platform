@@ -131,8 +131,7 @@ class PermissionRequiredMixinTest(UserTestCase, TestCase):
 
     def test_login_redirect_from_org_dashboard_to_dashboard(self):
         user = UserFactory.create()
-        assign_user_policies(user, *[])
-        org = OrganizationFactory.create()
+        org = OrganizationFactory.create(archived=True)
         view = org_views.OrganizationDashboard.as_view()
 
         request = HttpRequest()
