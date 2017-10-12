@@ -244,52 +244,52 @@
 #sidebar {
   li.overview {
     .icon {
-      background-image: url('/static/img/icon-overview.png');
+      background-image: url('#{$img-path}icon-overview.png');
     }
   }
   li.dashboard {
     .icon {
-      background-image: url('/static/img/icon-dashboard.png');
+      background-image: url('#{$img-path}icon-dashboard.png');
     }
   }
   li.search {
     .icon {
-      background-image: url('/static/img/icon-search.png');
+      background-image: url('#{$img-path}icon-search.png');
     }
   }
   li.map {
     .icon {
-      background-image: url('/static/img/icon-map.png');
+      background-image: url('#{$img-path}icon-map.png');
     }
   }
   li.parties {
     .icon {
-      background-image: url('/static/img/icon-parties.png');
+      background-image: url('#{$img-path}icon-parties.png');
     }
   }
   li.resources {
     .icon {
-      background-image: url('/static/img/icon-resources.png');
+      background-image: url('#{$img-path}icon-resources.png');
     }
   }
   li.reports {
     .icon {
-      background-image: url('/static/img/icon-reports.png');
+      background-image: url('#{$img-path}icon-reports.png');
     }
   }
   li.activity {
     .icon {
-      background-image: url('/static/img/icon-activity.png');
+      background-image: url('#{$img-path}icon-activity.png');
     }
   }
   li.projects {
     .icon {
-      background-image: url('/static/img/icon-projects.png');
+      background-image: url('#{$img-path}icon-projects.png');
     }
   }
   li.members {
     .icon {
-      background-image: url('/static/img/icon-members.png');
+      background-image: url('#{$img-path}icon-members.png');
     }
   }
 }

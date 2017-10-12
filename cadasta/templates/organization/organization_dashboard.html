@@ -6,10 +6,6 @@
 {% block page_title %}{% if is_member %}{% trans "Dashboard" %}{% else %}{% trans "Overview" %}{% endif %} | {% endblock %}
 {% block left-nav %}dashboard{% endblock %}
 
-{% block extra_script %}
-    <script type="text/javascript" src="{% static 'js/dataTables.selectFiltering.js' %}"></script>
-{% endblock %}
-
 {% block content %}
 
 <div class="col-md-12 content-single">
