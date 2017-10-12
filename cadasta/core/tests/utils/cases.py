@@ -3,6 +3,7 @@ from django.conf import settings
 from buckets.test.storage import FakeS3Storage
 from core.tests.factories import PolicyFactory
 from jsonattrs.models import create_attribute_types
+from accounts.management.commands import loadpermissions
 
 
 class UserTestCase:
@@ -10,6 +11,8 @@ class UserTestCase:
         super().setUp()
         PolicyFactory.load_policies()
         create_attribute_types()
+        loadpermissions.create_permissions()
+        loadpermissions.assign_permissions()
 
 
 class FileStorageTestCase:

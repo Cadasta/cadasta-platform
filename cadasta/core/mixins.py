@@ -37,14 +37,6 @@ class PermissionRequiredMixin(mixins.PermissionRequiredMixin):
                         kwargs={'slug': self.kwargs['organization']}
                     )
 
-            elif 'slug' in self.kwargs:
-                redirect_url = reverse(
-                    'organization:dashboard',
-                    kwargs={'slug': self.kwargs['slug']}
-                )
-                if redirect_url == self.request.get_full_path():
-                    redirect_url = reverse('core:dashboard')
-
         return redirect(redirect_url)
 
 
@@ -59,8 +51,6 @@ def update_permissions(permission, obj=None):
                 self.get_organization().archived):
             return False
         if (hasattr(self, 'get_project') and self.get_project().archived):
-            return False
-        if obj and self.get_object().archived:
             return False
         return permission
     return set_permissions
