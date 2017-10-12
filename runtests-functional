@@ -16,7 +16,7 @@ else
   ./manage.py loadstatic
   ./manage.py loadfunctestfixtures
   ./manage.py runserver 0.0.0.0:8000 &
-  sleep 5  # Wait for the Django server to start up
+  until curl http://0:8000 -f; do sleep .1; done  # Wait for the Django server to start up
   cd ..
 
   # Run the test suite in the Travis VM for PRs
