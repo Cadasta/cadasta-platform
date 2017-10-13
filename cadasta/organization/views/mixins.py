@@ -159,9 +159,6 @@ class ProjectRoles(ProjectMixin):
 
 class ProjectQuerySetMixin:
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Project.objects.all()
-
         if hasattr(self.request.user, 'organizations'):
             orgs = self.request.user.organizations.all()
             if len(orgs) > 0:
