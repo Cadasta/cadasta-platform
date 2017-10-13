@@ -343,6 +343,17 @@ class RegisterFormTest(UserTestCase, TestCase):
 
         assert User.objects.count() == 0
 
+        data = {
+            'username': 'sherlock',
+            'phone': '+8018225332',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.RegisterForm(data)
+        assert form.is_valid() is False
+        assert (_("Please enter a valid country code.")
+                in form.errors.get('phone'))
+
     def test_signup_with_blank_phone_and_email(self):
         data = {
             'username': 'sherlock',
@@ -882,6 +893,17 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         form = forms.ProfileForm(data=data, instance=user)
         assert form.is_valid() is False
         assert (phone_format in form.errors.get('phone'))
+
+        data = {
+            'username': 'sherlock',
+            'phone': '+8018225332',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.ProfileForm(data=data, instance=user)
+        assert form.is_valid() is False
+        assert (_("Please enter a valid country code.")
+                in form.errors.get('phone'))
 
     def test_update_remove_both_phone_and_email(self):
         user = UserFactory.create(username='sherlock',

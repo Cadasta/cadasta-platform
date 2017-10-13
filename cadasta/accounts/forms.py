@@ -15,6 +15,7 @@ from . import messages
 
 from parsley.decorators import parsleyfy
 from phonenumbers import parse as parse_phone
+from phonenumbers import NumberParseException
 
 
 @parsleyfy
@@ -72,9 +73,12 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
 
         phone = self.data.get('phone')
         if phone and phone_validator(phone):
-            phone = str(parse_phone(phone).national_number)
-            if phone in password:
-                errors.append(_("Passwords cannot contain your phone."))
+            try:
+                phone = str(parse_phone(phone).national_number)
+                if phone in password:
+                    errors.append(_("Passwords cannot contain your phone."))
+            except NumberParseException:
+                pass
 
         if errors:
             raise forms.ValidationError(errors)
@@ -99,6 +103,11 @@ class RegisterForm(SanitizeFieldsForm, forms.ModelForm):
                     unverified_phone=phone).exists():
                 raise forms.ValidationError(
                     _("User with this Phone number already exists."))
+            try:
+                parse_phone(phone)
+            except NumberParseException:
+                raise forms.ValidationError(
+                    _("Please enter a valid country code."))
         else:
             phone = None
         return phone
@@ -165,6 +174,12 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                                                   ).exists()):
                 raise forms.ValidationError(
                     _("User with this Phone number already exists."))
+            try:
+                parse_phone(phone)
+            except NumberParseException:
+                raise forms.ValidationError(
+                    _("Please enter a valid country code."))
+
         else:
             phone = None
         return phone

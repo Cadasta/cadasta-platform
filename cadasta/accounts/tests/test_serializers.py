@@ -476,6 +476,21 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         assert phone_format in serializer._errors['phone']
 
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+8018225332',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert serializer.is_valid() is False
+
+        assert (_("Please enter a valid country code.")
+                in serializer._errors['phone'])
+
     def test_insensitive_email_check(self):
         UserFactory.create(email='sherlock.holmes@bbc.uk')
         data = {
@@ -834,6 +849,25 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         )
         assert serializer.is_valid() is False
         assert (phone_format in serializer._errors['phone'])
+
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '+8018225332',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+        serializer = serializers.UserSerializer(
+            user, data=data, context={'request': Request(request)},
+            partial=True
+        )
+        assert serializer.is_valid() is False
+        assert (_("Please enter a valid country code.")
+                in serializer._errors['phone'])
 
     def test_update_with_existing_phone_in_VerificationDevice(self):
         user = UserFactory.create()
