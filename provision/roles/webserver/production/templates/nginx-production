@@ -3,7 +3,7 @@ upstream django {
 }
 
 map $sent_http_content_type $expires {
-    default                     24h;
+    default                     off;
     text/html                   epoch;
     text/css                    24h;
     application/javascript      24h;
