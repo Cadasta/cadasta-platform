@@ -114,4 +114,6 @@ CELERY_BROKER_TRANSPORT_OPTIONS = {
     'queue_name_prefix': '{}-'.format(os.environ.get('QUEUE-PREFIX', 'dev')),
     'wait_time_seconds': 20,
     'visibility_timeout': 20,
+    'max_retries': 1,
+    'interval_start': 0,
 } if CELERY_BROKER_TRANSPORT.lower() == 'sqs' else {}

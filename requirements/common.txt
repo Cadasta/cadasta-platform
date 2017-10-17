@@ -39,4 +39,6 @@ pyparsing==2.2.0
 django-compressor==2.2
 beautifulsoup4==4.6.0
 gpxpy==1.1.2
-cadasta-workertoolbox==0.1.16
+cadasta-workertoolbox==0.1.17
+git+https://github.com/celery/kombu@0f4da  # TODO: update to 4.1.1+ when released
+pybreaker==0.4.1

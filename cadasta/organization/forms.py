@@ -484,7 +484,7 @@ class DownloadForm(forms.Form):
         ('res', 'Resources'),
         ('all', 'All data'),
     )
-    type = forms.ChoiceField(choices=CHOICES, initial='all')
+    type = forms.ChoiceField(choices=CHOICES, initial='all', required=True)
 
 
 class SelectImportForm(SanitizeFieldsForm, forms.Form):

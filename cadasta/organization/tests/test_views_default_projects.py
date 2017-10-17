@@ -3,6 +3,7 @@ import os
 from unittest.mock import patch
 
 import pytest
+import pybreaker
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
@@ -1440,6 +1441,26 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'project': self.project.slug
             }
         )
+        assert ('Scheduled export of project records in XLS format.'
+                in response.messages)
+        schedule_export.assert_called_once_with(
+            self.project, self.user, self.post_data['type'])
+
+    @patch('organization.views.default.schedule_project_export')
+    def test_post_with_open_circuit(self, schedule_export):
+        schedule_export.side_effect = pybreaker.CircuitBreakerError
+        assign_policies(self.user)
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 302
+        assert response.location == reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug
+            }
+        )
+        assert ("The export service is temporarily offline. "
+                "Please try again later." in response.messages)
         schedule_export.assert_called_once_with(
             self.project, self.user, self.post_data['type'])
 
