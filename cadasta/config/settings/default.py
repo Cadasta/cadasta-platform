@@ -573,3 +573,7 @@ ES_SCHEME = 'http'
 ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
+
+# Async Tooling
+CELERY_BROKER_TRANSPORT = 'sqs' if os.environ.get('SQS') else 'memory'
+CELERY_QUEUE_PREFIX = os.environ.get('QUEUE_PREFIX', 'dev')

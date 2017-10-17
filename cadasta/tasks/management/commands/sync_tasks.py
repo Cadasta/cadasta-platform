@@ -1,7 +1,6 @@
 import logging
 import time
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 from kombu import Queue
 from kombu.async import Hub, set_event_loop
@@ -29,7 +28,7 @@ class Command(BaseCommand):
         # work queue
         set_event_loop(Hub())
         kwargs = {
-            'transport_options': settings.CELERY_BROKER_TRANSPORT_OPTIONS,
+            'transport_options': conf.broker_transport_options,
         }
         with app.connection(**kwargs) as conn:
             logger.info("Launching worker")
