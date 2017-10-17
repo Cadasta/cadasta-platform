@@ -1,4 +1,3 @@
-import os
 from .default import *  # NOQA
 
 DEBUG = True
@@ -106,7 +105,3 @@ LOGGING = {
 }
 
 ES_PORT = '8000'
-
-# Async Tooling
-CELERY_BROKER_TRANSPORT = 'sqs' if os.environ.get('SQS') else 'memory'
-CELERY_QUEUE_PREFIX = os.environ.get('QUEUE-PREFIX', 'dev')
