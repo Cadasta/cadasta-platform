@@ -6,7 +6,7 @@ import core.views.generic as generic
 import django.views.generic as base_generic
 import formtools.wizard.views as wizard
 from accounts.models import User
-from core.mixins import LoginPermissionRequiredMixin, PermissionRequiredMixin
+from core.mixins import LoginPermissionRequiredMixin
 from core.util import random_id
 from core.views import mixins as core_mixins
 from core.views import auth
@@ -427,7 +427,8 @@ class ProjectList(mixins.ProjectCreateCheckMixin,
             access='private',
             archived=False,
             organization__organizationrole__user=user,
-            organization__organizationrole__group__permissions__codename='project.view.private',
+            organization__organizationrole__group__permissions__codename=(
+                'project.view.private'),
         )
         archived_projects = Q(
             archived=True,
@@ -437,7 +438,8 @@ class ProjectList(mixins.ProjectCreateCheckMixin,
         archived_projects_org = Q(
             archived=True,
             organization__organizationrole__user=user,
-            organization__organizationrole__group__permissions__codename='project.view.archived',
+            organization__organizationrole__group__permissions__codename=(
+                'project.view.archived'),
         )
 
         if user.is_superuser:
