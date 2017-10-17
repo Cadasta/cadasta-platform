@@ -1,6 +1,6 @@
 # Change Log
 
-## [v1.13.0](https://github.com/Cadasta/cadasta-platform/tree/v1.13.0-alpha.1) (alpha.1, 2017-10-06)
+## [v1.13.0](https://github.com/Cadasta/cadasta-platform/tree/v1.13.0-alpha.2) (alpha.2, 2017-10-17)
 
 ### Added
 
@@ -24,6 +24,9 @@
 - Updated menu to replace old ellipsis with cog (#1819)
 - Reduce number of ResourceWarning when running tests (#1828)
 - Update dependencies (#1781, #1821)
+- Make test suite execute in less time (#1834)
+- Change profile page to two-column layout (#1835)
+- Adjusted left column nesting on user dashboard page (#1841)
 
 ### Fixed
 
@@ -33,6 +36,9 @@
 - Fix #1776: Make unit test deterministic (#1815)
 - Bugfix: Copy libffmpeg.so from remote source (#1832)
 - Makes review checklist checkable (#1833)
+- Fixes #1842 -- Exclude name existing org when validating if org name is unique (#1843)
+- Fixes #1840 -- User must be authenticated to access user dashboard (#1848)
+- Fixes #1845 -- Switch off default caching (#1850)
 
 ## [v1.12.1](https://github.com/Cadasta/cadasta-platform/tree/v1.12.1) (2017-09-11)
 [Full Changelog](https://github.com/Cadasta/cadasta-platform/compare/v1.12.1-alpha.3...v1.12.1)
