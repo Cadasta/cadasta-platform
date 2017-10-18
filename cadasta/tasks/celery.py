@@ -17,7 +17,6 @@ def get_app(conf):
     """ App setup, placed in function to make testing easier """
     app = Celery(amqp=CircuitBreakerAMQP)
     app.config_from_object(conf)
-    app.autodiscover_tasks(force=False)
     try:
         breakers.celery.call(setup_app, app, throw=True)
     except breakers.celery.expected_errors:
