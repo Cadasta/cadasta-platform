@@ -148,11 +148,11 @@
               </a>
             </div>
             <div class="panel-body">
-              {% if not user.email_verified %}
+              {% if user.email and not user.email_verified or user.phone and not user.phone_verified %}
                 <!-- Unverified account message -->
                 <div class="alert alert-info alert-full" role="alert">
-                  {% url 'account_email' as email_url %}
-                  {% blocktrans %}We’ve noticed your account has not been verified. If you haven’t received your verification link, please <a href="{{ email_url }}">request a new one</a>.{% endblocktrans %}
+                  {% url 'account:resend_token' as resend_url %}
+                  {% blocktrans %}We’ve noticed your account has not been verified. If you haven’t received your verification email or text, please <a href="{{ resend_url }}">request a new one</a>.{% endblocktrans %}
                 </div>
               {% endif %}
               <table class="table table-location">
@@ -166,10 +166,11 @@
                       <td><label>{% trans "Email" %}<label></td>
                       <td>{{ user.email }}</td>
                     </tr>
-                  {% else %}
+                  {% endif %}
+                  {% if user.phone %}
                     <tr>
                       <td></span><label>{% trans "Phone number" %}<label></td>
-                      <td>{{ user.tel }}</td>
+                      <td>{{ user.phone }}</td>
                     </tr>
                   {% endif %}
                   <tr>

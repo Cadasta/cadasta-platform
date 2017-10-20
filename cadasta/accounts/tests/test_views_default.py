@@ -22,25 +22,6 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.AccountRegister
     template = 'accounts/signup.html'
 
-    def test_user_signs_up(self):
-        data = {
-            'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes',
-            'language': 'fr'
-
-        }
-        response = self.request(method='POST', post_data=data)
-        assert response.status_code == 302
-        assert User.objects.count() == 1
-        assert VerificationDevice.objects.count() == 1
-        assert len(mail.outbox) == 1
-        user = User.objects.first()
-        assert user.check_password('221B@bakerstreet') is True
-        assert '/account/accountverification/' in response.location
-
     def test_signs_up_with_invalid(self):
         data = {
             'username': 'sherlock',
@@ -56,7 +37,6 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
     def test_signs_up_with_phone_only(self):
         data = {
             'username': 'sherlock',
-            'email': '',
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes',
@@ -73,7 +53,6 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
-            'phone': '',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes',
             'language': 'fr'
