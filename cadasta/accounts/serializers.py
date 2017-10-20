@@ -8,6 +8,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from djoser import serializers as djoser_serializers
 from phonenumbers import parse as parse_phone
+from phonenumbers import NumberParseException
 
 from core.serializers import SanitizeFieldSerializer
 from .models import User, VerificationDevice
@@ -24,7 +25,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
         required=False
     )
     phone = serializers.RegexField(
-        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        regex=r'^\+[0-9]{5,14}$',
         error_messages={'invalid': phone_format},
         validators=[UniqueValidator(
             queryset=User.objects.all(),
@@ -85,6 +86,11 @@ class RegistrationSerializer(SanitizeFieldSerializer,
                     unverified_phone=phone).exists():
                 raise serializers.ValidationError(
                     _("User with this Phone number already exists."))
+            try:
+                parse_phone(phone)
+            except NumberParseException:
+                raise serializers.ValidationError(
+                    _("Please enter a valid country code."))
         else:
             phone = None
         return phone
@@ -114,9 +120,13 @@ class RegistrationSerializer(SanitizeFieldSerializer,
         phone = self.initial_data.get('phone')
         if phone:
             if phone_validator(phone):
-                phone = str(parse_phone(phone).national_number)
-                if phone in password:
-                    errors.append(_("Passwords cannot contain your phone."))
+                try:
+                    phone = str(parse_phone(phone).national_number)
+                    if phone in password:
+                        errors.append(
+                            _("Passwords cannot contain your phone."))
+                except NumberParseException:
+                    pass
         if errors:
             raise serializers.ValidationError(errors)
 
@@ -132,7 +142,7 @@ class UserSerializer(SanitizeFieldSerializer,
 
     )
     phone = serializers.RegexField(
-        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        regex=r'^\+[0-9]{5,14}$',
         error_messages={'invalid': phone_format},
         validators=[UniqueValidator(
             queryset=User.objects.all(),
@@ -229,6 +239,11 @@ class UserSerializer(SanitizeFieldSerializer,
                     unverified_phone=phone).exists():
                 raise serializers.ValidationError(
                     _("User with this Phone number already exists."))
+            try:
+                parse_phone(phone)
+            except NumberParseException:
+                raise serializers.ValidationError(
+                    _("Please enter a valid country code."))
         else:
             phone = None
         return phone
@@ -309,7 +324,7 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
 class PhoneVerificationSerializer(serializers.Serializer,
                                   SanitizeFieldSerializer):
     phone = serializers.RegexField(
-        regex=r'^\+(?:[0-9]?){6,14}[0-9]$',
+        regex=r'^\+[0-9]{5,14}$',
         error_messages={'invalid': phone_format},
         required=True
     )

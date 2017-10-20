@@ -34,3 +34,37 @@
       }
     }, 2)
     .addMessage('emailfield', gettext('Your password cannot contain your email mailbox name.'));
+
+  // checks phone number starts with a plus
+  window.Parsley
+    .addValidator('phoneplus', function(value, requirement) {
+      var regex = new RegExp("^[+]");
+      var check = + regex.test(value);
+      if (check < 1) {
+        return false;
+      }
+    }, 3)
+    .addMessage('phoneplus', gettext('Your phone number must start with +.'));
+
+  // checks phone number has between 6 and 15 characters
+  window.Parsley
+    .addValidator('phonelength', function(value, requirement) {
+      var check = value.length;
+      if ((check < 6) || (check > requirement)) {
+        return false;
+      }
+    }, 2)
+    .addMessage('phonelength', gettext('Your phone number must have between 5 and 15 digits.'));
+
+  // checks phone number is all numbers without spaces or punctuation
+  window.Parsley
+    .addValidator('phonenumber', function(value, requirement) {
+      var regex = new RegExp("[+]([0-9]*$)");
+      var check = + regex.test(value);
+      if (check < 1) {
+        return false;
+      }
+    }, 1)
+    .addMessage('phonenumber', gettext('Your phone number must start with +, followed by a country code and phone number without spaces or punctuation. '));
+
+

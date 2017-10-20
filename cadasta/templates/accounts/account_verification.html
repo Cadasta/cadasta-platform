@@ -4,7 +4,7 @@
 
 {% load widget_tweaks %}
 
-{% block head_title %} {% trans "Account Verification" %}{% endblock %}
+{% block title %} | {% trans "Account Verification" %}{% endblock %}
 
 {% block content %}
   <div class="narrow">
@@ -17,13 +17,11 @@
 
     {% if phone %}
       <p>{% trans "To verify your phone number, enter the one-time password sent to your registered phone number." %}</p>
-      <form class="form-narrow" action="{% url 'account:verify_phone' %}" method="post">
+      <form action="{% url 'account:verify_phone' %}" method="post">
         {% csrf_token %}
         <div class="form-group {% if form.token.errors %} has-error {% endif %}">
-          <label class="input-group input-lg" for="{{ form.token.id_for_label }}">
-            {% trans "Token" %}
-          </label>
-          {% render_field form.token class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1" %}
+          <label class="control-label" for="{{ form.token.id_for_label }}">{% trans "Token" %}</label>
+          {% render_field form.token class+="form-control input-lg" data-parsley-required="true" data-parsley-sanitize="1"%}
           <div class="error-block">
             {{ form.token.errors }}
           </div>
@@ -33,10 +31,10 @@
         </button>
       </form>
     {% endif %}
-  
+
     {% url 'account:resend_token' as resend_url %}
-    <p>
-      {% blocktrans %} Click <a href="{{ resend_url }}">here</a> if you did not receive any email or text.{% endblocktrans %}
+    <p align="center">
+      {% blocktrans %}<a href="{{ resend_url }}"> Click here</a> if you did not receive an email or text.{% endblocktrans %}
     </p>
   </div>
 {% endblock %}
