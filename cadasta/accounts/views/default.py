@@ -41,7 +41,7 @@ class AccountRegister(CreateView):
             device = VerificationDevice.objects.create(
                 user=user, unverified_phone=user.phone)
             device.generate_challenge()
-            message = _("Verification Token sent to {phone}")
+            message = _("Verification token sent to {phone}")
             message = message.format(phone=user.phone)
             messages.add_message(self.request, messages.INFO, message)
 
