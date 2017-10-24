@@ -610,9 +610,7 @@ class ProjectUserSerializerTest(UserTestCase, TestCase):
         org_admin = UserFactory.create()
         public_user = UserFactory.create()
 
-        superuser = UserFactory.create()
-        superuser_role = Role.objects.get(name='superuser')
-        superuser.assign_policies(superuser_role)
+        superuser = UserFactory.create(is_superuser=True)
 
         org = OrganizationFactory.create(
             add_users=[superuser, prj_admin, public_user])

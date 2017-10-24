@@ -7,7 +7,6 @@ from rest_framework import serializers
 from rest_framework_gis import serializers as geo_serializers
 from django_countries.serializer_fields import CountryField
 
-from core.form_mixins import SuperUserCheck
 from core import serializers as core_serializers
 from accounts.models import User
 from accounts.serializers import UserSerializer
@@ -137,7 +136,7 @@ class ProjectGeometrySerializer(geo_serializers.GeoFeatureModelSerializer):
                     'project': object.slug})
 
 
-class EntityUserSerializer(SuperUserCheck, serializers.Serializer):
+class EntityUserSerializer(serializers.Serializer):
     username = serializers.CharField()
 
     def to_representation(self, instance):
@@ -253,7 +252,7 @@ class ProjectUserSerializer(EntityUserSerializer):
     role = serializers.CharField()
 
     def validate(self, data):
-        if ((self.instance and self.is_superuser(self.instance)) or
+        if ((self.instance and self.instance.is_superuser) or
                 self.org_role.admin):
             raise serializers.ValidationError(
                 _("User {username} is an organization admin, the role cannot "
@@ -286,7 +285,7 @@ class ProjectUserSerializer(EntityUserSerializer):
             return 'A' if role.admin else 'Pb'
 
     def get_role_json(self, instance):
-        if self.is_superuser(instance):
+        if instance.is_superuser:
             return 'A'
 
         try:
