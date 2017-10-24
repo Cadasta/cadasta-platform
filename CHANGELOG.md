@@ -1,6 +1,6 @@
 # Change Log
 
-## [v1.13.0](https://github.com/Cadasta/cadasta-platform/tree/v1.13.0-alpha.2) (alpha.2, 2017-10-17)
+## [v1.13.0](https://github.com/Cadasta/cadasta-platform/tree/v1.13.0) (2017-10-24)
 
 ### Added
 
