@@ -11,9 +11,19 @@ from jsonattrs.models import Attribute
 from jsonattrs.models import create_attribute_types
 
 from . import factories
-from .. import models
-from ..managers import create_children, create_options, santize_form
+from .. import models, managers
 from ..messages import MISSING_RELEVANT
+
+
+class RelevantSyntaxValidationTest(TestCase):
+    def test_relevant_syntax_valid(self):
+        assert managers.check_relevant_clause("${party_type}='IN'") is None
+
+    def test_relevant_syntax_invalid(self):
+        relevant = "${party_type='IN'}"
+        with pytest.raises(InvalidQuestionnaire) as e:
+            managers.check_relevant_clause(relevant)
+        assert str(e.value) == "Invalid relevant clause: ${party_type='IN'}"
 
 
 class SanitizeFormTest(TestCase):
@@ -23,7 +33,7 @@ class SanitizeFormTest(TestCase):
             'relevant': '${age}>10'
         }
         try:
-            santize_form(data)
+            managers.santize_form(data)
         except InvalidQuestionnaire:
             assert False, "InvalidQuestionnaire raised unexpectedly"
         else:
@@ -35,7 +45,7 @@ class SanitizeFormTest(TestCase):
             'relevant': '${age}>10'
         }
         with pytest.raises(InvalidQuestionnaire):
-            santize_form(data)
+            managers.santize_form(data)
 
     def test_sanitize_valid_list(self):
         data = {
@@ -45,7 +55,7 @@ class SanitizeFormTest(TestCase):
             ]
         }
         try:
-            santize_form(data)
+            managers.santize_form(data)
         except InvalidQuestionnaire:
             assert False, "InvalidQuestionnaire raised unexpectedly"
         else:
@@ -59,7 +69,7 @@ class SanitizeFormTest(TestCase):
             ]
         }
         with pytest.raises(InvalidQuestionnaire):
-            santize_form(data)
+            managers.santize_form(data)
 
     def test_valid_multilang_labels(self):
         data = {
@@ -67,7 +77,7 @@ class SanitizeFormTest(TestCase):
             'label': {'en': 'English', 'de': 'German'}
         }
         try:
-            santize_form(data)
+            managers.santize_form(data)
         except InvalidQuestionnaire:
             assert False, "InvalidQuestionnaire raised unexpectedly"
         else:
@@ -79,14 +89,14 @@ class SanitizeFormTest(TestCase):
             'label': {'en': 'English 😆', 'de': 'German'}
         }
         with pytest.raises(InvalidQuestionnaire):
-            santize_form(data)
+            managers.santize_form(data)
 
 
 class CreateChildrenTest(TestCase):
 
     def test_create_children_where_children_is_none(self):
         children = None
-        create_children(children)
+        managers.create_children(children)
 
         assert models.QuestionGroup.objects.exists() is False
         assert models.Question.objects.exists() is False
@@ -112,7 +122,8 @@ class CreateChildrenTest(TestCase):
                 }
             ],
         }]
-        create_children(children, kwargs={'questionnaire': questionnaire})
+        managers.create_children(children,
+                                 kwargs={'questionnaire': questionnaire})
 
         assert models.QuestionGroup.objects.filter(
             questionnaire=questionnaire).count() == 1
@@ -157,7 +168,8 @@ class CreateChildrenTest(TestCase):
                 }
             ],
         }]
-        create_children(children, kwargs={'questionnaire': questionnaire})
+        managers.create_children(children,
+                                 kwargs={'questionnaire': questionnaire})
 
         assert models.QuestionGroup.objects.filter(
             questionnaire=questionnaire).count() == 2
@@ -166,6 +178,35 @@ class CreateChildrenTest(TestCase):
         assert models.Question.objects.filter(
             questionnaire=questionnaire,
             question_group__isnull=False).count() == 2
+
+    def test_invalid_relevant_clause_in_children(self):
+        questionnaire = factories.QuestionnaireFactory.create()
+        children = [{
+            'label': 'This form showcases the different question',
+            'name': 'intro',
+            'type': 'note'
+        }, {
+            'label': 'Text question type',
+            'name': 'text_questions',
+            'type': 'group',
+            'children': [
+                {
+                    'hint': 'Can be short or long but '
+                            'always one line (type = '
+                            'text)',
+                    'label': 'Text',
+                    'name': 'my_string',
+                    'type': 'text',
+                    'bind': {'relevant': '$geo_type="geoshape"'}  # invalid
+                }
+            ],
+        }]
+
+        with pytest.raises(InvalidQuestionnaire) as e:
+            managers.create_children(children,
+                                     kwargs={'questionnaire': questionnaire})
+
+        assert str(e.value) == 'Invalid relevant clause: $geo_type="geoshape"'
 
 
 class CreateOptionsTest(TestCase):
@@ -177,14 +218,14 @@ class CreateOptionsTest(TestCase):
             {'label': 'option 2', 'name': '2'},
             {'label': 'option 3', 'name': '3'}
         ]
-        create_options(options, question)
+        managers.create_options(options, question)
         assert models.QuestionOption.objects.filter(
             question=question).count() == 3
 
     def test_create_options_with_empty_list(TestCase):
         errors = []
         question = factories.QuestionFactory.create(name='qu')
-        create_options([], question, errors)
+        managers.create_options([], question, errors)
         assert "Please provide at least one option for field 'qu'" in errors
 
 
@@ -343,6 +384,21 @@ class QuestionGroupManagerTest(TestCase):
         assert model.question_groups.count() == 1
         assert questionnaire.question_groups.count() == 2
 
+    def test_invalid_relevant_clause(self):
+        question_group_dict = {
+            'label': 'Basic Select question types',
+            'name': 'select_questions',
+            'type': 'group',
+            'bind': {'relevant': "$party_type='IN'"}  # invalid
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+        with pytest.raises(InvalidQuestionnaire) as e:
+            models.QuestionGroup.objects.create_from_dict(
+                dict=question_group_dict,
+                questionnaire=questionnaire
+            )
+        assert str(e.value) == "Invalid relevant clause: $party_type='IN'"
+
 
 class QuestionManagerTest(TestCase):
 
@@ -397,6 +453,26 @@ class QuestionManagerTest(TestCase):
         assert model.name == question_dict['name']
         assert model.type == 'GP'
         assert model.gps_accuracy == 1.5
+
+    def test_invalid_relevant_clause(self):
+        question_dict = {
+            'label': 'Integer',
+            'name': 'my_int',
+            'type': 'integer',
+            'default': 'default val',
+            'hint': 'An informative hint',
+            'bind': {
+                'relevant': "$party_id='abc123'",  # invalid
+                'required': 'yes'
+            }
+        }
+        questionnaire = factories.QuestionnaireFactory.create()
+        with pytest.raises(InvalidQuestionnaire) as e:
+            models.Question.objects.create_from_dict(
+                dict=question_dict,
+                questionnaire=questionnaire
+            )
+        assert str(e.value) == "Invalid relevant clause: $party_id='abc123'"
 
     def test_create_from_dict_ingnore_accuracy_threshold(self):
         """For non-geometry fields accuracy should be ignored"""

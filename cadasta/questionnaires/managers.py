@@ -15,10 +15,16 @@ from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
 from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 from .exceptions import InvalidQuestionnaire
-from .messages import MISSING_RELEVANT, INVALID_ACCURACY
-from .validators import validate_accuracy
+from .messages import MISSING_RELEVANT, INVALID_ACCURACY, INVALID_RELEVANT
+from .validators import validate_accuracy, validate_relevant
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
+
+
+def check_relevant_clause(relevant):
+    if not validate_relevant(relevant):
+        raise InvalidQuestionnaire(
+            [_(INVALID_RELEVANT.format(relevant))])
 
 
 def create_children(children, errors=[], project=None,
@@ -86,7 +92,7 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
         relevant = bind.get('relevant', None)
         if relevant:
             clauses = relevant.split('=')
-            selector = re.sub("'", '', clauses[1])
+            selector = re.sub("('|\"|”)", '', clauses[1])
             selectors += (selector,)
 
     try:
@@ -271,6 +277,8 @@ class QuestionGroupManager(models.Manager):
         bind = dict.get('bind')
         if bind:
             relevant = bind.get('relevant', None)
+            if relevant:
+                check_relevant_clause(relevant)
 
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
@@ -305,6 +313,8 @@ class QuestionManager(models.Manager):
         bind = dict.get('bind')
         if bind:
             relevant = bind.get('relevant', None)
+            if relevant:
+                check_relevant_clause(relevant)
             required = True if bind.get('required', 'no') == 'yes' else False
 
         gps_accuracy = None

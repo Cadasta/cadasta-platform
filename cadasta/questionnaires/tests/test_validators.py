@@ -353,3 +353,522 @@ class QuestionOptionTestCase(TestCase):
         }]
         errors = validators.validate_question_options(data)
         assert errors == [{}, {'label': ['This field is required.']}]
+
+
+class ValidateRelevantTest(TestCase):
+    def test_compare_text(self):
+        assert validators.validate_relevant("${party_type}='IN'") is True
+        assert validators.validate_relevant("${party_type}=\"IN\"") is True
+        assert validators.validate_relevant("${party_type}=“IN”") is True
+        assert validators.validate_relevant("${party_type}=‘IN’") is True
+        assert validators.validate_relevant("${party_type}>'IN'") is True
+        assert validators.validate_relevant("${party_type}>\"IN\"") is True
+        assert validators.validate_relevant("${party_type}>“IN”") is True
+        assert validators.validate_relevant("${party_type}>‘IN’") is True
+        assert validators.validate_relevant("${party_type}>='IN'") is True
+        assert validators.validate_relevant("${party_type}>=\"IN\"") is True
+        assert validators.validate_relevant("${party_type}>=“IN”") is True
+        assert validators.validate_relevant("${party_type}>=‘IN’") is True
+        assert validators.validate_relevant("${party_type}<'IN'") is True
+        assert validators.validate_relevant("${party_type}<\"IN\"") is True
+        assert validators.validate_relevant("${party_type}<“IN”") is True
+        assert validators.validate_relevant("${party_type}<‘IN’") is True
+        assert validators.validate_relevant("${party_type}<='IN'") is True
+        assert validators.validate_relevant("${party_type}<=\"IN\"") is True
+        assert validators.validate_relevant("${party_type}<=“IN”") is True
+        assert validators.validate_relevant("${party_type}<=‘IN’") is True
+        assert validators.validate_relevant("${party_type}!='IN'") is True
+        assert validators.validate_relevant("${party_type}!=\"IN\"") is True
+        assert validators.validate_relevant("${party_type}!=“IN”") is True
+        assert validators.validate_relevant("${party_type}!=‘IN’") is True
+
+    def test_compare_numbers(self):
+        assert validators.validate_relevant("${party_type}=9") is True
+        assert validators.validate_relevant("${party_type}=9") is True
+        assert validators.validate_relevant("${party_type}=9") is True
+        assert validators.validate_relevant("${party_type}=9") is True
+        assert validators.validate_relevant("${party_type}>9") is True
+        assert validators.validate_relevant("${party_type}>9") is True
+        assert validators.validate_relevant("${party_type}>9") is True
+        assert validators.validate_relevant("${party_type}>9") is True
+        assert validators.validate_relevant("${party_type}>=9") is True
+        assert validators.validate_relevant("${party_type}>=9") is True
+        assert validators.validate_relevant("${party_type}>=9") is True
+        assert validators.validate_relevant("${party_type}>=9") is True
+        assert validators.validate_relevant("${party_type}<9") is True
+        assert validators.validate_relevant("${party_type}<9") is True
+        assert validators.validate_relevant("${party_type}<9") is True
+        assert validators.validate_relevant("${party_type}<9") is True
+        assert validators.validate_relevant("${party_type}<=9") is True
+        assert validators.validate_relevant("${party_type}<=9") is True
+        assert validators.validate_relevant("${party_type}<=9") is True
+        assert validators.validate_relevant("${party_type}<=9") is True
+        assert validators.validate_relevant("${party_type}!=9") is True
+        assert validators.validate_relevant("${party_type}!=9") is True
+        assert validators.validate_relevant("${party_type}!=9") is True
+        assert validators.validate_relevant("${party_type}!=9") is True
+
+        assert validators.validate_relevant("${party_type}=482") is True
+        assert validators.validate_relevant("${party_type}=482") is True
+        assert validators.validate_relevant("${party_type}=482") is True
+        assert validators.validate_relevant("${party_type}=482") is True
+        assert validators.validate_relevant("${party_type}>482") is True
+        assert validators.validate_relevant("${party_type}>482") is True
+        assert validators.validate_relevant("${party_type}>482") is True
+        assert validators.validate_relevant("${party_type}>482") is True
+        assert validators.validate_relevant("${party_type}>=482") is True
+        assert validators.validate_relevant("${party_type}>=482") is True
+        assert validators.validate_relevant("${party_type}>=482") is True
+        assert validators.validate_relevant("${party_type}>=482") is True
+        assert validators.validate_relevant("${party_type}<482") is True
+        assert validators.validate_relevant("${party_type}<482") is True
+        assert validators.validate_relevant("${party_type}<482") is True
+        assert validators.validate_relevant("${party_type}<482") is True
+        assert validators.validate_relevant("${party_type}<=482") is True
+        assert validators.validate_relevant("${party_type}<=482") is True
+        assert validators.validate_relevant("${party_type}<=482") is True
+        assert validators.validate_relevant("${party_type}<=482") is True
+        assert validators.validate_relevant("${party_type}!=482") is True
+        assert validators.validate_relevant("${party_type}!=482") is True
+        assert validators.validate_relevant("${party_type}!=482") is True
+        assert validators.validate_relevant("${party_type}!=482") is True
+
+    def test_selected(self):
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’)") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, 'nets')") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, \"nets\")") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, “nets”)") is True
+
+    def test_not_text(self):
+        assert validators.validate_relevant("not(${party_type}='IN')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=\"IN\")") is True
+        assert validators.validate_relevant("not(${party_type}=“IN”)") is True
+        assert validators.validate_relevant("not(${party_type}=‘IN’)") is True
+        assert validators.validate_relevant("not(${party_type}>'IN')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}>\"IN\")") is True
+        assert validators.validate_relevant("not(${party_type}>“IN”)") is True
+        assert validators.validate_relevant("not(${party_type}>‘IN’)") is True
+        assert validators.validate_relevant("not(${party_type}>='IN')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}>=\"IN\")") is True
+        assert validators.validate_relevant("not(${party_type}>=“IN”)") is True
+        assert validators.validate_relevant("not(${party_type}>=‘IN’)") is True
+        assert validators.validate_relevant("not(${party_type}<'IN')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}<\"IN\")") is True
+        assert validators.validate_relevant("not(${party_type}<“IN”)") is True
+        assert validators.validate_relevant("not(${party_type}<‘IN’)") is True
+        assert validators.validate_relevant("not(${party_type}<='IN')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}<=\"IN\")") is True
+        assert validators.validate_relevant("not(${party_type}<=“IN”)") is True
+        assert validators.validate_relevant("not(${party_type}<=‘IN’)") is True
+        assert validators.validate_relevant("not(${party_type}!='IN')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}!=\"IN\")") is True
+        assert validators.validate_relevant("not(${party_type}!=“IN”)") is True
+        assert validators.validate_relevant("not(${party_type}!=‘IN’)") is True
+
+    def test_not_number(self):
+        assert validators.validate_relevant("not(${party_type}=9)") is True
+        assert validators.validate_relevant("not(${party_type}=9)") is True
+        assert validators.validate_relevant("not(${party_type}=9)") is True
+        assert validators.validate_relevant("not(${party_type}=9)") is True
+        assert validators.validate_relevant("not(${party_type}>9)") is True
+        assert validators.validate_relevant("not(${party_type}>9)") is True
+        assert validators.validate_relevant("not(${party_type}>9)") is True
+        assert validators.validate_relevant("not(${party_type}>9)") is True
+        assert validators.validate_relevant("not(${party_type}>=9)") is True
+        assert validators.validate_relevant("not(${party_type}>=9)") is True
+        assert validators.validate_relevant("not(${party_type}>=9)") is True
+        assert validators.validate_relevant("not(${party_type}>=9)") is True
+        assert validators.validate_relevant("not(${party_type}<9)") is True
+        assert validators.validate_relevant("not(${party_type}<9)") is True
+        assert validators.validate_relevant("not(${party_type}<9)") is True
+        assert validators.validate_relevant("not(${party_type}<9)") is True
+        assert validators.validate_relevant("not(${party_type}<=9)") is True
+        assert validators.validate_relevant("not(${party_type}<=9)") is True
+        assert validators.validate_relevant("not(${party_type}<=9)") is True
+        assert validators.validate_relevant("not(${party_type}<=9)") is True
+        assert validators.validate_relevant("not(${party_type}!=9)") is True
+        assert validators.validate_relevant("not(${party_type}!=9)") is True
+        assert validators.validate_relevant("not(${party_type}!=9)") is True
+        assert validators.validate_relevant("not(${party_type}!=9)") is True
+
+        assert validators.validate_relevant("not(${party_type}=482)") is True
+        assert validators.validate_relevant("not(${party_type}=482)") is True
+        assert validators.validate_relevant("not(${party_type}=482)") is True
+        assert validators.validate_relevant("not(${party_type}=482)") is True
+        assert validators.validate_relevant("not(${party_type}>482)") is True
+        assert validators.validate_relevant("not(${party_type}>482)") is True
+        assert validators.validate_relevant("not(${party_type}>482)") is True
+        assert validators.validate_relevant("not(${party_type}>482)") is True
+        assert validators.validate_relevant("not(${party_type}>=482)") is True
+        assert validators.validate_relevant("not(${party_type}>=482)") is True
+        assert validators.validate_relevant("not(${party_type}>=482)") is True
+        assert validators.validate_relevant("not(${party_type}>=482)") is True
+        assert validators.validate_relevant("not(${party_type}<482)") is True
+        assert validators.validate_relevant("not(${party_type}<482)") is True
+        assert validators.validate_relevant("not(${party_type}<482)") is True
+        assert validators.validate_relevant("not(${party_type}<482)") is True
+        assert validators.validate_relevant("not(${party_type}<=482)") is True
+        assert validators.validate_relevant("not(${party_type}<=482)") is True
+        assert validators.validate_relevant("not(${party_type}<=482)") is True
+        assert validators.validate_relevant("not(${party_type}<=482)") is True
+        assert validators.validate_relevant("not(${party_type}!=482)") is True
+        assert validators.validate_relevant("not(${party_type}!=482)") is True
+        assert validators.validate_relevant("not(${party_type}!=482)") is True
+        assert validators.validate_relevant("not(${party_type}!=482)") is True
+
+    def test_not_selected(self):
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’))") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, 'nets'))") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, \"nets\"))") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, “nets”))") is True
+
+    def test_logic(self):
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) and ${party_type}='IN'") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, 'nets') and ${party_type}=\"IN\"") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, \"nets\") and ${party_type}=“IN”") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, “nets”) and ${party_type}=‘IN’") is True
+        assert validators.validate_relevant(
+            "${party_type}='IN' and selected(${assets}, ‘nets’)") is True
+        assert validators.validate_relevant(
+            "${party_type}=\"IN\" and selected(${assets}, 'nets')") is True
+        assert validators.validate_relevant(
+            "${party_type}=“IN” and selected(${assets}, \"nets\")") is True
+        assert validators.validate_relevant(
+            "${party_type}=‘IN’ and selected(${assets}, “nets”)") is True
+
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) or ${party_type}='IN'") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, 'nets') or ${party_type}=\"IN\"") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, \"nets\") or ${party_type}=“IN”") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, “nets”) or ${party_type}=‘IN’") is True
+        assert validators.validate_relevant(
+            "${party_type}='IN' or selected(${assets}, ‘nets’)") is True
+        assert validators.validate_relevant(
+            "${party_type}=\"IN\" or selected(${assets}, 'nets')") is True
+        assert validators.validate_relevant(
+            "${party_type}=“IN” or selected(${assets}, \"nets\")") is True
+        assert validators.validate_relevant(
+            "${party_type}=‘IN’ or selected(${assets}, “nets”)") is True
+
+    def test_not_logic(self):
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’)) and ${party_type}='IN'") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, 'nets')) "
+            "and ${party_type}=\"IN\"") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, \"nets\")) "
+            "and ${party_type}=“IN”") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, “nets”)) and ${party_type}=‘IN’") is True
+        assert validators.validate_relevant(
+            "not(${party_type}='IN') and selected(${assets}, ‘nets’)") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=\"IN\") and "
+            "selected(${assets}, 'nets')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=“IN”) and "
+            "selected(${assets}, \"nets\")") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=‘IN’) and selected(${assets}, “nets”)") is True
+
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’)) or ${party_type}='IN'") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, 'nets')) or ${party_type}=\"IN\"") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, \"nets\")) or ${party_type}=“IN”") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, “nets”)) or ${party_type}=‘IN’") is True
+        assert validators.validate_relevant(
+            "not(${party_type}='IN') or selected(${assets}, ‘nets’)") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=\"IN\") or selected(${assets}, 'nets')") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=“IN”) or selected(${assets}, \"nets\")") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=‘IN’) or selected(${assets}, “nets”)") is True
+
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) and not(${party_type}='IN')") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, 'nets') and "
+            "not(${party_type}=\"IN\")") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, \"nets\") and "
+            "not(${party_type}=“IN”)") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, “nets”) and not(${party_type}=‘IN’)") is True
+        assert validators.validate_relevant(
+            "${party_type}='IN' and not(selected(${assets}, ‘nets’))") is True
+        assert validators.validate_relevant(
+            "${party_type}=\"IN\" and "
+            "not(selected(${assets}, 'nets'))") is True
+        assert validators.validate_relevant(
+            "${party_type}=“IN” and "
+            "not(selected(${assets}, \"nets\"))") is True
+        assert validators.validate_relevant(
+            "${party_type}=‘IN’ and not(selected(${assets}, “nets”))") is True
+
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) or not(${party_type}='IN')") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, 'nets') or not(${party_type}=\"IN\")") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, \"nets\") or not(${party_type}=“IN”)") is True
+        assert validators.validate_relevant(
+            "selected(${assets}, “nets”) or not(${party_type}=‘IN’)") is True
+        assert validators.validate_relevant(
+            "${party_type}='IN' or not(selected(${assets}, ‘nets’))") is True
+        assert validators.validate_relevant(
+            "${party_type}=\"IN\" or not(selected(${assets}, 'nets'))") is True
+        assert validators.validate_relevant(
+            "${party_type}=“IN” or not(selected(${assets}, \"nets\"))") is True
+        assert validators.validate_relevant(
+            "${party_type}=‘IN’ or not(selected(${assets}, “nets”))") is True
+
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’)) and "
+            "not(${party_type}='IN')") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, 'nets')) and "
+            "not(${party_type}=\"IN\")") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, \"nets\")) and "
+            "not(${party_type}=“IN”)") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, “nets”)) and "
+            "not(${party_type}=‘IN’)") is True
+        assert validators.validate_relevant(
+            "not(${party_type}='IN') and "
+            "not(selected(${assets}, ‘nets’))") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=\"IN\") and "
+            "not(selected(${assets}, 'nets'))") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=“IN”) and "
+            "not(selected(${assets}, \"nets\"))") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=‘IN’) and "
+            "not(selected(${assets}, “nets”))") is True
+
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’)) or "
+            "not(${party_type}='IN')") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, 'nets')) or "
+            "not(${party_type}=\"IN\")") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, \"nets\")) or "
+            "not(${party_type}=“IN”)") is True
+        assert validators.validate_relevant(
+            "not(selected(${assets}, “nets”)) or "
+            "not(${party_type}=‘IN’)") is True
+        assert validators.validate_relevant(
+            "not(${party_type}='IN') or "
+            "not(selected(${assets}, ‘nets’))") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=\"IN\") or "
+            "not(selected(${assets}, 'nets'))") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=“IN”) or "
+            "not(selected(${assets}, \"nets\"))") is True
+        assert validators.validate_relevant(
+            "not(${party_type}=‘IN’) or "
+            "not(selected(${assets}, “nets”))") is True
+
+    def test_invalid_compare_text(self):
+        assert validators.validate_relevant("$party_type=”IN”") is False
+        assert validators.validate_relevant("${party_type}=”IN”") is False
+        assert validators.validate_relevant("${party_type}=’IN‘") is False
+        assert validators.validate_relevant("${party_type}=>'IN'") is False
+        assert validators.validate_relevant("${party_type}=>\"IN\"") is False
+        assert validators.validate_relevant("${party_type}=>”IN”") is False
+        assert validators.validate_relevant("${party_type}=>‘IN’") is False
+        assert validators.validate_relevant("${party_type}=<'IN'") is False
+        assert validators.validate_relevant("${party_type}=<\"IN\"") is False
+        assert validators.validate_relevant("${party_type}=<”IN”") is False
+        assert validators.validate_relevant("${party_type}=<‘IN’") is False
+        assert validators.validate_relevant("${party_type}=!'IN'") is False
+        assert validators.validate_relevant("${party_type}=!\"IN\"") is False
+        assert validators.validate_relevant("${party_type}=!”IN”") is False
+        assert validators.validate_relevant("${party_type}=!‘IN’") is False
+
+    def test_invalid_compare_number(self):
+        assert validators.validate_relevant("${party_type}=>9") is False
+        assert validators.validate_relevant("${party_type}=>9") is False
+        assert validators.validate_relevant("${party_type}=>9") is False
+        assert validators.validate_relevant("${party_type}=>9") is False
+        assert validators.validate_relevant("${party_type}=<9") is False
+        assert validators.validate_relevant("${party_type}=<9") is False
+        assert validators.validate_relevant("${party_type}=<9") is False
+        assert validators.validate_relevant("${party_type}=<9") is False
+        assert validators.validate_relevant("${party_type}=!9") is False
+        assert validators.validate_relevant("${party_type}=!9") is False
+        assert validators.validate_relevant("${party_type}=!9") is False
+        assert validators.validate_relevant("${party_type}=!9") is False
+
+        assert validators.validate_relevant("${party_type}=>482") is False
+        assert validators.validate_relevant("${party_type}=>482") is False
+        assert validators.validate_relevant("${party_type}=>482") is False
+        assert validators.validate_relevant("${party_type}=>482") is False
+        assert validators.validate_relevant("${party_type}=<482") is False
+        assert validators.validate_relevant("${party_type}=<482") is False
+        assert validators.validate_relevant("${party_type}=<482") is False
+        assert validators.validate_relevant("${party_type}=<482") is False
+        assert validators.validate_relevant("${party_type}=!482") is False
+        assert validators.validate_relevant("${party_type}=!482") is False
+        assert validators.validate_relevant("${party_type}=!482") is False
+        assert validators.validate_relevant("${party_type}=!482") is False
+
+    def test_invalid_selected(self):
+        assert validators.validate_relevant(
+            "selected($assets, ’nets‘)") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, ’nets‘)") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, ”nets”)") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, 'nets'") is False
+        assert validators.validate_relevant(
+            "selected${assets}, 'nets')") is False
+        assert validators.validate_relevant(
+            "selected${assets}, 'nets'") is False
+        assert validators.validate_relevant(
+            "selected ${assets}, 'nets')") is False
+        assert validators.validate_relevant(
+            "selected ${assets}, 'nets'") is False
+
+    def test_invalid_not_text(self):
+        assert validators.validate_relevant(
+            "not(${party_type}=”IN”)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=’IN‘)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=>'IN')") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=>\"IN\")") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=>”IN”)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=>‘IN’)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=<'IN')") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=<\"IN\")") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=<”IN”)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=<‘IN’)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=!'IN')") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=!\"IN\")") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=!”IN”)") is False
+        assert validators.validate_relevant(
+            "not(${party_type}=!‘IN’)") is False
+
+    def test_invalid_not_number(self):
+        assert validators.validate_relevant("not(${party_type}=>9)") is False
+        assert validators.validate_relevant("not(${party_type}=>9)") is False
+        assert validators.validate_relevant("not(${party_type}=>9)") is False
+        assert validators.validate_relevant("not(${party_type}=>9)") is False
+        assert validators.validate_relevant("not(${party_type}=<9)") is False
+        assert validators.validate_relevant("not(${party_type}=<9)") is False
+        assert validators.validate_relevant("not(${party_type}=<9)") is False
+        assert validators.validate_relevant("not(${party_type}=<9)") is False
+        assert validators.validate_relevant("not(${party_type}=!9)") is False
+        assert validators.validate_relevant("not(${party_type}=!9)") is False
+        assert validators.validate_relevant("not(${party_type}=!9)") is False
+        assert validators.validate_relevant("not(${party_type}=!9)") is False
+
+        assert validators.validate_relevant("not(${party_type}=>482)") is False
+        assert validators.validate_relevant("not(${party_type}=>482)") is False
+        assert validators.validate_relevant("not(${party_type}=>482)") is False
+        assert validators.validate_relevant("not(${party_type}=>482)") is False
+        assert validators.validate_relevant("not(${party_type}=<482)") is False
+        assert validators.validate_relevant("not(${party_type}=<482)") is False
+        assert validators.validate_relevant("not(${party_type}=<482)") is False
+        assert validators.validate_relevant("not(${party_type}=<482)") is False
+        assert validators.validate_relevant("not(${party_type}=!482)") is False
+        assert validators.validate_relevant("not(${party_type}=!482)") is False
+        assert validators.validate_relevant("not(${party_type}=!482)") is False
+        assert validators.validate_relevant("not(${party_type}=!482)") is False
+
+        assert validators.validate_relevant("not(${party_type}='IN'") is False
+        assert validators.validate_relevant("not(${party_type}='IN' ") is False
+        assert validators.validate_relevant("not${party_type}='IN')") is False
+        assert validators.validate_relevant("not ${party_type}='IN')") is False
+
+    def test_invalid_not_selected(self):
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ’nets‘))") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ”nets”))") is False
+        assert validators.validate_relevant(
+            "notselected(${assets}, 'nets'))") is False
+        assert validators.validate_relevant(
+            "not selected(${assets}, 'nets'))") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, 'nets')") is False
+        assert validators.validate_relevant(
+            "notselected(${assets}, 'nets')") is False
+        assert validators.validate_relevant(
+            "not selected(${assets}, 'nets')") is False
+
+    def test_invalid_logic(self):
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ’nets‘))") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ”nets”))") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’) and ${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’) or ${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) and not(${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) or not(${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’) and "
+            "not(${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "not(selected(${assets}, ‘nets’) or "
+            "not(${party_type}='IN'") is False
+
+        assert validators.validate_relevant(
+            "notselected(${assets}, ‘nets’)) and ${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "notselected(${assets}, ‘nets’)) or ${party_type}='IN'") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) and not${party_type}='IN')") is False
+        assert validators.validate_relevant(
+            "selected(${assets}, ‘nets’) or not${party_type}='IN')") is False
+        assert validators.validate_relevant(
+            "notselected(${assets}, ‘nets’)) and "
+            "not${party_type}='IN')") is False
+        assert validators.validate_relevant(
+            "notselected(${assets}, ‘nets’)) or "
+            "not${party_type}='IN')") is False
