@@ -141,7 +141,7 @@
 {% endblock %}
 
 {% block modals %}
-{% if not current_user  %}
+{% if not current_user or org_member.is_superuser  %}
 <div class="modal fade" id="remove_confirm" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
