@@ -47,9 +47,9 @@
                   <div class="error-block">{{ org_role_form.org_role.errors }}</div>
                 </div>
                 <div class="btn-full">
-                  <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if org_admin and current_user %} disabled{% endif %}>
+                  <button type="button" class="btn btn-danger" name="remove" data-toggle="modal" data-target="#remove_confirm"{% if current_user and not org_member.is_superuser %} disabled{% endif %}>
                     <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans "Remove member" %}</button>
-                  {% if current_user %}
+                  {% if current_user and not org_member.is_superuser %}
                   <div class="alert alert-full" role="alert">
                     <div class="pull-left"><span class="glyphicon glyphicon-info-sign"></span></div>
                     <div>{% trans "An organization administrator cannot remove themself." %}</div>
@@ -86,7 +86,7 @@
                   </tbody>
                 </table>
               </div>
-              {% if not org_admin and not object.is_superuser %}
+              {% if not org_admin %}
               <div class="panel-footer panel-buttons text-center">
                 <button type="submit" class="btn btn-primary" name="submit">{% trans "Save" %}</button>
                 <a href="{% url 'organization:members' organization.slug %}" class="btn btn-default">{% trans "Cancel" %}</a>
