@@ -260,13 +260,13 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         context['project_role_form'] = self.get_prj_role_form()
         context['org_role_form'] = self.get_form()
 
-        context['org_admin'] = OrganizationRole.objects.filter(
-            user=context['org_member'],
-            organization=context['organization'],
-            admin=True).exists()
-        context['current_user'] = (
-            context['org_member'] == self.request.user and
-            not self.is_superuser)
+        context['org_admin'] = context['org_member'].is_superuser
+        if not context['org_admin']:
+            context['org_admin'] = OrganizationRole.objects.filter(
+                user=context['org_member'],
+                organization=context['organization'],
+                admin=True).exists()
+        context['current_user'] = context['org_member'] == self.request.user
         return context
 
     def post(self, request, *args, **kwargs):

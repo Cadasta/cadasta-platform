@@ -262,14 +262,16 @@ class EditOrganizationMemberProjectPermissionForm(forms.Form):
         project_roles = {r['project__id']: r['role'] for r in project_roles}
         active_projects = self.organization.projects.filter(archived=False)
 
+        admin = self.org_role_instance.admin or user.is_superuser
+
         for p in active_projects.values_list('id', 'name'):
             role = project_roles.get(p[0], 'Pb')
             self.fields[p[0]] = org_fields.ProjectRoleEditField(
                 choices=FORM_CHOICES,
                 label=p[1],
-                required=(not self.org_role_instance.admin),
+                required=(not admin),
                 initial=role,
-                admin=self.org_role_instance.admin,
+                admin=admin,
             )
 
     def save(self):
