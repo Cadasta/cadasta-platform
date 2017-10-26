@@ -803,6 +803,8 @@ section {
 -------------------------------------------------------------- */
 
 .top-btn {
+  position: relative;
+  z-index: 9;
   margin-top: 10px;
   margin-bottom: 10px;
   .btn {
@@ -1034,3 +1036,4 @@ h1 .label {
 .break { // for email and url long links
   word-break: break-all;
 }
+
