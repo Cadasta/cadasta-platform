@@ -4,6 +4,7 @@ import operator as op
 
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from django.utils import translation
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView
@@ -33,6 +34,11 @@ class AccountRegister(CreateView):
 
     def form_valid(self, form):
         user = form.save(self.request)
+
+        user_lang = form.cleaned_data['language']
+        if user_lang != translation.get_language():
+            translation.activate(user_lang)
+            self.request.session[translation.LANGUAGE_SESSION_KEY] = user_lang
 
         if user.email:
             send_email_confirmation(self.request, user)

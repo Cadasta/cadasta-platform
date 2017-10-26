@@ -1,5 +1,6 @@
 import datetime
 from django.core.urlresolvers import reverse_lazy
+from django.utils import translation
 from django.test import TestCase
 from django.core import mail
 from skivvy import ViewTestCase
@@ -40,7 +41,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes',
-            'language': 'fr'
+            'language': 'en'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -55,7 +56,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
             'email': 'sherlock.holmes@bbc.uk',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes',
-            'language': 'fr'
+            'language': 'en'
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 302
@@ -63,6 +64,23 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         assert VerificationDevice.objects.count() == 0
         assert len(mail.outbox) == 1
         assert 'account/accountverification/' in response.location
+
+    def test_signs_up_sets_language(self):
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes',
+            'language': 'es'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 302
+        assert User.objects.count() == 1
+        assert 'account/accountverification/' in response.location
+        assert translation.get_language() == 'es'
+
+        # Reset language for following tests
+        translation.activate('en')
 
 
 class ProfileTest(ViewTestCase, UserTestCase, TestCase):
