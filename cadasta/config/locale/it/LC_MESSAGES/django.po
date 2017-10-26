@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Cadasta platform\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-01 13:17+0000\n"
-"PO-Revision-Date: 2017-09-01 13:18+0000\n"
+"POT-Creation-Date: 2017-10-20 13:13+0000\n"
+"PO-Revision-Date: 2017-10-20 13:13+0000\n"
 "Last-Translator: Chandra Lash <clash@cadasta.org>\n"
 "Language-Team: Italian (http://www.transifex.com/cadasta/cadasta-platform/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -68,11 +68,11 @@ msgstr "Nuova Password"
 msgid "Please type your current password."
 msgstr "Per favore inerisci la tua password corrente."
 
-#: accounts/manager.py:16 organization/serializers.py:161
+#: accounts/manager.py:16 organization/serializers.py:164
 msgid "User with username or email {} does not exist"
 msgstr "Utente con nome utente o email {} non esiste"
 
-#: accounts/manager.py:21 organization/serializers.py:163
+#: accounts/manager.py:21 organization/serializers.py:166
 msgid "More than one user found for username or email {}"
 msgstr "Più di un utente trovato col nome utente o email {}"
 
@@ -80,23 +80,23 @@ msgstr "Più di un utente trovato col nome utente o email {}"
 msgid "full name"
 msgstr "nome e cognome"
 
-#: accounts/models.py:62
+#: accounts/models.py:68
 msgid "user"
 msgstr "utente"
 
-#: accounts/models.py:63
+#: accounts/models.py:69
 msgid "users"
 msgstr "utenti"
 
-#: accounts/models.py:73 organization/messages.py:33
+#: accounts/models.py:79 organization/messages.py:33
 msgid "You don't have permission to view user details"
 msgstr "Non hai il permesso di vedere i dettagli dell'utente"
 
-#: accounts/models.py:76 organization/messages.py:34
+#: accounts/models.py:82 organization/messages.py:34
 msgid "You don't have permission to update user details"
 msgstr "Non hai il permesso di aggiornare i dettagli dell'utente"
 
-#: accounts/models.py:117
+#: accounts/models.py:134
 msgid "Change of password at Cadasta Platform"
 msgstr "Cambiamento password della Piattaforma Cadasta"
 
@@ -107,7 +107,7 @@ msgstr "Un altro utente è già registrato con questo indirizzo email"
 
 #: accounts/serializers.py:118
 msgid "Cannot update last_login"
-msgstr ""
+msgstr "Non è possibile aggiornare last_login"
 
 #: accounts/tests/test_forms.py:54 accounts/tests/test_forms.py:66
 #: accounts/tests/test_forms.py:324 accounts/tests/test_serializers.py:58
@@ -145,76 +145,87 @@ msgstr "Le passwords deve contenere almeno {unique_types} dei seguenti {characte
 msgid "The email has not been verified."
 msgstr "La email non è stata verificata."
 
-#: accounts/views/default.py:59
+#: accounts/views/default.py:64
 msgid "Successfully updated profile information"
 msgstr "Aggiornate le informazioni del profilo con successo"
 
-#: accounts/views/default.py:64
+#: accounts/views/default.py:69
 msgid "Failed to update profile information"
 msgstr "Aggiornamento informazioni profilo fallito"
 
-#: config/settings/default.py:206
+#: accounts/views/default.py:148 organization/choices.py:4
+#: organization/views/default.py:434 organization/widgets.py:26
+#: organization/widgets.py:57 templates/accounts/user_dashboard.html:49
+#: templates/organization/organization_members_edit.html:38
+msgid "Administrator"
+msgstr "Amministratore"
+
+#: accounts/views/default.py:148 organization/forms.py:29
+msgid "Public User"
+msgstr "Utente Pubblico"
+
+#: config/settings/default.py:208
 msgid ""
 "Base map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> "
 "contributors under <a "
 "href=\"http://opendatacommons.org/licenses/odbl/\">ODbL</a>"
 msgstr "Dati mappa base &copia; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributore sotto <a href=\"http://opendatacommons.org/licenses/odbl/\">ODbL</a>"
 
-#: config/settings/default.py:210
+#: config/settings/default.py:212
 msgid "Imagery &copy; DigitalGlobe"
 msgstr "Imagery &copy; DigitalGlobe"
 
-#: config/settings/default.py:221
+#: config/settings/default.py:223
 msgid "OpenStreetMap"
 msgstr "OpenStreetMap"
 
-#: config/settings/default.py:227
+#: config/settings/default.py:229
 msgid "+Vivid imagery"
 msgstr "+Vivid imagery"
 
-#: config/settings/default.py:233
+#: config/settings/default.py:235
 msgid "Recent imagery"
 msgstr "Immagine recente"
 
-#: config/settings/default.py:239
+#: config/settings/default.py:241
 msgid "+Vivid imagery with OpenStreetMap"
 msgstr "+Vivid imagery con OpenStreetMap"
 
-#: config/settings/default.py:245
+#: config/settings/default.py:247
 msgid "Recent imagery with OpenStreetMap"
 msgstr "Immagine recente con OpenStreetMap"
 
-#: config/settings/default.py:277 config/settings/languages.py:19
+#: config/settings/default.py:279 config/settings/languages.py:21
 msgid "English"
 msgstr "Inglese"
 
-#: config/settings/default.py:278 config/settings/languages.py:26
+#: config/settings/default.py:280 config/settings/languages.py:28
 msgid "French"
 msgstr "Francese"
 
-#: config/settings/default.py:280 config/settings/languages.py:21
+#: config/settings/default.py:282 config/settings/languages.py:23
 msgid "Spanish"
 msgstr "Spagnolo"
 
-#: config/settings/default.py:281 config/settings/languages.py:36
+#: config/settings/default.py:283 config/settings/languages.py:38
 msgid "Indonesian"
 msgstr "Indonesiano"
 
-#: config/settings/default.py:282 config/settings/languages.py:39
+#: config/settings/default.py:284 config/settings/languages.py:41
 msgid "Italian"
 msgstr "Italiano"
 
-#: config/settings/default.py:283 config/settings/languages.py:61
+#: config/settings/default.py:285 config/settings/languages.py:65
 msgid "Portuguese"
 msgstr "Portoghese"
 
-#: config/settings/default.py:289
+#: config/settings/default.py:291
 msgid "Metric"
-msgstr ""
+msgstr "Metrico"
 
-#: config/settings/default.py:290
+#: config/settings/default.py:292
 msgid "Imperial"
-msgstr ""
+msgstr "Imperiale"
 
 #: config/settings/languages.py:5
 msgid "Afrikaans"
@@ -225,273 +236,285 @@ msgid "Arabic"
 msgstr "Arabo"
 
 #: config/settings/languages.py:7
+msgid "Aymara"
+msgstr ""
+
+#: config/settings/languages.py:8
 msgid "Azerbaijani"
 msgstr "Azerbaigiano"
 
-#: config/settings/languages.py:8
+#: config/settings/languages.py:9
 msgid "Belarusian"
 msgstr "Bielorusso"
 
-#: config/settings/languages.py:9
+#: config/settings/languages.py:10
 msgid "Bulgarian"
 msgstr "Bulgaro"
 
-#: config/settings/languages.py:10
+#: config/settings/languages.py:11
 msgid "Bengali"
 msgstr "Bengalese"
 
-#: config/settings/languages.py:11
+#: config/settings/languages.py:12
 msgid "Breton"
 msgstr "Bretone"
 
-#: config/settings/languages.py:12
+#: config/settings/languages.py:13
 msgid "Bosnian"
 msgstr "Bosniaco"
 
-#: config/settings/languages.py:13
+#: config/settings/languages.py:14
 msgid "Catalan"
 msgstr "Catalano"
 
-#: config/settings/languages.py:14
+#: config/settings/languages.py:15
+msgid "Garifuna"
+msgstr ""
+
+#: config/settings/languages.py:16
 msgid "Czech"
 msgstr "Cecoslovacco"
 
-#: config/settings/languages.py:15
+#: config/settings/languages.py:17
 msgid "Welsh"
 msgstr "Gallese"
 
-#: config/settings/languages.py:16
+#: config/settings/languages.py:18
 msgid "Danish"
 msgstr "Danese"
 
-#: config/settings/languages.py:17
+#: config/settings/languages.py:19
 msgid "German"
 msgstr "Tedesco"
 
-#: config/settings/languages.py:18
+#: config/settings/languages.py:20
 msgid "Greek"
 msgstr "Greco"
 
-#: config/settings/languages.py:20
+#: config/settings/languages.py:22
 msgid "Esperanto"
 msgstr "Esperanto"
 
-#: config/settings/languages.py:22
+#: config/settings/languages.py:24
 msgid "Estonian"
 msgstr "Estone"
 
-#: config/settings/languages.py:23
+#: config/settings/languages.py:25
 msgid "Basque"
 msgstr "Basco"
 
-#: config/settings/languages.py:24
+#: config/settings/languages.py:26
 msgid "Persian (Farsi)"
 msgstr "Persiano"
 
-#: config/settings/languages.py:25
+#: config/settings/languages.py:27
 msgid "Finnish"
 msgstr "Finlandese"
 
-#: config/settings/languages.py:27
+#: config/settings/languages.py:29
 msgid "Western Frisian"
 msgstr "Frisone Occidentale"
 
-#: config/settings/languages.py:28
+#: config/settings/languages.py:30
 msgid "Irish"
 msgstr "Irlandese"
 
-#: config/settings/languages.py:29
+#: config/settings/languages.py:31
 msgid "Scottish Gaelic"
 msgstr "Gaelico Scozzese"
 
-#: config/settings/languages.py:30
+#: config/settings/languages.py:32
 msgid "Galician"
 msgstr "Galiziano"
 
-#: config/settings/languages.py:31
+#: config/settings/languages.py:33
 msgid "Hebrew"
 msgstr "Ebraico"
 
-#: config/settings/languages.py:32
+#: config/settings/languages.py:34
 msgid "Hindi"
 msgstr "Hindi"
 
-#: config/settings/languages.py:33
+#: config/settings/languages.py:35
 msgid "Croatian"
 msgstr "Croato"
 
-#: config/settings/languages.py:34
+#: config/settings/languages.py:36
 msgid "Hungarian"
 msgstr "Ungherese"
 
-#: config/settings/languages.py:35
+#: config/settings/languages.py:37
 msgid "Interlingua"
 msgstr "Interlingua"
 
-#: config/settings/languages.py:37
+#: config/settings/languages.py:39
 msgid "Ido"
 msgstr "Ido"
 
-#: config/settings/languages.py:38
+#: config/settings/languages.py:40
 msgid "Icelandic"
 msgstr "Islandese"
 
-#: config/settings/languages.py:40
+#: config/settings/languages.py:42
 msgid "Japanese"
 msgstr "Giapponese"
 
-#: config/settings/languages.py:41
+#: config/settings/languages.py:43
 msgid "Georgian"
 msgstr "Georgiano"
 
-#: config/settings/languages.py:42
+#: config/settings/languages.py:44
+msgid "S'gaw Karen"
+msgstr "S'gaw Karen"
+
+#: config/settings/languages.py:45
 msgid "Kazakh"
 msgstr "Kazako"
 
-#: config/settings/languages.py:43
+#: config/settings/languages.py:46
 msgid "Khmer"
 msgstr "Khmer"
 
-#: config/settings/languages.py:44
+#: config/settings/languages.py:47
 msgid "Kannada"
 msgstr "Kannada"
 
-#: config/settings/languages.py:45
+#: config/settings/languages.py:48
 msgid "Korean"
 msgstr "Coreano"
 
-#: config/settings/languages.py:46
+#: config/settings/languages.py:49
 msgid "Luxembourgish"
 msgstr "Lussemburghese"
 
-#: config/settings/languages.py:47
+#: config/settings/languages.py:50
 msgid "Lithuanian"
 msgstr "Lituano"
 
-#: config/settings/languages.py:48
+#: config/settings/languages.py:51
 msgid "Latvian"
 msgstr "Lettone"
 
-#: config/settings/languages.py:49
+#: config/settings/languages.py:52
 msgid "Macedonian"
 msgstr "Macedone"
 
-#: config/settings/languages.py:50
+#: config/settings/languages.py:53
 msgid "Malayalam"
 msgstr "Malesiano"
 
-#: config/settings/languages.py:51
+#: config/settings/languages.py:54
 msgid "Mongolian"
 msgstr "Mongolo"
 
-#: config/settings/languages.py:52
+#: config/settings/languages.py:55
 msgid "Marathi"
 msgstr "Marathi"
 
-#: config/settings/languages.py:53
+#: config/settings/languages.py:56
 msgid "Burmese"
 msgstr "Burmese"
 
-#: config/settings/languages.py:54
+#: config/settings/languages.py:57
 msgid "Norwegian (Bokmål)"
 msgstr "Norvegese (Bokmål)"
 
-#: config/settings/languages.py:55
+#: config/settings/languages.py:58
 msgid "Nepali"
 msgstr "Nepalese"
 
-#: config/settings/languages.py:56
+#: config/settings/languages.py:59
 msgid "Dutch"
 msgstr "Olandese"
 
-#: config/settings/languages.py:57
+#: config/settings/languages.py:60
 msgid "Norwegian (Nynorsk)"
 msgstr "Norvegese (Nynorsk)"
 
-#: config/settings/languages.py:58
+#: config/settings/languages.py:61
+msgid "Odia"
+msgstr ""
+
+#: config/settings/languages.py:62
 msgid "Ossetian"
 msgstr "Osseto"
 
-#: config/settings/languages.py:59
+#: config/settings/languages.py:63
 msgid "Eastern Punjabi"
 msgstr "Punjabi Orientale"
 
-#: config/settings/languages.py:60
+#: config/settings/languages.py:64
 msgid "Polish"
 msgstr "Polacco"
 
-#: config/settings/languages.py:62
+#: config/settings/languages.py:66
 msgid "Romanian"
 msgstr "Rumeno"
 
-#: config/settings/languages.py:63
+#: config/settings/languages.py:67
 msgid "Russian"
 msgstr "Russo"
 
-#: config/settings/languages.py:64
+#: config/settings/languages.py:68
 msgid "Slovak"
 msgstr "Slovacco"
 
-#: config/settings/languages.py:65
+#: config/settings/languages.py:69
 msgid "Slovene"
 msgstr "Sloveno"
 
-#: config/settings/languages.py:66
+#: config/settings/languages.py:70
 msgid "Albanian"
 msgstr "Albanese"
 
-#: config/settings/languages.py:67
+#: config/settings/languages.py:71
 msgid "Serbian"
 msgstr "Serbo"
 
-#: config/settings/languages.py:68
+#: config/settings/languages.py:72
 msgid "Swedish"
 msgstr "Svedese"
 
-#: config/settings/languages.py:69
+#: config/settings/languages.py:73
 msgid "Swahili"
 msgstr "Swahili"
 
-#: config/settings/languages.py:70
+#: config/settings/languages.py:74
 msgid "Tamil"
 msgstr "Tamil"
 
-#: config/settings/languages.py:71
+#: config/settings/languages.py:75
 msgid "Telugu"
 msgstr "Telugu"
 
-#: config/settings/languages.py:72
+#: config/settings/languages.py:76
 msgid "Thai"
 msgstr "Tailandese"
 
-#: config/settings/languages.py:73
+#: config/settings/languages.py:77
 msgid "Turkish"
 msgstr "Turco"
 
-#: config/settings/languages.py:74
+#: config/settings/languages.py:78
 msgid "Tatar"
 msgstr "Tataro"
 
-#: config/settings/languages.py:75
+#: config/settings/languages.py:79
 msgid "Ukrainian"
 msgstr "Ucraino"
 
-#: config/settings/languages.py:76
+#: config/settings/languages.py:80
 msgid "Urdu"
 msgstr "Urdu"
 
-#: config/settings/languages.py:77
+#: config/settings/languages.py:81
 msgid "Vietnamese"
 msgstr "Vietnamita"
-
-#: config/settings/languages.py:78
-msgid "S'gaw Karen"
-msgstr "S'gaw Karen"
 
 #: core/messages.py:3
 msgid ""
 "Input can not contain HTML tags, emojis or start with any of + - = and @."
-msgstr ""
+msgstr "Input non può contenere HTML tags, emoji e non può iniziare con + - = o @."
 
 #: core/mixins.py:19
 msgid "You don't have permission for this action."
@@ -523,6 +546,7 @@ msgstr "Cancella disegno"
 
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:7
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:68
+#: templates/accounts/profile.html:94
 #: templates/organization/organization_add.html:30
 #: templates/organization/organization_edit.html:32
 #: templates/organization/organization_members_add.html:33
@@ -530,28 +554,28 @@ msgstr "Cancella disegno"
 #: templates/organization/organization_members_edit.html:153
 #: templates/organization/organization_members_edit.html:179
 #: templates/organization/organization_members_edit.html:205
-#: templates/organization/organization_wrapper.html:144
-#: templates/organization/organization_wrapper.html:170
-#: templates/organization/project_add_wrapper.html:54
+#: templates/organization/organization_wrapper.html:139
+#: templates/organization/organization_wrapper.html:165
+#: templates/organization/project_add_wrapper.html:51
 #: templates/organization/project_attrs_import.html:121
 #: templates/organization/project_defaults_import.html:101
 #: templates/organization/project_edit_details.html:110
 #: templates/organization/project_edit_geometry.html:78
 #: templates/organization/project_edit_permissions.html:41
 #: templates/organization/project_select_import.html:101
-#: templates/organization/project_wrapper.html:215
-#: templates/organization/project_wrapper.html:241
-#: templates/party/party_add.html:53 templates/party/party_delete.html:21
-#: templates/party/party_edit.html:56
+#: templates/organization/project_wrapper.html:217
+#: templates/organization/project_wrapper.html:243
+#: templates/party/party_add.html:50 templates/party/party_delete.html:21
+#: templates/party/party_edit.html:53
 #: templates/party/relationship_delete.html:20
-#: templates/party/relationship_edit.html:64 templates/resources/edit.html:57
+#: templates/party/relationship_edit.html:61 templates/resources/edit.html:57
 #: templates/resources/modal_add_lib.html:28
 #: templates/resources/modal_archive.html:26
 #: templates/resources/modal_unarchive.html:22
 #: templates/resources/modal_upload.html:30
 #: templates/spatial/location_delete.html:22
-#: templates/spatial/location_form.html:47
-#: templates/spatial/relationship_add.html:128
+#: templates/spatial/location_form.html:46
+#: templates/spatial/relationship_add.html:125
 msgid "Cancel"
 msgstr "Cancella"
 
@@ -632,6 +656,7 @@ msgid "Save changes."
 msgstr "Salva modifiche."
 
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:64
+#: templates/accounts/profile.html:93
 #: templates/organization/organization_add.html:27
 #: templates/organization/organization_edit.html:28
 #: templates/organization/organization_members_add.html:32
@@ -639,12 +664,12 @@ msgstr "Salva modifiche."
 #: templates/organization/project_edit_details.html:109
 #: templates/organization/project_edit_geometry.html:77
 #: templates/organization/project_edit_permissions.html:40
-#: templates/party/party_add.html:49 templates/party/party_edit.html:52
-#: templates/party/relationship_edit.html:63 templates/resources/edit.html:56
+#: templates/party/party_add.html:46 templates/party/party_edit.html:49
+#: templates/party/relationship_edit.html:60 templates/resources/edit.html:56
 #: templates/resources/modal_add_lib.html:25
 #: templates/resources/modal_upload.html:27
-#: templates/spatial/location_form.html:46
-#: templates/spatial/relationship_add.html:124
+#: templates/spatial/location_form.html:45
+#: templates/spatial/relationship_add.html:121
 msgid "Save"
 msgstr "Salva"
 
@@ -698,16 +723,10 @@ msgstr "o"
 msgid "{name} not found."
 msgstr "{name} non trovato."
 
-#: organization/choices.py:4 organization/views/default.py:415
-#: organization/widgets.py:26 organization/widgets.py:57
-#: templates/organization/organization_members_edit.html:38
-msgid "Administrator"
-msgstr "Amministratore"
-
 #: organization/choices.py:5
 #: templates/organization/organization_members.html:30
 #: templates/organization/organization_members_edit.html:17
-#: templates/organization/project_add_permissions.html:42
+#: templates/organization/project_add_permissions.html:43
 #: templates/organization/project_edit_permissions.html:29
 #: templates/organization/user_list.html:32
 msgid "Member"
@@ -730,16 +749,13 @@ msgid "Public"
 msgstr "Pubblico"
 
 #: organization/choices.py:12 organization/widgets.py:104
+#: templates/accounts/user_dashboard.html:74
 #: templates/organization/organization_dashboard_member.html:36
 #: templates/organization/organization_dashboard_nonmember.html:49
 #: templates/organization/project_list.html:56
 #: templates/organization/project_wrapper.html:20
 msgid "Private"
 msgstr "Privato"
-
-#: organization/forms.py:29
-msgid "Public User"
-msgstr "Utente Pubblico"
 
 #: organization/forms.py:95
 msgid "Please provide a name."
@@ -753,7 +769,7 @@ msgstr "L'email provveduta non è valida."
 msgid "Please provide either an email address or a phone number."
 msgstr "La preghiamo di provvedere un indirizzo email o un numero di telefono."
 
-#: organization/forms.py:145
+#: organization/forms.py:145 organization/serializers.py:45
 msgid "Organization with this name already exists."
 msgstr "Un'organizzazione con tale nome già esiste."
 
@@ -761,56 +777,56 @@ msgstr "Un'organizzazione con tale nome già esiste."
 msgid "Organization name cannot be “Add” or “New”."
 msgstr "Il nome dell'organizzazione non può essere \"Aggiunto\" o \"Nuovo\"."
 
-#: organization/forms.py:191
+#: organization/forms.py:201
 msgid "User is already a member of the organization."
 msgstr "L'utente è già un membro dell'organizzazione."
 
-#: organization/forms.py:197
+#: organization/forms.py:207
 msgid "The role could not be assigned because the data didn't validate."
 msgstr "Il ruolo non poteva essere assegnato perché i dati non sono stati validati."
 
-#: organization/forms.py:228
+#: organization/forms.py:238
 msgid ""
 "Organization administrators cannot change their own role in the "
 "organization."
 msgstr "Gli amministratori dell'organizzazione non possono modificare i loro stessi ruoli all'interno dell'organizzazione."
 
-#: organization/forms.py:312
+#: organization/forms.py:324
 msgid "Please select an organization"
 msgstr "Per favore seleziona un'organizzazione"
 
-#: organization/forms.py:322 organization/forms.py:399
-#: organization/serializers.py:73
+#: organization/forms.py:334 organization/forms.py:407
+#: organization/serializers.py:84
 msgid "Project name cannot be “Add” or “New”."
 msgstr "Nome progetto non può essere \"Aggiunto\" o \"Nuovo\"."
 
-#: organization/forms.py:334 organization/forms.py:410
-#: organization/serializers.py:92
-msgid "Project with this name already exists in this organization."
-msgstr "Un progetto con questo nome già esiste in questa organizzazione."
+#: organization/forms.py:343 organization/forms.py:416
+#: organization/serializers.py:96
+msgid "Project with this name already exists"
+msgstr ""
 
-#: organization/forms.py:371
+#: organization/forms.py:379
 msgid ""
 "Data has already been contributed to this project. To ensure data integrity,"
 " uploading a new questionnaire is disabled for this project."
 msgstr "I dati sono già stati aggiunti a questo progetto. Per assicurarsi dell'integrità dei dati, caricare un nuovo questionario è stato disabilitato per questo progetto."
 
-#: organization/forms.py:573
+#: organization/forms.py:578
 msgid "File too large, max size 512kb"
 msgstr "Il documento è troppo grande, max dimensione è 512kb"
 
-#: organization/forms.py:583
+#: organization/forms.py:588
 msgid "Invalid file type"
 msgstr "Tipo di documento invalido"
 
-#: organization/forms.py:595
+#: organization/forms.py:600
 msgid "Select at least one data type."
 msgstr "Seleziona almeno uno dei tipi di dati."
 
 #: organization/importers/exceptions.py:11
 #, python-format
 msgid "Error importing file at line %d: %s"
-msgstr ""
+msgstr "Errore importando il documento in linea %d: %s"
 
 #: organization/importers/exceptions.py:15
 #, python-format
@@ -918,113 +934,113 @@ msgstr "Non hai il permesso di rimuovere membri da questo progetto"
 
 #: organization/messages.py:28
 msgid "You don't have permission to export data from this project"
-msgstr ""
+msgstr "Non hai il permesso di esportare dati da questo progetto"
 
 #: organization/messages.py:30
 msgid "You don't have permission to import data to this project"
 msgstr "Non hai il permesso di importare dati a questo progetto"
 
-#: organization/models.py:64
+#: organization/models.py:68
 msgid "List existing organizations"
 msgstr "Lista di organizzazioni esistenti"
 
-#: organization/models.py:67
+#: organization/models.py:71
 msgid "Create organizations"
 msgstr "Crea organizzazioni"
 
-#: organization/models.py:70
+#: organization/models.py:74
 msgid "View existing organizations"
 msgstr "Vedi organizzazioni esistenti"
 
-#: organization/models.py:73
+#: organization/models.py:77
 msgid "View archived organization"
 msgstr "Vedi organizzazione archiviata"
 
-#: organization/models.py:76
+#: organization/models.py:80
 msgid "Update an existing organization"
 msgstr "Aggiorna un'organizzazione esistente"
 
-#: organization/models.py:79
+#: organization/models.py:83
 msgid "Archive an existing organization"
 msgstr "Archivia un'organizzazione esistente"
 
-#: organization/models.py:82
+#: organization/models.py:86
 msgid "Unarchive an existing organization"
 msgstr "Rimuovi un'organizzazione dall'archivio"
 
-#: organization/models.py:85
+#: organization/models.py:89
 msgid "List members of an organization"
 msgstr "Elenca i membri di un'organizzazione"
 
-#: organization/models.py:88
+#: organization/models.py:92
 msgid "Add a member to an organization"
 msgstr "Aggiungi un membro ad un'organizzazione"
 
-#: organization/models.py:91
+#: organization/models.py:95
 msgid "Edit a member of an organization"
 msgstr "Modifica un membro di un'organizzazione"
 
-#: organization/models.py:94
+#: organization/models.py:98
 msgid "Remove a member from an organization"
 msgstr "Rimuovi un membro da un'organizzazione"
 
-#: organization/models.py:202
+#: organization/models.py:214
 msgid "List existing projects in an organization"
 msgstr "Lista progetti di un'organizzazione"
 
-#: organization/models.py:205
+#: organization/models.py:217
 msgid "Create projects in an organization"
 msgstr "Crea progetti in un'organizzazione"
 
-#: organization/models.py:208
+#: organization/models.py:220
 msgid "View existing projects"
 msgstr "Vedi progetti esistenti"
 
-#: organization/models.py:211
+#: organization/models.py:223
 msgid "View private projects"
 msgstr "Vedi progetti privati"
 
-#: organization/models.py:214
+#: organization/models.py:226
 msgid "View archived projects"
 msgstr "Vedi progetti archiviati"
 
-#: organization/models.py:217
+#: organization/models.py:229
 msgid "Update an existing project"
 msgstr "Aggiorna un progetto esistente"
 
-#: organization/models.py:220
+#: organization/models.py:232
 msgid "Archive an existing project"
 msgstr "Archivia un progetto esistente"
 
-#: organization/models.py:223
+#: organization/models.py:235
 msgid "Unarchive an existing project"
 msgstr "Rimuovi un progetto dall'archivio"
 
-#: organization/models.py:226
+#: organization/models.py:238
 msgid "List users within a project"
 msgstr "Lista utenti di un progetto"
 
-#: organization/models.py:229
+#: organization/models.py:241
 msgid "Add user to a project"
 msgstr "Aggiungi utente ad un progetto"
 
-#: organization/models.py:232
+#: organization/models.py:244
 msgid "Edit roles of user in a project"
 msgstr "Modifica ruoli dell'utente di un progetto"
 
-#: organization/models.py:235
+#: organization/models.py:247
 msgid "Remove user from a project"
 msgstr "Rimuovi utente dal progetto"
 
-#: organization/models.py:238
+#: organization/models.py:250
 msgid "Export data from a project"
-msgstr ""
+msgstr "Esporta dati da questo progetto"
 
-#: organization/models.py:241
+#: organization/models.py:253
 msgid "Import data to a project"
 msgstr "Importa dati al progetto"
 
-#: organization/models.py:258
+#: organization/models.py:270 templates/accounts/user_dashboard.html:61
 #: templates/organization/organization_dashboard_member.html:23
 #: templates/organization/organization_dashboard_nonmember.html:36
 #: templates/organization/organization_members_edit.html:71
@@ -1032,42 +1048,46 @@ msgstr "Importa dati al progetto"
 msgid "Project"
 msgstr "Progetto"
 
-#: organization/serializers.py:173
+#: organization/serializers.py:176
 msgid "Not able to add member. The role already exists."
 msgstr "Non in grado di aggiungere membro. Il ruolo esiste già."
 
-#: organization/serializers.py:215
+#: organization/serializers.py:219
 msgid ""
 "Organization administrators cannot change their own permissions within the "
 "organization"
 msgstr "Gli amministratori dell'organizzazione non possono cambiare i loro stessi permessi all'interno dell'organizzazione"
 
-#: organization/serializers.py:254
+#: organization/serializers.py:259
 #, python-brace-format
 msgid "User {username} is an organization admin, the role cannot be updated."
 msgstr "Utente {username} è un amministratore di un'organizzazione, il ruolo non può essere aggiornato."
 
-#: organization/serializers.py:263 organization/tests/test_serializers.py:562
+#: organization/serializers.py:268 organization/tests/test_serializers.py:672
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
 msgstr "Utente {username} non è un membro dell'organizzazione di questo progetto"
 
-#: organization/tests/test_serializers.py:438
-#: organization/tests/test_serializers.py:576
+#: organization/tests/test_serializers.py:548
+#: organization/tests/test_serializers.py:686
 #, python-brace-format
 msgid "User with username or email {username} does not exist"
 msgstr "Utente con tale nome utente o email {username} non esiste"
 
-#: organization/tests/test_serializers.py:453
+#: organization/tests/test_serializers.py:563
 #, python-brace-format
 msgid "More than one user found for username or email {email}"
 msgstr "Più di un utente trovato con nome utente o email {email}"
+
+#: organization/views/default.py:323
+msgid "Administrators cannot remove themselves."
+msgstr ""
 
 #: organization/widgets.py:101
 msgid "Project visibility"
 msgstr "Visibilità progetto"
 
-#: organization/widgets.py:168 templates/party/party_detail.html:37
+#: organization/widgets.py:168 templates/party/party_detail.html:39
 #: templates/party/party_list.html:28 templates/resources/form.html:17
 msgid "Name"
 msgstr "Nome"
@@ -1076,7 +1096,8 @@ msgstr "Nome"
 msgid "Phone"
 msgstr "Telefono"
 
-#: organization/widgets.py:170 templates/accounts/profile.html:40
+#: organization/widgets.py:170 templates/accounts/profile.html:31
+#: templates/accounts/user_dashboard.html:166
 #: templates/allauth/account/email.html:59
 #: templates/allauth/account/signup.html:54
 #: templates/organization/organization_members.html:32
@@ -1090,43 +1111,43 @@ msgstr "Aggiungi contatto"
 
 #: party/choices.py:5
 msgid "Carbon Rights"
-msgstr ""
+msgstr "Diritti Di Carbonio"
 
 #: party/choices.py:6
 msgid "Concessionary Rights"
-msgstr ""
+msgstr "Diritti Concessionari"
 
 #: party/choices.py:7
 msgid "Customary Rights"
-msgstr ""
+msgstr "Diritti Ordinari"
 
 #: party/choices.py:8
 msgid "Easement"
-msgstr ""
+msgstr "Servitù Prediale"
 
 #: party/choices.py:9
 msgid "Equitable Servitude"
-msgstr ""
+msgstr "Servitù Disciplinata Dall'Equity"
 
 #: party/choices.py:10
 msgid "Freehold"
-msgstr ""
+msgstr "Proprietà Fondiaria Piena"
 
 #: party/choices.py:11
 msgid "Grazing Rights"
-msgstr ""
+msgstr "Diritti Di Pascolo"
 
 #: party/choices.py:12
 msgid "Hunting/Fishing/Harvest Rights"
-msgstr ""
+msgstr "Diritti Di Cacciare/Pescare/Produrre"
 
 #: party/choices.py:13
 msgid "Indigenous Land Rights"
-msgstr ""
+msgstr "Diritti Fondiari Degli Indegni"
 
 #: party/choices.py:14
 msgid "Joint Tenancy"
-msgstr ""
+msgstr "Coaffitto"
 
 #: party/choices.py:15
 msgid "Leasehold"
@@ -1134,31 +1155,31 @@ msgstr "Affitto"
 
 #: party/choices.py:16
 msgid "Longterm Leasehold"
-msgstr ""
+msgstr "Locato a Lungo Termine"
 
 #: party/choices.py:17
 msgid "Mineral Rights"
-msgstr ""
+msgstr "Diritti Minerari"
 
 #: party/choices.py:18
 msgid "Occupancy (No Documented Rights)"
-msgstr ""
+msgstr "Presa di Possesso/Occupazione (Diritti Non Documentati)"
 
 #: party/choices.py:19
 msgid "Tenancy (Documented Sub-lease)"
-msgstr ""
+msgstr "Affitto (Subaffitto Documentato)"
 
 #: party/choices.py:20
 msgid "Tenancy In Common"
-msgstr ""
+msgstr "Affitto In Comune"
 
 #: party/choices.py:21
 msgid "Undivided Co-ownership"
-msgstr ""
+msgstr "Comproprietà Indivisibile"
 
 #: party/choices.py:22
 msgid "Water Rights"
-msgstr ""
+msgstr "Diritti all'Acqua"
 
 #: party/forms.py:10 spatial/forms.py:81 spatial/forms.py:87
 msgid "Please select a party type"
@@ -1242,97 +1263,97 @@ msgid ""
 "You don't have permission to add resources to this tenure relationship."
 msgstr "Non hai il permesso di aggiungere risorse sulla relazione del possedimento fondiario"
 
-#: party/models.py:98
+#: party/models.py:102
 msgid "List existing parties of a project"
 msgstr "Elenca le parti esistenti di un progetto"
 
-#: party/models.py:102
+#: party/models.py:106
 msgid "Add a party to a project"
 msgstr "Aggiungi una parte al progetto"
 
-#: party/models.py:106
+#: party/models.py:110
 msgid "View an existing party"
 msgstr "Vedi una parte esistente"
 
-#: party/models.py:109
+#: party/models.py:113
 msgid "Update an existing party"
 msgstr "Aggiorna una parte esistente"
 
-#: party/models.py:112
+#: party/models.py:116
 msgid "Delete an existing party"
 msgstr "Rimuovi una parte esistente"
 
-#: party/models.py:115
+#: party/models.py:119
 msgid "Add resources to the party"
 msgstr "Aggiungi risorse alla parte"
 
-#: party/models.py:130 search/views/async.py:228
+#: party/models.py:134 search/views/async.py:228
 #: templates/organization/project_defaults_import.html:10
 #: templates/organization/project_select_import.html:64
-#: templates/party/party_detail.html:23
-#: templates/party/relationship_detail.html:27
+#: templates/party/party_detail.html:26
+#: templates/party/relationship_detail.html:31
 #: templates/spatial/location_detail.html:70
 msgid "Party"
 msgstr "Parte"
 
-#: party/models.py:187
+#: party/models.py:195
 msgid "List existing party relationships of a project"
 msgstr "Elenca le parti esistenti di un progetto"
 
-#: party/models.py:192
+#: party/models.py:200
 msgid "Add a party relationship to a project"
 msgstr "Aggiungi una relazione con una parte al progetto"
 
-#: party/models.py:196
+#: party/models.py:204
 msgid "View an existing party relationship"
 msgstr "Mostra un'esistente relazione con una parte"
 
-#: party/models.py:199
+#: party/models.py:207
 msgid "Update an existing party relationship"
 msgstr "Aggiorna un'esistente relazione con una parte"
 
-#: party/models.py:202
+#: party/models.py:210
 msgid "Delete an existing party relationship"
 msgstr "Rimuovi un'esistente relazione con una parte"
 
-#: party/models.py:253
+#: party/models.py:265
 msgid "List existing tenure relationships of a project"
 msgstr "Elenca esistenti possedimenti fondiari del progetto"
 
-#: party/models.py:258
+#: party/models.py:270
 msgid "Add a tenure relationship to a project"
 msgstr "Aggiungi un possedimento fondiario al progetto"
 
-#: party/models.py:262
+#: party/models.py:274
 msgid "View an existing tenure relationship"
 msgstr "Vedi un'esistente relazione sul possedimento fondiario"
 
-#: party/models.py:265
+#: party/models.py:277
 msgid "Update an existing tenure relationship"
 msgstr "Aggiorna un'esistente relazione col possedimento fondiario"
 
-#: party/models.py:268
+#: party/models.py:280
 msgid "Delete an existing tenure relationship"
 msgstr "Rimuovi un'esistente relazione sul possedimento fondiario"
 
-#: party/models.py:271
+#: party/models.py:283
 msgid "Add a resource to a tenure relationship"
 msgstr "Aggiungi una risorsa alla relazione sul possedimento fondiario"
 
-#: party/models.py:296 templates/party/party_detail.html:61
+#: party/models.py:308 templates/party/party_detail.html:63
 #: templates/spatial/location_detail.html:69
 msgid "Relationship"
 msgstr "Relazione"
 
-#: party/serializers.py:61
+#: party/serializers.py:46
 msgid "The parties must be different"
 msgstr "Le parti devono essere diverse"
 
-#: party/serializers.py:64
+#: party/serializers.py:49
 msgid "'party1' project ({}) should be equal to 'party2' project ({})"
 msgstr "'party1' progetto ({}) dovrebbe essere uguale a 'party2' progetto ({})"
 
-#: party/serializers.py:126
+#: party/serializers.py:109
 msgid "'party' project ({}) should be equal to 'spatial_unit' project ({})"
 msgstr "'party' progetto ({}) dovrebbe essere uguale a 'spatial_unit' progetto ({})"
 
@@ -1345,9 +1366,9 @@ msgstr "Relazione sconosciuta"
 msgid "Please provide at least one option for field '{field_name}'"
 msgstr "Per favore provvedi almeno un'opzione per il campo '{field_name}'"
 
-#: questionnaires/managers.py:207
+#: questionnaires/managers.py:209
 msgid "'form_id' field must not contain whitespace."
-msgstr ""
+msgstr "'form_id' campo non deve contenere uno spazio bianco."
 
 #: questionnaires/messages.py:3
 msgid "You don't have permission to view a questionnaire of this project"
@@ -1370,27 +1391,27 @@ msgstr "Non siamo stati in grado d'assegnare il gruppo di discussione all'entit�
 
 #: questionnaires/messages.py:14
 msgid "Accuracy threshold must be positive float."
-msgstr ""
+msgstr "Soglia di precisione deve contenere un numero positivo decimale."
 
-#: questionnaires/models.py:67
+#: questionnaires/models.py:72
 msgid "View the questionnaire of the project"
 msgstr "Vedi il questionario del progetto"
 
-#: questionnaires/models.py:71
+#: questionnaires/models.py:76
 msgid "Add a questionnaire to the project"
 msgstr "Aggiungi un questionario al progetto"
 
-#: questionnaires/models.py:75
+#: questionnaires/models.py:80
 msgid "Edit an existing questionnaire"
 msgstr "Modifica un'esistente questionario"
 
 #: questionnaires/validators.py:33
 msgid "'id_string' cannot be blank or contain whitespace."
-msgstr ""
+msgstr "'id_string' non può essere lasciato in bianco o contenere spazi."
 
 #: questionnaires/validators.py:70
 msgid "gps_accuracy must be positve float"
-msgstr ""
+msgstr "gps_accuracy deve essere un numero decimale positivo"
 
 #: questionnaires/validators.py:104
 msgid "Value must be of type {}."
@@ -1402,7 +1423,7 @@ msgstr "{} non è un valore accettabile."
 
 #: questionnaires/validators.py:111
 msgid "Validator {} did not validate."
-msgstr ""
+msgstr "Validatore {} non ha effettuato validazione."
 
 #: resources/messages.py:3
 msgid "You don't have permission to access the list of resources."
@@ -1428,39 +1449,39 @@ msgstr "Non hai il permesso di rimuovere questa risorsa."
 msgid "You don't have permission to restore this resource."
 msgstr "Non hai il permesso di ripristinare questa risorsa."
 
-#: resources/models.py:61 resources/models.py:233
+#: resources/models.py:65 resources/models.py:245
 msgid "List resources"
 msgstr "Elenca risorse"
 
-#: resources/models.py:65
+#: resources/models.py:69
 msgid "Add resources"
 msgstr "Aggiungi risorse"
 
-#: resources/models.py:69 resources/models.py:237
+#: resources/models.py:73 resources/models.py:249
 msgid "View resource"
 msgstr "Vedi risorse"
 
-#: resources/models.py:72 templates/resources/edit.html:4
+#: resources/models.py:76 templates/resources/edit.html:4
 #: templates/resources/project_detail.html:18
 msgid "Edit resource"
 msgstr "Modifica risorsa"
 
-#: resources/models.py:75 resources/models.py:240
+#: resources/models.py:79 resources/models.py:252
 msgid "Archive resource"
 msgstr "Archivia risorsa"
 
-#: resources/models.py:78 resources/models.py:243
+#: resources/models.py:82 resources/models.py:255
 msgid "Unarchive resource"
 msgstr "Rimuovi risorsa dall'archivio"
 
-#: resources/models.py:131 templates/resources/edit.html:26
+#: resources/models.py:135 templates/resources/edit.html:26
 #: templates/resources/project_detail.html:32 templates/resources/table.html:7
 #: templates/resources/table_add_lib.html:8
 #: templates/resources/table_sm.html:7
 msgid "Resource"
 msgstr "Risorsa"
 
-#: resources/models.py:201
+#: resources/models.py:209
 #, python-brace-format
 msgid "Invalid GPX mime type: {error}"
 msgstr "tipo GPX mime invalido: {error}"
@@ -1468,13 +1489,13 @@ msgstr "tipo GPX mime invalido: {error}"
 #: resources/processors/gpx.py:29
 #, python-format
 msgid "Invalid GPX file: %s"
-msgstr ""
+msgstr "Invalido documento GPX: %s"
 
 #: resources/processors/gpx.py:47 resources/tests/test_models.py:269
 msgid "Error parsing GPX file: no geometry found."
-msgstr ""
+msgstr "Errore parsing documento GPX: nessuna geometria trovata."
 
-#: resources/serializers.py:29
+#: resources/serializers.py:40
 msgid "Resource not found"
 msgstr "Risorsa non trovata"
 
@@ -1508,9 +1529,9 @@ msgstr "Allegato a {number} altre entità"
 msgid "unknown"
 msgstr "sconosciuto"
 
-#: search/views/async.py:225 templates/party/party_detail.html:41
+#: search/views/async.py:225 templates/party/party_detail.html:43
 #: templates/party/party_list.html:29
-#: templates/party/relationship_detail.html:23
+#: templates/party/relationship_detail.html:27
 #: templates/resources/table.html:8 templates/resources/table_add_lib.html:9
 #: templates/spatial/location_detail.html:43
 msgid "Type"
@@ -1618,65 +1639,65 @@ msgstr "Non hai il permesso di aggiornare questa relazione con il luogo."
 msgid "You don't have permission to remove this location relationship."
 msgstr "Non hai il permesso di rimuovere questa relazione con il luogo."
 
-#: spatial/models.py:70
+#: spatial/models.py:74
 msgid "List existing spatial units of a project"
 msgstr "Elenca esistenti unità spaziali di un progetto"
 
-#: spatial/models.py:74
+#: spatial/models.py:78
 msgid "Add a spatial unit to a project"
 msgstr "Aggiungi un'unità spaziale al progetto"
 
-#: spatial/models.py:78
+#: spatial/models.py:82
 msgid "View an existing spatial unit"
 msgstr "Vedi un'esistente unità spaziale"
 
-#: spatial/models.py:81
+#: spatial/models.py:85
 msgid "Update an existing spatial unit"
 msgstr "Aggiorna un'esistente unità spaziale"
 
-#: spatial/models.py:84
+#: spatial/models.py:88
 msgid "Delete an existing spatial unit"
 msgstr "Rimuovi un'esistente unità spaziale"
 
-#: spatial/models.py:87
+#: spatial/models.py:91
 msgid "Add resources to this spatial unit"
 msgstr "Aggiungi risorse a questa unità spaziale"
 
-#: spatial/models.py:106
+#: spatial/models.py:110
 #: templates/organization/project_defaults_import.html:51
 #: templates/organization/project_select_import.html:70
 #: templates/party/relationship_detail.html:9
-#: templates/party/relationship_edit.html:35
+#: templates/party/relationship_edit.html:32
 #: templates/spatial/location_detail.html:14
-#: templates/spatial/location_form.html:16
+#: templates/spatial/location_form.html:15
 msgid "Location"
 msgstr "Luogo"
 
-#: spatial/models.py:233
+#: spatial/models.py:241
 msgid "List existing spatial relationships of a project"
 msgstr "Elenca esistenti relazioni spaziali di un progetto"
 
-#: spatial/models.py:238
+#: spatial/models.py:246
 msgid "Add a spatial relationship to a project"
 msgstr "Aggiungi una relazione spaziale ad un progetto"
 
-#: spatial/models.py:242
+#: spatial/models.py:250
 msgid "View an existing spatial relationship"
 msgstr "Vedi un'esistente relazione spaziale"
 
-#: spatial/models.py:245
+#: spatial/models.py:253
 msgid "Update an existing spatial relationship"
 msgstr "Aggiorna un'esistente relazione spaziale"
 
-#: spatial/models.py:248
+#: spatial/models.py:256
 msgid "Delete an existing spatial relationship"
 msgstr "Rimuovi un'esistente relazione spaziale"
 
-#: spatial/serializers.py:95
+#: spatial/serializers.py:80
 msgid "The spatial units must be different"
 msgstr "Le unità spaziali devono essere diverse"
 
-#: spatial/serializers.py:98
+#: spatial/serializers.py:83
 msgid "'su1' project ({}) should be equal to 'su2' project ({})"
 msgstr "'su1' progetto ({}) deve essere uguale a 'su2' progetto ({})"
 
@@ -1695,8 +1716,8 @@ msgid "Please select a party"
 msgstr "Per favore seleziona una parte"
 
 #: spatial/widgets.py:42 templates/organization/project_wrapper.html:78
-#: templates/organization/project_wrapper.html:96
-#: templates/party/party_add.html:5 templates/party/party_add.html:42
+#: templates/organization/project_wrapper.html:97
+#: templates/party/party_add.html:5 templates/party/party_add.html:39
 msgid "Add party"
 msgstr "Aggiungi parte"
 
@@ -1795,57 +1816,55 @@ msgid "Your username, in case you've forgotten:"
 msgstr "Tuo nome utente, nel caso ti fossi dimenticato/a:"
 
 #: templates/accounts/profile.html:8
-msgid "Profile"
-msgstr "Profilo"
+#: templates/accounts/user_dashboard.html:147 templates/core/base.html:52
+msgid "Edit profile"
+msgstr "Modifica profilo"
 
-#: templates/accounts/profile.html:18
+#: templates/accounts/profile.html:21
 msgid "Update your profile"
 msgstr "Aggiorna il tuo profilo"
 
-#: templates/accounts/profile.html:23
-msgid "Profile picture"
-msgstr ""
-
-#: templates/accounts/profile.html:28
-msgid "For best results upload a square image, ideally 200x200 pixels."
-msgstr ""
-
-#: templates/accounts/profile.html:34
+#: templates/accounts/profile.html:26
+#: templates/accounts/user_dashboard.html:161
 #: templates/organization/organization_members.html:31
 msgid "Username"
 msgstr "Nome utente"
 
-#: templates/accounts/profile.html:42
+#: templates/accounts/profile.html:33
 msgid ""
 "The email for this account has been changed recently, but the new email "
 "address has not yet been verified. You should have received an email with a "
 "link to verify the new email address."
 msgstr "La email per questo account è stata cambiata di recente, ma la nuova email non è stata ancora verificata. Dovresti aver ricevuto un'email con un link per verificare il nuovo indirizzo email."
 
-#: templates/accounts/profile.html:47 templates/allauth/account/signup.html:74
+#: templates/accounts/profile.html:37 templates/allauth/account/signup.html:74
 msgid "Full name"
 msgstr "Nome e cognome"
 
-#: templates/accounts/profile.html:53 templates/allauth/account/signup.html:80
+#: templates/accounts/profile.html:42 templates/allauth/account/signup.html:80
 msgid "Your preferred language"
-msgstr ""
+msgstr "La tua lingua preferita"
 
-#: templates/accounts/profile.html:59
+#: templates/accounts/profile.html:47
 msgid "Your preferred measurement system"
-msgstr ""
+msgstr "Il tuo preferito sistema di misura"
 
-#: templates/accounts/profile.html:65 templates/allauth/account/login.html:53
+#: templates/accounts/profile.html:55
+msgid "Profile picture"
+msgstr "Foto profilo"
+
+#: templates/accounts/profile.html:60
+msgid "For best results upload a square image, ideally 200x200 pixels."
+msgstr "Per migliori risultati carica un'immagine quadrata, idealmente 200x200 pixels."
+
+#: templates/accounts/profile.html:69 templates/allauth/account/login.html:53
 #: templates/allauth/account/signup.html:60
 msgid "Password"
 msgstr "Password"
 
-#: templates/accounts/profile.html:66
+#: templates/accounts/profile.html:70
 msgid "Please enter your password to verify your identity."
 msgstr "Per favore inserisci la tua password per verificare la tua identità."
-
-#: templates/accounts/profile.html:73
-msgid "Update profile"
-msgstr "Aggiorna profilo"
 
 #: templates/accounts/profile.html:76
 msgid "Password options"
@@ -1862,6 +1881,103 @@ msgstr "Cambia password"
 #: templates/allauth/account/password_reset.html:27
 msgid "Reset password"
 msgstr "Resetta password"
+
+#: templates/accounts/user_dashboard.html:11
+msgid "User Dashboard"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:20 templates/core/base.html:49
+msgid "My dashboard"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:34
+msgid "Organizations & Projects"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:46
+msgid "Go to organization dashboard"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:51
+#: templates/accounts/user_dashboard.html:77
+#: templates/organization/organization_dashboard_member.html:39
+#: templates/organization/organization_dashboard_nonmember.html:52
+#: templates/organization/organization_list.html:59
+#: templates/organization/organization_wrapper.html:21
+#: templates/organization/project_list.html:59
+#: templates/organization/project_wrapper.html:23
+msgid "Archived"
+msgstr "Archiviato"
+
+#: templates/accounts/user_dashboard.html:62
+#: templates/organization/organization_members_edit.html:36
+msgid "Role"
+msgstr "Ruolo"
+
+#: templates/accounts/user_dashboard.html:63
+#: templates/organization/organization_dashboard_member.html:24
+#: templates/organization/organization_dashboard_nonmember.html:37
+#: templates/organization/project_list.html:45
+msgid "Country"
+msgstr "Paese"
+
+#: templates/accounts/user_dashboard.html:64
+#: templates/organization/organization_dashboard_member.html:25
+#: templates/organization/organization_dashboard_nonmember.html:38
+#: templates/organization/project_list.html:46
+#: templates/resources/table.html:10 templates/resources/table_add_lib.html:11
+msgid "Last updated"
+msgstr "Ultimo aggiornamento"
+
+#: templates/accounts/user_dashboard.html:92
+#: templates/organization/organization_dashboard_member.html:57
+msgid "This organization is all set. Now add your first project."
+msgstr "Questa organizzazione è creata. Adesso aggiungi il tuo primo progetto."
+
+#: templates/accounts/user_dashboard.html:95
+#: templates/organization/organization_dashboard_member.html:60
+msgid "Add a project"
+msgstr "Aggiungi progetto"
+
+#: templates/accounts/user_dashboard.html:101
+msgid ""
+"Looks like this organization has no projects. As projects are created, "
+"they'll appear here."
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:116
+msgid "Your account is all set. Now add your first organization."
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:119
+#: templates/organization/organization_add.html:6
+#: templates/organization/organization_add.html:20
+msgid "Add organization"
+msgstr "Aggiungi organizzazione"
+
+#: templates/accounts/user_dashboard.html:155
+#, python-format
+msgid ""
+"We’ve noticed your account has not been verified. If you haven’t received "
+"your verification link, please <a href=\"%(email_url)s\">request a new "
+"one</a>."
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:171
+msgid "Phone number"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:176
+msgid "Language"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:180
+msgid "Measurement"
+msgstr ""
+
+#: templates/accounts/user_dashboard.html:184
+msgid "Joined on"
+msgstr ""
 
 #: templates/allauth/account/account_inactive.html:5
 msgid "Account Inactive"
@@ -2211,7 +2327,7 @@ msgid "Set password"
 msgstr "Assegna password"
 
 #: templates/allauth/account/signup.html:10
-#: templates/allauth/account/signup.html:90 templates/core/base.html:61
+#: templates/allauth/account/signup.html:90 templates/core/base.html:69
 msgid "Register"
 msgstr "Registrati"
 
@@ -2363,142 +2479,138 @@ msgid ""
 "%(site_name)s. As a final step, please complete the following form:"
 msgstr "Stai per usare il tuo %(provider_name)s account per accedere a\n %(site_name)s. Per concludere, completa il seguente modulo:"
 
-#: templates/core/base.html:42
+#: templates/core/base.html:43
 msgid "You have superuser permissions"
-msgstr ""
+msgstr "Hai permessi di un superuser"
 
-#: templates/core/base.html:48
-msgid "Edit profile"
-msgstr "Modifica profilo"
-
-#: templates/core/base.html:52
+#: templates/core/base.html:56
 msgid "Logout"
 msgstr "Esci"
 
-#: templates/core/base.html:60
+#: templates/core/base.html:68
 #: templates/organization/project_dashboard_nonmember.html:36
 msgid "Sign in"
 msgstr "Accedi"
 
-#: templates/core/base.html:73 templates/core/base.html:95
+#: templates/core/base.html:81 templates/core/base.html:103
 #: templates/organization/organization_dashboard_member.html:11
 #: templates/organization/organization_dashboard_nonmember.html:29
 #: templates/organization/organization_list.html:43
-#: templates/organization/organization_wrapper.html:107
+#: templates/organization/organization_wrapper.html:102
 #: templates/organization/project_list.html:8
 #: templates/organization/project_list.html:21
 msgid "Projects"
 msgstr "Progetti"
 
-#: templates/core/base.html:78 templates/core/base.html:96
+#: templates/core/base.html:86 templates/core/base.html:104
 #: templates/organization/organization_list.html:9
 #: templates/organization/organization_list.html:22
 #: templates/organization/user_list.html:38
 msgid "Organizations"
 msgstr "Organizzazioni"
 
-#: templates/core/base.html:84 templates/core/base.html:97
+#: templates/core/base.html:92 templates/core/base.html:105
 #: templates/organization/user_list.html:7
 #: templates/organization/user_list.html:16
 msgid "Users"
 msgstr "Utenti"
 
-#: templates/core/base.html:99
+#: templates/core/base.html:107
 msgid "Help"
 msgstr "Aiuto"
 
-#: templates/core/base.html:121
+#: templates/core/base.html:129
 msgid "Loading locations..."
 msgstr "Caricamento luoghi..."
 
-#: templates/core/base.html:136
+#: templates/core/base.html:144
 #, python-format
 msgid "Copyright %(copydate)s Cadasta. <span>All Rights Reserved.</span> "
 msgstr "Diritti d'autore  %(copydate)s Cadasta. <span>Tutti i Diritti Riservati.</span>"
 
-#: templates/core/base.html:158
+#: templates/core/base.html:166
 msgid "About Us"
 msgstr "Chi siamo"
 
-#: templates/core/base.html:163
+#: templates/core/base.html:171
 msgid "Privacy"
 msgstr "Privacy"
 
-#: templates/core/base.html:168
+#: templates/core/base.html:176
 msgid "Terms of Use"
 msgstr "Termini d'Uso"
 
-#: templates/core/base.html:173
+#: templates/core/base.html:181
 msgid "Code of Conduct"
 msgstr "Codice di Condotta"
 
-#: templates/core/base.html:178
+#: templates/core/base.html:186
 msgid "Visit us on Github"
 msgstr "Visitaci su Github"
 
-#: templates/core/base.html:203
+#: templates/core/base.html:211
 msgid "No data available in table"
 msgstr "Nessun dato disponibile nella tabella"
 
-#: templates/core/base.html:204
+#: templates/core/base.html:212
 msgid "Showing _START_ - _END_ of _TOTAL_"
 msgstr "Mostrando _START_ - _END_ di _TOTAL_"
 
-#: templates/core/base.html:205
+#: templates/core/base.html:213
 msgid "Showing 0 - 0 of 0"
 msgstr "Mostrando 0 - 0 di 0"
 
-#: templates/core/base.html:206
+#: templates/core/base.html:214
 msgid "(filtered from _MAX_ total rows)"
 msgstr "(filtrato da _MAX_ righe totali)"
 
-#: templates/core/base.html:208 templates/search/search.html:124
+#: templates/core/base.html:216 templates/search/search.html:124
 msgid "10 per page"
 msgstr "10 per pagina"
 
-#: templates/core/base.html:209 templates/search/search.html:125
+#: templates/core/base.html:217 templates/search/search.html:125
 msgid "25 per page"
 msgstr "25 per pagina"
 
-#: templates/core/base.html:210 templates/search/search.html:126
+#: templates/core/base.html:218 templates/search/search.html:126
 msgid "50 per page"
 msgstr "50 per pagina"
 
-#: templates/core/base.html:211 templates/search/search.html:127
+#: templates/core/base.html:219 templates/search/search.html:127
 msgid "100 per page"
 msgstr "100 per pagina"
 
-#: templates/core/base.html:214
-#: templates/organization/project_wrapper.html:125
+#: templates/core/base.html:222
+#: templates/organization/project_wrapper.html:127
 #: templates/search/search.html:5 templates/search/search.html:14
 msgid "Search"
 msgstr "Cerca"
 
-#: templates/core/base.html:215
+#: templates/core/base.html:223
 msgid "No matching records found"
 msgstr "Nessun risultato corrispondente trovato"
 
-#: templates/core/base.html:219
+#: templates/core/base.html:227
 msgid "First"
 msgstr "Primo"
 
-#: templates/core/base.html:220
+#: templates/core/base.html:228
 msgid "Last"
 msgstr "Ultimo"
 
-#: templates/core/base.html:223
+#: templates/core/base.html:231
 msgid "activate to sort column ascending"
 msgstr "attiva ordine ascendente delle colonne"
 
-#: templates/core/base.html:224
+#: templates/core/base.html:232
 msgid "activate to sort column descending"
 msgstr "attiva ordine discendente delle colonne"
 
 #: templates/core/dashboard.html:10
 #: templates/organization/organization_dashboard.html:6
-#: templates/organization/organization_wrapper.html:101
+#: templates/organization/organization_wrapper.html:96
 #: templates/organization/project_dashboard.html:61
-#: templates/organization/project_wrapper.html:131
+#: templates/organization/project_wrapper.html:133
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -2536,79 +2648,45 @@ msgstr "Ricevi questa email perché sei stato aggiunto/a all'organizzazione  %(o
 msgid "Did you not want to be added to this organization, click here:"
 msgstr "Se non volevi essere aggiunto a questa organizzazione, clicca qui:"
 
-#: templates/organization/organization_add.html:6
-#: templates/organization/organization_add.html:20
-msgid "Add organization"
-msgstr "Aggiungi organizzazione"
-
 #: templates/organization/organization_dashboard.html:6
 #: templates/organization/project_dashboard.html:61
-#: templates/party/party_detail.html:26 templates/party/resources_list.html:16
+#: templates/party/party_detail.html:28 templates/party/resources_list.html:16
 #: templates/spatial/location_detail.html:32
-#: templates/spatial/location_form.html:24
+#: templates/spatial/location_form.html:23
 msgid "Overview"
 msgstr "Panoramica"
 
 #: templates/organization/organization_dashboard_member.html:6
 msgid "Organization Dashboard"
-msgstr ""
+msgstr "Dashboard Organizzazione"
 
 #: templates/organization/organization_dashboard_member.html:14
-#: templates/organization/organization_wrapper.html:56
-#: templates/organization/organization_wrapper.html:58
-#: templates/organization/organization_wrapper.html:77
+#: templates/organization/organization_wrapper.html:51
+#: templates/organization/organization_wrapper.html:53
+#: templates/organization/organization_wrapper.html:66
+#: templates/organization/organization_wrapper.html:72
 #: templates/organization/project_add_wrapper.html:5
-#: templates/organization/project_add_wrapper.html:44
+#: templates/organization/project_add_wrapper.html:30
 msgid "Add project"
 msgstr "Aggiungi progetto"
-
-#: templates/organization/organization_dashboard_member.html:24
-#: templates/organization/organization_dashboard_nonmember.html:37
-#: templates/organization/project_list.html:45
-msgid "Country"
-msgstr "Paese"
-
-#: templates/organization/organization_dashboard_member.html:25
-#: templates/organization/organization_dashboard_nonmember.html:38
-#: templates/organization/project_list.html:46
-#: templates/resources/table.html:10 templates/resources/table_add_lib.html:11
-msgid "Last updated"
-msgstr "Ultimo aggiornamento"
-
-#: templates/organization/organization_dashboard_member.html:39
-#: templates/organization/organization_dashboard_nonmember.html:52
-#: templates/organization/organization_list.html:59
-#: templates/organization/organization_wrapper.html:22
-#: templates/organization/project_list.html:59
-#: templates/organization/project_wrapper.html:23
-msgid "Archived"
-msgstr "Archiviato"
-
-#: templates/organization/organization_dashboard_member.html:57
-msgid "This organization is all set. Now add your first project."
-msgstr ""
-
-#: templates/organization/organization_dashboard_member.html:60
-msgid "Add a project"
-msgstr ""
 
 #: templates/organization/organization_dashboard_member.html:70
 #: templates/organization/organization_dashboard_nonmember.html:69
 msgid ""
 "Looks like this organization has no public projects. As public projects are "
 "created, they'll appear here."
-msgstr ""
+msgstr "Sembra che questa organizzazione non ha ancora progetti pubblici. Se creati, appariranno qui."
 
 #: templates/organization/organization_dashboard_member.html:73
 #: templates/organization/organization_dashboard_nonmember.html:13
 #: templates/organization/organization_dashboard_nonmember.html:72
 msgid "View all organizations"
-msgstr ""
+msgstr "Vedi tutte le organizzazioni"
 
 #: templates/organization/organization_dashboard_member.html:97
 #: templates/organization/organization_dashboard_nonmember.html:93
 msgid "About this org"
-msgstr ""
+msgstr "Riguardo questa org"
 
 #: templates/organization/organization_dashboard_member.html:100
 #: templates/organization/project_dashboard_member.html:224
@@ -2620,11 +2698,11 @@ msgstr "Modifica dettagli progetto"
 
 #: templates/organization/organization_dashboard_member.html:108
 msgid "This organization needs a description. Would you like to add one now?"
-msgstr ""
+msgstr "Questa organizzazione necessita di una descrizione. Vorresti aggiungerla ora?"
 
 #: templates/organization/organization_dashboard_member.html:110
 msgid "Add organization description"
-msgstr ""
+msgstr "Aggiungi descrizione organizzazione"
 
 #: templates/organization/organization_dashboard_member.html:120
 #: templates/organization/organization_dashboard_nonmember.html:109
@@ -2637,24 +2715,24 @@ msgstr "Contatti"
 #: templates/organization/organization_dashboard_member.html:150
 #: templates/organization/organization_members.html:6
 #: templates/organization/organization_members.html:17
-#: templates/organization/organization_wrapper.html:113
+#: templates/organization/organization_wrapper.html:108
 msgid "Members"
 msgstr "Membri"
 
 #: templates/organization/organization_dashboard_member.html:153
 msgid "Manage team members"
-msgstr ""
+msgstr "Gestisci membri team"
 
 #: templates/organization/organization_dashboard_member.html:156
 #: templates/organization/project_dashboard_member.html:318
 msgid "Add a member"
-msgstr ""
+msgstr "Aggiungi un membro"
 
 #: templates/organization/organization_dashboard_nonmember.html:10
 msgid ""
 "Looks like this organization has nothing to show yet. As details and "
 "projects are created, they'll appear here."
-msgstr ""
+msgstr "Sembra che questa organizzazione non ha nulla da mostrare per ora. Quando dettagli o progetti saranno creati, appariranno qua."
 
 #: templates/organization/organization_dashboard_nonmember.html:24
 msgid "Organization Overview"
@@ -2662,14 +2740,14 @@ msgstr "Panoramica Organizzazione"
 
 #: templates/organization/organization_dashboard_nonmember.html:100
 msgid "Looks like this organization doesn't have a description yet."
-msgstr ""
+msgstr "Sembra che questa organizzazione non ha una descrizione per ora."
 
 #: templates/organization/organization_edit.html:7
 msgid "Edit"
 msgstr "Modifica"
 
 #: templates/organization/organization_edit.html:21
-#: templates/organization/organization_wrapper.html:39
+#: templates/organization/organization_wrapper.html:34
 msgid "Edit organization"
 msgstr "Modifica organizzazione"
 
@@ -2720,10 +2798,6 @@ msgstr "Modifica membro"
 msgid "Last login:"
 msgstr "Ultimo accesso:"
 
-#: templates/organization/organization_members_edit.html:36
-msgid "Role"
-msgstr "Ruolo"
-
 #: templates/organization/organization_members_edit.html:46
 msgid "Remove member"
 msgstr "Rimuovi membro"
@@ -2737,7 +2811,7 @@ msgid "Member Permissions"
 msgstr "Permessi dei membri"
 
 #: templates/organization/organization_members_edit.html:72
-#: templates/organization/project_add_permissions.html:44
+#: templates/organization/project_add_permissions.html:45
 #: templates/organization/project_edit_permissions.html:31
 msgid "Permissions"
 msgstr "Permessi"
@@ -2779,45 +2853,44 @@ msgid ""
 "role from administrator to member?"
 msgstr "Cambiando questo ruolo in membro rimuoverai l'accesso completo e dovrai assegnare i permessi all'interno del progetto. Sei sicuro/a di voler cambiare il ruolo d'amministratore a quello di membro?"
 
-#: templates/organization/organization_wrapper.html:32
-#: templates/organization/organization_wrapper.html:35
+#: templates/organization/organization_wrapper.html:30
 #: templates/organization/project_wrapper.html:43
 msgid "More actions"
 msgstr "Più azioni"
 
-#: templates/organization/organization_wrapper.html:44
-#: templates/organization/organization_wrapper.html:158
+#: templates/organization/organization_wrapper.html:39
+#: templates/organization/organization_wrapper.html:153
 msgid "Unarchive organization"
 msgstr "Rimuovi organizzazione dall'archivio"
 
-#: templates/organization/organization_wrapper.html:46
-#: templates/organization/organization_wrapper.html:134
+#: templates/organization/organization_wrapper.html:41
+#: templates/organization/organization_wrapper.html:129
 msgid "Archive organization"
 msgstr "Archivia organizzazione"
 
-#: templates/organization/organization_wrapper.html:62
+#: templates/organization/organization_wrapper.html:57
 #: templates/organization/project_wrapper.html:75
 msgid "Toggle add"
 msgstr "Aggiungi toggle"
 
-#: templates/organization/organization_wrapper.html:65
-#: templates/organization/organization_wrapper.html:80
+#: templates/organization/organization_wrapper.html:60
+#: templates/organization/organization_wrapper.html:75
 msgid "Add org member"
 msgstr "Aggiungi membro org"
 
-#: templates/organization/organization_wrapper.html:137
+#: templates/organization/organization_wrapper.html:132
 msgid "Are you sure you want to archive this organization?"
 msgstr "Sei sicuro/a di voler archiviare l'organizzazione?"
 
-#: templates/organization/organization_wrapper.html:141
+#: templates/organization/organization_wrapper.html:136
 msgid "Yes, archive this organization"
 msgstr "Sì, archivia questa organizzazione"
 
-#: templates/organization/organization_wrapper.html:162
+#: templates/organization/organization_wrapper.html:157
 msgid "Are you sure you want to unarchive this organization?"
 msgstr "Sei sicuro/a di voler rimuovere questa organizzazione dall'archivio?"
 
-#: templates/organization/organization_wrapper.html:167
+#: templates/organization/organization_wrapper.html:162
 msgid "Yes, unarchive this organization"
 msgstr "Sì, rimuovi questa organizzazione dall'archivio"
 
@@ -2881,35 +2954,21 @@ msgstr "Per iniziare, scegli il modulo che meglio corrisponde alle tue esigenze.
 msgid "3. Contacts"
 msgstr "3. Contatti"
 
-#: templates/organization/project_add_details.html:151
-#: templates/organization/project_add_extents.html:73
-#: templates/organization/project_attrs_import.html:114
-#: templates/organization/project_select_import.html:99
-msgid "Next"
-msgstr "Prossimo"
-
-#: templates/organization/project_add_details.html:156
-#: templates/organization/project_add_permissions.html:66
-#: templates/organization/project_attrs_import.html:118
-#: templates/organization/project_defaults_import.html:98
-msgid "Previous"
-msgstr "Precedente"
-
 #: templates/organization/project_add_extents.html:7
 msgid "Draw map"
 msgstr "Disegna mappa"
 
-#: templates/organization/project_add_extents.html:59
+#: templates/organization/project_add_extents.html:61
 msgid "Draw project on map"
 msgstr "Disegna progetto sulla mappa"
 
-#: templates/organization/project_add_extents.html:62
+#: templates/organization/project_add_extents.html:64
 msgid ""
 "Use the tools provided on the left side of the map to outline your new "
 "project boundary. Once complete, select the save button below."
 msgstr "Usa gli strumenti sulla barra di sinistra della mappa per definire i confini del tuo nuovo progetto. Per salvare, seleziona il tasto salva sottostante."
 
-#: templates/organization/project_add_extents.html:67
+#: templates/organization/project_add_extents.html:69
 #: templates/organization/project_edit_geometry.html:72
 msgid ""
 "We encourage you to mark the area in which your project takes place (if your"
@@ -2921,11 +2980,11 @@ msgstr "La incoraggiamo a segnare l'area nella quale il tuo progetto ha luogo (n
 msgid "Assign team"
 msgstr "Assegna gruppo"
 
-#: templates/organization/project_add_permissions.html:18
+#: templates/organization/project_add_permissions.html:19
 msgid "Assign permissions to members"
 msgstr "Assegna permessi ai membri"
 
-#: templates/organization/project_add_permissions.html:22
+#: templates/organization/project_add_permissions.html:23
 msgid ""
 "\n"
 "      Not able to find a member?  Organization administrators must first\n"
@@ -2933,27 +2992,27 @@ msgid ""
 "      "
 msgstr "\nNon sei in gradi di trovare un membro? Gli amministratori dell'organizzazione devono prima\ninvitare gli utenti ad unirsi alla tua organizzazione prima che i permessi possano essere assegnati."
 
-#: templates/organization/project_add_permissions.html:43
+#: templates/organization/project_add_permissions.html:44
 #: templates/organization/project_edit_permissions.html:30
 msgid "Email address"
 msgstr "Indirizzo email"
 
-#: templates/organization/project_add_permissions.html:61
+#: templates/organization/project_add_wrapper.html:41
 #: templates/organization/project_defaults_import.html:94
 msgid "Finish"
 msgstr "Finisci"
 
-#: templates/organization/project_add_wrapper.html:22
-msgid "Draw Map"
-msgstr "Disegna Mappa"
+#: templates/organization/project_add_wrapper.html:41
+#: templates/organization/project_attrs_import.html:114
+#: templates/organization/project_select_import.html:99
+msgid "Next"
+msgstr "Prossimo"
 
-#: templates/organization/project_add_wrapper.html:30
-msgid "Add Details"
-msgstr "Aggiungi Dettagli"
-
-#: templates/organization/project_add_wrapper.html:38
-msgid "Assign Team"
-msgstr "Assegna Gruppo"
+#: templates/organization/project_add_wrapper.html:47
+#: templates/organization/project_attrs_import.html:118
+#: templates/organization/project_defaults_import.html:98
+msgid "Previous"
+msgstr "Precedente"
 
 #: templates/organization/project_attrs_import.html:24
 msgid "Select import fields"
@@ -3007,7 +3066,7 @@ msgid ""
 msgstr "I seguenti attributi sono stati trovati nel tuo schema ma non corrispondo ai campi importati."
 
 #: templates/organization/project_dashboard.html:29
-#: templates/spatial/location_add.html:47
+#: templates/spatial/location_add.html:44
 #: templates/spatial/location_map.html:23
 #: templates/spatial/location_wrapper.html:26
 msgid "Open location"
@@ -3018,81 +3077,81 @@ msgid ""
 "\n"
 "                  <p>Welcome to your newly created project! Here’s what you need to do to get it set up:</p>\n"
 "                  "
-msgstr ""
+msgstr "\n<p>Benvenuto/a nel progetto che hai appena creato! Qua le istruzioni per cosa fare adesso:</p>"
 
 #: templates/organization/project_dashboard_member.html:24
 msgid "Name your project"
-msgstr ""
+msgstr "Assegna un nome al progetto"
 
 #: templates/organization/project_dashboard_member.html:25
 msgid ""
 "Give your project a name and description. You can also set contacts, "
 "visibility, and other project details."
-msgstr ""
+msgstr "Da un nome ed una descrizione al progetto. Puoi aggiungere contatti, visibilità, e altri dettagli."
 
 #: templates/organization/project_dashboard_member.html:33
 msgid "Define your project map"
-msgstr ""
+msgstr "Definisci la mappa del progetto"
 
 #: templates/organization/project_dashboard_member.html:34
 msgid ""
 "Draw your boundary on the map and mark where you are going to be collecting "
 "data."
-msgstr ""
+msgstr "Disegna i confini sulla mappa e segna dove andrai a raccogliere i dati."
 
 #: templates/organization/project_dashboard_member.html:42
 msgid "Upload your questionnaire"
-msgstr ""
+msgstr "Carica il questionario"
 
 #: templates/organization/project_dashboard_member.html:43
 msgid "Upload the Cadasta XLSForm that best fits your project."
-msgstr ""
+msgstr "Carica il Cadasta XLSForm che meglio si adatta al tuo progetto."
 
 #: templates/organization/project_dashboard_member.html:51
 msgid "Select your team members"
-msgstr ""
+msgstr "Seleziona i membri del tuo team"
 
 #: templates/organization/project_dashboard_member.html:52
 msgid "Add new team members or assign member permissions to your project."
-msgstr ""
+msgstr "Aggiungi nuovi membri al team o assegna permessi ai membri del tuo team."
 
 #: templates/organization/project_dashboard_member.html:56
 msgid ""
 "\n"
 "                  <p>For additional assistance, refer to the <a href=\"https://docs.cadasta.org/\" target=\"_blank\">platform documentation</a> – the answer you need may be in there.</p>\n"
 "                  "
-msgstr ""
+msgstr "\n<p>Per assistenza, può riferirsi alla <a href=\"https://docs.cadasta.org/\" target=\"_blank\">documentazione</a> - la risposta che cerchi potrebbe essere là.</p>"
 
 #: templates/organization/project_dashboard_member.html:69
 msgid "Project locations"
-msgstr ""
+msgstr "Luoghi progetto"
 
 #: templates/organization/project_dashboard_member.html:70
 #: templates/organization/project_dashboard_nonmember.html:60
 msgid "Locations"
-msgstr ""
+msgstr "Luoghi"
 
 #: templates/organization/project_dashboard_member.html:83
 msgid "Project parties"
-msgstr ""
+msgstr "Parti progetto"
 
 #: templates/organization/project_dashboard_member.html:84
 #: templates/organization/project_dashboard_nonmember.html:72
-#: templates/organization/project_wrapper.html:143
+#: templates/organization/project_wrapper.html:145
 #: templates/party/party_list.html:4 templates/party/party_list.html:14
 msgid "Parties"
 msgstr "Parti"
 
 #: templates/organization/project_dashboard_member.html:94
 msgid "Project resources"
-msgstr ""
+msgstr "Risorse progetto"
 
 #: templates/organization/project_dashboard_member.html:95
 #: templates/organization/project_dashboard_nonmember.html:83
 #: templates/organization/project_download.html:35
-#: templates/organization/project_wrapper.html:149
-#: templates/party/party_detail.html:28
-#: templates/party/relationship_detail.html:40
+#: templates/organization/project_wrapper.html:151
+#: templates/party/party_detail.html:30
+#: templates/party/relationship_detail.html:44
 #: templates/party/resources_list.html:18
 #: templates/resources/project_list.html:4
 #: templates/resources/project_list.html:14
@@ -3108,7 +3167,7 @@ msgstr "Mappa Progetto"
 
 #: templates/organization/project_dashboard_member.html:115
 msgid "Edit project map"
-msgstr ""
+msgstr "Modifica mappa progetto"
 
 #: templates/organization/project_dashboard_member.html:119
 #: templates/organization/project_wrapper.html:68
@@ -3116,7 +3175,7 @@ msgstr ""
 #: templates/organization/project_wrapper.html:89
 #: templates/organization/project_wrapper.html:94
 #: templates/spatial/location_add.html:11
-#: templates/spatial/location_form.html:16
+#: templates/spatial/location_form.html:15
 msgid "Add location"
 msgstr "Aggiungi luogo"
 
@@ -3126,19 +3185,19 @@ msgid ""
 "                      <p>You haven't defined a project extent yet.\n"
 "                      Would you like to add a project extent?</p>\n"
 "                      "
-msgstr ""
+msgstr "\n<p>Non hai ancora definito l'estensione del progetto.\nVorresti aggiungere l'estensione del progetto?</p>"
 
 #: templates/organization/project_dashboard_member.html:132
 msgid "Define a project extent"
-msgstr ""
+msgstr "Definisci estensione progetto"
 
 #: templates/organization/project_dashboard_member.html:133
 msgid "Use global map"
-msgstr ""
+msgstr "Utilizza mappa globale"
 
 #: templates/organization/project_dashboard_member.html:148
 msgid "Data Collection"
-msgstr ""
+msgstr "Raccolta Dati"
 
 #: templates/organization/project_dashboard_member.html:154
 msgid ""
@@ -3146,11 +3205,11 @@ msgid ""
 "                        <p>You haven't designed your data collection by uploading an XLS Form.\n"
 "                          Do you want to do that now?</p>\n"
 "                        "
-msgstr ""
+msgstr "\n<p>Non hai definito i tuoi dati raccolti caricando un XLS Form.\nVorresti farlo ora?</p>"
 
 #: templates/organization/project_dashboard_member.html:159
 msgid "Upload XLS Form"
-msgstr ""
+msgstr "Carica XLS Form"
 
 #: templates/organization/project_dashboard_member.html:165
 msgid ""
@@ -3162,58 +3221,58 @@ msgid ""
 "                          </ul>\n"
 "                          If you need help or have questions, <a href=\"http://cadasta.org/contact/\" target=\"_blank\" class=\"alert-link\">please contact us</a>.\n"
 "                          "
-msgstr ""
+msgstr "Per iniziare, scegli il modulo che meglio si adatta alle tue esigenze.\n<ul>\n<li>Il <a href=\"https://docs.google.com/spreadsheets/d/1MHg6iok4SkDxN2NdMVt3P2W9UZe81VxH6CpAz_eUtOY/pub?output=xlsx\" class=\"alert-link\">Modulo dei Diritti Ordinari</a> serve a documentare i diritti di un singolo gruppo di persone che sta usando un lotto di terra.</li>\n<li>Il <a href=\"https://docs.google.com/spreadsheets/d/1hyF_uxZb4959lxD6vDMM574cQEFTyq636VAS7n3e0MA/pub?output=xlsx\" class=\"alert-link\">Modulo Reperimento Sostenibile</a> serve a documentare la terra utilizzata per produzione agricola sostenibile.</li>\n<li>Il <a href=\"https://docs.google.com/spreadsheets/d/1iORFg75ofq-QzLB5x-WvuggEZN6JaE0iS6yqc7dE1Y0/pub?output=xlsx\" class=\"alert-link\">Modulo Insediamenti Urbani Informali</a> documenta le tante persone le quali vivono in piccole aree urbane.</li>\n</ul>\nSe avessi bisogno d'aiuto o avessi delle domande, <a href=\"http://cadasta.org/contact/\" target=\"_blank\" class=\"alert-link\">la preghiamo di contattarci</a>."
 
 #: templates/organization/project_dashboard_member.html:179
 msgid ""
 "\n"
 "                        <p>You have designed a data collection for this project but have not collected any data. You can still change your schema.</p>\n"
 "                        "
-msgstr ""
+msgstr "\n<p>Hai designato una raccolta dati per questo progetto ma non hai raccolto alcun dato. Puoi ancora cambiare il tuo schema.</p>"
 
 #: templates/organization/project_dashboard_member.html:183
 msgid "Upload new XLS Form"
-msgstr ""
+msgstr "Carica nuovo XLS Form"
 
 #: templates/organization/project_dashboard_member.html:184
 msgid "Download current XLS Form"
-msgstr ""
+msgstr "Scarica XLS Form corrente"
 
 #: templates/organization/project_dashboard_member.html:194
 #: templates/organization/project_edit_details.html:92
 msgid "This project is using questionnaire"
-msgstr ""
+msgstr "Questo progetto utilizza un questionario"
 
 #: templates/organization/project_dashboard_member.html:195
 #: templates/organization/project_edit_details.html:94
 msgid ""
 "Data has already been contributed to this project. To ensure data integrity,"
 " uploading a new questionnaire is disabled."
-msgstr ""
+msgstr "Dati sono già stati aggiunti a questo progetto. Per assicurarsi dell'integrità dei dati, la possibilità di caricare un questionario è disabilitata."
 
 #: templates/organization/project_dashboard_member.html:202
 msgid "No questionnaire is available for this project."
-msgstr ""
+msgstr "Nessun questionario è a disposizione per questo progetto"
 
 #: templates/organization/project_dashboard_member.html:221
 #: templates/organization/project_dashboard_nonmember.html:119
 msgid "About this project"
-msgstr ""
+msgstr "Riguardo questo progetto"
 
 #: templates/organization/project_dashboard_member.html:233
 msgid ""
 "\n"
 "                        <p>This project needs a description. Would you like to add one now?</p>\n"
 "                      "
-msgstr ""
+msgstr "\n<p>Questo progetto necessita di una descrizione. Vorresti aggiungerla ora?</p>"
 
 #: templates/organization/project_dashboard_member.html:237
 msgid "Add project description"
-msgstr ""
+msgstr "Aggiungi descrizione progetto"
 
 #: templates/organization/project_dashboard_member.html:278
 msgid "Project records"
-msgstr ""
+msgstr "I record del progetto"
 
 #: templates/organization/project_dashboard_member.html:281
 #: templates/organization/project_import_wrapper.html:31
@@ -3224,38 +3283,38 @@ msgstr "Importa dati progetto"
 #: templates/organization/project_select_import.html:35
 #: templates/organization/project_wrapper.html:51
 #: templates/organization/project_wrapper.html:81
-#: templates/organization/project_wrapper.html:101
+#: templates/organization/project_wrapper.html:103
 msgid "Import data"
 msgstr "Importa dati"
 
 #: templates/organization/project_dashboard_member.html:286
 #: templates/organization/project_download.html:12
 msgid "Export project data"
-msgstr ""
+msgstr "Esporta dati progetto"
 
 #: templates/organization/project_dashboard_member.html:288
 #: templates/organization/project_wrapper.html:52
 msgid "Export data"
-msgstr ""
+msgstr "Esporta dati"
 
 #: templates/organization/project_dashboard_member.html:300
 msgid "Team Members"
-msgstr ""
+msgstr "Membri Team"
 
 #: templates/organization/project_dashboard_member.html:303
 msgid "Manage project members"
-msgstr ""
+msgstr "Gestisci membri progetto"
 
 #: templates/organization/project_dashboard_member.html:306
 msgid "Add new user"
-msgstr ""
+msgstr "Aggiungi nuovo utente"
 
 #: templates/organization/project_dashboard_member.html:314
 msgid ""
 "\n"
 "                        <p>You have not added any team members. Would you like to add team members now?</p>\n"
 "                      "
-msgstr ""
+msgstr "\n\n<p>Non hai aggiunto alcun membro al team. Vorresti aggiungerne uno ora?</p>"
 
 #: templates/organization/project_dashboard_nonmember.html:9
 msgid "Project Overview"
@@ -3263,33 +3322,33 @@ msgstr "Panoramica Progetto"
 
 #: templates/organization/project_dashboard_nonmember.html:17
 msgid "New Users"
-msgstr ""
+msgstr "Nuovi Utenti"
 
 #: templates/organization/project_dashboard_nonmember.html:20
 msgid "Have an account?"
-msgstr ""
+msgstr "Hai un account?"
 
 #: templates/organization/project_dashboard_nonmember.html:25
 msgid ""
 "Register for free to securely collect, manage, and store your land and "
 "resource rights documentation, geometries, and other data."
-msgstr ""
+msgstr "Registrati gratis per raccogliere, gestire, e salvare documentazioni e geometrie sulla tua terra e i tuoi diritti di risorse."
 
 #: templates/organization/project_dashboard_nonmember.html:28
 msgid "Sign in to manage your projects and access permissions-based data."
-msgstr ""
+msgstr "Collegati per gestire i tuoi progetti e per accedere ai dati."
 
 #: templates/organization/project_dashboard_nonmember.html:33
 msgid "Register now"
-msgstr ""
+msgstr "Registrati adesso"
 
 #: templates/organization/project_dashboard_nonmember.html:50
 msgid "Access to project data is restricted to current project members only."
-msgstr ""
+msgstr "L'accesso ai dati del progetto è consentito solo ai membri del progetto."
 
 #: templates/organization/project_dashboard_nonmember.html:126
 msgid "Looks like this project doesn't have a description yet."
-msgstr ""
+msgstr "Sembra che questo progetto non ha una descrizione per ora."
 
 #: templates/organization/project_defaults_import.html:6
 msgid "Configure default fields"
@@ -3354,7 +3413,7 @@ msgstr "Un documento zip contenente tutti i dati del progetto in file XLS e SHP 
 
 #: templates/organization/project_download.html:50
 msgid "Download file"
-msgstr ""
+msgstr "Scarica documento"
 
 #: templates/organization/project_edit_details.html:27
 msgid "1. General information"
@@ -3439,47 +3498,47 @@ msgid "Language for project fields"
 msgstr "Lingua per i campi del progetto"
 
 #: templates/organization/project_wrapper.html:56
-#: templates/organization/project_wrapper.html:229
+#: templates/organization/project_wrapper.html:231
 msgid "Unarchive project"
 msgstr "Rimuovi progetto dall'archivio"
 
 #: templates/organization/project_wrapper.html:58
-#: templates/organization/project_wrapper.html:205
+#: templates/organization/project_wrapper.html:207
 msgid "Archive project"
 msgstr "Archivia progetto"
 
 #: templates/organization/project_wrapper.html:79
-#: templates/organization/project_wrapper.html:98
+#: templates/organization/project_wrapper.html:100
 #: templates/party/resources_list.html:21
 msgid "Add resource"
 msgstr "Aggiungi risorsa"
 
-#: templates/organization/project_wrapper.html:137
+#: templates/organization/project_wrapper.html:139
 msgid "Data"
-msgstr ""
+msgstr "Dati"
 
-#: templates/organization/project_wrapper.html:159
+#: templates/organization/project_wrapper.html:161
 #: templates/search/search.html:22
 msgid "Search within project for"
 msgstr "Cerca dentro il progetto per"
 
-#: templates/organization/project_wrapper.html:160
+#: templates/organization/project_wrapper.html:162
 msgid "Search within project"
 msgstr "Cerca dentro il progetto"
 
-#: templates/organization/project_wrapper.html:208
+#: templates/organization/project_wrapper.html:210
 msgid "Are you sure you want to archive this project?"
 msgstr "Sei sicuro/a di voler archiviare questo progetto?"
 
-#: templates/organization/project_wrapper.html:212
+#: templates/organization/project_wrapper.html:214
 msgid "Yes, archive this project"
 msgstr "Sì, archivia questo progetto"
 
-#: templates/organization/project_wrapper.html:233
+#: templates/organization/project_wrapper.html:235
 msgid "Are you sure you want to unarchive this project?"
 msgstr "Sei sicuro/a di voler rimuovere questo progetto dall'archivio?"
 
-#: templates/organization/project_wrapper.html:238
+#: templates/organization/project_wrapper.html:240
 msgid "Yes, unarchive this project"
 msgstr "Sì, rimuovi progetto dall'archivio"
 
@@ -3495,7 +3554,7 @@ msgstr "btn-danger,btn-default"
 msgid "Deactivate,Activate"
 msgstr "Disattiva, Attiva"
 
-#: templates/party/party_delete.html:11 templates/party/party_detail.html:17
+#: templates/party/party_delete.html:11 templates/party/party_detail.html:20
 msgid "Delete party"
 msgstr "Rimuovi parte"
 
@@ -3511,53 +3570,53 @@ msgstr "Sì, rimuovi questa parte"
 msgid "Party detail"
 msgstr "Dettagli parte"
 
-#: templates/party/party_detail.html:16 templates/party/party_edit.html:5
-#: templates/party/party_edit.html:43
+#: templates/party/party_detail.html:17 templates/party/party_edit.html:5
+#: templates/party/party_edit.html:40
 msgid "Edit party"
 msgstr "Modifica parte"
 
-#: templates/party/party_detail.html:27 templates/party/resources_list.html:17
+#: templates/party/party_detail.html:29 templates/party/resources_list.html:17
 #: templates/spatial/location_detail.html:33
 msgid "Relationships"
 msgstr "Relazioni"
 
-#: templates/party/party_detail.html:62
+#: templates/party/party_detail.html:64
 msgid "Location Type"
 msgstr "Tipo Luogo"
 
-#: templates/party/party_detail.html:77
+#: templates/party/party_detail.html:79
 msgid ""
 "This party does not have any relationships and is not connected to any "
 "locations."
 msgstr "Questa parte non ha alcuna relazione e non è connessa con alcun luogo."
 
-#: templates/party/party_detail.html:92 templates/party/party_detail.html:104
-#: templates/party/relationship_detail.html:48
-#: templates/party/relationship_detail.html:60
+#: templates/party/party_detail.html:94 templates/party/party_detail.html:106
+#: templates/party/relationship_detail.html:52
+#: templates/party/relationship_detail.html:64
 #: templates/resources/project_list.html:25
 #: templates/spatial/location_detail.html:106
 #: templates/spatial/location_detail.html:118
 msgid "Attach"
 msgstr "Allega"
 
-#: templates/party/party_detail.html:97
+#: templates/party/party_detail.html:99
 msgid ""
 "This party does not have any attached resources. To attach a resource, "
 "select the button below."
 msgstr "Questa parte non ha alcuna risorsa allegata. Per allegare una risorsa, seleziona il tasto sottostante."
 
 #: templates/party/party_form.html:6
-#: templates/spatial/relationship_add.html:83
+#: templates/spatial/relationship_add.html:80
 msgid "Party name"
 msgstr "Nome parte"
 
 #: templates/party/party_form.html:12
-#: templates/spatial/relationship_add.html:89
+#: templates/spatial/relationship_add.html:86
 msgid "Party type"
 msgstr "Tipo parte"
 
 #: templates/party/relationship_delete.html:12
-#: templates/party/relationship_detail.html:15
+#: templates/party/relationship_detail.html:18
 msgid "Delete relationship"
 msgstr "Rimuovi relazione"
 
@@ -3573,26 +3632,26 @@ msgstr "Sì, rimuovi questa relazione"
 msgid "Relationship Detail"
 msgstr "Dettagli Relazione"
 
-#: templates/party/relationship_detail.html:14
+#: templates/party/relationship_detail.html:15
 msgid "Edit relationship"
 msgstr "Modifica relazione"
 
-#: templates/party/relationship_detail.html:20
-#: templates/party/relationship_edit.html:42
+#: templates/party/relationship_detail.html:24
+#: templates/party/relationship_edit.html:39
 msgid "Details"
 msgstr "Dettagli"
 
-#: templates/party/relationship_detail.html:53
+#: templates/party/relationship_detail.html:57
 msgid ""
 "This relationship does not have any attached resources. To attach a "
 "resource, select the button below."
 msgstr "Questa relazione non ha alcuna risorsa allegata. Per allegare una risorsa, seleziona il tasto sottostante."
 
-#: templates/party/relationship_edit.html:37
+#: templates/party/relationship_edit.html:34
 msgid "Edit Relationship"
 msgstr "Modifica Relazione"
 
-#: templates/party/relationship_edit.html:44
+#: templates/party/relationship_edit.html:41
 msgid "Relationship type"
 msgstr "Tipo relazione"
 
@@ -3779,7 +3838,7 @@ msgid ""
 "                    <li>Search results are limited to a maximum of %(max_num_results)s entries.</li>\n"
 "                  </ul>\n"
 "                  "
-msgstr ""
+msgstr "\n<ul>\n<li>Per impostazione predefinita, i risultati di ricerca devono combaciare con almeno uno dei termini provvisti.\nPer forzare la richiesta di un termine, prefissalo con un segno più (es. <kbd>+voluto</kbd>).\nPer forzare l'esclusione di un termine, prefissalo col segno meno (es. <kbd>-nonvoluto</kbd>).\n<li>Per cercare frasi esatte, usa le doppie virgolette (es. <kbd>\"John White\"</kbd>).</li>\n<li>Controlla la tua scrittura, sii sicuro/a che non ci siano errori di spelling nei tuoi termini di ricerca.</li>\n<li>Il numero massimo di risultati di ricerca permessi sono %(max_num_results)s.</li>\n</ul>"
 
 #: templates/search/search.html:48
 msgid "Last updated on"
@@ -3803,7 +3862,7 @@ msgstr "Ricontrolla spelling per errori"
 
 #: templates/search/search.html:62
 msgid "Add more keywords."
-msgstr ""
+msgstr "Aggiungi più parole chiave."
 
 #: templates/search/search.html:63
 msgid "Refer to our search guidelines for more tips."
@@ -3811,7 +3870,7 @@ msgstr "Consulta la nostra guida di ricerca per consigli."
 
 #: templates/search/search.html:69
 msgid "Export"
-msgstr ""
+msgstr "Esporta"
 
 #: templates/search/search.html:73
 msgid ""
@@ -3855,7 +3914,7 @@ msgstr "Questo luogo non ha alcuna relazione e non è connesso con alcuna parte.
 
 #: templates/spatial/location_detail.html:89
 #: templates/spatial/relationship_add.html:7
-#: templates/spatial/relationship_add.html:61
+#: templates/spatial/relationship_add.html:58
 msgid "Add relationship"
 msgstr "Aggiungi relazione"
 
@@ -3865,21 +3924,21 @@ msgid ""
 "select the button below."
 msgstr "Questo luogo non ha alcuna risorsa allegata. Per allegare una risorsa, seleziona il tasto sottostante."
 
-#: templates/spatial/location_form.html:16
+#: templates/spatial/location_form.html:15
 msgid "Edit details"
 msgstr "Modifica dettagli"
 
-#: templates/spatial/location_form.html:19
+#: templates/spatial/location_form.html:18
 msgid "Draw location on map"
 msgstr "Disegna luogo sulla mappa"
 
-#: templates/spatial/location_form.html:21
+#: templates/spatial/location_form.html:20
 msgid ""
 "Use the tools provided on the left side of the map to mark your new "
 "location."
 msgstr "Usa gli strumenti sulla sinistra della mappa per segnare il tuo nuovo luogo."
 
-#: templates/spatial/location_form.html:26
+#: templates/spatial/location_form.html:25
 msgid "What type of location is this?"
 msgstr "Che tipo di luogo è questo?"
 
@@ -3887,23 +3946,23 @@ msgstr "Che tipo di luogo è questo?"
 msgid "Currently viewing"
 msgstr "Vedendo al momento"
 
-#: templates/spatial/relationship_add.html:66
+#: templates/spatial/relationship_add.html:63
 msgid "1. Connected party"
 msgstr "1. Parte connessa"
 
-#: templates/spatial/relationship_add.html:69
+#: templates/spatial/relationship_add.html:66
 msgid "Choose an existing party to connect to this location"
 msgstr "Scegli una parte esistente da connettere a questo luogo"
 
-#: templates/spatial/relationship_add.html:74
+#: templates/spatial/relationship_add.html:71
 msgid "Or add a new party"
 msgstr "O aggiungi una nuova parte"
 
-#: templates/spatial/relationship_add.html:98
+#: templates/spatial/relationship_add.html:95
 msgid "2. Relationship details"
 msgstr "2. Dettagli relazione"
 
-#: templates/spatial/relationship_add.html:101
+#: templates/spatial/relationship_add.html:98
 msgid "Relationship Type"
 msgstr "Tipo Relazione"
 
