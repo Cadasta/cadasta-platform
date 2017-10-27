@@ -116,11 +116,11 @@ server {
         uwsgi_pass  django;
         include {{ application_path }}uwsgi_params;
         add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
+    }
 
-        error_page 503 @maintenance;
-        location @maintenance {
-            root /var/www/html/;
-            rewrite ^(.*)$ /maintenance.html break;
-        }
+    error_page 503 @maintenance;
+    location @maintenance {
+        root /var/www/html/;
+        rewrite ^(.*)$ /maintenance.html break;
     }
 }
