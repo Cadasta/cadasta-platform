@@ -109,8 +109,18 @@ server {
     }
 
     location / {
+        if (-f /var/www/html/maintenance.html) {
+            return 503;
+        }
+
         uwsgi_pass  django;
         include {{ application_path }}uwsgi_params;
         add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
+
+        error_page 503 @maintenance;
+        location @maintenance {
+            root /var/www/html/;
+            rewrite ^(.*)$ /maintenance.html break;
+        }
     }
 }
