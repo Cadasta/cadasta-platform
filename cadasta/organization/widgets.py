@@ -86,12 +86,12 @@ class PublicPrivateToggle(Widget):
 
     class Media:
         js = (
-            '/static/bootstrap-toggle/2.2.2/js/'
+            '/dist/bootstrap-toggle/2.2.2/js/'
             'bootstrap-toggle.min.js',
         )
         css = {
             'all': (
-                '/static/bootstrap-toggle/2.2.2/css/'
+                '/dist/bootstrap-toggle/2.2.2/css/'
                 'bootstrap-toggle.min.css',
             )
         }
@@ -139,7 +139,7 @@ class ContactsWidget(Widget):
 
     class Media:
         js = (
-            '/static/js/contacts.js',
+            '/dist/js/contacts.js',
         )
 
     def value_from_datadict(self, data, files, name):
