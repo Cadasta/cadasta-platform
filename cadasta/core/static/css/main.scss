@@ -18,45 +18,45 @@
 
 @font-face {
   font-family: 'Roboto';
-  src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot');
-  src: url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
-       url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
-       url('/static/fonts/roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
+  src: url('#{$font-path}roboto_regular_macroman/roboto-regular-webfont.eot');
+  src: url('#{$font-path}roboto_regular_macroman/roboto-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('#{$font-path}roboto_regular_macroman/roboto-regular-webfont.woff') format('woff'),
+       url('#{$font-path}roboto_regular_macroman/roboto-regular-webfont.ttf') format('truetype'),
+       url('#{$font-path}roboto_regular_macroman/roboto-regular-webfont.svg#roboto') format('svg');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto Condensed';
-  src: url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot');
-  src: url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.woff') format('woff'),
-       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.ttf') format('truetype'),
-       url('/static/fonts/roboto_condensed_macroman/roboto-condensed-regular-webfont.svg#roboto') format('svg');
+  src: url('#{$font-path}roboto_condensed_macroman/roboto-condensed-regular-webfont.eot');
+  src: url('#{$font-path}roboto_condensed_macroman/roboto-condensed-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('#{$font-path}roboto_condensed_macroman/roboto-condensed-regular-webfont.woff') format('woff'),
+       url('#{$font-path}roboto_condensed_macroman/roboto-condensed-regular-webfont.ttf') format('truetype'),
+       url('#{$font-path}roboto_condensed_macroman/roboto-condensed-regular-webfont.svg#roboto') format('svg');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'PadaukW';
-  src: url('/static/fonts/Padauk/Padauk-Regular.woff') format('woff'),
-       url('/static/fonts/Padauk/Padauk-Regular.ttf') format('truetype');
+  src: url('#{$font-path}Padauk/Padauk-Regular.woff') format('woff'),
+       url('#{$font-path}Padauk/Padauk-Regular.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'KNU Unicode';
-  src: url('/static/fonts/KNU/knuunicode-webfont.woff') format('woff'),
-       url('/static/fonts/KNU/knuunicode-webfont.ttf') format('truetype');
+  src: url('#{$font-path}KNU/knuunicode-webfont.woff') format('woff'),
+       url('#{$font-path}KNU/knuunicode-webfont.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Noto Sans Bengali';
-  src: url('/static/fonts/NotoSansBengali/NotoSansBengali-Regular.ttf') format('truetype');
+  src: url('#{$font-path}NotoSansBengali/NotoSansBengali-Regular.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }

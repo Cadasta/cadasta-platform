@@ -82,8 +82,8 @@ SERVER_EMAIL = 'platform@cadasta.org'
 DEFAULT_FROM_EMAIL = 'Cadasta Platform <platform@cadasta.org>'
 ROOT_URLCONF = 'config.urls.production'
 
-STATIC_URL = '/static/'
-STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/static/'
+STATIC_URL = '/dist/'
+STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/dist/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/opt/cadasta/cadasta-platform/cadasta/media/'
