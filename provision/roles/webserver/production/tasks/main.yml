@@ -147,12 +147,7 @@
         src="{{ application_path }}uwsgi.ini"
         state=link
 
-- name: Write Sync Tasks Upstart service definition
-  become: yes
-  become_user: root
-  template: src=nginx-production
-            dest=/etc/init/cadasta-sync-tasks.conf
-
+# Added in roles/cadasta/application/tasks
 - name: Start Sync Tasks process
   become: yes
   become_user: root

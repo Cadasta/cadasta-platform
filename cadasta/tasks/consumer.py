@@ -1,9 +1,9 @@
 import logging
 
 import boto3
-from django.conf import settings
 from kombu.mixins import ConsumerMixin
 
+from tasks.celery import conf
 from .models import BackgroundTask
 
 
@@ -27,7 +27,7 @@ class Worker(ConsumerMixin):
         logger.info('Processing message: %r', message)
         try:
             return self._handle_task(body, message)
-        except:
+        except:  # NOQA
             logger.exception(
                 "Failed to process message: %r", message)
         finally:
@@ -42,7 +42,7 @@ class Worker(ConsumerMixin):
 
     def _sqs_ack(self, message):
         logger.debug("Manually ACKing SQS message %r", message)
-        region = settings.CELERY_BROKER_TRANSPORT_OPTIONS['region']
+        region = conf.broker_transport_options.get('region', 'us-west-2')
         boto3.client('sqs', region).delete_message(
             QueueUrl=message.delivery_info['sqs_queue'],
             ReceiptHandle=message.delivery_info['sqs_message']['ReceiptHandle']
