@@ -20,7 +20,7 @@ class BackgroundTaskFactory(ExtendedFactory):
     id = factory.LazyFunction(gen_id)
     task_id = factory.LazyFunction(gen_id)
     root_id = factory.LazyAttribute(lambda o: o.task_id)
-    type = 'foo.bar'
+    type = 'export.project'
     input = factory.LazyFunction(input_field_default)
     creator = factory.SubFactory(UserFactory)
 

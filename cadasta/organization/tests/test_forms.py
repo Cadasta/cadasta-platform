@@ -10,6 +10,7 @@ from core.tests.utils.files import make_dirs  # noqa
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
+from django.http.response import Http404
 from questionnaires.exceptions import InvalidQuestionnaire
 from questionnaires.tests.factories import QuestionnaireFactory
 from resources.tests.utils import clear_temp  # noqa

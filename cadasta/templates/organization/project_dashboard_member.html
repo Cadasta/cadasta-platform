@@ -281,7 +281,7 @@
                     {% trans "Import data" %}
                   </a>
                   {% if has_content %}
-                    <a href="{% url 'organization:project-download' object.organization.slug object.slug %}" title="{% trans 'Export project data' %}" class="btn btn-default btn-panel btn-half pull-right">
+                    <a href="{% url 'organization:project-download' object.organization.slug object.slug %}" title="{% trans 'Export project data' %}" class="btn btn-default btn-panel btn-half pull-right {% if export_disabled %}disabled{% endif %}">
                       <i class="glyphicon glyphicon-export"></i>
                       {% trans "Export data" %}
                     </a>

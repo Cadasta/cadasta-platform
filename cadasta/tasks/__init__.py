@@ -1,1 +1,1 @@
-default_app_config = 'tasks.apps.TasksConfig'
+default_app_config = 'tasks.app.TasksConfig'
