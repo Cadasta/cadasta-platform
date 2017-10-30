@@ -15,6 +15,7 @@ from django.utils import timezone
 
 from accounts.models import User
 import core.views.generic as generic
+from core import breakers
 from core.mixins import (LoginPermissionRequiredMixin, PermissionRequiredMixin,
                          update_permissions)
 from core.util import random_id
@@ -453,6 +454,7 @@ class ProjectDashboard(PermissionRequiredMixin,
         context['num_resources'] = num_resources
         context['members'] = members
 
+        context['export_disabled'] = breakers.celery.is_open
         exports = self.object.tasks.filter(type=export.name)
         exports = exports.select_related('result').order_by('-created_date')
         last_week = timezone.now() - timezone.timedelta(days=7)
@@ -759,18 +761,25 @@ class ProjectDataDownload(mixins.ProjectMixin,
             return self.form_invalid(form)
 
         output_type = form.cleaned_data['type']
-        schedule_project_export(self.object, request.user, output_type)
-
-        message = {
-            'res': "Scheduled export of project resources.",
-            'xls': "Scheduled export of project records in XLS format.",
-            'shp': ("Scheduled export of project records in XLS format and "
-                    "as Shapefiles."),
-            'all': "Scheduled export of project resources and records.",
-        }
-        messages.add_message(
-            self.request, messages.SUCCESS,
-            _(message[output_type]))
+        try:
+            schedule_project_export(self.object, request.user, output_type)
+        except breakers.celery.expected_errors:
+            messages.add_message(
+                self.request, messages.ERROR,
+                _("The export service is temporarily offline. "
+                  "Please try again later.")
+            )
+        else:
+            message = {
+                'res': "Scheduled export of project resources.",
+                'xls': "Scheduled export of project records in XLS format.",
+                'shp': ("Scheduled export of project records in XLS format "
+                        "and as Shapefiles."),
+                'all': "Scheduled export of project resources and records.",
+            }
+            messages.add_message(
+                self.request, messages.SUCCESS,
+                _(message[output_type]))
         return redirect('organization:project-dashboard',
                         organization=organization,
                         project=project)
