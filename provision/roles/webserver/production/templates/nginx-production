@@ -13,6 +13,20 @@ map $sent_http_content_type $expires {
 server {
     listen      80;
 
+    set $should_redirect 0;
+    # Redirect any HTTP requests to HTTPS
+    if ($http_x_forwarded_proto != 'https') {
+        set $should_redirect 1;
+    }
+    # ... except for ELB Healthchecks, those come in at HTTP being that
+    # they occur behind the load balancer, where everything is HTTP
+    if ($http_user_agent ~* '^ELB-HealthChecker\/.*$') {
+        set $should_redirect 0;
+    }
+    if ($should_redirect) {
+        return 301 https://$host$request_uri;
+    }
+
     expires $expires;
     etag on;
     add_header Cache-Control "private, must-revalidate";
