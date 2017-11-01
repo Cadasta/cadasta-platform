@@ -1,3 +1,8 @@
+- name: Create system user
+  become: yes
+  become_user: root
+  user: name={{ app_user }} shell=/bin/bash
+
 - name: Create Postgres password file for Cadasta user
   become: yes
   become_user: root

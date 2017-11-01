@@ -41,7 +41,7 @@
   become: yes
   become_user: root
   file: path="{{ virtualenv_path | dirname }}" state=directory
-        owner="{{ app_user }}" mode=0755
+        owner="{{ app_user }}" group="{{ app_user }}" mode=0755
 
 - name: Manually create the initial virtualenv
   become: yes
@@ -63,6 +63,18 @@
   pip: virtualenv="{{ virtualenv_path }}"
        requirements="{{ application_path }}requirements/common.txt"
        extra_args="--find-links https://s3.amazonaws.com:443/cadasta-wheelhouse/index.html"
+
+- name: Create directory for static files
+  become: yes
+  become_user: root
+  file: path="{{ base_path }}static" state=directory
+        owner="{{ app_user }}" group="{{ app_user }}" mode=0755
+
+- name: Create directory for media files
+  become: yes
+  become_user: root
+  file: path="{{ base_path }}media" state=directory
+        owner="{{ app_user }}" group="{{ app_user }}" mode=0755
 
 - name: Set up logging directory
   become: yes
@@ -98,7 +110,7 @@
 - name: Install Bootstrap for SASS processing
   become: yes
   become_user: "{{ app_user }}"
-  command: chdir="{{ application_path }}cadasta/core"
+  command: chdir="{{ base_path }}"
            npm install bootstrap-sass
 
 - name: Write platform identifier to core template file

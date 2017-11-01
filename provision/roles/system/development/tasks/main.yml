@@ -1,0 +1,12 @@
+- name: Create ssh dir
+  become: yes
+  become_user: root
+  file: path="/home/{{ app_user }}/.ssh"
+        state="directory"
+        owner="{{ app_user }}"
+
+- name: Copy vagrant ssh keys
+  become: yes
+  become_user: root
+  copy: src=/home/vagrant/.ssh/authorized_keys dest="/home/{{ app_user }}/.ssh/authorized_keys"
+        owner="{{ app_user }}" mode=0700 remote_src=yes

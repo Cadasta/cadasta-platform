@@ -3,19 +3,14 @@
   remote_user: ubuntu
   gather_facts: true
   vars:
-    base_path: /opt/cadasta/
-    application_path: /opt/cadasta/cadasta-platform/
-    virtualenv_path: /opt/cadasta/env/
     django_settings: config.settings.production
-    app_user: cadasta
-    uwsgi_socket: "{{ application_path }}uwsgi.sock"
   vars_files:
     - shared_vars.yml
   roles:
-    - system/aws
     - system/common
     - db/common
     - db/production
+    - cadasta/common
     - cadasta/install
     - cadasta/application
     - cadasta/production
