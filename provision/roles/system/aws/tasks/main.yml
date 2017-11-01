@@ -1,4 +1,0 @@
-- name: Create Cadasta user
-  become: yes
-  become_user: root
-  user: name=cadasta

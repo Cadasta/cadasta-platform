@@ -1,0 +1,5 @@
+- name: Create base directory for installation
+  become: yes
+  become_user: root
+  file: path="{{ base_path }}" state=directory
+        owner="{{ app_user }}" group="{{ app_user }}" mode=0755

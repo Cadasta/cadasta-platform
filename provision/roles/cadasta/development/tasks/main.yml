@@ -1,4 +1,11 @@
-- name: Install requirements
+- name: Own files synced by Vagrant
+  file: path="{{ application_path }}"
+       owner="{{ app_user }}" group="{{ app_user }}"
+       state=directory
+
+- name: Install dev requirements
+  become: yes
+  become_user: "{{ app_user }}"
   pip: virtualenv="{{ virtualenv_path }}"
        requirements="{{ application_path }}requirements/dev.txt"
        extra_args="--find-links https://s3.amazonaws.com:443/cadasta-wheelhouse/index.html"
@@ -6,20 +13,20 @@
 - name: Activate virtual environment on VM login
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
-              line=". /opt/cadasta/env/bin/activate"
+  lineinfile: dest="/home/{{ app_user }}/.bashrc"
+              line=". {{ virtualenv_path }}bin/activate"
 
 - name: Set up development environment Django settings
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest="/home/{{ app_user }}/.bashrc"
               line="export DJANGO_SETTINGS_MODULE=config.settings.dev"
 
 - name: Go to cadasta-platform root on VM login
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
-              line="cd /vagrant"
+  lineinfile: dest="/home/{{ app_user }}/.bashrc"
+              line="cd {{ application_path }}"
 
 - name: Install gettext translation utilities
   become: yes
@@ -27,5 +34,7 @@
   apt: pkg=gettext state=installed update_cache=yes
 
 - name: Make Transifex credentials file link
+  become: yes
+  become_user: "{{ app_user }}"
   file: state=link force=yes
-        path=/home/vagrant/.transifexrc src=/vagrant/.transifexrc
+        path="/home/{{ app_user }}/.transifexrc" src={{ application_path }}.transifexrc
