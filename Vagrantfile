@@ -1,5 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+VAGRANT_COMMAND = ARGV[0]
 
 Vagrant.configure(2) do |config|
   if Vagrant.has_plugin?("vagrant-proxyconf")
@@ -15,6 +16,9 @@ Vagrant.configure(2) do |config|
           config.proxy.no_proxy = ENV["no_proxy"]
       end
   end
+
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/opt/cadasta/cadasta-platform", create: true
 
   config.vm.box = "ubuntu/trusty64"
   config.vm.network "forwarded_port", guest: 8000, host: 8000
