@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import TestCase
 from django.http.request import QueryDict
 from django.forms import formset_factory
@@ -11,10 +12,12 @@ from accounts.tests.factories import UserFactory
 
 class ProjectRoleWidgetTest(TestCase):
     def setUp(self):
+        test_avatar_path = settings.DEFAULT_AVATAR
         self.user = UserFactory.build(
             username='bob',
             email='me@example.com',
-            full_name='Bob Smith'
+            full_name='Bob Smith',
+            avatar=test_avatar_path,
         )
         self.widget = widgets.ProjectRoleWidget(user=self.user,
                                                 role='A',
@@ -26,6 +29,10 @@ class ProjectRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
+            '    <div class="avatar-box avatar-box-sm pull-left">'
+            '       <img src="/static/img/avatar_sm.jpg" alt="bob"'
+            '         class="avatar avatar-sm">'
+            '    </div>'
             '    <strong>bob</strong><br>'
             '    Bob Smith'
             '  </td>'
@@ -50,6 +57,10 @@ class ProjectRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
+            '    <div class="avatar-box avatar-box-sm pull-left">'
+            '       <img src="/static/img/avatar_sm.jpg" alt="bob"'
+            '         class="avatar avatar-sm">'
+            '    </div>'
             '    <strong>bob</strong><br>'
             '    Bob Smith'
             '  </td>'
@@ -72,6 +83,10 @@ class ProjectRoleWidgetTest(TestCase):
         expected = (
             '<tr>'
             '  <td>'
+            '    <div class="avatar-box avatar-box-sm pull-left">'
+            '       <img src="/static/img/avatar_sm.jpg" alt="bob"'
+            '         class="avatar avatar-sm">'
+            '    </div>'
             '    <strong>bob</strong><br>'
             '    Bob Smith'
             '  </td>'

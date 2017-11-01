@@ -20,10 +20,12 @@
         <div class="col-md-3">
           <!-- Member panel -->
           <div class="panel panel-default member-panel">
-            <div class="panel-body member-info">
-              <div class="member-pic">
-                <img src="/static/img/avatar.jpg" class="avatar-lg thumbnail">
+            <div class="panel-topimage">
+              <div id="preview-box">
+                <img src="{{ object.avatar_url }}" alt="{{ object.name }}" id="avatar-preview">
               </div>
+            </div>
+            <div class="panel-body member-info">
               <div class="member-detail">
                 <h4>
                   {{ object.username }}

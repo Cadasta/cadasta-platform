@@ -395,17 +395,18 @@ class ProjectDashboard(PermissionRequiredMixin,
         context = super().get_context_data(**kwargs)
         role_labels = dict(ROLE_CHOICES)
         org_admins = self.object.organization.users.filter(
-            organizationrole__admin=True).values('id', 'username')
-        org_roles = {
-            user['username']: _("Administrator") for user in org_admins}
-        org_admin_ids = [user['id'] for user in org_admins]
-        prj_members = self.object.users.exclude(
-            id__in=org_admin_ids).values('username', 'projectrole__role')
-        prj_roles = {
-            user['username']: role_labels.get(user['projectrole__role'])
-            for user in prj_members}
-        m = {**org_roles, **prj_roles}
-        members = OrderedDict(sorted(m.items(), key=lambda t: t[0]))
+            organizationrole__admin=True)
+        org_roles = [
+            (user.username, _("Administrator"), user.avatar_url)
+            for user in org_admins]
+        org_admin_ids = [user.id for user in org_admins]
+
+        prj_members = ProjectRole.objects.filter(project=self.object)
+        prj_members.exclude(user__id__in=org_admin_ids).select_related('user')
+        prj_roles = [
+            (role.user.username, role_labels[role.role], role.user.avatar_url)
+            for role in prj_members]
+        members = sorted(org_roles + prj_roles, key=lambda t: t[0])
 
         num_locations = self.object.spatial_units.count()
         num_parties = self.object.parties.count()

@@ -1,4 +1,5 @@
 from django.forms import Select, Widget
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
 
@@ -6,6 +7,10 @@ class ProjectRoleWidget(Select):
     html = (
         '<tr>'
         '  <td>'
+        '    <div class="avatar-box avatar-box-sm pull-left">'
+        '       <img src="{avatar_url}" alt="{username}"'
+        '         class="avatar avatar-sm">'
+        '    </div>'
         '    <strong>{username}</strong><br>'
         '    {full_name}'
         '  </td>'
@@ -27,10 +32,16 @@ class ProjectRoleWidget(Select):
         else:
             select = super().render(name, value, *args, **kwargs)
 
+        if not self.user.avatar or not self.user.avatar.url:
+            avatar_url = settings.DEFAULT_AVATAR
+        else:
+            avatar_url = self.user.avatar.url
+
         return self.html.format(
             full_name=self.user.full_name,
             username=self.user.username,
             email=self.user.email,
+            avatar_url=avatar_url,
             select=select
         )
 
