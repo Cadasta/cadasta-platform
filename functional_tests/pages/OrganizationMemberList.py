@@ -82,7 +82,7 @@ class OrganizationMemberListPage(Page):
             for f in err:
                 try:
                     self.test.assert_field_has_error(fields[f], message)
-                except:
+                except AssertionError:
                     raise AssertionError(
                         'Field "' + f + '" should have error, but does not'
                     )

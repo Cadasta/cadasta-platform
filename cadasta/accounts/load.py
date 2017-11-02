@@ -19,7 +19,7 @@ def run(verbose=True, force=False):
             pols[pol] = models.Policy.objects.get(name=pol)
             pols[pol].body = policy_file.read()
             pols[pol].save()
-        except:
+        except models.Policy.DoesNotExist:
             pols[pol] = models.Policy.objects.create(
                 name=pol,
                 body=policy_file.read()

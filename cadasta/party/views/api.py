@@ -1,6 +1,7 @@
 """Party API."""
 from django.db.models import Q
 from django.utils.translation import gettext as _
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,7 +24,7 @@ class PartyList(APIPermissionRequiredMixin,
                 generics.ListCreateAPIView):
 
     serializer_class = serializers.PartySerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter,)
     filter_fields = ('name', 'type')
     search_fields = ('name',)
@@ -57,7 +58,7 @@ class PartyResourceList(APIPermissionRequiredMixin,
                         mixins.PartyResourceMixin,
                         generics.ListCreateAPIView):
     serializer_class = ResourceSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
@@ -233,7 +234,7 @@ class TenureRelationshipResourceList(APIPermissionRequiredMixin,
                                      mixins.TenureRelationshipResourceMixin,
                                      generics.ListCreateAPIView):
     serializer_class = ResourceSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)

@@ -290,7 +290,7 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
                 self.country = WorldBorder.objects.get(
                     mpoly__contains=self.extent.centroid
                 ).iso2
-            except:
+            except WorldBorder.DoesNotExist:
                 pass
         super().save(*args, **kwargs)
 
