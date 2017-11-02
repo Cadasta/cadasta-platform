@@ -250,16 +250,7 @@ LEAFLET_CONFIG = {
              'maxZoom': 22}
         ),
     ],
-    'RESET_VIEW': False,
-    'PLUGINS': {
-        'draw': {
-            'js': '/static/leaflet/draw/leaflet.draw.js'
-        },
-        'groupedlayercontrol': {
-            'js': '/static/js/leaflet.groupedlayercontrol.min.js',
-            'css': '/static/css/leaflet.groupedlayercontrol.min.css'
-        }
-    }
+    'RESET_VIEW': False
 }
 
 # Invalid names for Cadasta organizations, projects, and usernames
@@ -308,11 +299,16 @@ SASS_PROCESSOR_INCLUDE_DIRS = (
 # Required for bootstrap-sass
 # https://github.com/jrief/django-sass-processor
 SASS_PRECISION = 8
+SASS_PROCESSOR_ROOT = (
+    os.path.join(os.path.dirname(BASE_DIR), 'core/static/cache')
+)
+SASS_OUTPUT_STYLE = 'compressed'
 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
+
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -320,6 +316,20 @@ STATICFILES_FINDERS = (
     'sass_processor.finders.CssFinder',
     'compressor.finders.CompressorFinder',
 )
+
+# django-compressor
+# https://django-compressor.readthedocs.io/en/latest/
+
+# change to false for debug
+COMPRESS_ENABLED = True
+COMPRESS_CSS_FILTERS = (
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter',
+)
+COMPRESS_URL = STATIC_URL
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
+COMPRESS_OUTPUT_DIR = 'cache'
 
 JSONATTRS_SCHEMA_SELECTORS = {
     'spatial.spatialunit': (
@@ -543,7 +553,7 @@ ICON_LOOKUPS = {
 }
 
 MIME_LOOKUPS = {
-     'gpx': 'application/gpx+xml'
+    'gpx': 'application/gpx+xml'
 }
 
 FILE_UPLOAD_HANDLERS = [

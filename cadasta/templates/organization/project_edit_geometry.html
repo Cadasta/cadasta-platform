@@ -1,6 +1,7 @@
 {% extends "organization/project_wrapper.html" %}
 
 {% load staticfiles %}
+{% load compress %}
 {% load i18n %}
 {% load leaflet_tags %}
 
@@ -9,15 +10,29 @@
 
 
 {% block extra_head %}
-{% leaflet_css plugins="draw,forms" %}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}">
 <link rel="stylesheet" href="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+{% endcompress %}
+{% compress css %}
+<link rel="stylesheet" href="{% static 'leaflet/draw/leaflet.draw.css' %}">
+{% endcompress %}
 {% endblock %}
 
 {% block extra_script %}
 {{ block.super }}
-{% leaflet_js plugins="draw,forms" %}
+{% leaflet_js %}
+{% compress js %}
 <script src="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.js' %}"></script>
+<script src="{% static 'js/leaflet.markercluster.js' %}"></script>
+<script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
+{% endcompress %}
+<script src="{% static 'leaflet/draw/leaflet.draw.js' %}"></script>
+<script src="{% static 'leaflet/leaflet.forms.js' %}"></script>
+
 <script>
  $(document).ready(function () {
    $(window).on('map:init', function(e) {
