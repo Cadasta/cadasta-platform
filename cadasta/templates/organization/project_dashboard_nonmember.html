@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load filters %}
+{% load humanize %}
 {% load leaflet_tags %}
 
       <!-- Project Overview for non-project members  -->
@@ -61,8 +62,8 @@
                       <div class="tile-content-wrapper">
                         <i class="glyphicon glyphicon-map-marker"></i>
                         <div class="tile-content">
-                          <span class="num">{{ num_locations }}</span>
-                          {% if total_area %}<span class="area">{{ total_area | format_area:user.measurement | safe }}</span>{% endif %}
+                          <span class="num">{{ num_locations | intcomma }}</span>
+                          {% if project.area > 0 %}<span class="area">{{ project.area | format_area:user.measurement | safe | intcomma }}</span>{% endif %}
                         </div>
                       </div>
                     </div>
@@ -73,7 +74,7 @@
                       <div class="tile-content-wrapper">
                         <i class="glyphicon glyphicon-user"></i>
                         <div class="tile-content">
-                          <span class="num">{{ num_parties }}</span>
+                          <span class="num">{{ num_parties | intcomma }}</span>
                         </div>
                       </div>
                     </div>
@@ -84,7 +85,7 @@
                       <div class="tile-content-wrapper">
                         <i class="glyphicon glyphicon-file"></i>
                         <div class="tile-content">
-                          <span class="num">{{ num_resources }}</span>
+                          <span class="num">{{ num_resources | intcomma }}</span>
                         </div>
                       </div>
                     </div>
