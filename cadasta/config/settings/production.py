@@ -29,7 +29,7 @@ DATABASES = {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'cadasta',
         'USER': 'cadasta',
-        'PASSWORD': 'cadasta',
+        'PASSWORD': os.environ['DB_PASS'],
         'HOST': os.environ['DB_HOST']
     }
 }

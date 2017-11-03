@@ -23,6 +23,7 @@
     marker: "ANSIBLE_{mark}=dummy"
     block: |
       DB_HOST="{{ db_host }}"
+      DB_PASS="{{ db_pass }}"
       API_HOST="{{ api_url }}"
       DOMAIN="{{ main_url }}"
       SECRET_KEY="{{ secret_key }}"

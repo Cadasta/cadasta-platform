@@ -9,7 +9,7 @@
 
 - name: Create database
   postgresql_db: login_host="{{ db_host }}"
-                 login_user="postgres" login_password="postgres"
+                 login_user="postgres" login_password="{{ postgres_pw }}"
                  name="cadasta"
 
 # This test is needed because of a bad interaction between the way
@@ -26,17 +26,17 @@
 
 - name: Create database user
   postgresql_user: login_host="{{ db_host }}"
-                   login_user="postgres" login_password="postgres"
+                   login_user="postgres" login_password="{{ postgres_pw }}"
                    name="cadasta" password="cadasta"
                    state=present role_attr_flags=NOSUPERUSER,CREATEDB
   when: user_test.stdout.find('0') != -1
 
 - name: Provide user with DB permissions
   postgresql_user: login_host="{{ db_host }}"
-                   login_user="postgres" login_password="postgres"
+                   login_user="postgres" login_password="{{ postgres_pw }}"
                    user="cadasta" db="cadasta" priv=ALL
 
 - name: Install PostGIS on DB
   postgresql_ext: login_host="{{ db_host }}"
-                  login_user="postgres" login_password="postgres"
+                  login_user="postgres" login_password="{{ postgres_pw }}"
                   name=postgis db="cadasta"
