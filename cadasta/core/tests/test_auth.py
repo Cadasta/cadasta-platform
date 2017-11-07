@@ -7,11 +7,12 @@ from django.core.exceptions import PermissionDenied, ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.messages.api import get_messages
+from django.contrib.auth.models import AnonymousUser
 from skivvy import ViewTestCase
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
-from ..views.auth import LoginRequiredMixin, PermissionRequiredMixin
+from ..views import auth
 
 
 class LoginRequiredTest(ViewTestCase, TestCase):
@@ -20,7 +21,7 @@ class LoginRequiredTest(ViewTestCase, TestCase):
         View should raise PermissionDenied if user is not logged in and
         raise_exception equals True.
         """
-        class TestView(LoginRequiredMixin, View):
+        class TestView(auth.LoginRequiredMixin, View):
             raise_exception = True
 
         self.view_class = TestView
@@ -33,7 +34,7 @@ class LoginRequiredTest(ViewTestCase, TestCase):
         View should redirect to login page if user is not logged in and
         raise_exception is not defined.
         """
-        class TestView(LoginRequiredMixin, View):
+        class TestView(auth.LoginRequiredMixin, View):
             pass
 
         self.view_class = TestView
@@ -49,7 +50,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         If neither permission_required is defined or get_permission_required is
         implemented ImproperlyConfigured must be raised
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             pass
 
         view = TestView()
@@ -61,17 +62,31 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         If permission_required is defined, its value should be returned when
         calling get_permission_required
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
         view = TestView()
         assert view.get_permission_required() == 'some.perm'
 
+    def test_get_permission_required_defined(self):
+        """
+        If get_permission_required is implemented it has prefenence over
+        permission_required.
+        """
+        class TestView(auth.PermissionRequiredMixin, View):
+            permission_required = 'some.perm'
+
+            def get_permission_required(self):
+                return 'other.perm'
+
+        view = TestView()
+        assert view.get_permission_required() == 'other.perm'
+
     def test_get_perms_not_defined(self):
         """
-        Instances of PermissionRequiredMixin must implement get_perms
+        Instances of auth.PermissionRequiredMixin must implement get_perms
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm', 'other.perm']
 
         view = TestView()
@@ -82,7 +97,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         """
         permission_required can be defined as a string
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -95,7 +110,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         """
         permission_required can be defined as a tuple
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ('some.perm', 'other.perm')
 
             def get_perms(self):
@@ -108,7 +123,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         """
         permission_required can be defined as a list
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm', 'other.perm']
 
             def get_perms(self):
@@ -121,7 +136,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         """
         has_permssions should use return value of get_permission_required
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -137,7 +152,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         """
         has_permssions should use return value of get_permission_required
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -154,7 +169,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         The permission returned from get_perms does not match the one defined
         in permission_required.
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -168,7 +183,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         All permissions defined in permission_required must be present in the
         return value of get_perms.
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm', 'other.perm']
 
             def get_perms(self):
@@ -182,7 +197,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         All permissions defined in permission_required must be present in the
         return value of get_perms.
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm', 'other.perm']
 
             def get_perms(self):
@@ -196,7 +211,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         All permissions defined in permission_required must be present in the
         return value of get_perms.
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm', 'other.perm']
 
             def get_perms(self):
@@ -210,7 +225,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         All permissions defined in permission_required must be present in the
         return value of get_perms.
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm', 'other.perm']
 
             def get_perms(self):
@@ -228,7 +243,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         request = Mock()
         request.user = user
 
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm']
 
             def get_perms(self):
@@ -247,7 +262,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         request = Mock()
         request.user = user
 
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = ['some.perm']
 
             def get_perms(self):
@@ -262,7 +277,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         View should raise PermissionDenied if required permissions are not met
         and raise_exception equals True.
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
             raise_exception = True
 
@@ -283,7 +298,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         referer if the user:
         - was not refered from the login page
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -309,7 +324,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
           (incl. location, party and relationship views)
         - was refered from the login page
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -339,7 +354,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         - tries to access the project dashboard
         - was refered from the login page
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -379,7 +394,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
           dashboard
         - was refered from the login page
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -409,7 +424,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         - tries to access the organization dashboard
         - was refered from the login page
         """
-        class TestView(PermissionRequiredMixin, View):
+        class TestView(auth.PermissionRequiredMixin, View):
             permission_required = 'some.perm'
 
             def get_perms(self):
@@ -439,3 +454,52 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
         assert exp_redirect == response['location']
         messages = [str(m) for m in get_messages(request)]
         assert "You don't have permission for this action." in messages
+
+
+class SuperUserRequiredTest(UserTestCase, ViewTestCase, TestCase):
+    def test_with_superuser(self):
+        """
+        For superusers, test_func should return True; the permission is granted
+        """
+        class TestView(auth.SuperUserRequiredMixin, View):
+            pass
+
+        user = UserFactory.create(is_superuser=True)
+        request = Mock()
+        request.user = user
+
+        view = TestView()
+        view.request = request
+        assert view.test_func() is True
+
+    def test_with_standard_user(self):
+        """
+        For standard users, test_func should return False; the permission is
+        denied
+        """
+        class TestView(auth.SuperUserRequiredMixin, View):
+            pass
+
+        user = UserFactory.create(is_superuser=False)
+        request = Mock()
+        request.user = user
+
+        view = TestView()
+        view.request = request
+        assert view.test_func() is False
+
+    def test_with_anonymous_user(self):
+        """
+        For anonymous users, test_func should return False; the permission is
+        denied
+        """
+        class TestView(auth.SuperUserRequiredMixin, View):
+            pass
+
+        user = AnonymousUser()
+        request = Mock()
+        request.user = user
+
+        view = TestView()
+        view.request = request
+        assert view.test_func() is False

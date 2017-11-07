@@ -365,10 +365,9 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
         return super().test_func()
 
 
-class UserList(LoginPermissionRequiredMixin, generic.ListView):
+class UserList(auth.SuperUserRequiredMixin, generic.ListView):
     model = User
     template_name = 'organization/user_list.html'
-    permission_required = 'user.list'
     permission_denied_message = error_messages.USERS_LIST
 
     def get_queryset(self):
@@ -389,13 +388,9 @@ class UserList(LoginPermissionRequiredMixin, generic.ListView):
         return context
 
 
-class UserActivation(LoginPermissionRequiredMixin, base_generic.View):
-    permission_required = 'user.update'
+class UserActivation(auth.SuperUserRequiredMixin, base_generic.View):
     permission_denied_message = error_messages.USERS_UPDATE
     new_state = None
-
-    def get_perms_objects(self):
-        return [get_object_or_404(User, username=self.kwargs['user'])]
 
     def post(self, request, user):
         userobj = get_object_or_404(User, username=user)
