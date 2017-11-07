@@ -16,3 +16,11 @@
   become_user: root
   template: src=tracker
             dest="{{ application_path }}cadasta/templates/core/tracker.html"
+
+- name: Ensure app_user owns application_path
+  become: yes
+  become_user: root
+  file: dest={{ application_path }}
+        owner={{ app_user }}
+        group={{ app_user }}
+        recurse=yes
