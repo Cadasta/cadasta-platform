@@ -303,10 +303,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-SASS_PROCESSOR_INCLUDE_DIRS = (
-    '/opt/cadasta/node_modules',
-)
-
 MEDIA_ROOT = '/opt/cadasta/media'
 MEDIA_URL = '/media/'
 STATIC_ROOT = '/opt/cadasta/static'
@@ -322,8 +318,9 @@ STATICFILES_FINDERS = (
 # Required for bootstrap-sass
 # https://github.com/jrief/django-sass-processor
 SASS_PRECISION = 8
-SASS_PROCESSOR_ROOT = (
-    os.path.join(STATIC_ROOT, 'cache')
+SASS_PROCESSOR_ROOT = os.path.join(STATIC_ROOT, 'cache')
+SASS_PROCESSOR_INCLUDE_DIRS = (
+    '/opt/cadasta/node_modules',
 )
 SASS_OUTPUT_STYLE = 'compressed'
 

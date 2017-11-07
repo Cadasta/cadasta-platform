@@ -73,6 +73,7 @@ LOGGING = {
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
-SASS_PROCESSOR_ROOT = (
-    os.path.join(STATIC_ROOT, 'cache')
+SASS_PROCESSOR_ROOT = os.path.join(STATIC_ROOT, 'cache')
+SASS_PROCESSOR_INCLUDE_DIRS = (
+    os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
 )
