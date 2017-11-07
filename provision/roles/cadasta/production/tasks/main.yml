@@ -20,7 +20,7 @@
 - name: Ensure app_user owns application_path
   become: yes
   become_user: root
-  file: dest={{ application_path }}
+  file: dest={{ base_path }}
         owner={{ app_user }}
         group={{ app_user }}
         recurse=yes
