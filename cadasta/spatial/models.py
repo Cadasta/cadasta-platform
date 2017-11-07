@@ -35,7 +35,7 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
                                 related_name='spatial_units')
 
     # Spatial unit type: used to manage range of allowed attributes.
-    type = models.CharField(max_length=10)
+    type = models.CharField(max_length=100)
 
     # Spatial unit geometry is optional: some spatial units may only
     # have a textual description of their location.
