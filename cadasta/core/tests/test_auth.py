@@ -45,6 +45,12 @@ class LoginRequiredTest(ViewTestCase, TestCase):
 
 
 class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
+    def assign_user(self, view):
+        user = UserFactory.build()
+        request = Mock()
+        request.user = user
+        view.request = request
+
     def test_permission_required_not_defined(self):
         """
         If neither permission_required is defined or get_permission_required is
@@ -104,6 +110,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', )
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is True
 
     def test_has_permission_with_tuple(self):
@@ -117,6 +124,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'other.perm')
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is True
 
     def test_has_permission_with_list(self):
@@ -130,6 +138,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'other.perm')
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is True
 
     def test_has_no_permission_with_permission_required_method(self):
@@ -146,6 +155,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return 'other.perm'
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is False
 
     def test_has_permission_with_permission_required_method(self):
@@ -162,6 +172,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return 'other.perm'
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is True
 
     def test_has_permission_permission_denied(self):
@@ -176,6 +187,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('other.perm', )
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is False
 
     def test_has_permission_permission_denied_with_list(self):
@@ -190,6 +202,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'another.perm')
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is False
 
     def test_has_permission_permission_denied_only_one_perm(self):
@@ -204,6 +217,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', )
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is False
 
     def test_has_permission_permission_granted_for_list(self):
@@ -218,6 +232,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'other.perm', 'third.perm')
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is True
 
     def test_has_permission_permission_denied_for_list(self):
@@ -232,14 +247,15 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
                 return ('some.perm', 'third.perm')
 
         view = TestView()
+        self.assign_user(view)
         assert view.has_permission() is False
 
-    def test_test_with_superuser(self):
+    def test_has_permission_with_superuser(self):
         """
-        For superuser test_func should always return True even if permission
-        would be denied otherwise.
+        For superusers has_permission should always return True even if
+        permission would be denied otherwise.
         """
-        user = UserFactory.create(is_superuser=True)
+        user = UserFactory.build(is_superuser=True)
         request = Mock()
         request.user = user
 
@@ -251,26 +267,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         view = TestView()
         view.request = request
-        assert view.test_func() is True
-
-    def test_test_with_standarduser(self):
-        """
-        For standard users test_func should always return False if permission
-        is denied.
-        """
-        user = UserFactory.create()
-        request = Mock()
-        request.user = user
-
-        class TestView(auth.PermissionRequiredMixin, View):
-            permission_required = ['some.perm']
-
-            def get_perms(self):
-                return ('other.perm', )
-
-        view = TestView()
-        view.request = request
-        assert view.test_func() is False
+        assert view.has_permission() is True
 
     def test_raise_permission_denied(self):
         """
@@ -286,7 +283,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         self.view_class = TestView
 
-        user = UserFactory.create()
+        user = UserFactory.build()
         referer = '/organizations/abc/projects/123'
 
         with pytest.raises(PermissionDenied):
@@ -306,7 +303,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         self.view_class = TestView
 
-        user = UserFactory.create()
+        user = UserFactory.build()
         referer = '/organizations/abc/projects/123'
 
         response = self.request(user=user,
@@ -332,7 +329,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         self.view_class = TestView
 
-        user = UserFactory.create()
+        user = UserFactory.build()
         referer = '/account/login/'
         url_kwargs = {'organization': 'abc', 'project': '123'}
 
@@ -359,7 +356,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
             def get_perms(self):
                 return ('other.perm', )
-        user = UserFactory.create()
+        user = UserFactory.build()
 
         view = TestView.as_view()
 
@@ -402,7 +399,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         self.view_class = TestView
 
-        user = UserFactory.create()
+        user = UserFactory.build()
         referer = '/account/login/'
         url_kwargs = {'slug': 'abc'}
 
@@ -430,7 +427,7 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
             def get_perms(self):
                 return ('other.perm', )
 
-        user = UserFactory.create()
+        user = UserFactory.build()
         view = TestView.as_view()
 
         request = HttpRequest()
@@ -459,39 +456,40 @@ class PermissionRequiredTest(UserTestCase, ViewTestCase, TestCase):
 class SuperUserRequiredTest(UserTestCase, ViewTestCase, TestCase):
     def test_with_superuser(self):
         """
-        For superusers, test_func should return True; the permission is granted
+        For superusers, has_permission should return True; the permission is
+        granted
         """
         class TestView(auth.SuperUserRequiredMixin, View):
             pass
 
-        user = UserFactory.create(is_superuser=True)
+        user = UserFactory.build(is_superuser=True)
         request = Mock()
         request.user = user
 
         view = TestView()
         view.request = request
-        assert view.test_func() is True
+        assert view.has_permission() is True
 
     def test_with_standard_user(self):
         """
-        For standard users, test_func should return False; the permission is
-        denied
+        For standard users, has_permission should return False; the permission
+        is denied
         """
         class TestView(auth.SuperUserRequiredMixin, View):
             pass
 
-        user = UserFactory.create(is_superuser=False)
+        user = UserFactory.build(is_superuser=False)
         request = Mock()
         request.user = user
 
         view = TestView()
         view.request = request
-        assert view.test_func() is False
+        assert view.has_permission() is False
 
     def test_with_anonymous_user(self):
         """
-        For anonymous users, test_func should return False; the permission is
-        denied
+        For anonymous users, has_permission should return False; the
+        permission is denied
         """
         class TestView(auth.SuperUserRequiredMixin, View):
             pass
@@ -502,4 +500,4 @@ class SuperUserRequiredTest(UserTestCase, ViewTestCase, TestCase):
 
         view = TestView()
         view.request = request
-        assert view.test_func() is False
+        assert view.has_permission() is False
