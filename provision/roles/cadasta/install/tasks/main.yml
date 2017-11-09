@@ -50,6 +50,7 @@
     insertafter: 'Defaults\s+secure_path'
     block: |
       Defaults	env_keep += DB_HOST
+      Defaults	env_keep += DB_PASS
       Defaults	env_keep += API_HOST
       Defaults	env_keep += DOMAIN
       Defaults	env_keep += SECRET_KEY
