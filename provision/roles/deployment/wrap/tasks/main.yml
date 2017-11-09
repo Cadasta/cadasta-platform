@@ -1,0 +1,4 @@
+- name: Remove maintenance page
+  become: yes
+  become_user: root
+  file: path=/var/www/html/maintenance.html state=absent
