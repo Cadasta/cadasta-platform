@@ -1,0 +1,4 @@
+- name: Write maintenance page
+  become: yes
+  become_user: root
+  copy: src=maintenance.html dest=/var/www/html/maintenance.html owner=www-data group=www-data mode=644

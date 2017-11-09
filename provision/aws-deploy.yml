@@ -12,6 +12,7 @@
   vars_files:
     - shared_vars.yml
   roles:
+    - deployment/init
     - system/aws
     - system/common
     - db/common
@@ -20,3 +21,4 @@
     - cadasta/application
     - cadasta/production
     - webserver/production
+    - deployment/wrap
