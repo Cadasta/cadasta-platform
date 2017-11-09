@@ -59,7 +59,7 @@ server {
 
     location /api {
         uwsgi_pass  django;
-        include {{ application_path }};
+        include {{ application_path }}uwsgi_params;
         uwsgi_read_timeout 30;
 
         add_header Cache-Control "private, must-revalidate";
