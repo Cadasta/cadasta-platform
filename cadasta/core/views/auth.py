@@ -129,8 +129,7 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
         everything in the platform); or if all required permissions are met
         by the user's permissions as returned by `get_perms`.
         """
-        user = self.request.user
-        if not user.is_anonymous and user.is_superuser:
+        if self.request.user.is_superuser:
             return True
 
         permissions_required = self.get_permission_required()
