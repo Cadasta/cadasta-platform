@@ -251,16 +251,7 @@ LEAFLET_CONFIG = {
              'maxZoom': 22}
         ),
     ],
-    'RESET_VIEW': False,
-    'PLUGINS': {
-        'draw': {
-            'js': '/static/leaflet/draw/leaflet.draw.js'
-        },
-        'groupedlayercontrol': {
-            'js': '/static/js/leaflet.groupedlayercontrol.min.js',
-            'css': '/static/css/leaflet.groupedlayercontrol.min.css'
-        }
-    }
+    'RESET_VIEW': False
 }
 
 # Invalid names for Cadasta organizations, projects, and usernames

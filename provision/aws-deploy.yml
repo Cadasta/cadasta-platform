@@ -9,6 +9,7 @@
     - shared_vars.yml
   roles:
     - deployment/init
+    - system/aws
     - system/common
     - db/common
     - db/production
