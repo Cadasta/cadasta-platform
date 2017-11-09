@@ -87,6 +87,14 @@
   notify:
     - Restart nginx
 
+- name: Remove default nginx site from sites-enabled
+  become: yes
+  become_user: root
+  file: path="/etc/nginx/sites-enabled/default"
+        state=absent
+  notify:
+    - Restart nginx
+
 - name: Load static data
   become: yes
   become_user: "{{ app_user }}"

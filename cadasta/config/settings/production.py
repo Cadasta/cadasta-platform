@@ -1,4 +1,5 @@
 import os
+import requests
 from .default import *  # NOQA
 
 INSTALLED_APPS += (  # NOQA
@@ -70,6 +71,13 @@ CSRF_COOKIE_SECURE = True
 
 # Adding localhost here for uWSGI debugging!
 ALLOWED_HOSTS = [os.environ['API_HOST'], os.environ['DOMAIN'], 'localhost']
+try:
+    # Append local ip to ALLOWED_HOSTS to allow successful responses from
+    # AWS ELB healthcheck
+    local_ip_url = 'http://169.254.169.254/latest/meta-data/local-ipv4'
+    ALLOWED_HOSTS.append(requests.get(local_ip_url, timeout=0.01).text)
+except requests.exceptions.RequestException:
+    pass
 
 ADMINS = [('Cadasta platform admins', 'platform-admin@cadasta.org'),
           ('Cadasta Platform Errors', os.environ['SLACK_HOOK'])]

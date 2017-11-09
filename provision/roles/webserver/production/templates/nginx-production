@@ -11,76 +11,25 @@ map $sent_http_content_type $expires {
 }
 
 server {
-    listen      80; #force redirect to https for API URLs
-    server_name {{ api_url }};
-    return      301         https://{{ api_url }}$request_uri;
-}
+    listen      80;
+    server_name *.cadasta.org "~^10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$";
 
-server {
-    listen      80; #force redirect to https for platform URLs
-    server_name {{ main_url }};
-    return      301         https://{{ main_url }}$request_uri;
-}
-
-server {
-    listen      443 ssl;
-    server_name {{ api_url }};
-
-    if ($http_host != "{{ api_url }}") {
-        return 403;
+    set $should_redirect 0;
+    # Redirect any HTTP requests to HTTPS
+    if ($http_x_forwarded_proto != 'https') {
+        set $should_redirect 1;
+    }
+    # ... except for ELB Healthchecks, those come in at HTTP being that
+    # they occur behind the load balancer, where everything is HTTP
+    if ($http_user_agent ~* '^ELB-HealthChecker\/.*$') {
+        set $should_redirect 0;
+    }
+    if ($should_redirect) {
+        return 301 https://$host$request_uri;
     }
 
-    ssl_certificate     /etc/ssl/private/domain.crt;
-    ssl_certificate_key /etc/ssl/private/domain.key;
-
-    charset     utf-8;
     proxy_set_header Host $http_host;
     proxy_set_header X-Url-Scheme $scheme;
-
-    client_max_body_size 75M;
-
-    # alias favicon.* to static
-    location ~ ^/favicon.(\w*)$ {
-        alias   {{ application_path }}cadasta/static/img/favicon.png;
-    }
-
-    location /static/ {
-        alias   {{ application_path }}cadasta/static/;
-    }
-
-    location / {
-        if ($request_method = OPTIONS) {
-            add_header 'Access-Control-Allow-Methods' 'GET, PUT, PATCH, POST, DELETE, OPTIONS';
-            add_header 'Access-Control-Allow-Origin' '*' always;
-            add_header 'Access-Control-Allow-Headers' 'Authorization,Access-Control-Allow-Origin,Content-Type';
-            add_header Content-Length 0;
-            add_header Content-Type text/plain;
-            add_header Access-Control-Max-Age 1728000;
-            return 200;
-        }
-
-        uwsgi_pass  django;
-        include     {{ application_path }}uwsgi_params;
-        uwsgi_read_timeout 30;
-        add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
-        add_header 'Access-Control-Allow-Methods' 'GET, PUT, PATCH, POST, DELETE, OPTIONS';
-        add_header 'Access-Control-Allow-Origin' '*' always;
-        add_header 'Access-Control-Allow-Headers' 'Authorization,Access-Control-Allow-Origin,Content-Type';
-        proxy_set_header X-Forwarded-Protocol $scheme;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-}
-
-server {
-    listen      443 ssl;
-    server_name {{ main_url }};
-
-    if ($http_host != "{{ main_url }}") {
-        return 403;
-    }
-
-    ssl_certificate     /etc/ssl/private/domain.crt;
-    ssl_certificate_key /etc/ssl/private/domain.key;
 
     expires $expires;
     etag on;
@@ -101,11 +50,23 @@ server {
 
     # alias favicon.* to static
     location ~ ^/favicon.(\w*)$ {
-        alias   {{ application_path }}cadasta/static/favicon.png;
+        alias   {{ application_path }}cadasta/static/img/favicon.png;
     }
 
     location /static/ {
         alias   {{ application_path }}cadasta/static/;
+    }
+
+    location /api {
+        uwsgi_pass  django;
+        include {{ application_path }}uwsgi_params;
+        uwsgi_read_timeout 30;
+
+        add_header Cache-Control "private, must-revalidate";
+        add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
+
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        add_header 'Access-Control-Allow-Headers' 'Authorization,Access-Control-Allow-Origin,Content-Type';
     }
 
     location / {
@@ -115,6 +76,8 @@ server {
 
         uwsgi_pass  django;
         include {{ application_path }}uwsgi_params;
+
+        add_header Cache-Control "private, must-revalidate";
         add_header 'X-Robots-Tag' 'noindex, nofollow, nosnippet, noarchive, noodp, noimageindex';
     }
 
