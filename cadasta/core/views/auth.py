@@ -125,9 +125,13 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
 
     def has_permission(self):
         """
-        Returns True if all required permissions are met by the user's
-        permissions as returned by `get_perms`.
+        Returns True if the user is a superuser (superuser can do
+        everything in the platform); or if all required permissions are met
+        by the user's permissions as returned by `get_perms`.
         """
+        if self.request.user.is_superuser:
+            return True
+
         permissions_required = self.get_permission_required()
         if not isinstance(permissions_required, (list, tuple)):
             permissions_required = (permissions_required, )
@@ -138,16 +142,11 @@ class PermissionRequiredMixin(auth_mixins.UserPassesTestMixin):
     def test_func(self):
         """
         `test_func` is the entry point for UserPassesTestMixin to validate
-        user's permissions on a view.
-
-        It always returns `True` if the user is a superuser (superuser can do
-        everything in the platform); otherwise it returns the value of
-        `has_permission`.
+        user's permissions on a view. It simply returns the value of
+        `has_permission`. That way we can overwrite `has_permission` instead
+        of `test_func` in implementing views, which allows us to use a more
+        obvious method name.
         """
-        user = self.request.user
-        if not user.is_anonymous and user.is_superuser:
-            return True
-
         return self.has_permission()
 
 
@@ -155,7 +154,7 @@ class SuperUserRequiredMixin(LoginRequiredMixin, PermissionRequiredMixin):
     """
     This mixin should be added to views that grant access to superusers only.
     """
-    def test_func(self):
+    def has_permission(self):
         """
         Returns True if the user is a superuser, the permission is granted.
         """

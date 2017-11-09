@@ -142,11 +142,11 @@ class OrganizationEdit(auth.LoginRequiredMixin,
     def get_success_url(self):
         return reverse('organization:dashboard', kwargs=self.kwargs)
 
-    def test_func(self):
+    def has_permission(self):
         if self.get_object().archived:
             return False
 
-        return super().test_func()
+        return super().has_permission()
 
 
 class OrgArchiveView(auth.LoginRequiredMixin,
@@ -312,11 +312,11 @@ class OrganizationMembersEdit(mixins.OrganizationMixin,
         form.save()
         return super().form_valid(form)
 
-    def test_func(self):
+    def has_permission(self):
         if self.get_organization().archived:
             return False
 
-        return super().test_func()
+        return super().has_permission()
 
 
 class OrganizationMembersRemove(mixins.OrganizationMixin,
@@ -358,11 +358,11 @@ class OrganizationMembersRemove(mixins.OrganizationMixin,
             return redirect('organization:members_edit', **self.kwargs)
         return super().delete(*args, **kwargs)
 
-    def test_func(self):
+    def has_permission(self):
         if self.get_organization().archived:
             return False
 
-        return super().test_func()
+        return super().has_permission()
 
 
 class UserList(auth.SuperUserRequiredMixin, generic.ListView):
