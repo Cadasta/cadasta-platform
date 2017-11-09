@@ -3,23 +3,16 @@
 {% load widget_tweaks %}
 {% load filters %}
 {% load staticfiles %}
-{% load compress %}
 
 {% block page_title %}{% trans "Add relationship" %} | {% endblock %}
 
 {% block extra_head %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'select2/4.0.3/css/select2.min.css' %}">
-<link rel="stylesheet" href="{% static 'jquery-ui/1.12.1/css/jquery-ui.min.css' %}">
 {% endblock %}
 
 {% block location_extra_script %}
   {{ form.media }}
   <script src="{% static 'select2/4.0.3/js/select2.min.js' %}"></script>
-  {% compress js %}
-  <script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
-  {% endcompress %}
-  <script src="{% static 'js/form_submit.js' %}"></script>
   <script>
     $(document).ready(function() {
       var template = function(party) {

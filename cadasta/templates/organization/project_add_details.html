@@ -8,7 +8,6 @@
 
 {% block extra_script %}
 {{ form.media }}
-<script src="{% static 'js/form_submit.js' %}"></script>
 <script>
 $(document).ready(function () {
   var logos = {{ org_logos|safe }};

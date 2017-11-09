@@ -20,6 +20,10 @@
     <link rel="stylesheet" type="text/css"
           href="{% static 'bootstrap-rtl/3.3.4/css/bootstrap-rtl.min.css' %}">
     {% endif %}
+    {% compress css %}
+    <link rel="stylesheet" href="{% static 'select2/4.0.3/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'jquery-ui/1.12.1/css/jquery-ui.min.css' %}">
+    {% endcompress %}
     {% include "core/tracker.html" %}
     {% block extra_head %}{% endblock %}
   </head>
@@ -196,12 +200,20 @@
     </div>
     {% block modals %} {% endblock %}
 
-    <!-- datatable scripts - contains jquery -->
+    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
     {% compress js %}
+    <!-- datatable scripts - contains jquery -->
     <script src="{% static 'datatables/1.10.8/js/datatables.min.js' %}"></script>
     <script src="{% static 'datatables/1.10.8/js/dataTables.conditionalPaging.js' %}"></script>
     <script src="{% static 'datatables/1.10.8/js/dataTables.selectFiltering.js' %}"></script>
     <script src="{% static 'datatables/1.10.8/js/dataTables.forms.js' %}"></script>
+    <!-- jquery ui forms -->
+    <script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/form_submit.js' %}"></script>
+    <!-- client-side validation -->
+    <script src="{% static 'js/parsleyConfig.js' %}"></script>
+    <script src="{% static 'js/parsley.js' %}"></script>
+    <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
     {% endcompress %}
 
     {% block extra_script %}{% endblock %}
@@ -248,13 +260,6 @@
         $(".alert-success").fadeTo(500, 0).slideUp(500, function(){ $(this).hide(); });
       }, 5000);
     </script>
-    <script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
-    <!-- client-side validation -->
-    {% compress js %}
-    <script src="{% static 'js/parsleyConfig.js' %}"></script>
-    <script src="{% static 'js/parsley.js' %}"></script>
-    <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
-    {% endcompress %}
     <script>
       // User tracking
       window.inlineManualTracking = {
