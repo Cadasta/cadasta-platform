@@ -47,7 +47,7 @@ class XFormRendererTest(TestCase):
                 assert q['control']['accuracyThreshold'] == 1.5
                 assert q['default'] == 'some default'
                 assert q['hint'] == 'An informative hint'
-    
+
     def test_transform_questions_appearance(self):
         questions = [{
             'id': "bzs2984c3gxgwcjhvambdt3w",
@@ -63,8 +63,6 @@ class XFormRendererTest(TestCase):
         for q in transformed:
             if q['name'] == 'party_resource_signature':
                 assert q['control']['appearance'] == "signature"
-
-
 
     def test_transform_groups(self):
         groups = [{
