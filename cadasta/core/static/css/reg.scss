@@ -2,7 +2,7 @@
 -------------------------------------------------------------- */
 
 body.tinted-bg { // photo for login and register forms
-  background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("#{$img-path}land.jpg");
+  background: linear-gradient(rgba(44, 74, 165, 0.55), rgba(44, 74, 165, 0.55)), url("/static/img/land.jpg");
   background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;

@@ -57,6 +57,7 @@ functional_tests/screenshots
 # Platform
 /cadasta/geography/data
 /cadasta/core/media/
-/cadasta/core/static/cache/
+/cadasta/core/static/css/main.css.map
+/cadasta/core/static/css/main.css
 
 /cadasta/templates/core/identifier.html
