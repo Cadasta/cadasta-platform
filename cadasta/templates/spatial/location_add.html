@@ -6,41 +6,27 @@
 {% block left-nav %}map{% endblock %}
 
 {% load staticfiles %}
-{% load compress %}
 {% load leaflet_tags %}
 
 {% block page_title %}{% trans "Add location" %} | {% endblock %}
 
 {% block extra_head %}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}">
+{% leaflet_css plugins="draw,forms,groupedlayercontrol" %}
 <link rel="stylesheet" href="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
-{% endcompress %}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'leaflet/draw/leaflet.draw.css' %}">
-{% endcompress %}
-<link rel="stylesheet" href="{% static 'css/leaflet.groupedlayercontrol.min.css' %}">
 <link rel="stylesheet" href="{% static 'jquery-ui/1.12.1/css/jquery-ui.min.css' %}">
 {% endblock %}
 
 {% block extra_script %}
 {{ block.super }}
 {{ form.media }}
-{% leaflet_js %}
-{% compress js %}
+{% leaflet_js plugins="draw,forms,groupedlayercontrol" %}
 <script src="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.js' %}"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
-<script src="{% static 'js/map_utils.js' %}"></script>
-{% endcompress %}
-<script src="{% static 'leaflet/draw/leaflet.draw.js' %}"></script>
-<script src="{% static 'leaflet/leaflet.forms.js' %}"></script>
-<script src="{% static 'js/leaflet.groupedlayercontrol.min.js' %}"></script>
-{% compress js %}
 <script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
-{% endcompress %}
+<script src="{% static 'js/map_utils.js' %}"></script>
 <script src="{% static 'js/form_submit.js' %}"></script>
 <script>
   $(document).ready(function () {

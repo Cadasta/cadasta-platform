@@ -7,28 +7,14 @@
 
 {% load leaflet_tags %}
 {% load staticfiles %}
-{% load compress %}
-
-{% block extra_head %}
-{% compress css %}
-<link rel="stylesheet" href="{% static 'leaflet/leaflet.css' %}">
-<link rel="stylesheet" href="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
-<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
-{% endcompress %}
-<link rel="stylesheet" href="{% static 'css/leaflet.groupedlayercontrol.min.css' %}">
-{% endblock %}
 
 {% block extra_script %}
 {{ block.super }}
-{% leaflet_js %}
-{% compress js %}
+{% leaflet_js plugins="groupedlayercontrol"%}
 <script src="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.js' %}"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
-{% endcompress %}
-<script src="{% static 'js/leaflet.groupedlayercontrol.min.js' %}"></script>
 <script>
   function locations_map_init(map, options) {
     // TODO: It seems Leaflet has a bug with L.geoJson()
@@ -64,6 +50,18 @@
     add_spatial_resources(map, url);
   }
 </script>
+{% endblock %}
+
+{% block extra_head %}
+{% leaflet_css plugins="groupedlayercontrol"%}
+<link rel="stylesheet" href="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
+<link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
+<style type="text/css">
+  #project-map {
+    height: 600px;
+  }
+</style>
 {% endblock %}
 
 {% block content %}

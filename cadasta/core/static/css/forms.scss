@@ -107,7 +107,7 @@ label.required:after { // show asterisk
 .has-success input,
 .has-success select,
 .has-success textarea {
-  background: url('#{$img-path}checkmark.png') calc(100% - 8px) 50% no-repeat;
+  background: url('/static/img/checkmark.png') calc(100% - 8px) 50% no-repeat;
   padding-right: 36px;
 }
 
@@ -115,7 +115,7 @@ label.required:after { // show asterisk
 .has-error select,
 .has-error textarea {
   border: 1px solid $brand-danger;
-  background: #fff url('#{$img-path}cross.png')  calc(100% - 8px) 50% no-repeat;
+  background: #fff url('/static/img/cross.png')  calc(100% - 8px) 50% no-repeat;
   padding-right: 36px;
 }
 
@@ -137,7 +137,7 @@ label.required:after { // show asterisk
 }
 
 .has-error #select2-party-select-container { // select party
-  background: #fff url('#{$img-path}cross.png')  right 50% no-repeat;
+  background: #fff url('/static/img/cross.png')  right 50% no-repeat;
   padding-right: 36px;
 }
 

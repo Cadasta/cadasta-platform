@@ -3,7 +3,6 @@
 {% load widget_tweaks %}
 {% load filters %}
 {% load staticfiles %}
-{% load compress %}
 
 {% block extra_head %}
 {{ block.super }}
@@ -13,10 +12,7 @@
 {% block extra_script %}
 {{ block.super }}
 {{ form.media }}
-{% compress js %}
 <script src="{% static 'jquery-ui/1.12.1/js/jquery-ui.js' %}"></script>
-{% endcompress %}
-<script src="{% static 'js/form_submit.js' %}"></script>
 <script>
   $(document).ready(function () {
     $('.datepicker').datepicker({
