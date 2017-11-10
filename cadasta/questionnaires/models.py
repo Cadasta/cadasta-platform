@@ -107,7 +107,6 @@ class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
     name = models.CharField(max_length=100)
     label_xlat = JSONField(default={})
     relevant = models.TextField(null=True, blank=True)
-    appearance = models.CharField(max_length=100, null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire,
                                       related_name='question_groups')
     question_group = models.ForeignKey('QuestionGroup',

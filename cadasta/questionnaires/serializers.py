@@ -126,7 +126,7 @@ class QuestionGroupSerializer(FindInitialMixin, serializers.ModelSerializer):
     class Meta:
         model = models.QuestionGroup
         fields = ('id', 'name', 'label',  'type', 'questions',
-                  'question_groups', 'label_xlat', 'relevant','appearance', 'index', )
+                  'question_groups', 'label_xlat', 'relevant', 'index', )
         read_only_fields = ('id', 'questions', 'question_groups', )
         write_only_fields = ('label_xlat', )
 
