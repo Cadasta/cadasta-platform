@@ -75,8 +75,8 @@ class QuestionSerializer(FindInitialMixin, serializers.ModelSerializer):
     class Meta:
         model = models.Question
         fields = ('id', 'name', 'label', 'type', 'required', 'constraint',
-                  'default', 'hint', 'relevant','appearance', 'label_xlat', 'index',
-                  'gps_accuracy')
+                  'default', 'hint', 'relevant', 'appearance', 'label_xlat',
+                  'index', 'gps_accuracy')
         read_only_fields = ('id', )
         write_only_fields = ('label_xlat', )
 

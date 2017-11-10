@@ -316,7 +316,6 @@ class QuestionManager(models.Manager):
         if control:
             appearance = control.get('appearance', None)
 
-
         instance.type = type_dict[dict.get('type')]
         instance.name = dict.get('name')
         instance.label_xlat = dict.get('label', {})
