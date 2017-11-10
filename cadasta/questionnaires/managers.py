@@ -299,7 +299,6 @@ class QuestionManager(models.Manager):
         dict = kwargs.pop('dict')
         instance = self.model(**kwargs)
         type_dict = {name: code for code, name in QUESTION_TYPES}
-
         relevant = None
         required = False
         bind = dict.get('bind')
@@ -313,6 +312,10 @@ class QuestionManager(models.Manager):
             gps_accuracy = control.get('accuracyThreshold', None)
             if gps_accuracy and not validate_accuracy(gps_accuracy):
                 raise(InvalidQuestionnaire([INVALID_ACCURACY]))
+        appearance = None
+        if control:
+            appearance = control.get('appearance', None)
+
 
         instance.type = type_dict[dict.get('type')]
         instance.name = dict.get('name')
@@ -323,6 +326,7 @@ class QuestionManager(models.Manager):
         instance.default = dict.get('default', None)
         instance.hint = dict.get('hint', None)
         instance.relevant = relevant
+        instance.appearance = appearance
         instance.index = index
         instance.save()
 

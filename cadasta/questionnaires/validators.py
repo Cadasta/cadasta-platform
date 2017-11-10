@@ -62,6 +62,7 @@ QUESTION_SCHEMA = {
              'required': True,
              'enum': [c[0] for c in QUESTION_TYPES]},
     'required': {'type': 'boolean'},
+    'appearance': {'type': 'string'},
     'constraint': {'type': 'string'},
     'index': {'type': 'integer', 'required': True},
     'gps_accuracy': {'type': 'number',
@@ -136,6 +137,7 @@ def validate_questions(questions):
     errors = []
 
     for question in questions:
+        print(question)
         question_errs = validate_schema(QUESTION_SCHEMA, question)
         option_errs = validate_question_options(question.get('options', []))
 

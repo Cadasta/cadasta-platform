@@ -107,6 +107,7 @@ class QuestionGroup(MultilingualLabelsMixin, RandomIDModel):
     name = models.CharField(max_length=100)
     label_xlat = JSONField(default={})
     relevant = models.TextField(null=True, blank=True)
+    appearance = models.CharField(max_length=100, null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire,
                                       related_name='question_groups')
     question_group = models.ForeignKey('QuestionGroup',
@@ -142,6 +143,7 @@ class Question(MultilingualLabelsMixin, RandomIDModel):
                                      validators=[validate_accuracy])
     hint = models.CharField(max_length=2500, null=True, blank=True)
     relevant = models.TextField(null=True, blank=True)
+    appearance = models.CharField(max_length=100, null=True, blank=True)
     constraint = models.CharField(max_length=50, null=True, blank=True)
     questionnaire = models.ForeignKey(Questionnaire, related_name='questions')
     question_group = models.ForeignKey(QuestionGroup,
