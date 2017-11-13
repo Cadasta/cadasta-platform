@@ -26,12 +26,11 @@ class AccountUser(djoser_views.UserView):
         new_email = serializer.validated_data.get('email', instance.email)
         new_phone = serializer.validated_data.get('phone', instance.phone)
         email_update_message = None
+        phone_update_message = None
         user = serializer.save()
 
         if current_email != new_email:
-            email_set = instance.emailaddress_set.all()
-            if email_set.exists():
-                email_set.delete()
+            instance.emailaddress_set.all().delete()
             if new_email:
                 send_email_confirmation(self.request._request, user)
                 email_update_message = messages.email_change
@@ -44,28 +43,31 @@ class AccountUser(djoser_views.UserView):
                 email_update_message = messages.email_delete
 
         if current_phone != new_phone:
-            phone_set = VerificationDevice.objects.filter(user=instance)
-            if phone_set.exists():
-                phone_set.delete()
+            instance.verificationdevice_set.all().delete()
             if new_phone:
                 device = VerificationDevice.objects.create(
                     user=instance,
                     unverified_phone=new_phone)
                 device.generate_challenge()
+                phone_update_message = utils.send_phone_update_notification
+
                 if current_phone:
                     user.phone = current_phone
                     utils.send_sms(current_phone, messages.phone_change)
-                if user.email:
-                    utils.send_phone_update_notification(user.email)
             else:
                 user.phone_verified = False
                 utils.send_sms(current_phone, messages.phone_delete)
-                if user.email:
-                    utils.send_phone_deleted_notification(user.email)
+                phone_update_message = utils.send_phone_deleted_notification
 
-        if user.phone and email_update_message:
-            utils.send_sms(to=user.phone, body=email_update_message)
         user.save()
+
+        if email_update_message and user.verificationdevice_set.filter(
+                unverified_phone=user.phone, verified=True).exists():
+            utils.send_sms(to=user.phone, body=email_update_message)
+
+        if phone_update_message and user.emailaddress_set.filter(
+                email=user.email, verified=True).exists():
+            phone_update_message(user.email)
 
 
 class AccountRegister(djoser_views.RegistrationView):

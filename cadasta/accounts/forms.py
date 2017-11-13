@@ -200,12 +200,10 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)
         email_update_message = None
+        phone_update_message = None
 
         if self.current_email != user.email:
-            current_email_set = self.instance.emailaddress_set.all()
-            if current_email_set.exists():
-                current_email_set.delete()
-
+            self.instance.emailaddress_set.all().delete()
             if user.email:
                 send_email_confirmation(self.request, user)
                 email_update_message = messages.email_change
@@ -219,29 +217,30 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                 utils.send_email_deleted_notification(self.current_email)
 
         if self.current_phone != user.phone:
-            current_phone_set = VerificationDevice.objects.filter(
-                user=self.instance)
-            if current_phone_set.exists():
-                current_phone_set.delete()
-
+            self.instance.verificationdevice_set.all().delete()
             if user.phone:
                 device = VerificationDevice.objects.create(
                     user=self.instance, unverified_phone=user.phone)
                 device.generate_challenge()
+                phone_update_message = utils.send_phone_update_notification
+
                 if self.current_phone:
                     utils.send_sms(self.current_phone, messages.phone_change)
                     user.phone = self.current_phone
-                if user.email:
-                    utils.send_phone_update_notification(user.email)
             else:
                 user.phone_verified = False
                 utils.send_sms(self.current_phone, messages.phone_delete)
-                if user.email:
-                    utils.send_phone_deleted_notification(user.email)
+                phone_update_message = utils.send_phone_deleted_notification
 
-        if user.phone and email_update_message:
-            utils.send_sms(user.phone, email_update_message)
         user.save()
+
+        if email_update_message and user.verificationdevice_set.filter(
+                unverified_phone=user.phone, verified=True).exists():
+            utils.send_sms(to=user.phone, body=email_update_message)
+
+        if phone_update_message and user.emailaddress_set.filter(
+                email=user.email, verified=True).exists():
+            phone_update_message(user.email)
         return user
 
 

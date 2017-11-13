@@ -351,7 +351,6 @@ class PhoneVerificationSerializer(serializers.Serializer,
             user.phone_verified = True
             user.is_active = True
             user.save()
-            device.delete()
             return token
         elif device.verify_token(token=token, tolerance=5):
             raise serializers.ValidationError(

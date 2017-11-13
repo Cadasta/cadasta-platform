@@ -343,7 +343,6 @@ class ConfirmPhone(FormView):
         user.phone_verified = True
         user.is_active = True
         user.save()
-        device.delete()
         message = _("Successfully verified {phone}")
         message = message.format(phone=user.phone)
         messages.add_message(self.request, messages.SUCCESS, message)

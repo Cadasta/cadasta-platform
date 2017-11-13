@@ -532,7 +532,7 @@ class ConfirmPhoneViewTest(ViewTestCase, UserTestCase, TestCase):
         assert VerificationDevice.objects.filter(
             user=self.user,
             unverified_phone=self.user.phone,
-            label='phone_verify').exists() is False
+            label='phone_verify').exists() is True
 
     def test_successful_new_phone_verification(self):
         device = VerificationDevice.objects.create(
@@ -552,7 +552,7 @@ class ConfirmPhoneViewTest(ViewTestCase, UserTestCase, TestCase):
         assert VerificationDevice.objects.filter(
             user=self.user,
             unverified_phone='+12345678990',
-            label='phone_verify').exists() is False
+            label='phone_verify').exists() is True
 
     def test_phone_verification_without_phone_verify_id(self):
         device = VerificationDevice.objects.create(
