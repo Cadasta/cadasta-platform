@@ -1,5 +1,28 @@
 # Change Log
 
+## [v1.13.1](https://github.com/Cadasta/cadasta-platform/tree/v1.13.1) (2017-11-13)
+
+### Changed
+
+- Updated dependencies (#1844, #1876)
+- Updated translations (#1853)
+- Updated deployment scripts
+  - Use variables for database passwords for deployment (#1870)
+  - Simplified nginx config (#1871)
+  - Adds Ansible roles to enable/disable maintenance mode (#1859)
+
+### Fixes
+
+- Fixes #1121 -- Displays permissions correctly for superusers in orgs (#1852)
+- Fixes #1626 -- Updates links to contact pages with mailto and subject line (#1857)
+- Fixes #1627 -- Updates regex to replace all underscores with blank spaces in file name (#1857)
+- Fixes #1575 -- Increase `max_length` of `SpatialUnit.type` and `TenureRelationship.tenure_type` to 100 (#1851)
+- Fixes #1804 -- Convert `relevant` fields to `TextField` (#1851)
+
+### Removed
+
+- Remove `core.form_mixins.SuperUserCheckMixin` (#1839)
+
 ## [v1.13.0](https://github.com/Cadasta/cadasta-platform/tree/v1.13.0) (2017-10-24)
 
 ### Added
