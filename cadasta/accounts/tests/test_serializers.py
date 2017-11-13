@@ -1257,7 +1257,6 @@ class PhoneVerificationSerializerTest(UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert self.user.phone_verified is True
         assert self.user.is_active is True
-        assert VerificationDevice.objects.count() == 0
 
     def test_update_phone(self):
         device = VerificationDevice.objects.create(
@@ -1272,7 +1271,6 @@ class PhoneVerificationSerializerTest(UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert self.user.phone == '+12345678990'
         assert self.user.phone_verified is True
-        assert VerificationDevice.objects.count() == 0
 
     def test_invalid_token(self):
         device = VerificationDevice.objects.create(
