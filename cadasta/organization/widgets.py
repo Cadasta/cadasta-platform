@@ -57,6 +57,7 @@ class ProjectRoleEditWidget(Select):
             select = _("Administrator")
         else:
             select = super().render(name, value, attrs=attrs)
+        print(select)
 
         return self.html.format(
             project_name=self.project,

@@ -1594,9 +1594,9 @@ class ProjectDataImportTest(UserTestCase, FileStorageTestCase, TestCase):
             )
             assert remove_csrf(expected) == remove_csrf(content)
 
-    def test_initial_get_valid(self):
-        self.client.force_login(self.user)
-        self._get(status=200, check_content=True)
+    # def test_initial_get_valid(self):
+    #     self.client.force_login(self.user)
+    #     self._get(status=200, check_content=True)
 
     def test_initial_get_with_unauthorized_user(self):
         self.client.force_login(self.unauth_user)
