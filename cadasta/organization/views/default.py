@@ -384,25 +384,8 @@ class ProjectList(PermissionRequiredMixin,
     project_create_check_multiple = True
 
     def get(self, request, *args, **kwargs):
-        user = self.request.user
-        if self.is_superuser:
-            projects = Project.objects.select_related('organization')
-        else:
-            projects = []
-            projects.extend(Project.objects.filter(
-                access='public', archived=False).select_related(
-                    'organization'))
-            if hasattr(user, 'organizations'):
-                for org in user.organizations.all():
-                    projects.extend(org.projects.filter(
-                        access='private', archived=False).select_related(
-                            'organization'))
-                    if OrganizationRole.objects.get(organization=org,
-                                                    user=user).admin is True:
-                        projects.extend(org.projects.filter(
-                            archived=True).select_related('organization'))
-        self.object_list = sorted(
-            projects, key=lambda p: p.organization.slug + ':' + p.slug)
+        self.object_list = self.get_queryset().order_by(
+            'organization__slug', 'slug')
         context = self.get_context_data()
         return super().render_to_response(context)
 
