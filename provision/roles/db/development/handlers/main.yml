@@ -1,0 +1,19 @@
+- name: Configure worker table privileges
+  become: yes
+  become_user: postgres
+  postgresql_privs: role="worker"
+                    privs="SELECT,INSERT,UPDATE"
+                    objs="celery_taskmeta"
+                    db="cadasta"
+  listen: migrations called
+
+- name: Configure worker sequence privileges
+  become: yes
+  become_user: postgres
+  postgresql_privs: role="worker"
+                    priv="USAGE"
+                    objs="task_id_sequence"
+                    type="sequence"
+                    db="cadasta"
+  listen:
+    - migrations called

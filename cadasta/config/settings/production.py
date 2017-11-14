@@ -145,3 +145,7 @@ LOGGING = {
         },
     },
 }
+
+# Async Tooling
+CELERY_BROKER_TRANSPORT = 'sqs'
+CELERY_QUEUE_PREFIX = os.environ['QUEUE_PREFIX']

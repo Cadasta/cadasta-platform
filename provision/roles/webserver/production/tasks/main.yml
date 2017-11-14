@@ -146,3 +146,9 @@
   file: path=/etc/uwsgi/cadasta.ini
         src="{{ application_path }}uwsgi.ini"
         state=link
+
+# Added in roles/cadasta/application/tasks
+- name: Start Sync Tasks process
+  become: yes
+  become_user: root
+  service: name=cadasta-sync-tasks state=restarted enabled=yes

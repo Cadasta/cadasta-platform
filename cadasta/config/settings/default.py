@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.gis',
+    'django.contrib.humanize',
     'corsheaders',
 
     'core',
@@ -53,6 +54,7 @@ INSTALLED_APPS = (
     'party',
     'xforms',
     'search',
+    'tasks',
 
     'django_filters',
     'crispy_forms',
@@ -96,6 +98,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_tmp_scoped_token.TokenAuth',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -570,3 +573,7 @@ ES_SCHEME = 'http'
 ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
+
+# Async Tooling
+CELERY_BROKER_TRANSPORT = 'sqs' if os.environ.get('SQS') else 'memory'
+CELERY_QUEUE_PREFIX = os.environ.get('QUEUE_PREFIX', 'dev')

@@ -1,7 +1,9 @@
 import json
 import os
+from unittest.mock import patch
 
 import pytest
+import pybreaker
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import FileStorageTestCase, UserTestCase
@@ -1388,14 +1390,12 @@ class ProjectUnarchiveTest(ViewTestCase, UserTestCase, TestCase):
 @pytest.mark.usefixtures('clear_temp')
 class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
     view_class = default.ProjectDataDownload
-    post_data = {'type': 'xls', 'include_resources': False}
+    post_data = {'type': 'xls'}
     template = 'organization/project_download.html'
 
     def setup_models(self):
         ensure_dirs()
         self.project = ProjectFactory.create()
-        geometry = 'SRID=4326;POINT (30 10)'
-        SpatialUnitFactory.create(project=self.project, geometry=geometry)
         self.user = UserFactory.create()
 
     def setup_url_kwargs(self):
@@ -1407,8 +1407,7 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
     def setup_template_context(self):
         return {'project': self.project,
                 'object': self.project,
-                'form': forms.DownloadForm(project=self.project,
-                                           user=self.user),
+                'form': forms.DownloadForm(),
                 'is_allowed_import': True}
 
     def test_get_with_authorized_user(self):
@@ -1429,26 +1428,65 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/login/' in response.location
 
-    def test_post_with_authorized_user(self):
+    @patch('organization.views.default.schedule_project_export')
+    def test_post_with_authorized_user(self, schedule_export):
         assign_policies(self.user)
         response = self.request(user=self.user, method='POST')
-        assert response.status_code == 200
-        assert (response.headers['content-disposition'][1] ==
-                'attachment; filename={}.xlsx'.format(self.project.slug))
-        assert (response.headers['content-type'][1] ==
-                'application/vnd.openxmlformats-officedocument.'
-                'spreadsheetml.sheet')
+        assert response.status_code == 302
+        assert response.location == reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug
+            }
+        )
+        assert ('Scheduled export of project records in XLS format.'
+                in response.messages)
+        schedule_export.assert_called_once_with(
+            self.project, self.user, self.post_data['type'])
 
-    def test_post_with_unauthorized_user(self):
+    @patch('organization.views.default.schedule_project_export')
+    def test_post_with_open_circuit(self, schedule_export):
+        schedule_export.side_effect = pybreaker.CircuitBreakerError
+        assign_policies(self.user)
+        response = self.request(user=self.user, method='POST')
+        assert response.status_code == 302
+        assert response.location == reverse(
+            'organization:project-dashboard',
+            kwargs={
+                'organization': self.project.organization.slug,
+                'project': self.project.slug
+            }
+        )
+        assert ("The export service is temporarily offline. "
+                "Please try again later." in response.messages)
+        schedule_export.assert_called_once_with(
+            self.project, self.user, self.post_data['type'])
+
+    @patch('organization.views.default.schedule_project_export')
+    def test_post_with_authorized_user_bad_data(self, schedule_export):
+        assign_policies(self.user)
+        response = self.request(
+            user=self.user, method='POST', post_data={'type': 'mp3'})
+        assert response.status_code == 200
+        msg = "Select a valid choice. mp3 is not one of the available choices."
+        assert msg in response.content
+        assert schedule_export.called is False
+
+    @patch('organization.views.default.schedule_project_export')
+    def test_post_with_unauthorized_user(self, schedule_export):
         response = self.request(user=self.user, method='POST')
         assert response.status_code == 302
         assert ("You don't have permission to export data from this project"
                 in response.messages)
+        assert schedule_export.called is False
 
-    def test_post_with_unauthenticated_user(self):
+    @patch('organization.views.default.schedule_project_export')
+    def test_post_with_unauthenticated_user(self, schedule_export):
         response = self.request(method='POST')
         assert response.status_code == 302
         assert '/account/login/' in response.location
+        assert schedule_export.called is False
 
 
 @pytest.mark.usefixtures('make_dirs')
