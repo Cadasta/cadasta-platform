@@ -1,3 +1,4 @@
+py==1.4.34  # rq.filter: <1.5
 Django==1.10.8  # rq.filter: <1.11.0
 djangorestframework==3.6.4
 psycopg2==2.7.3.1
