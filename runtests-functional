@@ -19,8 +19,8 @@ else
   until curl http://0:8000 -f; do sleep .1; done  # Wait for the Django server to start up
   cd ..
 
-  # Run the test suite in the Travis VM for PRs
-  if [[ $TRAVIS_EVENT_TYPE == pull_request && $TRAVIS_BRANCH == master ]]
+  # Run the test suite in the Travis VM for PRs to master
+  if [[ $TRAVIS_EVENT_TYPE == pull_request ]]
   then
     export CADASTA_TEST_WEBDRIVER=Firefox
     ./runtests.py --functional
@@ -28,7 +28,7 @@ else
   fi
 
   # Run the test suite via BrowserStack (as much as possible) for commits to master
-  if [[ $TRAVIS_EVENT_TYPE == push && $TRAVIS_BRANCH == master ]]
+  if [[ $TRAVIS_EVENT_TYPE == push ]]
   then
     # BrowserStack cannot handle local file uploads
     export CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome
