@@ -1,4 +1,3 @@
-import random
 import logging
 
 from django.conf import settings
@@ -22,7 +21,7 @@ class TwilioGateway(object):
             # create and send a message with client
             message = self.client.messages.create(
                 to=to,
-                from_=random.choice(self.from_phone_number_list),
+                from_=settings.TWILIO_PHONE,
                 body=body)
 
         except TwilioException as e:
