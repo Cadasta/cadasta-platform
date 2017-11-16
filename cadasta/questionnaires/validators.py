@@ -137,7 +137,6 @@ def validate_questions(questions):
     errors = []
 
     for question in questions:
-        print(question)
         question_errs = validate_schema(QUESTION_SCHEMA, question)
         option_errs = validate_question_options(question.get('options', []))
 
