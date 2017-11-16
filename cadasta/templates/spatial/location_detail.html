@@ -1,7 +1,8 @@
 {% extends "spatial/location_wrapper.html" %}
 {% load i18n %}
-{% load widget_tweaks %}
 {% load filters %}
+{% load humanize %}
+{% load widget_tweaks %}
 
 {% block page_title %}{% trans "Location detail" %} | {% endblock %}
 
@@ -13,8 +14,8 @@
       <h2 class="short">
         <span class="entity">{% trans "Location" %} </span>
         {{ location.name }}
-        {% if location.area %}
-          <span class="area">{{ location.area | format_area:user.measurement | safe }} </span>
+        {% if location.area > 0 %}
+          <span class="area">{{ location.area | format_area:user.measurement | safe | intcomma }} </span>
         {% endif %}
       </h2>
       <div class="top-btn pull-right">

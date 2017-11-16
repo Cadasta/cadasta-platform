@@ -429,6 +429,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
     def test_get_with_overview_stats(self):
         SpatialUnitFactory.create(project=self.project, geometry='SRID=4326;POLYGON \
              ((30 10, 20 20, 20 20, 10 20, 30 10))')
+        self.project.refresh_from_db()
         PartyFactory.create(project=self.project)
         ResourceFactory.create(project=self.project)
         ResourceFactory.create(project=self.project, archived=True)
