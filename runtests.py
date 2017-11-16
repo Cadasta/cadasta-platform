@@ -62,17 +62,12 @@ def flake8_main(args):
 
 def functional_main(args):
     print('Running functional tests')
-    django_settings_module = None
-    if 'DJANGO_SETTINGS_MODULE' in os.environ:
-        django_settings_module = os.environ['DJANGO_SETTINGS_MODULE']
-        del os.environ['DJANGO_SETTINGS_MODULE']
+    sys.path.append('/vagrant/cadasta')
     devnull = subprocess.DEVNULL
     xvfb = subprocess.Popen(["Xvfb", ":1"], stdout=devnull, stderr=devnull)
     os.environ['DISPLAY'] = ':1'
     ret = pytest.main(args)
     xvfb.terminate()
-    if django_settings_module:
-        os.environ['DJANGO_SETTINGS_MODULE'] = django_settings_module
     print('Functional tests failed' if ret else 'Functional tests passed')
     return ret
 
