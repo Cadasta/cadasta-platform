@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('questionnaires', '0021_add_audit_fields'),
+        ('questionnaires', '0022_convert_relevant_to_text'),
     ]
 
     operations = [
