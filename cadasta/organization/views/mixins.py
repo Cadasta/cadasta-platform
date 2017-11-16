@@ -159,25 +159,24 @@ class ProjectRoles(ProjectMixin):
 
 class ProjectQuerySetMixin:
     def get_queryset(self):
-        if self.request.user.is_superuser:
+        user = self.request.user
+        if user.is_superuser:
             projects = Project.objects.select_related('organization')
         else:
-            public_unarchived_projects = Q(
-                access='public', archived=False)
-            private_unarchived_projects = Q(
-                organization__organizationrole__user=self.request.user,
-                access='private', archived=False)
-            admin_archived_projects = Q(
-                organization__organizationrole__user=self.request.user,
-                organization__organizationrole__admin=True,
-                archived=True
-            )
-            projects = Project.objects.filter(
-                public_unarchived_projects |
-                private_unarchived_projects |
-                admin_archived_projects
-            ).distinct()
-        return projects.select_related('organization')
+            # public unarchived projects
+            query = Q(access='public', archived=False)
+            if not user.is_anonymous:
+                # private unarchived projects
+                query |= Q(
+                    organization__organizationrole__user=user,
+                    access='private', archived=False)
+                # admin archived projects
+                query |= Q(
+                    organization__organizationrole__user=user,
+                    organization__organizationrole__admin=True, archived=True)
+            projects = Project.objects.filter(query).distinct()
+        return projects.select_related('organization').order_by(
+            'organization__slug', 'slug')
 
 
 class ProjectAdminCheckMixin(SuperUserCheckMixin):

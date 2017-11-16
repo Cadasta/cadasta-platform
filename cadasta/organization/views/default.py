@@ -364,30 +364,13 @@ class UserActivation(LoginPermissionRequiredMixin, base_generic.View):
         return redirect('user:list')
 
 
-class ProjectList(PermissionRequiredMixin,
-                  mixins.ProjectQuerySetMixin,
+class ProjectList(mixins.ProjectQuerySetMixin,
                   mixins.ProjectCreateCheckMixin,
                   generic.ListView):
 
-    def permission_filter(self, view, p):
-        if p.archived is True:
-            return ('project.view_archived',)
-        elif p.access == 'private':
-            return ('project.view_private',)
-        else:
-            return ('project.view',)
-
     model = Project
     template_name = 'organization/project_list.html'
-    permission_required = 'project.list'
-    permission_filter_queryset = permission_filter
     project_create_check_multiple = True
-
-    def get(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset().order_by(
-            'organization__slug', 'slug')
-        context = self.get_context_data()
-        return super().render_to_response(context)
 
 
 class ProjectDashboard(PermissionRequiredMixin,
