@@ -504,30 +504,6 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         names = [proj['name'] for proj in response.content['results']]
         assert names == sorted(names, reverse=True)
 
-    def test_permission_filter(self):
-        addtional_clause = [{
-            'effect': 'allow',
-            'object': ['project/*/*'],
-            'action': ['party.create']
-        }, {
-            'effect': 'deny',
-            'object': ['project/*/unauthorized'],
-            'action': ['party.create']
-        }]
-
-        ProjectFactory.create_from_kwargs([
-            {'slug': 'unauthorized', 'organization': self.organization},
-            {'organization': self.organization}
-        ])
-
-        assign_policies(self.user, add_clauses=addtional_clause)
-
-        response = self.request(user=self.user,
-                                get_data={'permissions': 'party.create'})
-        assert response.status_code == 200
-        assert len(response.content['results']) == 1
-        assert response.content['results'][0]['slug'] != 'unauthorized'
-
     # CONDITIONS:
     #
     # 1. All public projects should be visible to all users.

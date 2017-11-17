@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework import generics, filters, status
@@ -182,17 +183,8 @@ class OrganizationProjectList(PermissionsFilterMixin,
         )
 
 
-class ProjectList(PermissionsFilterMixin,
-                  APIPermissionRequiredMixin,
-                  mixins.ProjectQuerySetMixin,
+class ProjectList(mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
-    def permission_filter(self, view, p):
-        if p.archived is True:
-            return ('project.view_archived',)
-        elif p.access == 'private':
-            return ('project.view_private',)
-        else:
-            return ('project.view',)
 
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -201,8 +193,7 @@ class ProjectList(PermissionsFilterMixin,
     filter_fields = ('archived',)
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
-    permission_required = {'GET': 'project.list'}
-    permission_filter_queryset = permission_filter
+    permission_classes = (AllowAny,)
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
