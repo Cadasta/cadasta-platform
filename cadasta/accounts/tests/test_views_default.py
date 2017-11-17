@@ -594,6 +594,9 @@ class ResendTokenViewTest(ViewTestCase, UserTestCase, TestCase):
         assert '/account/accountverification/' in response.location
         assert len(mail.outbox) == 1
         assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+        assert len(response.messages) == 1
+        assert ('Confirmation email sent to sherlock.holmes@bbc.uk.'
+                not in response.messages)
 
     def test_updated_email_send_link(self):
         EmailAddress.objects.create(user=self.user, email='john.watson@bbc.uk')
