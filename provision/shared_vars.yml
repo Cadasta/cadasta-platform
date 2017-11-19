@@ -2,3 +2,7 @@ postgresql_version: "9.4"
 aws_postgresql_version: "9.4.5"
 postgis_version: "2.1"
 postgis_package_version: "2.1.*.pgdg14.04+1"
+base_path: /opt/cadasta/
+application_path: "{{ base_path }}cadasta-platform/"
+virtualenv_path: "{{ base_path }}env/"
+uwsgi_socket: "{{ application_path }}uwsgi.sock"

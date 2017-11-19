@@ -1,4 +1,6 @@
+from .default import BASE_DIR
 from .default import *  # NOQA
+import os
 
 DEBUG = True
 
@@ -68,3 +70,6 @@ LOGGING = {
         }
     },
 }
+
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')

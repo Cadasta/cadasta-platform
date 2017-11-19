@@ -304,15 +304,12 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 SASS_PROCESSOR_INCLUDE_DIRS = (
-    os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
+    '/opt/cadasta/node_modules',
 )
-# Required for bootstrap-sass
-# https://github.com/jrief/django-sass-processor
-SASS_PRECISION = 8
 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
+MEDIA_ROOT = '/opt/cadasta/media'
 MEDIA_URL = '/media/'
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
+STATIC_ROOT = '/opt/cadasta/static'
 STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = (
@@ -321,6 +318,28 @@ STATICFILES_FINDERS = (
     'sass_processor.finders.CssFinder',
     'compressor.finders.CompressorFinder',
 )
+
+# Required for bootstrap-sass
+# https://github.com/jrief/django-sass-processor
+SASS_PRECISION = 8
+SASS_PROCESSOR_ROOT = (
+    os.path.join(STATIC_ROOT, 'cache')
+)
+SASS_OUTPUT_STYLE = 'compressed'
+
+# django-compressor
+# https://django-compressor.readthedocs.io/en/latest/
+
+# change to false for debug
+COMPRESS_ENABLED = True
+COMPRESS_CSS_FILTERS = (
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.CSSMinFilter',
+)
+COMPRESS_URL = STATIC_URL
+COMPRESS_ROOT = STATIC_ROOT
+COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
+COMPRESS_OUTPUT_DIR = 'cache'
 
 JSONATTRS_SCHEMA_SELECTORS = {
     'spatial.spatialunit': (
@@ -544,7 +563,7 @@ ICON_LOOKUPS = {
 }
 
 MIME_LOOKUPS = {
-     'gpx': 'application/gpx+xml'
+    'gpx': 'application/gpx+xml'
 }
 
 FILE_UPLOAD_HANDLERS = [

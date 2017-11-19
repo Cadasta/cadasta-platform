@@ -20,7 +20,7 @@
 - name: Add path to ChromeDriver
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export PATH=/usr/lib/chromium-browser:$PATH"
 
 - name: Download Firefox 46 install bundle
@@ -38,7 +38,7 @@
 - name: Add path to Firefox 46
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export PATH=/opt/firefox:$PATH"
 
 - name: Install Python Selenium driver
@@ -57,11 +57,11 @@
 - name: Set up HTTP proxy
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export http_proxy=http://localhost:3128/"
 
 - name: Set up HTTPS proxy
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export https_proxy=https://localhost:3128/"
