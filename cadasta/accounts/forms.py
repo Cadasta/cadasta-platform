@@ -140,16 +140,12 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.current_email = self.instance.email
+        if self.current_email:
+            self.fields['email'].required = True
+
         self.current_phone = self.instance.phone
-
-    def clean(self):
-        super(ProfileForm, self).clean()
-        email = self.data.get('email')
-        phone = self.data.get('phone')
-
-        if not phone and not email:
-            raise forms.ValidationError(
-                _("You cannot leave both phone and email empty."))
+        if self.current_phone:
+            self.fields['phone'].required = True
 
     def clean_username(self):
         username = self.data.get('username')
@@ -183,12 +179,6 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         else:
             phone = None
 
-            if (self.current_phone and
-                    not self.current_email and self.data.get('email')):
-                raise forms.ValidationError(
-                    _('It is not possible to change from phone to email for '
-                      'your account identifier.'))
-
         return phone
 
     def clean_email(self):
@@ -201,12 +191,6 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                     _("User with this Email address already exists."))
         else:
             email = None
-
-            if (self.current_email and
-                    not self.current_phone and self.data.get('phone')):
-                raise forms.ValidationError(
-                    _('It is not possible to change from email to phone for '
-                      'your account identifier.'))
 
         return email
 

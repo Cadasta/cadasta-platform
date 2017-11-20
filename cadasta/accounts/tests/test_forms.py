@@ -1,5 +1,6 @@
 import random
 import pytest
+from unittest.mock import Mock
 
 from core.tests.utils.cases import UserTestCase, FileStorageTestCase
 from core.messages import SANITIZE_ERROR
@@ -434,6 +435,24 @@ class RegisterFormTest(UserTestCase, TestCase):
 
 @pytest.mark.usefixtures('make_dirs')
 class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
+
+    def test_init_with_email(self):
+        user = UserFactory.build(email='john@beatles.uk',
+                                 email_verified=True,
+                                 phone=None,
+                                 phone_verified=True)
+        form = forms.ProfileForm({}, request=Mock(), instance=user)
+        assert form.fields['email'].required is True
+        assert form.fields['phone'].required is False
+
+    def test_init_with_phone(self):
+        user = UserFactory.build(email=None,
+                                 email_verified=True,
+                                 phone='+4915712111111111',
+                                 phone_verified=True)
+        form = forms.ProfileForm({}, request=Mock(), instance=user)
+        assert form.fields['phone'].required is True
+        assert form.fields['email'].required is False
 
     def test_update_user(self):
         test_file_path = '/accounts/tests/files/avatar.png'
@@ -871,6 +890,54 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         }
         form = forms.ProfileForm(data=data, instance=user)
         assert form.is_valid() is False
+
+    def test_update_add_phone_and_remove_email(self):
+        user = UserFactory.create(username='sherlock',
+                                  email='sherlock.holmes@bbc.uk',
+                                  phone=None,
+                                  email_verified=True,
+                                  password='221B@bakerstreet',
+                                  full_name='Sherlock Holmes')
+
+        EmailAddress.objects.create(user=user, email=user.email)
+
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        form = forms.ProfileForm(data=data, instance=user)
+        assert form.is_valid() is False
+        assert ('This field is required.' in form.errors['email'])
+
+    def test_update_add_email_and_remove_phone(self):
+        user = UserFactory.create(username='sherlock',
+                                  email=None,
+                                  phone='+919327768250',
+                                  phone_verified=True,
+                                  password='221B@bakerstreet',
+                                  full_name='Sherlock Holmes')
+
+        VerificationDevice.objects.create(user=user,
+                                          unverified_phone=user.phone)
+
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock.holmes@bbc.uk',
+            'phone': '',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+        assert ('This field is required.' in form.errors['phone'])
 
     def test_update_with_existing_email_in_EmailAddress(self):
         user = UserFactory.create()
