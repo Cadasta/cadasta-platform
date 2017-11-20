@@ -182,6 +182,13 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 
         else:
             phone = None
+
+            if (self.current_phone and
+                    not self.current_email and self.data.get('email')):
+                raise forms.ValidationError(
+                    _('It is not possible to change from phone to email for '
+                      'your account identifier.'))
+
         return phone
 
     def clean_email(self):
@@ -194,6 +201,12 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
                     _("User with this Email address already exists."))
         else:
             email = None
+
+            if (self.current_email and
+                    not self.current_phone and self.data.get('phone')):
+                raise forms.ValidationError(
+                    _('It is not possible to change from email to phone for '
+                      'your account identifier.'))
 
         return email
 

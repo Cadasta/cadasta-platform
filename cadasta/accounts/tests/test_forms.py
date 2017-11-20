@@ -1007,18 +1007,9 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
             'full_name': 'Sherlock Holmes'
         }
         form = forms.ProfileForm(data=data, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert user.phone == '+919327768250'
-        assert user.phone_verified is False
-        assert user.email is None
-        assert user.email_verified is False
-        assert EmailAddress.objects.count() == 0
-        assert VerificationDevice.objects.count() == 1
-        assert len(mail.outbox) == 1
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+        assert form.is_valid() is False
+        assert ('It is not possible to change from email to phone for '
+                'your account identifier.' in form.errors['email'])
 
     def test_update_add_email_and_remove_phone(self):
         user = UserFactory.create(username='sherlock',
@@ -1040,27 +1031,11 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes'
         }
-        request = HttpRequest()
-        setattr(request, 'session', 'session')
-        self.messages = FallbackStorage(request)
-        setattr(request, '_messages', self.messages)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
 
-        form = forms.ProfileForm(data, request=request, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert user.phone is None
-        assert user.phone_verified is False
-        assert user.email == 'sherlock.holmes@bbc.uk'
-        assert user.email_verified is False
-        assert EmailAddress.objects.count() == 1
-        assert VerificationDevice.objects.count() == 0
-        assert len(mail.outbox) == 2
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+        assert ('It is not possible to change from phone to email for '
+                'your account identifier.' in form.errors['phone'])
 
     def test_update_phone_and_remove_email(self):
         user = UserFactory.create(username='sherlock',
