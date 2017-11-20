@@ -25,7 +25,6 @@ class AccountUser(djoser_views.UserView):
         current_email, current_phone = instance.email, instance.phone
         new_email = serializer.validated_data.get('email', instance.email)
         new_phone = serializer.validated_data.get('phone', instance.phone)
-        email_update_message = None
         user = serializer.save()
 
         if current_email != new_email:
@@ -34,7 +33,6 @@ class AccountUser(djoser_views.UserView):
                 email_set.delete()
             if new_email:
                 send_email_confirmation(self.request._request, user)
-                email_update_message = messages.email_change
                 if current_email:
                     user.email = current_email
                     utils.send_email_update_notification(current_email)
@@ -51,16 +49,7 @@ class AccountUser(djoser_views.UserView):
                 if current_phone:
                     user.phone = current_phone
                     utils.send_sms(current_phone, messages.phone_change)
-                if user.email:
-                    utils.send_phone_update_notification(user.email)
-            else:
-                user.phone_verified = False
-                utils.send_sms(current_phone, messages.phone_delete)
-                if user.email:
-                    utils.send_phone_deleted_notification(user.email)
 
-        if user.phone and email_update_message:
-            utils.send_sms(to=user.phone, body=email_update_message)
         user.save()
 
 

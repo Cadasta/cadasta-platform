@@ -446,12 +446,11 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                   password='sgt-pepper',
                                   language='en',
                                   measurement='metric',
-                                  phone='+919327768250',
+                                  phone=None,
                                   phone_verified=True)
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
-            'phone': '+12345678990',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
             'language': 'en',
@@ -475,12 +474,10 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user.language == 'en'
         assert user.measurement == 'imperial'
         assert user.email_verified is True
-        assert user.phone == '+919327768250'
         assert user.phone_verified is True
-        assert len(mail.outbox) == 3
+        assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to
-        assert 'john@beatles.uk' in mail.outbox[2].to
 
     def test_display_name(self):
         user = UserFactory.create(username='imagine71',
@@ -568,12 +565,11 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         UserFactory.create(email='existing@example.com')
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
-                                  phone='+919327768250',
+                                  phone=None,
                                   password='sgt-pepper')
         data = {
             'username': 'imagine71',
             'email': 'existing@example.com',
-            'phone': '+919327768250',
             'full_name': 'John Lennon',
             'password': 'sgt-pepper',
             'language': 'en'
@@ -599,7 +595,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_signup_with_released_email(self):
         user = UserFactory.create(username='user1',
                                   email='user1@example.com',
-                                  phone='+919327768250',
+                                  phone=None,
                                   email_verified=True,
                                   password='sgt-pepper',
                                   measurement='metric')
@@ -611,7 +607,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
             'email': 'user1_email_change@example.com',
             'language': 'en',
             'measurement': 'metric',
-            'phone': '+919327768250',
             'password': 'sgt-pepper'
         }
 
@@ -633,12 +628,11 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_update_email_with_incorrect_password(self):
         user = UserFactory.create(email='john@beatles.uk',
-                                  phone='+919327768250',
+                                  phone=None,
                                   password='imagine71')
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'full_name': 'John Lennon',
@@ -652,12 +646,11 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_sanitize(self):
         user = UserFactory.create(email='john@beatles.uk',
-                                  phone='+919327768250',
+                                  phone=None,
                                   password='imagine71')
         data = {
             'username': '😛😛😛😛',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'password': 'Iloveyoko68!',
             'full_name': 'John Lennon'
         }
@@ -666,9 +659,9 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert form.is_valid() is False
         assert SANITIZE_ERROR in form.errors.get('username')
 
-    def test_update_phone_only(self):
+    def test_update_phone(self):
         user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
+                                  email=None,
                                   phone='+919327768250',
                                   email_verified=True,
                                   phone_verified=True,
@@ -678,7 +671,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                           unverified_phone=user.phone)
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+12345678990',
             'language': 'en',
             'measurement': 'metric',
@@ -694,13 +686,11 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user.phone_verified is True
         assert VerificationDevice.objects.filter(
             unverified_phone='+919327768250').exists() is False
-        assert len(mail.outbox) == 1
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
 
-    def test_update_email_only(self):
+    def test_update_email(self):
         user = UserFactory.create(username='sherlock',
                                   email='sherlock.holmes@bbc.uk',
-                                  phone='+919327768250',
+                                  phone=None,
                                   email_verified=True,
                                   phone_verified=True,
                                   password='221B@bakerstreet',
@@ -710,7 +700,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': 'john.watson@bbc.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': '221B@bakerstreet',
@@ -740,7 +729,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_update_with_duplicate_phone(self):
         UserFactory.create(phone='+12345678990')
         user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
+                                  email=None,
                                   email_verified=True,
                                   phone_verified=True,
                                   phone='+919327768250',
@@ -749,7 +738,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+12345678990',
             'language': 'en',
             'measurement': 'metric',
@@ -761,70 +749,9 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert (_("User with this Phone number already exists.")
                 in form.errors.get('phone'))
 
-    def test_update_add_phone(self):
-        user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
-                                  phone=None,
-                                  email_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-
-        data = {
-            'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-        form = forms.ProfileForm(data=data, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert user.phone == '+919327768250'
-        assert user.phone_verified is False
-        assert VerificationDevice.objects.count() == 1
-        assert len(mail.outbox) == 1
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
-
-    def test_update_add_email(self):
-        user = UserFactory.create(username='sherlock',
-                                  phone='+919327768250',
-                                  email=None,
-                                  phone_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-
-        data = {
-            'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-        request = HttpRequest()
-        setattr(request, 'session', 'session')
-        self.messages = FallbackStorage(request)
-        setattr(request, '_messages', self.messages)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
-
-        form = forms.ProfileForm(data, request=request, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert user.email == 'sherlock.holmes@bbc.uk'
-        assert user.email_verified is False
-        assert len(mail.outbox) == 1
-
     def test_udpate_with_invalid_phone(self):
         user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
+                                  email=None,
                                   phone='+919327768250',
                                   email_verified=True,
                                   phone_verified=True,
@@ -832,7 +759,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                   full_name='Sherlock Holmes')
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': 'Test Number',
             'password': '221B@bakerstreet',
             'language': 'en',
@@ -845,7 +771,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '9327768250',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes'
@@ -905,31 +830,9 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert (_("Please enter a valid country code.")
                 in form.errors.get('phone'))
 
-    def test_update_remove_both_phone_and_email(self):
-        user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
-                                  phone='+919327768250',
-                                  email_verified=True,
-                                  phone_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-        data = {
-            'username': 'sherlock',
-            'email': '',
-            'phone': '',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-        form = forms.ProfileForm(data=data, instance=user)
-        assert form.is_valid() is False
-        assert (_("You cannot leave both phone and email empty.")
-                in form.errors.get('__all__'))
-
     def test_update_remove_phone(self):
         user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
+                                  email=None,
                                   phone='+919327768250',
                                   email_verified=True,
                                   phone_verified=True,
@@ -939,7 +842,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                           unverified_phone=user.phone)
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '',
             'language': 'en',
             'measurement': 'metric',
@@ -947,20 +849,12 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
             'full_name': 'Sherlock Holmes'
         }
         form = forms.ProfileForm(data=data, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert not user.phone
-        assert user.phone_verified is False
-        assert VerificationDevice.objects.count() == 0
-        assert len(mail.outbox) == 1
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
+        assert form.is_valid() is False
 
     def test_update_remove_email(self):
         user = UserFactory.create(username='sherlock',
                                   email='sherlock.holmes@bbc.uk',
-                                  phone='+919327768250',
+                                  phone=None,
                                   email_verified=True,
                                   phone_verified=True,
                                   password='221B@bakerstreet',
@@ -970,37 +864,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': '',
-            'phone': '+919327768250',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-        form = forms.ProfileForm(data=data, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert not user.email
-        assert user.email_verified is False
-        assert EmailAddress.objects.count() == 0
-        assert len(mail.outbox) == 1
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
-
-    def test_update_add_phone_and_remove_email(self):
-        user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
-                                  phone=None,
-                                  email_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-
-        EmailAddress.objects.create(user=user, email=user.email)
-
-        data = {
-            'username': 'sherlock',
-            'email': '',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': '221B@bakerstreet',
@@ -1008,125 +871,13 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         }
         form = forms.ProfileForm(data=data, instance=user)
         assert form.is_valid() is False
-        assert ('It is not possible to change from email to phone for '
-                'your account identifier.' in form.errors['email'])
-
-    def test_update_add_email_and_remove_phone(self):
-        user = UserFactory.create(username='sherlock',
-                                  email=None,
-                                  phone='+919327768250',
-                                  phone_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-
-        VerificationDevice.objects.create(user=user,
-                                          unverified_phone=user.phone)
-
-        data = {
-            'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
-            'phone': '',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-
-        form = forms.ProfileForm(data, instance=user)
-        assert form.is_valid() is False
-        assert ('It is not possible to change from phone to email for '
-                'your account identifier.' in form.errors['phone'])
-
-    def test_update_phone_and_remove_email(self):
-        user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
-                                  phone='+12345678990',
-                                  phone_verified=True,
-                                  email_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-
-        EmailAddress.objects.create(user=user, email=user.email)
-        VerificationDevice.objects.create(user=user,
-                                          unverified_phone=user.phone)
-
-        data = {
-            'username': 'sherlock',
-            'email': '',
-            'phone': '+919327768250',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-        form = forms.ProfileForm(data=data, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert user.phone == '+12345678990'
-        assert user.phone_verified is True
-        assert user.email is None
-        assert user.email_verified is False
-        assert EmailAddress.objects.count() == 0
-        assert VerificationDevice.objects.filter(
-            unverified_phone='+12345678990').exists() is False
-        assert len(mail.outbox) == 1
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
-        # send sms to user's phone '+12345678990' about email removal
-        # send sms to user's phone '+12345678990' about phone change
-
-    def test_update_email_and_remove_phone(self):
-        user = UserFactory.create(username='sherlock',
-                                  email='john.watson@bbc.uk',
-                                  phone='+919327768250',
-                                  phone_verified=True,
-                                  email_verified=True,
-                                  password='221B@bakerstreet',
-                                  full_name='Sherlock Holmes')
-        EmailAddress.objects.create(user=user, email=user.email)
-        VerificationDevice.objects.create(user=user,
-                                          unverified_phone=user.phone)
-
-        data = {
-            'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
-            'phone': '',
-            'language': 'en',
-            'measurement': 'metric',
-            'password': '221B@bakerstreet',
-            'full_name': 'Sherlock Holmes'
-        }
-        request = HttpRequest()
-        setattr(request, 'session', 'session')
-        self.messages = FallbackStorage(request)
-        setattr(request, '_messages', self.messages)
-        request.META['SERVER_NAME'] = 'testserver'
-        request.META['SERVER_PORT'] = '80'
-
-        form = forms.ProfileForm(data, request=request, instance=user)
-        assert form.is_valid() is True
-        form.save()
-
-        user.refresh_from_db()
-        assert user.phone is None
-        assert user.phone_verified is False
-        assert user.email == 'john.watson@bbc.uk'
-        assert user.email_verified is True
-        assert EmailAddress.objects.filter(
-            email='john.watson@bbc.uk').exists() is False
-        assert VerificationDevice.objects.count() == 0
-        assert len(mail.outbox) == 3
-        assert 'sherlock.holmes@bbc.uk' in mail.outbox[0].to
-        assert 'john.watson@bbc.uk' in mail.outbox[1].to
-        assert 'john.watson@bbc.uk' in mail.outbox[2].to
 
     def test_update_with_existing_email_in_EmailAddress(self):
         user = UserFactory.create()
         EmailAddress.objects.create(email='sherlock.holmes@bbc.uk', user=user)
         user1 = UserFactory.create(username='sherlock',
                                    email='john.watson@bbc.uk',
-                                   phone='+919327768250',
+                                   phone=None,
                                    phone_verified=True,
                                    email_verified=True,
                                    password='221B@bakerstreet',
@@ -1134,7 +885,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': '221B@bakerstreet',
@@ -1150,7 +900,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         VerificationDevice.objects.create(unverified_phone='+919327768250',
                                           user=user)
         user1 = UserFactory.create(username='sherlock',
-                                   email='john.watson@bbc.uk',
+                                   email=None,
                                    phone='+12345678990',
                                    phone_verified=True,
                                    email_verified=True,
@@ -1159,7 +909,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
