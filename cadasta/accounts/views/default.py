@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import translation
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.api import get_messages
 from django.views.generic import FormView
 from django.shortcuts import redirect
 from django.utils.html import format_html
@@ -385,6 +386,12 @@ class ResendTokenView(FormView):
                 self.request.session['phone_verify_id'] = email_device.user.id
             except EmailAddress.DoesNotExist:
                 pass
+
+            # This is a gross hack, removing all messages previously added to
+            # the message queue so we don't reveal whether the email address
+            # existed in the system or not. (See issue #1869)
+            get_messages(self.request)._queued_messages = []
+
             message = _(
                 "Your email address has been submitted."
                 " If it matches your account on Cadasta Platform, you will"
