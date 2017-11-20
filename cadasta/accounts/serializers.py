@@ -78,6 +78,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
                     _("User with this Email address already exists."))
         else:
             email = None
+
         return email
 
     def validate_phone(self, phone):
@@ -93,6 +94,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
                     _("Please enter a valid country code."))
         else:
             phone = None
+
         return phone
 
     def validate_username(self, username):
@@ -221,6 +223,12 @@ class UserSerializer(SanitizeFieldSerializer,
                     _("User with this Email address already exists."))
         else:
             email = None
+
+            if (instance and instance.email and
+                    not instance.phone and self.initial_data.get('phone')):
+                raise serializers.ValidationError(
+                    _('It is not possible to change from email to phone for '
+                      'your account identifier.'))
         return email
 
     def validate_phone(self, phone):
@@ -246,6 +254,12 @@ class UserSerializer(SanitizeFieldSerializer,
                     _("Please enter a valid country code."))
         else:
             phone = None
+
+            if (instance and instance.phone and
+                    not instance.email and self.initial_data.get('email')):
+                raise serializers.ValidationError(
+                    _('It is not possible to change from phone to email for '
+                      'your account identifier.'))
         return phone
 
     def validate_username(self, username):

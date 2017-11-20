@@ -1034,6 +1034,36 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert (_("User with this Email address already exists.")
                 in serializer.errors['email'])
 
+    def test_update_replace_phone_with_email(self):
+        user = UserFactory.create(phone='+919327768250', email=None)
+        data = {'email': 'email@example.com', 'phone': None}
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+
+        serializer = serializers.UserSerializer(
+            user,
+            data=data,
+            partial=True,
+            context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert ('It is not possible to change from phone to email for '
+                'your account identifier.' in serializer.errors['phone'])
+
+    def test_update_replace_email_with_phone(self):
+        user = UserFactory.create(phone=None, email='email@example.com')
+        data = {'email': None, 'phone': '+919327768250'}
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+
+        serializer = serializers.UserSerializer(
+            user,
+            data=data,
+            partial=True,
+            context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert ('It is not possible to change from email to phone for '
+                'your account identifier.' in serializer.errors['email'])
+
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
 

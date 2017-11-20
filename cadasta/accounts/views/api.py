@@ -38,10 +38,6 @@ class AccountUser(djoser_views.UserView):
                 if current_email:
                     user.email = current_email
                     utils.send_email_update_notification(current_email)
-            else:
-                user.email_verified = False
-                utils.send_email_deleted_notification(current_email)
-                email_update_message = messages.email_delete
 
         if current_phone != new_phone:
             phone_set = VerificationDevice.objects.filter(user=instance)
