@@ -52,9 +52,15 @@ env:
 matrix:
   fast_finish: true
   include:
-    - env: TOX_ENV=py35-flake8
-    - env: TOX_ENV=py35-django-migration
-    - env: TOX_ENV=py35-django-unit
+    -
+      if: type = push
+      env: TOX_ENV=py35-flake8
+    -
+      if: type = push
+      env: TOX_ENV=py35-django-migration
+    -
+      if: type = push
+      env: TOX_ENV=py35-django-unit
     - # Functional tests locally for PRs
       if: type = pull_request AND branch = master
       env: TOX_ENV=py35-functional
