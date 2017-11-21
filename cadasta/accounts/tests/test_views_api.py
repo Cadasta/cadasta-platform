@@ -20,9 +20,9 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
     def setup_models(self):
         self.user = UserFactory.create(username='imagine71',
                                        email='john@beatles.uk',
-                                       phone='+12345678990',
                                        email_verified=True,
-                                       phone_verified=True)
+                                       phone=None,
+                                       phone_verified=False)
 
     def test_update_profile(self):
         data = {'email': 'boss@beatles.uk',
@@ -37,7 +37,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
 
         self.user.refresh_from_db()
         assert self.user.email_verified is True
-        assert self.user.phone_verified is True
+        assert self.user.phone_verified is False
         assert self.user.email == 'john@beatles.uk'
 
     def test_update_email_address(self):
@@ -98,6 +98,10 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         assert self.user.email_verified is True
 
     def test_update_phone_number(self):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.save()
+
         VerificationDevice.objects.create(
             user=self.user, unverified_phone=self.user.phone)
         data = {'phone': '+919327768250', 'username': 'imagine71'}
@@ -110,9 +114,14 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
 
         self.user.refresh_from_db()
         assert self.user.phone == '+12345678990'
-        assert self.user.phone_verified is True
+        assert self.user.phone_verified is False
 
     def test_keep_phone_number(self):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
         data = {'phone': self.user.phone, 'username': 'imagine71'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
@@ -124,6 +133,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
             user=self.user, unverified_phone=self.user.phone).exists() is False
 
     def test_update_with_existing_phone(self):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
         VerificationDevice.objects.create(
             user=self.user, unverified_phone=self.user.phone)
 

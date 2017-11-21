@@ -16,19 +16,6 @@ unverified_identifier = _(
     "You have not verified your phone or email. We request you to verify"
     " your registered phone or email in order to access your account.")
 
-# send an sms to the user's phone(if any) notifying the removal of email
-email_delete = _(
-    "You are receiving this message because a user at Cadasta Platform removed"
-    " the email address from the account linked to this phone number."
-    " If it wasn't you, please contact us immediately at security@cadasta.org")
-
-# send an sms to the user's phone(if any) notifying the change in email
-email_change = _(
-    "You are receiving this message because a user at Cadasta Platform updated"
-    " the email address for the account linked to this phone"
-    " number."
-    " If it wasn't you, please contact us immediately at security@cadasta.org")
-
 # send an sms to the user's old phone(if any) notifying the removal of phone
 phone_delete = _(
     "You are receiving this message because a user at Cadasta Platform removed"

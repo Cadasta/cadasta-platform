@@ -440,14 +440,14 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         user = UserFactory.build(email='john@beatles.uk',
                                  email_verified=True,
                                  phone=None,
-                                 phone_verified=True)
+                                 phone_verified=False)
         form = forms.ProfileForm({}, request=Mock(), instance=user)
         assert form.fields['email'].required is True
         assert form.fields['phone'].required is False
 
     def test_init_with_phone(self):
         user = UserFactory.build(email=None,
-                                 email_verified=True,
+                                 email_verified=False,
                                  phone='+4915712111111111',
                                  phone_verified=True)
         form = forms.ProfileForm({}, request=Mock(), instance=user)
@@ -466,7 +466,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                   language='en',
                                   measurement='metric',
                                   phone=None,
-                                  phone_verified=True)
+                                  phone_verified=False)
         data = {
             'username': 'imagine71',
             'email': 'john2@beatles.uk',
@@ -493,7 +493,6 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user.language == 'en'
         assert user.measurement == 'imperial'
         assert user.email_verified is True
-        assert user.phone_verified is True
         assert len(mail.outbox) == 2
         assert 'john2@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to
@@ -682,7 +681,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         user = UserFactory.create(username='sherlock',
                                   email=None,
                                   phone='+919327768250',
-                                  email_verified=True,
+                                  email_verified=False,
                                   phone_verified=True,
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
@@ -711,7 +710,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                   email='sherlock.holmes@bbc.uk',
                                   phone=None,
                                   email_verified=True,
-                                  phone_verified=True,
+                                  phone_verified=False,
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
         EmailAddress.objects.create(user=user, email=user.email, verified=True)
@@ -749,7 +748,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         UserFactory.create(phone='+12345678990')
         user = UserFactory.create(username='sherlock',
                                   email=None,
-                                  email_verified=True,
+                                  email_verified=False,
                                   phone_verified=True,
                                   phone='+919327768250',
                                   password='221B@bakerstreet',
@@ -772,7 +771,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         user = UserFactory.create(username='sherlock',
                                   email=None,
                                   phone='+919327768250',
-                                  email_verified=True,
+                                  email_verified=False,
                                   phone_verified=True,
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
@@ -853,7 +852,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         user = UserFactory.create(username='sherlock',
                                   email=None,
                                   phone='+919327768250',
-                                  email_verified=True,
+                                  email_verified=False,
                                   phone_verified=True,
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
@@ -875,7 +874,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                   email='sherlock.holmes@bbc.uk',
                                   phone=None,
                                   email_verified=True,
-                                  phone_verified=True,
+                                  phone_verified=False,
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
         EmailAddress.objects.create(user=user,
@@ -945,7 +944,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         user1 = UserFactory.create(username='sherlock',
                                    email='john.watson@bbc.uk',
                                    phone=None,
-                                   phone_verified=True,
+                                   phone_verified=False,
                                    email_verified=True,
                                    password='221B@bakerstreet',
                                    full_name='Sherlock Holmes')
@@ -970,7 +969,7 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
                                    email=None,
                                    phone='+12345678990',
                                    phone_verified=True,
-                                   email_verified=True,
+                                   email_verified=False,
                                    password='221B@bakerstreet',
                                    full_name='Sherlock Holmes')
 
