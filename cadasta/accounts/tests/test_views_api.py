@@ -98,11 +98,15 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         assert self.user.email_verified is True
 
     def test_update_phone_number(self):
+        VerificationDevice.objects.create(
+            user=self.user, unverified_phone=self.user.phone)
         data = {'phone': '+919327768250', 'username': 'imagine71'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 200
         assert VerificationDevice.objects.filter(
             unverified_phone='+919327768250').exists() is True
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+12345678990').exists() is False
 
         self.user.refresh_from_db()
         assert self.user.phone == '+12345678990'
