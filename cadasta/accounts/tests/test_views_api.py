@@ -140,7 +140,6 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'password': 'iloveyoko79!',
             'full_name': 'John Lennon',
         }

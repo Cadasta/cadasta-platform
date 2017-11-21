@@ -63,6 +63,12 @@ class RegistrationSerializer(SanitizeFieldSerializer,
 
         email = self.initial_data.get('email')
         phone = self.initial_data.get('phone')
+
+        if phone and email:
+            raise serializers.ValidationError(
+                _("You can either use your phone number or email to sign up "
+                  "but not both."))
+
         if (not phone) and (not email):
             raise serializers.ValidationError(
                 _("You cannot leave both phone and email empty."
