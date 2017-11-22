@@ -133,11 +133,12 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 @receiver(models.signals.post_save, sender=User)
 def assign_default_policy(sender, instance, **kwargs):
     perm_set = instance.permissionset.first()
-    if perm_set.policyinstance_set.filter(policy__name='default').exists():
+    if not perm_set:
         return
-    instance.assign_policies(
-        Policy.objects.get(name='default'),
-        *instance.assigned_policies())
+    if not perm_set.policyinstance_set.filter(policy__name='default').exists():
+        instance.assign_policies(
+            Policy.objects.get(name='default'),
+            *instance.assigned_policies())
 
 
 @receiver(password_changed)
