@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from twilio.rest import Client, TwilioException
+from twilio.rest import Client
 
 fake_logger = logging.getLogger(name='accounts.FakeGateway')
 
@@ -13,17 +13,10 @@ class TwilioGateway(object):
                              settings.TWILIO_AUTH_TOKEN)
 
     def send_sms(self, to, body):
-        try:
-            # create and send a message with client
-            message = self.client.messages.create(
-                to=to,
-                from_=settings.TWILIO_PHONE,
-                body=body)
-
-        except TwilioException as e:
-            message = e
-
-        return message
+        self.client.messages.create(
+            to=to,
+            from_=settings.TWILIO_PHONE,
+            body=body)
 
 
 class FakeGateway(object):

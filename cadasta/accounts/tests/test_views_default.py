@@ -1,9 +1,12 @@
+import pytest
 import datetime
+from unittest import mock
 from django.core.urlresolvers import reverse_lazy
 from django.utils import translation
 from django.test import TestCase
 from django.core import mail
 from skivvy import ViewTestCase
+from twilio.base.exceptions import TwilioRestException
 
 from accounts.tests.factories import UserFactory
 from core.tests.utils.cases import UserTestCase
@@ -81,6 +84,51 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
 
         # Reset language for following tests
         translation.activate('en')
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_sign_up_with_invalid_phone_number(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        data = {
+            'username': 'sherlock',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes',
+            'language': 'en'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert User.objects.count() == 0
+        assert VerificationDevice.objects.count() == 0
+        assert len(mail.outbox) == 0
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_twilio_error(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {
+            'username': 'sherlock',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes',
+            'language': 'en'
+        }
+        with pytest.raises(TwilioRestException):
+            self.request(method='POST', post_data=data)
+            assert User.objects.count() == 0
+            assert VerificationDevice.objects.count() == 0
+            assert len(mail.outbox) == 0
 
 
 class ProfileTest(ViewTestCase, UserTestCase, TestCase):

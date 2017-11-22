@@ -1,6 +1,7 @@
 from collections import defaultdict
 from itertools import groupby
 import operator as op
+from twilio.base.exceptions import TwilioRestException
 
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -11,6 +12,7 @@ from django.contrib.messages.api import get_messages
 from django.views.generic import FormView
 from django.shortcuts import redirect
 from django.utils.html import format_html
+from django.db import transaction
 
 from core.views.generic import UpdateView, ListView, CreateView
 from core.views.mixins import SuperUserCheckMixin
@@ -24,7 +26,7 @@ from allauth.account import signals
 from ..models import User, VerificationDevice
 from .. import forms
 from organization.models import Project
-from ..messages import account_inactive, unverified_identifier
+from ..messages import account_inactive, unverified_identifier, TWILIO_ERRORS
 
 
 class AccountRegister(CreateView):
@@ -34,31 +36,45 @@ class AccountRegister(CreateView):
     success_url = reverse_lazy('account:verify_phone')
 
     def form_valid(self, form):
-        user = form.save(self.request)
+        try:
+            with transaction.atomic():
+                user = form.save(self.request)
 
-        user_lang = form.cleaned_data['language']
-        if user_lang != translation.get_language():
-            translation.activate(user_lang)
-            self.request.session[translation.LANGUAGE_SESSION_KEY] = user_lang
+                user_lang = form.cleaned_data['language']
+                if user_lang != translation.get_language():
+                    translation.activate(user_lang)
+                    self.request.session[
+                        translation.LANGUAGE_SESSION_KEY] = user_lang
 
-        if user.email:
-            send_email_confirmation(self.request, user)
+                if user.phone:
+                    device = VerificationDevice.objects.create(
+                        user=user, unverified_phone=user.phone)
+                    device.generate_challenge()
 
-        if user.phone:
-            device = VerificationDevice.objects.create(
-                user=user, unverified_phone=user.phone)
-            device.generate_challenge()
-            message = _("Verification token sent to {phone}")
-            message = message.format(phone=user.phone)
-            messages.add_message(self.request, messages.INFO, message)
+                    message = _("Verification token sent to {phone}")
+                    message = message.format(phone=user.phone)
+                    messages.add_message(self.request, messages.INFO, message)
 
-        self.request.session['phone_verify_id'] = user.id
+                if user.email:
+                    send_email_confirmation(self.request, user)
 
-        message = _("We have created your account. You should have"
-                    " received an email or a text to verify your account.")
-        messages.add_message(self.request, messages.SUCCESS, message)
+                self.request.session['phone_verify_id'] = user.id
 
-        return super().form_valid(form)
+                message = _("We have created your account. You should have "
+                            "received an email or a text to verify your "
+                            "account.")
+                messages.add_message(self.request, messages.SUCCESS, message)
+
+                return super().form_valid(form)
+
+        except TwilioRestException as e:
+            msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
 
 class PasswordChangeView(LoginRequiredMixin,
