@@ -236,6 +236,52 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         assert User.objects.count() == 1
         assert VerificationDevice.objects.count() == 1
 
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_signup_invalid_phone(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 400
+        assert 'phone' in response.content.keys()
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+        assert User.objects.count() == 0
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_signup_twilio_error(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        with pytest.raises(TwilioRestException):
+            self.request(method='POST', post_data=data)
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+        assert User.objects.count() == 0
+
     def test_user_signs_up_with_email_only(self):
         data = {
             'username': 'sherlock',

@@ -29,8 +29,7 @@ class AccountUser(djoser_views.UserView):
         except TwilioRestException as e:
             msg = messages.TWILIO_ERRORS.get(e.code)
             if msg:
-                return Response(status=400,
-                                data={'phone': msg})
+                return Response(status=400, data={'phone': msg})
             else:
                 raise
 
@@ -67,6 +66,17 @@ class AccountUser(djoser_views.UserView):
 
 class AccountRegister(djoser_views.RegistrationView):
     serializer_class = serializers.RegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            with transaction.atomic():
+                return super().create(request, *args, **kwargs)
+        except TwilioRestException as e:
+            msg = messages.TWILIO_ERRORS.get(e.code)
+            if msg:
+                return Response(status=400, data={'phone': msg})
+            else:
+                raise
 
     def perform_create(self, serializer):
         user = serializer.save()
