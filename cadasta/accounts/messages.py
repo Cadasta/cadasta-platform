@@ -39,5 +39,6 @@ password_change_or_reset = _(
 
 
 TWILIO_ERRORS = {
-    21211: _("Unable to send verification SMS. Please provide a valid phone number.")
+    21211: _("Unable to send verification SMS. Please provide a valid phone "
+             "number.")
 }
