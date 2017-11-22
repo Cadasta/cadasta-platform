@@ -38,7 +38,7 @@ from resources.models import Resource
 from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
-from questionnaires.managers import create_attrs_schema
+from questionnaires.managers import create_attrs_schema, get_attr_type_ids
 from questionnaires.tests import attr_schemas
 from questionnaires.tests import factories as q_factories
 from ..parser import parse_query
@@ -88,24 +88,28 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
         self.questionnaire = q_factories.QuestionnaireFactory.create(
             project=self.project)
 
+        ATTR_TYPE_IDS = get_attr_type_ids()
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.individual_party_xform_group,
+            question_group_dict=attr_schemas.individual_party_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS
         )
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.default_party_xform_group,
+            question_group_dict=attr_schemas.default_party_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS
         )
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.tenure_relationship_xform_group,
+            question_group_dict=attr_schemas.tenure_relationship_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS
         )
 
         self.su = SpatialUnitFactory.create(project=self.project, type='CB')
