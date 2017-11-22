@@ -216,19 +216,20 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         assert (_("Passwords cannot contain your email.") in
                 serializer._errors['password'])
 
-    # def test_password_contains_blank_email(self):
-    #     data = {
-    #         'username': 'imagine71',
-    #         'email': '',
-    #         'language': 'en',
-    #         'measurement': 'metric',
-    #         'password': 'johnisjustheBest!!',
-    #         'password_repeat': 'johnisjustheBest!!',
-    #         'full_name': 'John Lennon',
-    #     }
-    #     serializer = serializers.RegistrationSerializer(data=data)
-    #     assert serializer.is_valid()
-    #     assert ('password' not in serializer._errors)
+    def test_password_contains_blank_email(self):
+        data = {
+            'username': 'imagine71',
+            'email': '',
+            'phone': '+4911111111',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': 'johnisjustheBest!!',
+            'password_repeat': 'johnisjustheBest!!',
+            'full_name': 'John Lennon',
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert serializer.is_valid()
+        assert ('password' not in serializer._errors)
 
     def test_password_contains_less_than_min_characters(self):
         data = {
@@ -279,19 +280,20 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         assert (_("Passwords cannot contain your phone.")
                 in serializer._errors['password'])
 
-    # def test_password_contains_blank_phone(self):
-    #     data = {
-    #         'username': 'sherlock',
-    #         'phone': '',
-    #         'language': 'en',
-    #         'measurement': 'metric',
-    #         'password': '221B@bakerstreet',
-    #         'password_repeat': '221B@bakerstreet',
-    #         'full_name': 'Sherlock Holmes'
-    #     }
-    #     serializer = serializers.RegistrationSerializer(data=data)
-    #     assert serializer.is_valid() is True
-    #     assert ('password' not in serializer._errors)
+    def test_password_contains_blank_phone(self):
+        data = {
+            'username': 'sherlock',
+            'email': 'sherlock@example.com',
+            'phone': '',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': '221B@bakerstreet',
+            'password_repeat': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert serializer.is_valid() is True
+        assert ('password' not in serializer._errors)
 
     def test_signup_with_phone_only(self):
         data = {
