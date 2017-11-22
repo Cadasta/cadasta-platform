@@ -1,3 +1,5 @@
+import pytest
+from twilio.base.exceptions import TwilioRestException
 from django.core import mail
 from django.test import TestCase
 from django.conf import settings
@@ -115,6 +117,48 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         self.user.refresh_from_db()
         assert self.user.phone == '+12345678990'
         assert self.user.phone_verified is False
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_update_invalid_phone(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        data = {'phone': '+15555555555', 'username': 'imagine71'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 400
+        assert 'phone' in response.content.keys()
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+
+        self.user.refresh_from_db()
+        assert self.user.username != '+imagine71'
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_update_twilio_error(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {'phone': '+15555555555', 'username': 'imagine71'}
+        with pytest.raises(TwilioRestException):
+            self.request(method='PUT', post_data=data, user=self.user)
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+
+        self.user.refresh_from_db()
+        assert self.user.username != '+imagine71'
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
 
     def test_keep_phone_number(self):
         self.user.email = None

@@ -1,3 +1,5 @@
+from django.db import transaction
+from twilio.base.exceptions import TwilioRestException
 from allauth.account.utils import send_email_confirmation
 
 from rest_framework.serializers import ValidationError
@@ -19,6 +21,18 @@ from accounts import exceptions
 
 class AccountUser(djoser_views.UserView):
     serializer_class = serializers.UserSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            with transaction.atomic():
+                return super().update(request, *args, **kwargs)
+        except TwilioRestException as e:
+            msg = messages.TWILIO_ERRORS.get(e.code)
+            if msg:
+                return Response(status=400,
+                                data={'phone': msg})
+            else:
+                raise
 
     def perform_update(self, serializer):
         instance = self.get_object()
