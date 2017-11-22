@@ -187,18 +187,29 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
         return form_kwargs
 
     def form_valid(self, form):
-        phone = form.data.get('phone')
-        messages.add_message(self.request, messages.SUCCESS,
-                             _("Successfully updated profile information"))
+        try:
+            with transaction.atomic():
+                phone = form.data.get('phone')
+                messages.add_message(
+                    self.request, messages.SUCCESS,
+                    _("Successfully updated profile information"))
 
-        if (phone != self.instance_phone and phone):
-            message = _("Verification Token sent to {phone}")
-            message = message.format(phone=phone)
-            messages.add_message(self.request, messages.INFO, message)
-            self.request.session['phone_verify_id'] = self.object.id
-            self.success_url = reverse_lazy('account:verify_phone')
+                if (phone != self.instance_phone and phone):
+                    message = _("Verification Token sent to {phone}")
+                    message = message.format(phone=phone)
+                    messages.add_message(self.request, messages.INFO, message)
+                    self.request.session['phone_verify_id'] = self.object.id
+                    self.success_url = reverse_lazy('account:verify_phone')
 
-        return super().form_valid(form)
+                return super().form_valid(form)
+        except TwilioRestException as e:
+            msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.ERROR,

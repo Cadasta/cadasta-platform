@@ -269,6 +269,57 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/accountverification/' in response.location
 
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_update_profile_with_invalid_phone(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        user = UserFactory.create(password='221B@bakerstreet')
+        post_data = {
+            'username': 'new_name',
+            'email': user.email,
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'full_name': 'Sherlock Holmes',
+            'password': '221B@bakerstreet'
+        }
+        response = self.request(method='POST', post_data=post_data, user=user)
+        assert response.status_code == 200
+        assert VerificationDevice.objects.count() == 0
+        user.refresh_from_db()
+        assert user.username != 'new_name'
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_twilio_error(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        user = UserFactory.create(password='221B@bakerstreet')
+        post_data = {
+            'username': 'new_name',
+            'email': user.email,
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'full_name': 'Sherlock Holmes',
+            'password': '221B@bakerstreet'
+        }
+        with pytest.raises(TwilioRestException):
+            self.request(method='POST', post_data=post_data, user=user)
+        assert VerificationDevice.objects.count() == 0
+        user.refresh_from_db()
+        assert user.username != 'new_name'
+
     def test_update_keep_phone(self):
         user = UserFactory.create(
             password='221B@bakerstreet')
