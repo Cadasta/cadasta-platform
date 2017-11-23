@@ -220,7 +220,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': '',
-            'phone': '+4911111111',
             'language': 'en',
             'measurement': 'metric',
             'password': 'johnisjustheBest!!',
@@ -228,7 +227,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is False
         assert ('password' not in serializer._errors)
 
     def test_password_contains_less_than_min_characters(self):
@@ -283,7 +282,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
     def test_password_contains_blank_phone(self):
         data = {
             'username': 'sherlock',
-            'email': 'sherlock@example.com',
             'phone': '',
             'language': 'en',
             'measurement': 'metric',
@@ -292,7 +290,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'Sherlock Holmes'
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert serializer.is_valid() is True
+        assert serializer.is_valid() is False
         assert ('password' not in serializer._errors)
 
     def test_signup_with_phone_only(self):
