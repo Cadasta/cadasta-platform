@@ -110,7 +110,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         assert len(mail.outbox) == 0
 
     @mock.patch('accounts.gateways.FakeGateway.send_sms')
-    def test_twilio_error(self, send_sms):
+    def test_twilio_error_400(self, send_sms):
         send_sms.side_effect = TwilioRestException(
             status=400,
             uri='http://localhost:8000',
@@ -130,6 +130,30 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
             assert User.objects.count() == 0
             assert VerificationDevice.objects.count() == 0
             assert len(mail.outbox) == 0
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_twilio_error_500(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=500,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {
+            'username': 'sherlock',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes',
+            'language': 'en'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert TWILIO_ERRORS['default'] in response.content
+        self.request(method='POST', post_data=data)
+        assert User.objects.count() == 0
+        assert VerificationDevice.objects.count() == 0
+        assert len(mail.outbox) == 0
 
 
 class ProfileTest(ViewTestCase, UserTestCase, TestCase):
@@ -298,7 +322,7 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         assert user.username != 'new_name'
 
     @mock.patch('accounts.gateways.FakeGateway.send_sms')
-    def test_twilio_error(self, send_sms):
+    def test_twilio_error_400(self, send_sms):
         send_sms.side_effect = TwilioRestException(
             status=400,
             uri='http://localhost:8000',
@@ -318,6 +342,32 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         }
         with pytest.raises(TwilioRestException):
             self.request(method='POST', post_data=post_data, user=user)
+        assert VerificationDevice.objects.count() == 0
+        user.refresh_from_db()
+        assert user.username != 'new_name'
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_twilio_error_500(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=500,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        user = UserFactory.create(password='221B@bakerstreet')
+        post_data = {
+            'username': 'new_name',
+            'email': user.email,
+            'phone': '+919327768250',
+            'language': 'en',
+            'measurement': 'metric',
+            'full_name': 'Sherlock Holmes',
+            'password': '221B@bakerstreet'
+        }
+        response = self.request(method='POST', post_data=post_data, user=user)
+        assert response.status_code == 200
+        assert TWILIO_ERRORS['default'] in response.content
         assert VerificationDevice.objects.count() == 0
         user.refresh_from_db()
         assert user.username != 'new_name'

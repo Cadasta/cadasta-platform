@@ -27,7 +27,11 @@ class AccountUser(djoser_views.UserView):
             with transaction.atomic():
                 return super().update(request, *args, **kwargs)
         except TwilioRestException as e:
-            msg = messages.TWILIO_ERRORS.get(e.code)
+            if e.status >= 500:
+                msg = messages.TWILIO_ERRORS.get('default')
+            else:
+                msg = messages.TWILIO_ERRORS.get(e.code)
+
             if msg:
                 return Response(status=400, data={'phone': msg})
             else:
@@ -72,7 +76,11 @@ class AccountRegister(djoser_views.RegistrationView):
             with transaction.atomic():
                 return super().create(request, *args, **kwargs)
         except TwilioRestException as e:
-            msg = messages.TWILIO_ERRORS.get(e.code)
+            if e.status >= 500:
+                msg = messages.TWILIO_ERRORS.get('default')
+            else:
+                msg = messages.TWILIO_ERRORS.get(e.code)
+
             if msg:
                 return Response(status=400, data={'phone': msg})
             else:

@@ -68,7 +68,10 @@ class AccountRegister(CreateView):
                 return super().form_valid(form)
 
         except TwilioRestException as e:
-            msg = TWILIO_ERRORS.get(e.code)
+            if e.status >= 500:
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
 
             if msg:
                 form.add_error('phone', msg)
@@ -203,7 +206,10 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
 
                 return super().form_valid(form)
         except TwilioRestException as e:
-            msg = TWILIO_ERRORS.get(e.code)
+            if e.status >= 500:
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
 
             if msg:
                 form.add_error('phone', msg)
