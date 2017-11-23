@@ -12,6 +12,7 @@ from skivvy import APITestCase
 from core.tests.utils.cases import UserTestCase
 from ..models import User, VerificationDevice
 from ..views import api as api_views
+from ..messages import TWILIO_ERRORS
 
 from .factories import UserFactory
 
@@ -131,7 +132,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         data = {'phone': '+15555555555', 'username': 'imagine71'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 400
-        assert 'phone' in response.content.keys()
+        assert TWILIO_ERRORS[21211] in response.content['phone']
         assert VerificationDevice.objects.filter(
             unverified_phone='+15555555555').exists() is False
 
@@ -255,7 +256,7 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 400
-        assert 'phone' in response.content.keys()
+        assert TWILIO_ERRORS[21211] in response.content['phone']
         assert VerificationDevice.objects.filter(
             unverified_phone='+15555555555').exists() is False
         assert User.objects.count() == 0

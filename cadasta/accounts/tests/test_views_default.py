@@ -19,7 +19,7 @@ from ..views import default
 from ..forms import ProfileForm
 from organization.models import OrganizationRole, ProjectRole
 from organization.tests.factories import ProjectFactory, OrganizationFactory
-from ..messages import account_inactive, unverified_identifier
+from ..messages import account_inactive, unverified_identifier, TWILIO_ERRORS
 
 
 class RegisterTest(ViewTestCase, UserTestCase, TestCase):
@@ -104,6 +104,7 @@ class RegisterTest(ViewTestCase, UserTestCase, TestCase):
         }
         response = self.request(method='POST', post_data=data)
         assert response.status_code == 200
+        assert TWILIO_ERRORS[21211] in response.content
         assert User.objects.count() == 0
         assert VerificationDevice.objects.count() == 0
         assert len(mail.outbox) == 0
@@ -291,6 +292,7 @@ class ProfileTest(ViewTestCase, UserTestCase, TestCase):
         }
         response = self.request(method='POST', post_data=post_data, user=user)
         assert response.status_code == 200
+        assert TWILIO_ERRORS[21211] in response.content
         assert VerificationDevice.objects.count() == 0
         user.refresh_from_db()
         assert user.username != 'new_name'
