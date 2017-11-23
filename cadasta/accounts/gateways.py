@@ -1,4 +1,3 @@
-import random
 import logging
 
 from django.conf import settings
@@ -9,20 +8,16 @@ fake_logger = logging.getLogger(name='accounts.FakeGateway')
 
 class TwilioGateway(object):
 
-    def __init__(self,
-                 account_sid=settings.TWILIO_ACCOUNT_SID,
-                 auth_token=settings.TWILIO_AUTH_TOKEN,
-                 from_phone_number_list=[]):
-
-        self.client = Client(account_sid, auth_token)
-        self.from_phone_number_list = from_phone_number_list
+    def __init__(self):
+        self.client = Client(settings.TWILIO_ACCOUNT_SID,
+                             settings.TWILIO_AUTH_TOKEN)
 
     def send_sms(self, to, body):
         try:
             # create and send a message with client
             message = self.client.messages.create(
                 to=to,
-                from_=random.choice(self.from_phone_number_list),
+                from_=settings.TWILIO_PHONE,
                 body=body)
 
         except TwilioException as e:

@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.conf import settings
 from accounts.gateways import TwilioGateway, FakeGateway
 from django.test.utils import override_settings
 from unittest import mock
@@ -10,14 +9,10 @@ class TwilioGatewayTest(TestCase):
     @override_settings(
         TWILIO_ACCOUNT_SID='SID',
         TWILIO_AUTH_TOKEN='TOKEN',
-        TWILIO_PHONE_NUMBER_LIST=['+123'])
+        TWILIO_TWILIO_PHONE='+123')
     @mock.patch('accounts.gateways.Client')
     def test_gateway(self, mock_client):
-        twilio = TwilioGateway(
-            account_sid=settings.TWILIO_ACCOUNT_SID,
-            auth_token=settings.TWILIO_AUTH_TOKEN,
-            from_phone_number_list=settings.TWILIO_PHONE_NUMBER_LIST
-        )
+        twilio = TwilioGateway()
         mock_client.assert_called_with('SID', 'TOKEN')
         body = 'Testing Twilio SMS gateway!'
         to = '+456'
@@ -27,10 +22,12 @@ class TwilioGatewayTest(TestCase):
             body=body,
             from_='+123')
 
+    @override_settings(
+        TWILIO_ACCOUNT_SID='SID',
+        TWILIO_AUTH_TOKEN='TOKEN',
+        TWILIO_TWILIO_PHONE='+123')
     def test_gateway_exception(self):
-        twilio = TwilioGateway(account_sid='SID',
-                               auth_token='TOKEN',
-                               from_phone_number_list=['+123'])
+        twilio = TwilioGateway()
         body = 'Testing Twilio SMS gateway!'
         to = '+456'
         response = twilio.send_sms(to, body)

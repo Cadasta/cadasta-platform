@@ -147,3 +147,4 @@ LOGGING = {
 }
 
 SMS_GATEWAY = 'accounts.gateways.TwilioGateway'
+TWILIO_PHONE = os.environ['TWILIO_PHONE']
