@@ -22,7 +22,6 @@ from .factories import UserFactory
 BASIC_TEST_DATA = {
     'username': 'imagine71',
     'email': 'john@beatles.uk',
-    'phone': '+919327768250',
     'password': 'iloveyoko79!',
     'full_name': 'John Lennon',
     'language': 'en',
@@ -70,6 +69,25 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         serializer.save()
         assert User.objects.count() == 4
 
+    def test_create_with_email_and_phone(self):
+        """User can either seign up using a phone number or an email address
+           but not both"""
+        data = {
+            'username': 'imagine71',
+            'email': 'john@beatles.uk',
+            'phone': '+49150111111111',
+            'language': 'en',
+            'measurement': 'metric',
+            'password': 'iloveyoko79!',
+            'password_repeat': 'iloveyoko79!',
+            'full_name': 'John Lennon',
+        }
+
+        serializer = serializers.RegistrationSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert ('You can either use your phone number or email to sign up but '
+                'not both.' in serializer.errors['non_field_errors'])
+
     def test_create_without_email(self):
         """Serialiser should be invalid when no email address is provided."""
 
@@ -90,7 +108,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveyoko79!',
@@ -111,7 +128,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveyoko79!',
@@ -129,7 +145,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveyoko79!',
@@ -146,7 +161,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'yoko79',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveyoko79!',
@@ -162,7 +176,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'yoko79',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveYOKO79!',
@@ -178,7 +191,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': '',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveyoko79!',
@@ -193,7 +205,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'johnisjustheBest!!',
@@ -209,7 +220,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': '',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'johnisjustheBest!!',
@@ -217,14 +227,13 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'John Lennon',
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert serializer.is_valid()
+        assert serializer.is_valid() is False
         assert ('password' not in serializer._errors)
 
     def test_password_contains_less_than_min_characters(self):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'yoko<3',
@@ -241,7 +250,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': 'iloveyoko',
@@ -259,7 +267,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
     def test_password_contains_phone(self):
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
@@ -275,7 +282,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
     def test_password_contains_blank_phone(self):
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '',
             'language': 'en',
             'measurement': 'metric',
@@ -284,7 +290,7 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
             'full_name': 'Sherlock Holmes'
         }
         serializer = serializers.RegistrationSerializer(data=data)
-        assert serializer.is_valid() is True
+        assert serializer.is_valid() is False
         assert ('password' not in serializer._errors)
 
     def test_signup_with_phone_only(self):
@@ -330,7 +336,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         UserFactory.create(phone='+919327768250')
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
@@ -380,7 +385,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
     def test_signup_with_invalid_phone(self):
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': 'Test Number',
             'language': 'en',
             'measurement': 'metric',
@@ -394,7 +398,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+91-9067439937',
             'language': 'en',
             'measurement': 'metric',
@@ -408,7 +411,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '9067439937',
             'language': 'en',
             'measurement': 'metric',
@@ -422,7 +424,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '9067439937',
             'language': 'en',
             'measurement': 'metric',
@@ -436,7 +437,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+91 9067439937',
             'language': 'en',
             'measurement': 'metric',
@@ -450,7 +450,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919067439937906743',
             'language': 'en',
             'measurement': 'metric',
@@ -464,7 +463,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+9190',
             'language': 'en',
             'measurement': 'metric',
@@ -478,7 +476,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+8018225332',
             'language': 'en',
             'measurement': 'metric',
@@ -496,7 +493,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': 'SHERLOCK.HOLMES@BBC.UK',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': '221B@bakerstreet',
@@ -513,7 +509,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': '221B@bakerstreet',
@@ -531,7 +526,6 @@ class RegistrationSerializerTest(UserTestCase, TestCase):
                                           unverified_phone='+919327768250')
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
@@ -563,7 +557,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'imagine71',
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'password': 'iloveyoko79',
             'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00',
@@ -581,6 +574,22 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert user_obj.is_active
         assert not user_obj.email_verified
         assert not user_obj.phone_verified
+
+    def test_create_with_phone_and_email(self):
+        data = {
+            'username': 'imagine71',
+            'phone': '+4978964545464',
+            'email': 'test@example.com',
+            'password': 'iloveyoko79',
+            'full_name': 'John Lennon',
+            'last_login': '2016-01-01 23:00:00',
+            'language': 'en',
+            'measurement': 'metric',
+        }
+        serializer = serializers.UserSerializer(data=data)
+        assert serializer.is_valid() is False
+        assert ('You can either use your phone number or email to sign up but '
+                'not both.' in serializer.errors['non_field_errors'])
 
     def test_update_username_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
@@ -623,7 +632,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         user = serializer.save()
         update_data1 = {'username': 'imagine71',
                         'email': 'john@beatles.uk',
-                        'phone': '+919327768250',
                         'last_login': '2016-01-01 23:00:00'}
         serializer2 = serializers.UserSerializer(user, data=update_data1)
         assert serializer2.is_valid() is False
@@ -637,7 +645,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': random.choice(invalid_usernames),
             'email': 'john@beatles.uk',
-            'phone': '+919327768250',
             'full_name': 'John Lennon',
         }
         request = APIRequestFactory().patch('/user/imagine71', data)
@@ -698,7 +705,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_update_with_blank_phone_and_email(self):
         user = UserFactory.create(username='sherlock',
                                   email='sherlock.holmes@bbc.uk',
-                                  phone='+919327768250',
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
         data = {
@@ -738,7 +744,10 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert (_("Cannot update email") in serializer2.errors['email'])
 
     def test_update_phone_fails(self):
-        serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
+        data = BASIC_TEST_DATA.copy()
+        del data['email']
+        data['phone'] = '+12345678990'
+        serializer = serializers.UserSerializer(data=data)
         assert serializer.is_valid() is True
 
         user = serializer.save()
@@ -756,13 +765,11 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
     def test_update_with_invalid_phone(self):
         user = UserFactory.create(username='sherlock',
-                                  email='sherlock.holmes@bbc.uk',
                                   phone='+919327768250',
                                   password='221B@bakerstreet',
                                   full_name='Sherlock Holmes')
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': 'Test Number',
             'language': 'en',
             'measurement': 'metric',
@@ -780,7 +787,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '9067439937',
             'language': 'en',
             'measurement': 'metric',
@@ -798,7 +804,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+91 9067439937',
             'language': 'en',
             'measurement': 'metric',
@@ -816,7 +821,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919067439937906743',
             'language': 'en',
             'measurement': 'metric',
@@ -834,7 +838,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+9190',
             'language': 'en',
             'measurement': 'metric',
@@ -852,7 +855,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+8018225332',
             'language': 'en',
             'measurement': 'metric',
@@ -874,13 +876,12 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         VerificationDevice.objects.create(user=user,
                                           unverified_phone='+919327768250')
         user1 = UserFactory.create(username='sherlock',
-                                   email='sherlock.holmes@bbc.uk',
+                                   phone='+496878645454654',
                                    password='221B@bakerstreet',
                                    full_name='Sherlock Holmes')
 
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
@@ -902,14 +903,13 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         EmailAddress.objects.create(user=user,
                                     email='sherlock.holmes@bbc.uk')
         user1 = UserFactory.create(username='sherlock',
-                                   phone='+919327768250',
+                                   email='test@example.com',
                                    password='221B@bakerstreet',
                                    full_name='Sherlock Holmes')
 
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
             'language': 'en',
             'measurement': 'metric',
             'password': '221B@bakerstreet',
@@ -934,7 +934,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         data = {
             'username': 'sherlock',
             'email': 'sherlock.holmes@bbc.uk',
-            'phone': '+919327768250',
             'password': '221B@bakerstreet',
             'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00',
@@ -953,7 +952,6 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
                                           unverified_phone='+919327768250')
         data = {
             'username': 'sherlock',
-            'email': 'sherlock.holmes@bbc.uk',
             'phone': '+919327768250',
             'password': '221B@bakerstreet',
             'full_name': 'Sherlock Holmes',
@@ -1013,12 +1011,11 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
     def test_update_insensitive_email_check(self):
         UserFactory.create(email='sherlock.holmes@bbc.uk')
         user = UserFactory.create(username='sherlock',
-                                  phone='+919327768250',
+                                  email='test@example.com',
                                   password='221B@bakerstreet')
         data = {
             'username': 'sherlock',
             'email': 'SHERLOCK.HOLMES@BBC.UK',
-            'phone': '+919327768250',
             'password': '221B@bakerstreet',
             'full_name': 'John Lennon',
             'last_login': '2016-01-01 23:00:00',
@@ -1033,6 +1030,36 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert serializer.is_valid() is False
         assert (_("User with this Email address already exists.")
                 in serializer.errors['email'])
+
+    def test_update_replace_phone_with_email(self):
+        user = UserFactory.create(phone='+919327768250', email=None)
+        data = {'email': 'email@example.com', 'phone': None}
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+
+        serializer = serializers.UserSerializer(
+            user,
+            data=data,
+            partial=True,
+            context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert ('It is not possible to change from phone to email for '
+                'your account identifier.' in serializer.errors['phone'])
+
+    def test_update_replace_email_with_phone(self):
+        user = UserFactory.create(phone=None, email='email@example.com')
+        data = {'email': None, 'phone': '+919327768250'}
+        request = APIRequestFactory().patch('/user/sherlock', data)
+        force_authenticate(request, user=user)
+
+        serializer = serializers.UserSerializer(
+            user,
+            data=data,
+            partial=True,
+            context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert ('It is not possible to change from email to phone for '
+                'your account identifier.' in serializer.errors['email'])
 
 
 class AccountLoginSerializerTest(UserTestCase, TestCase):
