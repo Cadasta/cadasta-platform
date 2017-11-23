@@ -199,19 +199,14 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         # email_update_message = None
 
         if self.current_email != user.email:
-            current_email_set = self.instance.emailaddress_set.all()
-            if current_email_set.exists():
-                current_email_set.delete()
+            self.instance.emailaddress_set.all().delete()
 
             send_email_confirmation(self.request, user)
             utils.send_email_update_notification(self.current_email)
             user.email = self.current_email
 
         if self.current_phone != user.phone:
-            current_phone_set = VerificationDevice.objects.filter(
-                user=self.instance)
-            if current_phone_set.exists():
-                current_phone_set.delete()
+            self.instance.verificationdevice_set.all().delete()
 
             device = VerificationDevice.objects.create(
                 user=self.instance, unverified_phone=user.phone)

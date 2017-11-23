@@ -28,9 +28,8 @@ class AccountUser(djoser_views.UserView):
         user = serializer.save()
 
         if current_email != new_email:
-            email_set = instance.emailaddress_set.all()
-            if email_set.exists():
-                email_set.delete()
+            instance.emailaddress_set.all().delete()
+
             if new_email:
                 send_email_confirmation(self.request._request, user)
                 if current_email:
@@ -38,9 +37,8 @@ class AccountUser(djoser_views.UserView):
                     utils.send_email_update_notification(current_email)
 
         if current_phone != new_phone:
-            phone_set = VerificationDevice.objects.filter(user=instance)
-            if phone_set.exists():
-                phone_set.delete()
+            instance.verificationdevice_set.all().delete()
+
             if new_phone:
                 device = VerificationDevice.objects.create(
                     user=instance,
