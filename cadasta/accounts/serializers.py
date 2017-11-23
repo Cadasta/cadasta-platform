@@ -63,6 +63,12 @@ class RegistrationSerializer(SanitizeFieldSerializer,
 
         email = self.initial_data.get('email')
         phone = self.initial_data.get('phone')
+
+        if phone and email:
+            raise serializers.ValidationError(
+                _("You can either use your phone number or email to sign up "
+                  "but not both."))
+
         if (not phone) and (not email):
             raise serializers.ValidationError(
                 _("You cannot leave both phone and email empty."
@@ -78,6 +84,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
                     _("User with this Email address already exists."))
         else:
             email = None
+
         return email
 
     def validate_phone(self, phone):
@@ -93,6 +100,7 @@ class RegistrationSerializer(SanitizeFieldSerializer,
                     _("Please enter a valid country code."))
         else:
             phone = None
+
         return phone
 
     def validate_username(self, username):
@@ -139,7 +147,6 @@ class UserSerializer(SanitizeFieldSerializer,
         allow_blank=True,
         allow_null=True,
         required=False
-
     )
     phone = serializers.RegexField(
         regex=r'^\+[0-9]{5,14}$',
@@ -193,13 +200,20 @@ class UserSerializer(SanitizeFieldSerializer,
 
     def validate(self, data):
         data = super(UserSerializer, self).validate(data)
-        instance = self.instance
-        if instance:
-            email = self.initial_data.get('email', instance.email)
-            phone = self.initial_data.get('phone', instance.phone)
-            if (not phone) and (not email):
-                raise serializers.ValidationError(
-                    _("You cannot leave both phone and email empty."))
+
+        email = self.initial_data.get('email',
+                                      getattr(self.instance, 'email', None))
+        phone = self.initial_data.get('phone',
+                                      getattr(self.instance, 'phone', None))
+
+        if phone and email:
+            raise serializers.ValidationError(
+                _("You can either use your phone number or email to sign "
+                  "up but not both."))
+
+        if (not phone) and (not email):
+            raise serializers.ValidationError(
+                _("You cannot leave both phone and email empty."))
         return data
 
     def validate_email(self, email):
@@ -221,6 +235,12 @@ class UserSerializer(SanitizeFieldSerializer,
                     _("User with this Email address already exists."))
         else:
             email = None
+
+            if (instance and instance.email and
+                    not instance.phone and self.initial_data.get('phone')):
+                raise serializers.ValidationError(
+                    _('It is not possible to change from email to phone for '
+                      'your account identifier.'))
         return email
 
     def validate_phone(self, phone):
@@ -246,6 +266,12 @@ class UserSerializer(SanitizeFieldSerializer,
                     _("Please enter a valid country code."))
         else:
             phone = None
+
+            if (instance and instance.phone and
+                    not instance.email and self.initial_data.get('email')):
+                raise serializers.ValidationError(
+                    _('It is not possible to change from phone to email for '
+                      'your account identifier.'))
         return phone
 
     def validate_username(self, username):

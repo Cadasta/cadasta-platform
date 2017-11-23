@@ -140,16 +140,12 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
         self.current_email = self.instance.email
+        if self.current_email:
+            self.fields['email'].required = True
+
         self.current_phone = self.instance.phone
-
-    def clean(self):
-        super(ProfileForm, self).clean()
-        email = self.data.get('email')
-        phone = self.data.get('phone')
-
-        if not phone and not email:
-            raise forms.ValidationError(
-                _("You cannot leave both phone and email empty."))
+        if self.current_phone:
+            self.fields['phone'].required = True
 
     def clean_username(self):
         username = self.data.get('username')
@@ -182,6 +178,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 
         else:
             phone = None
+
         return phone
 
     def clean_email(self):
@@ -199,24 +196,16 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 
     def save(self, *args, **kwargs):
         user = super().save(commit=False, *args, **kwargs)
-        email_update_message = None
+        # email_update_message = None
 
         if self.current_email != user.email:
             current_email_set = self.instance.emailaddress_set.all()
             if current_email_set.exists():
                 current_email_set.delete()
 
-            if user.email:
-                send_email_confirmation(self.request, user)
-                email_update_message = messages.email_change
-
-                if self.current_email:
-                    utils.send_email_update_notification(self.current_email)
-                    user.email = self.current_email
-            else:
-                user.email_verified = False
-                email_update_message = messages.email_delete
-                utils.send_email_deleted_notification(self.current_email)
+            send_email_confirmation(self.request, user)
+            utils.send_email_update_notification(self.current_email)
+            user.email = self.current_email
 
         if self.current_phone != user.phone:
             current_phone_set = VerificationDevice.objects.filter(
@@ -224,23 +213,12 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
             if current_phone_set.exists():
                 current_phone_set.delete()
 
-            if user.phone:
-                device = VerificationDevice.objects.create(
-                    user=self.instance, unverified_phone=user.phone)
-                device.generate_challenge()
-                if self.current_phone:
-                    utils.send_sms(self.current_phone, messages.phone_change)
-                    user.phone = self.current_phone
-                if user.email:
-                    utils.send_phone_update_notification(user.email)
-            else:
-                user.phone_verified = False
-                utils.send_sms(self.current_phone, messages.phone_delete)
-                if user.email:
-                    utils.send_phone_deleted_notification(user.email)
+            device = VerificationDevice.objects.create(
+                user=self.instance, unverified_phone=user.phone)
+            device.generate_challenge()
+            utils.send_sms(self.current_phone, messages.phone_change)
+            user.phone = self.current_phone
 
-        if user.phone and email_update_message:
-            utils.send_sms(user.phone, email_update_message)
         user.save()
         return user
 
