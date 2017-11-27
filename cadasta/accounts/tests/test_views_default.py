@@ -735,6 +735,61 @@ class ResendTokenViewTest(ViewTestCase, UserTestCase, TestCase):
         assert response.status_code == 302
         assert '/account/accountverification/' in response.location
 
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_send_token_with_invalid_phone(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone=self.user.phone)
+        data = {
+            'phone': '+919327768250',
+        }
+        response = self.request(method='POST', post_data=data)
+
+        assert response.status_code == 200
+        assert TWILIO_ERRORS[21211] in response.content
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_twilio_error_400(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone=self.user.phone)
+        data = {
+            'phone': '+919327768250',
+        }
+        with pytest.raises(TwilioRestException):
+            self.request(method='POST', post_data=data)
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_twilio_error_500(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=500,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        VerificationDevice.objects.create(user=self.user,
+                                          unverified_phone=self.user.phone)
+        data = {
+            'phone': '+919327768250',
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 200
+        assert TWILIO_ERRORS['default'] in response.content
+
     def test_email_send_link(self):
         EmailAddress.objects.create(user=self.user, email=self.user.email)
         data = {

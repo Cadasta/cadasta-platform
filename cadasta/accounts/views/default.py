@@ -393,14 +393,31 @@ class ResendTokenView(FormView):
     def form_valid(self, form):
         phone = form.data.get('phone')
         email = form.data.get('email')
+
         if phone:
+
             try:
-                phone_device = VerificationDevice.objects.get(
-                    unverified_phone=phone, verified=False)
-                phone_device.generate_challenge()
-                self.request.session['phone_verify_id'] = phone_device.user_id
+                with transaction.atomic():
+                    phone_device = VerificationDevice.objects.get(
+                        unverified_phone=phone, verified=False)
+                    phone_device.generate_challenge()
+                    self.request.session[
+                        'phone_verify_id'] = phone_device.user_id
+
+            except TwilioRestException as e:
+                if e.status >= 500:
+                    msg = TWILIO_ERRORS.get('default')
+                else:
+                    msg = TWILIO_ERRORS.get(e.code)
+
+                if msg:
+                    form.add_error('phone', msg)
+                    return self.form_invalid(form)
+                else:
+                    raise
             except VerificationDevice.DoesNotExist:
                 pass
+
             message = _(
                 "Your phone number has been submitted."
                 " If it matches your account on Cadasta Platform, you will"
