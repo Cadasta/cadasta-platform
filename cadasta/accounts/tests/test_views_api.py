@@ -129,7 +129,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
             method='POST',
             code=21211
         )
-        data = {'phone': '+15555555555', 'username': 'imagine71'}
+        data = {'phone': '+15555555555', 'username': 'imagine72'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 400
         assert TWILIO_ERRORS[21211] in response.content['phone']
@@ -137,7 +137,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
             unverified_phone='+15555555555').exists() is False
 
         self.user.refresh_from_db()
-        assert self.user.username != '+imagine71'
+        assert self.user.username != 'imagine72'
         assert self.user.phone == '+12345678990'
         assert self.user.phone_verified is True
 
@@ -150,14 +150,14 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
             method='POST',
             code=20005
         )
-        data = {'phone': '+15555555555', 'username': 'imagine71'}
+        data = {'phone': '+15555555555', 'username': 'imagine72'}
         with pytest.raises(TwilioRestException):
             self.request(method='PUT', post_data=data, user=self.user)
         assert VerificationDevice.objects.filter(
             unverified_phone='+15555555555').exists() is False
 
         self.user.refresh_from_db()
-        assert self.user.username != '+imagine71'
+        assert self.user.username != 'imagine72'
         assert self.user.phone == '+12345678990'
         assert self.user.phone_verified is True
 
@@ -170,7 +170,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
             method='POST',
             code=20005
         )
-        data = {'phone': '+15555555555', 'username': 'imagine71'}
+        data = {'phone': '+15555555555', 'username': 'imagine72'}
         response = self.request(method='PUT', post_data=data, user=self.user)
         assert response.status_code == 400
         assert TWILIO_ERRORS['default'] in response.content['phone']
@@ -178,7 +178,7 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
             unverified_phone='+15555555555').exists() is False
 
         self.user.refresh_from_db()
-        assert self.user.username != '+imagine71'
+        assert self.user.username != 'imagine72'
         assert self.user.phone == '+12345678990'
         assert self.user.phone_verified is True
 
