@@ -91,6 +91,22 @@ class PasswordResetView(SuperUserCheckMixin,
                         allauth_views.PasswordResetView):
     form_class = forms.ResetPasswordForm
 
+    def form_valid(self, form):
+        try:
+            with transaction.atomic():
+                return super().form_valid(form)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
+
 
 class PasswordResetDoneView(FormView, allauth_views.PasswordResetDoneView):
     """ If the user opts to reset password with phone, this view will display
