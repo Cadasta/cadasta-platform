@@ -30,6 +30,7 @@ def get_attr_type_ids():
 def create_children(children, errors=[], project=None, default_language='',
                     questionnaire=None, question_group=None):
     if children:
+        ATTR_TYPE_IDS = get_attr_type_ids()
         for idx, child in enumerate(children):
             if child.get('type') in ['group', 'repeat']:
                 model_name = 'QuestionGroup'
@@ -44,7 +45,7 @@ def create_children(children, errors=[], project=None, default_language='',
                             app_label=app_label, model=model)
                         create_attrs_schema(
                             project=project, question_group_dict=child,
-                            attr_type_ids=get_attr_type_ids(),
+                            attr_type_ids=ATTR_TYPE_IDS,
                             content_type=content_type,
                             default_language=default_language, errors=errors
                         )
