@@ -316,12 +316,15 @@ class ProjectAddDetails(SanitizeFieldsForm, forms.Form):
             self.orgs = Organization.objects.filter(
                 archived=False).order_by('name')
         else:
-            qs = self.user.organizations.filter(
-                archived=False).order_by('name')
-            self.orgs = [
-                o for o in qs
+            non_admin_orgs = self.user.organizations.filter(
+                archived=False, organizationrole__admin=False).order_by('name')
+            non_admin_orgs = [
+                o for o in non_admin_orgs
                 if check_perms(self.user, ('project.create',), (o,))
             ]
+            admin_orgs = list(self.user.organizations.filter(
+                archived=False, organizationrole__admin=True))
+            self.orgs = set(non_admin_orgs + admin_orgs)
         choices = [(o.slug, o.name) for o in self.orgs]
         if not org_is_chosen and len(choices) > 1:
             choices = [('', _("Please select an organization"))] + choices
