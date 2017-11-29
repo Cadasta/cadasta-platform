@@ -16,6 +16,7 @@ from django.db import transaction
 
 from core.views.generic import UpdateView, ListView, CreateView
 from core.views.mixins import SuperUserCheckMixin
+from core.util import log_with_opbeat
 
 import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
@@ -69,6 +70,7 @@ class AccountRegister(CreateView):
 
         except TwilioRestException as e:
             if e.status >= 500:
+                log_with_opbeat()
                 msg = TWILIO_ERRORS.get('default')
             else:
                 msg = TWILIO_ERRORS.get(e.code)
@@ -97,6 +99,7 @@ class PasswordResetView(SuperUserCheckMixin,
                 return super().form_valid(form)
         except TwilioRestException as e:
             if e.status >= 500:
+                log_with_opbeat()
                 msg = TWILIO_ERRORS.get('default')
             else:
                 msg = TWILIO_ERRORS.get(e.code)
@@ -223,6 +226,7 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
                 return super().form_valid(form)
         except TwilioRestException as e:
             if e.status >= 500:
+                log_with_opbeat()
                 msg = TWILIO_ERRORS.get('default')
             else:
                 msg = TWILIO_ERRORS.get(e.code)

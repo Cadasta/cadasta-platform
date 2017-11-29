@@ -12,6 +12,7 @@ from djoser import views as djoser_views
 from djoser import signals
 from allauth.account.signals import password_changed
 
+from core.util import log_with_opbeat
 from .. import serializers
 from .. import utils
 from .. import messages
@@ -28,6 +29,7 @@ class AccountUser(djoser_views.UserView):
                 return super().update(request, *args, **kwargs)
         except TwilioRestException as e:
             if e.status >= 500:
+                log_with_opbeat()
                 msg = messages.TWILIO_ERRORS.get('default')
             else:
                 msg = messages.TWILIO_ERRORS.get(e.code)
@@ -77,6 +79,7 @@ class AccountRegister(djoser_views.RegistrationView):
                 return super().create(request, *args, **kwargs)
         except TwilioRestException as e:
             if e.status >= 500:
+                log_with_opbeat()
                 msg = messages.TWILIO_ERRORS.get('default')
             else:
                 msg = messages.TWILIO_ERRORS.get(e.code)
