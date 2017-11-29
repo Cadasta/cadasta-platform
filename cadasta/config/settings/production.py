@@ -91,10 +91,10 @@ DEFAULT_FROM_EMAIL = 'Cadasta Platform <platform@cadasta.org>'
 ROOT_URLCONF = 'config.urls.production'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/static/'
+STATIC_ROOT = '/opt/cadasta/static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/opt/cadasta/cadasta-platform/cadasta/media/'
+MEDIA_ROOT = '/opt/cadasta/media'
 
 # Debug logging...
 LOGGING = {
