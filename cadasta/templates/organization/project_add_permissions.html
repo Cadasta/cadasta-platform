@@ -37,7 +37,7 @@
             {% endfor %}
           {% else %}
 
-            <table class="table table-striped">
+            <table class="table table-striped datatable" data-paging-type="simple">
               <thead>
                 <tr>
                   <th class="col-md-4">{% trans "Member" %}</th>
@@ -63,4 +63,14 @@
     </div>
     <!-- / main wizard text -->
 
+{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/dataTables.forms.js' %}"></script>
+<script>
+  'use strict';
+  $(function() {
+    activateFormFieldsInDataTable('.container-fluid form', 2, 'select');
+  });
+</script>
 {% endblock %}
