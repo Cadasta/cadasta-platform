@@ -176,7 +176,7 @@ class ProjectQuerySetMixin:
                     organization__organizationrole__admin=True, archived=True)
                 # project manager archived projects
                 query |= Q(
-                    projectrole__user=user, projectrole_role='PM',
+                    projectrole__user=user, projectrole__role='PM',
                     access='private', archived=True)
             projects = Project.objects.filter(query).distinct()
         return projects.select_related('organization').order_by(
