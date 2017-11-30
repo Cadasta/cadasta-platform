@@ -168,12 +168,16 @@ class ProjectQuerySetMixin:
             if not user.is_anonymous:
                 # private unarchived projects
                 query |= Q(
-                    organization__organizationrole__user=user,
+                    projectrole__user=user,
                     access='private', archived=False)
                 # admin archived projects
                 query |= Q(
                     organization__organizationrole__user=user,
                     organization__organizationrole__admin=True, archived=True)
+                # project manager archived projects
+                query |= Q(
+                    projectrole__user=user, projectrole_role='PM',
+                    access='private', archived=True)
             projects = Project.objects.filter(query).distinct()
         return projects.select_related('organization').order_by(
             'organization__slug', 'slug')
