@@ -121,6 +121,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
 
     @mock.patch('accounts.gateways.FakeGateway.send_sms')
     def test_update_invalid_phone(self, send_sms):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
         send_sms.side_effect = TwilioRestException(
             status=400,
             uri='http://localhost:8000',
@@ -143,6 +148,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
 
     @mock.patch('accounts.gateways.FakeGateway.send_sms')
     def test_update_twilio_error_400(self, send_sms):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
         send_sms.side_effect = TwilioRestException(
             status=400,
             uri='http://localhost:8000',
@@ -163,6 +173,11 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
 
     @mock.patch('accounts.gateways.FakeGateway.send_sms')
     def test_update_twilio_error_500(self, send_sms):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
         send_sms.side_effect = TwilioRestException(
             status=500,
             uri='http://localhost:8000',
