@@ -1,6 +1,7 @@
 from collections import defaultdict
 from itertools import groupby
 import operator as op
+from twilio.base.exceptions import TwilioRestException
 
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
@@ -11,9 +12,11 @@ from django.contrib.messages.api import get_messages
 from django.views.generic import FormView
 from django.shortcuts import redirect
 from django.utils.html import format_html
+from django.db import transaction
 
 from core.views.generic import UpdateView, ListView, CreateView
 from core.views.mixins import SuperUserCheckMixin
+from core.util import log_with_opbeat
 
 import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
@@ -24,7 +27,7 @@ from allauth.account import signals
 from ..models import User, VerificationDevice
 from .. import forms
 from organization.models import Project
-from ..messages import account_inactive, unverified_identifier
+from ..messages import account_inactive, unverified_identifier, TWILIO_ERRORS
 
 
 class AccountRegister(CreateView):
@@ -34,31 +37,49 @@ class AccountRegister(CreateView):
     success_url = reverse_lazy('account:verify_phone')
 
     def form_valid(self, form):
-        user = form.save(self.request)
+        try:
+            with transaction.atomic():
+                user = form.save(self.request)
 
-        user_lang = form.cleaned_data['language']
-        if user_lang != translation.get_language():
-            translation.activate(user_lang)
-            self.request.session[translation.LANGUAGE_SESSION_KEY] = user_lang
+                user_lang = form.cleaned_data['language']
+                if user_lang != translation.get_language():
+                    translation.activate(user_lang)
+                    self.request.session[
+                        translation.LANGUAGE_SESSION_KEY] = user_lang
 
-        if user.email:
-            send_email_confirmation(self.request, user)
+                if user.phone:
+                    device = VerificationDevice.objects.create(
+                        user=user, unverified_phone=user.phone)
+                    device.generate_challenge()
 
-        if user.phone:
-            device = VerificationDevice.objects.create(
-                user=user, unverified_phone=user.phone)
-            device.generate_challenge()
-            message = _("Verification token sent to {phone}")
-            message = message.format(phone=user.phone)
-            messages.add_message(self.request, messages.INFO, message)
+                    message = _("Verification token sent to {phone}")
+                    message = message.format(phone=user.phone)
+                    messages.add_message(self.request, messages.INFO, message)
 
-        self.request.session['phone_verify_id'] = user.id
+                if user.email:
+                    send_email_confirmation(self.request, user)
 
-        message = _("We have created your account. You should have"
-                    " received an email or a text to verify your account.")
-        messages.add_message(self.request, messages.SUCCESS, message)
+                self.request.session['phone_verify_id'] = user.id
 
-        return super().form_valid(form)
+                message = _("We have created your account. You should have "
+                            "received an email or a text to verify your "
+                            "account.")
+                messages.add_message(self.request, messages.SUCCESS, message)
+
+                return super().form_valid(form)
+
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
 
 class PasswordChangeView(LoginRequiredMixin,
@@ -71,6 +92,23 @@ class PasswordChangeView(LoginRequiredMixin,
 class PasswordResetView(SuperUserCheckMixin,
                         allauth_views.PasswordResetView):
     form_class = forms.ResetPasswordForm
+
+    def form_valid(self, form):
+        try:
+            with transaction.atomic():
+                return super().form_valid(form)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
 
 class PasswordResetDoneView(FormView, allauth_views.PasswordResetDoneView):
@@ -171,18 +209,33 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
         return form_kwargs
 
     def form_valid(self, form):
-        phone = form.data.get('phone')
-        messages.add_message(self.request, messages.SUCCESS,
-                             _("Successfully updated profile information"))
+        try:
+            with transaction.atomic():
+                phone = form.data.get('phone')
+                messages.add_message(
+                    self.request, messages.SUCCESS,
+                    _("Successfully updated profile information"))
 
-        if (phone != self.instance_phone and phone):
-            message = _("Verification Token sent to {phone}")
-            message = message.format(phone=phone)
-            messages.add_message(self.request, messages.INFO, message)
-            self.request.session['phone_verify_id'] = self.object.id
-            self.success_url = reverse_lazy('account:verify_phone')
+                if (phone != self.instance_phone and phone):
+                    message = _("Verification Token sent to {phone}")
+                    message = message.format(phone=phone)
+                    messages.add_message(self.request, messages.INFO, message)
+                    self.request.session['phone_verify_id'] = self.object.id
+                    self.success_url = reverse_lazy('account:verify_phone')
 
-        return super().form_valid(form)
+                return super().form_valid(form)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.ERROR,
@@ -360,14 +413,31 @@ class ResendTokenView(FormView):
     def form_valid(self, form):
         phone = form.data.get('phone')
         email = form.data.get('email')
+
         if phone:
+
             try:
-                phone_device = VerificationDevice.objects.get(
-                    unverified_phone=phone, verified=False)
-                phone_device.generate_challenge()
-                self.request.session['phone_verify_id'] = phone_device.user_id
+                with transaction.atomic():
+                    phone_device = VerificationDevice.objects.get(
+                        unverified_phone=phone, verified=False)
+                    phone_device.generate_challenge()
+                    self.request.session[
+                        'phone_verify_id'] = phone_device.user_id
+
+            except TwilioRestException as e:
+                if e.status >= 500:
+                    msg = TWILIO_ERRORS.get('default')
+                else:
+                    msg = TWILIO_ERRORS.get(e.code)
+
+                if msg:
+                    form.add_error('phone', msg)
+                    return self.form_invalid(form)
+                else:
+                    raise
             except VerificationDevice.DoesNotExist:
                 pass
+
             message = _(
                 "Your phone number has been submitted."
                 " If it matches your account on Cadasta Platform, you will"

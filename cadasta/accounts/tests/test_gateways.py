@@ -22,18 +22,6 @@ class TwilioGatewayTest(TestCase):
             body=body,
             from_='+123')
 
-    @override_settings(
-        TWILIO_ACCOUNT_SID='SID',
-        TWILIO_AUTH_TOKEN='TOKEN',
-        TWILIO_TWILIO_PHONE='+123')
-    def test_gateway_exception(self):
-        twilio = TwilioGateway()
-        body = 'Testing Twilio SMS gateway!'
-        to = '+456'
-        response = twilio.send_sms(to, body)
-        assert response.status == 404
-        assert 'Unable to create record' in response.msg
-
 
 class FakeGatewayTest(TestCase):
     @mock.patch('accounts.gateways.fake_logger')

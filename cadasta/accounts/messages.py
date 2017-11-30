@@ -36,3 +36,10 @@ password_change_or_reset = _(
     " changed or reset the password for your account linked to this phone"
     " number."
     " If it wasn't you, please contact us immediately at security@cadasta.org")
+
+
+TWILIO_ERRORS = {
+    'default': _("Unable to send verification SMS. Please try again later."),
+    21211: _("Unable to send verification SMS. Please provide a valid phone "
+             "number.")
+}

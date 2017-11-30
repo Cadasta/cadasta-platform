@@ -1,3 +1,5 @@
+from django.db import transaction
+from twilio.base.exceptions import TwilioRestException
 from allauth.account.utils import send_email_confirmation
 
 from rest_framework.serializers import ValidationError
@@ -10,6 +12,7 @@ from djoser import views as djoser_views
 from djoser import signals
 from allauth.account.signals import password_changed
 
+from core.util import log_with_opbeat
 from .. import serializers
 from .. import utils
 from .. import messages
@@ -19,6 +22,22 @@ from accounts import exceptions
 
 class AccountUser(djoser_views.UserView):
     serializer_class = serializers.UserSerializer
+
+    def update(self, request, *args, **kwargs):
+        try:
+            with transaction.atomic():
+                return super().update(request, *args, **kwargs)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = messages.TWILIO_ERRORS.get('default')
+            else:
+                msg = messages.TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                return Response(status=400, data={'phone': msg})
+            else:
+                raise
 
     def perform_update(self, serializer):
         instance = self.get_object()
@@ -53,6 +72,22 @@ class AccountUser(djoser_views.UserView):
 
 class AccountRegister(djoser_views.RegistrationView):
     serializer_class = serializers.RegistrationSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            with transaction.atomic():
+                return super().create(request, *args, **kwargs)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = messages.TWILIO_ERRORS.get('default')
+            else:
+                msg = messages.TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                return Response(status=400, data={'phone': msg})
+            else:
+                raise
 
     def perform_create(self, serializer):
         user = serializer.save()

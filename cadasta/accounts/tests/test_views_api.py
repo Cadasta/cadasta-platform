@@ -1,3 +1,5 @@
+import pytest
+from twilio.base.exceptions import TwilioRestException
 from django.core import mail
 from django.test import TestCase
 from django.conf import settings
@@ -10,6 +12,7 @@ from skivvy import APITestCase
 from core.tests.utils.cases import UserTestCase
 from ..models import User, VerificationDevice
 from ..views import api as api_views
+from ..messages import TWILIO_ERRORS
 
 from .factories import UserFactory
 
@@ -116,6 +119,84 @@ class AccountUserTest(APITestCase, UserTestCase, TestCase):
         assert self.user.phone == '+12345678990'
         assert self.user.phone_verified is False
 
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_update_invalid_phone(self, send_sms):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        data = {'phone': '+15555555555', 'username': 'imagine72'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 400
+        assert TWILIO_ERRORS[21211] in response.content['phone']
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+
+        self.user.refresh_from_db()
+        assert self.user.username != 'imagine72'
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_update_twilio_error_400(self, send_sms):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {'phone': '+15555555555', 'username': 'imagine72'}
+        with pytest.raises(TwilioRestException):
+            self.request(method='PUT', post_data=data, user=self.user)
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+
+        self.user.refresh_from_db()
+        assert self.user.username != 'imagine72'
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_update_twilio_error_500(self, send_sms):
+        self.user.email = None
+        self.user.phone = '+12345678990'
+        self.user.phone_verified = True
+        self.user.save()
+
+        send_sms.side_effect = TwilioRestException(
+            status=500,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {'phone': '+15555555555', 'username': 'imagine72'}
+        response = self.request(method='PUT', post_data=data, user=self.user)
+        assert response.status_code == 400
+        assert TWILIO_ERRORS['default'] in response.content['phone']
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+
+        self.user.refresh_from_db()
+        assert self.user.username != 'imagine72'
+        assert self.user.phone == '+12345678990'
+        assert self.user.phone_verified is True
+
     def test_keep_phone_number(self):
         self.user.email = None
         self.user.phone = '+12345678990'
@@ -191,6 +272,75 @@ class AccountSignupTest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
         assert User.objects.count() == 1
         assert VerificationDevice.objects.count() == 1
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_signup_invalid_phone(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Unable to create record: The "To" number +15555555555 is '
+                 'not a valid phone number.'),
+            method='POST',
+            code=21211
+        )
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 400
+        assert TWILIO_ERRORS[21211] in response.content['phone']
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+        assert User.objects.count() == 0
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_signup_twilio_error_400(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=400,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        with pytest.raises(TwilioRestException):
+            self.request(method='POST', post_data=data)
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+        assert User.objects.count() == 0
+
+    @mock.patch('accounts.gateways.FakeGateway.send_sms')
+    def test_signup_twilio_error_500(self, send_sms):
+        send_sms.side_effect = TwilioRestException(
+            status=500,
+            uri='http://localhost:8000',
+            msg=('Account not active'),
+            method='POST',
+            code=20005
+        )
+        data = {
+            'username': 'sherlock',
+            'email': '',
+            'phone': '+15555555555',
+            'password': '221B@bakerstreet',
+            'full_name': 'Sherlock Holmes'
+        }
+        response = self.request(method='POST', post_data=data)
+        assert response.status_code == 400
+        assert TWILIO_ERRORS['default'] in response.content['phone']
+        assert VerificationDevice.objects.filter(
+            unverified_phone='+15555555555').exists() is False
+        assert User.objects.count() == 0
 
     def test_user_signs_up_with_email_only(self):
         data = {
