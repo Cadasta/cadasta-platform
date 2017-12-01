@@ -178,10 +178,8 @@ class ProjectQuerySetMixin:
                 query |= Q(
                     organization__organizationrole__user=user,
                     organization__organizationrole__admin=True, archived=True)
-                # project managers can view archived projects
-                query |= Q(
-                    projectrole__user=user, projectrole__role='PM',
-                    access='private', archived=True)
+                # project managers can view private/public archived/active prjs
+                query |= Q(projectrole__user=user, projectrole__role='PM')
             projects = Project.objects.filter(query).distinct()
         return projects.select_related('organization').order_by(
             'organization__slug', 'slug')
