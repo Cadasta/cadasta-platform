@@ -183,8 +183,17 @@ class OrganizationProjectList(PermissionsFilterMixin,
         )
 
 
-class ProjectList(mixins.ProjectQuerySetMixin,
+class ProjectList(PermissionsFilterMixin,
+                  mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
+
+    def permission_filter(self, view, p):
+        if p.archived is True:
+            return ('project.view_archived',)
+        elif p.access == 'private':
+            return ('project.view_private',)
+        else:
+            return ('project.view',)
 
     serializer_class = serializers.ProjectSerializer
     filter_backends = (filters.DjangoFilterBackend,
@@ -194,6 +203,7 @@ class ProjectList(mixins.ProjectQuerySetMixin,
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
     permission_classes = (AllowAny,)
+    permission_filter_queryset = permission_filter
 
 
 class ProjectDetail(APIPermissionRequiredMixin,
