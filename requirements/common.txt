@@ -22,7 +22,7 @@ simplejson==3.13.2
 django-widget-tweaks==1.4.1
 django-buckets==0.1.22
 pyxform-cadasta==0.9.22
-python-magic==0.4.13
+python-magic==0.4.15
 Pillow==4.3.0
 django-jsonattrs==0.1.23
 openpyxl==2.4.9
