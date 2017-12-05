@@ -183,7 +183,8 @@ class OrganizationProjectList(PermissionsFilterMixin,
         )
 
 
-class ProjectList(PermissionsFilterMixin,
+class ProjectList(APIPermissionRequiredMixin,
+                  PermissionsFilterMixin,
                   mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
 
@@ -202,7 +203,7 @@ class ProjectList(PermissionsFilterMixin,
     filter_fields = ('archived',)
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
-    permission_classes = (AllowAny,)
+    permission_required = {'GET': 'project.list'}
     permission_filter_queryset = permission_filter
 
 
