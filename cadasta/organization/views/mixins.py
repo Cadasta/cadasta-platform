@@ -162,22 +162,19 @@ class ProjectQuerySetMixin:
         user = self.request.user
         if user.is_superuser:
             # superusers see all projects
-            projects = Project.objects.select_related('organization')
+            projects = Project.objects.all()
         else:
             # anyone can view public unarchived projects
             query = Q(access='public', archived=False)
             if not user.is_anonymous:
-                # org and project members can view private unarchived projects
+                # org/project members can view private unarchived projects
                 query |= Q(
                     organization__organizationrole__user=user,
-                    access='private', archived=False)
-                query |= Q(
-                    projectrole__user=user,
                     access='private', archived=False)
                 # org admins can view archived projects
                 query |= Q(
                     organization__organizationrole__user=user,
-                    organization__organizationrole__admin=True, archived=True)
+                    organization__organizationrole__admin=True)
                 # project managers can view private/public archived/active prjs
                 query |= Q(projectrole__user=user, projectrole__role='PM')
             projects = Project.objects.filter(query).distinct()
