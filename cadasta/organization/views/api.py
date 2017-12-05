@@ -1,6 +1,5 @@
 from django.shortcuts import get_object_or_404
 
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework import generics, filters, status
@@ -183,8 +182,8 @@ class OrganizationProjectList(PermissionsFilterMixin,
         )
 
 
-class ProjectList(APIPermissionRequiredMixin,
-                  PermissionsFilterMixin,
+class ProjectList(PermissionsFilterMixin,
+                  APIPermissionRequiredMixin,
                   mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
 
