@@ -42,10 +42,10 @@ class ResourceWidget(CheckboxInput):
             plural_text = _("Attached to {number} other entities")
             return plural_text.format(number=num_entities)
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def render(self, name, *args, **kwargs):
         date_format = formats.get_format("DATETIME_FORMAT",
                                          lang=get_language())
-        checkbox = super().render(name, value, attrs=attrs)
+        checkbox = super().render(name, *args, **kwargs)
         num_entities = self.resource.num_entities
         return self.html.format(
             name=name,

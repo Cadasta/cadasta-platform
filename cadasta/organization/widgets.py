@@ -21,11 +21,11 @@ class ProjectRoleWidget(Select):
         self.user = user
         self.role = role
 
-    def render(self, name, value, attrs=None, renderer=None):
+    def render(self, name, value, *args, **kwargs):
         if value == 'A' or self.role == 'A':
             select = _("Administrator")
         else:
-            select = super().render(name, value, attrs=attrs)
+            select = super().render(name, value, *args, **kwargs)
 
         return self.html.format(
             full_name=self.user.full_name,
