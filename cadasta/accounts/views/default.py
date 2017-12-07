@@ -1,24 +1,85 @@
 from collections import defaultdict
 from itertools import groupby
 import operator as op
+from twilio.base.exceptions import TwilioRestException
 
 from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from django.utils import translation
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.utils import timezone
+from django.contrib.messages.api import get_messages
+from django.views.generic import FormView
+from django.shortcuts import redirect
+from django.utils.html import format_html
+from django.db import transaction
 
-from core.views.generic import UpdateView, ListView
+from core.views.generic import UpdateView, ListView, CreateView
 from core.views.mixins import SuperUserCheckMixin
+from core.util import log_with_opbeat
 
 import allauth.account.views as allauth_views
 from allauth.account.views import ConfirmEmailView, LoginView
 from allauth.account.utils import send_email_confirmation
 from allauth.account.models import EmailAddress
+from allauth.account import signals
 
-from ..models import User
+from ..models import User, VerificationDevice
 from .. import forms
 from organization.models import Project
+from ..messages import account_inactive, unverified_identifier, TWILIO_ERRORS
+
+
+class AccountRegister(CreateView):
+    model = User
+    form_class = forms.RegisterForm
+    template_name = 'account/signup.html'
+    success_url = reverse_lazy('account:verify_phone')
+
+    def form_valid(self, form):
+        try:
+            with transaction.atomic():
+                user = form.save(self.request)
+
+                user_lang = form.cleaned_data['language']
+                if user_lang != translation.get_language():
+                    translation.activate(user_lang)
+                    self.request.session[
+                        translation.LANGUAGE_SESSION_KEY] = user_lang
+
+                if user.phone:
+                    device = VerificationDevice.objects.create(
+                        user=user, unverified_phone=user.phone)
+                    device.generate_challenge()
+
+                    message = _("Verification token sent to {phone}")
+                    message = message.format(phone=user.phone)
+                    messages.add_message(self.request, messages.INFO, message)
+
+                if user.email:
+                    send_email_confirmation(self.request, user)
+
+                self.request.session['phone_verify_id'] = user.id
+
+                message = _("We have created your account. You should have "
+                            "received an email or a text to verify your "
+                            "account.")
+                messages.add_message(self.request, messages.SUCCESS, message)
+
+                return super().form_valid(form)
+
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
 
 class PasswordChangeView(LoginRequiredMixin,
@@ -32,10 +93,92 @@ class PasswordResetView(SuperUserCheckMixin,
                         allauth_views.PasswordResetView):
     form_class = forms.ResetPasswordForm
 
+    def form_valid(self, form):
+        try:
+            with transaction.atomic():
+                return super().form_valid(form)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
+
+
+class PasswordResetDoneView(FormView, allauth_views.PasswordResetDoneView):
+    """ If the user opts to reset password with phone, this view will display
+     a form to verify the password reset token. """
+    form_class = forms.TokenVerificationForm
+    success_url = reverse_lazy('account:account_reset_password_from_phone')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['phone'] = self.request.session.get('phone', None)
+        return context
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        phone = self.request.session.get('phone', None)
+        try:
+            form_kwargs['device'] = VerificationDevice.objects.get(
+                unverified_phone=phone, label='password_reset')
+        except VerificationDevice.DoesNotExist:
+            pass
+        return form_kwargs
+
+    def form_valid(self, form):
+        device = form.device
+        message = _("Successfully Verified Token."
+                    " You can now reset your password.")
+        messages.add_message(self.request, messages.SUCCESS, message)
+        self.request.session.pop('phone', None)
+        self.request.session['password_reset_id'] = device.user_id
+        device.delete()
+        return super().form_valid(form)
+
 
 class PasswordResetFromKeyView(SuperUserCheckMixin,
                                allauth_views.PasswordResetFromKeyView):
     form_class = forms.ResetPasswordKeyForm
+
+
+class PasswordResetFromPhoneView(FormView, SuperUserCheckMixin):
+    """ This view will allow user to reset password once a user has
+     successfully verified the password reset token. """
+    form_class = forms.ResetPasswordKeyForm
+    template_name = 'account/password_reset_from_key.html'
+    success_url = reverse_lazy("account:account_reset_password_from_key_done")
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        try:
+            user_id = self.request.session['password_reset_id']
+            user = User.objects.get(id=user_id)
+            form_kwargs['user'] = user
+        except KeyError:
+            message = _(
+                "You must first verify your token before resetting password."
+                " Click <a href='{url}'>here</a> to get the password reset"
+                " verification token. ")
+            message = format_html(message.format(
+                url=reverse_lazy('account:account_reset_password')))
+            messages.add_message(self.request, messages.ERROR, message)
+
+        return form_kwargs
+
+    def form_valid(self, form):
+        form.save()
+        self.request.session.pop('password_reset_id', None)
+        signals.password_reset.send(sender=form.user.__class__,
+                                    request=self.request,
+                                    user=form.user)
+        return super().form_valid(form)
 
 
 class AccountProfile(LoginRequiredMixin, UpdateView):
@@ -45,13 +188,19 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('account:dashboard')
 
     def get_object(self, *args, **kwargs):
+        self.instance_phone = self.request.user.phone
         return self.request.user
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+
         emails_to_verify = EmailAddress.objects.filter(
             user=self.object, verified=False).exists()
+        phones_to_verify = VerificationDevice.objects.filter(
+            user=self.object, verified=False).exists()
+
         context['emails_to_verify'] = emails_to_verify
+        context['phones_to_verify'] = phones_to_verify
         return context
 
     def get_form_kwargs(self, *args, **kwargs):
@@ -60,9 +209,33 @@ class AccountProfile(LoginRequiredMixin, UpdateView):
         return form_kwargs
 
     def form_valid(self, form):
-        messages.add_message(self.request, messages.SUCCESS,
-                             _("Successfully updated profile information"))
-        return super().form_valid(form)
+        try:
+            with transaction.atomic():
+                phone = form.data.get('phone')
+                messages.add_message(
+                    self.request, messages.SUCCESS,
+                    _("Successfully updated profile information"))
+
+                if (phone != self.instance_phone and phone):
+                    message = _("Verification Token sent to {phone}")
+                    message = message.format(phone=phone)
+                    messages.add_message(self.request, messages.INFO, message)
+                    self.request.session['phone_verify_id'] = self.object.id
+                    self.success_url = reverse_lazy('account:verify_phone')
+
+                return super().form_valid(form)
+        except TwilioRestException as e:
+            if e.status >= 500:
+                log_with_opbeat()
+                msg = TWILIO_ERRORS.get('default')
+            else:
+                msg = TWILIO_ERRORS.get(e.code)
+
+            if msg:
+                form.add_error('phone', msg)
+                return self.form_invalid(form)
+            else:
+                raise
 
     def form_invalid(self, form):
         messages.add_message(self.request, messages.ERROR,
@@ -74,16 +247,29 @@ class AccountLogin(LoginView):
     success_url = reverse_lazy('account:dashboard')
 
     def form_valid(self, form):
+        login = form.cleaned_data['login']
         user = form.user
-        if not user.email_verified and timezone.now() > user.verify_email_by:
+
+        if (login == user.username and
+                not user.phone_verified and
+                not user.email_verified):
             user.is_active = False
             user.save()
-            send_email_confirmation(self.request, user)
+            messages.add_message(
+                self.request, messages.ERROR, account_inactive)
+            return redirect(reverse_lazy('account:resend_token'))
 
-        return super().form_valid(form)
+        if(login == user.email and not user.email_verified or
+                login == user.phone and not user.phone_verified):
+            messages.add_message(
+                self.request, messages.ERROR, unverified_identifier)
+            return redirect(reverse_lazy('account:resend_token'))
+        else:
+            return super().form_valid(form)
 
 
 class ConfirmEmail(ConfirmEmailView):
+
     def post(self, *args, **kwargs):
         response = super().post(*args, **kwargs)
 
@@ -173,3 +359,113 @@ class UserDashboard(LoginRequiredMixin, ListView):
         ).prefetch_related('organization')
         for org_role in org_roles:
             yield (org_role.organization, org_role.admin, [])
+
+
+class ConfirmPhone(FormView):
+    template_name = 'accounts/account_verification.html'
+    form_class = forms.TokenVerificationForm
+    success_url = reverse_lazy('account:login')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        user_id = self.request.session.get('phone_verify_id', None)
+
+        emails_to_verify = EmailAddress.objects.filter(
+            user_id=user_id, verified=False).exists()
+        phones_to_verify = VerificationDevice.objects.filter(
+            user_id=user_id, label='phone_verify').exists()
+        context['phone'] = phones_to_verify
+        context['email'] = emails_to_verify
+
+        return context
+
+    def get_form_kwargs(self, *args, **kwargs):
+        form_kwargs = super().get_form_kwargs(*args, **kwargs)
+        user_id = self.request.session.get('phone_verify_id', None)
+        try:
+            form_kwargs['device'] = VerificationDevice.objects.get(
+                user_id=user_id, label='phone_verify')
+        except VerificationDevice.DoesNotExist:
+            pass
+        return form_kwargs
+
+    def form_valid(self, form):
+        device = form.device
+        user = device.user
+        if user.phone != device.unverified_phone:
+            user.phone = device.unverified_phone
+        user.phone_verified = True
+        user.is_active = True
+        user.save()
+        device.delete()
+        message = _("Successfully verified {phone}")
+        message = message.format(phone=user.phone)
+        messages.add_message(self.request, messages.SUCCESS, message)
+        self.request.session.pop('phone_verify_id', None)
+        return super().form_valid(form)
+
+
+class ResendTokenView(FormView):
+    form_class = forms.ResendTokenForm
+    template_name = 'accounts/resend_token_page.html'
+    success_url = reverse_lazy('account:verify_phone')
+
+    def form_valid(self, form):
+        phone = form.data.get('phone')
+        email = form.data.get('email')
+
+        if phone:
+
+            try:
+                with transaction.atomic():
+                    phone_device = VerificationDevice.objects.get(
+                        unverified_phone=phone, verified=False)
+                    phone_device.generate_challenge()
+                    self.request.session[
+                        'phone_verify_id'] = phone_device.user_id
+
+            except TwilioRestException as e:
+                if e.status >= 500:
+                    msg = TWILIO_ERRORS.get('default')
+                else:
+                    msg = TWILIO_ERRORS.get(e.code)
+
+                if msg:
+                    form.add_error('phone', msg)
+                    return self.form_invalid(form)
+                else:
+                    raise
+            except VerificationDevice.DoesNotExist:
+                pass
+
+            message = _(
+                "Your phone number has been submitted."
+                " If it matches your account on Cadasta Platform, you will"
+                " receive a verification token to confirm your phone.")
+            messages.add_message(self.request, messages.SUCCESS, message)
+
+        if email:
+            email = email.casefold()
+            try:
+                email_device = EmailAddress.objects.get(
+                    email=email, verified=False)
+                user = email_device.user
+                if not user.email_verified:
+                    user.email = email
+                send_email_confirmation(self.request, user)
+                self.request.session['phone_verify_id'] = email_device.user.id
+            except EmailAddress.DoesNotExist:
+                pass
+
+            # This is a gross hack, removing all messages previously added to
+            # the message queue so we don't reveal whether the email address
+            # existed in the system or not. (See issue #1869)
+            get_messages(self.request)._queued_messages = []
+
+            message = _(
+                "Your email address has been submitted."
+                " If it matches your account on Cadasta Platform, you will"
+                " receive a verification link to confirm your email.")
+            messages.add_message(self.request, messages.SUCCESS, message)
+
+        return super().form_valid(form)

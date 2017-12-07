@@ -56,7 +56,7 @@ def server_error(request, template_name='500.html'):
     Templates: `500.html`
     Context: None
     """
-    from django.template import RequestContext, loader
+    from django.template import loader
     from django.http import HttpResponseServerError
     t = loader.get_template(template_name)
-    return HttpResponseServerError(t.render(RequestContext(request)))
+    return HttpResponseServerError(t.render())

@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, filters, status
 from rest_framework.response import Response
 from tutelary.mixins import APIPermissionRequiredMixin
@@ -20,7 +21,7 @@ class SpatialUnitList(APIPermissionRequiredMixin,
             return ['project.view_private', 'spatial.list']
 
     serializer_class = serializers.SpatialUnitSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('type',)
@@ -57,7 +58,7 @@ class SpatialUnitResourceList(APIPermissionRequiredMixin,
                               mixins.SpatialUnitResourceMixin,
                               generics.ListCreateAPIView):
     serializer_class = ResourceSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)

@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'simple_history',
     'jsonattrs',
     'compressor',
+    'django_otp',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -90,6 +91,7 @@ MIDDLEWARE_CLASSES = (
     'audit_log.middleware.UserLoggingMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
     'accounts.middleware.UserLanguageMiddleware',
+    'django_otp.middleware.OTPMiddleware',
 )
 
 REST_FRAMEWORK = {
@@ -138,7 +140,8 @@ TEMPLATES = [
 AUTHENTICATION_BACKENDS = [
     'core.backends.Auth',
     'django.contrib.auth.backends.ModelBackend',
-    'accounts.backends.AuthenticationBackend'
+    'accounts.backends.AuthenticationBackend',
+    'accounts.backends.PhoneAuthenticationBackend'
 ]
 
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
@@ -251,7 +254,16 @@ LEAFLET_CONFIG = {
              'maxZoom': 22}
         ),
     ],
-    'RESET_VIEW': False
+    'RESET_VIEW': False,
+    'PLUGINS': {
+        'draw': {
+            'js': '/static/leaflet/draw/leaflet.draw.js'
+        },
+        'groupedlayercontrol': {
+            'js': '/static/js/leaflet.groupedlayercontrol.min.js',
+            'css': '/static/css/leaflet.groupedlayercontrol.min.css'
+        }
+    }
 }
 
 # Invalid names for Cadasta organizations, projects, and usernames
@@ -578,3 +590,12 @@ ES_SCHEME = 'http'
 ES_HOST = 'localhost'
 ES_PORT = '9200'
 ES_MAX_RESULTS = 10000
+
+TOTP_TOKEN_VALIDITY = 3600
+TOTP_DIGITS = 6
+
+SMS_GATEWAY = 'accounts.gateways.FakeGateway'
+
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_PHONE = '+123'

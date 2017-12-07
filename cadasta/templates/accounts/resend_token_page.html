@@ -1,0 +1,51 @@
+{% extends "core/base.html" %}
+
+{% load staticfiles %}
+{% load i18n %}
+
+{% load widget_tweaks %}
+
+{% block top-nav %}verify{% endblock %}
+
+{% block title %} | {% trans "Verify Account" %}{% endblock %}
+
+{% block extra_script %}
+<script src="{% static 'js/parsleyAddValidator.js' %}"></script>
+<script src="{% static 'js/togglePhoneEmail.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="narrow">
+    <h1>
+        {% trans "Verify Account" %}
+    </h1>
+    <form method='POST' id="verification-form" action="{% url 'account:resend_token' %}" class="form" data-parsley-validate data-parsley-excluded=":hidden">
+        {% csrf_token %}
+        <div id="email-div" class="verifyDiv email clearfix form-group{% if form.email.errors %} has-error{% endif %}">
+            <p>{% trans "To receive a new verification link enter your email address."%}</p>
+            <label class="control-label" for="id_email">{% trans "Email" %}</label>
+            {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" data-parsley-required="true" %}
+            <div class="error-block">{{ form.email.errors }}</div>
+            <div>
+                <a href="#phone-div" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="phone" id="phone-btn">{% trans "I want to verify my phone" %}</a>
+            </div>
+        </div>
+
+        <div id="phone-div" class="verifyDiv phone clearfix form-group{% if form.phone.errors %} has-error{% endif %} hidden">
+            <p>{% trans "To receive a new verification token enter your phone number."%}</p>
+            <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
+            {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phoneplus="1" data-parsley-phonelength="16" data-parsley-phonenumber="1" data-parsley-errors-container="#phone-errors" %}
+            <p class="help-block small">{% trans "Phone numbers must start with a +, followed by a country code and phone number without spaces or punctuation. Phone numbers must contain between 5 and 15 digits." %}</p>
+            <div id="phone-errors"></div>
+            <div class="error-block">{{ form.phone.errors }}</div>
+            <div class="clearfix">
+                <a href="#email-div" class="btn btn-xs btn-link pull-right show-verifyDiv" data-verify="email" id="email-btn">{% trans "I want to verify my email" %}</a>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block text-uppercase" >
+            {% trans 'Send Verification' %}
+        </button>
+    </form>
+</div>
+{% endblock %}
+

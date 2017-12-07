@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework import generics, filters, status
@@ -21,7 +21,7 @@ class OrganizationList(PermissionsFilterMixin,
     lookup_field = 'slug'
     queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
@@ -117,7 +117,7 @@ class OrganizationUsersDetail(APIPermissionRequiredMixin,
 class UserAdminList(APIPermissionRequiredMixin, generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserAdminSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('is_active',)
@@ -145,7 +145,7 @@ class OrganizationProjectList(PermissionsFilterMixin,
                               generics.ListCreateAPIView):
     org_lookup = 'organization'
     serializer_class = serializers.ProjectSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
@@ -188,7 +188,7 @@ class ProjectList(PermissionsFilterMixin,
                   generics.ListAPIView):
 
     serializer_class = serializers.ProjectSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
