@@ -57,6 +57,11 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.NullHandler',
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        }
+
     },
     'loggers': {
         'django': {
@@ -67,8 +72,12 @@ LOGGING = {
         'xform.submissions': {
             'handlers': ['file'],
             'level': 'DEBUG'
-        }
-    },
+        },
+        'accounts.FakeGateway': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        },
+    }
 }
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')

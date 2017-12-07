@@ -125,7 +125,7 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
                                 user=self.user)
         assert response.status_code == 400
         assert self.project.users.count() == 0
-        assert ('User with username or email some-user does not exist'
+        assert ('User with username or email or phone some-user does not exist'
                 in response.content['username'])
 
     def test_add_user_to_archived_project(self):

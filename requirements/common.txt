@@ -38,3 +38,7 @@ pyparsing==2.2.0
 django-compressor==2.2
 beautifulsoup4==4.6.0
 gpxpy==1.1.2
+django-otp==0.3.11
+twilio==6.5.0
+phonenumbers==8.5.2
+opbeat==3.5.2

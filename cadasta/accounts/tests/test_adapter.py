@@ -18,7 +18,7 @@ from ..adapter import DefaultAccountAdapter as a
 class AccountAdapterTests(UserTestCase, TestCase):
     @override_settings(CACHES={
         'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
-        })
+    })
     def test_pre_authenticate(self):
         UserFactory.create(username='john_snow', password='Winteriscoming!')
         credentials = {'username': 'john_snow', 'password': 'knowsnothing'}
@@ -29,7 +29,7 @@ class AccountAdapterTests(UserTestCase, TestCase):
 
     @override_settings(CACHES={
         'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
-        })
+    })
     def test_pre_authenticate_fails(self):
         UserFactory.create(username='john_snow', password='Winteriscoming!')
         credentials = {'username': 'john_snow', 'password': 'knowsnothing'}
@@ -57,7 +57,7 @@ class AccountAdapterTests(UserTestCase, TestCase):
 
     @override_settings(CACHES={
         'default': {'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'}
-        })
+    })
     def test_pre_authenticate_maxes_out(self):
         UserFactory.create(username='john_snow', password='Winteriscoming!')
         credentials = {'username': 'john_snow', 'password': 'knowsnothing'}
@@ -67,7 +67,7 @@ class AccountAdapterTests(UserTestCase, TestCase):
         cache_key = all_auth()._get_login_attempts_cache_key(
             request, **credentials)
 
-        data = [None]*1000
+        data = [None] * 1000
         dt = timezone.now()
 
         data.append(time.mktime(dt.timetuple()))

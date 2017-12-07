@@ -6,6 +6,7 @@ from ..views import api
 
 
 class UserUrlsTest(TestCase):
+
     def test_account_user(self):
         assert reverse(version_ns('accounts:user')) == version_url('/account/')
 
@@ -32,3 +33,10 @@ class UserUrlsTest(TestCase):
 
         resolved = resolve(version_url('/account/password/'))
         assert resolved.func.__name__ == api.SetPasswordView.__name__
+
+    def test_account_verify_phone(self):
+        assert (reverse(version_ns('accounts:verify_phone')) ==
+                version_url('/account/verify/phone/'))
+
+        resolved = resolve(version_url('/account/verify/phone/'))
+        assert resolved.func.__name__ == api.ConfirmPhoneView.__name__

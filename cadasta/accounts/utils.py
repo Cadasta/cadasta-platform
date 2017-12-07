@@ -2,6 +2,7 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.utils.module_loading import import_string
 
 
 def send_email_update_notification(email):
@@ -14,3 +15,8 @@ def send_email_update_notification(email):
         [email],
         fail_silently=False,
     )
+
+
+def send_sms(to, body):
+    twilioobj = (import_string(settings.SMS_GATEWAY))()
+    twilioobj.send_sms(to, body)
