@@ -1,5 +1,22 @@
 # Change Log
 
+## [v1.14.0](https://github.com/Cadasta/cadasta-platform/tree/v1.14.0) (2017-12-07)
+
+## Added
+
+- Ability to register using a phone number (#1768)
+
+## Changed
+
+- Improved display of numbers on project dashboard (#1879)
+- Refactor static location in dev VM (#1867); including follow-on bug fixes:
+  - Fix cadasta path in `runtests.py` (#1920)
+  - Re-add Leaflet settings, resolves #1921 (#1922)
+- Update browsers and WebDrivers in VM (#1912)
+- Travis job updates:
+  - Use Travis conditional jobs feature (#1895)
+  - Run only functional tests for PRs (#1907)
+
 ## [v1.13.1](https://github.com/Cadasta/cadasta-platform/tree/v1.13.1) (2017-11-13)
 
 ### Changed
