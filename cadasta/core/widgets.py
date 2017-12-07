@@ -1,5 +1,4 @@
 from django.forms import Select, SelectMultiple
-from jsonattrs.mixins import template_xlang_labels
 
 
 class XLangSelect(Select):
@@ -7,15 +6,30 @@ class XLangSelect(Select):
         super().__init__(*args, **kwargs)
         self.xlang_labels = xlang_labels
 
-    def render_option(self, selected_choices, option_value, option_label):
-        rendered = super().render_option(
-            selected_choices, option_value, option_label)
-        rendered = rendered.replace(
-            '<option',
-            '<option ' + template_xlang_labels(
-                self.xlang_labels.get(option_value, ''))
-        )
-        return rendered
+    def set_xlang_labels(self, groups):
+        # Iterate over all option groups
+        for g in groups:
+
+            # Each group is represented as a tuple:
+            # (group name, list of options, index)
+            # We want to iterate over all options in each group, hence g[1]
+            for select in g[1]:
+                xlang_labels = self.xlang_labels.get(select['value'], {})
+
+                # converts the original xlang_labels to the required format
+                labels_attrs = {'data-label-' + k: v
+                                for k, v in xlang_labels.items()}
+                select['attrs'].update(labels_attrs)
+
+        return groups
+
+    def optgroups(self, name, value, attrs=None):
+        """
+        We overwriting optgroups because we need to set multilingual labels
+        for each option in the select field.
+        """
+        return self.set_xlang_labels(
+            super().optgroups(name, value, attrs=attrs))
 
 
 class XLangSelectMultiple(XLangSelect, SelectMultiple):
