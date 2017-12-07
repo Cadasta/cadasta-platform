@@ -38,7 +38,7 @@ class HandledErrors(type):
         try:
             for (method, errors) in getattr(cls, METHOD_KEY, []):
                 setattr(cls, method, safe_func(getattr(cls, method), errors))
-        except:
+        except (ValueError, AttributeError):
             raise ValueError(
                 "Failed to implement class {!r} with metaclass "
                 "'HandledErrors'".format(name))

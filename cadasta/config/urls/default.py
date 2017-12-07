@@ -23,6 +23,7 @@ server_error_handler = 'core.views.default.server_error'
 
 api_v1 = [
     url(r'^account/', include('accounts.urls.api', namespace='accounts')),
+    url(r'^account/', include('djoser.urls')),
     url(r'^account/', include('djoser.urls.authtoken')),
 
     url(r'^organizations/',

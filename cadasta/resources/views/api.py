@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics
 from tutelary.mixins import APIPermissionRequiredMixin
 from core.mixins import update_permissions
@@ -27,7 +28,7 @@ def filter_archived_resources(self, view, obj):
 class ProjectResources(APIPermissionRequiredMixin,
                        mixins.ProjectResourceMixin,
                        generics.ListCreateAPIView):
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
@@ -63,7 +64,7 @@ class ProjectSpatialResources(APIPermissionRequiredMixin,
                               mixins.ProjectSpatialResourceMixin,
                               generics.ListAPIView):
 
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('id', 'name')
