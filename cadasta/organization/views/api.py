@@ -177,28 +177,15 @@ class OrganizationProjectList(PermissionsFilterMixin,
         if self.request.method == 'POST':
             return [self.get_organization()]
 
-        if self.is_administrator:
-            return super().get_queryset().filter(
-                organization__slug=self.kwargs['organization']
-            )
-        else:
-            return super().get_queryset().filter(
-                organization__slug=self.kwargs['organization'],
-                archived=False, access='public'
-            )
+        return super().get_queryset().filter(
+            organization__slug=self.kwargs['organization']
+        )
 
 
 class ProjectList(PermissionsFilterMixin,
                   APIPermissionRequiredMixin,
                   mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
-    def permission_filter(self, view, p):
-        if p.archived is True:
-            return ('project.view_archived',)
-        elif p.access == 'private':
-            return ('project.view_private',)
-        else:
-            return ('project.view',)
 
     serializer_class = serializers.ProjectSerializer
     filter_backends = (DjangoFilterBackend,
@@ -207,8 +194,7 @@ class ProjectList(PermissionsFilterMixin,
     filter_fields = ('archived',)
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
-    permission_required = {'GET': 'project.list'}
-    permission_filter_queryset = permission_filter
+    permission_required = ()
 
 
 class ProjectDetail(APIPermissionRequiredMixin,

@@ -159,17 +159,27 @@ class ProjectRoles(ProjectMixin):
 
 class ProjectQuerySetMixin:
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Project.objects.all()
-
-        if hasattr(self.request.user, 'organizations'):
-            orgs = self.request.user.organizations.all()
-            if len(orgs) > 0:
-                return Project.objects.filter(
-                    Q(access='public') | Q(organization__in=orgs)
-                )
-
-        return Project.objects.filter(access='public')
+        user = self.request.user
+        if user.is_superuser:
+            # superusers see all projects
+            projects = Project.objects.all()
+        else:
+            # anyone can view public unarchived projects
+            query = Q(access='public', archived=False)
+            if not user.is_anonymous:
+                # org/project members can view private unarchived projects
+                query |= Q(
+                    organization__organizationrole__user=user,
+                    access='private', archived=False)
+                # org admins can view archived projects
+                query |= Q(
+                    organization__organizationrole__user=user,
+                    organization__organizationrole__admin=True)
+                # project managers can view private/public archived/active prjs
+                query |= Q(projectrole__user=user, projectrole__role='PM')
+            projects = Project.objects.filter(query).distinct()
+        return projects.select_related('organization').order_by(
+            'organization__slug', 'slug')
 
 
 class ProjectAdminCheckMixin(SuperUserCheckMixin):
