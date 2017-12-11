@@ -1,5 +1,4 @@
 from django.forms import Select, Widget
-from django.conf import settings
 from django.utils.translation import ugettext as _
 
 
@@ -32,16 +31,11 @@ class ProjectRoleWidget(Select):
         else:
             select = super().render(name, value, *args, **kwargs)
 
-        if not self.user.avatar or not self.user.avatar.url:
-            avatar_url = settings.DEFAULT_AVATAR
-        else:
-            avatar_url = self.user.avatar.url
-
         return self.html.format(
             full_name=self.user.full_name,
             username=self.user.username,
             email=self.user.email,
-            avatar_url=avatar_url,
+            avatar_url=self.user.avatar_url,
             select=select
         )
 
