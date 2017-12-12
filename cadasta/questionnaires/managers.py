@@ -69,7 +69,7 @@ def create_options(options, question, errors=[]):
             )
     else:
         errors.append(_("Please provide at least one option for field"
-                        " '{field_name}'".format(field_name=question.name)))
+                        " '{field_name}'").format(field_name=question.name))
 
 
 def fix_labels(labels):
@@ -132,11 +132,11 @@ def create_attrs_schema(project, question_group_dict, attr_type_ids,
         try:
             attr_type_id = attr_type_ids[field['attr_type']]
         except KeyError:
-            msg = (
+            msg = _(
                     "{attr_type!r} (found in the {name!r} question) is not "
                     "a supported attribute type."
                 ).format(**field)
-            raise InvalidQuestionnaire([_(msg)])
+            raise InvalidQuestionnaire([msg])
         choices = field.get('choices', [])
         choice_labels = field.get('choice_labels', None)
         default = field.get('default', '')
