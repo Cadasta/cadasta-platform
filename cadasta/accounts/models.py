@@ -134,14 +134,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
 def assign_default_policy(sender, instance, created, **kwargs):
     if not created:
         return
-    perm_set = instance.permissionset.first()
-    has_default = {'policy__name': 'default'}
-    if perm_set and perm_set.policyinstance_set.filter(**has_default).exists():
-        # Default policy already assigned, no action necessary
-        return
-    instance.assign_policies(
-        Policy.objects.get(name='default'),
-        *instance.assigned_policies())
+    instance.assign_policies(Policy.objects.get(name='default'))
 
 
 @receiver(password_changed)
