@@ -229,6 +229,18 @@ class QuestionnaireManagerTest(FileStorageTestCase, TestCase):
         assert m1.id != model.id
         assert project.current_questionnaire == model.id
 
+    def test_create_resource_in_group(self):
+        create_attribute_types()
+        file = self.get_file('/questionnaires/tests/files/'
+                             't_questionnaire_resource_in_group.xlsx', 'rb')
+        form = self.storage.save(
+            'xls-forms/t_questionnaire_resource_in_group.xlsx', file.read())
+        file.close()
+        models.Questionnaire.objects.create_from_form(
+            xls_form=form,
+            project=ProjectFactory.create()
+        )
+
     def test_create_from_invald_form(self):
         file = self.get_file(
             '/questionnaires/tests/files/xls-form-invalid.xlsx', 'rb')
