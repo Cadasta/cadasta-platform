@@ -142,3 +142,13 @@ class SanitizeFieldSerializerTest(TestCase):
         assert SANITIZE_ERROR in e.value.detail['name']
         assert SANITIZE_ERROR in e.value.detail['description']
         assert SANITIZE_ERROR in e.value.detail['attributes']
+
+    def test_valid_attributes_none(self):
+        data = {
+            'name': 'Name',
+            'description': 'Description',
+            'number': 2,
+            'attributes': None
+        }
+        serializer = MySanitizeFieldSerializer(data=data)
+        assert serializer.validate(data) == data
