@@ -5,9 +5,9 @@ pytest-cov==2.5.1
 selenium==3.6.0
 transifex-client==0.12.4
 tox==2.9.1
-flake8==3.4.1
+flake8==3.5.0
 django-debug-toolbar==1.8
-django-extensions==1.9.1
+django-extensions==1.9.7
 django-skivvy==0.1.9
 ipython==6.2.1
-git+https://github.com/Cadasta/cadasta-test.git@v0.2.8
+git+https://github.com/Cadasta/cadasta-test.git@v0.2.9

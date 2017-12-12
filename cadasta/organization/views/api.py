@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 from rest_framework import generics, filters, status
@@ -21,7 +21,7 @@ class OrganizationList(PermissionsFilterMixin,
     lookup_field = 'slug'
     queryset = Organization.objects.all()
     serializer_class = serializers.OrganizationSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
@@ -117,7 +117,7 @@ class OrganizationUsersDetail(APIPermissionRequiredMixin,
 class UserAdminList(APIPermissionRequiredMixin, generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserAdminSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('is_active',)
@@ -145,7 +145,7 @@ class OrganizationProjectList(PermissionsFilterMixin,
                               generics.ListCreateAPIView):
     org_lookup = 'organization'
     serializer_class = serializers.ProjectSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
@@ -177,38 +177,24 @@ class OrganizationProjectList(PermissionsFilterMixin,
         if self.request.method == 'POST':
             return [self.get_organization()]
 
-        if self.is_administrator:
-            return super().get_queryset().filter(
-                organization__slug=self.kwargs['organization']
-            )
-        else:
-            return super().get_queryset().filter(
-                organization__slug=self.kwargs['organization'],
-                archived=False, access='public'
-            )
+        return super().get_queryset().filter(
+            organization__slug=self.kwargs['organization']
+        )
 
 
 class ProjectList(PermissionsFilterMixin,
                   APIPermissionRequiredMixin,
                   mixins.ProjectQuerySetMixin,
                   generics.ListAPIView):
-    def permission_filter(self, view, p):
-        if p.archived is True:
-            return ('project.view_archived',)
-        elif p.access == 'private':
-            return ('project.view_private',)
-        else:
-            return ('project.view',)
 
     serializer_class = serializers.ProjectSerializer
-    filter_backends = (filters.DjangoFilterBackend,
+    filter_backends = (DjangoFilterBackend,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
     search_fields = ('name', 'organization__name', 'country', 'description',)
     ordering_fields = ('name', 'organization', 'country', 'description',)
-    permission_required = {'GET': 'project.list'}
-    permission_filter_queryset = permission_filter
+    permission_required = ()
 
 
 class ProjectDetail(APIPermissionRequiredMixin,

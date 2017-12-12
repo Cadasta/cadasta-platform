@@ -2,6 +2,7 @@ import string
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
 
+import re
 from .models import User
 
 DEFAULT_CHARACTER_TYPES = [
@@ -13,6 +14,7 @@ DEFAULT_CHARACTER_TYPES = [
 
 
 class CharacterTypePasswordValidator(object):
+
     def __init__(self, character_types=DEFAULT_CHARACTER_TYPES,
                  unique_types=3):
         self.character_types = character_types
@@ -40,8 +42,9 @@ class CharacterTypePasswordValidator(object):
 
 
 class EmailSimilarityValidator(object):
+
     def validate(self, password, user=None):
-        if not user:
+        if not user or not user.email:
             return None
 
         email = user.email.split('@')
@@ -59,3 +62,11 @@ def check_username_case_insensitive(username):
         raise ValidationError(
             _("A user with that username already exists")
         )
+
+
+def phone_validator(phone):
+    pattern = r'^\+(?:[0-9]?){6,14}[0-9]$'
+    if re.match(pattern=pattern, string=str(phone)):
+        return True
+    else:
+        return False

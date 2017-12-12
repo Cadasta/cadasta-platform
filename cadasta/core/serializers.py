@@ -45,7 +45,7 @@ class SanitizeFieldSerializer:
                     data[name] = value
                 valid = sanitize_string(value)
             elif type(field) is serializers.JSONField:
-                value = data.get(name, {})
+                value = data.get(name, {}) or {}
                 valid = all(sanitize_string(value[k]) for k in value)
 
             if not valid:

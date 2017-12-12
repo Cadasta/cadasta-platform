@@ -126,9 +126,9 @@ class OrganizationListAPITest(APITestCase, UserTestCase, TestCase):
             'clause': [
                 clause('allow', ['org.list']),
                 clause('allow', ['org.view', 'project.create'],
-                                ['organization/*']),
+                       ['organization/*']),
                 clause('deny', ['project.create'],
-                               ['organization/unauthorized'])
+                       ['organization/unauthorized'])
             ]
         }
         policy = Policy.objects.create(name='deny', body=json.dumps(clauses))
@@ -166,8 +166,8 @@ class OrganizationCreateAPITest(APITestCase, UserTestCase, TestCase):
         assert response.status_code == 201
         assert Organization.objects.count() == 1
         assert OrganizationRole.objects.get(
-                organization_id=response.content['id'], user=self.user
-            ).admin is True
+            organization_id=response.content['id'], user=self.user
+        ).admin is True
 
     def test_create_invalid_organization(self):
         data = {'description': 'Org description'}
@@ -442,8 +442,8 @@ class OrganizationUsersAPITest(APITestCase, UserTestCase, TestCase):
                                 post_data={'username': 'some_username'})
         assert response.status_code == 400
         assert self.org.users.count() == 2
-        assert ("User with username or email some_username does not exist"
-                in response.content['username'])
+        assert ("User with username or email or phone some_username does not"
+                " exist" in response.content['username'])
 
     def test_add_user_to_organization_that_does_not_exist(self):
         new_user = UserFactory.create()
