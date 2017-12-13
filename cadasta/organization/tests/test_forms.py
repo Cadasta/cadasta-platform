@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
+from django.http.response import Http404
 from jsonattrs.models import Attribute, AttributeType, Schema
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.exceptions import InvalidQuestionnaire
@@ -317,6 +318,15 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
         assert form.current_user == self.user
         assert form.org_role_instance.admin is False
         assert form.initial['org_role'] == 'M'
+
+    def test_init_with_non_member(self):
+        non_member = UserFactory.create()
+        data = {
+            'org_role': 'A'
+        }
+        with pytest.raises(Http404):
+            forms.EditOrganizationMemberForm(
+                self.org, non_member, self.user, data)
 
     def test_edit_org_role(self):
         org = OrganizationFactory.create()

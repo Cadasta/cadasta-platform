@@ -22,7 +22,7 @@ from resources.tests.factories import ResourceFactory
 from resources.tests.utils import clear_temp  # noqa
 from resources.utils.io import ensure_dirs
 from spatial.tests.factories import SpatialUnitFactory
-from questionnaires.managers import create_attrs_schema
+from questionnaires.managers import create_attrs_schema, get_attr_type_ids
 from questionnaires.tests import attr_schemas
 from questionnaires.tests.factories import QuestionnaireFactory
 from .fake_results import get_fake_es_api_results
@@ -45,37 +45,43 @@ class BaseTestClass(UserTestCase, TestCase):
         super().setUp()
         self.project = ProjectFactory.create()
         QuestionnaireFactory.create(project=self.project)
+        ATTR_TYPE_IDS = get_attr_type_ids()
 
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.location_xform_group,
+            question_group_dict=attr_schemas.location_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.default_party_xform_group,
+            question_group_dict=attr_schemas.default_party_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.individual_party_xform_group,
+            question_group_dict=attr_schemas.individual_party_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.group_party_attributes,
+            question_group_dict=attr_schemas.group_party_attributes,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.tenure_relationship_xform_group,
+            question_group_dict=attr_schemas.tenure_relationship_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
 
 

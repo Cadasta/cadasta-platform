@@ -9,7 +9,7 @@ from organization.tests.factories import ProjectFactory
 from spatial.tests.factories import SpatialUnitFactory
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from resources.tests.factories import ResourceFactory
-from questionnaires.managers import create_attrs_schema
+from questionnaires.managers import create_attrs_schema, get_attr_type_ids
 from questionnaires.tests import attr_schemas
 from questionnaires.tests.factories import QuestionnaireFactory
 from .. import views
@@ -20,32 +20,37 @@ class TransformTest(UserTestCase, TestCase):
     def setup_data(self):
         self.project = ProjectFactory.create()
         QuestionnaireFactory.create(project=self.project)
+        ATTR_TYPE_IDS = get_attr_type_ids()
 
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.location_xform_group,
+            question_group_dict=attr_schemas.location_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.default_party_xform_group,
+            question_group_dict=attr_schemas.default_party_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.individual_party_xform_group,
+            question_group_dict=attr_schemas.individual_party_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
             project=self.project,
-            dict=attr_schemas.tenure_relationship_xform_group,
+            question_group_dict=attr_schemas.tenure_relationship_xform_group,
             content_type=content_type,
+            attr_type_ids=ATTR_TYPE_IDS,
         )
 
         self.location = SpatialUnitFactory.create(
