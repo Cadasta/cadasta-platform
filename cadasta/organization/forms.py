@@ -15,6 +15,7 @@ from django.db import transaction
 from django.forms import ValidationError
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
+from django.shortcuts import get_object_or_404
 from leaflet.forms.widgets import LeafletWidget
 from questionnaires.models import Questionnaire
 from tutelary.models import check_perms
@@ -223,7 +224,8 @@ class EditOrganizationMemberForm(forms.Form):
         self.user = user
         self.current_user = current_user
 
-        self.org_role_instance = OrganizationRole.objects.get(
+        self.org_role_instance = get_object_or_404(
+            OrganizationRole,
             user=user,
             organization=self.organization)
 
