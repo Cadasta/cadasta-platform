@@ -112,7 +112,7 @@ class CreateChildrenTest(TestCase):
                 }
             ],
         }]
-        create_children(children, kwargs={'questionnaire': questionnaire})
+        create_children(children, questionnaire=questionnaire)
 
         assert models.QuestionGroup.objects.filter(
             questionnaire=questionnaire).count() == 1
@@ -157,7 +157,7 @@ class CreateChildrenTest(TestCase):
                 }
             ],
         }]
-        create_children(children, kwargs={'questionnaire': questionnaire})
+        create_children(children, questionnaire=questionnaire)
 
         assert models.QuestionGroup.objects.filter(
             questionnaire=questionnaire).count() == 2
@@ -309,7 +309,7 @@ class QuestionGroupManagerTest(TestCase):
         questionnaire = factories.QuestionnaireFactory.create()
 
         model = models.QuestionGroup.objects.create_from_dict(
-            dict=question_group_dict,
+            data=question_group_dict,
             questionnaire=questionnaire
         )
         assert model.questionnaire == questionnaire
@@ -333,7 +333,7 @@ class QuestionGroupManagerTest(TestCase):
         questionnaire = factories.QuestionnaireFactory.create()
 
         model = models.QuestionGroup.objects.create_from_dict(
-            dict=question_group_dict,
+            data=question_group_dict,
             questionnaire=questionnaire
         )
         assert model.questionnaire == questionnaire
@@ -361,7 +361,7 @@ class QuestionManagerTest(TestCase):
         questionnaire = factories.QuestionnaireFactory.create()
 
         model = models.Question.objects.create_from_dict(
-            dict=question_dict,
+            data=question_dict,
             questionnaire=questionnaire
         )
 
@@ -387,7 +387,7 @@ class QuestionManagerTest(TestCase):
         questionnaire = factories.QuestionnaireFactory.create()
 
         model = models.Question.objects.create_from_dict(
-            dict=question_dict,
+            data=question_dict,
             questionnaire=questionnaire
         )
 
@@ -411,7 +411,7 @@ class QuestionManagerTest(TestCase):
         questionnaire = factories.QuestionnaireFactory.create()
 
         model = models.Question.objects.create_from_dict(
-            dict=question_dict,
+            data=question_dict,
             questionnaire=questionnaire
         )
 
@@ -434,7 +434,7 @@ class QuestionManagerTest(TestCase):
         questionnaire = factories.QuestionnaireFactory.create()
 
         model = models.Question.objects.create_from_dict(
-            dict=question_dict,
+            data=question_dict,
             questionnaire=questionnaire
         )
 
@@ -460,7 +460,7 @@ class QuestionManagerTest(TestCase):
 
         with pytest.raises(InvalidQuestionnaire):
             models.Question.objects.create_from_dict(
-                dict=question_dict,
+                data=question_dict,
                 questionnaire=questionnaire
             )
 
@@ -475,7 +475,7 @@ class QuestionManagerTest(TestCase):
         question_group = factories.QuestionGroupFactory.create()
 
         model = models.Question.objects.create_from_dict(
-            dict=question_dict,
+            data=question_dict,
             questionnaire=questionnaire,
             question_group=question_group
         )

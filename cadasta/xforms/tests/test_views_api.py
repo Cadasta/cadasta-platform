@@ -18,7 +18,7 @@ from core.tests.utils.files import make_dirs  # noqa
 from organization.models import OrganizationRole
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from party.models import Party, TenureRelationship
-from questionnaires.managers import create_attrs_schema
+from questionnaires.managers import create_attrs_schema, get_attr_type_ids
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import (QuestionFactory,
                                             QuestionnaireFactory)
@@ -145,22 +145,27 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         return questionnaire
 
     def _create_attrs_schema(self, prj):
+        attr_type_ids = get_attr_type_ids()
         create_attrs_schema(
-            project=prj, dict=default_party_xform_group,
+            project=prj, question_group_dict=default_party_xform_group,
             content_type=ContentType.objects.get(
-                app_label='party', model='party'), errors=[])
+                app_label='party', model='party'),
+            errors=[], attr_type_ids=attr_type_ids)
         create_attrs_schema(
-            project=prj, dict=individual_party_xform_group,
+            project=prj, question_group_dict=individual_party_xform_group,
             content_type=ContentType.objects.get(
-                app_label='party', model='party'), errors=[])
+                app_label='party', model='party'),
+            errors=[], attr_type_ids=attr_type_ids)
         create_attrs_schema(
-            project=prj, dict=location_xform_group,
+            project=prj, question_group_dict=location_xform_group,
             content_type=ContentType.objects.get(
-                app_label='spatial', model='spatialunit'), errors=[])
+                app_label='spatial', model='spatialunit'),
+            errors=[], attr_type_ids=attr_type_ids)
         create_attrs_schema(
-            project=prj, dict=tenure_relationship_xform_group,
+            project=prj, question_group_dict=tenure_relationship_xform_group,
             content_type=ContentType.objects.get(
-                app_label='party', model='tenurerelationship'), errors=[])
+                app_label='party', model='tenurerelationship'),
+            errors=[], attr_type_ids=attr_type_ids)
 
     def _get_resource(self, file_name, file_type):
         file = self.get_file(
