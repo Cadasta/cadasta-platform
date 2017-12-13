@@ -13,12 +13,11 @@ from spatial.tests.factories import (SpatialRelationshipFactory,
                                      SpatialUnitFactory)
 
 from .. import models
-from ..managers import create_attrs_schema
-from .attr_schemas import (location_relationship_xform_group,
-                           location_xform_group,
+from ..managers import create_attrs_schema, get_attr_type_ids
+from ..exceptions import InvalidQuestionnaire
+from .attr_schemas import (location_xform_group,
                            party_relationship_xform_group,
-                           individual_party_xform_group,
-                           tenure_relationship_xform_group)
+                           individual_party_xform_group)
 from .factories import QuestionnaireFactory
 
 
@@ -44,8 +43,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=individual_party_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=individual_party_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         party = PartyFactory.create(
             name='TestParty', project=project,
             type='IN',
@@ -73,8 +73,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=individual_party_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=individual_party_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             PartyFactory.create(
@@ -85,14 +86,29 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
                 }
             )
 
+    def test_party_invalid_attribute_type(self):
+        project = ProjectFactory.create(name='TestProject')
+        QuestionnaireFactory.create(project=project)
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        with pytest.raises(InvalidQuestionnaire) as e:
+            create_attrs_schema(
+                project=project,
+                question_group_dict=individual_party_xform_group,
+                content_type=content_type, errors=[], attr_type_ids={})
+        assert e.value.errors == [
+            "'select_one' (found in the 'gender' question) is not a "
+            "supported attribute type."]
+
     def test_spatial_unit_attribute_schema(self):
         project = ProjectFactory.create(name='TestProject')
         QuestionnaireFactory.create(project=project)
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         create_attrs_schema(
-            project=project, dict=location_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=location_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         spatial_unit = SpatialUnitFactory.create(
             project=project,
             attributes={
@@ -118,8 +134,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         create_attrs_schema(
-            project=project, dict=location_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=location_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             SpatialUnitFactory.create(
@@ -135,8 +152,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialrelationship')
         create_attrs_schema(
-            project=project, dict=location_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=project, content_type=content_type, errors=[],
+            question_group_dict=party_relationship_xform_group,
+            attr_type_ids=get_attr_type_ids())
         sur = SpatialRelationshipFactory.create(
             project=project, attributes={
                 'notes': 'Some additional textual info'}
@@ -154,8 +172,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialrelationship')
         create_attrs_schema(
-            project=project, dict=location_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=project, content_type=content_type, errors=[],
+            question_group_dict=party_relationship_xform_group,
+            attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             SpatialRelationshipFactory.create(
@@ -171,8 +190,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='partyrelationship')
         create_attrs_schema(
-            project=project, dict=party_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=project, content_type=content_type, errors=[],
+            question_group_dict=party_relationship_xform_group,
+            attr_type_ids=get_attr_type_ids())
         pr = PartyRelationshipFactory.create(
             project=project, attributes={
                 'notes': 'Some additional textual info'}
@@ -190,8 +210,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='partyrelationship')
         create_attrs_schema(
-            project=project, dict=party_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=project, content_type=content_type, errors=[],
+            question_group_dict=party_relationship_xform_group,
+            attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             PartyRelationshipFactory.create(
@@ -207,8 +228,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
-            project=project, dict=tenure_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=project, content_type=content_type, errors=[],
+            question_group_dict=party_relationship_xform_group,
+            attr_type_ids=get_attr_type_ids())
         tr = TenureRelationshipFactory.create(
             project=project, attributes={
                 'notes': 'Some additional textual info'}
@@ -226,8 +248,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='tenurerelationship')
         create_attrs_schema(
-            project=project, dict=tenure_relationship_xform_group,
-            content_type=content_type, errors=[])
+            project=project, content_type=content_type, errors=[],
+            question_group_dict=party_relationship_xform_group,
+            attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
         with pytest.raises(KeyError):
             TenureRelationshipFactory.create(
@@ -243,8 +266,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='spatial', model='spatialunit')
         create_attrs_schema(
-            project=project, dict=location_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=location_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         with pytest.raises(KeyError):
             SpatialUnitFactory.create(
                 project=project,
@@ -259,8 +283,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=individual_party_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=individual_party_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         # with pytest.raises(ValidationError):
         #     PartyFactory.create(
         #         project=project,
@@ -282,8 +307,9 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
         content_type = ContentType.objects.get(
             app_label='party', model='party')
         create_attrs_schema(
-            project=project, dict=individual_party_xform_group,
-            content_type=content_type, errors=[])
+            project=project, question_group_dict=individual_party_xform_group,
+            content_type=content_type, errors=[],
+            attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
         with pytest.raises(ValidationError):
             PartyFactory.create(

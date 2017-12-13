@@ -1,4 +1,3 @@
-import itertools
 import re
 from xml.dom.minidom import Element
 from django.apps import apps
@@ -21,15 +20,23 @@ from .validators import validate_accuracy
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
 
-def create_children(children, errors=[], project=None,
-                    default_language='', kwargs={}):
+def get_attr_type_ids():
+    return {
+        _type: _id
+        for _type, _id in AttributeType.objects.values_list('name', 'id')
+    }
+
+
+def create_children(children, errors=[], project=None, default_language='',
+                    questionnaire=None, question_group=None):
     if children:
-        for c, idx in zip(children, itertools.count()):
-            if c.get('type') in ['group', 'repeat']:
+        ATTR_TYPE_IDS = get_attr_type_ids()
+        for idx, child in enumerate(children):
+            if child.get('type') in ['group', 'repeat']:
                 model_name = 'QuestionGroup'
 
                 # parse attribute group
-                attribute_group = c.get('name')
+                attribute_group = child.get('name')
                 for attr_group in ATTRIBUTE_GROUPS.keys():
                     if attribute_group.startswith(attr_group):
                         app_label = ATTRIBUTE_GROUPS[attr_group]['app_label']
@@ -37,33 +44,32 @@ def create_children(children, errors=[], project=None,
                         content_type = ContentType.objects.get(
                             app_label=app_label, model=model)
                         create_attrs_schema(
-                            project=project, dict=c,
+                            project=project, question_group_dict=child,
+                            attr_type_ids=ATTR_TYPE_IDS,
                             content_type=content_type,
-                            default_language=default_language,
-                            errors=errors
+                            default_language=default_language, errors=errors
                         )
             else:
                 model_name = 'Question'
 
             model = apps.get_model('questionnaires', model_name)
-            model.objects.create_from_dict(dict=c,
-                                           index=idx,
-                                           errors=errors,
-                                           **kwargs)
+            model.objects.create_from_dict(
+                data=child, index=idx, errors=errors,
+                questionnaire=questionnaire, question_group=question_group)
 
 
 def create_options(options, question, errors=[]):
     if options:
-        for o, idx in zip(options, itertools.count()):
+        for idx, option in enumerate(options, 1):
             QuestionOption = apps.get_model('questionnaires', 'QuestionOption')
 
             QuestionOption.objects.create(
-                question=question, index=idx+1, name=o['name'],
-                label_xlat=o.get('label_xlat', o.get('label', {}))
+                question=question, index=idx, name=option['name'],
+                label_xlat=option.get('label_xlat', option.get('label', {}))
             )
     else:
         errors.append(_("Please provide at least one option for field"
-                        " '{field_name}'".format(field_name=question.name)))
+                        " '{field_name}'").format(field_name=question.name))
 
 
 def fix_labels(labels):
@@ -73,15 +79,15 @@ def fix_labels(labels):
         return labels
 
 
-def create_attrs_schema(project=None, dict=None, content_type=None,
-                        default_language='', errors=[]):
+def create_attrs_schema(project, question_group_dict, attr_type_ids,
+                        content_type, default_language='', errors=[]):
     fields = []
     selectors = (project.organization.pk, project.pk,
                  project.current_questionnaire)
     # check if the attribute group has a relevant bind statement,
     # eg ${party_type}='IN'
     # this enables conditional attribute schema creation
-    bind = dict.get('bind', None)
+    bind = question_group_dict.get('bind', None)
     if bind:
         relevant = bind.get('relevant', None)
         if relevant:
@@ -96,34 +102,41 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
     except IntegrityError:
         raise InvalidQuestionnaire(errors=[MISSING_RELEVANT])
 
-    for c in dict.get('children'):
+    for child in question_group_dict['children']:
         field = {}
-        field['name'] = c.get('name')
-        field['long_name'] = c.get('label')
+        field['name'] = child.get('name')
+        field['long_name'] = child.get('label')
         # HACK: pyxform renames select_multiple to select all that apply
-        if c.get('type') == 'select all that apply':
+        if child.get('type') == 'select all that apply':
             field['attr_type'] = 'select_multiple'
         else:
             # HACK: pyxform strips underscores from xform field names
-            field['attr_type'] = c.get('type').replace(' ', '_')
-        if c.get('default'):
-            field['default'] = c.get('default', '')
-        if c.get('omit'):
-            field['omit'] = c.get('omit')
-        bind = c.get('bind')
+            field['attr_type'] = child.get('type').replace(' ', '_')
+        if child.get('default'):
+            field['default'] = child.get('default', '')
+        if child.get('omit'):
+            field['omit'] = child.get('omit')
+        bind = child.get('bind')
         if bind:
             field['required'] = True if bind.get(
-                'required', 'no') == 'yes' else False
-        if c.get('choices'):
+                'required') == 'yes' else False
+        if child.get('choices'):
             field['choices'] = [choice.get('name')
-                                for choice in c.get('choices')]
+                                for choice in child.get('choices')]
             field['choice_labels'] = [fix_labels(choice.get('label'))
-                                      for choice in c.get('choices')]
+                                      for choice in child.get('choices')]
         fields.append(field)
 
-    for field, index in zip(fields, itertools.count(1)):
+    for idx, field in enumerate(fields, 1):
         long_name = field.get('long_name', field['name'])
-        attr_type = AttributeType.objects.get(name=field['attr_type'])
+        try:
+            attr_type_id = attr_type_ids[field['attr_type']]
+        except KeyError:
+            msg = _(
+                    "{attr_type!r} (found in the {name!r} question) is not "
+                    "a supported attribute type."
+                ).format(**field)
+            raise InvalidQuestionnaire([msg])
         choices = field.get('choices', [])
         choice_labels = field.get('choice_labels', None)
         default = field.get('default', '')
@@ -132,7 +145,7 @@ def create_attrs_schema(project=None, dict=None, content_type=None,
         Attribute.objects.create(
             schema=schema_obj,
             name=field['name'], long_name=long_name,
-            attr_type=attr_type, index=index,
+            attr_type_id=attr_type_id, index=idx,
             choices=choices, choice_labels=choice_labels,
             default=default, required=required, omit=omit
         )
@@ -144,10 +157,10 @@ def check_for_language(lang):
 
 def multilingual_label_check(children):
     has_multi = False
-    for c in children:
-        if 'label' in c and isinstance(c['label'], dict):
+    for child in children:
+        if isinstance(child.get('label'), dict):
             has_multi = True
-            for lang in c['label'].keys():
+            for lang in child['label'].keys():
                 if lang != 'default' and not check_for_language(lang):
                     raise InvalidQuestionnaire(
                         ["Label language code '{}' unknown".format(lang)]
@@ -157,10 +170,11 @@ def multilingual_label_check(children):
         # multilingual_label_check to make sure we check the language
         # codes everywhere, rather than dropping out as soon as we
         # find that the form is multilingual.
-        if 'children' in c:
-            has_multi = multilingual_label_check(c['children']) or has_multi
-        if 'choices' in c:
-            has_multi = multilingual_label_check(c['choices']) or has_multi
+        if 'children' in child:
+            has_multi = (
+                multilingual_label_check(child['children']) or has_multi)
+        if 'choices' in child:
+            has_multi = multilingual_label_check(child['choices']) or has_multi
     return has_multi
 
 
@@ -235,6 +249,7 @@ class QuestionnaireManager(models.Manager):
 
                 survey = create_survey_element_from_dict(json)
                 xml_form = survey.xml()
+
                 fix_languages(xml_form)
 
                 instance.save()
@@ -246,7 +261,7 @@ class QuestionnaireManager(models.Manager):
                     errors=errors,
                     project=project,
                     default_language=instance.default_language,
-                    kwargs={'questionnaire': instance}
+                    questionnaire=instance
                 )
                 project.save()
 
@@ -262,32 +277,30 @@ class QuestionnaireManager(models.Manager):
 
 class QuestionGroupManager(models.Manager):
 
-    def create_from_dict(self, dict=None, question_group=None,
-                         questionnaire=None, errors=[], index=0):
+    def create_from_dict(self, data, questionnaire, question_group=None,
+                         errors=[], index=0):
         instance = self.model(questionnaire=questionnaire,
                               question_group=question_group)
 
         relevant = None
-        bind = dict.get('bind')
+        bind = data.get('bind')
         if bind:
-            relevant = bind.get('relevant', None)
+            relevant = bind.get('relevant')
 
-        instance.name = dict.get('name')
-        instance.label_xlat = dict.get('label', {})
-        instance.type = dict.get('type')
+        instance.name = data.get('name')
+        instance.label_xlat = data.get('label', {})
+        instance.type = data.get('type')
         instance.relevant = relevant
         instance.index = index
         instance.save()
 
         create_children(
-            children=dict.get('children'),
+            children=data.get('children'),
             errors=errors,
             project=questionnaire.project,
             default_language=questionnaire.default_language,
-            kwargs={
-                'questionnaire': questionnaire,
-                'question_group': instance
-            }
+            questionnaire=questionnaire,
+            question_group=instance
         )
 
         return instance
@@ -295,38 +308,39 @@ class QuestionGroupManager(models.Manager):
 
 class QuestionManager(models.Manager):
 
-    def create_from_dict(self, errors=[], index=0, **kwargs):
-        dict = kwargs.pop('dict')
-        instance = self.model(**kwargs)
+    def create_from_dict(self, data, questionnaire, question_group=None,
+                         errors=[], index=0):
+        instance = self.model(
+            questionnaire=questionnaire, question_group=question_group)
         type_dict = {name: code for code, name in QUESTION_TYPES}
 
         relevant = None
         required = False
-        bind = dict.get('bind')
+        bind = data.get('bind')
         if bind:
             relevant = bind.get('relevant', None)
             required = True if bind.get('required', 'no') == 'yes' else False
 
         gps_accuracy = None
-        control = dict.get('control')
-        if control and type_dict[dict.get('type')] in XFORM_GEOM_FIELDS:
+        control = data.get('control')
+        if control and type_dict[data.get('type')] in XFORM_GEOM_FIELDS:
             gps_accuracy = control.get('accuracyThreshold', None)
             if gps_accuracy and not validate_accuracy(gps_accuracy):
                 raise(InvalidQuestionnaire([INVALID_ACCURACY]))
 
-        instance.type = type_dict[dict.get('type')]
-        instance.name = dict.get('name')
-        instance.label_xlat = dict.get('label', {})
+        instance.type = type_dict[data.get('type')]
+        instance.name = data.get('name')
+        instance.label_xlat = data.get('label', {})
         instance.required = required
         instance.gps_accuracy = gps_accuracy
-        instance.constraint = dict.get('constraint')
-        instance.default = dict.get('default', None)
-        instance.hint = dict.get('hint', None)
+        instance.constraint = data.get('constraint')
+        instance.default = data.get('default', None)
+        instance.hint = data.get('hint', None)
         instance.relevant = relevant
         instance.index = index
         instance.save()
 
         if instance.has_options:
-            create_options(dict.get('choices'), instance, errors=errors)
+            create_options(data.get('choices'), instance, errors=errors)
 
         return instance
