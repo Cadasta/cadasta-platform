@@ -12,6 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.forms.utils import ErrorDict
 from django.test import TestCase
+from django.http.response import Http404
 from jsonattrs.models import Attribute, AttributeType, Schema
 from party.tests.factories import PartyFactory, TenureRelationshipFactory
 from questionnaires.exceptions import InvalidQuestionnaire
@@ -317,6 +318,15 @@ class EditOrganizationMemberFormTest(UserTestCase, TestCase):
         assert form.current_user == self.user
         assert form.org_role_instance.admin is False
         assert form.initial['org_role'] == 'M'
+
+    def test_init_with_non_member(self):
+        non_member = UserFactory.create()
+        data = {
+            'org_role': 'A'
+        }
+        with pytest.raises(Http404):
+            forms.EditOrganizationMemberForm(
+                self.org, non_member, self.user, data)
 
     def test_edit_org_role(self):
         org = OrganizationFactory.create()
@@ -999,7 +1009,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             'class="close remove-contact" href="#">'
             '<span aria-hidden="true">&times;</span></a></td></tr>\n'
         )
-        assert expected == html
+        self.assertHTMLEqual(expected, html)
 
     def test_as_table_with_no_name_error(self):
         data = {
@@ -1025,7 +1035,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             'class="close remove-contact" href="#">'
             '<span aria-hidden="true">&times;</span></a></td></tr>\n'
         )
-        assert expected == html
+        self.assertHTMLEqual(expected, html)
 
     def test_as_table_with_invalid_email_error(self):
         data = {
@@ -1051,7 +1061,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             'class="close remove-contact" href="#">'
             '<span aria-hidden="true">&times;</span></a></td></tr>\n'
         )
-        assert expected == html
+        self.assertHTMLEqual(expected, html)
 
     def test_as_table_with_no_name_and_invalid_email_error(self):
         data = {
@@ -1078,7 +1088,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             'class="close remove-contact" href="#">'
             '<span aria-hidden="true">&times;</span></a></td></tr>\n'
         )
-        assert expected == html
+        self.assertHTMLEqual(expected, html)
 
     def test_as_table_with_missing_email_or_phone_error(self):
         data = {
@@ -1104,7 +1114,7 @@ class ContactsFormTest(UserTestCase, TestCase):
             'class="close remove-contact" href="#">'
             '<span aria-hidden="true">&times;</span></a></td></tr>\n'
         )
-        assert expected == html
+        self.assertHTMLEqual(expected, html)
 
     def test_clean_string(self):
         form = forms.ContactsForm()

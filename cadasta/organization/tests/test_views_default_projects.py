@@ -177,7 +177,8 @@ class ProjectListTest(ViewTestCase, UserTestCase, TestCase):
         response = self.request(user=superuser)
         assert response.status_code == 200
         assert response.content == self.render_content(
-            object_list=sorted(Project.objects.all(), key=self.sort_key),
+            object_list=Project.objects.all().order_by(
+                'organization__slug', 'slug'),
             add_allowed=True,
             is_superuser=True)
 

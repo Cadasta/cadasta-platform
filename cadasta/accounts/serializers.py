@@ -18,7 +18,7 @@ from .messages import phone_format
 
 
 class RegistrationSerializer(SanitizeFieldSerializer,
-                             djoser_serializers.UserRegistrationSerializer):
+                             djoser_serializers.UserCreateSerializer):
     email = serializers.EmailField(
         allow_blank=True,
         allow_null=True,
@@ -298,8 +298,7 @@ class UserSerializer(SanitizeFieldSerializer,
         return last_login
 
 
-class AccountLoginSerializer(djoser_serializers.LoginSerializer):
-
+class AccountLoginSerializer(djoser_serializers.TokenCreateSerializer):
     def validate(self, attrs):
         attrs = super(AccountLoginSerializer, self).validate(attrs)
 

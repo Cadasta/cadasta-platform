@@ -70,7 +70,7 @@ class AccountUser(djoser_views.UserView):
         user.save()
 
 
-class AccountRegister(djoser_views.RegistrationView):
+class AccountRegister(djoser_views.UserCreateView):
     serializer_class = serializers.RegistrationSerializer
 
     def create(self, request, *args, **kwargs):
@@ -103,7 +103,7 @@ class AccountRegister(djoser_views.RegistrationView):
             verification_device.generate_challenge()
 
 
-class AccountLogin(djoser_views.LoginView):
+class AccountLogin(djoser_views.TokenCreateView):
     serializer_class = serializers.AccountLoginSerializer
 
     def post(self, request):

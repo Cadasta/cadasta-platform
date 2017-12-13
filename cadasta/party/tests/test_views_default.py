@@ -1312,10 +1312,9 @@ class PartyRelationshipEditTest(ViewTestCase, UserTestCase, TestCase):
         assign_policies(user)
         response = self.request(user=user)
         assert response.status_code == 200
-        assert ('<input class="form-control" data-parsley-sanitize="1" '
-                'id="id_tenurerelationship::default::fname" '
-                'name="tenurerelationship::default::fname" '
-                'type="text" value="test" />') in response.content
+        assert (
+            '<input type="text" name="tenurerelationship::default::fname"'
+        ) in response.content
 
     def test_get_from_non_existent_project(self):
         user = UserFactory.create()

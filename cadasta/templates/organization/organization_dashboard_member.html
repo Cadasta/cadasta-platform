@@ -9,7 +9,7 @@
             <div class="panel panel-default">
               <div class="panel-heading">
                 <h3 class="panel-title inline">{% trans "Projects" %}</h3>
-                {% if is_administrator %}
+                {% if add_allowed %}
                   <a href="{% url 'organization:project-add' organization.slug %}">
                     <i class="glyphicon glyphicon-plus" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'Add project' %}"></i>
                   </a>
@@ -40,7 +40,7 @@
                             {% endif %}
                           </h4>
                           <p>{{ proj.description }}</p>
-                        </td>   
+                        </td>
                         <td class="hidden-xs">{{ proj.country }}</td>
                         <td data-sort="{{ proj.last_updated|date:'U' }}">{{ proj.last_updated }}</td>
                         <td class="hidden" data-filter="archived-{{ proj.archived }}"></td>
@@ -124,7 +124,7 @@
                       <dd class="clearfix">
                         {% if contact.email %}
                         <a href="mailto:{{ contact.email }}" class="break">
-                          <i class="glyphicon glyphicon-envelope"></i> 
+                          <i class="glyphicon glyphicon-envelope"></i>
                          {{ contact.email }}
                         </a>
                         {% endif %}
