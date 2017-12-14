@@ -41,4 +41,4 @@ gpxpy==1.1.2
 django-otp==0.4.1.1
 twilio==6.9.1
 phonenumbers==8.8.8
-opbeat==3.5.3
+opbeat==3.6.0
