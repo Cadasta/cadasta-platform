@@ -425,6 +425,13 @@ class ModelHelper():
         for attr_group in data:
             if '{model}_attributes'.format(model=model_type) in attr_group:
                 for item in data[attr_group]:
+
+                    # Remove resources from attributes
+                    if any('{}_resource'.format(model_type) in item
+                           for model_type in ('tenure', 'location', 'party')):
+                        continue
+
+                    # don't add resources here
                     if Attribute.objects.filter(
                         name=item,
                         attr_type=AttributeType.objects.get(
@@ -444,16 +451,24 @@ class ModelHelper():
         return resources
 
     def _get_resource_names(self, data, model, model_type):
+        group_name = '{}_attributes'.format(model_type)
+        if model_type == 'tenure':
+            group_name = 'tenure_relationship_attributes'
+
         resources = {'id': model.id, 'resources': []}
         # for legacy xlsforms
         if '{}_photo'.format(model_type) in data.keys():
-                    resources['resources'].append(
-                        data['{}_photo'.format(model_type)])
+            resources['resources'].append(data['{}_photo'.format(model_type)])
 
         for key in data.keys():
+            if group_name in key:
+                for group_key in data[key].keys():
+                    if '{}_resource'.format(model_type) in group_key:
+                        resources['resources'].append(data[key][group_key])
+
             if '{}_resource'.format(model_type) in key:
-                resources['resources'].append(
-                    data[key])
+                resources['resources'].append(data[key])
+
         return resources
 
     # ~~~~~~~~~~~~~~~
