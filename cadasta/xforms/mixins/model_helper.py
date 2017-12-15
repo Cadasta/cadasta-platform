@@ -426,12 +426,11 @@ class ModelHelper():
             if '{model}_attributes'.format(model=model_type) in attr_group:
                 for item in data[attr_group]:
 
-                    # Remove resources from attributes
+                    # Skip resources
                     if any('{}_resource'.format(model_type) in item
                            for model_type in ('tenure', 'location', 'party')):
                         continue
 
-                    # don't add resources here
                     if Attribute.objects.filter(
                         name=item,
                         attr_type=AttributeType.objects.get(
