@@ -1,12 +1,60 @@
 # Change Log
 
+## [v1.14.0](https://github.com/Cadasta/cadasta-platform/tree/v1.14.1) (2017-12-15)
+
+### Changes
+
+- Dependency upgrades (#1868, #1914, #1924. #1931)
+  - Django 1.11.x
+  - psycopg2 (2.7.3.2)
+  - djoser (1.0.1)
+  - django-allauth (0.34.0)
+  - django-filter (1.1.0)
+  - django-crispy-forms (1.7.0)
+  - openpyxl (2.4.9)
+  - pytz (2017.3)
+  - pandas (0.21.0)
+  - opbeat (3.5.3)
+  - flake8 (3.5.0)
+  - django-tutelary (0.1.22)
+  - djangorestframework (3.7.3)
+  - djoser (1.1.5)
+  - django-parsley (0.7)
+  - django-sass-processor (0.5.6)
+  - djangorestframework-gis (0.12)
+  - simplejson (3.13.2)
+  - django-buckets (0.1.23)
+  - python-magic (0.4.15)
+  - shapely (1.6.3)
+  - awscli (1.14.9)
+  - django-otp (0.4.1.1)
+  - twilio (6.9.1)
+  - phonenumbers (8.8.8)
+  - selenium (3.8.0)
+  - transifex-client (0.12.5)
+  - django-debug-toolbar (1.9.1)
+  - django-extensions (1.9.8)
+  - django-skivvy (0.1.10)
+  - pytest (3.3.1)
+- Avoid assigning policies on user save if user already has default policy (#1910)
+- Reduce queries on dashboard view (#1926)
+- Optimize DB lookups for projects views (#1893)
+
+### Fixes
+
+- Ensure unsupported AttributeTypes are caught (#1915)
+- Fixes #1856 -- Raise 404 when user is not member of org (#1924)
+- Fixes #1872 -- Ensure JSON fields are sanitized against dict (#1929)
+- Only show Add Project link on Organization Dashboard if user has project.create perm (#1919)
+- Fix DataTables on project-add permissions view (#1918)
+
 ## [v1.14.0](https://github.com/Cadasta/cadasta-platform/tree/v1.14.0) (2017-12-07)
 
-## Added
+### Added
 
 - Ability to register using a phone number (#1768)
 
-## Changed
+### Changed
 
 - Improved display of numbers on project dashboard (#1879)
 - Refactor static location in dev VM (#1867); including follow-on bug fixes:
