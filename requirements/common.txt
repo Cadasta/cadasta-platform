@@ -1,16 +1,16 @@
 Django==1.11.10  # rq.filter: <2.0
-djangorestframework==3.7.3
+djangorestframework==3.7.7
 psycopg2==2.7.3.2
 djoser==1.1.5
-django-allauth==0.34.0
+django-allauth==0.35.0
 django-cors-headers==2.1.0
 django-filter==1.1.0
 django-crispy-forms==1.7.0
 django-parsley==0.7
 django-formtools==2.1
-django-countries==5.0
+django-countries==5.1.1
 django-leaflet==0.18.1  # rq.filter: <=0.18.1
-django-sass-processor==0.5.6
+django-sass-processor==0.5.8
 djangorestframework-gis==0.12
 drf-tmp-scoped-token==0.2.0
 jsonschema==2.6.0
@@ -24,25 +24,25 @@ django-widget-tweaks==1.4.1
 django-buckets==0.1.23
 pyxform-cadasta==0.9.22
 python-magic==0.4.15
-Pillow==4.3.0
+Pillow==5.0.0
 django-jsonattrs==0.1.23
-openpyxl==2.4.9
+openpyxl==2.5.0
 pytz==2017.3
-shapely==1.6.3
+shapely==1.6.4.post1
 gdal==1.10.0  # rq.filter: <1.11.0
 pylibmc==1.5.2
-awscli==1.14.10
-pandas==0.21.1
-argon2-cffi==16.3.0
+awscli==1.14.33
+pandas==0.22.0
+argon2-cffi==18.1.0
 requests==2.18.4
 pyparsing==2.2.0
 django-compressor==2.2
 beautifulsoup4==4.6.0
 gpxpy==1.1.2
-django-otp==0.4.1.1
-twilio==6.9.1
-phonenumbers==8.8.8
-opbeat==3.6.0
+django-otp==0.4.2
+twilio==6.10.2
+phonenumbers==8.8.10
+opbeat==3.6.1
 cadasta-workertoolbox==0.4.0
 git+https://github.com/celery/kombu@0f4da  # TODO: update to 4.1.1+ when released
-pybreaker==0.4.1
+pybreaker==0.4.2
