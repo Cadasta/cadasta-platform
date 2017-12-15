@@ -46,7 +46,7 @@
 - Fixes #1856 -- Raise 404 when user is not member of org (#1924)
 - Fixes #1872 -- Ensure JSON fields are sanitized against dict (#1929)
 - Only show Add Project link on Organization Dashboard if user has project.create perm (#1919)
-- Disable DataTables on project-add permissions view (#1918)
+- Fix DataTables on project-add permissions view (#1918)
 
 ## [v1.14.0](https://github.com/Cadasta/cadasta-platform/tree/v1.14.0) (2017-12-07)
 
