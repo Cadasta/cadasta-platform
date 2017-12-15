@@ -30,7 +30,7 @@ pytz==2017.3
 shapely==1.6.3
 gdal==1.11.2  # rq.filter: <2.0.0
 pylibmc==1.5.2
-awscli==1.14.9
+awscli==1.14.10
 pandas==0.21.1
 argon2-cffi==16.3.0
 requests==2.18.4
