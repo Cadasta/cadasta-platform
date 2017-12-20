@@ -1,5 +1,4 @@
 from core.models import RandomIDModel
-from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
 from django.contrib.gis.db.models import GeometryField
 from django.db import models
@@ -18,7 +17,7 @@ from .choices import TYPE_CHOICES
 from resources.mixins import ResourceModelMixin
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
-from questionnaires.models import Question
+from questionnaires.models import Question, Questionnaire
 
 
 @fix_model_for_attributes
@@ -62,6 +61,8 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
     last_updated = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
+
+    _LOCATION_TYPE_KEY = '_location_type'
 
     class Meta:
         ordering = ('type',)
@@ -119,22 +120,30 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
             },
         ))
 
-    @cached_property
+    @property
     def location_type_label(self):
         if not self.project.current_questionnaire:
             return dict(TYPE_CHOICES)[self.type]
 
-        question = Question.objects.get(
-            questionnaire_id=self.project.current_questionnaire,
-            name='location_type'
-        )
-        label = question.options.get(name=self.type).label_xlat
+        if not hasattr(self, self._LOCATION_TYPE_KEY):
+            question = Question.objects.get(
+                questionnaire_id=self.project.current_questionnaire,
+                name='location_type'
+            )
+            setattr(
+                self, self._LOCATION_TYPE_KEY,
+                question.options.get(name=self.type).label_xlat)
+
+        label = getattr(self, self._LOCATION_TYPE_KEY)
         if label is None or isinstance(label, str):
             return label
         else:
-            return label.get(
-                get_language(),
-                label[question.questionnaire.default_language]
+            return (
+                label.get(get_language()) or
+                label[
+                    Questionnaire.objects.get(
+                        id=self.project.current_questionnaire
+                    ).default_language]
             )
 
 

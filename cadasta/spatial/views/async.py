@@ -1,6 +1,9 @@
+from django.db.models import OuterRef, Subquery
 from tutelary.mixins import APIPermissionRequiredMixin
 from rest_framework import generics
 from rest_framework_gis.pagination import GeoJsonPagination
+
+from questionnaires.models import QuestionOption
 
 from . import mixins
 from .. import serializers
@@ -30,7 +33,18 @@ class SpatialUnitList(APIPermissionRequiredMixin,
 
     def get_queryset(self, *args, **kwargs):
         queryset = super().get_queryset(*args, **kwargs)
-        return queryset.exclude(id=self.request.GET.get('exclude'))
+        queryset = queryset.exclude(id=self.request.GET.get('exclude'))
+        annotation = {
+            # Prefetch the location type name
+            queryset.model._LOCATION_TYPE_KEY: Subquery(
+                QuestionOption.objects.filter(
+                    question__questionnaire_id=OuterRef(
+                        'project__current_questionnaire'),
+                    name=OuterRef('type')
+                ).values('label_xlat')
+            )
+        }
+        return queryset.annotate(**annotation)
 
     def get_perms_objects(self):
         return [self.get_project()]
