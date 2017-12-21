@@ -54,6 +54,8 @@ class SpatialUnitGeoJsonSerializer(geo_serializers.GeoFeatureModelSerializer):
 
     def get_fixed_precision_geometry(self, location):
         """ Field to return geometry rounded down to a specified precision """
+        if not location.geometry:
+            return None
         # Notes on precision notes:
         # https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude/8674#8674  # NOQA
         # - The fourth decimal place is worth up to 11 m: it can identify a

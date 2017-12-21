@@ -1,6 +1,7 @@
 import pytest
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.gis.geos import Polygon
 from rest_framework.serializers import ValidationError
 from jsonattrs.models import Attribute, AttributeType, Schema
 
@@ -236,3 +237,18 @@ class SpatialUnitGeoJsonSerializerTest(TestCase):
         location = SpatialUnitFactory.build(type='CB')
         serializer = serializers.SpatialUnitGeoJsonSerializer(location)
         assert serializer.get_type(location) == 'Community boundary'
+
+    def test_simplified_geometry(self):
+        poly = Polygon(((-72.32137149, 18.5310175),
+                       (-72.32137148, 18.53101767),
+                       (-72.32137273, 18.53101229),
+                       (-72.32137195, 18.53101184),
+                       (-72.32137149, 18.5310175),
+                       (-72.32137149, 18.5310175)))
+        location = SpatialUnitFactory.build(type='CB', geometry=poly)
+        serializer = serializers.SpatialUnitGeoJsonSerializer(location)
+        assert serializer.get_fixed_precision_geometry(location).coords == (
+            [(-72.32137, 18.53102),
+             (-72.32137, 18.53101),
+             (-72.32137, 18.53102)],
+         )
