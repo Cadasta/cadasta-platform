@@ -107,8 +107,6 @@ def create_attrs_schema(project, question_group_dict, attr_type_ids,
         field['name'] = child.get('name')
         field['long_name'] = child.get('label')
 
-        field['name'] = child.get('name')
-
         if any('{}_resource'.format(model_type) in field['name']
                for model_type in ('tenure', 'location', 'party')):
             continue
