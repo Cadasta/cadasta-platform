@@ -1422,28 +1422,6 @@ class XFormModelHelperTest(TestCase):
         assert 'party_name' not in attributes
         assert 'party_type' not in attributes
 
-    def test_get_resource_files(self):
-        data = {
-            'ardvark': 'Ardvark!',
-            'party_resource_thing': 'Party Resource Thing!',
-            'location_resource_thing': 'Location Resource!',
-            'party_photo': 'Party Photo!'
-        }
-        resources = mh._get_resource_files(self, data, 'party')
-        assert type(resources) == list
-        assert 'Party Resource Thing!' in resources
-        assert 'Party Photo!' in resources
-
-        assert 'Ardvark!' not in resources
-        assert 'Location Resource!' not in resources
-
-        resources = mh._get_resource_files(self, data, 'location')
-        assert 'Location Resource!' in resources
-
-        assert 'Ardvark!' not in resources
-        assert 'Party Resource Thing!' not in resources
-        assert 'Party Photo!' not in resources
-
     def test_get_resource_names(self):
         data = {
             'party_type': 'Party Type',
