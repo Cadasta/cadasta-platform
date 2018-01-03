@@ -23,7 +23,7 @@ else
   if [[ $TRAVIS_EVENT_TYPE == pull_request ]]
   then
     export CADASTA_TEST_WEBDRIVER=Firefox
-    ./runtests.py --functional
+    ./runtests.py --functional -m "$TESTBATCH"
     ret=$?
   fi
 
@@ -32,14 +32,14 @@ else
   then
     # BrowserStack cannot handle local file uploads
     export CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome
-    ./runtests.py --functional -m 'not uploads'
+    ./runtests.py --functional -m "$TESTBATCH and not uploads"
     ret=$?
 
     if [[ $ret == 0 ]]
     then
       # Run file upload tests using the local WebDriver
       export CADASTA_TEST_WEBDRIVER=Firefox
-      ./runtests.py --functional -m uploads
+      ./runtests.py --functional -m "$TESTBATCH and uploads"
       ret=$?
     fi
   fi
