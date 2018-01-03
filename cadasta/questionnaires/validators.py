@@ -62,6 +62,7 @@ QUESTION_SCHEMA = {
              'required': True,
              'enum': [c[0] for c in QUESTION_TYPES]},
     'required': {'type': 'boolean'},
+    'appearance': {'type': 'string'},
     'constraint': {'type': 'string'},
     'index': {'type': 'integer', 'required': True},
     'gps_accuracy': {'type': 'number',

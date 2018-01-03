@@ -48,6 +48,22 @@ class XFormRendererTest(TestCase):
                 assert q['default'] == 'some default'
                 assert q['hint'] == 'An informative hint'
 
+    def test_transform_questions_appearance(self):
+        questions = [{
+            'id': "bzs2984c3gxgwcjhvambdt3w",
+            'name': "party_resource_signature",
+            'label': "Party Signature",
+            'type': "PH",
+            'required': False,
+            'appearance': 'signature',
+        }]
+        renderer = XFormRenderer()
+        transformed = renderer.transform_questions(questions)
+        assert len(transformed) == 1
+        for q in transformed:
+            if q['name'] == 'party_resource_signature':
+                assert q['control']['appearance'] == "signature"
+
     def test_transform_groups(self):
         groups = [{
             'id': '123',

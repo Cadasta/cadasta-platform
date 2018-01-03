@@ -90,7 +90,8 @@ class XFormRenderer(BaseRenderer):
 
             if q.get('gps_accuracy'):
                 control['accuracyThreshold'] = q.get('gps_accuracy')
-
+            if q.get('appearance'):
+                control['appearance'] = q.get('appearance')
             if control:
                 q['control'] = control
 

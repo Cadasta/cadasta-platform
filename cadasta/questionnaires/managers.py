@@ -318,7 +318,6 @@ class QuestionManager(models.Manager):
         instance = self.model(
             questionnaire=questionnaire, question_group=question_group)
         type_dict = {name: code for code, name in QUESTION_TYPES}
-
         relevant = None
         required = False
         bind = data.get('bind')
@@ -332,6 +331,9 @@ class QuestionManager(models.Manager):
             gps_accuracy = control.get('accuracyThreshold', None)
             if gps_accuracy and not validate_accuracy(gps_accuracy):
                 raise(InvalidQuestionnaire([INVALID_ACCURACY]))
+        appearance = None
+        if control:
+            appearance = control.get('appearance', None)
 
         instance.type = type_dict[data.get('type')]
         instance.name = data.get('name')
@@ -342,6 +344,7 @@ class QuestionManager(models.Manager):
         instance.default = data.get('default', None)
         instance.hint = data.get('hint', None)
         instance.relevant = relevant
+        instance.appearance = appearance
         instance.index = index
         instance.save()
 
