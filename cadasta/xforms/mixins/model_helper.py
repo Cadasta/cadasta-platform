@@ -294,40 +294,17 @@ class ModelHelper():
              tenure_relationships, tenure_resources
              ) = self.create_models(submission, request.user)
 
-            party_submissions = [submission]
-            location_submissions = [submission]
-            tenure_submissions = [submission]
-
-            if 'party_repeat' in submission:
-                party_submissions = self._format_repeat(submission, ['party'])
-                if 'tenure_type' in party_submissions[0]:
-                    tenure_submissions = party_submissions
-
-            elif 'location_repeat' in submission:
-                location_submissions = self._format_repeat(
-                    submission, ['location']
-                )
-                if 'tenure_type' in location_submissions[0]:
-                    tenure_submissions = location_submissions
-
             party_resource_files = []
+            for party in party_resources:
+                party_resource_files.extend(party['resources'])
+
             location_resource_files = []
+            for location in location_resources:
+                location_resource_files.extend(location['resources'])
+
             tenure_resource_files = []
-
-            for group in party_submissions:
-                party_resource_files.extend(
-                    self._get_resource_files(group, 'party')
-                )
-
-            for group in location_submissions:
-                location_resource_files.extend(
-                    self._get_resource_files(group, 'location')
-                )
-
-            for group in tenure_submissions:
-                tenure_resource_files.extend(
-                    self._get_resource_files(group, 'tenure')
-                )
+            for tenure in tenure_resources:
+                tenure_resource_files.extend(tenure['resources'])
 
             resource_data = {
                 'project': questionnaire.project,
@@ -425,6 +402,12 @@ class ModelHelper():
         for attr_group in data:
             if '{model}_attributes'.format(model=model_type) in attr_group:
                 for item in data[attr_group]:
+
+                    # Skip resources
+                    if any('{}_resource'.format(model_type) in item
+                           for model_type in ('tenure', 'location', 'party')):
+                        continue
+
                     if Attribute.objects.filter(
                         name=item,
                         attr_type=AttributeType.objects.get(
@@ -435,25 +418,25 @@ class ModelHelper():
                         attributes[item] = data[attr_group][item]
         return attributes
 
-    def _get_resource_files(self, data, model_type):
-        resources = []
-        for file_name in data.keys():
-            if ("{}_resource".format(model_type) in file_name or
-               "{}_photo".format(model_type) in file_name):
-                resources.append(data[file_name])
-        return resources
-
     def _get_resource_names(self, data, model, model_type):
+        group_name = '{}_attributes'.format(model_type)
+        if model_type == 'tenure':
+            group_name = 'tenure_relationship_attributes'
+
         resources = {'id': model.id, 'resources': []}
         # for legacy xlsforms
         if '{}_photo'.format(model_type) in data.keys():
-                    resources['resources'].append(
-                        data['{}_photo'.format(model_type)])
+            resources['resources'].append(data['{}_photo'.format(model_type)])
 
         for key in data.keys():
+            if group_name in key:
+                for group_key in data[key].keys():
+                    if '{}_resource'.format(model_type) in group_key:
+                        resources['resources'].append(data[key][group_key])
+
             if '{}_resource'.format(model_type) in key:
-                resources['resources'].append(
-                    data[key])
+                resources['resources'].append(data[key])
+
         return resources
 
     # ~~~~~~~~~~~~~~~
