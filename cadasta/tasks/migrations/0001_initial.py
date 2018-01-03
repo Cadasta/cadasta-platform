@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.CharField(max_length=24, primary_key=True, serialize=False)),
                 ('task_id', models.CharField(editable=False, max_length=155, unique=True, verbose_name='UUID')),
-                ('type', models.CharField(choices=[('export.project', 'export.project'), ('opbeat.contrib.celery.send_raw', 'opbeat.contrib.celery.send_raw')], max_length=128, verbose_name='Task function')),
+                ('type', models.CharField(max_length=128, verbose_name='Task function')),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('last_updated', models.DateTimeField(auto_now=True)),
                 ('input', django.contrib.postgres.fields.jsonb.JSONField(blank=True, default=tasks.utils.fields.input_field_default, validators=[functools.partial(tasks.utils.fields.validate_type, *(dict,), **{}), tasks.utils.fields.validate_input_field])),
