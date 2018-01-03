@@ -1,7 +1,7 @@
 - name: Configure worker table privileges
   become: yes
   postgresql_privs: login_host="{{ db_host }}"
-                    login_user="postgres" login_password="postgres"
+                    login_user="cadasta" login_password="{{ db_pass }}"
                     role="worker"
                     privs="SELECT,INSERT,UPDATE"
                     objs="celery_taskmeta"
@@ -11,7 +11,7 @@
 - name: Configure worker sequence privileges
   become: yes
   postgresql_privs: login_host="{{ db_host }}"
-                    login_user="postgres" login_password="postgres"
+                    login_user="cadasta" login_password="{{ db_pass }}"
                     role="worker"
                     priv="USAGE"
                     objs="task_id_sequence"
