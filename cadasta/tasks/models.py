@@ -6,19 +6,12 @@ from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
 from django.db.models.expressions import F
 from django.utils.translation import ugettext_lazy as _
-from django.utils.functional import lazy
 
 from core.util import ID_FIELD_LENGTH
 from core.models import RandomIDModel
 
-from .celery import app
 from .utils import fields as utils
 from .fields import PickledObjectField
-
-
-choices = lazy(lambda: [
-    (t, t) for t in sorted(app.tasks.keys())
-    if not t.startswith('celery.')], list)
 
 
 class TaskResult(models.Model):
@@ -48,8 +41,7 @@ class BackgroundTask(RandomIDModel):
         editable=False)
 
     type = models.CharField(
-        _('Task function'), max_length=128,
-        choices=choices())
+        _('Task function'), max_length=128)
 
     created_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
@@ -85,6 +77,13 @@ class BackgroundTask(RandomIDModel):
 
     def __str__(self):
         return 'id={0.id} type={0.type} status={0.status}'.format(self)
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            super().save(*args, **kwargs)
+            # Ensure model fields run through validators after special
+            # auto-filled data (eg auto_now_add) is added.
+            self.full_clean(exclude=None)
 
     @property
     def status(self):
