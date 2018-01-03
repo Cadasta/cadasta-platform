@@ -264,7 +264,9 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             user=self.user,
             admin=True
         )
-        members = {self.user.username: 'Administrator'}
+        members = [(self.user.username,
+                    'Administrator',
+                    self.user.avatar_url)]
         response = self.request(user=self.user)
         assert response.status_code == 200
         expected = self.render_content(is_administrator=True,
@@ -284,7 +286,9 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
         )
         response = self.request(user=self.user)
         assert response.status_code == 200
-        members = {self.user.username: role.get_role_display()}
+        members = [(self.user.username,
+                    role.get_role_display(),
+                    self.user.avatar_url)]
         expected = self.render_content(is_administrator=True,
                                        is_allowed_add_location=True,
                                        is_allowed_add_resource=True,
@@ -413,7 +417,7 @@ class ProjectDashboardTest(FileStorageTestCase, ViewTestCase, UserTestCase,
             user=org_admin,
             admin=True
         )
-        members = {org_admin.username: 'Administrator'}
+        members = [(org_admin.username, 'Administrator', org_admin.avatar_url)]
         self.project.archived = True
         self.project.save()
         response = self.request(user=org_admin)

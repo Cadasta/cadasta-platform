@@ -630,23 +630,42 @@ img.org-logo, img#org-logo {
   }
 }
 
+.avatar-box {
+  margin: 0 10px 0 0;
+  width: 64px;
+  height: 64px;
+  background-color: white;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+}
+
+.avatar-box-sm {
+  width: 32px;
+  height: 32px;
+}
+
 .avatar {
-  width: 48px;
-  height: 48px;
+  width: auto;
+  height: 64px;
+  position: absolute;
+  top: -9999px;
+  bottom: -9999px;
+  left: -9999px;
+  right: -9999px;
+  margin: auto;
   @media (max-width: $screen-xs-max) {
-    width: 36px;
-    height: 36px;
+    height: 33px;
   }
 }
 
 .avatar-sm {
-  width: 24px;
-  height: 24px;
+  height: 32px;
 }
 
 .avatar-lg {
-  width: 120px;
-  height: 120px;
+  height: 128px;
 }
 
 .thumb-60 {

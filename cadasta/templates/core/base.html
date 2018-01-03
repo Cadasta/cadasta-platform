@@ -36,8 +36,9 @@
             <div class="btn-group divider" role="group">
               <button type="button" class="btn btn-user dropdown-toggle" data-toggle="dropdown"
               aria-haspopup="true" aria-expanded="false">
-                <img src="/static/img/avatar.jpg" class="avatar thumbnail">
-                <span class="visible-xs-inline glyphicon glyphicon-user"></span>
+                <div class="avatar-box avatar-box-sm pull-left">
+                  <img src="{{ user.avatar_url }}" alt="{{ user.name }}" class="avatar avatar-sm">
+                </div>
                 <span class="username visible-sm-inline visible-md-inline visible-lg-inline">{{ user.get_display_name }}</span>
                 {% if is_superuser %}
                   <span class="badge" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{% trans 'You have superuser permissions' %}">SU</span>

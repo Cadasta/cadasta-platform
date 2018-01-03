@@ -6,6 +6,10 @@ class ProjectRoleWidget(Select):
     html = (
         '<tr>'
         '  <td>'
+        '    <div class="avatar-box avatar-box-sm pull-left">'
+        '       <img src="{avatar_url}" alt="{username}"'
+        '         class="avatar avatar-sm">'
+        '    </div>'
         '    <strong>{username}</strong><br>'
         '    {full_name}'
         '  </td>'
@@ -31,6 +35,7 @@ class ProjectRoleWidget(Select):
             full_name=self.user.full_name,
             username=self.user.username,
             email=self.user.email,
+            avatar_url=self.user.avatar_url,
             select=select
         )
 

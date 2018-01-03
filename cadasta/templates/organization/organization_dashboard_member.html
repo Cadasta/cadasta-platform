@@ -161,8 +161,10 @@
                 <ul class="list-unstyled list-divider">
                   {% for user in organization.users.all %}
                     <li class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
-                      <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">
-                        <!--<i class="glyphicon glyphicon-user" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{ user.username }}"></i>-->
+                      <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{ user.username }}">
+                        <div class="avatar-box avatar-box-sm pull-left">
+                          <img src="{{ user.avatar_url }}" alt="{{ user.username }}" class="avatar avatar-sm">
+                        </div>
                         <strong>{{ user.username }}</strong>
                       </a>
                     </li>
