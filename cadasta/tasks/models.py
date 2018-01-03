@@ -86,13 +86,6 @@ class BackgroundTask(RandomIDModel):
     def __str__(self):
         return 'id={0.id} type={0.type} status={0.status}'.format(self)
 
-    def save(self, *args, **kwargs):
-        with transaction.atomic():
-            super().save(*args, **kwargs)
-            # Ensure model fields run through validators after special
-            # auto-filled data (eg auto_now_add) is added.
-            self.full_clean(exclude=None)
-
     @property
     def status(self):
         try:
