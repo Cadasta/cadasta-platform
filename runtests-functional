@@ -19,34 +19,17 @@ else
   until curl http://0:8000 -f; do sleep .1; done  # Wait for the Django server to start up
   cd ..
 
-  # Run the test suite in the Travis VM for PRs to master
-  if [[ $TRAVIS_EVENT_TYPE == pull_request ]]
+  # BrowserStack cannot handle local file uploads
+  export CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome
+  ./runtests.py --functional -m "$TESTBATCH and not uploads"
+  ret=$?
+
+  if [[ $ret == 0 ]]
   then
+    # Run file upload tests using the local WebDriver
     export CADASTA_TEST_WEBDRIVER=Firefox
-    ./runtests.py --functional -m "$TESTBATCH"
+    ./runtests.py --functional -m "$TESTBATCH and uploads"
     ret=$?
-
-    if [[ $ret != 0 ]]
-    then
-      curl -v http://0:8000/dashboard/
-    fi
-  fi
-
-  # Run the test suite via BrowserStack (as much as possible) for commits to master
-  if [[ $TRAVIS_EVENT_TYPE == push ]]
-  then
-    # BrowserStack cannot handle local file uploads
-    export CADASTA_TEST_WEBDRIVER=BrowserStack-Chrome
-    ./runtests.py --functional -m "$TESTBATCH and not uploads"
-    ret=$?
-
-    if [[ $ret == 0 ]]
-    then
-      # Run file upload tests using the local WebDriver
-      export CADASTA_TEST_WEBDRIVER=Firefox
-      ./runtests.py --functional -m "$TESTBATCH and uploads"
-      ret=$?
-    fi
   fi
 
   # Kill the Django server
