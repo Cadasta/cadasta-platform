@@ -649,6 +649,7 @@
       }
     }
     ul.list-divider li { // lists with lines between
+
       border-bottom: 1px solid $table-border-color;
       padding: 12px 2px;
       &:last-child {
@@ -685,6 +686,7 @@
     margin-bottom: 20px;
   }
   ul.list-divider li { // lists with lines between
+    @include clearfix;
     border-bottom: 1px solid $table-border-color;
     padding: 12px 2px;
     &:last-child {

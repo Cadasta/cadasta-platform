@@ -37,7 +37,11 @@
             {% for user in organization.users.all %}
               <tr class="linked" onclick="window.document.location='{% url 'organization:members_edit' slug=organization.slug username=user.username %}';">
                 <td>
-                  <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">{{ user.get_display_name }}</a>
+                  <a href="{% url 'organization:members_edit' slug=organization.slug username=user.username %}">
+                    <div class="avatar-box avatar-box-sm pull-left">
+                      <img src="{{ user.avatar_url }}" alt="{{ user.name }}" class="avatar avatar-sm">
+                    </div>
+                    {{ user.get_display_name }}</a>
                   <div class="hidden-sm hidden-md hidden-lg">
                     {{ user.username }}<br />
                     {{ user.email }}

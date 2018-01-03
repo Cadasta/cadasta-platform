@@ -320,9 +320,12 @@
                   </div>
                 {% else %}
                   <ul class="list-unstyled list-divider">
-                    {% for member, role in members.items %}
+
+                    {% for member, role, avatar in members %}
                       <li>
-                        <!--<i class="glyphicon glyphicon-user" aria-hidden="true" data-toggle="tooltip" data-trigger="hover" data-placement="left" title="{{member}}"></i>-->
+                        <div class="avatar-box avatar-box-sm pull-left">
+                          <img src="{{ avatar }}" alt="{{ member }}" class="avatar avatar-sm">
+                        </div>
                         <strong>{{ member }}</strong>, {{ role }}
                       </li>
                     {% endfor %}
