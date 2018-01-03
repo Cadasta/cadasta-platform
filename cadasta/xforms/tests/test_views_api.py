@@ -18,7 +18,7 @@ from core.tests.utils.files import make_dirs  # noqa
 from organization.models import OrganizationRole
 from organization.tests.factories import OrganizationFactory, ProjectFactory
 from party.models import Party, TenureRelationship
-from questionnaires.managers import create_attrs_schema
+from questionnaires.managers import create_attrs_schema, get_attr_type_ids
 from questionnaires.models import Questionnaire
 from questionnaires.tests.factories import (QuestionFactory,
                                             QuestionnaireFactory)
@@ -145,22 +145,27 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         return questionnaire
 
     def _create_attrs_schema(self, prj):
+        attr_type_ids = get_attr_type_ids()
         create_attrs_schema(
-            project=prj, dict=default_party_xform_group,
+            project=prj, question_group_dict=default_party_xform_group,
             content_type=ContentType.objects.get(
-                app_label='party', model='party'), errors=[])
+                app_label='party', model='party'),
+            errors=[], attr_type_ids=attr_type_ids)
         create_attrs_schema(
-            project=prj, dict=individual_party_xform_group,
+            project=prj, question_group_dict=individual_party_xform_group,
             content_type=ContentType.objects.get(
-                app_label='party', model='party'), errors=[])
+                app_label='party', model='party'),
+            errors=[], attr_type_ids=attr_type_ids)
         create_attrs_schema(
-            project=prj, dict=location_xform_group,
+            project=prj, question_group_dict=location_xform_group,
             content_type=ContentType.objects.get(
-                app_label='spatial', model='spatialunit'), errors=[])
+                app_label='spatial', model='spatialunit'),
+            errors=[], attr_type_ids=attr_type_ids)
         create_attrs_schema(
-            project=prj, dict=tenure_relationship_xform_group,
+            project=prj, question_group_dict=tenure_relationship_xform_group,
             content_type=ContentType.objects.get(
-                app_label='party', model='tenurerelationship'), errors=[])
+                app_label='party', model='tenurerelationship'),
+            errors=[], attr_type_ids=attr_type_ids)
 
     def _get_resource(self, file_name, file_type):
         file = self.get_file(
@@ -688,6 +693,168 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
         self._test_resource('test_image_three', party_one)
         self._test_resource('test_image_four', party_one)
         self._test_resource('test_image_five', party_two)
+
+    def test_form_resource_in_group(self):
+        questionnaire = self._create_questionnaire(
+            't_questionnaire_resource_in_group', 7, schema=False)
+
+        attr_type_ids = get_attr_type_ids()
+        create_attrs_schema(
+            project=self.prj, question_group_dict={
+                "label": "Default Party Attributes",
+                "children": [
+                    {
+                        "label": "Notes",
+                        "type": "text",
+                        "name": "party_notes"
+                    }
+                ],
+                "type": "group",
+                "name": "party_attributes_default"
+            },
+            content_type=ContentType.objects.get(
+                app_label='party', model='party'),
+            errors=[], attr_type_ids=attr_type_ids)
+        create_attrs_schema(
+            project=self.prj, question_group_dict={
+                "label": "Individual Party Attributes",
+                "children": [
+                    {
+                        "label": "National Id Number",
+                        "type": "text",
+                        "name": "national_id",
+                    },
+                    {
+                        "label": "Mobile Number",
+                        "type": "text",
+                        "name": "mobile_number",
+                    },
+                    {
+                        "label": "Gender",
+                        "default": "f",
+                        "choices": [
+                            {
+                                "label": "Male",
+                                "name": "m"
+                            },
+                            {
+                                "label": "Female",
+                                "name": "f"
+                            }
+                        ],
+                        "type": "select one",
+                        "name": "gender"
+                    },
+                    {
+                        "label": "Date of Birth",
+                        "type": "date",
+                        "name": "dob",
+                    },
+                ],
+                "name": "party_attributes_individual",
+                "bind": {
+                    "relevant": "${party_type}='IN'"
+                },
+                "type": "group"
+            },
+            content_type=ContentType.objects.get(
+                app_label='party', model='party'),
+            errors=[], attr_type_ids=attr_type_ids)
+        create_attrs_schema(
+            project=self.prj, question_group_dict={
+                "type": "group",
+                "name": "location_attributes",
+                "label": "Location Attributes",
+                "children": [
+                    {
+                        "label": "Name of Location",
+                        "name": "location_name",
+                        "type": "text",
+                    },
+                    {
+                        "label": "Village name",
+                        "name": "village_name",
+                        "type": "text",
+                    },
+                    {
+                        "label": "Please, select all problems that apply",
+                        "name": "location_problems",
+                        "type": "select all that apply",
+                        "choices": [
+                            {
+                                "name": "eviction",
+                                "label": "Risk of eviction",
+                            },
+                            {
+                                "name": "conflict",
+                                "label": "Conflicts",
+                            },
+                            {
+                                "name": "lack_of_prop_docs",
+                                "label": "Lack of property documents",
+                            },
+                            {
+                                "name": "none",
+                                "label": "None",
+                            },
+                        ]
+                    },
+                    {
+                        "label": "Notes about the Location",
+                        "name": "location_notes",
+                        "type": "text",
+                    },
+                ]
+            },
+            content_type=ContentType.objects.get(
+                app_label='spatial', model='spatialunit'),
+            errors=[], attr_type_ids=attr_type_ids)
+        create_attrs_schema(
+            project=self.prj, question_group_dict={
+                "name": "tenure_relationship_attributes",
+                "children": [
+                    {
+                        "label": "Tenure Notes",
+                        "name": "relationship_notes",
+                        "type": "text",
+                    }
+                ],
+                "label": "Tenure relationship attributes",
+                "type": "group"
+            },
+            content_type=ContentType.objects.get(
+                app_label='party', model='tenurerelationship'),
+            errors=[], attr_type_ids=attr_type_ids)
+
+        data = self._submission(form='submission_resource_in_group',
+                                image=['test_image_one',
+                                       'test_image_two',
+                                       'test_image_three'],
+                                audio=['test_audio_one'])
+
+        response = self.request(method='POST', user=self.user, post_data=data,
+                                content_type='multipart/form-data')
+
+        assert response.status_code == 201
+        assert Party.objects.all().count() == 1
+        assert SpatialUnit.objects.all().count() == 1
+        assert TenureRelationship.objects.all().count() == 1
+        party = Party.objects.first()
+        location = SpatialUnit.objects.first()
+        tenure = TenureRelationship.objects.first()
+        assert party.name == 'Bilbo Baggins'
+        assert location.type == 'MI'
+        assert tenure.tenure_type == 'LH'
+        assert tenure.party == party
+        assert tenure.spatial_unit == location
+
+        self._test_resource('test_image_one', location)
+        self._test_resource('test_image_two', party)
+        self._test_resource('test_audio_one', party)
+        self._test_resource('test_image_three', tenure)
+
+        xfsubmission = XFormSubmission.objects.get(user=self.user)
+        assert xfsubmission.questionnaire == questionnaire
 
 
 class XFormDownloadView(APITestCase, UserTestCase, TestCase):

@@ -55,9 +55,9 @@ CACHES = {
 ES_HOST = os.environ['ES_HOST']
 
 OPBEAT = {
-    'ORGANIZATION_ID': os.environ['OPBEAT_ORGID'],
-    'APP_ID': os.environ['OPBEAT_APPID'],
-    'SECRET_TOKEN': os.environ['OPBEAT_TOKEN'],
+    'ORGANIZATION_ID': os.environ['OPBEAT_ORGANIZATION_ID'],
+    'APP_ID': os.environ['OPBEAT_APP_ID'],
+    'SECRET_TOKEN': os.environ['OPBEAT_SECRET_TOKEN'],
     'ASYNC': True,
 }
 
@@ -91,10 +91,10 @@ DEFAULT_FROM_EMAIL = 'Cadasta Platform <platform@cadasta.org>'
 ROOT_URLCONF = 'config.urls.production'
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/opt/cadasta/cadasta-platform/cadasta/static/'
+STATIC_ROOT = '/opt/cadasta/static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/opt/cadasta/cadasta-platform/cadasta/media/'
+MEDIA_ROOT = '/opt/cadasta/media'
 
 # Debug logging...
 LOGGING = {
@@ -145,3 +145,6 @@ LOGGING = {
         },
     },
 }
+
+SMS_GATEWAY = 'accounts.gateways.TwilioGateway'
+TWILIO_PHONE = os.environ['TWILIO_PHONE']

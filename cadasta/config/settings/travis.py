@@ -1,4 +1,6 @@
+from .default import BASE_DIR
 from .default import *  # NOQA
+import os
 
 DEBUG = True
 
@@ -55,6 +57,11 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.NullHandler',
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        }
+
     },
     'loggers': {
         'django': {
@@ -65,6 +72,17 @@ LOGGING = {
         'xform.submissions': {
             'handlers': ['file'],
             'level': 'DEBUG'
-        }
-    },
+        },
+        'accounts.FakeGateway': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        },
+    }
 }
+
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/media')
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'core/static')
+SASS_PROCESSOR_ROOT = os.path.join(STATIC_ROOT, 'cache')
+SASS_PROCESSOR_INCLUDE_DIRS = (
+    os.path.join(os.path.dirname(BASE_DIR), 'core/node_modules'),
+)

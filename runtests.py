@@ -62,7 +62,7 @@ def flake8_main(args):
 
 def functional_main(args):
     print('Running functional tests')
-    sys.path.append('/vagrant/cadasta')
+    sys.path.append('/opt/cadasta/cadasta-platform/cadasta')
     devnull = subprocess.DEVNULL
     xvfb = subprocess.Popen(["Xvfb", ":1"], stdout=devnull, stderr=devnull)
     os.environ['DISPLAY'] = ':1'

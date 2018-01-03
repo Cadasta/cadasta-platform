@@ -282,7 +282,7 @@ class Importer(SchemaSelectorMixin):
                             continue
                         try:
                             val = row[headers.index(attribute.name.lower())]
-                        except:
+                        except (KeyError, ValueError):
                             val = row[headers.index(attr_label)]
 
                         if not sanitize_string(val):
@@ -303,11 +303,11 @@ class Importer(SchemaSelectorMixin):
         if type == 'integer':
             try:
                 val = int(float(val))
-            except:
+            except (ValueError, TypeError):
                 val = 0
         if type == 'decimal':
             try:
                 val = float(val)
-            except:
+            except (ValueError, TypeError):
                 val = 0.0
         return val

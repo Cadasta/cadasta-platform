@@ -90,6 +90,10 @@ LOGGING = {
             'formatter': 'simple',
             'delay': True
         },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
     },
     'loggers': {
         'django': {
@@ -97,10 +101,17 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'django.db.backends': {
+            'handlers': ['console'],
+        },
         'xform.submissions': {
             'handlers': ['file'],
             'level': 'DEBUG'
-        }
+        },
+        'accounts.FakeGateway': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        },
     },
 }
 

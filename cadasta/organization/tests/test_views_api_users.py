@@ -134,7 +134,7 @@ class UserDetailAPITest(APITestCase, TestCase):
             body=json.dumps(clauses))
         self.user = UserFactory.create()
         assign_user_policies(self.user, policy)
-        self.test_user = UserFactory.create(username='test-user')
+        self.test_user = UserFactory.create(username='test-user', phone=None)
 
     def setup_url_kwargs(self):
         return {'username': self.test_user.username}

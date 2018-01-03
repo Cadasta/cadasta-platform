@@ -1,9 +1,3 @@
-- name: Create base directory for installation
-  become: yes
-  become_user: root
-  file: path="{{ base_path }}" state=directory
-        owner="{{ app_user }}" mode=0755
-
 - name: Clone cadasta-platform repository
   become: yes
   become_user: "{{ app_user }}"
@@ -35,10 +29,14 @@
       DJANGO_SETTINGS_MODULE="{{ django_settings }}"
       MEMCACHED_HOST="{{ memcached_host }}"
       ES_HOST="{{ es_host }}"
-      OPBEAT_ORGID="{{ opbeat_orgID }}"
-      OPBEAT_APPID="{{ opbeat_appID }}"
-      OPBEAT_TOKEN="{{ opbeat_token }}"
+      OPBEAT_ORGANIZATION_ID="{{ opbeat_orgID }}"
+      OPBEAT_APP_ID="{{ opbeat_appID }}"
+      OPBEAT_SECRET_TOKEN="{{ opbeat_token }}"
       SLACK_HOOK="{{ slack_hook }}"
+      TWILIO_ACCOUNT_SID="{{ twilio_account_sid }}"
+      TWILIO_AUTH_TOKEN="{{ twilio_auth_token }}"
+      TWILIO_PHONE={{ twilio_phone }}
+
 
 - name: Enable environment variables for SSH
   become: yes
@@ -62,10 +60,13 @@
       Defaults  env_keep += S3_SECRET_KEY
       Defaults  env_keep += MEMCACHED_HOST
       Defaults  env_keep += ES_HOST
-      Defaults  env_keep += OPBEAT_ORGID
-      Defaults  env_keep += OPBEAT_APPID
-      Defaults  env_keep += OPBEAT_TOKEN
+      Defaults  env_keep += OPBEAT_ORGANIZATION_ID
+      Defaults  env_keep += OPBEAT_APP_ID
+      Defaults  env_keep += OPBEAT_SECRET_TOKEN
       Defaults  env_keep += SLACK_HOOK
+      Defaults  env_keep += TWILIO_ACCOUNT_SID
+      Defaults  env_keep += TWILIO_AUTH_TOKEN
+      Defaults  env_keep += TWILIO_PHONE
 
 # This is VERY ugly.  The problem is that Ansible keeps SSH
 # connections open across tasks, so the environment variable changes

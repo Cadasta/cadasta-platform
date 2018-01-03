@@ -15,6 +15,7 @@ from django.db import transaction
 from django.forms import ValidationError
 from django.forms.utils import ErrorDict
 from django.utils.translation import ugettext as _
+from django.shortcuts import get_object_or_404
 from leaflet.forms.widgets import LeafletWidget
 from questionnaires.models import Questionnaire
 from tutelary.models import check_perms
@@ -190,7 +191,7 @@ class AddOrganizationMemberForm(forms.Form):
     def clean_identifier(self):
         identifier = self.data.get('identifier')
         try:
-            self.user = User.objects.get_from_username_or_email(
+            self.user = User.objects.get_from_username_or_email_or_phone(
                 identifier=identifier)
         except (User.DoesNotExist, User.MultipleObjectsReturned) as e:
             raise forms.ValidationError(e)
@@ -223,7 +224,8 @@ class EditOrganizationMemberForm(forms.Form):
         self.user = user
         self.current_user = current_user
 
-        self.org_role_instance = OrganizationRole.objects.get(
+        self.org_role_instance = get_object_or_404(
+            OrganizationRole,
             user=user,
             organization=self.organization)
 
@@ -555,8 +557,8 @@ class SelectImportForm(SanitizeFieldsForm, forms.Form):
     type = forms.ChoiceField(
         choices=TYPE_CHOICES, initial='csv', widget=forms.RadioSelect)
     entity_types = forms.MultipleChoiceField(
-        choices=ENTITY_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple(),
-        required=False, initial=[choice[0] for choice in ENTITY_TYPE_CHOICES])
+        choices=ENTITY_TYPE_CHOICES, required=False,
+        initial=[choice[0] for choice in ENTITY_TYPE_CHOICES])
     file = forms.FileField(required=True)
     description = forms.CharField(
         required=False, max_length=2500, widget=forms.Textarea)

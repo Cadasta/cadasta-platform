@@ -15,6 +15,5 @@ class Command(BaseCommand):
         dir = os.path.join(
             os.path.dirname(inspect.getfile(cadasta.test)), 'fixtures')
         files = [os.path.join(dir, f) for f in os.listdir(dir) if '.json' in f]
-        for f in files:
-            call_command('loaddata', f)
+        call_command('loaddata', *files)
         self.stdout.write(self.style.SUCCESS("Functional test data loaded."))

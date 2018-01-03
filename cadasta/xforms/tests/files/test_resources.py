@@ -661,6 +661,46 @@ REPEAT_PARTY_MINUS_TENURE = '''<?xml version=\'1.0\' ?>
         </meta>
     </t_questionnaire_repeat_party_minus_tenure>'''.strip()
 
+RESOURCE_IN_GROUP = '''<?xml version=\'1.0\' ?>
+    <t_questionnaire_resource_in_group
+        id="t_questionnaire_resource_in_group" version="20160727122117">
+        <start>2016-07-07T16:38:20.310-04</start>
+        <end>2016-07-07T16:39:23.673-04</end>
+        <today>2016-07-07</today>
+        <deviceid>00:bb:3a:44:d0:fb</deviceid>
+        <title />
+        <party_type>IN</party_type>
+        <party_name>Bilbo Baggins</party_name>
+        <location_geometry>40.6890612 -73.9925067 0.0 0.0;</location_geometry>
+        <location_type>MI</location_type>
+        <tenure_type>LH</tenure_type>
+        <location_attributes>
+            <location_name>Baggins House</location_name>
+            <village_name>The Shire</village_name>
+            <location_problems>none</location_problems>
+            <location_notes>Now owned by Frodo Baggins.</location_notes>
+            <location_resource_photo>test_image_one.png</location_resource_photo>
+        </location_attributes>
+        <party_attributes_default>
+            <party_notes>Party attribute default notes.</party_notes>
+            <party_resource_photo>test_image_two.png</party_resource_photo>
+            <party_resource_audio>test_audio_one.mp3</party_resource_audio>
+        </party_attributes_default>
+        <party_attributes_individual>
+            <national_id>Shire-12345</national_id>
+            <mobile_number>1234567890</mobile_number>
+            <gender>m</gender>
+            <dob>2016-07-07</dob>
+        </party_attributes_individual>
+        <tenure_relationship_attributes>
+            <relationship_notes>Tenure relationship notes.</relationship_notes>
+            <tenure_resource_photo>test_image_three.png</tenure_resource_photo>
+        </tenure_relationship_attributes>
+        <meta>
+            <instanceID>uuid:b3f225d3-0fac-4a0b-80c7-60e6db4cc0ad</instanceID>
+        </meta>
+    </t_questionnaire_resource_in_group>'''.strip()
+
 responses = {
     'submission': STANDARD,
     'submission_not_sane': NOT_SANE,
@@ -681,4 +721,5 @@ responses = {
     'submission_location_one_repeat': REPEAT_ONE_LOCATION,
     'submission_repeat_minus_tenure': REPEAT_MINUS_TENURE,
     'submission_repeat_party_minus_tenure': REPEAT_PARTY_MINUS_TENURE,
+    'submission_resource_in_group': RESOURCE_IN_GROUP,
 }

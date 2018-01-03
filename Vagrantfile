@@ -16,6 +16,9 @@ Vagrant.configure(2) do |config|
       end
   end
 
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+  config.vm.synced_folder ".", "/opt/cadasta/cadasta-platform", create: true
+
   config.vm.box = "ubuntu/trusty64"
   config.vm.network "forwarded_port", guest: 8000, host: 8000
 

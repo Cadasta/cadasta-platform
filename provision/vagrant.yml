@@ -1,11 +1,8 @@
 - hosts: all
   vars:
-    application_path: /vagrant/
-    virtualenv_path: /opt/cadasta/env/
     django_settings: config.settings.dev
-    app_user: vagrant
-    uwsgi_socket: /tmp/uwsgi.sock
     identifier: local
+    app_user: vagrant
   vars_files:
     - shared_vars.yml
   roles:
@@ -13,6 +10,7 @@
     - db/common
     - db/development
     - node
+    - cadasta/common
     - cadasta/application
     - cadasta/development
     - testing

@@ -125,7 +125,7 @@ class ProjectUsersAPITest(APITestCase, UserTestCase, TestCase):
                                 user=self.user)
         assert response.status_code == 400
         assert self.project.users.count() == 0
-        assert ('User with username or email some-user does not exist'
+        assert ('User with username or email or phone some-user does not exist'
                 in response.content['username'])
 
     def test_add_user_to_archived_project(self):
@@ -386,7 +386,7 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
         assert names == sorted(names, reverse=True)
 
     def test_permission_filter(self):
-        addtional_clause = [{
+        additional_clause = [{
             'effect': 'allow',
             'object': ['project/*/*'],
             'action': ['party.create']
@@ -401,7 +401,7 @@ class OrganizationProjectListAPITest(APITestCase, UserTestCase, TestCase):
             {'organization': self.organization}
         ])
 
-        assign_policies(self.user, add_clauses=addtional_clause)
+        assign_policies(self.user, add_clauses=additional_clause)
 
         response = self.request(user=self.user,
                                 get_data={'permissions': 'party.create'})
@@ -456,7 +456,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
 
     def test_empty_list_with_unauthorized_user(self):
         """
-        It should 403 "You do not have permission to perform this action."
+        It should return an empty array.
         """
         response = self.request()
         assert response.status_code == 200
@@ -505,7 +505,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
         assert names == sorted(names, reverse=True)
 
     def test_permission_filter(self):
-        addtional_clause = [{
+        additional_clause = [{
             'effect': 'allow',
             'object': ['project/*/*'],
             'action': ['party.create']
@@ -520,7 +520,7 @@ class ProjectListAPITest(APITestCase, UserTestCase, TestCase):
             {'organization': self.organization}
         ])
 
-        assign_policies(self.user, add_clauses=addtional_clause)
+        assign_policies(self.user, add_clauses=additional_clause)
 
         response = self.request(user=self.user,
                                 get_data={'permissions': 'party.create'})

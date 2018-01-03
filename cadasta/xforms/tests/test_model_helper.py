@@ -30,6 +30,17 @@ from xforms.exceptions import InvalidXMLSubmission
 path = os.path.dirname(settings.BASE_DIR)
 
 
+geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+            '45.56176327330353 -122.67669159919024 0.0 0.0;'
+            '45.56151562182025 -122.67490658909082 0.0 0.0;'
+            '45.563479432877415 -122.67494414001703 0.0 0.0;'
+            '45.56176327330353 -122.67669159919024 0.0 0.0')
+
+line = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
+        '45.56176327330353 -122.67669159919024 0.0 0.0;'
+        '45.56151562182025 -122.67490658909082 0.0 0.0;')
+
+
 class XFormModelHelperTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -407,7 +418,7 @@ class XFormModelHelperTest(TestCase):
         assert tenure_resources[1]['id'] == tenure2.id
         assert tenure_resources[1]['resources'] == ['resource_three.png']
 
-    def test_create_party(self):
+    def test_create_party_without_repeats(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test without repeats
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -436,6 +447,41 @@ class XFormModelHelperTest(TestCase):
         assert 'invitation.pdf' in party_resources[0]['resources']
         assert party.project == self.project
 
+        assert Party.objects.count() == 1
+
+    def test_create_party_resource_in_attribute_group(self):
+        data = {
+            'party_name': 'Party One',
+            'party_type': 'IN',
+            'party_attributes_individual': {
+                'fname': False,
+                'fname_two': 'socks',
+                'party_resource_photo': 'sad_birthday.png',
+                'party_resource_invite': 'invitation.pdf',
+            },
+            'party_photo': 'sad_birthday2.png',
+            'party_resource_invite_2': 'invitation2.pdf',
+        }
+
+        party_objects, party_resources = mh.create_party(
+            mh(), data, self.project
+        )
+        assert len(party_objects) == 1
+        party = Party.objects.get(name='Party One')
+        assert party.type == 'IN'
+        assert party.attributes == {'fname': False, 'fname_two': 'socks'}
+        assert len(party_resources) == 1
+        assert party_resources[0]['id'] == party.id
+        assert len(party_resources[0]['resources']) == 4
+        assert 'sad_birthday.png' in party_resources[0]['resources']
+        assert 'invitation.pdf' in party_resources[0]['resources']
+        assert 'sad_birthday2.png' in party_resources[0]['resources']
+        assert 'invitation2.pdf' in party_resources[0]['resources']
+        assert party.project == self.project
+
+        assert Party.objects.count() == 1
+
+    def test_create_party_with_repeats(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test with repeats
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -487,6 +533,9 @@ class XFormModelHelperTest(TestCase):
         assert 'invitation_two.pdf' in party_resources[1]['resources']
         assert party2.project == self.project
 
+        assert Party.objects.count() == 2
+
+    def test_create_party_without_name(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test without fails
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -505,19 +554,9 @@ class XFormModelHelperTest(TestCase):
             mh.create_party(
                 mh(), data, self.project
             )
-        assert Party.objects.count() == 3
+        assert Party.objects.count() == 0
 
     def test_create_spatial_unit(self):
-        geoshape = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
-                    '45.56176327330353 -122.67669159919024 0.0 0.0;'
-                    '45.56151562182025 -122.67490658909082 0.0 0.0;'
-                    '45.563479432877415 -122.67494414001703 0.0 0.0;'
-                    '45.56176327330353 -122.67669159919024 0.0 0.0')
-
-        line = ('45.56342779158167 -122.67650283873081 0.0 0.0;'
-                '45.56176327330353 -122.67669159919024 0.0 0.0;'
-                '45.56151562182025 -122.67490658909082 0.0 0.0;')
-
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test without repeats
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -546,6 +585,44 @@ class XFormModelHelperTest(TestCase):
         assert 'resource_two.pdf' in location_resources[0]['resources']
         assert location.project == self.project
 
+        assert SpatialUnit.objects.count() == 1
+
+    def test_create_spatial_unit_with_resouce_in_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # test without repeats
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        data = {
+            'location_type': 'BU',
+            'location_geometry': geoshape,
+            'location_attributes': {
+                'fname': False,
+                'fname_two': 'Location One',
+                'location_resource_photo': 'resource_three.png',
+                'location_resource_invite_2': 'resource_four.pdf',
+            },
+            'location_photo': 'resource.png',
+            'location_resource_invite': 'resource_two.pdf',
+        }
+
+        location_objects, location_resources = mh.create_spatial_unit(
+            mh(), data, self.project)
+        assert len(location_objects) == 1
+        location = SpatialUnit.objects.get(type='BU')
+        assert location.attributes == {
+            'fname': False, 'fname_two': 'Location One'}
+        assert location.geometry.geom_type == 'Polygon'
+        assert len(location_resources) == 1
+        assert location_resources[0]['id'] == location.id
+        assert len(location_resources[0]['resources']) == 4
+        assert 'resource.png' in location_resources[0]['resources']
+        assert 'resource_two.pdf' in location_resources[0]['resources']
+        assert 'resource_three.png' in location_resources[0]['resources']
+        assert 'resource_four.pdf' in location_resources[0]['resources']
+        assert location.project == self.project
+
+        assert SpatialUnit.objects.count() == 1
+
+    def test_create_spatial_unit_with_repeats(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test with repeats
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -597,6 +674,63 @@ class XFormModelHelperTest(TestCase):
         assert 'resource_four.pdf' in location_resources[1]['resources']
         assert location2.project == self.project
 
+        assert SpatialUnit.objects.count() == 2
+
+    def test_create_spatial_unit_with_repeats_resource_in_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # test with repeats
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        data = {
+            'location_repeat': [{
+                'location_type': 'PA',
+                'location_geotrace': line,
+                'location_attributes': {
+                    'fname': False,
+                    'fname_two': 'Location One',
+                    'location_resource_photo': 'resource.png',
+                    'location_resource_invite': 'resource_two.pdf'
+                },
+            }, {
+                'location_type': 'CB',
+                'location_geoshape': geoshape,
+                'location_attributes': {
+                    'fname': True,
+                    'fname_two': 'Location Two',
+                    'location_resource_photo': 'resource_three.png',
+                    'location_resource_invite': 'resource_four.pdf'
+                }
+            }]
+        }
+
+        location_objects, location_resources = mh.create_spatial_unit(
+            mh(), data, self.project)
+
+        assert len(location_objects) == 2
+        location = SpatialUnit.objects.get(type='PA')
+        assert location.geometry.geom_type == 'LineString'
+        assert location.attributes == {
+            'fname': False, 'fname_two': 'Location One'}
+        location2 = SpatialUnit.objects.get(type='CB')
+        assert location2.geometry.geom_type == 'Polygon'
+        assert location2.attributes == {
+            'fname': True, 'fname_two': 'Location Two'}
+
+        assert len(location_resources) == 2
+        assert location_resources[0]['id'] == location.id
+        assert len(location_resources[0]['resources']) == 2
+        assert 'resource.png' in location_resources[0]['resources']
+        assert 'resource_two.pdf' in location_resources[0]['resources']
+        assert location.project == self.project
+
+        assert location_resources[1]['id'] == location2.id
+        assert len(location_resources[1]['resources']) == 2
+        assert 'resource_three.png' in location_resources[1]['resources']
+        assert 'resource_four.pdf' in location_resources[1]['resources']
+        assert location2.project == self.project
+
+        assert SpatialUnit.objects.count() == 2
+
+    def test_create_spatial_unit_with_invalid_data(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test fails
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -614,7 +748,7 @@ class XFormModelHelperTest(TestCase):
         with pytest.raises(InvalidXMLSubmission):
             mh.create_spatial_unit(
                 mh(), data, self.project)
-        assert SpatialUnit.objects.count() == 3
+        assert SpatialUnit.objects.count() == 0
 
     def test_create_tenure_relationship(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -642,12 +776,45 @@ class XFormModelHelperTest(TestCase):
         assert len(tenure_resources) == 1
         assert tenure_resources[0]['id'] == tenure.id
         assert 'resource.png' in tenure_resources[0]['resources']
+        assert TenureRelationship.objects.count() == 1
 
+    def test_create_tenure_relationship_with_resource_in_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # test without repeats
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        party = PartyFactory.create(project=self.project)
+        location = SpatialUnitFactory.create(project=self.project)
+
+        data = {
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure One',
+                'tenure_resource_2': 'resource2.png'
+            },
+            'tenure_resource_photo': 'resource.png'
+        }
+
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
+            mh(), data, [party], [location], self.project)
+        tenure = TenureRelationship.objects.get(tenure_type='CO')
+        assert tenure_relationships == [tenure]
+        assert tenure.party == party
+        assert tenure.spatial_unit == location
+        assert tenure.attributes == {'fname': False, 'fname_two': 'Tenure One'}
+        assert len(tenure_resources) == 1
+        assert tenure_resources[0]['id'] == tenure.id
+        assert 'resource.png' in tenure_resources[0]['resources']
+        assert 'resource2.png' in tenure_resources[0]['resources']
+        assert TenureRelationship.objects.count() == 1
+
+    def test_create_tenure_relationship_with_repeat(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # inside party_repeat
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         party2 = PartyFactory.create(project=self.project)
         party3 = PartyFactory.create(project=self.project)
+        location = SpatialUnitFactory.create(project=self.project)
 
         data = {
             'party_repeat': [{
@@ -689,10 +856,63 @@ class XFormModelHelperTest(TestCase):
 
         assert tenure_resources[1]['id'] == tenure3.id
         assert 'resource_three.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
 
+    def test_create_tenure_relationship_with_repeat_resource_in_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # inside party_repeat
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        party2 = PartyFactory.create(project=self.project)
+        party3 = PartyFactory.create(project=self.project)
+        location = SpatialUnitFactory.create(project=self.project)
+
+        data = {
+            'party_repeat': [{
+                'tenure_type': 'WR',
+                'tenure_relationship_attributes': {
+                    'fname': False,
+                    'fname_two': 'Tenure Two',
+                    'tenure_resource_photo': 'resource_two.png'
+                }
+            }, {
+                'tenure_type': 'CO',
+                'tenure_relationship_attributes': {
+                    'fname': True,
+                    'fname_two': 'Tenure Three',
+                    'tenure_resource_photo': 'resource_three.png'
+                }
+            }]
+        }
+
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
+            mh(), data, [party2, party3], [location], self.project)
+        tenure2 = TenureRelationship.objects.get(party=party2)
+        tenure3 = TenureRelationship.objects.get(party=party3)
+        assert tenure_relationships == [tenure2, tenure3]
+
+        assert tenure2.spatial_unit == location
+        assert tenure2.tenure_type == 'WR'
+        assert tenure2.attributes == {
+            'fname': False, 'fname_two': 'Tenure Two'}
+
+        assert tenure3.spatial_unit == location
+        assert tenure3.tenure_type == 'CO'
+        assert tenure3.attributes == {
+            'fname': True, 'fname_two': 'Tenure Three'}
+
+        assert len(tenure_resources) == 2
+        assert tenure_resources[0]['id'] == tenure2.id
+        assert 'resource_two.png' in tenure_resources[0]['resources']
+
+        assert tenure_resources[1]['id'] == tenure3.id
+        assert 'resource_three.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
+
+    def test_create_tenure_relationship_inside_location_repeat(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # inside location_repeat
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        party = PartyFactory.create(project=self.project)
         location2 = SpatialUnitFactory.create(project=self.project)
         location3 = SpatialUnitFactory.create(project=self.project)
 
@@ -737,12 +957,66 @@ class XFormModelHelperTest(TestCase):
 
         assert tenure_resources[1]['id'] == tenure5.id
         assert 'resource_five.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
 
+    def test_create_tenure_relationship_inside_location_repeat_res_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # inside location_repeat
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        party = PartyFactory.create(project=self.project)
+        location2 = SpatialUnitFactory.create(project=self.project)
+        location3 = SpatialUnitFactory.create(project=self.project)
+
+        data = {
+            'location_repeat': [{
+                'tenure_type': 'WR',
+                'tenure_relationship_attributes': {
+                    'fname': False,
+                    'fname_two': 'Tenure Four',
+                    'tenure_resource_photo': 'resource_four.png'
+                }
+            }, {
+                'tenure_type': 'CO',
+                'tenure_relationship_attributes': {
+                    'fname': True,
+                    'fname_two': 'Tenure Five',
+                    'tenure_resource_photo': 'resource_five.png'
+                }
+            }]
+        }
+
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
+            mh(), data, [party], [location2, location3], self.project)
+
+        tenure4 = TenureRelationship.objects.get(spatial_unit=location2)
+        tenure5 = TenureRelationship.objects.get(spatial_unit=location3)
+        assert tenure_relationships == [tenure4, tenure5]
+
+        assert tenure4.party == party
+        assert tenure4.tenure_type == 'WR'
+        assert tenure4.attributes == {
+            'fname': False, 'fname_two': 'Tenure Four'}
+
+        assert tenure5.party == party
+        assert tenure5.tenure_type == 'CO'
+        assert tenure5.attributes == {
+            'fname': True, 'fname_two': 'Tenure Five'}
+
+        assert len(tenure_resources) == 2
+        assert tenure_resources[0]['id'] == tenure4.id
+        assert 'resource_four.png' in tenure_resources[0]['resources']
+
+        assert tenure_resources[1]['id'] == tenure5.id
+        assert 'resource_five.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
+
+    def test_create_tenure_relationship_outside_party_repeat(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # outside party_repeat
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         party4 = PartyFactory.create(project=self.project)
         party5 = PartyFactory.create(project=self.project)
+        location = SpatialUnitFactory.create(project=self.project)
 
         data = {
             'party_repeat': [],
@@ -776,12 +1050,57 @@ class XFormModelHelperTest(TestCase):
 
         assert tenure_resources[1]['id'] == tenure7.id
         assert 'resource_six.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
 
+    def test_create_tenure_relationship_outside_party_repeat_res_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # outside party_repeat
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        party4 = PartyFactory.create(project=self.project)
+        party5 = PartyFactory.create(project=self.project)
+        location = SpatialUnitFactory.create(project=self.project)
+
+        data = {
+            'party_repeat': [],
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': {
+                'fname': True,
+                'fname_two': 'Tenure 6, 7',
+                'tenure_resource_photo': 'resource_six.png'
+            }
+        }
+
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
+            mh(), data, [party4, party5], [location], self.project)
+        tenure6 = TenureRelationship.objects.get(party=party4)
+        tenure7 = TenureRelationship.objects.get(party=party5)
+
+        assert tenure_relationships == [tenure6, tenure7]
+        assert tenure6.spatial_unit == location
+        assert tenure6.tenure_type == 'CO'
+        assert tenure6.attributes == {
+            'fname': True, 'fname_two': 'Tenure 6, 7'}
+
+        assert tenure7.spatial_unit == location
+        assert tenure7.tenure_type == 'CO'
+        assert tenure7.attributes == {
+            'fname': True, 'fname_two': 'Tenure 6, 7'}
+
+        assert len(tenure_resources) == 2
+        assert tenure_resources[0]['id'] == tenure6.id
+        assert 'resource_six.png' in tenure_resources[0]['resources']
+
+        assert tenure_resources[1]['id'] == tenure7.id
+        assert 'resource_six.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
+
+    def test_create_tenure_relationship_outside_location_repeat(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # outside location_repeat
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         location4 = SpatialUnitFactory.create(project=self.project)
         location5 = SpatialUnitFactory.create(project=self.project)
+        party = PartyFactory.create(project=self.project)
 
         data = {
             'location_repeat': [],
@@ -816,7 +1135,55 @@ class XFormModelHelperTest(TestCase):
 
         assert tenure_resources[1]['id'] == tenure9.id
         assert 'resource_seven.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
 
+    def test_create_tenure_relationship_outside_location_repeat_resgroup(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # outside location_repeat
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        location4 = SpatialUnitFactory.create(project=self.project)
+        location5 = SpatialUnitFactory.create(project=self.project)
+        party = PartyFactory.create(project=self.project)
+
+        data = {
+            'location_repeat': [],
+            'tenure_type': 'WR',
+            'tenure_relationship_attributes': {
+                'fname': False,
+                'fname_two': 'Tenure 8, 9',
+                'tenure_resource_photo': 'resource_seven.png'
+            }
+        }
+
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
+            mh(), data, [party], [location4, location5], self.project)
+
+        tenure8 = TenureRelationship.objects.get(spatial_unit=location4)
+        tenure9 = TenureRelationship.objects.get(spatial_unit=location5)
+        assert tenure_relationships == [tenure8, tenure9]
+
+        assert tenure8.party == party
+        assert tenure8.tenure_type == 'WR'
+        assert tenure8.attributes == {
+            'fname': False, 'fname_two': 'Tenure 8, 9'}
+
+        assert tenure9.party == party
+        assert tenure9.tenure_type == 'WR'
+        assert tenure9.attributes == {
+            'fname': False, 'fname_two': 'Tenure 8, 9'}
+
+        assert len(tenure_resources) == 2
+        assert tenure_resources[0]['id'] == tenure8.id
+        assert 'resource_seven.png' in tenure_resources[0]['resources']
+
+        assert tenure_resources[1]['id'] == tenure9.id
+        assert 'resource_seven.png' in tenure_resources[1]['resources']
+        assert TenureRelationship.objects.count() == 2
+
+    def test_create_tenure_relationship_invalid_data(self):
+        location4 = SpatialUnitFactory.create(project=self.project)
+        location5 = SpatialUnitFactory.create(project=self.project)
+        party = PartyFactory.create(project=self.project)
         data = {
             'location_repeat': [],
             'tenure_nonsense': 'Blah blah blah',
@@ -833,7 +1200,7 @@ class XFormModelHelperTest(TestCase):
         with pytest.raises(InvalidXMLSubmission):
             mh.create_tenure_relationship(
                 mh(), data, [party], [location4, location5], self.project)
-        assert TenureRelationship.objects.count() == 9
+        assert TenureRelationship.objects.count() == 0
 
     def test_create_resource(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1054,28 +1421,6 @@ class XFormModelHelperTest(TestCase):
         assert attributes['type_ppl'] == 'Where my party people at?'
         assert 'party_name' not in attributes
         assert 'party_type' not in attributes
-
-    def test_get_resource_files(self):
-        data = {
-            'ardvark': 'Ardvark!',
-            'party_resource_thing': 'Party Resource Thing!',
-            'location_resource_thing': 'Location Resource!',
-            'party_photo': 'Party Photo!'
-        }
-        resources = mh._get_resource_files(self, data, 'party')
-        assert type(resources) == list
-        assert 'Party Resource Thing!' in resources
-        assert 'Party Photo!' in resources
-
-        assert 'Ardvark!' not in resources
-        assert 'Location Resource!' not in resources
-
-        resources = mh._get_resource_files(self, data, 'location')
-        assert 'Location Resource!' in resources
-
-        assert 'Ardvark!' not in resources
-        assert 'Party Resource Thing!' not in resources
-        assert 'Party Photo!' not in resources
 
     def test_get_resource_names(self):
         data = {

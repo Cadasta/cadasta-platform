@@ -8,38 +8,41 @@
       - chromium-browser
       - chromium-chromedriver
 
-- name: Make Chromium dependency visible to Chromium
-  become: yes
-  become_user: root
-  copy: src=/usr/lib/chromium-browser/libffmpeg.so
-        dest=/usr/lib/libffmpeg.so
-        owner=root
-        mode=644
-        remote_src=true
-
 - name: Add path to ChromeDriver
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export PATH=/usr/lib/chromium-browser:$PATH"
 
-- name: Download Firefox 46 install bundle
+- name: Download GeckoDriver 0.19.0
   become: yes
   become_user: root
-  get_url: url=https://cadasta-miscellaneous.s3.amazonaws.com/firefox-46.0.1.tar.bz2
-           dest=/opt/firefox-46.0.1.tar.bz2
+  get_url: url=https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz
+           dest=/opt/geckodriver.tar.gz
 
-- name: Unpack Firefox 46 install bundle
+- name: Unpack GeckoDriver
   become: yes
   become_user: root
-  unarchive: creates=/opt/firefox/firefox
-             src=/opt/firefox-46.0.1.tar.bz2 dest=/opt copy=no
+  unarchive: src=/opt/geckodriver.tar.gz remote_src=yes dest=/opt
+             creates=/opt/geckodriver
 
-- name: Add path to Firefox 46
+- name: Download Firefox 55.0.3
+  become: yes
+  become_user: root
+  get_url: url=http://ftp.mozilla.org/pub/firefox/releases/55.0.3/linux-x86_64/en-US/firefox-55.0.3.tar.bz2
+           dest=/opt/firefox.tar.bz2
+
+- name: Unpack Firefox
+  become: yes
+  become_user: root
+  unarchive: src=/opt/firefox.tar.bz2 remote_src=yes dest=/opt
+             creates=/opt/firefox/firefox
+
+- name: Add path to Firefox and GeckoDriver
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
-              line="export PATH=/opt/firefox:$PATH"
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
+              line="export PATH=/opt/firefox:/opt:$PATH"
 
 - name: Install Python Selenium driver
   become: yes
@@ -57,11 +60,11 @@
 - name: Set up HTTP proxy
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export http_proxy=http://localhost:3128/"
 
 - name: Set up HTTPS proxy
   become: yes
   become_user: "{{ app_user }}"
-  lineinfile: dest=/home/vagrant/.bashrc
+  lineinfile: dest=/home/{{ app_user }}/.bashrc
               line="export https_proxy=https://localhost:3128/"
