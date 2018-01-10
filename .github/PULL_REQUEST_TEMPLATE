@@ -1,9 +1,10 @@
 ### Proposed changes in this pull request
 
-[List all changes you want to add here. If you fixed an issue, please
-add a reference to that issue as well.]
+#### Why I made this change
 
--
+#### Description of the change
+
+#### How someone else can test the change
 
 ### When should this PR be merged
 
@@ -16,15 +17,12 @@ can merge this pull request.]
 
 [List any risks that could arise from merging your pull request.]
 
--
 
 ### Follow-up actions
 
 [List any possible follow-up actions here; for instance, testing data
 migrations, software that we need to install on staging and production
 environments.]
-
--
 
 
 ### Checklist (for reviewing)
