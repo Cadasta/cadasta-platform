@@ -273,6 +273,7 @@ const Header = ({ orderKeyword, ordering, columns, setOrder, title, thClasses })
    * @return {string}          Class name
    */
   const getOrderingClass = (keyword, ordering) => {
+    if (!keyword || !ordering) return ''
     if (orderKeyword == ordering) return 'sorting_asc'
     if (orderKeyword == ordering.slice(1)) return 'sorting_desc'
     return ''
@@ -285,7 +286,7 @@ const Header = ({ orderKeyword, ordering, columns, setOrder, title, thClasses })
         getOrderingClass(orderKeyword, ordering)
       }
       style={ orderKeyword ? {cursor: 'pointer'} : {}}
-      onClick={ () => setOrder(orderKeyword) }
+      onClick={ orderKeyword ? () => setOrder(orderKeyword) : null }
     >
       { title }
     </th>
