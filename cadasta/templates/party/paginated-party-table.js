@@ -18,6 +18,7 @@ var context = {
     {
       title: "{% trans 'Type' %}",
       columns: 9,
+      orderKeyword: 'type',
       render: function(resource) {
         return (
           td(null, resource.type_display)

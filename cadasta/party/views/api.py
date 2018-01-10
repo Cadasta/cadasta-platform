@@ -28,7 +28,7 @@ class PartyList(APIPermissionRequiredMixin,
                        filters.SearchFilter, filters.OrderingFilter,)
     filter_fields = ('name', 'type')
     search_fields = ('name',)
-    ordering_fields = ('name',)
+    ordering_fields = ('name', 'type')
     permission_required = {
         'GET': 'party.list',
         'POST': update_permissions('party.create')
