@@ -29,6 +29,8 @@ install:
   - pip install tox==2.9.1
   - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo wget -O /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v0.19.0/geckodriver-v0.19.0-linux64.tar.gz; fi
   - if [[ $TOX_ENV == 'py35-functional' ]]; then sudo tar -zxvf /tmp/geckodriver.tar.gz -C /usr/local/bin/; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then npm install; fi
+  - if [[ $TOX_ENV == 'py35-functional' ]]; then npm run-script build; fi
 
 before_script:
   - if [[ $TOX_ENV != 'py35-flake8' ]]; then sudo cp provision/roles/testing/files/squid.conf /etc/squid3/squid.conf; fi
