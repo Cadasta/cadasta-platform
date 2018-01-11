@@ -113,6 +113,18 @@
   command: chdir="{{ base_path }}"
            npm install bootstrap-sass
 
+- name: Install React requirements
+  become: yes
+  become_user: "{{ app_user }}"
+  command: chdir="{{ application_path }}"
+           npm install
+
+- name: Transpile JSX
+  become: yes
+  become_user: "{{ app_user }}"
+  command: chdir="{{ application_path }}"
+           npm run-script build
+
 - name: Write platform identifier to core template file
   become: yes
   become_user: "{{ app_user }}"
