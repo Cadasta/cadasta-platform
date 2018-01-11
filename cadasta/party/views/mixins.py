@@ -12,11 +12,6 @@ class PartyQuerySetMixin(ProjectMixin):
     def get_queryset(self):
         self.proj = self.get_project()
         parties = self.proj.parties.all()
-        if (
-            hasattr(self, 'no_jsonattrs_in_queryset') and
-            self.no_jsonattrs_in_queryset
-        ):
-            parties = parties.only('id', 'name', 'type', 'project')
         return parties
 
     def get_serializer_context(self, *args, **kwargs):
