@@ -196,7 +196,7 @@ class PaginatedTable extends React.Component {
         handleSearch: this.changeSearch.bind(this) }),
       React.createElement(
         'table',
-        { id: 'paginated-table', className: 'table table-hover dataTable' },
+        { id: 'DataTables_Table_0', className: 'table table-hover dataTable' },
         React.createElement(
           'thead',
           null,
@@ -344,7 +344,7 @@ class SearchField extends React.Component {
       { className: 'table-search clearfix' },
       React.createElement(
         'div',
-        { className: 'dataTables_filter' },
+        { id: 'DataTables_Table_0_filter', className: 'dataTables_filter' },
         React.createElement(
           'label',
           null,

@@ -207,7 +207,7 @@ class PaginatedTable extends React.Component {
         <SearchField
           query={ this.state.search }
           handleSearch={ this.changeSearch.bind(this) }/>
-        <table id="paginated-table" className="table table-hover dataTable">
+        <table id="DataTables_Table_0" className="table table-hover dataTable">
           <thead>
             <tr>
               {
@@ -355,7 +355,7 @@ class SearchField extends React.Component {
   render() {
     return (
       <div className="table-search clearfix">
-        <div className="dataTables_filter">
+        <div id="DataTables_Table_0_filter" className="dataTables_filter">
           <label>
             <div className="input-group">
               <span className="input-group-addon">
