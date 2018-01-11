@@ -1,5 +1,6 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Resources" %} | {% endblock %}
 {% block left-nav %}resources{% endblock %}
@@ -25,7 +26,7 @@
               <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
           </div>
           {% endif %}
-          {% include 'resources/table.html' %}
+          <div id="paginated-table"></div>
         </div>
       </div>
     </div>
@@ -36,4 +37,14 @@
 
 {% block form_modal %}
 {% include 'resources/modal_unarchive.html' with unarchive_url="#" %}
+{% endblock %}
+
+{% block extra_script %}
+  {{ block.super }}
+  {% include 'utils/react.js' %}
+  <script type="text/javascript" src="{% static 'moment.js/2.20.1/moment.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'dist/paginated-table.js' %}"></script>
+  <script type="text/javascript">
+    {% include 'resources/paginated-resource-table.js' %}
+  </script>
 {% endblock %}
