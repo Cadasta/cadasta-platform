@@ -174,6 +174,9 @@ class PaginatedTable extends React.Component {
       );
     }
     if (!this.state.data.length) {
+      if (this.state.search.length > 0) {
+        return '';
+      }
       return React.createElement(
         'td',
         { colSpan: '100%', style: { "text-align": "left", padding: "10px" } },
