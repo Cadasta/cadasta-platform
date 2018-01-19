@@ -150,7 +150,7 @@ LOGGING = {
         # Log errors from the Opbeat module to the console
         'opbeat.errors': {
             'level': 'ERROR',
-            'handlers': ['error_file'],
+            'handlers': ['file', 'error_file'],
             'propagate': False,
         },
     },
