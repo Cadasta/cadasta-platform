@@ -185,13 +185,14 @@ class PaginatedTable extends React.Component {
       )
     }
     if (!this.state.data.length) {
+      var msg = 'No data available in table';
       if (this.state.search.length > 0) {
-        return ''
+        msg = 'No matching records found';
       }
       return (
         <td colSpan="100%" style={{"text-align": "left", padding: "10px"}}>
           {/* TODO: Support internationalization */}
-          No data available in table
+          { msg }
         </td>
       )
     }
