@@ -64,7 +64,7 @@ matrix:
       if: type = push
       env: TOX_ENV=py35-django-unit
     - # Functional tests locally for PRs
-      if: type = pull_request AND branch = master
+      if: type = push
       env: TOX_ENV=py35-functional
     - # Functional tests via BrowserStack for commits to master
       if: type = push AND branch = master
