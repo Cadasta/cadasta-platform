@@ -15,11 +15,15 @@ class PartySerializer(core_serializers.JSONAttrsSerializer,
                       core_serializers.FieldSelectorSerializer,
                       serializers.ModelSerializer):
     attrs_selector = 'type'
+    type_display = serializers.SerializerMethodField()
 
     class Meta:
         model = models.Party
-        fields = ('id', 'name', 'type', 'attributes', )
+        fields = ('id', 'name', 'type', 'attributes', 'type_display')
         read_only_fields = ('id', )
+
+    def get_type_display(self, instance):
+        return instance.get_type_display()
 
     def create(self, validated_data):
         project = self.context['project']
