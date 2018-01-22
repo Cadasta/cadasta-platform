@@ -14,8 +14,8 @@ def get_pkg_from_git_url(link):
     """
     try:
         link = link.split('#')[0].strip()
-        end = link.split('/')[-1]
-        pkg, version = end.split('@', 1)
+        link, branch = link.split('@', 1)
+        pkg = link.split('/')[-1]
         pkg = pkg.split('.git')[0]
         return pkg
     except:
