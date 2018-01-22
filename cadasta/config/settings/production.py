@@ -122,20 +122,19 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        '': {
             'handlers': ['file', 'email_admins', 'opbeat'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'level': 'INFO',
         },
         'core': {
             'handlers': ['file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         'xform.submissions': {
             'handlers': ['file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         # Log errors from the Opbeat module to the console
         'opbeat.errors': {
