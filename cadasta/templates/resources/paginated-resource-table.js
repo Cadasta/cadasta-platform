@@ -1,6 +1,11 @@
 {% load i18n %}
 
-function isLinked(resource) {
+/**
+ * Returns link to project, if it exists
+ * @param  {Object} resource
+ * @return {Object} link relating resource to project
+ */
+function findLink(resource) {
   return resource.links.find(function(link) {
     return link.id == "{{ object.id }}"
   });
@@ -75,7 +80,7 @@ var context = {
       title: "{% trans 'Attached to' %}",
       columns: 2,
       render: function(resource) {
-        var text = isLinked(resource) ?
+        var text = findLink(resource) ?
           (resource.links.length - 1) + " {% trans 'other' %}" :
           resource.links.length || "{% trans 'Unattached' %}"
         return (
@@ -94,7 +99,8 @@ var context = {
          * @return {DOMElement}      Button to be rendered
          */
         function getButton(resource) {
-          if (isLinked(resource)) {
+          var link = findLink(resource);
+          if (link) {
             var removeOpts = {
               className: 'btn btn-danger btn-sm',
               ariaHidden: true,
