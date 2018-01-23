@@ -27,7 +27,7 @@ class ResourceSerializer(SanitizeFieldSerializer, serializers.ModelSerializer):
         model = Resource
         fields = ('id', 'name', 'description', 'file', 'original_file',
                   'archived', 'mime_type', 'links',
-                  'contributor', 'last_updated', 'file_type', )
+                  'contributor', 'last_updated', 'file_type', 'thumbnail',)
         read_only_fields = ('id', )
         extra_kwargs = {'mime_type': {'required': False}}
 
