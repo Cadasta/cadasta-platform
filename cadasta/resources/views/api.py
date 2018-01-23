@@ -38,7 +38,7 @@ class ProjectResources(APIPermissionRequiredMixin,
                        filters.SearchFilter,
                        filters.OrderingFilter,)
     filter_fields = ('archived',)
-    search_fields = ('name', 'description', 'file',)
+    search_fields = ('name', 'description', 'original_file')
     ordering_fields = ('name', 'description', 'file',
                        'contributor__username', 'last_updated')
     permission_required = {
