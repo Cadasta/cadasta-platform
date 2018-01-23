@@ -1,7 +1,7 @@
 - name: Add deadsnakes Python repository
   become: yes
   become_user: root
-  apt_repository: repo='ppa:fkrull/deadsnakes'
+  apt_repository: repo='ppa:deadsnakes/ppa'
 
 - name: Remove ubuntugis repository
   become: yes
