@@ -1,7 +1,7 @@
 - name: Add deadsnakes Python repository
   become: yes
   become_user: root
-  apt_repository: repo='ppa:fkrull/deadsnakes'
+  apt_repository: repo='ppa:deadsnakes/ppa'
 
 - name: Remove ubuntugis repository
   become: yes
@@ -107,6 +107,10 @@
                  virtualenv="{{ virtualenv_path }}"
                  settings="{{ django_settings }}"
 
+- name: Trigger "migrations called" signal
+  command: echo "Migrations have been called"
+  notify: migrations called
+
 - name: Install Bootstrap for SASS processing
   become: yes
   become_user: "{{ app_user }}"
@@ -118,3 +122,10 @@
   become_user: "{{ app_user }}"
   template: src=identifier
             dest="{{ application_path }}cadasta/templates/core/identifier.html"
+
+# Started in roles/webserver/production/tasks
+- name: Write Sync Tasks Upstart service definition
+  become: yes
+  become_user: root
+  template: src=sync-tasks
+            dest=/etc/init/cadasta-sync-tasks.conf

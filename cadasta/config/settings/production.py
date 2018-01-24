@@ -158,3 +158,7 @@ LOGGING = {
 
 SMS_GATEWAY = 'accounts.gateways.TwilioGateway'
 TWILIO_PHONE = os.environ['TWILIO_PHONE']
+
+# Async Tooling
+CELERY_BROKER_TRANSPORT = 'sqs'
+CELERY_QUEUE_PREFIX = os.environ['QUEUE_PREFIX']

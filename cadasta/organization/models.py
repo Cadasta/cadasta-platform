@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.db import models
 from django_countries.fields import CountryField
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.dispatch import receiver
 from django.utils.translation import ugettext as _
@@ -195,6 +196,12 @@ class Project(ResourceModelMixin, SlugModel, RandomIDModel):
         max_length=24, null=True, blank=True
     )
     area = models.FloatField(default=0)
+
+    tasks = GenericRelation(
+        'tasks.BackgroundTask',
+        content_type_field='related_content_type',
+        object_id_field='related_object_id',
+    )
 
     # Audit history
     created_date = models.DateTimeField(auto_now_add=True)

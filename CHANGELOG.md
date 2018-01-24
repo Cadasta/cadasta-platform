@@ -1,6 +1,22 @@
 # Change Log
 
-## [v1.14.0](https://github.com/Cadasta/cadasta-platform/tree/v1.14.1) (2017-12-15)
+## [v1.15.0](https://github.com/Cadasta/cadasta-platform/tree/v1.15.0) (2018-01-03)
+
+### Added
+
+- Allow file fields in question groups (#1934)
+- Integrate avatars into platform (#1930)
+- Support for signatures in XLS forms (#1888)
+- Asynchronous exports (#1883)
+
+### Changes
+
+- Dependency upgrades (#1933)
+  - awscli (1.14.10)
+  - pandas (0.21.1)
+  - opbeat (3.6.0)
+
+## [v1.14.1](https://github.com/Cadasta/cadasta-platform/tree/v1.14.1) (2017-12-15)
 
 ### Changes
 
