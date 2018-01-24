@@ -1,0 +1,21 @@
+- name: Configure worker table privileges
+  become: yes
+  postgresql_privs: login_host="{{ db_host }}"
+                    login_user="cadasta" login_password="{{ db_pass }}"
+                    role="worker"
+                    privs="SELECT,INSERT,UPDATE"
+                    objs="celery_taskmeta"
+                    db="cadasta"
+  listen: migrations called
+
+- name: Configure worker sequence privileges
+  become: yes
+  postgresql_privs: login_host="{{ db_host }}"
+                    login_user="cadasta" login_password="{{ db_pass }}"
+                    role="worker"
+                    priv="USAGE"
+                    objs="task_id_sequence"
+                    type="sequence"
+                    db="cadasta"
+  listen:
+    - migrations called
