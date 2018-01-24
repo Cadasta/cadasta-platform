@@ -1,0 +1,17 @@
+description "Cadasta Sync Tasks Service"
+start on runlevel [2345]
+stop on runlevel [06]
+
+respawn
+setuid {{ app_user }}
+
+script
+  # Set environment for service
+  set -a
+  . /etc/environment
+
+  # Run service
+  {{ virtualenv_path }}bin/python \
+    {{ application_path }}cadasta/manage.py \
+    sync_tasks -v 2
+end script

@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'party',
     'xforms',
     'search',
+    'tasks',
 
     'django_filters',
     'crispy_forms',
@@ -99,6 +100,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_tmp_scoped_token.TokenAuth',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -599,3 +601,7 @@ SMS_GATEWAY = 'accounts.gateways.FakeGateway'
 TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_PHONE = '+123'
+
+# Async Tooling
+CELERY_BROKER_TRANSPORT = 'sqs' if os.environ.get('SQS') else 'memory'
+CELERY_QUEUE_PREFIX = os.environ.get('QUEUE_PREFIX', 'dev')
