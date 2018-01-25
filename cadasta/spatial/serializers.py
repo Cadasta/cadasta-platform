@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from rest_framework import serializers
@@ -43,11 +45,47 @@ class SpatialUnitSerializer(core_serializers.JSONAttrsSerializer,
 class SpatialUnitGeoJsonSerializer(geo_serializers.GeoFeatureModelSerializer):
     url = serializers.SerializerMethodField()
     type = serializers.SerializerMethodField()
+    fixed_precision_geometry = geo_serializers.GeometrySerializerMethodField()
 
     class Meta:
         model = SpatialUnit
-        geo_field = 'geometry'
+        geo_field = 'fixed_precision_geometry'
         fields = ('id', 'type', 'url')
+
+    def get_fixed_precision_geometry(self, location):
+        """ Field to return geometry rounded down to a specified precision """
+        if not location.geometry:
+            return None
+        # Notes on precision notes:
+        # https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude/8674#8674  # NOQA
+        # - The fourth decimal place is worth up to 11 m: it can identify a
+        #   parcel of land. It is comparable to the typical accuracy of an
+        #   uncorrected GPS unit with no interference.
+        # - The fifth decimal place is worth up to 1.1 m: it distinguish trees
+        #   from each other. Accuracy to this level with commercial GPS units
+        #   can only be achieved with differential correction.
+        # - The sixth decimal place is worth up to 0.11 m: you can use this for
+        #   laying out structures in detail, for designing landscapes, building
+        #   roads. It should be more than good enough for tracking movements of
+        #   glaciers and rivers. This can be achieved by taking painstaking
+        #   measures with GPS, such as differentially corrected GPS.
+        precision = 5
+
+        features = []
+        for feature in location.geometry.coords:
+            coords = []
+            for f_coords in feature:
+                # Decrease precision
+                r_coords = tuple(round(coord, precision) for coord in f_coords)
+
+                # Rm duplicates
+                if coords and coords[-1] == r_coords:
+                    continue
+                coords.append(r_coords)
+            features.append(coords)
+
+        Feature = namedtuple('Feature', 'geom_type,coords')
+        return Feature(location.geometry.geom_type, tuple(features))
 
     def get_url(self, location):
         project = location.project
