@@ -1,6 +1,8 @@
 import importlib
 from unittest.mock import patch, MagicMock
 
+from django.core.cache import cache
+from django.core import signals
 from django.test import TestCase, override_settings
 from django.core.cache.backends.memcached import PyLibMCCache
 import pylibmc
@@ -8,17 +10,17 @@ import pylibmc
 from core import backends
 
 
+@override_settings(CACHES={
+    'default': {
+        'BACKEND': 'core.backends.MemorySafePyLibMCCache',
+        'LOCATION': ['localhost'],
+    }
+})
 class MemorySafePyLibMCCacheTest(TestCase):
 
     def tearDown(cls):
         importlib.reload(backends)
 
-    @override_settings(CACHES={
-        'default': {
-            'BACKEND': 'core.backends.MemorySafePyLibMCCache',
-            'LOCATION': ['localhost'],
-        }
-    })
     @patch('core.types.logging')
     def _test_method(self, method, logging):
         mock_logger = MagicMock()
@@ -62,3 +64,11 @@ class MemorySafePyLibMCCacheTest(TestCase):
 
     def test_set_many(self):
         return self._test_method('set_many')
+
+    def test_close(self):
+        """ Ensure cache connections are closed at end of request """
+        mock_cache = patch.object(
+            cache._lib.Client, 'disconnect_all', autospec=True)
+        with mock_cache as mock_disconnect:
+            signals.request_finished.send(self.__class__)
+            mock_disconnect.assert_called_once_with()

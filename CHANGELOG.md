@@ -15,6 +15,11 @@
   - awscli (1.14.10)
   - pandas (0.21.1)
   - opbeat (3.6.0)
+- Run functional tests in two batches (#1938)
+
+### Fixed
+- Update deadsnakes repository for provisioning (#1950)
+- Prevent excessive cache connections (#1953)
 
 ## [v1.14.1](https://github.com/Cadasta/cadasta-platform/tree/v1.14.1) (2017-12-15)
 
