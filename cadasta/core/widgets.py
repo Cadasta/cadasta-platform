@@ -16,6 +16,9 @@ class XLangSelect(Select):
             for select in g[1]:
                 xlang_labels = self.xlang_labels.get(select['value'], {})
 
+                if not hasattr(xlang_labels, 'items'):
+                    continue
+
                 # converts the original xlang_labels to the required format
                 labels_attrs = {'data-label-' + k: v
                                 for k, v in xlang_labels.items()}
