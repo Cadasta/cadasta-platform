@@ -6,7 +6,6 @@
 
 {% block extra_head %}
 {% leaflet_css plugins="groupedlayercontrol"%}
-<link rel="stylesheet" href="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.css' %}">
 <link rel="stylesheet" href="{% static 'css/MarkerCluster.Default.css' %}">
 {% endblock %}
@@ -14,7 +13,6 @@
 {% block extra_script %}
 {{ block.super }}
 {% leaflet_js plugins="groupedlayercontrol"%}
-<script src="{% static 'leaflet-geocoder-mapzen/1.9.2/leaflet-geocoder-mapzen.js' %}"></script>
 <script src="{% static 'js/leaflet.markercluster.js' %}"></script>
 <script src="{% static 'js/L.Map.Deflate.js' %}"></script>
 <script src="{% static 'js/map_utils.js' %}"></script>
