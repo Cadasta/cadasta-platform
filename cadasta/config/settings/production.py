@@ -132,6 +132,11 @@ LOGGING = {
         },
     },
     'loggers': {
+        'django': {		
+            'handlers': ['file', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         'core': {
             'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
