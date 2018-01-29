@@ -20,8 +20,18 @@ var context = {
       columns: 9,
       orderKeyword: 'type',
       render: function(resource) {
+        // Populate data tags for xlang plugin
+        var translations = {};
+        for (var lang in resource.type_display) {
+          var key = 'data-label-' + lang;
+          translations[key] = resource.type_display[lang];
+        }
+
+        // Render value to current language settings
+        var cur_lang = $('#form-langs-select').val();
+        var translated_type_display = resource.type_display[cur_lang];
         return (
-          td(null, resource.type_display)
+          td(translations, translated_type_display)
         )
       }
     },

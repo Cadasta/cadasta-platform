@@ -18,7 +18,10 @@ from .factories import PartyFactory
 class PartySerializerTest(UserTestCase, TestCase):
     def test_serialize_party(self):
         party = PartyFactory.create()
-        serializer = serializers.PartySerializer(party)
+        proj = ProjectFactory.create()
+        serializer = serializers.PartySerializer(party, context={
+            'project': proj
+        })
         serialized = serializer.data
 
         assert serialized['id'] == party.id

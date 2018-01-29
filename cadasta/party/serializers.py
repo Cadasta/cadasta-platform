@@ -1,13 +1,15 @@
 """Party Serializers."""
 
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from . import models
 from core import serializers as core_serializers
-from .choices import TENURE_RELATIONSHIP_TYPES
-from spatial.serializers import SpatialUnitSerializer
 from core.form_mixins import get_types
+from spatial.serializers import SpatialUnitSerializer
+from questionnaires.models import QuestionOption
+from . import models
+from .choices import TENURE_RELATIONSHIP_TYPES
 
 
 class PartySerializer(core_serializers.JSONAttrsSerializer,
@@ -22,8 +24,16 @@ class PartySerializer(core_serializers.JSONAttrsSerializer,
         fields = ('id', 'name', 'type', 'attributes', 'type_display')
         read_only_fields = ('id', )
 
+    @cached_property
+    def type_displays_translations(self):
+        project = self.context['project']
+        return dict(QuestionOption.objects.filter(
+            question__name='party_type',
+            question__questionnaire_id=project.current_questionnaire
+        ).values_list('name', 'label_xlat'))
+
     def get_type_display(self, instance):
-        return instance.get_type_display()
+        return self.type_displays_translations.get(instance.type, {})
 
     def create(self, validated_data):
         project = self.context['project']
