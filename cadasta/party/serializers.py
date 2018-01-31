@@ -33,7 +33,8 @@ class PartySerializer(core_serializers.JSONAttrsSerializer,
         ).values_list('name', 'label_xlat'))
 
     def get_type_display(self, instance):
-        return self.type_displays_translations.get(instance.type, {})
+        return self.type_displays_translations.get(instance.type,
+                                                   instance.get_type_display())
 
     def create(self, validated_data):
         project = self.context['project']

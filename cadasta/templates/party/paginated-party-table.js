@@ -20,6 +20,12 @@ var context = {
       columns: 9,
       orderKeyword: 'type',
       render: function(resource) {
+        if (typeof resource.type_display === 'string') {
+          return (
+            td(null, resource.type_display)
+          )
+        }
+
         // Populate data tags for xlang plugin
         var translations = {};
         for (var lang in resource.type_display) {
