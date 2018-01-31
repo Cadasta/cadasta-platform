@@ -11,13 +11,6 @@ function add_map_controls(map) {
     zoomOutTitle: gettext("Zoom out")
   }));
 
-  var geocoder = L.control.geocoder('search-QctWfva', {
-    markers: false
-  }).addTo(map);
-  geocoder.on('select', function (e) {
-    map.setZoomAround(e.latlng, 9);
-  });
-
   var Geolocate = L.Control.extend({
     options: {
       position: 'topleft'
