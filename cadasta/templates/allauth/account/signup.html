@@ -10,11 +10,6 @@
 {% block title %} | {% trans "Register" %}{% endblock %}
 
 {% block extra_script %}
-<script type="text/javascript">
-  $("input[id='id_phone']").on('focus', function() {
-    $(this).next(".help-block").removeClass("hidden");
-  });
-</script>
 <script src="{% static 'js/password_widget.js' %}"></script>
 <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
 <script src="{% static 'js/togglePhoneEmail.js' %}"></script>
