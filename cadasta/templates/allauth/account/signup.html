@@ -56,7 +56,7 @@
   <div id="phone-div" class="verifyDiv phone hidden clearfix form-group{% if form.phone.errors %} has-error{%endif%} hidden">
     <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
     {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phoneplus="1" data-parsley-phonelength="16" data-parsley-phonenumber="1" data-parsley-errors-container="#phone-errors" %}
-    <p class="help-block small hidden">{% trans "Phone numbers must start with a +, followed by a country code and phone number without spaces or punctuation. Phone numbers must contain between 5 and 15 digits." %}</p>
+    <p class="help-block small">{% trans "Phone numbers must start with a +, followed by a country code and phone number without spaces or punctuation. Phone numbers must contain between 5 and 15 digits." %}</p>
     <div id="phone-errors"></div>
     <div class="error-block">{{form.phone.errors}}</div>
     <div class="clearfix">
