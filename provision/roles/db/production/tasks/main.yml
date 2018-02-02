@@ -19,7 +19,7 @@
 - name: Check for existence of database user
   become: yes
   become_user: cadasta
-  shell: psql -h '{{ db_host }}' -U postgres
+  shell: PGPASSWORD={{ postgres_pw }} psql -h '{{ db_host }}' -U postgres
          -c "select rolname from pg_roles where rolname='cadasta'"
   register: cadasta_user_test
   ignore_errors: true
@@ -27,7 +27,7 @@
 - name: Check for existence of database worker user
   become: yes
   become_user: cadasta
-  shell: psql -h '{{ db_host }}' -U postgres
+  shell: PGPASSWORD={{ postgres_pw }} psql -h '{{ db_host }}' -U postgres
          -c "select rolname from pg_roles where rolname='worker'"
   register: worker_user_test
   ignore_errors: true
