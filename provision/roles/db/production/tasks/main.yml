@@ -51,7 +51,7 @@
 
 - name: Create worker user
   postgresql_user: login_host="{{ db_host }}"
-                   login_user="postgres" login_password="postgres"
+                   login_user="postgres" login_password="{{ postgres_pw }}"
                    name="worker" password="cadasta"
                    state=present role_attr_flags=NOSUPERUSER
   when: worker_user_test.stdout.find('0') != -1
