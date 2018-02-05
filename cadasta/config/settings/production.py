@@ -141,6 +141,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'django.request': {
+            'handlers': ['debug_file', 'error_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
         'opbeat.errors': {
             'level': 'ERROR',
             'handlers': ['debug_file', 'error_file', 'email_admins'],
