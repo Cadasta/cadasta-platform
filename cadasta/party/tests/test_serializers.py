@@ -18,12 +18,47 @@ from .factories import PartyFactory
 class PartySerializerTest(UserTestCase, TestCase):
     def test_serialize_party(self):
         party = PartyFactory.create()
-        serializer = serializers.PartySerializer(party)
+        proj = ProjectFactory.create()
+        serializer = serializers.PartySerializer(party, context={
+            'project': proj
+        })
         serialized = serializer.data
 
         assert serialized['id'] == party.id
         assert serialized['name'] == party.name
         assert serialized['type'] == party.type
+        assert serialized['type_display'] == party.get_type_display()
+        assert 'attributes' in serialized
+
+    def test_serialize_party_with_translations(self):
+        proj = ProjectFactory.create()
+
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            project=proj)
+        question = q_factories.QuestionFactory.create(
+            type='S1',
+            name='party_type',
+            questionnaire=questionnaire)
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='IN',
+            label={'en': 'Individual', 'de': 'Individuell'})
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='GR',
+            label={'en': 'Group', 'de': 'Gruppe'})
+
+        party = PartyFactory.create(project=proj)
+        serializer = serializers.PartySerializer(party, context={
+            'project': proj
+        })
+        serialized = serializer.data
+
+        assert serialized['id'] == party.id
+        assert serialized['name'] == party.name
+        assert serialized['type'] == party.type
+        assert serialized['type_display'] == {'en': 'Individual',
+                                              'de': 'Individuell'}
         assert 'attributes' in serialized
 
     def test_create_party(self):

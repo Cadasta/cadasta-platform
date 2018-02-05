@@ -1,5 +1,6 @@
 {% extends "organization/project_wrapper.html" %}
 {% load i18n %}
+{% load staticfiles %}
 
 {% block page_title %}{% trans "Parties" %} | {% endblock %}
 {% block left-nav %}parties{% endblock %}
@@ -22,24 +23,21 @@
             </a>
           </div>
           {% endif %}
-          <table class="table table-hover datatable" data-paging-type="simple">
-            <thead>
-              <tr>
-                <th class="col-md-3">{% trans "Name" %}</th>
-                <th class="col-md-9">{% trans "Type" %}</th>
-              </tr>
-            </thead>
-            {% for party in object_list %}
-            <tr class="linked" onclick="window.document.location='{% url 'parties:detail' object.organization.slug object.slug party.id %}';">
-              <td><a href="{% url 'parties:detail' object.organization.slug object.slug party.id %}">{{ party.name }}</a></td>
-              <td {{ party.type_labels|safe }}>{{ party.get_type_display }}</td>
-            </tr>
-            {% endfor %}
-          </table>
+          <div id="paginated-table"></div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_script %}
+{{ block.super }}
+{% include 'utils/react.html' %}
+<script type="text/javascript" src="{% static 'moment.js/2.20.1/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'dist/paginated-table.js' %}"></script>
+<script type="text/javascript">
+{% include 'party/paginated-party-table.js' %}
+</script>
 {% endblock %}

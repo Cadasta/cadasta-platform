@@ -1,6 +1,6 @@
 # Change Log
 
-## [v1.15.0](https://github.com/Cadasta/cadasta-platform/tree/v1.15.0) (2018-01-03)
+## [v1.15.0](https://github.com/Cadasta/cadasta-platform/tree/v1.15.0) (2018-02-01)
 
 ### Added
 
@@ -16,10 +16,18 @@
   - pandas (0.21.1)
   - opbeat (3.6.0)
 - Run functional tests in two batches (#1938)
+- Log Django to file and error_file only (#1959)
+- Ensure log files are rotated in production (#1946)
 
 ### Fixed
 - Update deadsnakes repository for provisioning (#1950)
 - Prevent excessive cache connections (#1953)
+- Fixed #1954 -- Broken sign-in link (#1960)
+- Fixes #1943 -- Skip creating translation labels for one-language forms (#1947)
+
+### Removed
+
+- Remove Mapzen geocoder (#1958)
 
 ## [v1.14.1](https://github.com/Cadasta/cadasta-platform/tree/v1.14.1) (2017-12-15)
 
