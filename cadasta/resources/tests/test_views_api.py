@@ -153,21 +153,24 @@ class ProjectResourcesTest(APITestCase, UserTestCase,
         assert self.project.resources.count() == 3
 
     def test_search_for_file(self):
-        file = self.get_file('/resources/tests/files/image.jpg', 'rb')
-        not_found = self.storage.save('resources/bild.jpg', file.read())
-        file.close()
         prj = ProjectFactory.create()
         ResourceFactory.create_from_kwargs([
-            {'content_object': prj, 'project': prj, 'file': self.file_name},
-            {'content_object': prj, 'project': prj, 'file': self.file_name},
-            {'content_object': prj, 'project': prj, 'file': not_found}
+            {
+                'content_object': prj,
+                'project': prj,
+                'original_file': 'my/image.png'
+            },
+            {
+                'content_object': prj,
+                'project': prj,
+                'original_file': 'foo/an_image_thing.jpeg'
+            },
+            {
+                'content_object': prj,
+                'project': prj,
+                'original_file': 'bar.png'
+            }
         ])
-
-        # self._get(prj.organization.slug,
-        #           prj.slug,
-        #           query='search=image',
-        #           status=200,
-        #           count=2)
 
         response = self.request(
             user=self.user,
