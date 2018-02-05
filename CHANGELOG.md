@@ -17,6 +17,7 @@
   - opbeat (3.6.0)
 - Run functional tests in two batches (#1938)
 - Log Django to file and error_file only (#1959)
+- Ensure log files are rotated in production (#1946)
 
 
 ### Fixed
