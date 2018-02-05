@@ -19,7 +19,6 @@
 - Log Django to file and error_file only (#1959)
 - Ensure log files are rotated in production (#1946)
 
-
 ### Fixed
 - Update deadsnakes repository for provisioning (#1950)
 - Prevent excessive cache connections (#1953)
