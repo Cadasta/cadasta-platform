@@ -18,7 +18,7 @@ from .choices import TYPE_CHOICES
 from resources.mixins import ResourceModelMixin
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
-from questionnaires.models import Question
+from questionnaires.models import Question, QuestionOption
 
 
 @fix_model_for_attributes
@@ -124,18 +124,22 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         if not self.project.current_questionnaire:
             return dict(TYPE_CHOICES)[self.type]
 
-        question = Question.objects.get(
-            questionnaire_id=self.project.current_questionnaire,
-            name='location_type'
-        )
-        label = question.options.get(name=self.type).label_xlat
+        try:
+            question = Question.objects.get(
+                questionnaire_id=self.project.current_questionnaire,
+                name='location_type'
+            )
+            label = question.options.get(name=self.type).label_xlat
+        except (Question.DoesNotExist, QuestionOption.DoesNotExist):
+            return dict(TYPE_CHOICES)[self.type]
+
         if label is None or isinstance(label, str):
             return label
         else:
             return label.get(
                 get_language(),
                 label[question.questionnaire.default_language]
-            )
+                )
 
 
 def reassign_spatial_geometry(instance):
