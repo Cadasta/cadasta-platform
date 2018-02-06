@@ -122,6 +122,14 @@ LOGGING = {
             'backupCount': 5,
             'formatter': 'simple'
         },
+        'requests_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/var/log/django/requests.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'simple'
+        },
         'email_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
@@ -142,7 +150,7 @@ LOGGING = {
             'propagate': True,
         },
         'django.request': {
-            'handlers': ['debug_file', 'error_file'],
+            'handlers': ['debug_file', 'requests_file'],
             'level': 'DEBUG',
             'propagate': False,
         },
