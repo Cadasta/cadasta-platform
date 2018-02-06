@@ -16,10 +16,25 @@ class UserManagerTest(UserTestCase, TestCase):
 
         assert found == user
 
+    def test_get_from_username_non_case_sensitive(self):
+        user = UserFactory.create(username='TestUser')
+        found = User.objects.get_from_username_or_email_or_phone(
+            identifier='testuser'
+        )
+
+        assert found == user
+
     def test_get_from_email(self):
         user = UserFactory.create()
         found = User.objects.get_from_username_or_email_or_phone(
             identifier=user.email)
+
+        assert found == user
+
+    def test_get_from_email_non_case_sensitive(self):
+        user = UserFactory.create(email='TestUser@example.com')
+        found = User.objects.get_from_username_or_email_or_phone(
+            identifier='testuser@example.com')
 
         assert found == user
 

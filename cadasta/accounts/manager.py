@@ -5,8 +5,8 @@ from django.utils.translation import ugettext as _
 
 class UserManager(DjangoUserManager):
     def get_from_username_or_email_or_phone(self, identifier=None):
-        users = self.filter(Q(username=identifier) | Q(
-            email=identifier) | Q(phone=identifier))
+        users = self.filter(Q(username__iexact=identifier) | Q(
+            email__iexact=identifier) | Q(phone=identifier))
         users_count = len(users)
 
         if users_count == 1:
