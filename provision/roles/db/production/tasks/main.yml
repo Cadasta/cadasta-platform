@@ -19,18 +19,16 @@
 - name: Check for existence of database user
   become: yes
   become_user: cadasta
-  shell: psql -h '{{ db_host }}' -U postgres
+  shell: PGPASSWORD={{ postgres_pw }} psql -h '{{ db_host }}' -U postgres
          -c "select rolname from pg_roles where rolname='cadasta'"
   register: cadasta_user_test
-  ignore_errors: true
 
 - name: Check for existence of database worker user
   become: yes
   become_user: cadasta
-  shell: psql -h '{{ db_host }}' -U postgres
+  shell: PGPASSWORD={{ postgres_pw }} psql -h '{{ db_host }}' -U postgres
          -c "select rolname from pg_roles where rolname='worker'"
   register: worker_user_test
-  ignore_errors: true
 
 - name: Create database user
   postgresql_user: login_host="{{ db_host }}"
@@ -51,7 +49,7 @@
 
 - name: Create worker user
   postgresql_user: login_host="{{ db_host }}"
-                   login_user="postgres" login_password="postgres"
+                   login_user="postgres" login_password="{{ postgres_pw }}"
                    name="worker" password="cadasta"
                    state=present role_attr_flags=NOSUPERUSER
   when: worker_user_test.stdout.find('0') != -1
