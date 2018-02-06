@@ -7,11 +7,11 @@ then
 
 # We are on a Travis build
 else
-
   # Perform any final installations and setups before running tests on Travis
-  cd cadasta/core
-  npm install bootstrap-sass
-  cd ..
+  npm install
+  npm run-script build
+  npm install bootstrap-sass --prefix cadasta/core
+  cd cadasta
   ./manage.py migrate
   ./manage.py loadstatic
   ./manage.py loadfunctestfixtures
@@ -25,6 +25,11 @@ else
     export CADASTA_TEST_WEBDRIVER=Firefox
     ./runtests.py --functional -m "$TESTBATCH"
     ret=$?
+
+    if [[ $ret != 0 ]]
+    then
+      curl -v http://0:8000/dashboard/
+    fi
   fi
 
   # Run the test suite via BrowserStack (as much as possible) for commits to master

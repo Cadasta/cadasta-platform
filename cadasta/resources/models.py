@@ -101,7 +101,7 @@ class Resource(RandomIDModel):
 
     @property
     def file_type(self):
-        return self.file_name.split('.')[-1]
+        return self.file_name.lower().split('.')[-1]
 
     @property
     def thumbnail(self):

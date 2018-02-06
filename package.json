@@ -1,0 +1,16 @@
+{
+  "name": "cadasta",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:Cadasta/cadasta-platform.git",
+  "license": "MIT",
+  "author": "Anthony Lukach <alukach@cadasta.org>",
+  "dependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-es2015": "^6.24.1"
+  },
+  "scripts": {
+    "build": "node node_modules/babel-cli/bin/babel --plugins transform-react-jsx cadasta/core/static/jsx/ -d cadasta/core/static/dist"
+  }
+}

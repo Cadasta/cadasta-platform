@@ -8,25 +8,34 @@ from .models import ContentObject, Resource, SpatialResource
 
 
 class ContentObjectSerializer(serializers.ModelSerializer):
+    link_id = serializers.CharField(source='id')
     id = serializers.CharField(source='object_id')
     type = serializers.CharField(source='content_type.model')
 
     class Meta:
         model = ContentObject
-        fields = ('id', 'type')
+        fields = ('link_id', 'id', 'type')
 
 
 class ResourceSerializer(SanitizeFieldSerializer, serializers.ModelSerializer):
     file = S3Field()
     links = ContentObjectSerializer(
         many=True, required=False, source='content_objects')
+    contributor = serializers.SerializerMethodField()
 
     class Meta:
         model = Resource
         fields = ('id', 'name', 'description', 'file', 'original_file',
-                  'archived', 'mime_type', 'links')
+                  'archived', 'mime_type', 'links',
+                  'contributor', 'last_updated', 'file_type', 'thumbnail',)
         read_only_fields = ('id', )
         extra_kwargs = {'mime_type': {'required': False}}
+
+    def get_contributor(self, obj):
+        return {
+            'username': obj.contributor.username,
+            'full_name': obj.contributor.full_name
+        }
 
     def is_valid(self, raise_exception=False):
         data = self.initial_data
