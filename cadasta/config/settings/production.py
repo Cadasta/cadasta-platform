@@ -154,6 +154,7 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        # Don't try to send opbeat errors to opbeat
         'opbeat.errors': {
             'level': 'ERROR',
             'handlers': ['debug_file', 'error_file', 'email_admins'],
