@@ -429,7 +429,7 @@ class ModelHelper():
             resources['resources'].append(data['{}_photo'.format(model_type)])
 
         for key in data.keys():
-            if group_name in key:
+            if group_name in key and hasattr(data[key], 'keys'):
                 for group_key in data[key].keys():
                     if '{}_resource'.format(model_type) in group_key:
                         resources['resources'].append(data[key][group_key])

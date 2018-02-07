@@ -750,6 +750,31 @@ class XFormModelHelperTest(TestCase):
                 mh(), data, self.project)
         assert SpatialUnit.objects.count() == 0
 
+    def test_create_tenure_relationship_empty_group(self):
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # test without repeats
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        party = PartyFactory.create(project=self.project)
+        location = SpatialUnitFactory.create(project=self.project)
+
+        data = {
+            'tenure_type': 'CO',
+            'tenure_relationship_attributes': '',
+            'tenure_resource_photo': 'resource.png'
+        }
+
+        tenure_relationships, tenure_resources = mh.create_tenure_relationship(
+            mh(), data, [party], [location], self.project)
+        tenure = TenureRelationship.objects.get(tenure_type='CO')
+        assert tenure_relationships == [tenure]
+        assert tenure.party == party
+        assert tenure.spatial_unit == location
+        assert tenure.attributes == {}
+        assert len(tenure_resources) == 1
+        assert tenure_resources[0]['id'] == tenure.id
+        assert 'resource.png' in tenure_resources[0]['resources']
+        assert TenureRelationship.objects.count() == 1
+
     def test_create_tenure_relationship(self):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~
         # test without repeats
