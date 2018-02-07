@@ -27,6 +27,6 @@ def get_app(conf):
 conf = Config(
     broker_transport=settings.CELERY_BROKER_TRANSPORT,
     QUEUE_PREFIX=settings.CELERY_QUEUE_PREFIX,
-    SETUP_LOGGING=False,
+    SETUP_FILE_LOGGING=False, SETUP_OPBEAT_LOGGING=False
 )
 app = get_app(conf)
