@@ -106,7 +106,7 @@ LOGGING = {
         }
     },
     'handlers': {
-        'debug_file': {
+        'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/var/log/django/debug.log',
@@ -140,24 +140,25 @@ LOGGING = {
         },
     },
     'loggers': {
-        '': {
-            'handlers': ['error_file', 'email_admins', 'opbeat'],
-            'level': 'ERROR'
-        },
         'django': {
-            'handlers': ['debug_file'],
+            'handlers': ['file', 'error_file'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'django.request': {
-            'handlers': ['debug_file', 'requests_file'],
+        'core': {
+            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
-            'propagate': False,
+            'propagate': True,
         },
-        # Don't try to send opbeat errors to opbeat
+        'xform.submissions': {
+            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        # Log errors from the Opbeat module to the console
         'opbeat.errors': {
             'level': 'ERROR',
-            'handlers': ['debug_file', 'error_file', 'email_admins'],
+            'handlers': ['file', 'error_file'],
             'propagate': False,
         },
     },
