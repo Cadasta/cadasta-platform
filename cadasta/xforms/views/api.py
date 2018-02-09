@@ -49,7 +49,7 @@ class XFormSubmissionViewSet(OpenRosaHeadersMixin, viewsets.GenericViewSet):
         try:
             instance = ModelHelper().upload_submission_data(request)
         except InvalidXMLSubmission as e:
-            logger.debug(str(e))
+            logger.exception(str(e))
             return self._sendErrorResponse(request, e,
                                            status.HTTP_400_BAD_REQUEST)
         except PermissionDenied as e:
