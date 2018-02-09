@@ -322,7 +322,7 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
 
     def validate(self, attrs):
 
-        if not self.context['request'].user.change_pw:
+        if not self.context['request'].user.update_profile:
             raise serializers.ValidationError(
                 _("The password for this user can not be changed."))
         return super().validate(attrs)

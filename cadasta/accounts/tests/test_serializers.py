@@ -1104,7 +1104,8 @@ class AccountLoginSerializerTest(UserTestCase, TestCase):
 class ChangePasswordSerializerTest(UserTestCase, TestCase):
 
     def test_user_can_change_pw(self):
-        user = UserFactory.create(password='beatles4Lyfe!', change_pw=True)
+        user = UserFactory.create(password='beatles4Lyfe!',
+                                  update_profile=True)
         request = APIRequestFactory().patch('/user/imagine71', {})
         force_authenticate(request, user=user)
         data = {
@@ -1119,7 +1120,8 @@ class ChangePasswordSerializerTest(UserTestCase, TestCase):
         assert serializer.is_valid() is True
 
     def test_user_can_not_change_pw(self):
-        user = UserFactory.create(password='beatles4Lyfe!', change_pw=False)
+        user = UserFactory.create(password='beatles4Lyfe!',
+                                  update_profile=False)
         request = APIRequestFactory().patch('/user/imagine71', {})
         force_authenticate(request, user=user)
         data = {
