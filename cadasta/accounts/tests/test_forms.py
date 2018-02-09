@@ -1092,7 +1092,8 @@ class ChangePasswordFormTest(UserTestCase, TestCase):
                   ))
 
     def test_user_not_allowed_change_password(self):
-        user = UserFactory.create(password='beatles4Lyfe!', change_pw=False)
+        user = UserFactory.create(password='beatles4Lyfe!',
+                                  update_profile=False)
         data = {
             'oldpassword': 'beatles4Lyfe!',
             'password': 'iloveyoko79!',
@@ -1203,7 +1204,8 @@ class ResetPasswordKeyFormTest(UserTestCase, TestCase):
                   ))
 
     def test_user_not_allowed_change_password(self):
-        user = UserFactory.create(password='beatles4Lyfe!', change_pw=False)
+        user = UserFactory.create(password='beatles4Lyfe!',
+                                  update_profile=False)
         data = {
             'password': 'iloveyoko79!',
         }

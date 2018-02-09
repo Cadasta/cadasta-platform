@@ -221,7 +221,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 class ChangePasswordMixin:
 
     def clean_password(self):
-        if not self.user or not self.user.change_pw:
+        if not self.user or not self.user.update_profile:
             raise forms.ValidationError(_("The password for this user can not "
                                           "be changed."))
 
