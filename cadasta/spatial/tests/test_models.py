@@ -177,6 +177,30 @@ class SpatialUnitTest(UserTestCase, TestCase):
             type='HOUSE')
         assert su.location_type_label == 'Haus'
 
+    def test_location_type_label_no_question_defined(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='RW')
+        assert su.location_type_label == 'Right-of-way'
+
+    def test_location_type_label_no_question_option_defined(self):
+        questionnaire = q_factories.QuestionnaireFactory.create()
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='HOUSE',
+            label='Haus'
+        )
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='RW')
+        assert su.location_type_label == 'Right-of-way'
+
     def test_ui_class_name(self):
         su = SpatialUnitFactory.create()
         assert su.ui_class_name == "Location"
