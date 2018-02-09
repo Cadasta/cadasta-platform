@@ -52,7 +52,7 @@ class User(auth_base.AbstractBaseUser, auth.PermissionsMixin):
     date_joined = abstract_user_field('date_joined')
     email_verified = models.BooleanField(default=False)
     phone_verified = models.BooleanField(default=False)
-    change_pw = models.BooleanField(default=True)
+    update_profile = models.BooleanField(default=True)
     language = models.CharField(max_length=10,
                                 choices=settings.LANGUAGES,
                                 default=settings.LANGUAGE_CODE)
