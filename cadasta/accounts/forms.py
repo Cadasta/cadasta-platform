@@ -147,6 +147,13 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         if self.current_phone:
             self.fields['phone'].required = True
 
+    def clean(self):
+        if not self.instance.update_profile:
+            raise forms.ValidationError(
+                _("The profile for this user can not be updated."))
+
+        return super().clean()
+
     def clean_username(self):
         username = self.data.get('username')
         if self.instance.username.casefold() != username.casefold():

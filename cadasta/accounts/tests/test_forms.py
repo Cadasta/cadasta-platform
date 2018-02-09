@@ -497,6 +497,25 @@ class ProfileFormTest(UserTestCase, FileStorageTestCase, TestCase):
         assert 'john2@beatles.uk' in mail.outbox[0].to
         assert 'john@beatles.uk' in mail.outbox[1].to
 
+    def test_update_not_allowed(self):
+        user = UserFactory.create(update_profile=False,
+                                  password='sgt-pepper',
+                                  phone=None,
+                                  phone_verified=False)
+        data = {
+            'username': 'imagine71',
+            'email': 'john2@beatles.uk',
+            'phone': '',
+            'full_name': 'John Lennon',
+            'password': 'sgt-pepper',
+            'language': 'en',
+            'measurement': 'imperial',
+        }
+        form = forms.ProfileForm(data, instance=user)
+        assert form.is_valid() is False
+        assert ("The profile for this user can not be updated." in
+                form.errors['__all__'])
+
     def test_display_name(self):
         user = UserFactory.create(username='imagine71',
                                   email='john@beatles.uk',
