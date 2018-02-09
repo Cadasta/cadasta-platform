@@ -591,6 +591,26 @@ class UserSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert ('You can either use your phone number or email to sign up but '
                 'not both.' in serializer.errors['non_field_errors'])
 
+    def test_update_not_allowed(self):
+        user = UserFactory.create(username='imagine71',
+                                  update_profile=False,
+                                  password='sgt-pepper',
+                                  phone=None,
+                                  phone_verified=False)
+        data = {
+            'username': 'imagine72',
+            'password': 'sgt-pepper',
+        }
+
+        request = APIRequestFactory().patch('/user/imagine71', data)
+        force_authenticate(request, user=user)
+
+        serializer = serializers.UserSerializer(
+            user, data, context={'request': Request(request)})
+        assert serializer.is_valid() is False
+        assert (serializer.errors['non_field_errors'] ==
+                ['The profile for this user can not be updated.'])
+
     def test_update_username_fails(self):
         serializer = serializers.UserSerializer(data=BASIC_TEST_DATA)
         assert serializer.is_valid() is True

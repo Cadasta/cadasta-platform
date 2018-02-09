@@ -199,6 +199,10 @@ class UserSerializer(SanitizeFieldSerializer,
         }
 
     def validate(self, data):
+        if self.instance and not self.instance.update_profile:
+            raise serializers.ValidationError(
+                _("The profile for this user can not be updated."))
+
         data = super(UserSerializer, self).validate(data)
 
         email = self.initial_data.get('email',
