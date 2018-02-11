@@ -13,6 +13,7 @@
 <script src="{% static 'js/password_widget.js' %}"></script>
 <script src="{% static 'js/parsleyAddValidator.js' %}"></script>
 <script src="{% static 'js/togglePhoneEmail.js' %}"></script>
+<script src="{% static 'js/libphonenumber-js.min.js' %}"></script>
 {{ form.media }}
 {% endblock %}
 
@@ -34,16 +35,18 @@
 {% endif %}
 
 <form class="account-register form-narrow" id="signup_form" method="POST"
-      action="{% url 'account_signup' %}" data-parsley-validate data-parsley-excluded=":hidden">
+      action="{% url 'account_signup' %}" data-parsley-validate data-parsley-priority-enabled="true" data-parsley-excluded=":hidden">
   <h1>{% trans "Register for a free account" %}</h1>
   {% csrf_token %}
 
+<!-- USERNAME -->
   <div class="form-group{% if form.username.errors %} has-error{% endif %}">
     <label class="control-label" for="id_username">{% trans "Choose your username" %}</label>
     {% render_field form.username class+="form-control input-lg" data-parsley-minlength="3" data-parsley-sanitize="1" %}
     <div class="error-block">{{ form.username.errors }}</div>
   </div>
 
+<!-- EMAIL -->
   <div id="email-div" class="verifyDiv email clearfix form-group{% if form.email.errors %} has-error{% endif %}">
     <label class="control-label" for="id_email">{% trans "Email" %}</label>
     {% render_field form.email class+="form-control input-lg" data-parsley-sanitize="1" data-parsley-required="true" %}
@@ -53,9 +56,10 @@
     </div>
   </div>
 
-  <div id="phone-div" class="verifyDiv phone hidden clearfix form-group{% if form.phone.errors %} has-error{%endif%} hidden">
+<!-- PHONE -->
+  <div id="phone-div" class="verifyDiv phone hidden clearfix form-group{% if form.phone.errors %} has-error{% endif %}">
     <label class="control-label" for="id_phone">{% trans "Phone" %}</label>
-    {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-phoneplus="1" data-parsley-phonelength="16" data-parsley-phonenumber="1" data-parsley-errors-container="#phone-errors" %}
+    {% render_field form.phone class+="form-control input-lg" placeholder="+9999999999" data-parsley-required="true" data-parsley-validation-threshold="1" data-parsley-phonenumber="1" data-parsley-phoneplus="1" data-parsley-phonelength="1" data-parsley-errors-container="#phone-errors" %}
     <p class="help-block small">{% trans "Phone numbers must start with a +, followed by a country code and phone number without spaces or punctuation. Phone numbers must contain between 5 and 15 digits." %}</p>
     <div id="phone-errors"></div>
     <div class="error-block">{{form.phone.errors}}</div>
@@ -64,10 +68,11 @@
     </div>
   </div>
 
+<!-- PASSWORD -->
   <div class="form-group{% if form.password.errors %} has-error{% endif %}">
     <label class="control-label" for="id_password">{% trans "Password" %}</label>
     <div class="input-group input-group-lg">
-      {% render_field form.password class+="form-control" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" data-parsley-sanitize="1" data-parsley-errors-container="#password-errors" %}
+      {% render_field form.password class+="form-control" data-parsley-minlength="10" data-parsley-character="3" data-parsley-userfield="1" data-parsley-emailfield="1" data-parsley-phonefield="1" data-parsley-sanitize="1" data-parsley-errors-container="#password-errors" %}
       <span class="input-group-btn">
         <button class="btn" type="button">
           <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
@@ -79,21 +84,26 @@
     <div class="error-block">{{ form.password.errors }}</div>
   </div>
 
+<!-- FULL NAME -->
   <div class="form-group{% if form.full_name.errors %} has-error{% endif %}">
     <label class="control-label" for="id_full_name">{% trans "Full name" %}</label>
     {% render_field form.full_name class+="form-control input-lg" data-parsley-sanitize="1" %}
     <div class="error-block">{{ form.full_name.errors }}</div>
   </div>
 
+<!-- LANGUAGE -->
   <div class="form-group{% if form.language.errors %} has-error{% endif %}">
     <label class="control-label" for="id_language">{% trans "Your preferred language" %}</label>
     {% render_field form.language class+="form-control input-lg" %}
     <div class="error-block">{{ form.language.errors }}</div>
   </div>
 
+<!-- REDIRECT -->
   {% if redirect_field_value %}
   <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
   {% endif %}
+
+<!-- BUTTONS -->
   <button type="submit" name="register"
           class="btn btn-primary btn-lg btn-block text-uppercase">
     {% trans "Register" %}
