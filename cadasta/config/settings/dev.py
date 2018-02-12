@@ -101,9 +101,9 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
-        # 'django.db.backends': {
-        #     'handlers': ['console'],
-        # },
+        'django.db.backends': {
+            'handlers': ['console'],
+        },
         'xform.submissions': {
             'handlers': ['file'],
             'level': 'DEBUG'
