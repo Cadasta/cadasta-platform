@@ -96,7 +96,6 @@ STATIC_ROOT = '/opt/cadasta/static'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = '/opt/cadasta/media'
 
-# Debug logging...
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -106,7 +105,7 @@ LOGGING = {
         }
     },
     'handlers': {
-        'file': {
+        'debug_file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': '/var/log/django/debug.log',
@@ -140,25 +139,21 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['file', 'error_file'],
+        '': {
+            'handlers': ['debug_file', 'error_file', 'email_admins', 'opbeat'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        'core': {
-            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
+        # Prevent Django Requests logs from reaching email or opbeat
+        'django.requests': {
+            'handlers': ['requests_file'],
             'level': 'DEBUG',
-            'propagate': True,
-        },
-        'xform.submissions': {
-            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
-            'level': 'DEBUG',
-            'propagate': True,
+            'propagate': False,
         },
         # Log errors from the Opbeat module to the console
         'opbeat.errors': {
             'level': 'ERROR',
-            'handlers': ['file', 'error_file'],
+            'handlers': ['debug_file', 'error_file'],
             'propagate': False,
         },
     },
