@@ -46,3 +46,4 @@ opbeat==3.6.1
 cadasta-workertoolbox==0.4.0
 git+https://github.com/celery/kombu@0f4da  # TODO: update to 4.1.1+ when released
 pybreaker==0.4.2
+libsass==0.13.7
