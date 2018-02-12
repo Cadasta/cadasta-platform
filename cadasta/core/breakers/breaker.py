@@ -25,5 +25,4 @@ class CircuitBreaker(pybreaker.CircuitBreaker):
         return self.current_state == pybreaker.STATE_OPEN
 
     def __repr__(self):
-        print(self.name)
         return "<{0.__class__.__name__}: {0.name}>".format(self)
