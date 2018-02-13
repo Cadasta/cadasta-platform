@@ -153,6 +153,39 @@ class PartySerializerTest(UserTestCase, TestCase):
             serializer.validate_attributes(party_data['attributes'])
         assert 'Validation failed for age: "Blah"' in e.value.detail
 
+    def test_validate_unknown_attributes(self):
+        project = ProjectFactory.create(name='Test Project')
+        content_type = ContentType.objects.get(
+            app_label='party', model='party')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+
+        Attribute.objects.create(
+            schema=schema,
+            name='notes',
+            long_name='Notes',
+            attr_type=AttributeType.objects.get(name='text'),
+            index=0
+        )
+
+        party_data = {
+            'name': 'Tea Party',
+            'type': 'IN',
+            'attributes': {
+                'notes': 'Blah',
+                'age': 'Blah'
+            }
+        }
+        serializer = serializers.PartySerializer(
+            data=party_data,
+            context={'project': project}
+        )
+
+        with pytest.raises(ValidationError) as e:
+            serializer.validate_attributes(party_data['attributes'])
+        assert 'Unknown key "age"' in e.value.detail
+
     def test_full_invalid(self):
         project = ProjectFactory.create(name='Test Project')
         content_type = ContentType.objects.get(
@@ -407,6 +440,41 @@ class TenureRelationshipSerializer(UserTestCase, TestCase):
         )
         assert serializer.is_valid() is False
         assert serializer.errors['attributes']
+
+    def test_unknown_attributes(self):
+        project = ProjectFactory.create(name='Test Project')
+        su = SpatialUnitFactory.create(project=project)
+        party = PartyFactory.create(project=project)
+
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+
+        Attribute.objects.create(
+            schema=schema,
+            name='notes',
+            long_name='Notes',
+            attr_type=AttributeType.objects.get(name='text'),
+            index=0
+        )
+
+        data = {
+            'spatial_unit': su.id,
+            'party': party.id,
+            'tenure_type': 'WR',
+            'attributes': {
+                'notes': 'Blah',
+                'age': 'Blah'
+            }
+        }
+        serializer = serializers.TenureRelationshipSerializer(
+            data=data,
+            context={'project': project}
+        )
+        assert serializer.is_valid() is False
+        assert 'Unknown key "age"' in serializer.errors['attributes']
 
     def test_sanitise_string(self):
         project = ProjectFactory.create(name='Test Project')
