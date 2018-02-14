@@ -1,3 +1,5 @@
+import logging
+
 from django.db import transaction
 from twilio.base.exceptions import TwilioRestException
 from allauth.account.utils import send_email_confirmation
@@ -12,12 +14,13 @@ from djoser import views as djoser_views
 from djoser import signals
 from allauth.account.signals import password_changed
 
-from core.util import log_with_opbeat
 from .. import serializers
 from .. import utils
 from .. import messages
 from ..models import VerificationDevice
 from accounts import exceptions
+
+logger = logging.getLogger(__name__)
 
 
 class AccountUser(djoser_views.UserView):
@@ -29,7 +32,7 @@ class AccountUser(djoser_views.UserView):
                 return super().update(request, *args, **kwargs)
         except TwilioRestException as e:
             if e.status >= 500:
-                log_with_opbeat()
+                logger.exception(str(e))
                 msg = messages.TWILIO_ERRORS.get('default')
             else:
                 msg = messages.TWILIO_ERRORS.get(e.code)
@@ -79,7 +82,7 @@ class AccountRegister(djoser_views.UserCreateView):
                 return super().create(request, *args, **kwargs)
         except TwilioRestException as e:
             if e.status >= 500:
-                log_with_opbeat()
+                logger.exception(str(e))
                 msg = messages.TWILIO_ERRORS.get('default')
             else:
                 msg = messages.TWILIO_ERRORS.get(e.code)

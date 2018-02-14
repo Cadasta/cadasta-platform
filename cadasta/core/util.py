@@ -98,9 +98,3 @@ def get_previous_link(request):
 
     offset = offset - limit
     return replace_query_param(url, 'offset', offset)
-
-
-def log_with_opbeat():
-    if not settings.DEBUG:
-        opbeat_client = Client()
-        opbeat_client.capture_exception()
