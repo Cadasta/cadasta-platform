@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.core.files.storage import get_storage_class
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db import models as geo_models
@@ -395,7 +395,7 @@ class ModelHelper():
                 id_string=id_string, version=int(version)
             )
         except Questionnaire.DoesNotExist:
-            raise ValidationError(_('Questionnaire not found.'))
+            raise InvalidXMLSubmission(_('Questionnaire not found.'))
 
     def _get_attributes(self, data, model_type):
         attributes = {}
