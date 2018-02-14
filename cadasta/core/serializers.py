@@ -74,7 +74,7 @@ class JSONAttrsSerializer(SchemaSelectorMixin):
             try:
                 attr = attributes[key]
             except KeyError:
-                errors += 'Unknown key "{}"'.format(key)
+                errors.append('Unknown key "{}"'.format(key))
             else:
                 try:
                     attr.validate(value)
