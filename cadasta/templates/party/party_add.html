@@ -31,7 +31,7 @@
   <div class="modal show" data-backdrop="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form method="POST" data-parsley-validate>
+        <form method="POST" data-parsley-validate data-parsley-excluded=':hidden, [disabled]'>
           <div class="modal-header">
             <a class="close" href="{% url 'parties:list' object.organization.slug object.slug %}">
               <span aria-hidden="true">&times;</span>
