@@ -199,6 +199,10 @@ class UserSerializer(SanitizeFieldSerializer,
         }
 
     def validate(self, data):
+        if self.instance and not self.instance.update_profile:
+            raise serializers.ValidationError(
+                _("The profile for this user can not be updated."))
+
         data = super(UserSerializer, self).validate(data)
 
         email = self.initial_data.get('email',
@@ -322,7 +326,7 @@ class ChangePasswordSerializer(djoser_serializers.SetPasswordRetypeSerializer):
 
     def validate(self, attrs):
 
-        if not self.context['request'].user.change_pw:
+        if not self.context['request'].user.update_profile:
             raise serializers.ValidationError(
                 _("The password for this user can not be changed."))
         return super().validate(attrs)

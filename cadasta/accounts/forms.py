@@ -147,6 +147,13 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
         if self.current_phone:
             self.fields['phone'].required = True
 
+    def clean(self):
+        if not self.instance.update_profile:
+            raise forms.ValidationError(
+                _("The profile for this user can not be updated."))
+
+        return super().clean()
+
     def clean_username(self):
         username = self.data.get('username')
         if self.instance.username.casefold() != username.casefold():
@@ -221,7 +228,7 @@ class ProfileForm(SanitizeFieldsForm, forms.ModelForm):
 class ChangePasswordMixin:
 
     def clean_password(self):
-        if not self.user or not self.user.change_pw:
+        if not self.user or not self.user.update_profile:
             raise forms.ValidationError(_("The password for this user can not "
                                           "be changed."))
 
