@@ -12,7 +12,7 @@
       if (check < 1) {
         return false;
       }
-    }, 1006)
+    }, 511)
     .addMessage('phoneplus', gettext('Your phone number must start with +.'));
 
   // checks phone number is between 5 and 15 digits
@@ -23,7 +23,7 @@
       if (check < 1) {
         return false;
       }
-    }, 1005)
+    }, 510)
     .addMessage('phonelength', gettext('Your phone number must contain between 5 and 15 digits without spaces or punctuation.'));
 
   // checks country code and phone number is valid
@@ -32,7 +32,7 @@
       if (!libphonenumber.isValidNumber(value)) {
         return false;
       }
-    }, 1004)
+    }, 509)
     .addMessage('phonenumber', gettext('Your country code and phone number is not valid.'));
 
 // PASSWORD CUSTOM VALIDATORS
@@ -47,7 +47,7 @@
       if (isNumeric + isCapitals  + isSmall + isSpecial < requirement) {
         return false;
       }
-    }, 1003)
+    }, 508)
     .addMessage('character', gettext('Your password must contain at least 3 of the following: lowercase characters, uppercase characters, special characters, and/or numerical characters.'));
 
   // checks username not contained in password when username is another field in form
@@ -57,7 +57,7 @@
       if (term.length && value.indexOf(term) >= 0) {
         return false;
       }
-    }, 1002)
+    }, 507)
     .addMessage('userfield', gettext('Your password cannot contain your username.'));
 
   // checks email not contained in password when email is another field in form
@@ -67,7 +67,7 @@
       if (term[0].length && value.indexOf(term[0]) >= 0) {
         return false;
       }
-    }, 1001)
+    }, 506)
     .addMessage('emailfield', gettext('Your password cannot contain your email mailbox name.'));
 
   // checks phone number not contained in password
@@ -82,5 +82,5 @@
             return false;
         }
       }
-    }, 1000)
+    }, 505)
     .addMessage('phonefield', gettext('Your password cannot contain your phone number.'));
