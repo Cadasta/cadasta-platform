@@ -184,7 +184,7 @@ class PartySerializerTest(UserTestCase, TestCase):
 
         with pytest.raises(ValidationError) as e:
             serializer.validate_attributes(party_data['attributes'])
-        assert 'Unknown key "age"' in e.value.detail
+        assert 'Unknown attribute "age"' in e.value.detail
 
     def test_full_invalid(self):
         project = ProjectFactory.create(name='Test Project')
@@ -474,7 +474,7 @@ class TenureRelationshipSerializer(UserTestCase, TestCase):
             context={'project': project}
         )
         assert serializer.is_valid() is False
-        assert 'Unknown key "age"' in serializer.errors['attributes']
+        assert 'Unknown attribute "age"' in serializer.errors['attributes']
 
     def test_sanitise_string(self):
         project = ProjectFactory.create(name='Test Project')

@@ -241,7 +241,7 @@ class SpatialUnitSerializerTest(UserTestCase, TestCase):
             context={'project': project}
         )
         assert serializer.is_valid() is False
-        assert 'Unknown key "age"' in serializer.errors['attributes']
+        assert 'Unknown attribute "age"' in serializer.errors['attributes']
 
 
 class SpatialUnitGeoJsonSerializerTest(TestCase):
