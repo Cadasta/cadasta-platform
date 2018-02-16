@@ -77,7 +77,7 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
             content_type=content_type, errors=[],
             attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
-        with pytest.raises(KeyError):
+        with pytest.raises(ValidationError):
             PartyFactory.create(
                 name='TestParty', project=project,
                 attributes={
@@ -138,7 +138,7 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
             content_type=content_type, errors=[],
             attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
-        with pytest.raises(KeyError):
+        with pytest.raises(ValidationError):
             SpatialUnitFactory.create(
                 project=project,
                 attributes={
@@ -176,7 +176,7 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
             question_group_dict=party_relationship_xform_group,
             attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
-        with pytest.raises(KeyError):
+        with pytest.raises(ValidationError):
             SpatialRelationshipFactory.create(
                 project=project,
                 attributes={
@@ -214,7 +214,7 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
             question_group_dict=party_relationship_xform_group,
             attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
-        with pytest.raises(KeyError):
+        with pytest.raises(ValidationError):
             PartyRelationshipFactory.create(
                 project=project,
                 attributes={
@@ -252,7 +252,7 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
             question_group_dict=party_relationship_xform_group,
             attr_type_ids=get_attr_type_ids())
         assert 1 == Schema.objects.all().count()
-        with pytest.raises(KeyError):
+        with pytest.raises(ValidationError):
             TenureRelationshipFactory.create(
                 project=project,
                 attributes={
@@ -269,7 +269,7 @@ class CreateAttributeSchemaTest(UserTestCase, FileStorageTestCase, TestCase):
             project=project, question_group_dict=location_xform_group,
             content_type=content_type, errors=[],
             attr_type_ids=get_attr_type_ids())
-        with pytest.raises(KeyError):
+        with pytest.raises(ValidationError):
             SpatialUnitFactory.create(
                 project=project,
                 attributes={

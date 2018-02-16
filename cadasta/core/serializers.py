@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 from django.db.models.query import QuerySet
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
@@ -70,15 +71,19 @@ class JSONAttrsSerializer(SchemaSelectorMixin):
         attributes = self.get_model_attributes(self.context['project'], label)
         attributes = attributes.get(attrs_selector, {})
 
-        for key, attr in attributes.items():
-            value = attrs.get(key)
+        for key, value in attrs.items():
             try:
-                attr.validate(value)
-            except ValidationError as e:
-                errors += e.messages
+                attr = attributes[key]
+            except KeyError:
+                errors.append(_('Unknown attribute "{}"'.format(key)))
             else:
-                if hasattr(value, 'strip'):
-                    attrs[key] = value.strip()
+                try:
+                    attr.validate(value)
+                except ValidationError as e:
+                    errors += e.messages
+                else:
+                    if hasattr(value, 'strip'):
+                        attrs[key] = value.strip()
 
         if errors:
             raise serializers.ValidationError(errors)

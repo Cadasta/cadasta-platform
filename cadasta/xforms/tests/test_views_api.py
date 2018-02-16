@@ -6,7 +6,6 @@ from lxml import etree
 
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from skivvy import APITestCase
 from tutelary.models import Policy
@@ -439,13 +438,14 @@ class XFormSubmissionTest(APITestCase, UserTestCase, FileStorageTestCase,
                 in response.content)
 
     def test_questionnaire_not_found(self):
-        with pytest.raises(ValidationError):
-            data = self._submission(form='submission_bad_questionnaire')
-            response = self.request(method='POST',
-                                    post_data=data,
-                                    user=self.user,
-                                    content_type='multipart/form-data')
-            assert response.status_code == 400
+        data = self._submission(form='submission_bad_questionnaire')
+        response = self.request(method='POST',
+                                post_data=data,
+                                user=self.user,
+                                content_type='multipart/form-data')
+        assert response.status_code == 400
+        msg = self._getResponseMessage(response)
+        assert msg == 'Questionnaire not found.'
 
     def test_no_content_head(self):
         response = self.request(method='HEAD', user=self.user)

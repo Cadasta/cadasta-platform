@@ -3,7 +3,7 @@ import io
 import pytest
 from django.conf import settings
 from django.test import TestCase
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.contrib.contenttypes.models import ContentType
 from jsonattrs.models import Attribute, AttributeType, Schema
@@ -1421,7 +1421,7 @@ class XFormModelHelperTest(TestCase):
             self, 'a1', '0')
         assert questionnaire == self.questionnaire
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(InvalidXMLSubmission):
             mh._get_questionnaire(
                 self, 'bad_info', '0')
 

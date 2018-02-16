@@ -209,6 +209,40 @@ class SpatialUnitSerializerTest(UserTestCase, TestCase):
         assert serializer.is_valid() is False
         assert serializer.errors['attributes']
 
+    def test_unknown_attribute(self):
+        project = ProjectFactory.create(name='Test Project')
+
+        content_type = ContentType.objects.get(
+            app_label='spatial', model='spatialunit')
+        schema = Schema.objects.create(
+            content_type=content_type,
+            selectors=(project.organization.id, project.id, ))
+
+        Attribute.objects.create(
+            schema=schema,
+            name='notes',
+            long_name='Notes',
+            attr_type=AttributeType.objects.get(name='text'),
+            index=0
+        )
+        data = {
+            'properties': {
+                'type': 'AP',
+                'project': project,
+                'attributes': {
+                    'notes': 'Blah',
+                    'age': 'Ten'
+                }
+            }
+        }
+
+        serializer = serializers.SpatialUnitSerializer(
+            data=data,
+            context={'project': project}
+        )
+        assert serializer.is_valid() is False
+        assert 'Unknown attribute "age"' in serializer.errors['attributes']
+
 
 class SpatialUnitGeoJsonSerializerTest(TestCase):
     def test_serialize(self):
