@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 from django.db.models.query import QuerySet
 from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.models import ContentType
@@ -74,7 +75,7 @@ class JSONAttrsSerializer(SchemaSelectorMixin):
             try:
                 attr = attributes[key]
             except KeyError:
-                errors.append('Unknown key "{}"'.format(key))
+                errors.append(_('Unknown attribute "{}"'.format(key)))
             else:
                 try:
                     attr.validate(value)

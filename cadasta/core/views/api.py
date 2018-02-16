@@ -63,7 +63,7 @@ def eval_json(response_data):
 def exception_handler(exception, context):
     """
     Overwriting Django Rest Frameworks exception handler to provide more
-    meaniful exception messages for 404 errors.
+    meaningful exception messages for 404 and validation errors.
     """
     exception = set_exception(exception,
                               context['request'].build_absolute_uri())
