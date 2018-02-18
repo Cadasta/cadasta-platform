@@ -324,8 +324,17 @@ main.container-fluid {
   .btn-sm {
     min-width: 80px !important;
   }
-  .table-condensed .btn-sm {
-    min-width: 60px !important;
+  &.table-condensed {
+    .btn-sm {
+      min-width: 60px !important;
+    }
+    .help-block {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+    samp {
+      font-size: 12px;
+    }
   }
   div.org-logo {
     padding: 4px 0;
@@ -1055,4 +1064,3 @@ h1 .label {
 .break { // for email and url long links
   word-break: break-all;
 }
-

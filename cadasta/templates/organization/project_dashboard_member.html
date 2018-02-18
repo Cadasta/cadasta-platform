@@ -295,36 +295,33 @@
                   </div>
                   <!-- Recent exports -->
                   <div class="panel-body">
-                    <table class="table table-location">
+                    <table class="table table-condensed">
                       <tbody>
                         {% for task in recent_exports %}
                           <tr>
                             <td>
-                              <span title="{{ task.created_date.isoformat }}">
-                                {{ task.created_date|naturaltime }}
-                              </span>
-                            </td>
-                            <td>
                               {% if task.overall_status == 'SUCCESS' %}
-                                <ul class="list-inline">
                                 {% for result in task.overall_results %}
                                   {% for link in result.links %}
-                                    <li>
-                                      <a href="{{ link.url }}">
-                                        <samp>{{ link.text }}</samp>
-                                      </a>
-                                    </li>
+                                    <a href="{{ link.url }}">
+                                      <samp>{{ link.text }}</samp>
+                                    </a>
                                   {% endfor %}
                                 {% endfor %}
-                                </ul>
                               {% else %}
                                 {{ task.overall_status|title }}
                               {% endif %}
+                              <span class="small help-block" title="{{ task.created_date.isoformat }}">
+                                {{ task.created_date|naturaltime }}
+                              </span>
                             </td>
                           </tr>
                         {% endfor %}
                       </tbody>
                     </table>
+                    {% blocktrans %}
+                    <p class="text-center small"><a role="button" class="btn btn-default btn-sm" onClick="location.href=location.href"><span class="glyphicon glyphicon-repeat"></span> Refresh</a> this page for updates</p>
+                    {% endblocktrans %}
                   </div>
                 {% endif %}
               </div>
