@@ -15,7 +15,7 @@ from core.validators import sanitize_string
 from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 from .exceptions import InvalidQuestionnaire
 from .messages import MISSING_RELEVANT, INVALID_ACCURACY
-from .validators import validate_accuracy
+from .validators import validate_accuracy, validate_required
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -227,6 +227,7 @@ class QuestionnaireManager(models.Manager):
                     raise InvalidQuestionnaire([
                         _("'form_id' field must not contain whitespace.")])
 
+                validate_required(json.get('children', []))
                 santize_form(json)
 
                 has_default_language = (
