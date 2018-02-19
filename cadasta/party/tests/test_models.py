@@ -231,6 +231,15 @@ class TenureRelationshipTest(UserTestCase, TestCase):
         assert len(relationship.project.tenure_relationships.all()) == 1
 
     def test_set_attributes(self):
+        # add attribute schema
+        content_type = ContentType.objects.get(
+            app_label='party', model='tenurerelationship')
+        sch = Schema.objects.create(content_type=content_type, selectors=())
+        attr_type = AttributeType.objects.get(name="text")
+        Attribute.objects.create(
+            schema=sch, name='description', long_name='Description',
+            required=False, index=1, attr_type=attr_type
+        )
         tenure_relationship = TenureRelationshipFactory.create()
         attributes = {
             'description':
