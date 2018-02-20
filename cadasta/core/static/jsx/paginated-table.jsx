@@ -72,7 +72,7 @@ class PaginatedTable extends React.Component {
    * @return {null}
    */
   changeSearch(value) {
-    this.setState({ search: value }, () => this.fetchData(false) )
+    this.setState({ search: value, offset: 0 }, () => this.fetchData(false) )
   }
 
   /**
