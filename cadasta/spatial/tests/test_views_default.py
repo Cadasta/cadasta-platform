@@ -440,6 +440,7 @@ class LocationDetailTest(ViewTestCase, UserTestCase, TestCase):
 
         user = UserFactory.create()
         assign_policies(user)
+        self.location.refresh_from_db()
         response = self.request(user=user)
         assert response.status_code == 200
         assert response.content == self.render_content(
