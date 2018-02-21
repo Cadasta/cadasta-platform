@@ -272,15 +272,16 @@ def validate_field(field_def, available_fields, field):
     """
     # Check if the field is defined
     if field not in available_fields.keys():
-        return 'Field {} is required.'.format(field)
+        return _('Field {} is required.').format(field)
 
     # Check if the field has the correct type
     if not available_fields[field][0] == field_def[field]:
-        return 'Field {} must be of type {}.'.format(field, field_def[field])
+        return _('Field {} must be of type {}.').format(
+            field, field_def[field])
 
     # Check if the field is defined as required.
     if not available_fields[field][1]:
-        return 'Field {} must be required.'.format(field)
+        return _('Field {} must be required.').format(field)
 
 
 def validate_required(all_fields):
@@ -318,7 +319,7 @@ def validate_required(all_fields):
 
     # One geometry must be defined, so we're checking that here.
     if not len(geometries) > 0:
-        errors.append('Please provide at least one geometry field.')
+        errors.append(_('Please provide at least one geometry field.'))
 
     errors = list(filter(None, errors))
     if errors:
