@@ -11,9 +11,12 @@ class FilterTest(TestCase):
         assert validators.filter_required({'name': 'party_type'}) is True
         assert validators.filter_required({'name': 'party_name'}) is True
         assert validators.filter_required({'name': 'tenure_type'}) is True
-        assert validators.filter_required({'name': 'location_geoshape'}) is True
-        assert validators.filter_required({'name': 'location_geotrace'}) is True
-        assert validators.filter_required({'name': 'location_geometry'}) is True
+        assert validators.filter_required(
+            {'name': 'location_geoshape'}) is True
+        assert validators.filter_required(
+            {'name': 'location_geotrace'}) is True
+        assert validators.filter_required(
+            {'name': 'location_geometry'}) is True
         assert validators.filter_required({'name': 'other_field'}) is False
 
     def test_filter_geometries(self):
