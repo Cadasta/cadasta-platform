@@ -13,6 +13,7 @@
     - system/common
     - db/common
     - db/production
+    - node
     - cadasta/common
     - cadasta/install
     - cadasta/application
