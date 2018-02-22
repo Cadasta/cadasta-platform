@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-28 18:59+0000\n"
+"POT-Creation-Date: 2018-02-21 20:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Chandra Lash <clash@cadasta.org>, 2016\n"
 "Language-Team: German (https://www.transifex.com/cadasta/teams/61422/de/)\n"
@@ -17,6 +17,50 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: core/static/babel-polyfill/6.26.0/polyfill.min.js:1
+msgid "delete"
+msgstr ""
+
+#: core/static/babel-polyfill/6.26.0/polyfill.min.js:1
+msgid "has"
+msgstr ""
+
+#: core/static/babel-polyfill/6.26.0/polyfill.min.js:1
+msgid "get"
+msgstr ""
+
+#: core/static/babel-polyfill/6.26.0/polyfill.min.js:2
+msgid "Wrong offset!"
+msgstr ""
+
+#: core/static/babel-polyfill/6.26.0/polyfill.min.js:2
+msgid "Wrong length!"
+msgstr ""
+
+#: core/static/jquery-ui/1.12.1/js/jquery-ui.js:7236
+msgid "Done"
+msgstr ""
+
+#: core/static/jquery-ui/1.12.1/js/jquery-ui.js:7237
+msgid "Prev"
+msgstr ""
+
+#: core/static/jquery-ui/1.12.1/js/jquery-ui.js:7238
+msgid "Next"
+msgstr ""
+
+#: core/static/jquery-ui/1.12.1/js/jquery-ui.js:7239
+msgid "Today"
+msgstr ""
+
+#: core/static/jquery-ui/1.12.1/js/jquery-ui.js:7247
+msgid "Wk"
+msgstr ""
+
+#: core/static/jquery-ui/1.12.1/js/jquery-ui.js:7248
+msgid "dd/mm/yy"
+msgstr ""
 
 #: core/static/js/dataTables.selectFiltering.js:11
 msgid "Active"
@@ -38,7 +82,7 @@ msgstr ""
 msgid "Zoom out"
 msgstr ""
 
-#: core/static/js/map_utils.js:30
+#: core/static/js/map_utils.js:23
 msgid "Go to my location"
 msgstr ""
 
@@ -150,4 +194,23 @@ msgstr ""
 
 #: core/static/js/parsleyAddValidator.js:36
 msgid "Your password cannot contain your email mailbox name."
+msgstr ""
+
+#: core/static/js/parsleyAddValidator.js:47
+msgid "Your phone number must start with +."
+msgstr ""
+
+#: core/static/js/parsleyAddValidator.js:57
+msgid "Your phone number must have between 5 and 15 digits."
+msgstr ""
+
+#: core/static/js/parsleyAddValidator.js:68
+msgid ""
+"Your phone number must start with +, followed by a country code and phone "
+"number without spaces or punctuation. "
+msgstr ""
+
+#: core/static/js/sanitize.js:18
+msgid ""
+"Input can not contain HTML tags, emojis or start with any of + - = and @."
 msgstr ""
