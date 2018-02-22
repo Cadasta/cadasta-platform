@@ -49,21 +49,7 @@ class PaginatedTable extends React.Component {
    */
   changeLimit(event) {
     const limit = Number(event.target.value)
-    this.setState(
-      prevState => {
-        // Adjust offset so that it starts at an interval of the new limit
-        // (i.e. if we were looking at third page of data, it will still show
-        // third page of data with new values)
-        let offset = Math.floor(prevState.offset / prevState.limit) * limit;
-        // If new limit makes current page empty, set values so that view is
-        // of last page that would contain data
-        if (offset >= prevState.count) {
-          offset = (Math.ceil(prevState.count / limit) - 1) * limit
-        }
-        return { limit, offset }
-      },
-      () => this.fetchData(false)
-    )
+    this.setState({ limit, offset: 0 }, () => this.fetchData(false) )
   }
 
   /**
@@ -72,7 +58,7 @@ class PaginatedTable extends React.Component {
    * @return {null}
    */
   changeSearch(value) {
-    this.setState({ search: value }, () => this.fetchData(false) )
+    this.setState({ search: value, offset: 0 }, () => this.fetchData(false) )
   }
 
   /**
