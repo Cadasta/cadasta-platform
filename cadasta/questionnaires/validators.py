@@ -1,5 +1,5 @@
 import re
-from functools import partial, reduce
+from functools import partial
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from core.messages import SANITIZE_ERROR
