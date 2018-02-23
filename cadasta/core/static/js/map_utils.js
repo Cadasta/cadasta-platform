@@ -103,7 +103,7 @@ function renderFeatures(map, featuresUrl, options) {
     }
   });
 
-  var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
+  var markers = L.Deflate({minSize: 5, layerGroup: geoJson});
   markers.addTo(map);
   geoJson.addTo(map);
 
