@@ -263,7 +263,7 @@ def validate_field(field_def, available_fields, field):
     Validates a field against a field definition.
 
     Args:
-        field_def: Field definition, the field is validated againts.
+        field_def: Field definition, the field is validated against.
         available_fields: Fields defined in the questionnaire.
         field: string containting the field name
 
@@ -288,11 +288,11 @@ def validate_required(all_fields):
     # Required fields can be inside repeat groups so we're getting all children
     # from repeat groups and attaching them to the highest level in the dict
     repeat_groups = filter(lambda x: x.get('type') == 'repeat', all_fields)
-    repeat_cildren = reduce(
+    repeat_children = reduce(
         lambda children, group: children + group.get('children', []),
         repeat_groups,
         [])
-    all_fields = all_fields + repeat_cildren
+    all_fields = all_fields + repeat_children
 
     # Getting all required fields defined in the questionnaire
     required_available = flatten(filter(filter_required, all_fields))
