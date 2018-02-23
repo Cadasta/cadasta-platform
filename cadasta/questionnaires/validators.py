@@ -212,35 +212,6 @@ def is_required(bind):
     return bind is not None and bind.get('required') == 'yes'
 
 
-def filter_required(field):
-    """
-    Filter function that checks if a field is a required field. Used in
-    check_required to get all required fields defined in a questionnaire.
-
-    Args:
-        field - string containing the field name
-
-    Returns:
-        True if the field name is either in required_fields or geometry_fields
-    """
-    fields = list(required_fields.keys()) + list(geometry_fields.keys())
-    return field.get('name') in fields
-
-
-def filter_geometries(field):
-    """
-    Filter function that checks if a field is a geometry field. Used in
-    check_required to get all geometry fields defined in a questionnaire.
-
-    Args:
-        field: string containing the field name
-
-    Returns:
-        True if the field name is in geometry_fields
-    """
-    return field.get('name') in geometry_fields.keys()
-
-
 def map_fields(fields):
     """
     Extracts the neccessary info needed to validate fields.
@@ -287,24 +258,28 @@ def validate_field(field_def, available_fields, field):
 def validate_required(all_fields):
     # Required fields can be inside repeat groups so we're getting all children
     # from repeat groups and attaching them to the highest level in the dict
-    repeat_groups = filter(lambda x: x.get('type') == 'repeat', all_fields)
-    repeat_children = reduce(
-        lambda children, group: children + group.get('children', []),
-        repeat_groups,
-        [])
+    repeat_groups = [f for f in all_fields if (f.get('type') == 'repeat')]
+    repeat_children = []
+    for group in repeat_groups:
+        repeat_children += group.get('children', [])
     all_fields = all_fields + repeat_children
 
     # Getting all required fields defined in the questionnaire
-    required_available = map_fields(filter(filter_required, all_fields))
+    fields = list(required_fields.keys()) + list(geometry_fields.keys())
+    required_available = (f for f in all_fields if f.get('name') in fields)
+    required_available = map_fields(required_available)
 
     # Getting all geometry fields defined in the questionnaire
-    geometries = map_fields(filter(filter_geometries, all_fields))
+    geometries = (f for f in all_fields
+                  if f.get('name') in geometry_fields.keys())
+    geometries = map_fields(geometries)
 
     # Validating all required fields
     _validate_required = partial(validate_field,
                                  required_fields,
                                  required_available)
-    required_errors = map(_validate_required, list(required_fields.keys()))
+    required_errors = [_validate_required(f)
+                       for f in list(required_fields.keys())]
 
     # Validating all geometry fields. This is a separate action because only
     # one of the three possible must be defined. We're basically just checking
@@ -312,7 +287,8 @@ def validate_required(all_fields):
     _validate_geometries = partial(validate_field,
                                    geometry_fields,
                                    required_available)
-    geometry_errors = map(_validate_geometries, list(geometries.keys()))
+    geometry_errors = [_validate_geometries(g)
+                       for g in list(geometries.keys())]
 
     # joining both error lists
     errors = list(required_errors) + list(geometry_errors)
@@ -321,6 +297,6 @@ def validate_required(all_fields):
     if not len(geometries) > 0:
         errors.append(_('Please provide at least one geometry field.'))
 
-    errors = list(filter(None, errors))
+    errors = [e for e in errors if e]
     if errors:
         raise InvalidQuestionnaire(errors)

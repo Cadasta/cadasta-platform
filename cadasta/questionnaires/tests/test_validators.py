@@ -5,31 +5,6 @@ from ..exceptions import InvalidQuestionnaire
 from .. import validators
 
 
-class FilterTest(TestCase):
-    def test_filter_required(self):
-        assert validators.filter_required({'name': 'location_type'}) is True
-        assert validators.filter_required({'name': 'party_type'}) is True
-        assert validators.filter_required({'name': 'party_name'}) is True
-        assert validators.filter_required({'name': 'tenure_type'}) is True
-        assert validators.filter_required(
-            {'name': 'location_geoshape'}) is True
-        assert validators.filter_required(
-            {'name': 'location_geotrace'}) is True
-        assert validators.filter_required(
-            {'name': 'location_geometry'}) is True
-        assert validators.filter_required({'name': 'other_field'}) is False
-
-    def test_filter_geometries(self):
-        assert validators.filter_geometries(
-            {'name': 'location_geoshape'}) is True
-        assert validators.filter_geometries(
-            {'name': 'location_geotrace'}) is True
-        assert validators.filter_geometries(
-            {'name': 'location_geometry'}) is True
-        assert validators.filter_geometries(
-            {'name': 'other_field'}) is False
-
-
 class IsRequiredTest(TestCase):
     def test(self):
         assert validators.is_required({'required': 'yes'}) is True
