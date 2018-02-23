@@ -208,8 +208,7 @@ def santize_form(form_json):
 
 class QuestionnaireManager(models.Manager):
 
-    def create_from_form(self, xls_form=None, original_file=None,
-                         project=None):
+    def create_from_form(self, xls_form, project, original_file=None):
         try:
             with transaction.atomic():
                 errors = []
