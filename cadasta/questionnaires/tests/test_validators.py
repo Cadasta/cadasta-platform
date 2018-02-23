@@ -37,7 +37,7 @@ class IsRequiredTest(TestCase):
         assert validators.is_required(None) is False
 
 
-class FlattenTest(TestCase):
+class MapFieldsTest(TestCase):
     def test(self):
         fields = [
             {'name': 'location_type',
@@ -47,7 +47,7 @@ class FlattenTest(TestCase):
              'type': 'text',
              'bind': {'required': 'no'}},
         ]
-        flat = validators.flatten(fields)
+        flat = validators.map_fields(fields)
         assert flat == {
             'location_type': ('select one', True),
             'party_type': ('text', False)

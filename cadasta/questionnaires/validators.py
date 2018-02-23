@@ -241,7 +241,7 @@ def filter_geometries(field):
     return field.get('name') in geometry_fields.keys()
 
 
-def flatten(fields):
+def map_fields(fields):
     """
     Extracts the neccessary info needed to validate fields.
 
@@ -295,10 +295,10 @@ def validate_required(all_fields):
     all_fields = all_fields + repeat_children
 
     # Getting all required fields defined in the questionnaire
-    required_available = flatten(filter(filter_required, all_fields))
+    required_available = map_fields(filter(filter_required, all_fields))
 
     # Getting all geometry fields defined in the questionnaire
-    geometries = flatten(filter(filter_geometries, all_fields))
+    geometries = map_fields(filter(filter_geometries, all_fields))
 
     # Validating all required fields
     _validate_required = partial(validate_field,
