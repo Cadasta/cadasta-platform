@@ -270,16 +270,14 @@ def validate_required(all_fields):
     required_available = map_fields(required_available)
 
     # Getting all geometry fields defined in the questionnaire
-    geometries = (f for f in all_fields
-                  if f.get('name') in geometry_fields.keys())
+    geometries = (f for f in all_fields if f.get('name') in geometry_fields)
     geometries = map_fields(geometries)
 
     # Validating all required fields
     _validate_required = partial(validate_field,
                                  required_fields,
                                  required_available)
-    required_errors = [_validate_required(f)
-                       for f in list(required_fields.keys())]
+    required_errors = [_validate_required(f) for f in required_fields]
 
     # Validating all geometry fields. This is a separate action because only
     # one of the three possible must be defined. We're basically just checking
@@ -287,11 +285,10 @@ def validate_required(all_fields):
     _validate_geometries = partial(validate_field,
                                    geometry_fields,
                                    required_available)
-    geometry_errors = [_validate_geometries(g)
-                       for g in list(geometries.keys())]
+    geometry_errors = [_validate_geometries(g) for g in geometries]
 
     # joining both error lists
-    errors = list(required_errors) + list(geometry_errors)
+    errors = required_errors + geometry_errors
 
     # One geometry must be defined, so we're checking that here.
     if not len(geometries) > 0:
