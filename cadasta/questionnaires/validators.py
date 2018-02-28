@@ -222,11 +222,19 @@ def map_fields(fields):
     Returns:
         dict containing all fields with their type and required status as
         defined in the questionnaire. Each element in the dict has the
-        structure `fieldname: (type, required)`
+        structure `fieldname: (type, required, choices)`
     """
     return {field.get('name'): (field.get('type'),
-                                is_required(field.get('bind')))
+                                is_required(field.get('bind')),
+                                field.get('choices'))
             for field in fields}
+
+
+def validate_party_types(choices):
+    if choices is None:
+        return False
+
+    return {c.get('name') for c in choices} == {'IN', 'GR', 'CO'}
 
 
 def validate_field(field_def, available_fields, field):
@@ -253,6 +261,10 @@ def validate_field(field_def, available_fields, field):
     # Check if the field is defined as required.
     if not available_fields[field][1]:
         return _('Field {} must be required.').format(field)
+
+    if (field == 'party_type' and
+            not validate_party_types(available_fields[field][2])):
+        return _('Field party_type must have choices "IN", "GR", "CO"')
 
 
 def validate_required(all_fields):

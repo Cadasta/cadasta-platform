@@ -5,6 +5,27 @@ from ..exceptions import InvalidQuestionnaire
 from .. import validators
 
 
+class ValidatePartyTypesTest(TestCase):
+    def test(self):
+        choices = [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]
+        assert validators.validate_party_types(choices) is True
+
+        choices = [{'name': 'IN'}, {'name': 'CO'}, {'name': 'GR'}]
+        assert validators.validate_party_types(choices) is True
+
+        choices = [{'name': 'IN'}, {'name': 'GR'}]
+        assert validators.validate_party_types(choices) is False
+
+        choices = []
+        assert validators.validate_party_types(choices) is False
+
+        choices = None
+        assert validators.validate_party_types(choices) is False
+
+        choices = [{'name': 'BB'}, {'name': 'AA'}]
+        assert validators.validate_party_types(choices) is False
+
+
 class IsRequiredTest(TestCase):
     def test(self):
         assert validators.is_required({'required': 'yes'}) is True
@@ -20,12 +41,13 @@ class MapFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'text',
+             'choices': ['IN', 'GR'],
              'bind': {'required': 'no'}},
         ]
         flat = validators.map_fields(fields)
         assert flat == {
-            'location_type': ('select one', True),
-            'party_type': ('text', False)
+            'location_type': ('select one', True, None),
+            'party_type': ('text', False, ['IN', 'GR']),
         }
 
 
@@ -76,7 +98,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -102,7 +125,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'tenure_type',
              'type': 'select one',
              'bind': {'required': 'yes'}},
@@ -121,7 +145,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name'},
             {'name': 'tenure_type',
              'type': 'select one',
@@ -141,7 +166,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'select one',
              'bind': {'required': 'yes'}},
@@ -180,7 +206,8 @@ class CheckRequiredFieldsTest(TestCase):
             {'name': 'location_type',
              'type': 'select one',
              'bind': {'required': 'yes'}},
-            {'name': 'party_type'},
+            {'name': 'party_type',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -202,7 +229,31 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'text',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
              'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_type_wrong_choices(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'text',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'WE'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -221,7 +272,8 @@ class CheckRequiredFieldsTest(TestCase):
         data = [
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -241,7 +293,8 @@ class CheckRequiredFieldsTest(TestCase):
             {'name': 'location_type'},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -263,7 +316,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -285,7 +339,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -304,7 +359,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -325,7 +381,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -347,7 +404,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -366,7 +424,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -387,7 +446,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -407,7 +467,10 @@ class CheckRequiredFieldsTest(TestCase):
             {'name': 'location_type',
              'type': 'select one',
              'bind': {'required': 'yes'}},
-            {'name': 'party_type', 'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'bind': {'required': 'yes'},
+             'type': 'select one',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -429,7 +492,10 @@ class CheckRequiredFieldsTest(TestCase):
             {'name': 'location_type',
              'type': 'select one',
              'bind': {'required': 'yes'}},
-            {'name': 'party_type', 'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'bind': {'required': 'yes'},
+             'type': 'select one',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'name': 'party_name',
              'type': 'text',
              'bind': {'required': 'yes'}},
@@ -454,7 +520,8 @@ class CheckRequiredFieldsTest(TestCase):
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'type': 'repeat',
              'children': [{'name': 'party_name',
                            'type': 'text',
@@ -481,8 +548,9 @@ class CheckRequiredFieldsTest(TestCase):
              'type': 'select one',
              'bind': {'required': 'yes'}},
             {'name': 'party_type',
+             'bind': {'required': 'yes'},
              'type': 'select one',
-             'bind': {'required': 'yes'}},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
             {'type': 'repeat',
              'children': [{'name': 'party_name',
                            'type': 'text',
