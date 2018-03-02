@@ -37,6 +37,7 @@
       TWILIO_AUTH_TOKEN="{{ twilio_auth_token }}"
       TWILIO_PHONE={{ twilio_phone }}
       QUEUE_PREFIX="{{ identifier }}"
+      SENTRY_DSN="{{ sentry_dsn }}"
 
 
 - name: Enable environment variables for SSH
@@ -69,6 +70,7 @@
       Defaults  env_keep += TWILIO_AUTH_TOKEN
       Defaults  env_keep += TWILIO_PHONE
       Defaults  env_keep += QUEUE_PREFIX
+      Defaults  env_keep += SENTRY_DSN
 
 # This is VERY ugly.  The problem is that Ansible keeps SSH
 # connections open across tasks, so the environment variable changes
