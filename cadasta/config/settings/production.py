@@ -3,12 +3,11 @@ import requests
 from .default import *  # NOQA
 
 INSTALLED_APPS += (  # NOQA
-    'opbeat.contrib.django',
+    
 )
 
 MIDDLEWARE_CLASSES = (
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-    'opbeat.contrib.django.middleware.Opbeat404CatchMiddleware',
+
 ) + MIDDLEWARE_CLASSES  # NOQA
 
 DEBUG = False
@@ -53,13 +52,6 @@ CACHES = {
 }
 
 ES_HOST = os.environ['ES_HOST']
-
-OPBEAT = {
-    'ORGANIZATION_ID': os.environ['OPBEAT_ORGANIZATION_ID'],
-    'APP_ID': os.environ['OPBEAT_APP_ID'],
-    'SECRET_TOKEN': os.environ['OPBEAT_SECRET_TOKEN'],
-    'ASYNC': True,
-}
 
 DJOSER.update({  # NOQA
     'DOMAIN': os.environ['DOMAIN'],
@@ -126,10 +118,6 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
         },
-        'opbeat': {
-            'level': 'WARNING',
-            'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
-        },
     },
     'loggers': {
         'django': {
@@ -138,20 +126,14 @@ LOGGING = {
             'propagate': True,
         },
         'core': {
-            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
+            'handlers': ['file', 'error_file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'xform.submissions': {
-            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
+            'handlers': ['file', 'error_file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
-        },
-        # Log errors from the Opbeat module to the console
-        'opbeat.errors': {
-            'level': 'ERROR',
-            'handlers': ['file', 'error_file'],
-            'propagate': False,
         },
     },
 }
