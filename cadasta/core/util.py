@@ -6,7 +6,6 @@ import django.utils.text as base_utils
 from django.conf import settings
 from rest_framework.settings import api_settings
 from rest_framework.utils.urls import replace_query_param, remove_query_param
-from opbeat import Client
 
 
 ID_FIELD_LENGTH = 24
@@ -98,9 +97,3 @@ def get_previous_link(request):
 
     offset = offset - limit
     return replace_query_param(url, 'offset', offset)
-
-
-def log_with_opbeat():
-    if not settings.DEBUG:
-        opbeat_client = Client()
-        opbeat_client.capture_exception()

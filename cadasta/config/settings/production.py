@@ -1,15 +1,11 @@
 import os
+import raven
 import requests
 from .default import *  # NOQA
 
 INSTALLED_APPS += (  # NOQA
-    'opbeat.contrib.django',
+    'raven.contrib.django.raven_compat',
 )
-
-MIDDLEWARE_CLASSES = (
-    'opbeat.contrib.django.middleware.OpbeatAPMMiddleware',
-    'opbeat.contrib.django.middleware.Opbeat404CatchMiddleware',
-) + MIDDLEWARE_CLASSES  # NOQA
 
 DEBUG = False
 
@@ -54,11 +50,11 @@ CACHES = {
 
 ES_HOST = os.environ['ES_HOST']
 
-OPBEAT = {
-    'ORGANIZATION_ID': os.environ['OPBEAT_ORGANIZATION_ID'],
-    'APP_ID': os.environ['OPBEAT_APP_ID'],
-    'SECRET_TOKEN': os.environ['OPBEAT_SECRET_TOKEN'],
-    'ASYNC': True,
+RAVEN_CONFIG = {
+    'dsn': os.environ['SENTRY_DSN'],
+    # If you are using git, you can also automatically configure the
+    # release based on the git info.
+    'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
 }
 
 DJOSER.update({  # NOQA
@@ -100,6 +96,10 @@ MEDIA_ROOT = '/opt/cadasta/media'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'root': {
+        'level': 'WARNING',
+        'handlers': ['sentry'],
+    },
     'formatters': {
         'simple': {
             'format': '%(asctime)s %(levelname)s %(message)s'
@@ -126,9 +126,10 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler',
         },
-        'opbeat': {
-            'level': 'WARNING',
-            'class': 'opbeat.contrib.django.handlers.OpbeatHandler',
+        'sentry': {
+            'level': 'ERROR',
+            'class': 'raven.contrib.django.'
+                     'raven_compat.handlers.SentryHandler',
         },
     },
     'loggers': {
@@ -138,19 +139,23 @@ LOGGING = {
             'propagate': True,
         },
         'core': {
-            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
+            'handlers': ['file', 'error_file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
         'xform.submissions': {
-            'handlers': ['file', 'error_file', 'email_admins', 'opbeat'],
+            'handlers': ['file', 'error_file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
-        # Log errors from the Opbeat module to the console
-        'opbeat.errors': {
-            'level': 'ERROR',
-            'handlers': ['file', 'error_file'],
+        'raven': {
+            'level': 'DEBUG',
+            'handlers': ['file', 'error_file', 'email_admins'],
+            'propagate': False,
+        },
+        'sentry.errors': {
+            'level': 'DEBUG',
+            'handlers': ['file', 'error_file', 'email_admins'],
             'propagate': False,
         },
     },
