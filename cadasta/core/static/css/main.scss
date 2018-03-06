@@ -770,6 +770,7 @@ section {
   }
   .panel-body {
     position: relative;
+    overflow-x: hidden;
     @include clearfix;
     > h3 {
       margin-bottom: 10px;
