@@ -9,7 +9,7 @@ def populate_label_field(apps, schema_editor):
     SpatialUnit = apps.get_model('spatial', 'SpatialUnit')
     QuestionOption = apps.get_model('questionnaires', 'QuestionOption')
     question_options = QuestionOption.objects.filter(
-        question__name="location_type").select_related("question")
+        question__name='location_type').select_related('question')
     for qo in question_options:
         SpatialUnit.objects.filter(
             type=qo.name,
