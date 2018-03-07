@@ -738,14 +738,29 @@ class ProjectDataDownload(mixins.ProjectMixin,
             )
         else:
             message = {
-                'res': "Scheduled export of project resources.",
-                'xls': "Scheduled export of project records in XLS format.",
-                'shp': ("Scheduled export of project records in XLS format "
-                        "and as Shapefiles."),
-                'all': "Scheduled export of project resources and records.",
+                'res': "Your requested resource export is in progress. "
+                       "Once available, your file will be available in "
+                       "the Project Records section of this dashboard. "
+                       "Please note you may need to refresh this page "
+                       "to view updated progress.",
+                'xls': "Your requested XLS export is in progress. "
+                       "Once available, your file will be available in "
+                       "the Project Records section of this dashboard. "
+                       "Please note you may need to refresh this page "
+                       "to view updated progress.",
+                'shp': "Your requested SHP export is in progress. "
+                       "Once available, your file will be available in "
+                       "the Project Records section of this dashboard. "
+                       "Please note you may need to refresh this page "
+                       "to view updated progress.",
+                'all': "Your requested export is in progress. "
+                       "Once available, your file will be available in "
+                       "the Project Records section of this dashboard. "
+                       "Please note you may need to refresh this page "
+                       "to view updated progress.",
             }
             messages.add_message(
-                self.request, messages.SUCCESS,
+                self.request, messages.INFO,
                 _(message[output_type]))
         return redirect('organization:project-dashboard',
                         organization=organization,

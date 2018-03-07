@@ -1446,7 +1446,11 @@ class ProjectDataDownloadTest(ViewTestCase, UserTestCase, TestCase):
                 'project': self.project.slug
             }
         )
-        assert ('Scheduled export of project records in XLS format.'
+        assert ('Your requested XLS export is in progress. '
+                'Once available, your file will be available in '
+                'the Project Records section of this dashboard. '
+                'Please note you may need to refresh this page '
+                'to view updated progress.'
                 in response.messages)
         schedule_export.assert_called_once_with(
             self.project, self.user, self.post_data['type'])
