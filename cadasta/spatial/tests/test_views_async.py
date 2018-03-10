@@ -84,12 +84,12 @@ class SpatialUnitListAPITest(APITestCase, UserTestCase, TestCase):
         assert response.content['count'] == 1010
         assert '?page=2' in response.content['next']
         assert response.content['previous'] is None
-        assert len(response.content['features']) == 100
+        assert len(response.content['features']) == 1000
 
     def test_pagination_page_2(self):
         SpatialUnitFactory.create_batch(1010, project=self.prj)
 
-        response = self.request(user=self.user, get_data={'page': '11'})
+        response = self.request(user=self.user, get_data={'page': '2'})
         assert response.status_code == 200
         assert len(response.content['features']) == 10
         assert response.content['count'] == 1010
