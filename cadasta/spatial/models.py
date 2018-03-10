@@ -106,10 +106,6 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
                        ' type={obj.type}>')
         return repr_string.format(obj=self)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._original_type = self.type  # Cache type for change detection
-
     @property
     def name(self):
         return self.location_type_label
@@ -287,8 +283,13 @@ def set_label_on_spatialunits(sender, instance, **kwargs):
     """
     Set label of related QuestionOption onto new SpatialUnit instances
     """
-    if not instance._state.adding and instance._original_type == instance.type:
-        return
+    # Ignore if instance is not new and has not changed its 'type' property
+    if not instance._state.adding:
+        unchanged = SpatialUnit.objects.filter(
+            id=instance.id, type=instance.type).exists()
+        if unchanged:
+            return
+
     try:
         rel_questionoption = QuestionOption.objects.get(
             name=instance.type,

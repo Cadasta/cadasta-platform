@@ -243,10 +243,10 @@ class SpatialUnitTest(UserTestCase, TestCase):
             object_id=su.id,
             resource=resource,).exists()
 
-        su_deferred = SpatialUnit.objects.all().defer('attributes')[0]
-        assert resource in su_deferred.resources
+        su_2 = SpatialUnit.objects.all().first()
+        assert resource in su_2.resources
+        su_2.delete()
 
-        su_deferred.delete()
         assert not ContentObject.objects.filter(
             object_id=su.id, resource=resource).exists()
         assert SpatialUnit.objects.all().count() == 0
