@@ -1,14 +1,17 @@
 {% extends "core/base.html" %}
 
-{% load i18n %}
 {% load widget_tweaks %}
+{% load staticfiles %}
+{% load i18n %}
 
 {% block top-nav %}profile{% endblock %}
 
 {% block title %} | {% trans "Edit profile" %}{% endblock %}
 
 {% block extra_script %}
-  {{ form.media }}
+<script src="{% static 'js/parsleyAddValidator.js' %}"></script>
+<script src="{% static 'libphonenumber-js/1.0.24/libphonenumber-js.min.js' %}"></script>
+{{ form.media }}
 {% endblock %}
 
 {% block content %}
@@ -43,10 +46,11 @@
           {% if form.instance.phone %}
           <div class="form-group{% if form.phone.errors %} has-error{%endif%}">
             <label class="control-label" for="{{ form.phone.id_for_label }}">{% trans "Phone" %}</label>
-            {% render_field form.phone class+='form-control input-lg'  %}
+            {% render_field form.phone class+='form-control input-lg' data-parsley-validation-threshold="1" data-parsley-phonenumber="1" data-parsley-phoneplus="1" data-parsley-phonelength="1" data-parsley-errors-container="#phone-errors" %}
               {% if phones_to_verify %}
                 <p class="help-block small">{% blocktrans %} The phone for this account has been changed recently, but the new phone number has not yet been verified. To verify the new phone number, click <a href="{{ resend_url }}"> here.</a>{% endblocktrans %}</p>
               {% endif %}
+              <div id="phone-errors"></div>
               <div class="error-block">{{ form.phone.errors }}</div>
           </div>
           {% endif %}

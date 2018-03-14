@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-20 13:13+0000\n"
+"POT-Creation-Date: 2018-02-22 16:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,124 +17,318 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: accounts/forms.py:35 accounts/forms.py:94 accounts/serializers.py:48
-#: accounts/serializers.py:110 accounts/tests/test_forms.py:211
-#: accounts/tests/test_serializers.py:126
-#: accounts/tests/test_serializers.py:318
+#: accounts/exceptions.py:8
+msgid "The email has not been verified."
+msgstr ""
+
+#: accounts/exceptions.py:16
+msgid "The phone has not been verified."
+msgstr ""
+
+#: accounts/exceptions.py:24
+msgid "User account is disabled."
+msgstr ""
+
+#: accounts/forms.py:47 accounts/serializers.py:74
+#: accounts/tests/test_forms.py:368 accounts/tests/test_serializers.py:365
+#: accounts/tests/test_serializers.py:381
+msgid ""
+"You cannot leave both phone and email empty. Signup with either phone or "
+"email or both."
+msgstr ""
+
+#: accounts/forms.py:55 accounts/forms.py:163 accounts/serializers.py:110
+#: accounts/serializers.py:292 accounts/tests/test_forms.py:216
+#: accounts/tests/test_serializers.py:157
+#: accounts/tests/test_serializers.py:677
 msgid "Username cannot be “add” or “new”."
 msgstr ""
 
-#: accounts/forms.py:45 accounts/serializers.py:58
-#: accounts/tests/test_forms.py:120 accounts/tests/test_forms.py:513
-#: accounts/tests/test_forms.py:612 accounts/tests/test_serializers.py:177
-#: accounts/tests/test_serializers.py:473 accounts/validators.py:50
+#: accounts/forms.py:67 accounts/serializers.py:121
+#: accounts/tests/test_forms.py:125 accounts/tests/test_forms.py:1080
+#: accounts/tests/test_forms.py:1194 accounts/tests/test_serializers.py:216
+#: accounts/tests/test_serializers.py:1217 accounts/validators.py:53
 msgid "Passwords cannot contain your email."
 msgstr ""
 
-#: accounts/forms.py:50 accounts/forms.py:139 accounts/serializers.py:63
-#: accounts/serializers.py:148 accounts/tests/test_forms.py:79
-#: accounts/tests/test_forms.py:93 accounts/tests/test_forms.py:485
-#: accounts/tests/test_forms.py:499 accounts/tests/test_forms.py:586
-#: accounts/tests/test_forms.py:599 accounts/tests/test_serializers.py:139
-#: accounts/tests/test_serializers.py:152
-#: accounts/tests/test_serializers.py:433
-#: accounts/tests/test_serializers.py:453
+#: accounts/forms.py:72 accounts/forms.py:241 accounts/serializers.py:126
+#: accounts/serializers.py:341 accounts/tests/test_forms.py:84
+#: accounts/tests/test_forms.py:98 accounts/tests/test_forms.py:1052
+#: accounts/tests/test_forms.py:1066 accounts/tests/test_forms.py:1168
+#: accounts/tests/test_forms.py:1181 accounts/tests/test_serializers.py:172
+#: accounts/tests/test_serializers.py:187
+#: accounts/tests/test_serializers.py:1177
+#: accounts/tests/test_serializers.py:1197
 msgid "The password is too similar to the username."
 msgstr ""
 
-#: accounts/forms.py:61 accounts/forms.py:108 accounts/tests/test_forms.py:196
-msgid "Another user with this email already exists"
+#: accounts/forms.py:79 accounts/forms.py:248 accounts/serializers.py:135
+#: accounts/serializers.py:348 accounts/tests/test_forms.py:255
+#: accounts/tests/test_forms.py:1136 accounts/tests/test_forms.py:1246
+#: accounts/tests/test_serializers.py:279
+#: accounts/tests/test_serializers.py:1284
+msgid "Passwords cannot contain your phone."
 msgstr ""
 
-#: accounts/forms.py:101
+#: accounts/forms.py:94 accounts/forms.py:198 accounts/serializers.py:84
+#: accounts/serializers.py:239 accounts/tests/test_forms.py:201
+#: accounts/tests/test_forms.py:401 accounts/tests/test_forms.py:417
+#: accounts/tests/test_forms.py:980 accounts/tests/test_serializers.py:140
+#: accounts/tests/test_serializers.py:503
+#: accounts/tests/test_serializers.py:520
+#: accounts/tests/test_serializers.py:946
+#: accounts/tests/test_serializers.py:965
+#: accounts/tests/test_serializers.py:1051
+msgid "User with this Email address already exists."
+msgstr ""
+
+#: accounts/forms.py:105 accounts/forms.py:179 accounts/serializers.py:32
+#: accounts/serializers.py:95 accounts/serializers.py:156
+#: accounts/serializers.py:265 accounts/tests/test_forms.py:270
+#: accounts/tests/test_forms.py:432 accounts/tests/test_forms.py:786
+#: accounts/tests/test_forms.py:1005 accounts/tests/test_serializers.py:348
+#: accounts/tests/test_serializers.py:538
+#: accounts/tests/test_serializers.py:918
+#: accounts/tests/test_serializers.py:984
+msgid "User with this Phone number already exists."
+msgstr ""
+
+#: accounts/forms.py:110 accounts/forms.py:184 accounts/serializers.py:100
+#: accounts/serializers.py:270 accounts/tests/test_forms.py:355
+#: accounts/tests/test_forms.py:867 accounts/tests/test_serializers.py:488
+#: accounts/tests/test_serializers.py:891
+msgid "Please enter a valid country code."
+msgstr ""
+
+#: accounts/forms.py:153 accounts/serializers.py:204
+msgid "The profile for this user can not be updated."
+msgstr ""
+
+#: accounts/forms.py:170
 msgid "Please provide the correct password for your account."
 msgstr ""
 
-#: accounts/forms.py:130 accounts/serializers.py:137
-#: accounts/tests/test_forms.py:555 accounts/tests/test_forms.py:651
+#: accounts/forms.py:232 accounts/serializers.py:331
+#: accounts/tests/test_forms.py:1123 accounts/tests/test_forms.py:1234
+#: accounts/tests/test_forms.py:1254
 msgid "The password for this user can not be changed."
 msgstr ""
 
-#: accounts/forms.py:151
+#: accounts/forms.py:259
 msgid "Current Password"
 msgstr ""
 
-#: accounts/forms.py:152 accounts/forms.py:164
+#: accounts/forms.py:260 accounts/forms.py:272
 msgid "New Password"
 msgstr ""
 
-#: accounts/forms.py:156 accounts/tests/test_forms.py:471
+#: accounts/forms.py:264 accounts/tests/test_forms.py:1038
 msgid "Please type your current password."
 msgstr ""
 
-#: accounts/manager.py:16 organization/serializers.py:164
-msgid "User with username or email {} does not exist"
+#: accounts/forms.py:290 accounts/forms.py:363 accounts/serializers.py:220
+#: accounts/tests/test_forms.py:1317 accounts/tests/test_forms.py:1326
+#: accounts/tests/test_forms.py:1419 accounts/tests/test_forms.py:1426
+#: accounts/tests/test_serializers.py:746
+msgid "You cannot leave both phone and email empty."
 msgstr ""
 
-#: accounts/manager.py:21 organization/serializers.py:166
-msgid "More than one user found for username or email {}"
+#: accounts/forms.py:324 accounts/serializers.py:360
+#: templates/accounts/account_verification.html:23
+#: templates/allauth/account/password_reset_done.html:24
+msgid "Token"
 msgstr ""
 
-#: accounts/models.py:35
+#: accounts/forms.py:335 accounts/tests/test_forms.py:1376
+msgid "The token could not be verified. Please click on 'here' to try again."
+msgstr ""
+
+#: accounts/forms.py:340 accounts/serializers.py:371
+#: accounts/tests/test_forms.py:1370 accounts/tests/test_serializers.py:1366
+msgid "Token must be a number."
+msgstr ""
+
+#: accounts/forms.py:346 accounts/tests/test_forms.py:1362
+msgid "The token has expired. Please click on 'here' to receive the new token."
+msgstr ""
+
+#: accounts/manager.py:17 organization/serializers.py:165
+msgid "User with username or email or phone {} does not exist"
+msgstr ""
+
+#: accounts/manager.py:22 organization/serializers.py:168
+msgid "More than one user found for username or email or phone {}"
+msgstr ""
+
+#: accounts/messages.py:5
+msgid ""
+"Your phone number must start with +, followed by a  country code and phone "
+"number without spaces or  punctuation. It must contain between 5 and 15 "
+"digits."
+msgstr ""
+
+#: accounts/messages.py:11
+msgid ""
+"Your account has been set inactive. We request you to verify your registered "
+"phone or email in order to access your account."
+msgstr ""
+
+#: accounts/messages.py:16
+msgid ""
+"You have not verified your phone or email. We request you to verify your "
+"registered phone or email in order to access your account."
+msgstr ""
+
+#: accounts/messages.py:21
+msgid ""
+"You are receiving this message because a user at Cadasta Platform removed "
+"the phone number from the account previously linked to this phone number. If "
+"it wasn't you, please contact us immediately at security@cadasta.org"
+msgstr ""
+
+#: accounts/messages.py:28
+msgid ""
+"You are receiving this message because a user at Cadasta Platform changed "
+"the phone number for the account previously linked to this phone number. If "
+"it wasn't you, please contact us immediately at security@cadasta.org"
+msgstr ""
+
+#: accounts/messages.py:35
+msgid ""
+"You are receiving this message because a user at Cadasta Platform has "
+"changed or reset the password for your account linked to this phone number. "
+"If it wasn't you, please contact us immediately at security@cadasta.org"
+msgstr ""
+
+#: accounts/messages.py:42
+msgid "Unable to send verification SMS. Please try again later."
+msgstr ""
+
+#: accounts/messages.py:43
+msgid "Unable to send verification SMS. Please provide a valid phone number."
+msgstr ""
+
+#: accounts/models.py:42
 msgid "full name"
 msgstr ""
 
-#: accounts/models.py:68
+#: accounts/models.py:44
+msgid "email address"
+msgstr ""
+
+#: accounts/models.py:47
+msgid "phone number"
+msgstr ""
+
+#: accounts/models.py:81
 msgid "user"
 msgstr ""
 
-#: accounts/models.py:69
+#: accounts/models.py:82
 msgid "users"
 msgstr ""
 
-#: accounts/models.py:79 organization/messages.py:33
+#: accounts/models.py:92 organization/messages.py:33
 msgid "You don't have permission to view user details"
 msgstr ""
 
-#: accounts/models.py:82 organization/messages.py:34
+#: accounts/models.py:95 organization/messages.py:34
 msgid "You don't have permission to update user details"
 msgstr ""
 
-#: accounts/models.py:134
+#: accounts/models.py:147
 msgid "Change of password at Cadasta Platform"
 msgstr ""
 
-#: accounts/serializers.py:22 accounts/serializers.py:76
-#: accounts/tests/test_serializers.py:111
-msgid "Another user is already registered with this email address"
+#: accounts/models.py:178
+msgid "Verify Phone"
 msgstr ""
 
-#: accounts/serializers.py:118
+#: accounts/models.py:179
+msgid "Reset Password"
+msgstr ""
+
+#: accounts/models.py:202
+#, python-brace-format
+msgid ""
+"Your token for Cadasta is {token_value}. It is valid for {time_validity} "
+"minutes."
+msgstr ""
+
+#: accounts/serializers.py:69 accounts/serializers.py:215
+msgid "You can either use your phone number or email to sign up but not both."
+msgstr ""
+
+#: accounts/serializers.py:167
+msgid "Language invalid or not available"
+msgstr ""
+
+#: accounts/serializers.py:174
+msgid "Measurement system invalid or not available"
+msgstr ""
+
+#: accounts/serializers.py:227 accounts/tests/test_serializers.py:764
+msgid "Cannot update email"
+msgstr ""
+
+#: accounts/serializers.py:246
+msgid ""
+"It is not possible to change from email to phone for your account identifier."
+msgstr ""
+
+#: accounts/serializers.py:254 accounts/tests/test_serializers.py:784
+msgid "Cannot update phone"
+msgstr ""
+
+#: accounts/serializers.py:277
+msgid ""
+"It is not possible to change from phone to email for your account identifier."
+msgstr ""
+
+#: accounts/serializers.py:301
 msgid "Cannot update last_login"
 msgstr ""
 
-#: accounts/tests/test_forms.py:54 accounts/tests/test_forms.py:66
-#: accounts/tests/test_forms.py:324 accounts/tests/test_serializers.py:58
-#: accounts/tests/test_serializers.py:287 accounts/validators.py:60
+#: accounts/serializers.py:387 accounts/tests/test_serializers.py:1355
+msgid "The token has expired."
+msgstr ""
+
+#: accounts/serializers.py:390 accounts/tests/test_forms.py:1350
+#: accounts/tests/test_serializers.py:1337
+msgid "Invalid Token. Enter a valid token."
+msgstr ""
+
+#: accounts/tests/test_forms.py:59 accounts/tests/test_forms.py:71
+#: accounts/tests/test_forms.py:575 accounts/tests/test_serializers.py:63
+#: accounts/tests/test_serializers.py:646 accounts/validators.py:63
 msgid "A user with that username already exists"
 msgstr ""
 
-#: accounts/tests/test_forms.py:147 accounts/tests/test_forms.py:526
-#: accounts/tests/test_forms.py:624 accounts/tests/test_serializers.py:202
-#: accounts/tests/test_serializers.py:494
+#: accounts/tests/test_forms.py:152 accounts/tests/test_forms.py:1093
+#: accounts/tests/test_forms.py:1206 accounts/tests/test_serializers.py:245
+#: accounts/tests/test_serializers.py:1238
 msgid "This password is too short. It must contain at least 10 characters."
 msgstr ""
 
-#: accounts/tests/test_forms.py:162 accounts/tests/test_forms.py:178
-#: accounts/tests/test_forms.py:540 accounts/tests/test_forms.py:637
-#: accounts/tests/test_serializers.py:216
-#: accounts/tests/test_serializers.py:516
+#: accounts/tests/test_forms.py:167 accounts/tests/test_forms.py:183
+#: accounts/tests/test_forms.py:1107 accounts/tests/test_forms.py:1219
+#: accounts/tests/test_serializers.py:261
+#: accounts/tests/test_serializers.py:1260
 msgid ""
 "Passwords must contain at least 3 of the following 4 character types:\n"
 "lowercase characters, uppercase characters, special characters, and/or "
 "numerical character.\n"
 msgstr ""
 
-#: accounts/utils.py:11
+#: accounts/tests/test_serializers.py:1380
+msgid "Phone is already verified or not linked to any user account."
+msgstr ""
+
+#: accounts/utils.py:12
 msgid "Change of email at Cadasta Platform"
 msgstr ""
 
-#: accounts/validators.py:23
+#: accounts/validators.py:25
 #, python-brace-format
 msgid ""
 "Passwords must contain at least {unique_types} of the following "
@@ -143,89 +337,129 @@ msgid ""
 "numerical character.\n"
 msgstr ""
 
-#: accounts/views/api.py:68
-msgid "The email has not been verified."
+#: accounts/views/default.py:55
+#, python-brace-format
+msgid "Verification token sent to {phone}"
 msgstr ""
 
 #: accounts/views/default.py:64
+msgid ""
+"We have created your account. You should have received an email or a text to "
+"verify your account."
+msgstr ""
+
+#: accounts/views/default.py:137
+msgid "Successfully Verified Token. You can now reset your password."
+msgstr ""
+
+#: accounts/views/default.py:166
+#, python-brace-format
+msgid ""
+"You must first verify your token before resetting password. Click <a "
+"href='{url}'>here</a> to get the password reset verification token. "
+msgstr ""
+
+#: accounts/views/default.py:217
 msgid "Successfully updated profile information"
 msgstr ""
 
-#: accounts/views/default.py:69
+#: accounts/views/default.py:220
+#, python-brace-format
+msgid "Verification Token sent to {phone}"
+msgstr ""
+
+#: accounts/views/default.py:242
 msgid "Failed to update profile information"
 msgstr ""
 
-#: accounts/views/default.py:148 organization/choices.py:4
-#: organization/views/default.py:434 organization/widgets.py:26
-#: organization/widgets.py:57 templates/accounts/user_dashboard.html:49
-#: templates/organization/organization_members_edit.html:38
+#: accounts/views/default.py:334 organization/choices.py:4
+#: organization/views/default.py:403 organization/widgets.py:30
+#: organization/widgets.py:62 templates/accounts/user_dashboard.html:49
+#: templates/organization/organization_members_edit.html:45
 msgid "Administrator"
 msgstr ""
 
-#: accounts/views/default.py:148 organization/forms.py:29
+#: accounts/views/default.py:334 organization/forms.py:25
 msgid "Public User"
 msgstr ""
 
-#: config/settings/default.py:208
+#: accounts/views/default.py:401
+#, python-brace-format
+msgid "Successfully verified {phone}"
+msgstr ""
+
+#: accounts/views/default.py:442
+msgid ""
+"Your phone number has been submitted. If it matches your account on Cadasta "
+"Platform, you will receive a verification token to confirm your phone."
+msgstr ""
+
+#: accounts/views/default.py:466
+msgid ""
+"Your email address has been submitted. If it matches your account on Cadasta "
+"Platform, you will receive a verification link to confirm your email."
+msgstr ""
+
+#: config/settings/default.py:214
 msgid ""
 "Base map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> "
 "contributors under <a href=\"http://opendatacommons.org/licenses/odbl/"
 "\">ODbL</a>"
 msgstr ""
 
-#: config/settings/default.py:212
+#: config/settings/default.py:218
 msgid "Imagery &copy; DigitalGlobe"
 msgstr ""
 
-#: config/settings/default.py:223
+#: config/settings/default.py:229
 msgid "OpenStreetMap"
 msgstr ""
 
-#: config/settings/default.py:229
+#: config/settings/default.py:235
 msgid "+Vivid imagery"
 msgstr ""
 
-#: config/settings/default.py:235
+#: config/settings/default.py:241
 msgid "Recent imagery"
 msgstr ""
 
-#: config/settings/default.py:241
+#: config/settings/default.py:247
 msgid "+Vivid imagery with OpenStreetMap"
 msgstr ""
 
-#: config/settings/default.py:247
+#: config/settings/default.py:253
 msgid "Recent imagery with OpenStreetMap"
 msgstr ""
 
-#: config/settings/default.py:279 config/settings/languages.py:21
+#: config/settings/default.py:285 config/settings/languages.py:21
 msgid "English"
 msgstr ""
 
-#: config/settings/default.py:280 config/settings/languages.py:28
+#: config/settings/default.py:286 config/settings/languages.py:28
 msgid "French"
 msgstr ""
 
-#: config/settings/default.py:282 config/settings/languages.py:23
+#: config/settings/default.py:288 config/settings/languages.py:23
 msgid "Spanish"
 msgstr ""
 
-#: config/settings/default.py:283 config/settings/languages.py:38
+#: config/settings/default.py:289 config/settings/languages.py:38
 msgid "Indonesian"
 msgstr ""
 
-#: config/settings/default.py:284 config/settings/languages.py:41
+#: config/settings/default.py:290 config/settings/languages.py:41
 msgid "Italian"
 msgstr ""
 
-#: config/settings/default.py:285 config/settings/languages.py:65
+#: config/settings/default.py:291 config/settings/languages.py:65
 msgid "Portuguese"
 msgstr ""
 
-#: config/settings/default.py:291
+#: config/settings/default.py:297
 msgid "Metric"
 msgstr ""
 
-#: config/settings/default.py:292
+#: config/settings/default.py:298
 msgid "Imperial"
 msgstr ""
 
@@ -522,6 +756,10 @@ msgstr ""
 msgid "You don't have permission for this action."
 msgstr ""
 
+#: core/serializers.py:78
+msgid "Unknown attribute \"{}\""
+msgstr ""
+
 #: core/tests/test_translations.py:11
 msgid "First name"
 msgstr ""
@@ -532,7 +770,7 @@ msgstr ""
 
 #: core/tests/test_validators.py:55 core/validators.py:26
 #: organization/tests/test_validators.py:29
-#: organization/tests/test_validators.py:61 questionnaires/validators.py:99
+#: organization/tests/test_validators.py:61 questionnaires/validators.py:100
 #: spatial/forms.py:104 spatial/forms.py:112 spatial/forms.py:120
 msgid "This field is required."
 msgstr ""
@@ -548,21 +786,21 @@ msgstr ""
 
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:7
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:68
-#: templates/accounts/profile.html:94
+#: templates/accounts/profile.html:112
 #: templates/organization/organization_add.html:30
 #: templates/organization/organization_edit.html:32
 #: templates/organization/organization_members_add.html:33
-#: templates/organization/organization_members_edit.html:87
-#: templates/organization/organization_members_edit.html:153
-#: templates/organization/organization_members_edit.html:179
-#: templates/organization/organization_members_edit.html:205
+#: templates/organization/organization_members_edit.html:94
+#: templates/organization/organization_members_edit.html:160
+#: templates/organization/organization_members_edit.html:186
+#: templates/organization/organization_members_edit.html:212
 #: templates/organization/organization_wrapper.html:139
 #: templates/organization/organization_wrapper.html:165
 #: templates/organization/project_add_wrapper.html:51
 #: templates/organization/project_attrs_import.html:121
 #: templates/organization/project_defaults_import.html:101
 #: templates/organization/project_edit_details.html:110
-#: templates/organization/project_edit_geometry.html:78
+#: templates/organization/project_edit_geometry.html:76
 #: templates/organization/project_edit_permissions.html:41
 #: templates/organization/project_select_import.html:101
 #: templates/organization/project_wrapper.html:217
@@ -658,13 +896,13 @@ msgid "Save changes."
 msgstr ""
 
 #: core/translation-links/leaflet/_leaflet_draw_i18n.js:64
-#: templates/accounts/profile.html:93
+#: templates/accounts/profile.html:111
 #: templates/organization/organization_add.html:27
 #: templates/organization/organization_edit.html:28
 #: templates/organization/organization_members_add.html:32
-#: templates/organization/organization_members_edit.html:86
+#: templates/organization/organization_members_edit.html:93
 #: templates/organization/project_edit_details.html:109
-#: templates/organization/project_edit_geometry.html:77
+#: templates/organization/project_edit_geometry.html:75
 #: templates/organization/project_edit_permissions.html:40
 #: templates/party/party_add.html:46 templates/party/party_edit.html:49
 #: templates/party/relationship_edit.html:60 templates/resources/edit.html:56
@@ -720,7 +958,7 @@ msgstr ""
 msgid " or "
 msgstr ""
 
-#: core/views/api.py:17
+#: core/views/api.py:22
 #, python-brace-format
 msgid "{name} not found."
 msgstr ""
@@ -746,11 +984,11 @@ msgstr ""
 msgid "Project Manager"
 msgstr ""
 
-#: organization/choices.py:11 organization/widgets.py:103
+#: organization/choices.py:11 organization/widgets.py:108
 msgid "Public"
 msgstr ""
 
-#: organization/choices.py:12 organization/widgets.py:104
+#: organization/choices.py:12 organization/widgets.py:109
 #: templates/accounts/user_dashboard.html:74
 #: templates/organization/organization_dashboard_member.html:36
 #: templates/organization/organization_dashboard_nonmember.html:49
@@ -759,35 +997,35 @@ msgstr ""
 msgid "Private"
 msgstr ""
 
-#: organization/forms.py:95
+#: organization/forms.py:91
 msgid "Please provide a name."
 msgstr ""
 
-#: organization/forms.py:99
+#: organization/forms.py:95
 msgid "The provided email address is invalid."
 msgstr ""
 
-#: organization/forms.py:107
+#: organization/forms.py:103
 msgid "Please provide either an email address or a phone number."
 msgstr ""
 
-#: organization/forms.py:145 organization/serializers.py:45
+#: organization/forms.py:141 organization/serializers.py:44
 msgid "Organization with this name already exists."
 msgstr ""
 
-#: organization/forms.py:152 organization/serializers.py:35
+#: organization/forms.py:148 organization/serializers.py:34
 msgid "Organization name cannot be “Add” or “New”."
 msgstr ""
 
-#: organization/forms.py:201
+#: organization/forms.py:197
 msgid "User is already a member of the organization."
 msgstr ""
 
-#: organization/forms.py:207
+#: organization/forms.py:203
 msgid "The role could not be assigned because the data didn't validate."
 msgstr ""
 
-#: organization/forms.py:238
+#: organization/forms.py:236
 msgid ""
 "Organization administrators cannot change their own role in the organization."
 msgstr ""
@@ -797,12 +1035,12 @@ msgid "Please select an organization"
 msgstr ""
 
 #: organization/forms.py:334 organization/forms.py:407
-#: organization/serializers.py:84
+#: organization/serializers.py:83
 msgid "Project name cannot be “Add” or “New”."
 msgstr ""
 
 #: organization/forms.py:343 organization/forms.py:416
-#: organization/serializers.py:96
+#: organization/serializers.py:95
 msgid "Project with this name already exists"
 msgstr ""
 
@@ -812,15 +1050,15 @@ msgid ""
 "uploading a new questionnaire is disabled for this project."
 msgstr ""
 
-#: organization/forms.py:578
+#: organization/forms.py:539
 msgid "File too large, max size 512kb"
 msgstr ""
 
-#: organization/forms.py:588
+#: organization/forms.py:549
 msgid "Invalid file type"
 msgstr ""
 
-#: organization/forms.py:600
+#: organization/forms.py:561
 msgid "Select at least one data type."
 msgstr ""
 
@@ -941,172 +1179,179 @@ msgstr ""
 msgid "You don't have permission to import data to this project"
 msgstr ""
 
-#: organization/models.py:68
+#: organization/models.py:69
 msgid "List existing organizations"
 msgstr ""
 
-#: organization/models.py:71
+#: organization/models.py:72
 msgid "Create organizations"
 msgstr ""
 
-#: organization/models.py:74
+#: organization/models.py:75
 msgid "View existing organizations"
 msgstr ""
 
-#: organization/models.py:77
+#: organization/models.py:78
 msgid "View archived organization"
 msgstr ""
 
-#: organization/models.py:80
+#: organization/models.py:81
 msgid "Update an existing organization"
 msgstr ""
 
-#: organization/models.py:83
+#: organization/models.py:84
 msgid "Archive an existing organization"
 msgstr ""
 
-#: organization/models.py:86
+#: organization/models.py:87
 msgid "Unarchive an existing organization"
 msgstr ""
 
-#: organization/models.py:89
+#: organization/models.py:90
 msgid "List members of an organization"
 msgstr ""
 
-#: organization/models.py:92
+#: organization/models.py:93
 msgid "Add a member to an organization"
 msgstr ""
 
-#: organization/models.py:95
+#: organization/models.py:96
 msgid "Edit a member of an organization"
 msgstr ""
 
-#: organization/models.py:98
+#: organization/models.py:99
 msgid "Remove a member from an organization"
 msgstr ""
 
-#: organization/models.py:214
+#: organization/models.py:221
 msgid "List existing projects in an organization"
 msgstr ""
 
-#: organization/models.py:217
+#: organization/models.py:224
 msgid "Create projects in an organization"
 msgstr ""
 
-#: organization/models.py:220
+#: organization/models.py:227
 msgid "View existing projects"
 msgstr ""
 
-#: organization/models.py:223
+#: organization/models.py:230
 msgid "View private projects"
 msgstr ""
 
-#: organization/models.py:226
+#: organization/models.py:233
 msgid "View archived projects"
 msgstr ""
 
-#: organization/models.py:229
+#: organization/models.py:236
 msgid "Update an existing project"
 msgstr ""
 
-#: organization/models.py:232
+#: organization/models.py:239
 msgid "Archive an existing project"
 msgstr ""
 
-#: organization/models.py:235
+#: organization/models.py:242
 msgid "Unarchive an existing project"
 msgstr ""
 
-#: organization/models.py:238
+#: organization/models.py:245
 msgid "List users within a project"
 msgstr ""
 
-#: organization/models.py:241
+#: organization/models.py:248
 msgid "Add user to a project"
 msgstr ""
 
-#: organization/models.py:244
+#: organization/models.py:251
 msgid "Edit roles of user in a project"
 msgstr ""
 
-#: organization/models.py:247
+#: organization/models.py:254
 msgid "Remove user from a project"
 msgstr ""
 
-#: organization/models.py:250
+#: organization/models.py:257
 msgid "Export data from a project"
 msgstr ""
 
-#: organization/models.py:253
+#: organization/models.py:260
 msgid "Import data to a project"
 msgstr ""
 
-#: organization/models.py:270 templates/accounts/user_dashboard.html:61
+#: organization/models.py:277 templates/accounts/user_dashboard.html:61
 #: templates/organization/organization_dashboard_member.html:23
 #: templates/organization/organization_dashboard_nonmember.html:36
-#: templates/organization/organization_members_edit.html:71
+#: templates/organization/organization_members_edit.html:78
 #: templates/organization/project_list.html:43
 msgid "Project"
 msgstr ""
 
-#: organization/serializers.py:176
+#: organization/serializers.py:179
 msgid "Not able to add member. The role already exists."
 msgstr ""
 
-#: organization/serializers.py:219
+#: organization/serializers.py:222
 msgid ""
 "Organization administrators cannot change their own permissions within the "
 "organization"
 msgstr ""
 
-#: organization/serializers.py:259
+#: organization/serializers.py:262
 #, python-brace-format
 msgid "User {username} is an organization admin, the role cannot be updated."
 msgstr ""
 
-#: organization/serializers.py:268 organization/tests/test_serializers.py:672
+#: organization/serializers.py:271 organization/tests/test_serializers.py:671
 #, python-brace-format
 msgid "User {username} is not member of the project's organization"
 msgstr ""
 
 #: organization/tests/test_serializers.py:548
-#: organization/tests/test_serializers.py:686
+#: organization/tests/test_serializers.py:685
 #, python-brace-format
-msgid "User with username or email {username} does not exist"
+msgid "User with username or email or phone {username} does not exist"
 msgstr ""
 
-#: organization/tests/test_serializers.py:563
+#: organization/tests/test_serializers.py:564
 #, python-brace-format
-msgid "More than one user found for username or email {email}"
+msgid "More than one user found for username or email or phone {email}"
 msgstr ""
 
-#: organization/views/default.py:323
+#: organization/views/default.py:326
 msgid "Administrators cannot remove themselves."
 msgstr ""
 
-#: organization/widgets.py:101
+#: organization/views/default.py:736
+msgid "The export service is temporarily offline. Please try again later."
+msgstr ""
+
+#: organization/widgets.py:106
 msgid "Project visibility"
 msgstr ""
 
-#: organization/widgets.py:168 templates/party/party_detail.html:39
-#: templates/party/party_list.html:28 templates/resources/form.html:17
+#: organization/widgets.py:173 templates/party/paginated-party-table.js:7
+#: templates/party/party_detail.html:39 templates/resources/form.html:17
 msgid "Name"
 msgstr ""
 
-#: organization/widgets.py:169
+#: organization/widgets.py:174 templates/accounts/profile.html:45
+#: templates/accounts/resend_token_page.html:36
+#: templates/allauth/account/signup.html:57
 msgid "Phone"
 msgstr ""
 
-#: organization/widgets.py:170 templates/accounts/profile.html:31
+#: organization/widgets.py:175 templates/accounts/profile.html:34
+#: templates/accounts/resend_token_page.html:26
 #: templates/accounts/user_dashboard.html:166
 #: templates/allauth/account/email.html:59
-#: templates/allauth/account/signup.html:54
+#: templates/allauth/account/signup.html:48
 #: templates/organization/organization_members.html:32
 #: templates/organization/user_list.html:35
 msgid "Email"
 msgstr ""
 
-#: organization/widgets.py:171
+#: organization/widgets.py:176
 msgid "Add contact"
 msgstr ""
 
@@ -1291,7 +1536,7 @@ msgstr ""
 #: templates/organization/project_select_import.html:64
 #: templates/party/party_detail.html:26
 #: templates/party/relationship_detail.html:31
-#: templates/spatial/location_detail.html:70
+#: templates/spatial/location_detail.html:71
 msgid "Party"
 msgstr ""
 
@@ -1340,32 +1585,38 @@ msgid "Add a resource to a tenure relationship"
 msgstr ""
 
 #: party/models.py:308 templates/party/party_detail.html:63
-#: templates/spatial/location_detail.html:69
+#: templates/spatial/location_detail.html:70
 msgid "Relationship"
 msgstr ""
 
-#: party/serializers.py:46
+#: party/serializers.py:61
 msgid "The parties must be different"
 msgstr ""
 
-#: party/serializers.py:49
+#: party/serializers.py:64
 msgid "'party1' project ({}) should be equal to 'party2' project ({})"
 msgstr ""
 
-#: party/serializers.py:109
+#: party/serializers.py:124
 msgid "'party' project ({}) should be equal to 'spatial_unit' project ({})"
 msgstr ""
 
-#: party/views/api.py:119
+#: party/views/api.py:120
 msgid "Relationship class is unknown"
 msgstr ""
 
-#: questionnaires/managers.py:65
+#: questionnaires/managers.py:71
 #, python-brace-format
 msgid "Please provide at least one option for field '{field_name}'"
 msgstr ""
 
-#: questionnaires/managers.py:209
+#: questionnaires/managers.py:141
+msgid ""
+"{attr_type!r} (found in the {name!r} question) is not a supported attribute "
+"type."
+msgstr ""
+
+#: questionnaires/managers.py:228
 msgid "'form_id' field must not contain whitespace."
 msgstr ""
 
@@ -1408,19 +1659,19 @@ msgstr ""
 msgid "'id_string' cannot be blank or contain whitespace."
 msgstr ""
 
-#: questionnaires/validators.py:70
+#: questionnaires/validators.py:71
 msgid "gps_accuracy must be positve float"
 msgstr ""
 
-#: questionnaires/validators.py:104
+#: questionnaires/validators.py:105
 msgid "Value must be of type {}."
 msgstr ""
 
-#: questionnaires/validators.py:108
+#: questionnaires/validators.py:109
 msgid "{} is not an accepted value."
 msgstr ""
 
-#: questionnaires/validators.py:111
+#: questionnaires/validators.py:112
 msgid "Validator {} did not validate."
 msgstr ""
 
@@ -1474,6 +1725,7 @@ msgid "Unarchive resource"
 msgstr ""
 
 #: resources/models.py:135 templates/resources/edit.html:26
+#: templates/resources/paginated-resource-table.js:21
 #: templates/resources/project_detail.html:32 templates/resources/table.html:7
 #: templates/resources/table_add_lib.html:8
 #: templates/resources/table_sm.html:7
@@ -1494,7 +1746,7 @@ msgstr ""
 msgid "Error parsing GPX file: no geometry found."
 msgstr ""
 
-#: resources/serializers.py:40
+#: resources/serializers.py:49
 msgid "Resource not found"
 msgstr ""
 
@@ -1511,7 +1763,8 @@ msgstr ""
 msgid "Files of type {mime} are not accepted."
 msgstr ""
 
-#: resources/widgets.py:38 templates/resources/table.html:44
+#: resources/widgets.py:38 templates/resources/paginated-resource-table.js:85
+#: templates/resources/table.html:44
 msgid "Unattached"
 msgstr ""
 
@@ -1528,11 +1781,12 @@ msgstr ""
 msgid "unknown"
 msgstr ""
 
-#: search/views/async.py:225 templates/party/party_detail.html:43
-#: templates/party/party_list.html:29
+#: search/views/async.py:225 templates/party/paginated-party-table.js:19
+#: templates/party/party_detail.html:43
 #: templates/party/relationship_detail.html:27
+#: templates/resources/paginated-resource-table.js:44
 #: templates/resources/table.html:8 templates/resources/table_add_lib.html:9
-#: templates/spatial/location_detail.html:43
+#: templates/spatial/location_detail.html:44
 msgid "Type"
 msgstr ""
 
@@ -1667,28 +1921,28 @@ msgstr ""
 #: templates/organization/project_select_import.html:70
 #: templates/party/relationship_detail.html:9
 #: templates/party/relationship_edit.html:32
-#: templates/spatial/location_detail.html:14
+#: templates/spatial/location_detail.html:15
 #: templates/spatial/location_form.html:15
 msgid "Location"
 msgstr ""
 
-#: spatial/models.py:241
+#: spatial/models.py:245
 msgid "List existing spatial relationships of a project"
 msgstr ""
 
-#: spatial/models.py:246
+#: spatial/models.py:250
 msgid "Add a spatial relationship to a project"
 msgstr ""
 
-#: spatial/models.py:250
+#: spatial/models.py:254
 msgid "View an existing spatial relationship"
 msgstr ""
 
-#: spatial/models.py:253
+#: spatial/models.py:257
 msgid "Update an existing spatial relationship"
 msgstr ""
 
-#: spatial/models.py:256
+#: spatial/models.py:260
 msgid "Delete an existing spatial relationship"
 msgstr ""
 
@@ -1720,6 +1974,51 @@ msgstr ""
 msgid "Add party"
 msgstr ""
 
+#: tasks/models.py:25
+msgid "State"
+msgstr ""
+
+#: tasks/models.py:40
+msgid "UUID"
+msgstr ""
+
+#: tasks/models.py:44
+msgid "Task function"
+msgstr ""
+
+#: tasks/models.py:55
+msgid "Task scheduling options"
+msgstr ""
+
+#: tasks/models.py:73
+msgid "If arguments are immutable (only applies to chained tasks)."
+msgstr ""
+
+#: tasks/utils/fields.py:13
+#, python-format
+msgid "This field must be of type %(valid_type)r, got type %(type)r"
+msgstr ""
+
+#: tasks/utils/fields.py:40
+#, python-format
+msgid "This field must be of type 'dict', got type %(type)r"
+msgstr ""
+
+#: tasks/utils/fields.py:46
+#, python-format
+msgid "%(val)s does not have correct keys, expected: %(keys)s"
+msgstr ""
+
+#: tasks/utils/fields.py:51
+#, python-format
+msgid "\"args\" value should be type 'list/tuple', got %(type)r"
+msgstr ""
+
+#: tasks/utils/fields.py:56
+#, python-format
+msgid "\"kwargs\" value should be type 'dict', got %(type)r"
+msgstr ""
+
 #: templates/500.html:6 templates/500.html:9
 msgid "Platform Error"
 msgstr ""
@@ -1731,6 +2030,35 @@ msgstr ""
 
 #: templates/500.html:13
 msgid "Our developers have been notified."
+msgstr ""
+
+#: templates/accounts/account_verification.html:7
+#: templates/accounts/account_verification.html:12
+msgid "Account Verification"
+msgstr ""
+
+#: templates/accounts/account_verification.html:15
+msgid ""
+"To verify your email address, click on the verification link sent to your "
+"registered email address."
+msgstr ""
+
+#: templates/accounts/account_verification.html:19
+msgid ""
+"To verify your phone number, enter the one-time password sent to your "
+"registered phone number."
+msgstr ""
+
+#: templates/accounts/account_verification.html:30
+#: templates/allauth/account/password_reset_done.html:29
+msgid "Verify Token"
+msgstr ""
+
+#: templates/accounts/account_verification.html:37
+#, python-format
+msgid ""
+"<a href=\"%(resend_url)s\"> Click here</a> if you did not receive an email "
+"or text."
 msgstr ""
 
 #: templates/accounts/email/activate_email.txt:2
@@ -1790,6 +2118,8 @@ msgid ""
 msgstr ""
 
 #: templates/accounts/email/email_changed_notification.txt:9
+#: templates/accounts/email/phone_changed_notification.txt:9
+#: templates/accounts/email/phone_deleted_notification.txt:9
 msgid "The Cadasta Team. "
 msgstr ""
 
@@ -1815,8 +2145,28 @@ msgstr ""
 msgid "Your username, in case you've forgotten:"
 msgstr ""
 
+#: templates/accounts/email/phone_changed_notification.txt:3
+msgid ""
+"\n"
+"You are receiving this email because a user at Cadasta Platform changed the "
+"phone number for the account linked to this email address.\n"
+"\n"
+"If it wasn't you who changed the phone number, please contact us immediately "
+"under security@cadasta.org.\n"
+msgstr ""
+
+#: templates/accounts/email/phone_deleted_notification.txt:3
+msgid ""
+"\n"
+"You are receiving this email because a user at Cadasta Platform removed the "
+"phone number for the account linked to this email address.\n"
+"\n"
+"If it wasn't you who removed the phone number, please contact us immediately "
+"under security@cadasta.org.\n"
+msgstr ""
+
 #: templates/accounts/profile.html:8
-#: templates/accounts/user_dashboard.html:147 templates/core/base.html:52
+#: templates/accounts/user_dashboard.html:147 templates/core/base.html:53
 msgid "Edit profile"
 msgstr ""
 
@@ -1830,63 +2180,107 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: templates/accounts/profile.html:33
+#: templates/accounts/profile.html:37
+#, python-format
 msgid ""
-"The email for this account has been changed recently, but the new email "
+" The email for this account has been changed recently, but the new email "
 "address has not yet been verified. You should have received an email with a "
-"link to verify the new email address."
+"link to verify the new email address. To manually verify the new email "
+"address, click <a href=\"%(resend_url)s\">here.</a>"
 msgstr ""
 
-#: templates/accounts/profile.html:37 templates/allauth/account/signup.html:74
+#: templates/accounts/profile.html:48
+#, python-format
+msgid ""
+" The phone for this account has been changed recently, but the new phone "
+"number has not yet been verified. To verify the new phone number, click <a "
+"href=\"%(resend_url)s\"> here.</a>"
+msgstr ""
+
+#: templates/accounts/profile.html:55 templates/allauth/account/signup.html:83
 msgid "Full name"
 msgstr ""
 
-#: templates/accounts/profile.html:42 templates/allauth/account/signup.html:80
+#: templates/accounts/profile.html:60 templates/allauth/account/signup.html:89
 msgid "Your preferred language"
 msgstr ""
 
-#: templates/accounts/profile.html:47
+#: templates/accounts/profile.html:65
 msgid "Your preferred measurement system"
 msgstr ""
 
-#: templates/accounts/profile.html:55
+#: templates/accounts/profile.html:73
 msgid "Profile picture"
 msgstr ""
 
-#: templates/accounts/profile.html:60
+#: templates/accounts/profile.html:78
 msgid "For best results upload a square image, ideally 200x200 pixels."
 msgstr ""
 
-#: templates/accounts/profile.html:69 templates/allauth/account/login.html:53
-#: templates/allauth/account/signup.html:60
+#: templates/accounts/profile.html:87 templates/allauth/account/login.html:53
+#: templates/allauth/account/signup.html:68
 msgid "Password"
 msgstr ""
 
-#: templates/accounts/profile.html:70
+#: templates/accounts/profile.html:88
 msgid "Please enter your password to verify your identity."
 msgstr ""
 
-#: templates/accounts/profile.html:76
+#: templates/accounts/profile.html:94
 msgid "Password options"
 msgstr ""
 
-#: templates/accounts/profile.html:80
+#: templates/accounts/profile.html:98
 #: templates/allauth/account/password_change.html:51
 #: templates/allauth/account/password_reset_from_key.html:39
 #: templates/allauth/account/password_reset_from_key_done.html:9
 msgid "Change password"
 msgstr ""
 
-#: templates/accounts/profile.html:85
-#: templates/allauth/account/password_reset.html:27
+#: templates/accounts/profile.html:103
+#: templates/allauth/account/password_reset.html:49
 msgid "Reset password"
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:10
+#: templates/accounts/resend_token_page.html:20
+msgid "Verify Account"
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:25
+msgid "To receive a new verification link enter your email address."
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:30
+msgid "I want to verify my phone"
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:35
+msgid "To receive a new verification token enter your phone number."
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:38
+#: templates/allauth/account/password_reset.html:41
+#: templates/allauth/account/signup.html:59
+msgid ""
+"Phone numbers must start with a +, followed by a country code and phone "
+"number without spaces or punctuation. Phone numbers must contain between 5 "
+"and 15 digits."
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:42
+msgid "I want to verify my email"
+msgstr ""
+
+#: templates/accounts/resend_token_page.html:46
+msgid "Send Verification"
 msgstr ""
 
 #: templates/accounts/user_dashboard.html:11
 msgid "User Dashboard"
 msgstr ""
 
-#: templates/accounts/user_dashboard.html:20 templates/core/base.html:49
+#: templates/accounts/user_dashboard.html:20 templates/core/base.html:50
 msgid "My dashboard"
 msgstr ""
 
@@ -1910,7 +2304,7 @@ msgid "Archived"
 msgstr ""
 
 #: templates/accounts/user_dashboard.html:62
-#: templates/organization/organization_members_edit.html:36
+#: templates/organization/organization_members_edit.html:43
 msgid "Role"
 msgstr ""
 
@@ -1959,23 +2353,23 @@ msgstr ""
 #, python-format
 msgid ""
 "We’ve noticed your account has not been verified. If you haven’t received "
-"your verification link, please <a href=\"%(email_url)s\">request a new one</"
-"a>."
+"your verification email or text, please <a href=\"%(resend_url)s\">request a "
+"new one</a>."
 msgstr ""
 
-#: templates/accounts/user_dashboard.html:171
+#: templates/accounts/user_dashboard.html:172
 msgid "Phone number"
 msgstr ""
 
-#: templates/accounts/user_dashboard.html:176
+#: templates/accounts/user_dashboard.html:177
 msgid "Language"
 msgstr ""
 
-#: templates/accounts/user_dashboard.html:180
+#: templates/accounts/user_dashboard.html:181
 msgid "Measurement"
 msgstr ""
 
-#: templates/accounts/user_dashboard.html:184
+#: templates/accounts/user_dashboard.html:185
 msgid "Joined on"
 msgstr ""
 
@@ -2121,8 +2515,8 @@ msgid ""
 msgstr ""
 
 #: templates/allauth/account/email_confirm.html:23
-#: templates/organization/organization_members_edit.html:176
-#: templates/organization/organization_members_edit.html:202
+#: templates/organization/organization_members_edit.html:183
+#: templates/organization/organization_members_edit.html:209
 msgid "Confirm"
 msgstr ""
 
@@ -2167,7 +2561,7 @@ msgid "Sign in to your account"
 msgstr ""
 
 #: templates/allauth/account/login.html:47
-msgid "Username or email address"
+msgid "Username, email address, or phone number"
 msgstr ""
 
 #: templates/allauth/account/login.html:60
@@ -2268,7 +2662,6 @@ msgstr ""
 
 #: templates/allauth/account/password_change.html:45
 #: templates/allauth/account/password_reset_from_key.html:35
-#: templates/allauth/account/signup.html:69
 msgid ""
 "Passwords must have a minimum of 10 characters and contain at least 3 of the "
 "following: lowercase characters, uppercase characters, special characters, "
@@ -2276,24 +2669,49 @@ msgid ""
 "address."
 msgstr ""
 
-#: templates/allauth/account/password_reset.html:7
-#: templates/allauth/account/password_reset_done.html:6
+#: templates/allauth/account/password_reset.html:8
+#: templates/allauth/account/password_reset_done.html:7
 msgid "Password Reset"
 msgstr ""
 
-#: templates/allauth/account/password_reset.html:13
+#: templates/allauth/account/password_reset.html:18
 msgid "Reset your password"
 msgstr ""
 
-#: templates/allauth/account/password_reset.html:22
+#: templates/allauth/account/password_reset.html:30
 msgid "Enter email"
 msgstr ""
 
-#: templates/allauth/account/password_reset_done.html:12
+#: templates/allauth/account/password_reset.html:34
+msgid "I want to reset password with my phone"
+msgstr ""
+
+#: templates/allauth/account/password_reset.html:39
+msgid "Enter phone"
+msgstr ""
+
+#: templates/allauth/account/password_reset.html:45
+msgid "I want to reset password with my email"
+msgstr ""
+
+#: templates/allauth/account/password_reset_done.html:13
 msgid "Password reset"
 msgstr ""
 
-#: templates/allauth/account/password_reset_done.html:18
+#: templates/allauth/account/password_reset_done.html:19
+msgid ""
+"Your phone number has been submitted. If it matches your account on the "
+"Cadasta Platform, you will receive a token shortly. If the token matches, "
+"you will be further allowed to reset your password. Please <a href=\"mailto:"
+"support@cadasta.org\">contact us</a> if you require assistance."
+msgstr ""
+
+#: templates/allauth/account/password_reset_done.html:32
+#, python-format
+msgid "<a href=\"%(resend_url)s\">Click here</a> to try password reset again."
+msgstr ""
+
+#: templates/allauth/account/password_reset_done.html:34
 msgid ""
 "Your email address has been submitted. If it matches your account on the "
 "Cadasta Platform, you will receive an email shortly with instructions for "
@@ -2328,21 +2746,41 @@ msgid "Set password"
 msgstr ""
 
 #: templates/allauth/account/signup.html:10
-#: templates/allauth/account/signup.html:90 templates/core/base.html:69
+#: templates/allauth/account/signup.html:99 templates/core/base.html:70
 msgid "Register"
 msgstr ""
 
-#: templates/allauth/account/signup.html:44
+#: templates/allauth/account/signup.html:38
 msgid "Register for a free account"
 msgstr ""
 
-#: templates/allauth/account/signup.html:48
+#: templates/allauth/account/signup.html:42
 msgid "Choose your username"
 msgstr ""
 
-#: templates/allauth/account/signup.html:94
-#, python-format
-msgid "Already have an account? <a href=\"%(login_url)s\">Sign in</a>"
+#: templates/allauth/account/signup.html:52
+msgid "I want to register with my phone"
+msgstr ""
+
+#: templates/allauth/account/signup.html:63
+msgid "I want to register with my email"
+msgstr ""
+
+#: templates/allauth/account/signup.html:77
+msgid ""
+"Passwords must have a minimum of 10 characters and contain at least 3 of the "
+"following: lowercase characters, uppercase characters, special characters, "
+"and/or numerical characters.  Passwords cannot contain the username, email "
+"address, or phone."
+msgstr ""
+
+#: templates/allauth/account/signup.html:103
+msgid "Already have an account?"
+msgstr ""
+
+#: templates/allauth/account/signup.html:104 templates/core/base.html:69
+#: templates/organization/project_dashboard_nonmember.html:37
+msgid "Sign in"
 msgstr ""
 
 #: templates/allauth/account/signup_closed.html:5
@@ -2480,20 +2918,15 @@ msgid ""
 "%(site_name)s. As a final step, please complete the following form:"
 msgstr ""
 
-#: templates/core/base.html:43
+#: templates/core/base.html:44
 msgid "You have superuser permissions"
 msgstr ""
 
-#: templates/core/base.html:56
+#: templates/core/base.html:57
 msgid "Logout"
 msgstr ""
 
-#: templates/core/base.html:68
-#: templates/organization/project_dashboard_nonmember.html:36
-msgid "Sign in"
-msgstr ""
-
-#: templates/core/base.html:81 templates/core/base.html:103
+#: templates/core/base.html:82 templates/core/base.html:104
 #: templates/organization/organization_dashboard_member.html:11
 #: templates/organization/organization_dashboard_nonmember.html:29
 #: templates/organization/organization_list.html:43
@@ -2503,119 +2936,119 @@ msgstr ""
 msgid "Projects"
 msgstr ""
 
-#: templates/core/base.html:86 templates/core/base.html:104
+#: templates/core/base.html:87 templates/core/base.html:105
 #: templates/organization/organization_list.html:9
 #: templates/organization/organization_list.html:22
 #: templates/organization/user_list.html:38
 msgid "Organizations"
 msgstr ""
 
-#: templates/core/base.html:92 templates/core/base.html:105
+#: templates/core/base.html:93 templates/core/base.html:106
 #: templates/organization/user_list.html:7
 #: templates/organization/user_list.html:16
 msgid "Users"
 msgstr ""
 
-#: templates/core/base.html:107
+#: templates/core/base.html:108
 msgid "Help"
 msgstr ""
 
-#: templates/core/base.html:129
+#: templates/core/base.html:130
 msgid "Loading locations..."
 msgstr ""
 
-#: templates/core/base.html:144
+#: templates/core/base.html:145
 #, python-format
 msgid "Copyright %(copydate)s Cadasta. <span>All Rights Reserved.</span> "
 msgstr ""
 
-#: templates/core/base.html:166
+#: templates/core/base.html:167
 msgid "About Us"
 msgstr ""
 
-#: templates/core/base.html:171
+#: templates/core/base.html:172
 msgid "Privacy"
 msgstr ""
 
-#: templates/core/base.html:176
+#: templates/core/base.html:177
 msgid "Terms of Use"
 msgstr ""
 
-#: templates/core/base.html:181
+#: templates/core/base.html:182
 msgid "Code of Conduct"
 msgstr ""
 
-#: templates/core/base.html:186
+#: templates/core/base.html:187
 msgid "Visit us on Github"
 msgstr ""
 
-#: templates/core/base.html:211
+#: templates/core/base.html:213
 msgid "No data available in table"
 msgstr ""
 
-#: templates/core/base.html:212
+#: templates/core/base.html:214
 msgid "Showing _START_ - _END_ of _TOTAL_"
 msgstr ""
 
-#: templates/core/base.html:213
+#: templates/core/base.html:215
 msgid "Showing 0 - 0 of 0"
 msgstr ""
 
-#: templates/core/base.html:214
+#: templates/core/base.html:216
 msgid "(filtered from _MAX_ total rows)"
 msgstr ""
 
-#: templates/core/base.html:216 templates/search/search.html:124
+#: templates/core/base.html:218 templates/search/search.html:124
 msgid "10 per page"
 msgstr ""
 
-#: templates/core/base.html:217 templates/search/search.html:125
+#: templates/core/base.html:219 templates/search/search.html:125
 msgid "25 per page"
 msgstr ""
 
-#: templates/core/base.html:218 templates/search/search.html:126
+#: templates/core/base.html:220 templates/search/search.html:126
 msgid "50 per page"
 msgstr ""
 
-#: templates/core/base.html:219 templates/search/search.html:127
+#: templates/core/base.html:221 templates/search/search.html:127
 msgid "100 per page"
 msgstr ""
 
-#: templates/core/base.html:222
+#: templates/core/base.html:224
 #: templates/organization/project_wrapper.html:127
 #: templates/search/search.html:5 templates/search/search.html:14
 msgid "Search"
 msgstr ""
 
-#: templates/core/base.html:223
+#: templates/core/base.html:225
 msgid "No matching records found"
 msgstr ""
 
-#: templates/core/base.html:227
+#: templates/core/base.html:229
 msgid "First"
 msgstr ""
 
-#: templates/core/base.html:228
+#: templates/core/base.html:230
 msgid "Last"
 msgstr ""
 
-#: templates/core/base.html:231
+#: templates/core/base.html:233
 msgid "activate to sort column ascending"
 msgstr ""
 
-#: templates/core/base.html:232
+#: templates/core/base.html:234
 msgid "activate to sort column descending"
 msgstr ""
 
 #: templates/core/dashboard.html:10
 #: templates/organization/organization_dashboard.html:6
 #: templates/organization/organization_wrapper.html:96
-#: templates/organization/project_dashboard.html:61
+#: templates/organization/project_dashboard.html:59
 #: templates/organization/project_wrapper.html:133
 msgid "Dashboard"
 msgstr ""
 
-#: templates/core/dashboard.html:37
+#: templates/core/dashboard.html:35
 msgid "Open project"
 msgstr ""
 
@@ -2658,9 +3091,9 @@ msgid "Did you not want to be added to this organization, click here:"
 msgstr ""
 
 #: templates/organization/organization_dashboard.html:6
-#: templates/organization/project_dashboard.html:61
+#: templates/organization/project_dashboard.html:59
 #: templates/party/party_detail.html:28 templates/party/resources_list.html:16
-#: templates/spatial/location_detail.html:32
+#: templates/spatial/location_detail.html:33
 #: templates/spatial/location_form.html:23
 msgid "Overview"
 msgstr ""
@@ -2698,7 +3131,7 @@ msgid "About this org"
 msgstr ""
 
 #: templates/organization/organization_dashboard_member.html:100
-#: templates/organization/project_dashboard_member.html:224
+#: templates/organization/project_dashboard_member.html:223
 #: templates/organization/project_edit_details.html:13
 #: templates/organization/project_edit_details.html:24
 #: templates/organization/project_wrapper.html:48
@@ -2716,8 +3149,8 @@ msgstr ""
 #: templates/organization/organization_dashboard_member.html:120
 #: templates/organization/organization_dashboard_nonmember.html:109
 #: templates/organization/organization_form.html:33
-#: templates/organization/project_dashboard_member.html:247
-#: templates/organization/project_dashboard_nonmember.html:135
+#: templates/organization/project_dashboard_member.html:245
+#: templates/organization/project_dashboard_nonmember.html:136
 msgid "Contacts"
 msgstr ""
 
@@ -2733,7 +3166,7 @@ msgid "Manage team members"
 msgstr ""
 
 #: templates/organization/organization_dashboard_member.html:156
-#: templates/organization/project_dashboard_member.html:318
+#: templates/organization/project_dashboard_member.html:356
 msgid "Add a member"
 msgstr ""
 
@@ -2775,8 +3208,8 @@ msgstr ""
 #: templates/organization/organization_list.html:25
 #: templates/organization/organization_members.html:20
 #: templates/organization/project_list.html:25
-#: templates/party/party_list.html:21
-#: templates/spatial/location_detail.html:63
+#: templates/party/party_list.html:22
+#: templates/spatial/location_detail.html:64
 msgid "Add"
 msgstr ""
 
@@ -2796,66 +3229,70 @@ msgid "Add member"
 msgstr ""
 
 #: templates/organization/organization_members_add.html:25
-msgid "Enter new member's username or email address"
+msgid "Enter new member's username, email address, or phone number"
 msgstr ""
 
 #: templates/organization/organization_members_edit.html:7
 msgid "Edit member"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:31
+#: templates/organization/organization_members_edit.html:33
+msgid "This user has superuser permissions"
+msgstr ""
+
+#: templates/organization/organization_members_edit.html:38
 msgid "Last login:"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:46
+#: templates/organization/organization_members_edit.html:53
 msgid "Remove member"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:50
+#: templates/organization/organization_members_edit.html:57
 msgid "An organization administrator cannot remove themself."
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:65
+#: templates/organization/organization_members_edit.html:72
 msgid "Member Permissions"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:72
+#: templates/organization/organization_members_edit.html:79
 #: templates/organization/project_add_permissions.html:45
 #: templates/organization/project_edit_permissions.html:31
 msgid "Permissions"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:145
+#: templates/organization/organization_members_edit.html:152
 msgid "Remove Member"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:148
+#: templates/organization/organization_members_edit.html:155
 msgid ""
 "Removing this member will remove the member's project permissions for this "
 "organization."
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:149
+#: templates/organization/organization_members_edit.html:156
 msgid "Are you sure you want to remove this member?"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:152
+#: templates/organization/organization_members_edit.html:159
 msgid "Yes, remove this member"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:167
-#: templates/organization/organization_members_edit.html:193
+#: templates/organization/organization_members_edit.html:174
+#: templates/organization/organization_members_edit.html:200
 msgid "Confirm Role Change"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:171
+#: templates/organization/organization_members_edit.html:178
 msgid ""
 "Changing this role to administrator will remove project-level permissions "
 "and grant full access. Are you sure you want to change the role from member "
 "to administrator?"
 msgstr ""
 
-#: templates/organization/organization_members_edit.html:197
+#: templates/organization/organization_members_edit.html:204
 msgid ""
 "Changing this role to member will remove full access and permissions will "
 "need to be assigned on a project level. Are you sure you want to change the "
@@ -2965,9 +3402,9 @@ msgid ""
 "\" class=\"alert-link\">Urban Informal Settlements Form</a> is for "
 "documenting many people who may be living in a very small urban area.</li>\n"
 "                      </ul>\n"
-"                      If you need help or have questions, <a href=\"http://"
-"cadasta.org/contact/\" target=\"_blank\" class=\"alert-link\">please contact "
-"us</a>.\n"
+"                      If you need help or have questions, <a href=\"mailto:"
+"support@cadasta.org?subject=Request for help with project questionnaire\" "
+"class=\"alert-link\">please contact us</a>.\n"
 "                      "
 msgstr ""
 
@@ -2980,18 +3417,18 @@ msgstr ""
 msgid "Draw map"
 msgstr ""
 
-#: templates/organization/project_add_extents.html:61
+#: templates/organization/project_add_extents.html:59
 msgid "Draw project on map"
 msgstr ""
 
-#: templates/organization/project_add_extents.html:64
+#: templates/organization/project_add_extents.html:62
 msgid ""
 "Use the tools provided on the left side of the map to outline your new "
 "project boundary. Once complete, select the save button below."
 msgstr ""
 
-#: templates/organization/project_add_extents.html:69
-#: templates/organization/project_edit_geometry.html:72
+#: templates/organization/project_add_extents.html:67
+#: templates/organization/project_edit_geometry.html:70
 msgid ""
 "We encourage you to mark the area in which your project takes place (if your "
 "project doesn't include the entire world). This makes interactions simpler "
@@ -3088,14 +3525,14 @@ msgid ""
 "any import fields."
 msgstr ""
 
-#: templates/organization/project_dashboard.html:29
-#: templates/spatial/location_add.html:44
-#: templates/spatial/location_map.html:23
+#: templates/organization/project_dashboard.html:27
+#: templates/spatial/location_add.html:42
+#: templates/spatial/location_map.html:22
 #: templates/spatial/location_wrapper.html:26
 msgid "Open location"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:16
+#: templates/organization/project_dashboard_member.html:17
 msgid ""
 "\n"
 "                  <p>Welcome to your newly created project! Here’s what you "
@@ -3103,43 +3540,43 @@ msgid ""
 "                  "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:24
+#: templates/organization/project_dashboard_member.html:25
 msgid "Name your project"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:25
+#: templates/organization/project_dashboard_member.html:26
 msgid ""
 "Give your project a name and description. You can also set contacts, "
 "visibility, and other project details."
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:33
+#: templates/organization/project_dashboard_member.html:34
 msgid "Define your project map"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:34
+#: templates/organization/project_dashboard_member.html:35
 msgid ""
 "Draw your boundary on the map and mark where you are going to be collecting "
 "data."
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:42
+#: templates/organization/project_dashboard_member.html:43
 msgid "Upload your questionnaire"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:43
+#: templates/organization/project_dashboard_member.html:44
 msgid "Upload the Cadasta XLSForm that best fits your project."
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:51
+#: templates/organization/project_dashboard_member.html:52
 msgid "Select your team members"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:52
+#: templates/organization/project_dashboard_member.html:53
 msgid "Add new team members or assign member permissions to your project."
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:56
+#: templates/organization/project_dashboard_member.html:57
 msgid ""
 "\n"
 "                  <p>For additional assistance, refer to the <a href="
@@ -3148,54 +3585,54 @@ msgid ""
 "                  "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:69
+#: templates/organization/project_dashboard_member.html:70
 msgid "Project locations"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:70
-#: templates/organization/project_dashboard_nonmember.html:60
+#: templates/organization/project_dashboard_member.html:71
+#: templates/organization/project_dashboard_nonmember.html:61
 msgid "Locations"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:83
+#: templates/organization/project_dashboard_member.html:82
 msgid "Project parties"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:84
-#: templates/organization/project_dashboard_nonmember.html:72
+#: templates/organization/project_dashboard_member.html:83
+#: templates/organization/project_dashboard_nonmember.html:73
 #: templates/organization/project_wrapper.html:145
-#: templates/party/party_list.html:4 templates/party/party_list.html:14
+#: templates/party/party_list.html:5 templates/party/party_list.html:15
 msgid "Parties"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:94
+#: templates/organization/project_dashboard_member.html:93
 msgid "Project resources"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:95
-#: templates/organization/project_dashboard_nonmember.html:83
+#: templates/organization/project_dashboard_member.html:94
+#: templates/organization/project_dashboard_nonmember.html:84
 #: templates/organization/project_download.html:35
 #: templates/organization/project_wrapper.html:151
 #: templates/party/party_detail.html:30
 #: templates/party/relationship_detail.html:44
 #: templates/party/resources_list.html:18
-#: templates/resources/project_list.html:4
-#: templates/resources/project_list.html:14
-#: templates/spatial/location_detail.html:34
+#: templates/resources/project_list.html:5
+#: templates/resources/project_list.html:15
+#: templates/spatial/location_detail.html:35
 msgid "Resources"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:112
-#: templates/organization/project_dashboard_nonmember.html:102
+#: templates/organization/project_dashboard_member.html:111
+#: templates/organization/project_dashboard_nonmember.html:103
 #: templates/spatial/location_map.html:4
 msgid "Project Map"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:115
+#: templates/organization/project_dashboard_member.html:114
 msgid "Edit project map"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:119
+#: templates/organization/project_dashboard_member.html:118
 #: templates/organization/project_wrapper.html:68
 #: templates/organization/project_wrapper.html:69
 #: templates/organization/project_wrapper.html:89
@@ -3205,7 +3642,7 @@ msgstr ""
 msgid "Add location"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:127
+#: templates/organization/project_dashboard_member.html:126
 msgid ""
 "\n"
 "                      <p>You haven't defined a project extent yet.\n"
@@ -3213,19 +3650,19 @@ msgid ""
 "                      "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:132
+#: templates/organization/project_dashboard_member.html:131
 msgid "Define a project extent"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:133
+#: templates/organization/project_dashboard_member.html:132
 msgid "Use global map"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:148
+#: templates/organization/project_dashboard_member.html:147
 msgid "Data Collection"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:154
+#: templates/organization/project_dashboard_member.html:153
 msgid ""
 "\n"
 "                        <p>You haven't designed your data collection by "
@@ -3234,11 +3671,11 @@ msgid ""
 "                        "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:159
+#: templates/organization/project_dashboard_member.html:158
 msgid "Upload XLS Form"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:165
+#: templates/organization/project_dashboard_member.html:164
 msgid ""
 "To get started, choose the form that most closely matches your documentation "
 "needs.\n"
@@ -3258,12 +3695,12 @@ msgid ""
 "documenting many people who may be living in a very small urban area.</li>\n"
 "                          </ul>\n"
 "                          If you need help or have questions, <a href="
-"\"http://cadasta.org/contact/\" target=\"_blank\" class=\"alert-link"
-"\">please contact us</a>.\n"
+"\"mailto:support@cadasta.org?subject=Request for help with project "
+"questionnaire\" class=\"alert-link\">please contact us</a>.\n"
 "                          "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:179
+#: templates/organization/project_dashboard_member.html:178
 msgid ""
 "\n"
 "                        <p>You have designed a data collection for this "
@@ -3272,36 +3709,36 @@ msgid ""
 "                        "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:183
+#: templates/organization/project_dashboard_member.html:182
 msgid "Upload new XLS Form"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:184
+#: templates/organization/project_dashboard_member.html:183
 msgid "Download current XLS Form"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:194
+#: templates/organization/project_dashboard_member.html:193
 #: templates/organization/project_edit_details.html:92
 msgid "This project is using questionnaire"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:195
+#: templates/organization/project_dashboard_member.html:194
 #: templates/organization/project_edit_details.html:94
 msgid ""
 "Data has already been contributed to this project. To ensure data integrity, "
 "uploading a new questionnaire is disabled."
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:202
+#: templates/organization/project_dashboard_member.html:201
 msgid "No questionnaire is available for this project."
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:221
-#: templates/organization/project_dashboard_nonmember.html:119
+#: templates/organization/project_dashboard_member.html:220
+#: templates/organization/project_dashboard_nonmember.html:120
 msgid "About this project"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:233
+#: templates/organization/project_dashboard_member.html:231
 msgid ""
 "\n"
 "                        <p>This project needs a description. Would you like "
@@ -3309,20 +3746,20 @@ msgid ""
 "                      "
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:237
+#: templates/organization/project_dashboard_member.html:235
 msgid "Add project description"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:278
+#: templates/organization/project_dashboard_member.html:276
 msgid "Project records"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:281
+#: templates/organization/project_dashboard_member.html:279
 #: templates/organization/project_import_wrapper.html:31
 msgid "Import project data"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:283
+#: templates/organization/project_dashboard_member.html:281
 #: templates/organization/project_select_import.html:35
 #: templates/organization/project_wrapper.html:51
 #: templates/organization/project_wrapper.html:81
@@ -3330,29 +3767,33 @@ msgstr ""
 msgid "Import data"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:286
+#: templates/organization/project_dashboard_member.html:284
 #: templates/organization/project_download.html:12
 msgid "Export project data"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:288
+#: templates/organization/project_dashboard_member.html:286
 #: templates/organization/project_wrapper.html:52
 msgid "Export data"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:300
+#: templates/organization/project_dashboard_member.html:293
+msgid "Recent Exports"
+msgstr ""
+
+#: templates/organization/project_dashboard_member.html:338
 msgid "Team Members"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:303
+#: templates/organization/project_dashboard_member.html:341
 msgid "Manage project members"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:306
+#: templates/organization/project_dashboard_member.html:344
 msgid "Add new user"
 msgstr ""
 
-#: templates/organization/project_dashboard_member.html:314
+#: templates/organization/project_dashboard_member.html:352
 msgid ""
 "\n"
 "                        <p>You have not added any team members. Would you "
@@ -3360,37 +3801,37 @@ msgid ""
 "                      "
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:9
+#: templates/organization/project_dashboard_nonmember.html:10
 msgid "Project Overview"
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:17
+#: templates/organization/project_dashboard_nonmember.html:18
 msgid "New Users"
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:20
+#: templates/organization/project_dashboard_nonmember.html:21
 msgid "Have an account?"
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:25
+#: templates/organization/project_dashboard_nonmember.html:26
 msgid ""
 "Register for free to securely collect, manage, and store your land and "
 "resource rights documentation, geometries, and other data."
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:28
+#: templates/organization/project_dashboard_nonmember.html:29
 msgid "Sign in to manage your projects and access permissions-based data."
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:33
+#: templates/organization/project_dashboard_nonmember.html:34
 msgid "Register now"
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:50
+#: templates/organization/project_dashboard_nonmember.html:51
 msgid "Access to project data is restricted to current project members only."
 msgstr ""
 
-#: templates/organization/project_dashboard_nonmember.html:126
+#: templates/organization/project_dashboard_nonmember.html:127
 msgid "Looks like this project doesn't have a description yet."
 msgstr ""
 
@@ -3464,12 +3905,12 @@ msgid "1. General information"
 msgstr ""
 
 #: templates/organization/project_edit_geometry.html:7
-#: templates/organization/project_edit_geometry.html:63
+#: templates/organization/project_edit_geometry.html:61
 #: templates/organization/project_wrapper.html:47
 msgid "Edit project boundary"
 msgstr ""
 
-#: templates/organization/project_edit_geometry.html:67
+#: templates/organization/project_edit_geometry.html:65
 msgid ""
 "Use the tools provided on the left side of the map to update your project "
 "boundary. Once complete, select the save button below."
@@ -3620,7 +4061,7 @@ msgid "Edit party"
 msgstr ""
 
 #: templates/party/party_detail.html:29 templates/party/resources_list.html:17
-#: templates/spatial/location_detail.html:33
+#: templates/spatial/location_detail.html:34
 msgid "Relationships"
 msgstr ""
 
@@ -3637,9 +4078,9 @@ msgstr ""
 #: templates/party/party_detail.html:94 templates/party/party_detail.html:106
 #: templates/party/relationship_detail.html:52
 #: templates/party/relationship_detail.html:64
-#: templates/resources/project_list.html:25
-#: templates/spatial/location_detail.html:106
-#: templates/spatial/location_detail.html:118
+#: templates/resources/project_list.html:26
+#: templates/spatial/location_detail.html:107
+#: templates/spatial/location_detail.html:119
 msgid "Attach"
 msgstr ""
 
@@ -3804,6 +4245,37 @@ msgstr ""
 msgid "Yes, restore this resource"
 msgstr ""
 
+#: templates/resources/paginated-resource-table.js:54
+#: templates/resources/table.html:9 templates/resources/table_add_lib.html:10
+msgid "Contributor"
+msgstr ""
+
+#: templates/resources/paginated-resource-table.js:68
+msgid "Last Updated"
+msgstr ""
+
+#: templates/resources/paginated-resource-table.js:80
+#: templates/resources/project_detail.html:67
+#: templates/resources/table.html:11
+msgid "Attached to"
+msgstr ""
+
+#: templates/resources/paginated-resource-table.js:84
+msgid "other"
+msgstr ""
+
+#: templates/resources/paginated-resource-table.js:122
+#: templates/resources/project_detail.html:74
+#: templates/resources/project_detail.html:86
+#: templates/resources/table.html:53 templates/resources/table_sm.html:30
+msgid "Detach"
+msgstr ""
+
+#: templates/resources/paginated-resource-table.js:143
+#: templates/resources/table.html:58
+msgid "Restore"
+msgstr ""
+
 #: templates/resources/project_add_existing.html:5
 msgid "Add resource for project"
 msgstr ""
@@ -3824,11 +4296,6 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
-#: templates/resources/project_detail.html:67
-#: templates/resources/table.html:11
-msgid "Attached to"
-msgstr ""
-
 #: templates/resources/project_detail.html:72
 msgid "Entity Class"
 msgstr ""
@@ -3837,27 +4304,13 @@ msgstr ""
 msgid "Entity Name or Description"
 msgstr ""
 
-#: templates/resources/project_detail.html:74
-#: templates/resources/project_detail.html:86
-#: templates/resources/table.html:53 templates/resources/table_sm.html:30
-msgid "Detach"
-msgstr ""
-
 #: templates/resources/project_detail.html:95
 msgid "This resource is currently not attached to anything."
-msgstr ""
-
-#: templates/resources/table.html:9 templates/resources/table_add_lib.html:10
-msgid "Contributor"
 msgstr ""
 
 #: templates/resources/table.html:38
 #, python-format
 msgid "%(amount)s other"
-msgstr ""
-
-#: templates/resources/table.html:58
-msgid "Restore"
 msgstr ""
 
 #: templates/resources/table_add_lib.html:12
@@ -3939,7 +4392,7 @@ msgstr ""
 
 #: templates/spatial/location_delete.html:4
 #: templates/spatial/location_delete.html:14
-#: templates/spatial/location_detail.html:26
+#: templates/spatial/location_detail.html:27
 msgid "Delete location"
 msgstr ""
 
@@ -3951,28 +4404,28 @@ msgstr ""
 msgid "Yes, delete this location"
 msgstr ""
 
-#: templates/spatial/location_detail.html:6
+#: templates/spatial/location_detail.html:7
 msgid "Location detail"
 msgstr ""
 
-#: templates/spatial/location_detail.html:23
+#: templates/spatial/location_detail.html:24
 #: templates/spatial/location_edit.html:7
 msgid "Edit location"
 msgstr ""
 
-#: templates/spatial/location_detail.html:85
+#: templates/spatial/location_detail.html:86
 msgid ""
 "This location does not have any relationships and is not connected to any "
 "parties. To add your first relationship, select the button below."
 msgstr ""
 
-#: templates/spatial/location_detail.html:89
+#: templates/spatial/location_detail.html:90
 #: templates/spatial/relationship_add.html:7
 #: templates/spatial/relationship_add.html:58
 msgid "Add relationship"
 msgstr ""
 
-#: templates/spatial/location_detail.html:111
+#: templates/spatial/location_detail.html:112
 msgid ""
 "This location does not have any attached resources. To attach a resource, "
 "select the button below."
@@ -4055,7 +4508,7 @@ msgstr ""
 msgid "XML submission not found"
 msgstr ""
 
-#: xforms/mixins/model_helper.py:421
+#: xforms/mixins/model_helper.py:398
 msgid "Questionnaire not found."
 msgstr ""
 

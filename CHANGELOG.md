@@ -1,5 +1,57 @@
 # Change Log
 
+## [v1.16.0](https://github.com/Cadasta/cadasta-platform/tree/v1.16.0) (2018-02-20)
+
+### Changes
+
+- Dependency upgrades (#1936)
+  - cadasta-test (v0.5.0)
+  - djangorestframework (3.7.7)
+  - psycopg2 (2.7.4)
+  - django-allauth (0.35.0)
+  - django-countries (5.1.1)
+  - django-sass-processor (0.5.8)
+  - Pillow (5.0.0)
+  - openpyxl (2.5.0)
+  - pytz (2018.3)
+  - shapely (1.6.4.post1)
+  - awscli (1.14.36)
+  - pandas (0.22.0)
+  - argon2-cffi (18.1.0)
+  - django-otp (0.4.2)
+  - twilio (6.10.3)
+  - phonenumbers (8.8.11)
+  - opbeat (3.6.1)
+  - pybreaker (0.4.2)
+- Add react.js-based paginated tables (#1940)
+- Improve handling of ValidationErrors for API (#1987)
+
+### Fixes
+
+- Use postgres_pw for user postgres (#1965)
+- Run functional tests in 3 batches (#1964)
+- Fixes "Datepicker styles are missing on add-relationship form (#1989)" -- Update link to css file (#1992)
+- Fixes "API 500 Error - 'is not JSON serializable' (#1656)" -- Bump jsonattrs (#1984)
+- Fixes "No glyphicons on localhost (#1957)" -- Update link to font files (#1980)
+- Fixes "Required asterisks disappearing on party type change (#1849)" -- Removing toggleParsleyRequired and adding no validation for hidden fields (#1988)
+- Fixes "Demo guest user is able to edit account username and name (#1944)" -- Prevents demo user from updating profile information (#1977)
+- Fixes "Not possible to attach a second resource after the first one is rejected (#1761)" -- Bump django-buckets (#1981)
+- Fixes "High number of 'Invalid HTTP_HOST header' errors (#1939)" -- Send illegal hosts to default server (#1972)
+- Fixes "Adding user names and emails case-sensitive (#1563)" -- Use iexact matching when querying users (#1973)
+- Fixes "Return default location type label if custom label is not defined (#1962)" -- Return default location-type label if option is not defined (#1968)
+
+## [v1.15.2](https://github.com/Cadasta/cadasta-platform/tree/v1.15.2) (2018-02-07)
+
+### Fixes
+
+- Fixes a bug that prevented some forms to be submitted from GeoODK (#1975)
+
+## [v1.15.1](https://github.com/Cadasta/cadasta-platform/tree/v1.15.1) (2018-02-05)
+
+### Changes
+
+- Upgrade Django dependency to 1.11.10 (#1967)
+
 ## [v1.15.0](https://github.com/Cadasta/cadasta-platform/tree/v1.15.0) (2018-02-01)
 
 ### Added

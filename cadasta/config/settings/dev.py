@@ -1,3 +1,4 @@
+import os
 from .default import *  # NOQA
 
 DEBUG = True
@@ -102,7 +103,7 @@ LOGGING = {
             'propagate': True,
         },
         'django.db.backends': {
-            'handlers': ['console'],
+            'handlers': ['console'] if 'NODB' not in os.environ else [],
         },
         'xform.submissions': {
             'handlers': ['file'],

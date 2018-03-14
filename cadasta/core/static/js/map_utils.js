@@ -46,24 +46,41 @@ function renderFeatures(map, featuresUrl, options) {
     }
   }
 
+  function allFeaturesLoaded() {
+    $('#messages #loading').addClass('hidden');
+    if (options.fitBounds === 'locations') {
+      var bounds = markers.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds);
+      }
+    }
+    locationToFront();
+  }
+
   function loadFeatures(url) {
     $('#messages #loading').removeClass('hidden');
-    $.get(url, function(response) {
+    return $.get(url, function(response) {
       geoJson.addData(response);
 
-      if (response.next) {
-        loadFeatures(response.next, map, options.trans);
-      } else {
-        $('#messages #loading').addClass('hidden');
-        if (options.fitBounds === 'locations') {
-          var bounds = markers.getBounds();
-          if (bounds.isValid()) {
-            map.fitBounds(bounds);
-          }
-        }
-      }
+      // On first response, request all subsequent pages concurrently
+      if (response.next && !response.previous) {
+        items_per_page = response.features.length;
+        total_items = response.count;
+        total_pages = Math.ceil(total_items / items_per_page);
 
-      locationToFront();
+        // Start requests
+        var requests = [];
+        for (var i = 2; i <= total_pages; i++) {
+          requests.push(loadFeatures(url + '?page=' + i, map, options.trans));
+        }
+
+        // Take action when all requests complete
+        $.when.apply(this, requests).then(allFeaturesLoaded);
+
+      // Handle situations where there is only 1 page of data
+      } else if (!response.next && !response.previous) {
+        allFeaturesLoaded()
+      }
     });
   }
 
@@ -103,7 +120,7 @@ function renderFeatures(map, featuresUrl, options) {
     }
   });
 
-  var markers = L.Deflate({minSize: 20, layerGroup: geoJson});
+  var markers = L.Deflate({minSize: 5, layerGroup: geoJson});
   markers.addTo(map);
   geoJson.addTo(map);
 
