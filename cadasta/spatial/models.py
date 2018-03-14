@@ -2,6 +2,7 @@ from core.models import RandomIDModel
 from django.utils.functional import cached_property
 from django.core.urlresolvers import reverse
 from django.contrib.gis.db.models import GeometryField
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils.translation import ugettext as _
 from django.utils.encoding import iri_to_uri
@@ -18,7 +19,7 @@ from .choices import TYPE_CHOICES
 from resources.mixins import ResourceModelMixin
 from jsonattrs.fields import JSONAttributeField
 from jsonattrs.decorators import fix_model_for_attributes
-from questionnaires.models import Question, QuestionOption
+from questionnaires.models import Questionnaire, QuestionOption
 
 
 @fix_model_for_attributes
@@ -56,6 +57,10 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
         symmetrical=False,
         related_name='relationships_set',
     )
+
+    # Denormalized duplication of label from the QuestionOption related to the
+    # SpatialUnit
+    label = JSONField(null=True)
 
     # Audit history
     created_date = models.DateTimeField(auto_now_add=True)
@@ -121,25 +126,23 @@ class SpatialUnit(ResourceModelMixin, RandomIDModel):
 
     @cached_property
     def location_type_label(self):
-        if not self.project.current_questionnaire:
+        # Handle no questionnaire
+        if (not self.project.current_questionnaire) or (self.label is None):
             return dict(TYPE_CHOICES)[self.type]
 
-        try:
-            question = Question.objects.get(
-                questionnaire_id=self.project.current_questionnaire,
-                name='location_type'
-            )
-            label = question.options.get(name=self.type).label_xlat
-        except (Question.DoesNotExist, QuestionOption.DoesNotExist):
-            return dict(TYPE_CHOICES)[self.type]
+        # Handle non-translatable label
+        if isinstance(self.label, str):
+            return self.label
 
-        if label is None or isinstance(label, str):
-            return label
-        else:
-            return label.get(
-                get_language(),
-                label[question.questionnaire.default_language]
-                )
+        # Handle translated label
+        translated_label = self.label.get(get_language())
+        if translated_label:
+            return translated_label
+
+        # If label failed to translate, fallback to default language
+        rel_questionnaire = Questionnaire.objects.get(
+            id=self.project.current_questionnaire)
+        return self.label.get(rel_questionnaire.default_language)
 
 
 def reassign_spatial_geometry(instance):
@@ -273,3 +276,24 @@ class SpatialRelationship(RandomIDModel):
                        ' su2={obj.su2_id}'
                        ' type={obj.type}>')
         return repr_string.format(obj=self)
+
+
+@receiver(models.signals.pre_save, sender=SpatialUnit)
+def set_label_on_spatialunits(sender, instance, **kwargs):
+    """
+    Set label of related QuestionOption onto new SpatialUnit instances
+    """
+    # Ignore if instance is not new and has not changed its 'type' property
+    if not instance._state.adding:
+        unchanged = SpatialUnit.objects.filter(
+            id=instance.id, type=instance.type).exists()
+        if unchanged:
+            return
+
+    try:
+        rel_questionoption = QuestionOption.objects.get(
+            name=instance.type,
+            question__questionnaire__id=instance.project.current_questionnaire)
+    except QuestionOption.DoesNotExist:
+        return
+    instance.label = rel_questionoption.label_xlat
