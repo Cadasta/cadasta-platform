@@ -13,7 +13,7 @@
     <div class="page-title">
       <h2 class="short">
         <span class="entity">{% trans "Location" %} </span>
-        {{ location.name }}
+        <span {{ type_choice_labels|safe }}>{{ location.name }}</span>
         {% if location.area > 0 %}
           <span class="area">{{ location.area | format_area:user.measurement | safe | intcomma }} </span>
         {% endif %}

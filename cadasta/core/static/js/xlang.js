@@ -1,7 +1,7 @@
 $(document).ready(function () {
   const storage_key = 'form_lang::' + $('#form-langs-select').attr('data-project-slug')
   function setLabels(lang) {
-    const labels = $('label, option, td, a, div');
+    const labels = $('label, option, td, a, div, span');
 
     for (var i = 0, l = labels.length; i < l; i++) {
       const label = $(labels[i]);
