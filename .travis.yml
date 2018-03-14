@@ -48,6 +48,8 @@ before_script:
 env:
   global:
     - DJANGO_SETTINGS_MODULE=config.settings.travis
+    - BROWSERSTACK_USERNAME=eugenealvinvilla1
+    - secure: hQjB6YEpq1OL97l3EOmzgC6Z23y3H57sRl7NkX7I69dySXdMBOnYK7qHkldqYf9PE76s17tra8rW9FLpmZ0IpvAphbfaURqXoXHe0JYGVIBhPpgCqdcyGpcGYpmuVWn4Wp+3/x5Eukok122xt9WpjPbJWSJNtpbKdBYkM19aOXC1nt/MQ07WQj5DBAOBmJ3xPjhXyNeXuiGFqDBtgMj2e7zGvBKQU43aANxWLRj4ormfqS0Ege7buqhwaTQHIxA0J5m4al2Bd9JcZOcD9rCJW4PC6Er7XDx8CiPj1h0+wO7ZH49FinSj/2n5iq87Xc6QWANlCDR8ojShOCWKTcqe54PzVBeziM4vU1Z0KI64F12JJICCYNlEolXG+HL1KDU+ZcFie9ZiiRgoM0iW3kXojI9+JTPBZIOvGbFSC2VeaeCpoJxnAibBoOACKe84Ffh71P7jfwuw2gKM2lV7Z0ygy/juTMTvI/soMfl3EFtZrWSN3LEZgKgG3egh9w0pmzS3NgF3+VJlJ7h6VbhlrQ8tKK5BxNbQEp0RPiU4pL90sn5U2HoKIbHQ7f0/I1RY4UUuBu01/Um/mKKaSDq8jS7/NTBFhX90PGEfX0YO4KE8iVwajLrqUoGUCa1Jc0RWyO4Y2jedWO10dSh3m/daEDartLagkUIMuzEhDLTnGpjp7Ts=
 
 matrix:
   fast_finish: true
@@ -61,33 +63,18 @@ matrix:
     -
       if: type = push
       env: TOX_ENV=py35-django-unit
-    - # Functional tests locally for PRs (batch 1)
-      if: type = pull_request AND branch = master
+    -
+      if: type IN (push, pull_request) AND branch = master
       env: TOX_ENV=py35-functional-batch1
-    - # Functional tests locally for PRs (batch 2)
-      if: type = pull_request AND branch = master
+    -
+      if: type IN (push, pull_request) AND branch = master
       env: TOX_ENV=py35-functional-batch2
-    - # Functional tests locally for PRs (batch 3)
-      if: type = pull_request AND branch = master
+    -
+      if: type IN (push, pull_request) AND branch = master
       env: TOX_ENV=py35-functional-batch3
-    - # Functional tests via BrowserStack for commits to master (batch 1)
-      if: type = push AND branch = master
-      env:
-        - TOX_ENV=py35-functional-batch1
-        - BROWSERSTACK_USERNAME=eugenealvinvilla1
-        - secure: hQjB6YEpq1OL97l3EOmzgC6Z23y3H57sRl7NkX7I69dySXdMBOnYK7qHkldqYf9PE76s17tra8rW9FLpmZ0IpvAphbfaURqXoXHe0JYGVIBhPpgCqdcyGpcGYpmuVWn4Wp+3/x5Eukok122xt9WpjPbJWSJNtpbKdBYkM19aOXC1nt/MQ07WQj5DBAOBmJ3xPjhXyNeXuiGFqDBtgMj2e7zGvBKQU43aANxWLRj4ormfqS0Ege7buqhwaTQHIxA0J5m4al2Bd9JcZOcD9rCJW4PC6Er7XDx8CiPj1h0+wO7ZH49FinSj/2n5iq87Xc6QWANlCDR8ojShOCWKTcqe54PzVBeziM4vU1Z0KI64F12JJICCYNlEolXG+HL1KDU+ZcFie9ZiiRgoM0iW3kXojI9+JTPBZIOvGbFSC2VeaeCpoJxnAibBoOACKe84Ffh71P7jfwuw2gKM2lV7Z0ygy/juTMTvI/soMfl3EFtZrWSN3LEZgKgG3egh9w0pmzS3NgF3+VJlJ7h6VbhlrQ8tKK5BxNbQEp0RPiU4pL90sn5U2HoKIbHQ7f0/I1RY4UUuBu01/Um/mKKaSDq8jS7/NTBFhX90PGEfX0YO4KE8iVwajLrqUoGUCa1Jc0RWyO4Y2jedWO10dSh3m/daEDartLagkUIMuzEhDLTnGpjp7Ts=
-    - # Functional tests via BrowserStack for commits to master (batch 2)
-      if: type = push AND branch = master
-      env:
-        - TOX_ENV=py35-functional-batch2
-        - BROWSERSTACK_USERNAME=eugenealvinvilla1
-        - secure: hQjB6YEpq1OL97l3EOmzgC6Z23y3H57sRl7NkX7I69dySXdMBOnYK7qHkldqYf9PE76s17tra8rW9FLpmZ0IpvAphbfaURqXoXHe0JYGVIBhPpgCqdcyGpcGYpmuVWn4Wp+3/x5Eukok122xt9WpjPbJWSJNtpbKdBYkM19aOXC1nt/MQ07WQj5DBAOBmJ3xPjhXyNeXuiGFqDBtgMj2e7zGvBKQU43aANxWLRj4ormfqS0Ege7buqhwaTQHIxA0J5m4al2Bd9JcZOcD9rCJW4PC6Er7XDx8CiPj1h0+wO7ZH49FinSj/2n5iq87Xc6QWANlCDR8ojShOCWKTcqe54PzVBeziM4vU1Z0KI64F12JJICCYNlEolXG+HL1KDU+ZcFie9ZiiRgoM0iW3kXojI9+JTPBZIOvGbFSC2VeaeCpoJxnAibBoOACKe84Ffh71P7jfwuw2gKM2lV7Z0ygy/juTMTvI/soMfl3EFtZrWSN3LEZgKgG3egh9w0pmzS3NgF3+VJlJ7h6VbhlrQ8tKK5BxNbQEp0RPiU4pL90sn5U2HoKIbHQ7f0/I1RY4UUuBu01/Um/mKKaSDq8jS7/NTBFhX90PGEfX0YO4KE8iVwajLrqUoGUCa1Jc0RWyO4Y2jedWO10dSh3m/daEDartLagkUIMuzEhDLTnGpjp7Ts=
-    - # Functional tests via BrowserStack for commits to master (batch 3)
-      if: type = push AND branch = master
-      env:
-        - TOX_ENV=py35-functional-batch3
-        - BROWSERSTACK_USERNAME=eugenealvinvilla1
-        - secure: hQjB6YEpq1OL97l3EOmzgC6Z23y3H57sRl7NkX7I69dySXdMBOnYK7qHkldqYf9PE76s17tra8rW9FLpmZ0IpvAphbfaURqXoXHe0JYGVIBhPpgCqdcyGpcGYpmuVWn4Wp+3/x5Eukok122xt9WpjPbJWSJNtpbKdBYkM19aOXC1nt/MQ07WQj5DBAOBmJ3xPjhXyNeXuiGFqDBtgMj2e7zGvBKQU43aANxWLRj4ormfqS0Ege7buqhwaTQHIxA0J5m4al2Bd9JcZOcD9rCJW4PC6Er7XDx8CiPj1h0+wO7ZH49FinSj/2n5iq87Xc6QWANlCDR8ojShOCWKTcqe54PzVBeziM4vU1Z0KI64F12JJICCYNlEolXG+HL1KDU+ZcFie9ZiiRgoM0iW3kXojI9+JTPBZIOvGbFSC2VeaeCpoJxnAibBoOACKe84Ffh71P7jfwuw2gKM2lV7Z0ygy/juTMTvI/soMfl3EFtZrWSN3LEZgKgG3egh9w0pmzS3NgF3+VJlJ7h6VbhlrQ8tKK5BxNbQEp0RPiU4pL90sn5U2HoKIbHQ7f0/I1RY4UUuBu01/Um/mKKaSDq8jS7/NTBFhX90PGEfX0YO4KE8iVwajLrqUoGUCa1Jc0RWyO4Y2jedWO10dSh3m/daEDartLagkUIMuzEhDLTnGpjp7Ts=
+    -
+      if: type IN (push, pull_request) AND branch = master
+      env: TOX_ENV=py35-functional-batch4
 
 script:
   - tox -e $TOX_ENV
