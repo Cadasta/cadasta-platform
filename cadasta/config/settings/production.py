@@ -98,7 +98,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'root': {
         'level': 'WARNING',
-        'handlers': ['sentry'],
+        'handlers': ['sentry', 'file', 'error_file', 'email_admins'],
     },
     'formatters': {
         'simple': {
@@ -135,16 +135,6 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['file', 'error_file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'core': {
-            'handlers': ['file', 'error_file', 'email_admins'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'xform.submissions': {
-            'handlers': ['file', 'error_file', 'email_admins'],
             'level': 'DEBUG',
             'propagate': True,
         },
