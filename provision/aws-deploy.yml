@@ -15,7 +15,7 @@
     - db/production
     - cadasta/common
     - cadasta/install
-    - cadasta/application
     - cadasta/production
+    - cadasta/application
     - webserver/production
     - deployment/wrap
