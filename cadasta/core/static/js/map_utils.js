@@ -112,7 +112,7 @@ function renderFeatures(map, featuresUrl, options) {
     onEachFeature: function(feature, layer) {
       if (options.trans && options.projectUser) {
         layer.bindPopup("<div class=\"text-wrap\">" +
-                      "<h2><span class=\"entity\">Location</span>" +
+                      "<h2><span class=\"entity\">" + options.trans['location'] + "</span>" +
                       feature.properties.type + "</h2></div>" +
                       "<div class=\"btn-wrap\"><a href='" + feature.properties.url + "' class=\"btn btn-primary btn-sm btn-block\">" + options.trans['open'] + "</a>"  +
                       "</div>");
