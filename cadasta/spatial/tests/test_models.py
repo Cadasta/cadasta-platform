@@ -160,6 +160,25 @@ class SpatialUnitTest(UserTestCase, TestCase):
             type='FREE')
         assert su.location_type_label == 'Haus'
 
+    def test_location_type_label_questionnaire_missing_lang(self):
+        activate('fr')
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='en')
+        question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        q_factories.QuestionOptionFactory.create(
+            question=question,
+            name='FREE',
+            label={'en': 'House', 'es': 'Haus'}
+        )
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='FREE')
+        assert su.location_type_label == 'House'
+
     def test_location_type_label_questionnaire_single_lang(self):
         questionnaire = q_factories.QuestionnaireFactory.create()
         question = q_factories.QuestionFactory.create(
@@ -176,30 +195,6 @@ class SpatialUnitTest(UserTestCase, TestCase):
             project=questionnaire.project,
             type='HOUSE')
         assert su.location_type_label == 'Haus'
-
-    def test_location_type_label_no_question_defined(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        su = SpatialUnitFactory.create(
-            project=questionnaire.project,
-            type='RW')
-        assert su.location_type_label == 'Right-of-way'
-
-    def test_location_type_label_no_question_option_defined(self):
-        questionnaire = q_factories.QuestionnaireFactory.create()
-        question = q_factories.QuestionFactory.create(
-            questionnaire=questionnaire,
-            name='location_type',
-            type='S1'
-        )
-        q_factories.QuestionOptionFactory.create(
-            question=question,
-            name='HOUSE',
-            label='Haus'
-        )
-        su = SpatialUnitFactory.create(
-            project=questionnaire.project,
-            type='RW')
-        assert su.location_type_label == 'Right-of-way'
 
     def test_ui_class_name(self):
         su = SpatialUnitFactory.create()
@@ -248,10 +243,10 @@ class SpatialUnitTest(UserTestCase, TestCase):
             object_id=su.id,
             resource=resource,).exists()
 
-        su_deferred = SpatialUnit.objects.all().defer('attributes')[0]
-        assert resource in su_deferred.resources
+        su_2 = SpatialUnit.objects.all().first()
+        assert resource in su_2.resources
+        su_2.delete()
 
-        su_deferred.delete()
         assert not ContentObject.objects.filter(
             object_id=su.id, resource=resource).exists()
         assert SpatialUnit.objects.all().count() == 0

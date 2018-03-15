@@ -1,9 +1,11 @@
 import re
+from functools import partial
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from core.messages import SANITIZE_ERROR
 from core.validators import sanitize_string
 from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
+from .exceptions import InvalidQuestionnaire
 
 
 def validate_accuracy(val):
@@ -186,3 +188,124 @@ def validate_questionnaire(json):
 
     if errors:
         return errors
+
+
+required_fields = {'location_type': 'select one',
+                   'party_name': 'text',
+                   'party_type': 'select one',
+                   'tenure_type': 'select one'}
+geometry_fields = {'location_geoshape': 'geoshape',
+                   'location_geotrace': 'geotrace',
+                   'location_geometry': 'geopoint'}
+
+
+def is_required(bind):
+    """
+    Checks if a field is required.
+
+    Args:
+        bind: dict containing the field's bind property
+
+    Returns:
+        `True` if `bind` is defined and bind['required'] == 'yes
+    """
+    return bind is not None and bind.get('required') == 'yes'
+
+
+def map_fields(fields):
+    """
+    Extracts the neccessary info needed to validate fields.
+
+    Args:
+        fields: All required and geometry fields defined in the questionnaire.
+
+    Returns:
+        dict containing all fields with their type and required status as
+        defined in the questionnaire. Each element in the dict has the
+        structure `fieldname: (type, required, choices)`
+    """
+    return {field.get('name'): (field.get('type'),
+                                is_required(field.get('bind')),
+                                field.get('choices'))
+            for field in fields}
+
+
+def validate_party_types(choices):
+    if choices is None:
+        return False
+
+    return {c.get('name') for c in choices} == {'IN', 'GR', 'CO'}
+
+
+def validate_field(field_def, available_fields, field):
+    """
+    Validates a field against a field definition.
+
+    Args:
+        field_def: Field definition, the field is validated against.
+        available_fields: Fields defined in the questionnaire.
+        field: string containting the field name
+
+    Returns:
+        string containing the error message if a criteria is not met.
+    """
+    # Check if the field is defined
+    if field not in available_fields.keys():
+        return _('Field {} is required.').format(field)
+
+    # Check if the field has the correct type
+    if not available_fields[field][0] == field_def[field]:
+        return _('Field {} must be of type {}.').format(
+            field, field_def[field])
+
+    # Check if the field is defined as required.
+    if not available_fields[field][1]:
+        return _('Field {} must be required.').format(field)
+
+    if (field == 'party_type' and
+            not validate_party_types(available_fields[field][2])):
+        return _('Field party_type must have choices "IN", "GR", "CO"')
+
+
+def validate_required(all_fields):
+    # Required fields can be inside repeat groups so we're getting all children
+    # from repeat groups and attaching them to the highest level in the dict
+    repeat_groups = [f for f in all_fields if (f.get('type') == 'repeat')]
+    repeat_children = []
+    for group in repeat_groups:
+        repeat_children += group.get('children', [])
+    all_fields = all_fields + repeat_children
+
+    # Getting all required fields defined in the questionnaire
+    fields = list(required_fields.keys()) + list(geometry_fields.keys())
+    required_available = (f for f in all_fields if f.get('name') in fields)
+    required_available = map_fields(required_available)
+
+    # Getting all geometry fields defined in the questionnaire
+    geometries = (f for f in all_fields if f.get('name') in geometry_fields)
+    geometries = map_fields(geometries)
+
+    # Validating all required fields
+    _validate_required = partial(validate_field,
+                                 required_fields,
+                                 required_available)
+    required_errors = [_validate_required(f) for f in required_fields]
+
+    # Validating all geometry fields. This is a separate action because only
+    # one of the three possible must be defined. We're basically just checking
+    # if the geometries that are defined are ok.
+    _validate_geometries = partial(validate_field,
+                                   geometry_fields,
+                                   required_available)
+    geometry_errors = [_validate_geometries(g) for g in geometries]
+
+    # joining both error lists
+    errors = required_errors + geometry_errors
+
+    # One geometry must be defined, so we're checking that here.
+    if not len(geometries) > 0:
+        errors.append(_('Please provide at least one geometry field.'))
+
+    errors = [e for e in errors if e]
+    if errors:
+        raise InvalidQuestionnaire(errors)

@@ -41,7 +41,7 @@ class QuestionnaireSerializerTest(UserTestCase, FileStorageTestCase, TestCase):
         assert serializer.data['id_string'] == questionnaire.id_string
         assert serializer.data['xls_form'] == questionnaire.xls_form.url
         assert serializer.data['version'] == questionnaire.version
-        assert len(serializer.data['questions']) == 1
+        assert len(serializer.data['questions']) == 6
 
     def test_deserialize_invalid_form(self):
         form = self.get_form('xls-form-invalid')

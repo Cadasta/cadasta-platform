@@ -3,6 +3,7 @@ from datetime import datetime
 from buckets.fields import S3FileField
 from core.models import RandomIDModel
 from django.db import models
+from django.dispatch import receiver
 from django.utils.translation import ugettext as _
 from django.utils.translation import get_language
 from django.contrib.postgres.fields import JSONField
@@ -195,3 +196,17 @@ class QuestionOption(MultilingualLabelsMixin, RandomIDModel):
         repr_string = ('<QuestionOption id={obj.id} name={obj.name}'
                        ' question={obj.question.id}>')
         return repr_string.format(obj=self)
+
+
+@receiver(models.signals.post_save, sender=QuestionOption)
+def set_label_on_spatialunits(sender, instance, **kwargs):
+    """
+    Set label of QuestionOption onto related SpatialUnit instances
+    """
+    if instance.question.name != 'location_type':
+        return
+    from spatial.models import SpatialUnit
+    SpatialUnit.objects.filter(
+        type=instance.name,
+        project__current_questionnaire=instance.question.questionnaire.id,
+    ).update(label=instance.label_xlat)

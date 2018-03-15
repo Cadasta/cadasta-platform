@@ -1,6 +1,572 @@
+import pytest
 from django.test import TestCase
 from core.messages import SANITIZE_ERROR
+from ..exceptions import InvalidQuestionnaire
 from .. import validators
+
+
+class ValidatePartyTypesTest(TestCase):
+    def test(self):
+        choices = [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]
+        assert validators.validate_party_types(choices) is True
+
+        choices = [{'name': 'IN'}, {'name': 'CO'}, {'name': 'GR'}]
+        assert validators.validate_party_types(choices) is True
+
+        choices = [{'name': 'IN'}, {'name': 'GR'}]
+        assert validators.validate_party_types(choices) is False
+
+        choices = []
+        assert validators.validate_party_types(choices) is False
+
+        choices = None
+        assert validators.validate_party_types(choices) is False
+
+        choices = [{'name': 'BB'}, {'name': 'AA'}]
+        assert validators.validate_party_types(choices) is False
+
+
+class IsRequiredTest(TestCase):
+    def test(self):
+        assert validators.is_required({'required': 'yes'}) is True
+        assert validators.is_required({'required': 'no'}) is False
+        assert validators.is_required(None) is False
+
+
+class MapFieldsTest(TestCase):
+    def test(self):
+        fields = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'text',
+             'choices': ['IN', 'GR'],
+             'bind': {'required': 'no'}},
+        ]
+        flat = validators.map_fields(fields)
+        assert flat == {
+            'location_type': ('select one', True, None),
+            'party_type': ('text', False, ['IN', 'GR']),
+        }
+
+
+class ValidateRequiredTest(TestCase):
+    available_fields = {
+        'valid': ('text', True),
+        'wrong_type': ('text', True),
+        'not_required': ('text', False),
+    }
+
+    field_def = {
+        'valid': 'text',
+        'not_present': 'text',
+        'wrong_type': 'select one',
+        'not_required': 'text',
+    }
+
+    def test_valid(self):
+        error = validators.validate_field(self.field_def,
+                                          self.available_fields,
+                                          'valid')
+        assert error is None
+
+    def test_required_field_not_provided(self):
+        error = validators.validate_field(self.field_def,
+                                          self.available_fields,
+                                          'not_present')
+        assert error == 'Field not_present is required.'
+
+    def test_wrong_type(self):
+        error = validators.validate_field(self.field_def,
+                                          self.available_fields,
+                                          'wrong_type')
+        assert error == 'Field wrong_type must be of type select one.'
+
+    def test_not_required(self):
+        error = validators.validate_field(self.field_def,
+                                          self.available_fields,
+                                          'not_required')
+        assert error == 'Field not_required must be required.'
+
+
+class CheckRequiredFieldsTest(TestCase):
+    def test_validate_required_valid(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        try:
+            validators.validate_required(data)
+        except InvalidQuestionnaire:
+            assert False, "InvalidQuestionnaire raised unexpectedly"
+        else:
+            assert True
+
+    def test_validate_required__party_name(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_name_not_required(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name'},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_name_wrong_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_type_not_required(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_type_wrong_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'text',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__party_type_wrong_choices(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'WE'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__location_type(self):
+        data = [
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__location_type_not_required(self):
+        data = [
+            {'name': 'location_type'},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__location_type_wrong_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__tenure_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__tenure_type_not_required(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one'},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__tenure_type_wrong_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__location_field(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__location_field_not_required(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape'},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__location_field_wrong_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__one_location_field_not_required(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'bind': {'required': 'yes'},
+             'type': 'select one',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'geoshape'},
+            {'name': 'location_geotrace',
+             'type': 'geotrace',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required__one_location_field_wrong_type(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'bind': {'required': 'yes'},
+             'type': 'select one',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'name': 'party_name',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'tenure_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geoshape',
+             'type': 'text',
+             'bind': {'required': 'yes'}},
+            {'name': 'location_geotrace',
+             'type': 'geotrace',
+             'bind': {'required': 'yes'}},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
+
+    def test_validate_required_valid_with_repeat(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'},
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'type': 'repeat',
+             'children': [{'name': 'party_name',
+                           'type': 'text',
+                           'bind': {'required': 'yes'}},
+                          {'name': 'tenure_type',
+                           'type': 'select one',
+                           'bind': {'required': 'yes'}}]},
+            {'type': 'repeat',
+             'children': [{'name': 'location_geoshape',
+                           'type': 'geoshape',
+                           'bind': {'required': 'yes'}}]},
+            {'name': 'other_field'}
+        ]
+        try:
+            validators.validate_required(data)
+        except InvalidQuestionnaire:
+            assert False, "InvalidQuestionnaire raised unexpectedly"
+        else:
+            assert True
+
+    def test_validate_required_error_in_repeat(self):
+        data = [
+            {'name': 'location_type',
+             'type': 'select one',
+             'bind': {'required': 'yes'}},
+            {'name': 'party_type',
+             'bind': {'required': 'yes'},
+             'type': 'select one',
+             'choices': [{'name': 'IN'}, {'name': 'GR'}, {'name': 'CO'}]},
+            {'type': 'repeat',
+             'children': [{'name': 'party_name',
+                           'type': 'text',
+                           'bind': {'required': 'yes'}},
+                          {'name': 'tenure_type',
+                           'type': 'select one',
+                           'bind': {'required': 'yes'}}]},
+            {'type': 'repeat',
+             'children': [{'name': 'location_geoshape',
+                           'type': 'text',
+                           'bind': {'required': 'yes'}}]},
+            {'name': 'other_field'}
+        ]
+        with pytest.raises(InvalidQuestionnaire):
+            validators.validate_required(data)
 
 
 class ValidateAccuracyTest(TestCase):

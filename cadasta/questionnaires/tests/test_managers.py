@@ -11,8 +11,7 @@ from jsonattrs.models import Attribute
 from jsonattrs.models import create_attribute_types
 
 from . import factories
-from .. import models
-from ..managers import create_children, create_options, santize_form
+from .. import models, managers
 from ..messages import MISSING_RELEVANT
 
 
@@ -23,7 +22,7 @@ class SanitizeFormTest(TestCase):
             'relevant': '${age}>10'
         }
         try:
-            santize_form(data)
+            managers.santize_form(data)
         except InvalidQuestionnaire:
             assert False, "InvalidQuestionnaire raised unexpectedly"
         else:
@@ -35,7 +34,7 @@ class SanitizeFormTest(TestCase):
             'relevant': '${age}>10'
         }
         with pytest.raises(InvalidQuestionnaire):
-            santize_form(data)
+            managers.santize_form(data)
 
     def test_sanitize_valid_list(self):
         data = {
@@ -45,7 +44,7 @@ class SanitizeFormTest(TestCase):
             ]
         }
         try:
-            santize_form(data)
+            managers.santize_form(data)
         except InvalidQuestionnaire:
             assert False, "InvalidQuestionnaire raised unexpectedly"
         else:
@@ -59,7 +58,7 @@ class SanitizeFormTest(TestCase):
             ]
         }
         with pytest.raises(InvalidQuestionnaire):
-            santize_form(data)
+            managers.santize_form(data)
 
     def test_valid_multilang_labels(self):
         data = {
@@ -67,7 +66,7 @@ class SanitizeFormTest(TestCase):
             'label': {'en': 'English', 'de': 'German'}
         }
         try:
-            santize_form(data)
+            managers.santize_form(data)
         except InvalidQuestionnaire:
             assert False, "InvalidQuestionnaire raised unexpectedly"
         else:
@@ -79,14 +78,14 @@ class SanitizeFormTest(TestCase):
             'label': {'en': 'English 😆', 'de': 'German'}
         }
         with pytest.raises(InvalidQuestionnaire):
-            santize_form(data)
+            managers.santize_form(data)
 
 
 class CreateChildrenTest(TestCase):
 
     def test_create_children_where_children_is_none(self):
         children = None
-        create_children(children)
+        managers.create_children(children)
 
         assert models.QuestionGroup.objects.exists() is False
         assert models.Question.objects.exists() is False
@@ -112,7 +111,7 @@ class CreateChildrenTest(TestCase):
                 }
             ],
         }]
-        create_children(children, questionnaire=questionnaire)
+        managers.create_children(children, questionnaire=questionnaire)
 
         assert models.QuestionGroup.objects.filter(
             questionnaire=questionnaire).count() == 1
@@ -157,7 +156,7 @@ class CreateChildrenTest(TestCase):
                 }
             ],
         }]
-        create_children(children, questionnaire=questionnaire)
+        managers.create_children(children, questionnaire=questionnaire)
 
         assert models.QuestionGroup.objects.filter(
             questionnaire=questionnaire).count() == 2
@@ -177,14 +176,14 @@ class CreateOptionsTest(TestCase):
             {'label': 'option 2', 'name': '2'},
             {'label': 'option 3', 'name': '3'}
         ]
-        create_options(options, question)
+        managers.create_options(options, question)
         assert models.QuestionOption.objects.filter(
             question=question).count() == 3
 
     def test_create_options_with_empty_list(TestCase):
         errors = []
         question = factories.QuestionFactory.create(name='qu')
-        create_options([], question, errors)
+        managers.create_options([], question, errors)
         assert "Please provide at least one option for field 'qu'" in errors
 
 

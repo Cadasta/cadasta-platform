@@ -576,6 +576,7 @@ class SearchAPITest(APITestCase, UserTestCase, TestCase):
             name='CB',
             label={'en': 'House', 'es': 'Haus'}
         )
+        self.su.refresh_from_db()
 
         view = self.view_class()
         view.tenure_types = dict(TENURE_RELATIONSHIP_TYPES)

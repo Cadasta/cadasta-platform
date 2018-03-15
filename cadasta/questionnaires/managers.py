@@ -15,7 +15,7 @@ from core.validators import sanitize_string
 from .choices import QUESTION_TYPES, XFORM_GEOM_FIELDS
 from .exceptions import InvalidQuestionnaire
 from .messages import MISSING_RELEVANT, INVALID_ACCURACY
-from .validators import validate_accuracy
+from .validators import validate_accuracy, validate_required
 
 ATTRIBUTE_GROUPS = settings.ATTRIBUTE_GROUPS
 
@@ -208,8 +208,7 @@ def santize_form(form_json):
 
 class QuestionnaireManager(models.Manager):
 
-    def create_from_form(self, xls_form=None, original_file=None,
-                         project=None):
+    def create_from_form(self, xls_form, project, original_file=None):
         try:
             with transaction.atomic():
                 errors = []
@@ -227,6 +226,7 @@ class QuestionnaireManager(models.Manager):
                     raise InvalidQuestionnaire([
                         _("'form_id' field must not contain whitespace.")])
 
+                validate_required(json.get('children', []))
                 santize_form(json)
 
                 has_default_language = (
