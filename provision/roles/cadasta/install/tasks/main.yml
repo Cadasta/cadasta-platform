@@ -29,9 +29,6 @@
       DJANGO_SETTINGS_MODULE="{{ django_settings }}"
       MEMCACHED_HOST="{{ memcached_host }}"
       ES_HOST="{{ es_host }}"
-      OPBEAT_ORGANIZATION_ID="{{ opbeat_orgID }}"
-      OPBEAT_APP_ID="{{ opbeat_appID }}"
-      OPBEAT_SECRET_TOKEN="{{ opbeat_token }}"
       SLACK_HOOK="{{ slack_hook }}"
       TWILIO_ACCOUNT_SID="{{ twilio_account_sid }}"
       TWILIO_AUTH_TOKEN="{{ twilio_auth_token }}"
@@ -62,9 +59,6 @@
       Defaults  env_keep += S3_SECRET_KEY
       Defaults  env_keep += MEMCACHED_HOST
       Defaults  env_keep += ES_HOST
-      Defaults  env_keep += OPBEAT_ORGANIZATION_ID
-      Defaults  env_keep += OPBEAT_APP_ID
-      Defaults  env_keep += OPBEAT_SECRET_TOKEN
       Defaults  env_keep += SLACK_HOOK
       Defaults  env_keep += TWILIO_ACCOUNT_SID
       Defaults  env_keep += TWILIO_AUTH_TOKEN
