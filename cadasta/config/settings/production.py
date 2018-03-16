@@ -1,4 +1,5 @@
 import os
+import subprocess
 import raven
 import requests
 from .default import *  # NOQA
@@ -52,9 +53,17 @@ ES_HOST = os.environ['ES_HOST']
 
 RAVEN_CONFIG = {
     'dsn': os.environ['SENTRY_DSN'],
-    # If you are using git, you can also automatically configure the
-    # release based on the git info.
-    'release': raven.fetch_git_sha(os.path.abspath(os.pardir)),
+    'release':
+        subprocess.check_output(
+            'git symbolic-ref -q --short HEAD'
+            ' || '
+            'git describe --tags --exact-match',
+            shell=True
+        ).decode().strip(),
+    'tags': {
+        'git_sha': raven.fetch_git_sha(os.path.abspath(os.pardir))
+    },
+    'environment': os.environ['SENTRY_ENVIRONMENT'],
 }
 
 DJOSER.update({  # NOQA
