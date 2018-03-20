@@ -51,6 +51,8 @@ CACHES = {
 
 ES_HOST = os.environ['ES_HOST']
 
+project_dir = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir))
 RAVEN_CONFIG = {
     'dsn': os.environ['SENTRY_DSN'],
     'release':
@@ -58,10 +60,11 @@ RAVEN_CONFIG = {
             'git symbolic-ref -q --short HEAD'
             ' || '
             'git describe --tags --exact-match',
-            shell=True
+            shell=True,
+            cwd=project_dir,
         ).decode().strip(),
     'tags': {
-        'git_sha': raven.fetch_git_sha(os.path.abspath(os.pardir))
+        'git_sha': raven.fetch_git_sha(project_dir),
     },
     'environment': os.environ['SENTRY_ENVIRONMENT'],
 }
