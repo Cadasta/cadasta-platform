@@ -1,5 +1,24 @@
 # Change Log
 
+## [v1.17.0](https://github.com/Cadasta/cadasta-platform/tree/v1.16.0) (2018-03-20)
+
+### Changes
+
+- Lower deflate tolerance for project maps (#1993)
+- Update export area on project dashboard (#2000)
+- Add option to silent DB logs during dev process (#2008)
+- Make async spatial requests concurrently (#2007)
+- Improve async locations endpoint response speed (#2006)
+- Validate required fields (#1998)
+- Replace Opbeat logging with Sentry (#2010, #2013, #2014, #2016)
+- Add multi-lang support to location header (#2011)
+- Move handler from cadasta/production to cadasta/application (#2012)
+- Translate location label on Project Dashboard (#2015)
+
+### Fixes 
+
+- Fixes #1898 -- Add library to validate phone numbers (#1985)
+
 ## [v1.16.0](https://github.com/Cadasta/cadasta-platform/tree/v1.16.0) (2018-02-20)
 
 ### Changes
