@@ -7,7 +7,7 @@ from .. import serializers
 
 
 class Paginator(GeoJsonPagination):
-    page_size = 1000
+    page_size = 250
 
 
 class SpatialUnitList(APIPermissionRequiredMixin,
