@@ -1,5 +1,13 @@
-{% extends "organization/project_import_wrapper.html" %} {% load i18n %} {% load widget_tweaks %} {% block extra_script %} {{ block.super }} {{ form.media }} {% endblock %} {% block step_content %} {{ wizard.management_form }} {% if wizard.form.forms %} {{ wizard.form.management_form
-}} {% for form in wizard.form.forms %} {{ form }} {% endfor %} {% else %}
+{% extends "organization/project_import_wrapper.html" %}
+{% load i18n %}
+{% load widget_tweaks %}
+{% block extra_script %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+
+{% block step_content %}
+{{ wizard.management_form }}
 
 <div class="panel panel-default">
     <div class="panel-body">
@@ -102,4 +110,4 @@
     </div>
 </div>
 
-{% endif %} {% endblock %}
+{% endblock %}

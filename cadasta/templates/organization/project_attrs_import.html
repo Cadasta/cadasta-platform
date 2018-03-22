@@ -11,13 +11,6 @@
 {% block step_content %}
 
 {{ wizard.management_form }}
-{% if wizard.form.forms %}
-    {{ wizard.form.management_form }}
-    {% for form in wizard.form.forms %}
-        {{ form }}
-    {% endfor %}
-{% else %}
-
   <div class="panel panel-default">
 
     <div class="panel-body">
@@ -122,7 +115,5 @@
     </div>
 
   </div>
-
-{% endif %}
 
 {% endblock %}

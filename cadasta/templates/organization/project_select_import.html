@@ -5,20 +5,16 @@
 {{ block.super }}
 {{ form.media }}
 {% endblock %}
+
 {% block step_content %}
 {{ wizard.management_form }}
-{% if wizard.form.forms %}
-{{ wizard.form.management_form }}
-{% for form in wizard.form.forms %}
-{{ form }}
-{% endfor %}
-{% else %}
 
 <div class="panel panel-default">
     <div class="panel-body">
         <h3>{% trans "Import details" %}</h3>
         <div class="row">
             <div class="col-md-9">
+
                 {{ wizard.form.non_field_errors }}
                 <div class="form-group{% if form.name.errors %} has-error{% endif %}">
                     <label class="control-label" for="{{ form.name.id_for_label }}">{% trans "Import name" %}</label>
@@ -59,7 +55,6 @@
                             {{ form.entity_types.errors }}
                         </div>
                         <li class="checkbox">
-                            {{ wizard.form.entity_types.values_list }}
                             <label class="control-label" for="id_select_file-entity_types_parties">
                                 <input type="checkbox" id="id_select_file-entity_types_parties" name="select_file-entity_types" type="checkbox" value="PT" data-parsley-multiple="select_file-entity_types" {% if 'PT' in wizard.form.entity_types.value %}checked{% endif %}> {% trans "Party" %}
                                 <small>{% trans "Includes party information for individuals, groups, corporations." %}</small>
@@ -101,5 +96,4 @@
         <a class="btn btn-link pull-left cancel" href="{% url 'organization:project-dashboard' object.organization.slug object.slug %}">{% trans "Cancel" %}</a>
     </div>
 </div>
-
-{% endif %} {% endblock %}
+{% endblock %}
