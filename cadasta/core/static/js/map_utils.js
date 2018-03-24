@@ -71,11 +71,8 @@ function renderFeatures(map, featuresUrl, options) {
         // Start requests
         var requests = [];
         for (var i = 2; i <= total_pages; i++) {
-          var page = '?page='
-          if (url.indexOf('?') !== -1) {
-            page = '&page='
-          }
-          requests.push(loadFeatures(url + page + i, map, options.trans));
+          var page = (url.indexOf('?') === -1 ? '?' : '&') + 'page=' + i;
+          requests.push(loadFeatures(url + page, map, options.trans));
         }
 
         // Take action when all requests complete
