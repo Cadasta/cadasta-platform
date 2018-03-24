@@ -10,7 +10,7 @@ class GPXParser(parser.GPXParser):
 
     def parse(self, version=None):
         try:
-            self.xml_parser = parser.LXMLParser(self.xml)
+            self.xml_parser = parser.XMLParser(self.xml)
             self.__parse_dom(version)
             return self.gpx
         except Exception as e:
