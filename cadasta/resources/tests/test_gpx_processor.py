@@ -4,21 +4,9 @@ from django.conf import settings
 from django.contrib.gis.geos import GeometryCollection
 from django.test import TestCase
 
-from ..processors.gpx import GPXParser, GPXProcessor
+from ..processors.gpx import GPXProcessor
 
 path = os.path.dirname(settings.BASE_DIR)
-
-
-class GPXParserTest(TestCase):
-
-    def test_parse(self):
-        file_path = path + '/resources/tests/files/tracks.gpx'
-        file = open(file_path, 'r')
-        xml = file.read()
-        file.close()
-        with open(file_path, 'r') as f:
-            parser = GPXParser(f)
-            assert parser.xml == xml
 
 
 class GPXProcessorTest(TestCase):
