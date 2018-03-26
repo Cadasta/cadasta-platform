@@ -6,25 +6,13 @@ from gpxpy import gpx, parser
 from ..exceptions import InvalidGPXFile
 
 
-class GPXParser(parser.GPXParser):
-
-    def parse(self, version=None):
-        try:
-            self.xml_parser = parser.XMLParser(self.xml)
-            self.__parse_dom(version)
-            return self.gpx
-        except Exception as e:
-            raise gpx.GPXXMLSyntaxException(
-                'Error parsing XML: %s' % str(e), e)
-
-
 class GPXProcessor:
 
     def __init__(self, gpx_file):
         with open(gpx_file, 'r') as f:
             try:
-                parser = GPXParser(f)
-                self.gpx = parser.parse(f)
+                p = parser.GPXParser(f)
+                self.gpx = p.parse(f)
             except gpx.GPXException as e:
                 raise InvalidGPXFile(_("Invalid GPX file: %s" % str(e)))
 
