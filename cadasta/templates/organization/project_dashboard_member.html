@@ -359,9 +359,11 @@
 
                     {% for member, role, avatar in members %}
                       <li>
-                        <div class="avatar-box avatar-box-sm pull-left">
+                        {% comment "Disable until we start thumbnailing avatars" %}
+                        <!-- <div class="avatar-box avatar-box-sm pull-left">
                           <img src="{{ avatar }}" alt="{{ member }}" class="avatar avatar-sm">
-                        </div>
+                        </div> -->
+                        {% endcomment %}
                         <strong>{{ member }}</strong>, {{ role }}
                       </li>
                     {% endfor %}
