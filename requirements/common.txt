@@ -20,7 +20,7 @@ django-tutelary==0.1.22
 django-audit-log==0.7.0
 django-simple-history==1.9.1
 simplejson==3.13.2
-django-widget-tweaks==1.4.1
+django-widget-tweaks==1.4.2
 django-buckets==0.1.24.post1
 pyxform-cadasta==0.9.22
 python-magic==0.4.15
