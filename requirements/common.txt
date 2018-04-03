@@ -1,4 +1,4 @@
-Django==1.11.11  # rq.filter: <2.0
+Django==1.11.12  # rq.filter: <2.0
 djangorestframework==3.7.7
 psycopg2==2.7.4
 djoser==1.1.5
