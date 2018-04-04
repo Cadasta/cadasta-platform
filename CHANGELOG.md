@@ -1,5 +1,11 @@
 # Change Log
 
+## [v1.TODO](https://github.com/Cadasta/cadasta-platform/tree/v1.TODO) (TODO)
+
+### Fixes
+
+- Fixes #2017 -- Ensure URLs with non-ASCII characters can be exported (#2029)
+
 ## [v1.17.0](https://github.com/Cadasta/cadasta-platform/tree/v1.16.0) (2018-03-20)
 
 ### Changes
@@ -15,7 +21,7 @@
 - Move handler from cadasta/production to cadasta/application (#2012)
 - Translate location label on Project Dashboard (#2015)
 
-### Fixes 
+### Fixes
 
 - Fixes #1898 -- Add library to validate phone numbers (#1985)
 
