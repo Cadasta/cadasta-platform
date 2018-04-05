@@ -18,7 +18,7 @@ rfc3987==1.3.7
 drfdocs-cadasta==0.0.12
 django-tutelary==0.1.22
 django-audit-log==0.7.0
-django-simple-history==1.9.1
+django-simple-history==2.0
 simplejson==3.13.2
 django-widget-tweaks==1.4.2
 django-buckets==0.1.24.post1
