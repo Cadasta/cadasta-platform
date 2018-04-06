@@ -1,5 +1,5 @@
 Django==1.11.12  # rq.filter: <2.0
-djangorestframework==3.8.1
+djangorestframework==3.8.2
 psycopg2==2.7.4
 djoser==1.1.5
 django-allauth==0.35.0
