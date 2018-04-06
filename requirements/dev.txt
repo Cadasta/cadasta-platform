@@ -9,5 +9,5 @@ flake8==3.5.0
 django-debug-toolbar==1.9.1
 django-extensions==2.0.6
 django-skivvy==0.1.10
-ipython==6.3.0
+ipython==6.3.1
 git+https://github.com/Cadasta/cadasta-test.git@v0.8.0
