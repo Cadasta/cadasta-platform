@@ -91,7 +91,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
     'simple_history.middleware.HistoryRequestMiddleware',
-    'accounts.middleware.UserLanguageMiddleware',
+    'user_language_middleware.UserLanguageMiddleware',
     'django_otp.middleware.OTPMiddleware',
 )
 
