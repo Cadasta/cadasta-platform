@@ -136,6 +136,10 @@ class SpatialUnitTest(UserTestCase, TestCase):
             name='HOUSE',
             label={'en': 'House', 'de': 'Hause'}
         )
+        su = SpatialUnitFactory.create(
+            project=questionnaire.project,
+            type='HOUSE')
+        assert su.location_type_label == 'House'
 
     def test_location_type_label_uses_correct_question_option(self):
         """
