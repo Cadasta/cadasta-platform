@@ -136,6 +136,30 @@ class SpatialUnitTest(UserTestCase, TestCase):
             name='HOUSE',
             label={'en': 'House', 'de': 'Hause'}
         )
+
+    def test_location_type_label_uses_correct_question_option(self):
+        """
+        Ensure that the label setter pre_save signal fetches the correct
+        question option.
+        """
+        questionnaire = q_factories.QuestionnaireFactory.create(
+            default_language='en')
+        location_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='location_type',
+            type='S1'
+        )
+        other_question = q_factories.QuestionFactory.create(
+            questionnaire=questionnaire,
+            name='least_favorite_music_genre',
+            type='S1'
+        )
+        for q in (location_question, other_question):
+            q_factories.QuestionOptionFactory.create(
+                question=q,
+                name='HOUSE',
+                label={'en': 'House', 'de': 'Hause'}
+            )
         su = SpatialUnitFactory.create(
             project=questionnaire.project,
             type='HOUSE')
