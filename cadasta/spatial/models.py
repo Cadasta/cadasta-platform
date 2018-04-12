@@ -293,6 +293,7 @@ def set_label_on_spatialunits(sender, instance, **kwargs):
     try:
         rel_questionoption = QuestionOption.objects.get(
             name=instance.type,
+            question__name='location_type',
             question__questionnaire__id=instance.project.current_questionnaire)
     except QuestionOption.DoesNotExist:
         return
