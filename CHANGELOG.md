@@ -1,10 +1,66 @@
 # Change Log
 
-## [v1.TODO](https://github.com/Cadasta/cadasta-platform/tree/v1.TODO) (TODO)
+## [v1.17.5](https://github.com/Cadasta/cadasta-platform/tree/v1.17.5) (2018-04-12)
 
 ### Fixes
 
+- Use QuestionOption.question.name when fetching location_type question (#2032)
+
+## [v1.17.4](https://github.com/Cadasta/cadasta-platform/tree/v1.17.4) (2018-04-04)
+
+### Changes
+
+- Dependency updates (1982)
+		- django-cors-headers (2.2.0)
+    - django-crispy-forms (1.7.2)
+    - django-countries (5.2)
+    - django-sass-processor (0.6)
+    - openpyxl (2.5.1)
+    - awscli (1.14.63)
+    - gpxpy (1.2.0)
+    - django-otp (0.4.3)
+    - twilio (6.11.0)
+    - phonenumbers (8.9.2)
+    - cadasta-workertoolbox (0.6.0)
+    - libsass (0.14.2)
+    - selenium (3.11.0)
+    - django-extensions (2.0.6)
+- Hide avatars on project dashboard (#2028)
+
+### Fixes
+
+- Suppress OSERROR write error (#2024)
+- Add `lazy-apps` option to `uwsgi.ini` to address memcached errors (#2030)
 - Fixes #2017 -- Ensure URLs with non-ASCII characters can be exported (#2029)
+
+## [v1.17.3](https://github.com/Cadasta/cadasta-platform/tree/v1.17.3) (2018-03-24)
+
+### Changes
+
+- Update BrowserStack access key (#2025)
+
+### Fixes
+
+- Fix recursive async calls on location detail page (#2026)
+
+
+## [v1.17.2](https://github.com/Cadasta/cadasta-platform/tree/v1.17.2) (2018-03-23)
+
+### Changes 
+
+- Upgrade cadasta-test to 0.8.0 (#2022)
+
+### Fixes
+
+- Remove recursive template code (#2023)
+
+
+## [v1.17.1](https://github.com/Cadasta/cadasta-platform/tree/v1.17.1) (2018-03-21)
+
+### Changes
+
+- Reduce pagination size for async locations (#2020)
+- Upgrade Django to 1.11.11 (#2021)
 
 ## [v1.17.0](https://github.com/Cadasta/cadasta-platform/tree/v1.16.0) (2018-03-20)
 
