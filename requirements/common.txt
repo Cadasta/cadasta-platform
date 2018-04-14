@@ -40,7 +40,7 @@ django-compressor==2.2
 beautifulsoup4==4.6.0
 gpxpy==1.2.0
 django-otp==0.4.3
-twilio==6.11.0
+twilio==6.12.0
 phonenumbers==8.9.3
 cadasta-workertoolbox==0.6.0
 git+https://github.com/celery/kombu@0f4da  # TODO: update to 4.1.1+ when released
