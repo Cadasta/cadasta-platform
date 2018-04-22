@@ -19,7 +19,7 @@ drfdocs-cadasta==0.0.12
 django-tutelary==0.1.22
 django-audit-log==0.7.0
 django-simple-history==2.0
-simplejson==3.13.2
+simplejson==3.14.0
 django-widget-tweaks==1.4.2
 django-buckets==0.1.24.post1
 pyxform-cadasta==0.9.22
