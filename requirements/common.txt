@@ -45,4 +45,4 @@ phonenumbers==8.9.4
 cadasta-workertoolbox==0.6.0
 git+https://github.com/celery/kombu@0f4da  # TODO: update to 4.1.1+ when released
 pybreaker==0.4.2
-libsass==0.14.3
+libsass==0.14.4
