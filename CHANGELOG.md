@@ -11,7 +11,7 @@
 ### Changes
 
 - Dependency updates (1982)
-		- django-cors-headers (2.2.0)
+	- django-cors-headers (2.2.0)
     - django-crispy-forms (1.7.2)
     - django-countries (5.2)
     - django-sass-processor (0.6)
