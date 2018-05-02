@@ -1,7 +1,8 @@
 from django.utils import translation
+from django.utils.deprecation import MiddlewareMixin
 
 
-class UserLanguageMiddleware(object):
+class UserLanguageMiddleware(MiddlewareMixin):
 
     def process_response(self, request, response):
         if not hasattr(request, 'user'):
