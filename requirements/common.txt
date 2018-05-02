@@ -21,7 +21,7 @@ django-audit-log==0.7.0
 django-simple-history==1.9.0 # rq.filter: <0.2
 simplejson==3.14.0
 django-widget-tweaks==1.4.2
-django-buckets==0.1.24.post1
+django-buckets==0.1.25
 pyxform-cadasta==0.9.22
 python-magic==0.4.15
 Pillow==5.1.0
