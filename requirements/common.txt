@@ -43,6 +43,6 @@ django-otp==0.4.3
 twilio==6.12.1
 phonenumbers==8.9.4
 cadasta-workertoolbox==0.6.0
-git+https://github.com/celery/kombu@0f4da  # TODO: update to 4.1.1+ when released
+kombu==4.2.1
 pybreaker==0.4.2
 libsass==0.14.4
