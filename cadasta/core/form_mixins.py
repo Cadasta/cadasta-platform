@@ -98,7 +98,7 @@ class AttributeFormMixin(SchemaSelectorMixin):
                     else:
                         chs = [(c, c) for c in attr.choices]
 
-                    field_kwargs['choices'] = chs
+                    field_kwargs['choices'] = [('', '')] + chs
                 if atype.form_field == 'BooleanField':
                     field_kwargs['required'] = attr.required
                     if len(attr.default) > 0:
