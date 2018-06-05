@@ -3,7 +3,7 @@ import time
 
 from django.core.management.base import BaseCommand
 from kombu import Queue
-from kombu.async import Hub, set_event_loop
+from kombu.asynchronous import Hub, set_event_loop
 
 from core import breakers
 from tasks.celery import app, conf
