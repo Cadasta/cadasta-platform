@@ -1,6 +1,7 @@
 from collections import namedtuple
 from unittest.mock import patch, MagicMock, call
 
+from django.db import InterfaceError, OperationalError
 from django.test import TestCase, override_settings
 
 from tasks.consumer import Worker
@@ -93,6 +94,27 @@ class TestConsumers(TestCase):
         self.assert_sqs_ack(sqs_client, msg)
         logger.exception.assert_called_once_with(
             'Failed to process message: %r', msg)
+
+    @patch('tasks.consumer.logger')
+    @patch('tasks.consumer.Worker._handle_task')
+    @patch('tasks.consumer.close_old_connections')
+    def test_process_task_handles_failed_db(
+            self, close_old_connections, handle_task, logger):
+        """
+        Ensure that process_task() gracefully handles closed DB connections
+        """
+        for err in (InterfaceError, OperationalError):
+            handle_task.side_effect = err('Broken DB')
+
+            body = MagicMock()
+            msg = MagicMock()
+
+            # First time will fail, will log error, and not ack message
+            self.mock_worker.process_task(body, msg)
+            assert not msg.ack.called
+            assert logger.exception.calls[0][0]
+            assert close_old_connections.called
+            close_old_connections.reset_mock()
 
     @patch('tasks.consumer.logger')
     @patch('tasks.consumer.Worker._handle_task', MagicMock())
