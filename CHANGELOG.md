@@ -1,5 +1,48 @@
 # Change Log
 
+## [v1.17.7](https://github.com/Cadasta/cadasta-platform/tree/v1.17.7) (2018-06-08)
+
+### Changes
+
+- Dependency update
+  - django-jsonattrs (0.1.26)
+  - kombu (4.2.1)
+
+### Fixes 
+
+- Add empty option to select fields (#2037)
+
+## [v1.17.6](https://github.com/Cadasta/cadasta-platform/tree/v1.17.6) (2018-05-03)
+
+## Changes 
+
+- Add forward compatibility for UserLanguageMiddleware (#2035)
+- Dependency updates (#2027, #2036)
+  - Django (1.11.12)
+  - djangorestframework (3.8.2)
+  - django-countries (5.3)
+  - simplejson (3.14.0)
+  - django-widget-tweaks (1.4.2)
+  - Pillow (5.1.0)
+  - openpyxl (2.5.3)
+  - pytz (2018.4)
+  - awscli (1.15.8)
+  - twilio (6.12.1)
+  - phonenumbers (8.9.4)
+  - libsass (0.14.4)
+  - pytest-django (3.2.1)
+  - transifex-client (0.13.2)
+  - tox (3.0.0)
+  - django-extensions (2.0.7)
+  - ipython (6.3.1)
+  - raven (6.7.0)
+  - pytest (3.5.1)
+  - django-buckets (0.1.25)
+
+## Fixes
+
+- Ensure local_ip_url added to ALLOWED_HOSTS (#2033)
+
 ## [v1.17.5](https://github.com/Cadasta/cadasta-platform/tree/v1.17.5) (2018-04-12)
 
 ### Fixes
