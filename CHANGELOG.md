@@ -1,5 +1,11 @@
 # Change Log
 
+## [v1.17.8](https://github.com/Cadasta/cadasta-platform/tree/v1.17.8) (2018-06-14)
+
+### Fixes
+
+- Reset sync-task DB connections if connection is lost (#2041)
+
 ## [v1.17.7](https://github.com/Cadasta/cadasta-platform/tree/v1.17.7) (2018-06-08)
 
 ### Changes
@@ -8,13 +14,13 @@
   - django-jsonattrs (0.1.26)
   - kombu (4.2.1)
 
-### Fixes 
+### Fixes
 
 - Add empty option to select fields (#2037)
 
 ## [v1.17.6](https://github.com/Cadasta/cadasta-platform/tree/v1.17.6) (2018-05-03)
 
-## Changes 
+## Changes
 
 - Add forward compatibility for UserLanguageMiddleware (#2035)
 - Dependency updates (#2027, #2036)
@@ -89,7 +95,7 @@
 
 ## [v1.17.2](https://github.com/Cadasta/cadasta-platform/tree/v1.17.2) (2018-03-23)
 
-### Changes 
+### Changes
 
 - Upgrade cadasta-test to 0.8.0 (#2022)
 
