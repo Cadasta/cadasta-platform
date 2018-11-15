@@ -1,4 +1,4 @@
-Django==1.11.12  # rq.filter: <2.0
+Django==1.11.15  # rq.filter: <2.0
 djangorestframework==3.8.2
 psycopg2==2.7.4
 djoser==1.1.5
@@ -34,7 +34,7 @@ pylibmc==1.5.2
 awscli==1.15.8
 pandas==0.22.0
 argon2-cffi==18.1.0
-requests==2.18.4
+requests==2.20.0
 pyparsing==2.2.0
 django-compressor==2.2
 beautifulsoup4==4.6.0
