@@ -13,13 +13,13 @@
   become: yes
   become_user: root
   register: pg_hba
-  copy: src=pg_hba.conf dest=/etc/postgresql/9.4/main/pg_hba.conf force=yes
+  copy: src=pg_hba.conf dest=/etc/postgresql/9.5/main/pg_hba.conf force=yes
 
 - name: Listen for external connections
   become: yes
   become_user: root
   register: postgresql_conf
-  copy: src=postgresql.conf dest=/etc/postgresql/9.4/main/postgresql.conf force=yes
+  copy: src=postgresql.conf dest=/etc/postgresql/9.5/main/postgresql.conf force=yes
 
 - name: Restart Postgres
   become: yes
