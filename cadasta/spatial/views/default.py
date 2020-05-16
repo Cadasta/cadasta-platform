@@ -67,7 +67,6 @@ class LocationDetail(LoginPermissionRequiredMixin,
                      JsonAttrsMixin,
                      mixins.SpatialUnitObjectMixin,
                      organization_mixins.ProjectAdminCheckMixin,
-                     resource_mixins.HasUnattachedResourcesMixin,
                      resource_mixins.DetachableResourcesListMixin,
                      generic.DetailView):
     template_name = 'spatial/location_detail.html'
@@ -175,7 +174,6 @@ class LocationResourceAdd(LoginPermissionRequiredMixin,
 class LocationResourceNew(LoginPermissionRequiredMixin,
                           mixins.SpatialUnitResourceMixin,
                           organization_mixins.ProjectAdminCheckMixin,
-                          resource_mixins.HasUnattachedResourcesMixin,
                           generic.CreateView):
     template_name = 'spatial/resources_new.html'
     permission_required = update_permissions('spatial.resources.add')

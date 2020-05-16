@@ -16,7 +16,6 @@ from ..models import ContentObject, Resource
 
 class ProjectResources(LoginPermissionRequiredMixin,
                        mixins.ProjectResourceMixin,
-                       mixins.HasUnattachedResourcesMixin,
                        mixins.DetachableResourcesListMixin,
                        organization_mixins.ProjectAdminCheckMixin,
                        generic.ListView):
@@ -65,7 +64,6 @@ class ProjectResourcesAdd(LoginPermissionRequiredMixin,
 
 class ProjectResourcesNew(LoginPermissionRequiredMixin,
                           mixins.ProjectResourceMixin,
-                          mixins.HasUnattachedResourcesMixin,
                           organization_mixins.ProjectAdminCheckMixin,
                           generic.CreateView):
     template_name = 'resources/project_add_new.html'
