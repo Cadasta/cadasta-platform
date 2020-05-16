@@ -18,11 +18,7 @@
         <div class="panel-body">
           {% if is_allowed_add_resource %}
           <div class="top-btn pull-right top-add">
-            {% if has_unattached_resources %}
-            <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_existing' project=object.slug organization=object.organization.slug %}">
-            {% else %}
             <a class="btn btn-primary btn-sm" href="{% url 'resources:project_add_new' project=object.slug organization=object.organization.slug %}">
-            {% endif %}
               <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
           </div>
           {% endif %}
