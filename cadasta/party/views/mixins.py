@@ -123,9 +123,6 @@ class PartyRelationshipObjectMixin(ProjectMixin):
 class PartyRelationshipResourceMixin(ResourceViewMixin,
                                      PartyRelationshipObjectMixin):
 
-    def get_content_object(self):
-        return self.get_object()
-
     def get_form_kwargs(self, *args, **kwargs):
         kwargs = {
             'project_id': self.get_project().id,

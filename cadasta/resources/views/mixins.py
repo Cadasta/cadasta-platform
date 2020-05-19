@@ -114,30 +114,6 @@ class ResourceObjectMixin(ProjectResourceMixin):
         return reverse('resources:project_detail', kwargs=self.kwargs)
 
 
-class HasUnattachedResourcesMixin(ProjectMixin):
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-
-        # Determine the object that can have resources
-        if hasattr(self, 'get_content_object'):
-            # This is for views for uploading a new resource
-            # or the ProjectResources view
-            object = self.get_content_object()
-        elif hasattr(self, 'object'):
-            # This is for views that list entity resources
-            object = self.object
-
-        project_resource_set_count = self.get_project().resource_set.filter(
-            archived=False).count()
-        if (
-            project_resource_set_count > 0 and
-            project_resource_set_count != object.resources.count()
-        ):
-            context['has_unattached_resources'] = True
-
-        return context
-
-
 class DetachableResourcesListMixin(ProjectMixin):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
