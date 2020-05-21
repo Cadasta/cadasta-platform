@@ -10,12 +10,6 @@
               <span aria-hidden="true">&times;</span>
             </a>
             <h3 class="modal-title">{% trans "Upload new resource" %}</h3>
-            {% if has_unattached_resources %}
-            <ul class="nav nav-tabs" role="tablist">
-              <li role="presentation"><a href="{{ add_lib_url }}" role="tab">{% trans "Attach from library" %}</a></li>
-              <li role="presentation" class="active"><a href="" role="tab">{% trans "Upload new" %}</a></li>
-            </ul>
-            {% endif %}
           </div>
 
           <div class="modal-body modal-6-12">

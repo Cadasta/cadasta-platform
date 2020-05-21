@@ -99,11 +99,7 @@
       <div role="tabpanel" class="tab-pane" id="resources">
         {% if resource_list %}
           <div class="top-btn pull-right top-add">
-            {% if has_unattached_resources %}
-            <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
-            {% else %}
             <a class="btn btn-primary btn-sm" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
-            {% endif %}
               <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
           </div>
           {% include 'resources/table_sm.html' %}
@@ -111,11 +107,7 @@
           <div>
             <p>{% trans "This location does not have any attached resources. To attach a resource, select the button below." %}</p>
             <div class="btn-full">
-              {% if has_unattached_resources %}
-              <a class="btn btn-primary" href="{% url 'locations:resource_add' object.organization.slug object.slug location.id %}">
-              {% else %}
               <a class="btn btn-primary" href="{% url 'locations:resource_new' object.organization.slug object.slug location.id %}">
-              {% endif %}
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans "Attach" %}</a>
             </div>
           </div>

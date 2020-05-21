@@ -63,18 +63,6 @@ matrix:
     -
       if: type = push
       env: TOX_ENV=py35-django-unit
-    -
-      if: type IN (push, pull_request) AND branch = master
-      env: TOX_ENV=py35-functional-batch1
-    -
-      if: type IN (push, pull_request) AND branch = master
-      env: TOX_ENV=py35-functional-batch2
-    -
-      if: type IN (push, pull_request) AND branch = master
-      env: TOX_ENV=py35-functional-batch3
-    -
-      if: type IN (push, pull_request) AND branch = master
-      env: TOX_ENV=py35-functional-batch4
 
 script:
   - tox -e $TOX_ENV
