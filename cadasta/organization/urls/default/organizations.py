@@ -69,6 +69,10 @@ urlpatterns = [
         r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/import/$',
         default.ProjectDataImportWizard.as_view(),
         name='project-import'),
+    url(
+        r'^(?P<organization>[-\w]+)/projects/(?P<project>[-\w]+)/detach-gpx/$',
+        default.ProjectDetach.as_view(),
+        name='project-detach'),
 
     #
     # MEMBERS

@@ -47,6 +47,8 @@
             <li><a class="edit" href="{% url 'organization:project-edit-geometry' object.organization.slug object.slug %}">{% trans "Edit project boundary" %}</a></li>
             <li><a class="edit" href="{% url 'organization:project-edit-details' object.organization.slug object.slug %}">{% trans "Edit project details" %}</a></li>
             <li><a class="edit" href="{% url 'organization:project-edit-permissions' object.organization.slug object.slug %}">{% trans "Edit member permissions" %}</a></li>
+            {% if is_superuser %}<li><a class="edit" href="{% url 'organization:project-detach' object.organization.slug object.slug %}">Detach spatial resources</a></li>{% endif %}
+
             <li role="separator" class="divider"></li>
             <li><a href="{% url 'organization:project-import' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Import data" %}</a></li>
             <li><a href="{% url 'organization:project-download' object.organization.slug object.slug %}" data-toggle="modal">{% trans "Export data" %}</a></li>
