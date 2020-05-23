@@ -717,9 +717,10 @@ class ProjectDetach(core_mixins.SuperUserCheckMixin, base_generic.View):
                 resource__spatial_resources__isnull=False
             ).delete()
 
-        response_url = reverse('organization:project-dashboard', kwargs=self.kwargs)
+        response_url = reverse(
+            'organization:project-dashboard',
+            kwargs=self.kwargs)
         return HttpResponseRedirect(response_url)
-
 
 
 class ProjectDataDownload(mixins.ProjectMixin,
