@@ -149,10 +149,6 @@ if __name__ == "__main__":
         sys.stdout = tee(stdoutsav, outputlog)
         exit_on_failure(pytest.main(pytest_args))
         sys.stdout = stdoutsav
-        for l in open('pytest.txt'):
-            if l.startswith('TOTAL') and not l.endswith("100%\n"):
-                print('Test coverage < 100%')
-                exit(1)
     if run_flake8:
         exit_on_failure(flake8_main(FLAKE8_ARGS))
     if run_functional:
