@@ -12,6 +12,7 @@ from django.db.models import Sum, When, Case, IntegerField
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import ugettext as _
 from django.utils import timezone
+from django.http import HttpResponseRedirect
 
 from accounts.models import User
 import core.views.generic as generic
@@ -706,6 +707,20 @@ class ProjectUnarchive(ProjectEdit,
     permission_required = patch_actions
     permission_denied_message = error_messages.PROJ_UNARCHIVE
     do_archive = False
+
+
+class ProjectDetach(core_mixins.SuperUserCheckMixin, base_generic.View):
+    def get(self, request, *args, **kwargs):
+        if self.is_superuser:
+            ContentObject.objects.filter(
+                resource__project__slug=self.kwargs['project'],
+                resource__spatial_resources__isnull=False
+            ).delete()
+
+        response_url = reverse(
+            'organization:project-dashboard',
+            kwargs=self.kwargs)
+        return HttpResponseRedirect(response_url)
 
 
 class ProjectDataDownload(mixins.ProjectMixin,
